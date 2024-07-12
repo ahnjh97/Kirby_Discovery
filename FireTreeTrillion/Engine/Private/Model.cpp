@@ -290,7 +290,7 @@ HRESULT CModel::Lerp_PartialAnim(_float fTimeDelta)
 	if (pair == m_mapValidBones.end())
 		return E_FAIL;
 
-	m_Animations[m_iCurPartialAnim]->Lerp_TransformMatrix(fTimeDelta, m_Bones, m_fPartialAnimLerpTime, this, pair->second.second); // set 전달
+	m_Animations[m_iCurrentAnimIndex]->Lerp_TransformMatrix(fTimeDelta, m_Bones, this, pair->first, m_fPartialAnimLerpTime, pair->second.second); // set 전달
 
 	for (auto& Idx : pair->second.first) // vector 순회
 		m_Bones[Idx]->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix), false);
@@ -313,11 +313,11 @@ HRESULT CModel::Play_PartialAnimation(_float fTimeDelta)
 	if (true == m_bStop)
 		return S_OK;
 
-	m_Animations[m_iCurPartialAnim]->Invalidate_TransformationMatrix(fTimeDelta, m_Bones, false, this);
-
 	auto& pair = m_mapValidBones.find(m_iCurPartialAnim);
 	if (pair == m_mapValidBones.end())
 		return E_FAIL;
+
+	m_Animations[m_iCurPartialAnim]->Update_TransformationMatrix_ForPartialAnim(fTimeDelta, m_Bones, pair->second.second); // set 전달
 
 	for (auto& Idx : pair->second.first) // vector 순회
 		m_Bones[Idx]->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix), false);

@@ -39,7 +39,7 @@ vector<_uint> CAnimation::Get_ValidBoneIndices()
 	for (auto& channel : m_Channels)
 		if (true == channel->IsValid())
 			vecValidChannelIndices.push_back(channel->Get_ChannelBoneIndex());
-
+			
 	return vecValidChannelIndices;
 }
 
@@ -117,20 +117,39 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 		m_Channels[i]->Invalidate_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
 }
 
-void CAnimation::Lerp_TransformMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _float& fPartialAnimLerpTime, CModel* pModel, unordered_set<_uint>& _setValidBones)
+void CAnimation::Update_TransformationMatrix_ForPartialAnim(_float fTimeDelta, const vector<class CBone*>& Bones, unordered_set<_uint>& _setValidIndices)
+{
+	m_IsFinished = false;
+	m_fTrackPosition += m_fTickPerSecond * fTimeDelta;
+
+	if (m_fDuration <= m_fTrackPosition) {
+		m_IsFinished = true;
+		return;
+	}
+
+	/* 이 뼈의 상태행렬을 만들어서 CBone의 TransformationMatrix를 바꿔라. */
+	for (_uint i = 0; i < m_iNumChannels; ++i) {
+		_uint iChannelBoneIdx = m_Channels[i]->Get_ChannelBoneIndex();
+		if(_setValidIndices.end() != _setValidIndices.find(iChannelBoneIdx))
+			m_Channels[i]->Invalidate_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
+	}
+}
+
+void CAnimation::Lerp_TransformMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, CModel* pModel
+	, _uint iPartialAnimIdx, _float& fPartialAnimLerpTime, unordered_set<_uint>& _setValidIndices)
 {
 	// 재생바를 계속 증가시킨다.
 	fPartialAnimLerpTime += fTimeDelta;
 
 	for (_uint i = 0; i < m_iNumChannels; ++i) { //Channel의 뼈
-
 		_uint iChannelBoneIdx = m_Channels[i]->Get_ChannelBoneIndex();
-		if(_setValidBones.end() != _setValidBones.find(iChannelBoneIdx))
+		if (_setValidIndices.end() != _setValidIndices.find(iChannelBoneIdx))
 			m_Channels[i]->Ratio_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
 	}
 
 	if (fPartialAnimLerpTime > m_fLerpTime)
 	{
+		pModel->Reset_TrackPosition(iPartialAnimIdx);
 		fPartialAnimLerpTime = 0.f;
 		pModel->Set_LerpPartialAnim(false);
 	}

@@ -215,35 +215,36 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		switch (iState)
 		{
 		case CSimba::Simba_DoubleClawChargeStart:
-			pSimba->Change_State(CSimba::Simba_DoubleClawChargeWait, 66.66f, false, true);
+			pSimba->Change_State(CSimba::Simba_DoubleClawChargeWait, 50.f, false, true);
 			break;
 		case CSimba::Simba_DoubleClawChargeWait:
-			pSimba->Change_State(CSimba::Simba_DoubleClawDashStart, 66.66f, false, true);
+			pSimba->Change_State(CSimba::Simba_DoubleClawDashStart, 50.f, false, true);
 			break;
 		case CSimba::Simba_DoubleClawDashStart:
-			pSimba->Change_State(CSimba::Simba_DoubleClawDash, 66.66f, true, true);
+			pSimba->Change_State(CSimba::Simba_DoubleClawDash, 50.f, true, true);
 			break;
 		case CSimba::Simba_DoubleClaw:
-			pSimba->Change_State(CSimba::Simba_DoubleClawEnd, 66.66f, false, true);
+			pSimba->Change_State(CSimba::Simba_DoubleClawEnd, 50.f, false, true);
 			break;
 		case CSimba::Simba_DoubleClawEnd:
 			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 15.f) {
 				pSimba->Set_PreState(iState);
 				pSimba->Change_State(CSimba::Simba_JumpStart, 50.f, false, true);
 			}
-			else 
+			else
+				; // 점프공격
 				break;
 		}
 	}
 
 	if (CSimba::Simba_DoubleClawDash == iState)
 	{
-		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 0.6f);
-		_vector vLook = m_pTransform->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 6.5f;
+		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 0.8f);
+		_vector vLook = m_pTransform->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 10.f;
 		m_pController->Move_Dir(m_pTransform, vLook, fTimeDelta, s_fOffsetY);
 
 		_float fDis = m_pGameInstance->Compute_Distance(m_pKirby, pGameObject);
-		if (fDis < 7.5f)
+		if (fDis < 8.5f)
 			pSimba->Change_State(CSimba::Simba_DoubleClaw, 66.66f, false, true);
 	}
 }
@@ -294,9 +295,9 @@ void CSimba_Jump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 				if (CSimba::Simba_QuickClawEndL == iPreState || CSimba::Simba_QuickClawEndR == iPreState)
 					pSimba->Change_State(CSimba::Simba_FinalCrusherStart, 66.66f, false, true);
 				else if (CSimba::Simba_FinalCrusherEnd == iPreState)
-					pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 66.66f, false, true); 
+					pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 50.f, false, true);
 				else if (CSimba::Simba_DoubleClawEnd == iPreState)
-					; // 점프공격
+					pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 50.f, false, true); ; // 점프공격
 			}	
 		}
 	}

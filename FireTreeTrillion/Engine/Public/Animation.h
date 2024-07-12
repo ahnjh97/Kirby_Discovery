@@ -56,7 +56,9 @@ public:
 public:
 	HRESULT		Initialize(const vector<class CBone*>& Bones, ifstream& fileStream);
 	void		Invalidate_TransformationMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _bool bIsLooping, class CModel* model);
-	void		Lerp_TransformMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, _float& fPartialAnimLerpTime, CModel* pModel, unordered_set<_uint>& _setValidBones);
+	void		Update_TransformationMatrix_ForPartialAnim(_float fTimeDelta, const vector<class CBone*>& Bones, unordered_set<_uint>& _setValidIndices);
+	void		Lerp_TransformMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, CModel* pModel
+					, _uint iPartialAnimIdx, _float& fPartialAnimLerpTime, unordered_set<_uint>& _setValidIndices);
 	void		Read_AnimationData(ifstream& fileStream);
 
 private:

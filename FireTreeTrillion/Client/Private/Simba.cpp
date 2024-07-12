@@ -128,18 +128,21 @@ _int CSimba::Tick(_float fTimeDelta)
 	__super::Tick(m_fTimeDelta);
 
 	if (true == m_pModelCom->IsFinished(Simba_DamageFaceSub)) {
+		if(true == m_bPlayDamageFaceSub)
+			m_pModelCom->Set_LerpPartialAnim(true);
 		m_bPlayDamageFaceSub = false;
-		m_pModelCom->Set_LerpPartialAnim(true);
 	}
 		
 	if (true == m_pModelCom->IsFinished(Simba_LipSyncSub)) {
+		if (true == m_bPlayLipSyncSub)
+			m_pModelCom->Set_LerpPartialAnim(true);
 		m_bPlayLipSyncSub = false;
-		m_pModelCom->Set_LerpPartialAnim(true);
 	}
 		
 	if (true == m_pModelCom->IsFinished(Simba_LipSyncSubA)) {
+		if (true == m_bPlayLipSyncSubA)
+			m_pModelCom->Set_LerpPartialAnim(true);
 		m_bPlayLipSyncSubA = false;
-		m_pModelCom->Set_LerpPartialAnim(true);
 	}
 		
 	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
@@ -160,11 +163,11 @@ _int CSimba::Tick(_float fTimeDelta)
 		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD3, KEY_DOWN))
 			Activate_Attack(ATTACK3);
 		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD7, KEY_DOWN)) {
-			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSub, 66.66f, false, true);
+			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSub, 66.66f, false, false);
 			m_bPlayLipSyncSub = true;
 		}
 		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD8, KEY_DOWN)) {
-			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSubA, 66.66f, false, true);
+			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSubA, 66.66f, false, false);
 			m_bPlayLipSyncSubA = true;
 		}
 	}
@@ -177,17 +180,18 @@ _int CSimba::Tick(_float fTimeDelta)
 void CSimba::Late_Tick(_float fTimeDelta)
 {
 	_bool bIsFinished = m_pModelCom->IsFinished();
-
 	m_pModelCom->Play_Animation(m_fTimeDelta);
 
-	if (false == bIsFinished)
-	{
-		if (true == m_bPlayDamageFaceSub || true == m_bPlayLipSyncSub || true == m_bPlayLipSyncSubA)
-			m_pModelCom->Play_PartialAnimation(m_fTimeDelta);
-	}
-
 	/*if (true == m_pModelCom->Get_LerpPartialAnim())
-		m_pModelCom->Lerp_PartialAnim(m_fTimeDelta);*/
+		m_pModelCom->Lerp_PartialAnim(m_fTimeDelta);
+	else
+	{	*/
+		if (false == bIsFinished)
+		{
+			if (true == m_bPlayDamageFaceSub || true == m_bPlayLipSyncSub || true == m_bPlayLipSyncSubA)
+				m_pModelCom->Play_PartialAnimation(m_fTimeDelta);
+		}
+	//}
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
@@ -305,7 +309,7 @@ void CSimba::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 	if (true == m_bPlayDamageFaceSub)
 		return;
 
-	m_pModelCom->Reset_PartialAnimation(Simba_DamageFaceSub, 66.66f, false, true);
+	m_pModelCom->Reset_PartialAnimation(Simba_DamageFaceSub, 50.f, false, false);
 	m_bPlayDamageFaceSub = true;
 }
 
@@ -502,7 +506,7 @@ void CSimba::OnWave1Dead(CGameObject* pObj)
 
 void CSimba::OnWave2Dead(CGameObject* pObj)
 {
-	Change_State(Simba_DemoAppear2Cut1, 66.66f, false, true);
+	Change_State(Simba_DemoAppear2Cut1, 66.66f, false, false);
 	TransformToDefault();
 }
 
