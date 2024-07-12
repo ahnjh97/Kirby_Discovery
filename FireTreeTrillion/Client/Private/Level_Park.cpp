@@ -17,7 +17,7 @@
 #include "BG.h"
 #include "HUD.h"
 #include "SkySphere.h"
-//#include "Kirby.h"
+#include "TransingStar.h"
 
 CLevel_Park::CLevel_Park(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -76,18 +76,19 @@ HRESULT CLevel_Park::Initialize()
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet_ByIndex(6);
 
-
-	// 해당 위치의 행렬을 넘긴다.
-	//surprisedDesc.matWorld = transformationMatrix;
-	//surprisedDesc.eColor = CSurprisedBoard::RED;
-	//surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
-	//surprisedDesc.vPosition = _float3(32.f, 5.1f, -92.f);//21.39f, 5.08f, -87.56f);
-	//hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
-	//CHECK_FAILED(hr);
-
-
+	// 레벨전환 트리거
+	function<void(_int)> func = bind(&CLevel_Park::Teleport_Player, this);
+	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_STAR, func);
 
 	return S_OK;
+}
+
+void CLevel_Park::Teleport_Player()
+{
+	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
+	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
+	pTransingStar->Set_NextLevel(LEVEL_END);
+	pTransingStar->Activate(CTransingStar::CLOSE);
 }
 
 void CLevel_Park::Tick(_float fTimeDelta)

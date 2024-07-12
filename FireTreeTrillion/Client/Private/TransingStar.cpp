@@ -101,7 +101,6 @@ HRESULT CTransingStar::Render()
     hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
     CHECK_FAILED(hr);
 
-    // g_vSmallStarColor && g_vLargeStarColor
     m_pShaderCom->Bind_RawValue("g_vSmallStarColor", &m_vSmallColor, sizeof(_float3));
     m_pShaderCom->Bind_RawValue("g_vLargeStarColor", &m_vLargeColor, sizeof(_float3));
 
@@ -122,6 +121,9 @@ void CTransingStar::Render_IMGUI()
 /// <summary> 텍스쳐들의 위치를 초기화 시킨다. </summary>
 void CTransingStar::Activate(TYPE _eActivateType)
 {
+    if (_eActivateType == OPEN && m_eActivateType != CLOSE)
+        return;
+    
     // 활성화 시키는 부울값 ON
     m_eActivateType = _eActivateType;
 
@@ -141,14 +143,17 @@ void CTransingStar::Activate(TYPE _eActivateType)
                                 0.f, 1.f);
 
     fill(m_arrayStarMatrix.begin(), m_arrayStarMatrix.end(), _float4x4());
-    if(_eActivateType == OPEN)
-        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
-    
     for (_int i = 0; i < 3; ++i)
     {
         _float4 vFinalPoswithZ = _float4(vFinalPos.x, vFinalPos.y, vFinalPos.z + i * 0.1f, 1.f);
         CUtils::Set_State_Matrix(m_arrayStarMatrix[i], CUtils::STATE_POSITION, vFinalPoswithZ);
         CUtils::Rotation(m_arrayStarMatrix[i], _float4(0.f, 0.f, 1.f, 0.f), 0.f);
+    }
+
+    if (_eActivateType == OPEN)
+    {
+        CUtils::Set_State_Matrix(m_arrayStarMatrix[2], CUtils::STATE_POSITION, _float4(0.f, 0.f, 0.2f, 1.f));
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
     }
 }
 
