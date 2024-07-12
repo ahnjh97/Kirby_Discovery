@@ -100,8 +100,12 @@ HRESULT CBasicMap::Initialize(void* pArg)
     }
     else
     {
-        //if ( == wstrModelTag) //맵 이름이 모시깽이면 
-        //    return S_OK;
+        //해당 BasicMap들은 Deco 한번만 생성하게 처리
+        if (TEXT("Land_PkFunHouseDarkness") == wstrModelTag || TEXT("Gimmick_PkFunHouseDarkness01") == wstrModelTag
+            || TEXT("Gimmick_PkFunHouseDarkness02") == wstrModelTag || TEXT("Gimmick_PkFunHouseDarkness03") == wstrModelTag
+            || TEXT("Gimmick_PkFunHouseDarkness04") == wstrModelTag || TEXT("Gimmick_PkFunHouseDarkness05") == wstrModelTag
+            || TEXT("Gimmick_PkFunHouse06") == wstrModelTag || TEXT("Gimmick_PkFunHouse07") == wstrModelTag)
+            return S_OK;
 
         if (LEVEL_TOOL_MAP != *m_pCurrentLevelID)
         {

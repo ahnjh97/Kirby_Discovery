@@ -37,6 +37,9 @@ HRESULT CTransingStar::Initialize(void* pArg)
     XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
     XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
    
+    m_vSmallColor = _float3(160.f / 255.f, 212.f / 255.f, 104.f / 255.f);
+    m_vLargeColor = _float3(91.f / 255.f,  121.f / 255.f, 59.f / 255.f);
+
     return S_OK;
 }
 
@@ -97,6 +100,10 @@ HRESULT CTransingStar::Render()
     CHECK_FAILED(hr);
     hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
     CHECK_FAILED(hr);
+
+    // g_vSmallStarColor && g_vLargeStarColor
+    m_pShaderCom->Bind_RawValue("g_vSmallStarColor", &m_vSmallColor, sizeof(_float3));
+    m_pShaderCom->Bind_RawValue("g_vLargeStarColor", &m_vLargeColor, sizeof(_float3));
 
     if (m_eActivateType == CLOSE)
         RenderClose();
@@ -234,7 +241,7 @@ void CTransingStar::RenderClose()
         CHECK_FAILED(hr);
 
         // 실질적 render
-        hr = m_pShaderCom->Begin(17);
+        hr = m_pShaderCom->Begin(POSTEX_FOCUSINGPOSITION);
         CHECK_FAILED(hr);
         hr = m_pVIBufferCom->Bind_Buffers();
         CHECK_FAILED(hr);
@@ -283,7 +290,7 @@ void CTransingStar::RenderOpen()
         CHECK_FAILED(hr);
 
         // 실질적 render
-        hr = m_pShaderCom->Begin(17);
+        hr = m_pShaderCom->Begin(POSTEX_FOCUSINGPOSITION);
         CHECK_FAILED(hr);
         hr = m_pVIBufferCom->Bind_Buffers();
         CHECK_FAILED(hr);

@@ -24,8 +24,11 @@ float g_fMaskRatio = { 1.f };
 
 float g_fAlarmColor = { 0.f };
 
-int g_iFade = 0;
-float g_fFadeRatio = { 1.f };
+int     g_iFade = 0;
+float   g_fFadeRatio = { 1.f };
+
+float3  g_vSmallStarColor = { 1.f, 1.f, 1.f };
+float3  g_vLargeStarColor = { 1.f, 1.f, 1.f };
 
 // 회전된 UV를 계산
 float2 RotateUV(float2 vCoord, float fAngle)
@@ -158,21 +161,6 @@ PS_OUT PS_MAIN_SOLIDALPHABLEND(PS_IN_ALPHABLEND In)
 	PS_OUT			Out = (PS_OUT)0;
     vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    
-    //if(g_iMasking == 2)
-    //{
-    //    if (Out.vColor.a < 0.1f)
-    //        discard;
-
-    //    if( g_fMaskRatio < vMask.r )
-    //         discard;
-    //}
-    //else
-    //{
-    //    //알파 값 예외처리
-    //    if (Out.vColor.a < 0.1f)
-    //        discard;
-    //}
 
     Out.vColor.rgb = g_vRColor;
     Out.vColor.a *= g_fAlpha;
@@ -496,31 +484,31 @@ PS_OUT PS_FOCUSING_UI(PS_IN_ALPHABLEND In)
     {
         case 0: // 첫 번째 포커싱 별
         {
-            if (vDiffuse.r >= .6f) // 1은 하양
-                Out.vColor.a = 0.f;
-            else
-                discard;
-        }
-        break;
+                if (vDiffuse.r >= .6f) // 1은 하양
+                    Out.vColor.a = 0.f;
+                else
+                    discard;
+            }
+            break;
         case 1: // 연두
         {
-            if (vDiffuse.r >= .9f) // 하양별부분 연두
-            {
-                Out.vColor.r = 160.f / 255.f;
-                Out.vColor.g = 212.f / 255.f;
-                Out.vColor.b = 104.f / 255.f;
+                if (vDiffuse.r >= .9f) // 하양별부분 연두
+                {
+                    Out.vColor.r = g_vSmallStarColor.x;
+                    Out.vColor.g = g_vSmallStarColor.y;
+                    Out.vColor.b = g_vSmallStarColor.z;
+                }
+                else
+                    discard;
             }
-            else // 검정배경부분 찐연두
-                discard;
-        }
-        break;
+            break;
         case 2: // 찐연두
         {
-            Out.vColor.r = 91.f / 255.f;
-            Out.vColor.g = 121.f / 255.f;
-            Out.vColor.b = 59.f / 255.f;
-        }
-        break;
+                Out.vColor.r = g_vLargeStarColor.x;
+                Out.vColor.g = g_vLargeStarColor.y;
+                Out.vColor.b = g_vLargeStarColor.z;
+            }
+            break;
     }
     
     return Out;

@@ -47,6 +47,9 @@ public:
 
 	void						Change_Level(LEVEL eLevel);
 
+	void						Set_SmallColor(_float3 vSmallColor) { m_vSmallColor = vSmallColor; }
+	void						Set_LargeColor(_float3 vLargeColor) { m_vLargeColor = vLargeColor; }
+
 private:
 	HRESULT						Add_Components();
 
@@ -76,6 +79,9 @@ private:
 
 	_float						m_fTimeDelta = _float();
 
+	// COLOR
+	_float3						m_vSmallColor = _float3(1.f, 1.f, 1.f);
+	_float3						m_vLargeColor = _float3(1.f, 1.f, 1.f);
 
 public:
 	static CTransingStar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

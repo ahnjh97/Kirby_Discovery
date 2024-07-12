@@ -122,13 +122,18 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 #pragma region BASIC MAP
 
 	m_vecMapModelNames = { "Level0Stage1Step01", "Level0Stage1Step02",  "Level1Stage1Step01", "DeeDeeDeeMap", "Town", "TownShop"
+
+#pragma region LEVEL_PARK (WONDARIA REMAINS) OBJECT
 		, "PkFunHouse"
+		, "Land_PkFunHouseDarkness", "Gimmick_PkFunHouseDarkness01", "Gimmick_PkFunHouseDarkness02", "Gimmick_PkFunHouseDarkness03"
+		, "Gimmick_PkFunHouseDarkness04", "Gimmick_PkFunHouseDarkness05", "Gimmick_PkFunHouse06", "Gimmick_PkFunHouse07"
+#pragma endregion
+
 		, "Land_VcLabo"
 		, "Land_LbLastBossBeforeStep" //,"LevelFinale_LbLastBuilding" :: 텍스처 및 모델 수정으로 사용안함
 		, "Land_LbLastBossStage"
 		, "LbBossLoom01L" // 심바
-		//피날레
-		, "FinaleCave"
+		, "FinaleCave" //피날레
 	};
 
 #pragma endregion

@@ -108,11 +108,10 @@ HRESULT CHUD_AbilityDiscard::Render()
 		return E_FAIL;
 
 	PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
-
 	for (_uint iTexIndex = 0; iTexIndex < TEXDC_NONE; ++iTexIndex)
 	{
 		if (TEXDC_GAUGE == iTexIndex)
-			ePassType = POSTEX_BOSS_BARPASS_DEFAULT;
+			ePassType = POSTEX_BOSS_BARPASS_DEFAULT;  
 
 		if (TEXDC_BTN == iTexIndex)
 			ePassType = POSTEX_UIWHITEALPHA;
