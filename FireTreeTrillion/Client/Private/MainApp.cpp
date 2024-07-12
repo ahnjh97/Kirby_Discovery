@@ -207,9 +207,6 @@ HRESULT CMainApp::Ready_Object_For_Static()
 {
 	HRESULT hr(S_OK);
 
-	//hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
-	//CHECK_FAILED(hr);
-
 	return S_OK;
 }
 

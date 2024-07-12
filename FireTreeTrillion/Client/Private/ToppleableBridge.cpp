@@ -58,22 +58,31 @@ HRESULT CToppleableBridge::Initialize(void* pArg)
 	m_bMotionBlur = false;
 	m_wstrModelName = Desc->wstrModelName;
 
-	if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
-		return E_FAIL;
-	//if (TEXT("BoardA") == m_wstrModelName || TEXT("BoardB") == m_wstrModelName) {
-	//	
-	//}
-	//else if (TEXT("BoardC") == m_wstrModelName) {
-	//	unordered_set<string> setIncludeMesh = { "FakeCollider" };
-	//	if (FAILED(m_pModelCom->CreateStaticActors_Include(setIncludeMesh, m_pTransformCom->Get_WorldFloat4x4())))
-	//		return E_FAIL;
-	//}
-
-	vector<PxRigidActor*> vecActors = m_pModelCom->Get_Actors();
-
 	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
-	for (auto& actor : vecActors)
-		pKirby->RegisterActorsToPlayer(actor, this);
+
+	if (TEXT("BoardA") == Desc->wstrModelName || TEXT("BoardB") == Desc->wstrModelName) 
+	{
+		m_pStaticActor = m_pModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
+		pKirby->RegisterActorToPlayer(m_pStaticActor, this);
+	}
+	else if (TEXT("BoardC") == Desc->wstrModelName)
+	{
+		_uint iFakeColliderIdx = m_pModelCom->Find_MeshIndex("FakeCollider");
+		unordered_set<_uint> setFakeMeshes = { iFakeColliderIdx };
+		unordered_set<_uint> setRealMeshes;
+		
+		for (_uint i = 0; i < m_pModelCom->Get_NumMeshes(); i++)
+		{
+			if (i != iFakeColliderIdx)
+				setRealMeshes.insert(i);
+		}
+		
+		_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
+
+		m_pStaticActor = m_pModelCom->ReturnStaticActor_FilterByIndex(matWorld, setFakeMeshes, false);
+		m_pFakeWall = m_pModelCom->ReturnStaticActor_FilterByIndex(matWorld, setFakeMeshes, true);
+		pKirby->RegisterActorToPlayer(m_pFakeWall, this);
+	}
 
 	GAMEOBJECT_DESC tDesc{};
 	tDesc.wstrModelName = Desc->wstrModelName + TEXT("_Anim");
@@ -111,21 +120,15 @@ void CToppleableBridge::Late_Tick(_float fTimeDelta)
 
 	if (TEXT("BoardA") == m_wstrModelName || TEXT("BoardB") == m_wstrModelName) {
 		if (m_fHitTime >= 0.75f && m_bActorCreated == false) {
-			m_pModelCom->DisableActors();
-
-			if (FAILED(m_pModelCom->CreateStaticActor(m_pTransformCom->Get_WorldFloat4x4())))
-				return;
+			m_pGameInstance->DisableActor(m_pStaticActor); 
+			m_pStaticActor = m_pModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
 			m_bActorCreated = true;
 		}
 	}
 
 	if (TEXT("BoardC") == m_wstrModelName) {
 		if (m_fHitTime >= 2.f && m_bActorCreated == false) {
-			unordered_set<string> setExcludeMesh = { "FakeCollider" };
-			m_pModelCom->DisableActors(setExcludeMesh);
-			
-			//if (FAILED(m_pModelCom->CreateStaticActors_Exclude(setExcludeMesh, m_pTransformCom->Get_WorldFloat4x4())))
-			//	return;
+			m_pGameInstance->DisableActor(m_pFakeWall);
 			m_bActorCreated = true;
 		}
 	}
@@ -272,6 +275,9 @@ CGameObject* CToppleableBridge::Clone(void* pArg)
 void CToppleableBridge::Free()
 {
 	__super::Free();
+
+	m_pGameInstance->ReleaseActor(m_pStaticActor);
+	m_pGameInstance->ReleaseActor(m_pFakeWall);
 
 	Safe_Release(m_pAnimBridge);
 	Safe_Release(m_pModelCom);

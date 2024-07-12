@@ -38,6 +38,8 @@ private:
 	CModel*			m_pModelCom = { nullptr };
 	CShader*		m_pShaderCom = { nullptr };
 	CGameObject*	m_pAnimBridge = { nullptr };
+	PxRigidStatic*	m_pStaticActor = { nullptr };
+	PxRigidStatic*	m_pFakeWall = { nullptr };
 
 	wstring			m_wstrModelName;
 

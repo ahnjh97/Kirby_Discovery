@@ -37,6 +37,9 @@ HRESULT CTransingStar::Initialize(void* pArg)
     XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
     XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
    
+    m_vSmallColor = _float3(160.f / 255.f, 212.f / 255.f, 104.f / 255.f);
+    m_vLargeColor = _float3(91.f / 255.f,  121.f / 255.f, 59.f / 255.f);
+
     return S_OK;
 }
 
@@ -98,6 +101,9 @@ HRESULT CTransingStar::Render()
     hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
     CHECK_FAILED(hr);
 
+    m_pShaderCom->Bind_RawValue("g_vSmallStarColor", &m_vSmallColor, sizeof(_float3));
+    m_pShaderCom->Bind_RawValue("g_vLargeStarColor", &m_vLargeColor, sizeof(_float3));
+
     if (m_eActivateType == CLOSE)
         RenderClose();
     else if (m_eActivateType == OPEN)
@@ -115,6 +121,9 @@ void CTransingStar::Render_IMGUI()
 /// <summary> 텍스쳐들의 위치를 초기화 시킨다. </summary>
 void CTransingStar::Activate(TYPE _eActivateType)
 {
+    if (_eActivateType == OPEN && m_eActivateType != CLOSE)
+        return;
+    
     // 활성화 시키는 부울값 ON
     m_eActivateType = _eActivateType;
 
@@ -134,14 +143,17 @@ void CTransingStar::Activate(TYPE _eActivateType)
                                 0.f, 1.f);
 
     fill(m_arrayStarMatrix.begin(), m_arrayStarMatrix.end(), _float4x4());
-    if(_eActivateType == OPEN)
-        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
-    
     for (_int i = 0; i < 3; ++i)
     {
         _float4 vFinalPoswithZ = _float4(vFinalPos.x, vFinalPos.y, vFinalPos.z + i * 0.1f, 1.f);
         CUtils::Set_State_Matrix(m_arrayStarMatrix[i], CUtils::STATE_POSITION, vFinalPoswithZ);
         CUtils::Rotation(m_arrayStarMatrix[i], _float4(0.f, 0.f, 1.f, 0.f), 0.f);
+    }
+
+    if (_eActivateType == OPEN)
+    {
+        CUtils::Set_State_Matrix(m_arrayStarMatrix[2], CUtils::STATE_POSITION, _float4(0.f, 0.f, 0.2f, 1.f));
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
     }
 }
 
@@ -234,7 +246,7 @@ void CTransingStar::RenderClose()
         CHECK_FAILED(hr);
 
         // 실질적 render
-        hr = m_pShaderCom->Begin(17);
+        hr = m_pShaderCom->Begin(POSTEX_FOCUSINGPOSITION);
         CHECK_FAILED(hr);
         hr = m_pVIBufferCom->Bind_Buffers();
         CHECK_FAILED(hr);
@@ -283,7 +295,7 @@ void CTransingStar::RenderOpen()
         CHECK_FAILED(hr);
 
         // 실질적 render
-        hr = m_pShaderCom->Begin(17);
+        hr = m_pShaderCom->Begin(POSTEX_FOCUSINGPOSITION);
         CHECK_FAILED(hr);
         hr = m_pVIBufferCom->Bind_Buffers();
         CHECK_FAILED(hr);

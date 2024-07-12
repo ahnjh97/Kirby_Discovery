@@ -197,6 +197,7 @@
     <ClInclude Include="..\Public\Bomber_State.h" />
     <ClInclude Include="..\Public\BombOrbit.h" />
     <ClInclude Include="..\Public\BombOrbitGlow.h" />
+    <ClInclude Include="..\Public\BossChimera.h" />
     <ClInclude Include="..\Public\BossClone.h" />
     <ClInclude Include="..\Public\BreakableBlock.h" />
     <ClInclude Include="..\Public\BreakableRock.h" />
@@ -433,6 +434,7 @@
     <ClCompile Include="..\Private\Bomber_State.cpp" />
     <ClCompile Include="..\Private\BombOrbit.cpp" />
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
+    <ClCompile Include="..\Private\BossChimera.cpp" />
     <ClCompile Include="..\Private\BossClone.cpp" />
     <ClCompile Include="..\Private\Box.cpp" />
     <ClCompile Include="..\Private\BreakableBlock.cpp" />

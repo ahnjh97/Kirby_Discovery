@@ -101,7 +101,6 @@
 #include "DeeDeeDee.h"
 #include "DeeDeeDeeHammer.h"
 
-
 //와들디
 #include "Dee_Part.h"
 #include "OriginalDee.h"
@@ -162,9 +161,17 @@
 #include "FinalePartical_Maker.h"
 #include "FinaleCut_ControlCenter.h"
 
-//기믹
+#pragma region LEVEL_FINALBOSS (LAB_DISCOVERA)
+//BOSS
+#include "BossChimera.h"
+
+//GIMMICK
 #include "Gm_LabAntenna.h"
 #include "Gm_LabBossRoomDoor.h"
+
+#pragma endregion
+
+//기믹
 #include "Gm_ParkFhEntranceAlien.h"
 #include "Gm_ParkSolarPanelCharge.h"
 #include "Gm_ParkSolarPanelOnce.h"
@@ -488,8 +495,12 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Box"), CBox);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Debris"), CDebris);
 
-	#pragma region GIMMICK::LEVEL_FINALBOSS
+	#pragma region LEVEL_FINALBOSS :: LAB_DISCOVERA
 
+	//BOSS
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossChimera"), CBossChimera);
+
+	//GIMMICK
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_LabAntenna"), CGm_LabAntenna);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_LabBossRoomDoor"), CGm_LabBossRoomDoor);
 
@@ -502,7 +513,6 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkSolarPanelOnce"), CGm_ParkSolarPanelOnce);
 
 	#pragma endregion
-
 
 	// 미니게임 in 와들디마을
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimeFood"), CPartTimeFood);
@@ -1640,8 +1650,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("PopStar_StarRiver", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("PopStar_StarSmall", TYPE_NONANIM);
 
-
-
+		//워프 스타
+		//m_vecModelInfo.emplace_back("WarpStar_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		//m_vecModelInfo.emplace_back("WarpStar_Anim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 	}
 	else if (eLevel == LEVEL_LOGO)
 	{
@@ -1913,6 +1924,16 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Map
 		m_vecModelInfo.emplace_back("PkFunHouse", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
+		//전구하우스 BulbZone
+		m_vecModelInfo.emplace_back("Land_PkFunHouseDarkness", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouseDarkness01", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouseDarkness02", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouseDarkness03", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouseDarkness04", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouseDarkness05", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse06", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse07", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
 		//기믹 오브젝트
 		m_vecModelInfo.emplace_back("FhEntranceAlien_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("FhEntranceAlien_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
@@ -1923,7 +1944,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SolarPanelOnce_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SolarPanelOnce_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
-		m_vecModelInfo.emplace_back("WarpStar_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		// For Kirby Body
 		Load_KirbyBodyModels();
@@ -1940,9 +1960,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SpookStep", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("GhostGordo", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("Bomber", TYPE_ANIM, 1.f, 180.f);
+
 		m_vecModelInfo.emplace_back("SurprisedBoardBlue", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("NonAnim_SurprisedBoardBlue",	TYPE_NONANIM, 1.f, 0.f, 0, string("Monsters/"));
 		m_vecModelInfo.emplace_back("SurprisedBoardGreen", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("NonAnim_SurprisedBoardGreen",	TYPE_NONANIM, 1.f, 0.f, 0, string("Monsters/"));
 		m_vecModelInfo.emplace_back("SurprisedBoardRed", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("NonAnim_SurprisedBoardRed",	TYPE_NONANIM, 1.f, 0.f, 0, string("Monsters/"));
 
 		// Gimmick
 		m_vecModelInfo.emplace_back("Crumble", TYPE_ANIM);
@@ -2014,6 +2038,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		Load_ItemModels();
 		Load_KickableModels();
+
+		// 액체괴물 :: Fecto_Forgo
+		//m_vecModelInfo.emplace_back("", TYPE_ANIM, 1.f, 180.f);
 
 		// For Boss 
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
