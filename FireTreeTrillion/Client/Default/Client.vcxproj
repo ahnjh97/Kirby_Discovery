@@ -224,6 +224,7 @@
     <ClInclude Include="..\Public\Crumble.h" />
     <ClInclude Include="..\Public\Debris.h" />
     <ClInclude Include="..\public\DecoObject.h" />
+    <ClInclude Include="..\public\Finale_SpecialDebris.h" />
     <ClInclude Include="..\Public\GhostGordo.h" />
     <ClInclude Include="..\Public\GhostGordo_State.h" />
     <ClInclude Include="..\Public\Deform.h" />
@@ -461,6 +462,7 @@
     <ClCompile Include="..\Private\Crumble.cpp" />
     <ClCompile Include="..\Private\Debris.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
+    <ClCompile Include="..\private\Finale_SpecialDebris.cpp" />
     <ClCompile Include="..\Private\GhostGordo.cpp" />
     <ClCompile Include="..\Private\GhostGordo_State.cpp" />
     <ClCompile Include="..\Private\Deform.cpp" />
