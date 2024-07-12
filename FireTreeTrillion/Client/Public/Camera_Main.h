@@ -198,6 +198,11 @@ private:
 	_int				m_iMatrixIndex = { -1 };
 
 
+	list<_float>		m_FinaleSeqATime;
+	list<_float>		m_FinaleSeqBTime;
+	list<_float>		m_FinaleSeqCTime;
+	list<_float>		m_FinaleSeqDTime;
+
 	_float3 m_vCurKirbyTriggerLocalPos = { 0.f, 0.f, 0.f };
 	vector<pair<_vector, _float>>	m_vecFrontDirRadius;
 	vector<pair<_vector, _float>>	m_vecRearDirRadius;
@@ -344,8 +349,12 @@ private:
 
 	void System_Tick(_float fTimeDelta);
 	void Check_FinaleScene(_float fTimeDelta);
-	//void Orbit_Target(_float fTimeDelta);
 
+	void Fill_HardCutSet(CAMACTION& Action, _float fTime);
+	void Fill_InterpolateCutSet(CAMACTION& Action, _float fTime, EASING eEase, _float fInterpolateSpeed);
+
+	void Fill_ActionPos(CAMACTION& Action, CAMPOS eCamPos, _float3 vPos);
+	void Fill_ActionDir(CAMACTION& Action, CAMDIR eCamDir, _float3 vDir);
 
 public:
 	static CCamera_Main* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
