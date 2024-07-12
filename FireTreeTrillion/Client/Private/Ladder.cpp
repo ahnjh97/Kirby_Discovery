@@ -39,6 +39,8 @@ HRESULT CLadder::Initialize(void* pArg)
 	_float3 fScale = m_pTransformCom->Get_Scaled();
 	m_fHeight *= fScale.y;
 
+	m_pStaticActor = m_pModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
+
 	return S_OK;
 }
 
@@ -203,6 +205,9 @@ CGameObject* CLadder::Clone(void* pArg)
 void CLadder::Free()
 {
 	__super::Free();
+
+	m_pGameInstance->ReleaseActor(m_pStaticActor);
+
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 

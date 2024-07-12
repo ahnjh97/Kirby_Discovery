@@ -172,7 +172,7 @@ void CCharacterController::MoveUpAndDown(CTransform* pTransform, _fvector vPosit
 
 // 현재 위치에서 순수 델타량만큼의 변화량을 더해주며 이동시키는 함수
 // 예) 룩방향으로의 이동
-void CCharacterController::Move_Dir(CTransform* pTransform, _fvector fDelta, _float fTimeDelta)
+void CCharacterController::Move_Dir(CTransform* pTransform, _fvector fDelta, _float fTimeDelta, _float fOffsetY)
 {
 	PxVec3 movement(0.f);
 	movement += CUtils::To_PxVec3(fDelta);
@@ -188,7 +188,7 @@ void CCharacterController::Move_Dir(CTransform* pTransform, _fvector fDelta, _fl
 		PxExtendedVec3 pxPos = m_pController->getPosition();
 		PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
-		_vector xmPos = XMVectorSet(pos.x, pos.y - m_fHeightOffset, pos.z, 0.f);
+		_vector xmPos = XMVectorSet(pos.x, pos.y - (m_fHeightOffset + fOffsetY), pos.z, 0.f);
 
 		pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));
 	}

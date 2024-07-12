@@ -14,45 +14,45 @@ class CSimba final : public CMonster
 {
 public:
 	enum SIMBA_ANIM {
-		SIMBA_ATTACKJUMP, SIMBA_ATTACKJUMPEND, SIMBA_ATTACKJUMPHIT, SIMBA_ATTACKJUMPPRE, SIMBA_ATTACKJUMPSTART, SIMBA_ATTACKJUMPWAIT,
-		SIMBA_BACKSTEP, SIMBA_BACKSTEPEND, SIMBA_BACKSTEPLANDING, SIMBA_BACKSTEPSTART,
-		SIMBA_BITERUSH, SIMBA_BITERUSHEND, SIMBA_BITEFALLL, SIMBA_BITEFALLR,
-		SIMBA_BITERUSHJUMPL, SIMBA_BITERUSHJUMPR, SIMBA_BITERUSHJUMPSTARTL, SIMBA_BITERUSHJUMPSTARTR,
-		SIMBA_BITERUSHLANDINGL, SIMBA_BITERUSHLANDINGR, SIMBA_BITERUSHSTART, SIMBA_BITERUSHSTARTSTRAIGHT,
-		SIMBA_BITERUSHTIREDATTACKSTART, SIMBA_BITERUSHTIREDATTACKSTARTSTRAIGHT, 
-		SIMBA_BITERUSHTIREDEND, SIMBA_BITERUSHTIREDSTART, SIMBA_BITERUSHTIREDWAIT,
-		SIMBA_COMMAND, 
-		SIMBA_DAMAGE, SIMBA_DAMAGEFACESUB,
-		SIMBA_DEATH,
-		SIMBA_DEMOAPPEAR1CUT10, SIMBA_DEMOAPPEAR1CUT10WAIT, 
-		SIMBA_DEMOAPPEAR1CUT2, SIMBA_DEMOAPPEAR1CUT2WAIT,
-		SIMBA_DEMOAPPEAR1CUT3, SIMBA_DEMOAPPEAR1CUT3WAIT, 
-		SIMBA_DEMOAPPEAR1CUT4, SIMBA_DEMOAPPEAR1CUT4WAIT,
-		SIMBA_DEMOAPPEAR1CUT6, SIMBA_DEMOAPPEAR1CUT6WAIT, 
-		SIMBA_DEMOAPPEAR1CUT9, SIMBA_DEMOAPPEAR1CUT9WAIT,
-		SIMBA_DEMOAPPEAR2CUT1, SIMBA_DEMOAPPEAR2CUT2,
-		SIMBA_DEMODEADCUT1, SIMBA_DEMODEADCUT2,
-		SIMBA_DEMOEXAPPEARCUT1, SIMBA_DEMOEXAPPEARCUT2, SIMBA_DEMOEXAPPEARCUT3, SIMBA_DEMOEXAPPEARCUT4, SIMBA_DEMOEXAPPEARCUT5, 
-		SIMBA_DEMOEXAPPEARCUT6, SIMBA_DEMOEXAPPEARCUT6MULTI, SIMBA_DEMOEXAPPEARCUT7, SIMBA_DEMOEXAPPEARCUTPREWAIT,
-		SIMBA_DEMOMORPHOKNIGHTAPPPEARCUT1, SIMBA_DEMOMORPHOKNIGHTAPPPEARCUT2, SIMBA_DEMOMORPHOKNIGHTAPPPEARCUT3, SIMBA_DEMOMORPHOKNIGHTAPPPEARCUT4, SIMBA_DEMOMORPHOKNIGHTAPPPEARCUT5,
-		SIMBA_DEMOSOULAPPEARCUT1, SIMBA_DIMENSIONCLAW, SIMBA_DIMENSIONCLAWCONTINUE, SIMBA_DIMENSIONCLAWEND, SIMBA_DIMENSIONCLAWSTART, SIMBA_DIMENSIONCLAWSTARTCONTINUE, SIMBA_DIMENSIONCLAWWAIT,
-		SIMBA_DIMENSIONLASER, SIMBA_DIMENSIONLASEREND, SIMBA_DIMENSIONLASERSTART, SIMBA_DIMENSIONLASERWAIT,
-		SIMBA_DOUBLECLAW, SIMBA_DOUBLECLAWCHARGESTART, SIMBA_DOUBLECLAWCHARGEWAIT, SIMBA_DOUBLECLAWDASH, SIMBA_DOUBLECLAWDASHSTART, SIMBA_DOUBLECLAWEND,
-		SIMBA_FALL, 
-		SIMBA_FINALCRUSHER, SIMBA_FINALCRUSHEREND, SIMBA_FINALCRUSHERREPEAT, 
-		SIMBA_FINALCRUSHERSTART, SIMBA_FINALCRUSHERSTARTCONTINUE, SIMBA_FINALCRUSHERSTARTREPEAT, SIMBA_FINALCRUSHERSTARTREPEATEND,
-		SIMBA_JUMP, SIMBA_JUMPSTART,
-		SIMBA_KNEEL, SIMBA_KNEELEND, SIMBA_KNEELSTART,
-		SIMBA_LANDING,
-		SIMBA_LIPSYNCSUB, SIMBA_LIPSYNCSUBA,
-		SIMBA_MOUTHSUB,
-		SIMBA_QUICKCLAW2L, SIMBA_QUICKCLAW2R, SIMBA_QUICKCLAWAGAINL, SIMBA_QUICKCLAWAGAINR, SIMBA_QUICKCLAWCHARGEL, SIMBA_QUICKCLAWCHARGER,	
-		SIMBA_QUICKCLAWENDL, SIMBA_QUICKCLAWENDR, SIMBA_QUICKCLAWL, SIMBA_QUICKCLAWFROMSTART, SIMBA_QUICKCLAWR, 
-		SIMBA_QUICKCLAWREPEATL, SIMBA_QUICKCLAWREPEATR,	SIMBA_QUICKCLAWRFROMSTART, SIMBA_QUICKCLAWSTARTL, SIMBA_QUICKCLAWSTARTR,
-		SIMBA_ROAR, SIMBA_ROAR2, SIMBA_ROAR2LONG, SIMBA_ROAR2SOUL,
-		SIMBA_SIT,
-		SIMBA_WAIT1, SIMBA_WAIT2,
-		SIMBA_WALK,
+		Simba_AttackJump, Simba_AttackJumpEnd, Simba_AttackJumpHit, Simba_AttackJumpPre, Simba_AttackJumpStart, Simba_AttackJumpWait,
+		Simba_BackStep, Simba_BackStepEnd, Simba_BackStepLanding, Simba_BackStepStart,
+		Simba_BiteRush, Simba_BiteRushEnd, Simba_BiteFallL, Simba_BiteFallR,
+		Simba_BiteRushJumpL, Simba_BiteRushJumpR, Simba_BiteRushJumpStartL, Simba_BiteRushJumpStartR,
+		Simba_BiteRushLandingL, Simba_BiteRushLandingR, Simba_BiteRushStart, Simba_BiteRushStartStraight,
+		Simba_BiteRushTiredAttackStart, Simba_BiteRushTiredAttackStartStraight, 
+		Simba_BiteRushTiredEnd, Simba_BiteRushTiredStart, Simba_BiteRushTiredWait,
+		Simba_Command, 
+		Simba_Damage, Simba_DamageFaceSub,
+		Simba_Death,
+		Simba_DemoAppear1Cut10, Simba_DemoAppear1Cut10Wait, 
+		Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait,
+		Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait, 
+		Simba_DemoAppear1Cut4, Simba_DemoAppear1Cut4Wait,
+		Simba_DemoAppear1Cut6, Simba_DemoAppear1Cut6Wait, 
+		Simba_DemoAppear1Cut9, Simba_DemoAppear1Cut9Wait,
+		Simba_DemoAppear2Cut1, Simba_DemoAppear2Cut2,
+		Simba_DemoDeadCut1, Simba_DemoDeadCut2,
+		Simba_DemoExAppearCut1, Simba_DemoExAppearCut2, Simba_DemoExAppearCut3, Simba_DemoExAppearCut4, Simba_DemoExAppearCut5, 
+		Simba_DemoExAppearCut6, Simba_DemoExAppearCut6Multi, Simba_DemoExAppearCut7, Simba_DemoExAppearCutPreWait,
+		Simba_DemoMorphoKnightAppearCut1, Simba_DemoMorphoKnightAppearCut2, Simba_DemoMorphoKnightAppearCut3, Simba_DemoMorphoKnightAppearCut4, Simba_DemoMorphoKnightAppearCut5,
+		Simba_DemoSoulAppearCut1, Simba_DimensionClaw, Simba_DimensionClawContinue, Simba_DimensionClawEnd, Simba_DimensionClawStart, Simba_DimensionClawStartContinue, SIMBA_DIMENSIONCLAWWAIT,
+		Simba_DimensionLaser, Simba_DimensionLaserEnd, Simba_DimensionLaserStart, Simba_DimensionLaserWait,
+		Simba_DoubleClaw, Simba_DoubleClawChargeStart, Simba_DoubleClawChargeWait, Simba_DoubleClawDash, Simba_DoubleClawDashStart, Simba_DoubleClawEnd,
+		Simba_Fall, 
+		Simba_FinalCrusher, Simba_FinalCrusherEnd, Simba_FinalCrusherRepeat, 
+		Simba_FinalCrusherStart, Simba_FinalCrusherStartContinue, Simba_FinalCrusherStartRepeat, Simba_FinalCrusherStartRepeatEnd,
+		Simba_Jump, Simba_JumpStart,
+		Simba_Kneel, Simba_KneelEnd, Simba_KneelStart,
+		Simba_Landing,
+		Simba_LipSyncSub, Simba_LipSyncSubA,
+		Simba_MouthSub,
+		Simba_QuickClaw2L, Simba_QuickClaw2R, Simba_QuickClawAgainL, Simba_QuickClawAgainR, Simba_QuickClawChargeL, Simba_QuickClawChargeR,	
+		Simba_QuickClawEndL, Simba_QuickClawEndR, Simba_QuickClawL, Simba_QuickClawLFromStart, Simba_QuickClawR, 
+		Simba_QuickClawRepeatL, Simba_QuickClawRepeatR,	Simba_QuickClawRFromStart, Simba_QuickClawStartL, Simba_QuickClawStartR,
+		Simba_Roar, Simba_Roar2, Simba_Roar2Long, Simba_Roar2Soul,
+		Simba_Sit,
+		Simba_Wait1, Simba_Wait2,
+		Simba_Walk,
 		SIMBA_END
 	};
 
@@ -69,6 +69,10 @@ public:
 	_float4 Get_Pos() { return m_vPos; }
 
 	void InsertHitboxActivationTiming(_uint iAnimIdx, vector<tuple<_float, _bool, COLLISION_VALUE>>& _vecTimings);
+	void TransformToDefault();
+
+	SIMBA_ANIM Get_PreState() { return m_ePreState; }
+	void Set_PreState(_uint _ePreState) { m_ePreState = SIMBA_ANIM(_ePreState); }
 
 public:
 	virtual HRESULT Initialize_Prototype()			override;
@@ -90,8 +94,10 @@ public:
 
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
+	CGameObject*	m_pKirby = { nullptr };
 
 	SIMBA_ANIM		m_eCurrentState = { SIMBA_END };
+	SIMBA_ANIM		m_ePreState = { SIMBA_END };
 	SIMBA_EYESTATE	m_eEyeState = { SIMBAEYE_END };
 
 	vector<_uint>	m_vecMeshes;
@@ -110,6 +116,7 @@ private:
 
 	_float			m_fAngle = { 0.f };
 	_float4			m_vPos = {};
+	_float4x4		m_matDefault = {};
 
 private:
 	HRESULT		Add_Components();

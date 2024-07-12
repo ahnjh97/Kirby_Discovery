@@ -28,8 +28,8 @@ static _int s_iTriggerIdx = -1;
 static _int s_iMapMeshIndex = -1;
 static _int s_iSelectedMeshIndex = -1; 
 
-static const _char* s_ShaderPasses[] = { "0. Blend X, NormalO", "1. Blend X, Normal X", "2. LightDepth", "3. Blend O, Normal O", "4. Blend O, Normal X"
-		, "5. BLEND X, DISCARD X", "6. BLEND O, DISCARD X" };
+static const _char* s_ShaderPasses[] = { "0. Normal O", "1. Normal X", "2. LightDepth", "3. AlphaBlend", 
+	"4. Discard X" , "5. Masked, NormalO" };
 static vector<vector<_int>> s_vecPassIndices;
 static vector<vector<_float>> s_vecSamplingFactors;
 static _int s_iMapIndex = 0;
@@ -1969,6 +1969,7 @@ void CMapToolHelper::Reset_MapShaderInfo()
 
 	_int iNumMesh = pModel->Get_NumMeshes();
 	s_vecPassIndices[s_iMapIndex].resize(iNumMesh);
+	fill(s_vecPassIndices[s_iMapIndex].begin(), s_vecPassIndices[s_iMapIndex].end(), MAP_NONBLEND_NONDISCARD);
 	s_vecSamplingFactors[s_iMapIndex].resize(iNumMesh);
 	fill(s_vecSamplingFactors[s_iMapIndex].begin(), s_vecSamplingFactors[s_iMapIndex].end(), 1.f);
 }
