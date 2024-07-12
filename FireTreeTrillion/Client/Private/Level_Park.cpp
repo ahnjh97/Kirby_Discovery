@@ -230,18 +230,35 @@ HRESULT CLevel_Park::Ready_Map()
 
 		if ("BG0" == strModelName || "BG1" == strModelName)
 			wstrGameObjectTag = TEXT("BG");
+
+		//else if ("Gimmick_PkFunHouseDarkness01" == strModelName ||  ) //¿¤º£ ¶ò, ¿òÁ÷ÀÌ´Â ¶¥
+		//	wstrGameObjectTag = TEXT("NotMap");
+			
 		else
 			wstrGameObjectTag = TEXT("BasicMap");
 
 		if (wstrGameObjectTag == TEXT("BasicMap"))
 			int a = 0;
-		if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tMapDesc)))
+
+		if (TEXT("BasicMap") == wstrGameObjectTag || TEXT("BG") == wstrGameObjectTag)
 		{
-			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
-			MSG_BOX(wstrErrorMsg.c_str());
-			fileInput.close();
-			return E_FAIL;
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tMapDesc)))
+			{
+				wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
+				MSG_BOX(wstrErrorMsg.c_str());
+				fileInput.close();
+				return E_FAIL;
+			}
 		}
+		/*
+		else
+		{
+			if ("" == strModelName) //¸ðµ¨ ¸í ÀÏÄ¡ÇÒ °æ¿ì
+			{
+				//m_pGameInstance->Add_Clone();
+			}
+		}
+		*/
 	}
 
 	fileInput.close();
