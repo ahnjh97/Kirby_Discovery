@@ -101,7 +101,6 @@
 #include "DeeDeeDee.h"
 #include "DeeDeeDeeHammer.h"
 
-
 //와들디
 #include "Dee_Part.h"
 #include "OriginalDee.h"
@@ -162,9 +161,17 @@
 #include "FinalePartical_Maker.h"
 #include "FinaleCut_ControlCenter.h"
 
-//기믹
+#pragma region LEVEL_FINALBOSS (LAB_DISCOVERA)
+//BOSS
+#include "BossChimera.h"
+
+//GIMMICK
 #include "Gm_LabAntenna.h"
 #include "Gm_LabBossRoomDoor.h"
+
+#pragma endregion
+
+//기믹
 #include "Gm_ParkFhEntranceAlien.h"
 #include "Gm_ParkSolarPanelCharge.h"
 #include "Gm_ParkSolarPanelOnce.h"
@@ -488,8 +495,12 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Box"), CBox);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Debris"), CDebris);
 
-	#pragma region GIMMICK::LEVEL_FINALBOSS
+	#pragma region LEVEL_FINALBOSS :: LAB_DISCOVERA
 
+	//BOSS
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossChimera"), CBossChimera);
+
+	//GIMMICK
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_LabAntenna"), CGm_LabAntenna);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_LabBossRoomDoor"), CGm_LabBossRoomDoor);
 
@@ -502,7 +513,6 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkSolarPanelOnce"), CGm_ParkSolarPanelOnce);
 
 	#pragma endregion
-
 
 	// 미니게임 in 와들디마을
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimeFood"), CPartTimeFood);
@@ -2028,6 +2038,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		Load_ItemModels();
 		Load_KickableModels();
+
+		// 액체괴물 :: Fecto_Forgo
+		//m_vecModelInfo.emplace_back("", TYPE_ANIM, 1.f, 180.f);
 
 		// For Boss 
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);

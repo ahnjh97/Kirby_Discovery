@@ -42,19 +42,19 @@ HRESULT CBossChimera::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	if(MON_WAIT == m_eMonState)
-		m_pModelCom->Set_Animation(AWOOFY_GROOMING, 45.f, false, true);
-	else if(MON_CIRCLE == m_eMonState)
-		m_pModelCom->Set_Animation(AWOOFY_WALK, 45.f, true, true);
-	else if(MON_SLEEP == m_eMonState)
-		m_pModelCom->Set_Animation(AWOOFY_SLEEP, 45.f, true, true);
+	//if(MON_WAIT == m_eMonState)
+	//	m_pModelCom->Set_Animation(AWOOFY_GROOMING, 45.f, false, true);
+	//else if(MON_CIRCLE == m_eMonState)
+	//	m_pModelCom->Set_Animation(AWOOFY_WALK, 45.f, true, true);
+	//else if(MON_SLEEP == m_eMonState)
+	//	m_pModelCom->Set_Animation(AWOOFY_SLEEP, 45.f, true, true);
 
 	m_fMaxHp = 10.f;
 	m_fHp = 10.f;
 	m_fAttack = 8.f;
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;
-	m_eEyeState = AWOOFYEYE_IDLE;
+	//m_eEyeState = AWOOFYEYE_IDLE;
 
 	Add_AnimEvent();
 
@@ -79,8 +79,8 @@ _int CBossChimera::Tick(_float fTimeDelta)
 		return OBJ_NOEVENT;
 	}
 
-	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
-		Change_State(CBossChimera::AWOOFY_DAMAGE, 120.f, true, false);
+	//if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
+	//	Change_State(CBossChimera::AWOOFY_DAMAGE, 120.f, true, false);
 
 
 	__super::Tick(m_fTimeDelta);
@@ -241,8 +241,8 @@ void CBossChimera::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	{
 		if (m_ePhyXState == PO_NORMAL)
 		{
-			Change_State(CBossChimera::AWOOFY_DAMAGE, 50.f, false, true);
-			m_eEyeState = AWOOFYEYE_HAPPY;
+			//Change_State(CBossChimera::AWOOFY_DAMAGE, 50.f, false, true);
+			//m_eEyeState = AWOOFYEYE_HAPPY;
 		}
 	}
 	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
@@ -253,16 +253,18 @@ void CBossChimera::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	{
 		if (m_ePhyXState == PO_NORMAL)
 		{
-			Change_State(CBossChimera::AWOOFY_DAMAGE, 50.f, false, true);
-			m_eEyeState = AWOOFYEYE_HAPPY;
+			//Change_State(CBossChimera::AWOOFY_DAMAGE, 50.f, false, true);
+			//m_eEyeState = AWOOFYEYE_HAPPY;
 		}
 	}
 }
 
+/*
 void CBossChimera::Change_State(AWOOFY_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
 	m_pFSM->ChangeState((_uint)eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
+*/
 
 _bool CBossChimera::IsAnimFinished()
 {
@@ -401,30 +403,30 @@ void CBossChimera::SetUp_FSM()
 	// FSM 상태 초기화
 	m_pFSM = CFSM::Create();
 
-	m_pFSM->Add_State(AWOOFY_WALK, CBossChimera_Walk_State::Create());
+	//m_pFSM->Add_State(AWOOFY_WALK, CBossChimera_Walk_State::Create());
 
-	m_pFSM->Add_State(AWOOFY_WAIT, CBossChimera_Idle_State::Create());
-	m_pFSM->Add_State(AWOOFY_GROOMING, CBossChimera_Idle_State::Create());
-	m_pFSM->Add_State(AWOOFY_LOOKAROUND, CBossChimera_Idle_State::Create());
-	m_pFSM->Add_State(AWOOFY_SLEEP, CBossChimera_Idle_State::Create());
+	//m_pFSM->Add_State(AWOOFY_WAIT, CBossChimera_Idle_State::Create());
+	//m_pFSM->Add_State(AWOOFY_GROOMING, CBossChimera_Idle_State::Create());
+	//m_pFSM->Add_State(AWOOFY_LOOKAROUND, CBossChimera_Idle_State::Create());
+	//m_pFSM->Add_State(AWOOFY_SLEEP, CBossChimera_Idle_State::Create());
 
-	m_pFSM->Add_State(AWOOFY_RUN, CBossChimera_Run_State::Create());
-	m_pFSM->Add_State(AWOOFY_FIND, CBossChimera_Find_State::Create());
-	m_pFSM->Add_State(AWOOFY_BRAKE, CBossChimera_Brake_State::Create());
-	m_pFSM->Add_State(AWOOFY_LOOKAROUNDAFTERBRAKE, CBossChimera_LookAroundAfterBrake_State::Create());
+	//m_pFSM->Add_State(AWOOFY_RUN, CBossChimera_Run_State::Create());
+	//m_pFSM->Add_State(AWOOFY_FIND, CBossChimera_Find_State::Create());
+	//m_pFSM->Add_State(AWOOFY_BRAKE, CBossChimera_Brake_State::Create());
+	//m_pFSM->Add_State(AWOOFY_LOOKAROUNDAFTERBRAKE, CBossChimera_LookAroundAfterBrake_State::Create());
 
-	m_pFSM->Add_State(AWOOFY_DAMAGE, CBossChimera_Damage_State::Create());
+	//m_pFSM->Add_State(AWOOFY_DAMAGE, CBossChimera_Damage_State::Create());
 
 	// 상태 Initialize
-	CFSM::FSM_INFO		FSM_Desc = {};
-	if (MON_WAIT == m_eMonState)
-		FSM_Desc.iState = AWOOFY_GROOMING;
-	else if (MON_CIRCLE == m_eMonState)
-		FSM_Desc.iState = AWOOFY_WALK;
-	else if (MON_SLEEP == m_eMonState)
-		FSM_Desc.iState = AWOOFY_SLEEP;
-	FSM_Desc.pModel = &m_pModelCom;
-	m_pFSM->Initialize(&FSM_Desc);
+	//CFSM::FSM_INFO		FSM_Desc = {};
+	//if (MON_WAIT == m_eMonState)
+	//	FSM_Desc.iState = AWOOFY_GROOMING;
+	//else if (MON_CIRCLE == m_eMonState)
+	//	FSM_Desc.iState = AWOOFY_WALK;
+	//else if (MON_SLEEP == m_eMonState)
+	//	FSM_Desc.iState = AWOOFY_SLEEP;
+	//FSM_Desc.pModel = &m_pModelCom;
+	//m_pFSM->Initialize(&FSM_Desc);
 }
 
 CBossChimera* CBossChimera::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

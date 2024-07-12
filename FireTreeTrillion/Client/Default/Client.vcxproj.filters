@@ -637,6 +637,12 @@
     <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Once">
       <UniqueIdentifier>{1d07bb83-aab5-4f0c-9c11-2c69099db84d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossChimera">
+      <UniqueIdentifier>{f1701de4-78bb-4ad2-a907-3000e2c43777}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossChimera\State">
+      <UniqueIdentifier>{2ab78432-08ae-459b-aebd-548e73d1a2f2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1273,6 +1279,9 @@
     <ClInclude Include="..\Public\Gm_ParkSolarPanelOnce.h">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Once</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BossChimera.h">
+      <Filter>02.GameObjects\PhysXObject\Character\BossChimera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1889,6 +1898,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Gm_ParkSolarPanelOnce.cpp">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Once</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BossChimera.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\BossChimera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
