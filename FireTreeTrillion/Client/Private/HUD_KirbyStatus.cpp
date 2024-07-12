@@ -208,11 +208,11 @@ HRESULT CHUD_KirbyStatus::Render_BindSet(CShader* _pShaderCom, CTransform* _pTra
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	SHADER_PS ePassIndex = { PS_APBLEND_NOZTEST }; //셰이더 패스 기본값
-	if (TEXT("Gauge") == m_UIObjDesc.wstrUITag){ ePassIndex = PS_MASK_HP;	}
-	if (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag){ ePassIndex = PS_MASK_HPDAMAGE;	}
+	PASS_POSTEX ePassType = { POSTEX_SOLIDBLEND_NOZTEST };
+	if (TEXT("Gauge") == m_UIObjDesc.wstrUITag){ ePassType = POSTEX_UI_MASK;	}
+	if (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag){ ePassType = POSTEX_UI_MASK2;	}
 
-	if (FAILED(Bind_ShaderResources(_pShaderCom, ePassIndex, m_pTextureCom, m_iTexIndex)))
+	if (FAILED(Bind_ShaderResources(_pShaderCom, ePassType, m_pTextureCom, m_iTexIndex)))
 		return E_FAIL;
 
 	return S_OK;

@@ -320,18 +320,17 @@ HRESULT CHUD_StarPoint::Render_BindSet(CShader* _pShaderCom, CTransform* _pTrans
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	SHADER_PS ePassIndex = { PS_APBLEND_NOZTEST }; //셰이더 패스 기본값
-	//if (TEXT("Icon") == m_UIObjDesc.wstrUITag) { ePassIndex = PS_DEFAULT; }
+	PASS_POSTEX ePassType = { POSTEX_SOLIDBLEND_NOZTEST };
 
 	// 이게... 이펙트....
 	if (m_iTexIndex == 3)
 	{
-		if (FAILED(Bind_ShaderResources(_pShaderCom, ePassIndex, m_pTextureCom, (_uint)m_fFrame)))
+		if (FAILED(Bind_ShaderResources(_pShaderCom, ePassType, m_pTextureCom, (_uint)m_fFrame)))
 			return E_FAIL;
 	}
 	else
 	{
-		if (FAILED(Bind_ShaderResources(_pShaderCom, ePassIndex, m_pTextureCom, m_iTexIndex)))
+		if (FAILED(Bind_ShaderResources(_pShaderCom, ePassType, m_pTextureCom, m_iTexIndex)))
 			return E_FAIL;
 	}
 

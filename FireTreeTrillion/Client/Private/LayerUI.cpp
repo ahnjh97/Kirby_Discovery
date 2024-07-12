@@ -141,13 +141,13 @@ HRESULT CLayerUI::Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom)
 	if (FAILED(_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	SHADER_PS ePassIndex = { PS_APBLEND_NOZTEST }; //셰이더 패스 기본값
-	if (TEXT("Icon") == m_UIObjDesc.wstrUITag) { ePassIndex = PS_DEFAULT; }
+	PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
+	if (TEXT("Icon") == m_UIObjDesc.wstrUITag) { ePassType = POSTEX_DEFAULT; }
 	//if (TEXT("Effect_Mask") == m_UIObjDesc.wstrUITag) { ePassIndex = PS_MASK_HP; }
 
 	//if (FAILED(Bind_ShaderResources(_pShaderCom, ePassIndex, m_pMultiTex[CHUD::HUD_KIRBYHP], m_iTexIndex)))
 	//	return E_FAIL;
-	if (FAILED(Bind_ShaderResources(_pShaderCom, ePassIndex, m_pTextureCom, m_iTexIndex)))
+	if (FAILED(Bind_ShaderResources(_pShaderCom, ePassType, m_pTextureCom, m_iTexIndex)))
 		return E_FAIL;
 
 	return S_OK;
