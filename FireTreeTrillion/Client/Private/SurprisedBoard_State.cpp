@@ -60,8 +60,8 @@ void CSurprisedBoard_Popout_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 void CSurprisedBoard_Popout_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CSurprisedBoard* pSurprisedBoard = static_cast<CSurprisedBoard*>(pGameObject);
-	CTransform* pTransform = pSurprisedBoard->Get_TransformCom();
-	_float fSecondTimeDelta = m_pGameInstance->Get_SecondTimer();
+	//CTransform* pTransform = pSurprisedBoard->Get_TransformCom();
+	//_float fSecondTimeDelta = m_pGameInstance->Get_SecondTimer();
 	if (pSurprisedBoard->IsAnimFinished())
 	{
 		switch (pSurprisedBoard->Get_State())
@@ -91,9 +91,10 @@ void CSurprisedBoard_Popout_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		switch (pSurprisedBoard->Get_State())
 		{
 		case CSurprisedBoard::POP_OUT_L:
-			//pTransform->Go_Right(fSecondTimeDelta); // 서프라이즈 보드 기점으로 오른쪽 이동
+			pSurprisedBoard->Go_Right_Rigid();
 			break;
 		case CSurprisedBoard::POP_OUT_R:
+			pSurprisedBoard->Go_Left_Rigid();
 			break;
 		}
 	}
@@ -152,9 +153,10 @@ void CSurprisedBoard_Return_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		switch (pSurprisedBoard->Get_State())
 		{
 		case CSurprisedBoard::RETURN_L:
-			//pTransform->Go_Left(fSecondTimeDelta); // 서프라이즈 보드 기점으로 오른쪽 이동
+			pSurprisedBoard->Go_Left_Rigid();
 			break;
 		case CSurprisedBoard::RETURN_R:
+			pSurprisedBoard->Go_Right_Rigid();
 			break;
 		}
 	}

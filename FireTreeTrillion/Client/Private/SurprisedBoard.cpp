@@ -48,12 +48,15 @@ HRESULT CSurprisedBoard::Initialize(void* pArg)
 	/* FSM */
 	SetUp_FSM(tDesc.eStartState);
 	m_arrModelCom[m_eModelColor]->Set_Animation(tDesc.eStartState, 45.f, true, true);
-	//if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
-	//{
-	//	m_pDynamicActor = m_arrNonModelCom[m_eModelColor]->ReturnDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
-	//	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-	//}
-	m_matWorld = _float4x4(); // 지영아 여기야
+	
+	// m_matWorld 초기화
+	m_matWorld = m_pTransformCom->Get_WorldFloat4x4();
+	m_fTimeDelta = 1.f;
+	if (tDesc.eStartState == WAIT_L)
+		Go_Left_Rigid();
+	else if (tDesc.eStartState == WAIT_R)
+		Go_Right_Rigid();
+
 	m_fAttack = 8.f;
 	Add_AnimEvent();
 
@@ -71,19 +74,6 @@ _int CSurprisedBoard::Tick(_float fTimeDelta)
 			m_pFSM->Update(this, fTimeDelta);
 	}
 
-	//if (m_pDynamicActor)
-	//{
-	//	_float3 vScale, vTrans;
-	//	Quaternion vRotQuat;
-	//	_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
-	//	matWorld.Decompose(vScale, vRotQuat, vTrans);
-
-	//	PxMeshScale meshScale(PxVec3(vScale.x, vScale.y, vScale.z));
-	//	PxConvexMeshGeometryFlags meshFlags = PxConvexMeshGeometryFlags();
-	//	PxTransform pxTransform(PxVec3(matWorld._41, matWorld._42, matWorld._43), PxQuat(vRotQuat.x, vRotQuat.y, vRotQuat.z, vRotQuat.w));
-	//	m_pDynamicActor->setKinematicTarget(pxTransform);
-	//}
-
 	return OBJ_NOEVENT;
 }
 
@@ -91,7 +81,7 @@ void CSurprisedBoard::Late_Tick(_float fTimeDelta)
 {
 	m_arrModelCom[m_eModelColor]->Play_Animation(m_fTimeDelta);
 
-	m_pRigidBodyCom->Update(m_pTransformCom->Get_WorldFloat4x4());
+	m_pRigidBodyCom->Update(m_matWorld);
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
@@ -202,6 +192,28 @@ _bool CSurprisedBoard::IsAnimFinished()
 _bool CSurprisedBoard::IsAnimFinished(_uint iCurrentAnimIndex)
 {
 	return m_arrModelCom[m_eModelColor]->IsFinished(iCurrentAnimIndex);
+}
+
+void CSurprisedBoard::Go_Left_Rigid(_float fOffset)
+{
+	_vector		vPosition = m_matWorld.Translation();
+	_vector		vRight = m_matWorld.Right();
+
+	_float fSpeed = m_pTransformCom->Get_SpeedPerSec();
+	vPosition -= XMVector3Normalize(vRight) * fSpeed * m_fTimeDelta * fOffset;
+
+	memcpy(&m_matWorld.m[3], &vPosition, sizeof(_float4));
+}
+
+void CSurprisedBoard::Go_Right_Rigid(_float fOffset)
+{
+	_vector		vPosition = m_matWorld.Translation();
+	_vector		vRight	  = m_matWorld.Right();
+	
+	_float fSpeed = m_pTransformCom->Get_SpeedPerSec();
+	vPosition += XMVector3Normalize(vRight) * fSpeed * m_fTimeDelta * fOffset;
+	
+	memcpy(&m_matWorld.m[3], &vPosition, sizeof(_float4));
 }
 
 HRESULT CSurprisedBoard::Add_Components()
