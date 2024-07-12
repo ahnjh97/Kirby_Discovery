@@ -100,8 +100,12 @@ HRESULT CBasicMap::Initialize(void* pArg)
     }
     else
     {
-        //if ( == wstrModelTag) //맵 이름이 모시깽이면 
-        //    return S_OK;
+        //해당 BasicMap들은 Deco 한번만 생성하게 처리
+        if (TEXT("Land_PkFunHouseDarkness") == wstrModelTag || TEXT("Gimmick_PkFunHouseDarkness01") == wstrModelTag
+            || TEXT("Gimmick_PkFunHouseDarkness02") == wstrModelTag || TEXT("Gimmick_PkFunHouseDarkness03") == wstrModelTag
+            || TEXT("Gimmick_PkFunHouseDarkness04") == wstrModelTag || TEXT("Gimmick_PkFunHouseDarkness05") == wstrModelTag
+            || TEXT("Gimmick_PkFunHouse06") == wstrModelTag || TEXT("Gimmick_PkFunHouse07") == wstrModelTag)
+            return S_OK;
 
         if (LEVEL_TOOL_MAP != *m_pCurrentLevelID)
         {
@@ -159,9 +163,6 @@ HRESULT CBasicMap::Render()
         m_iRenderAll = m_iRenderMyMesh = 0;
         m_pOcTree->Culling(m_pGameInstance, m_pShaderCom, m_pNonAnimShaderCom, m_pAnimShaderCom
             , m_iRenderAll, m_iRenderMyMesh);
-
-       /* for (auto& blendDeco : m_vecBlendObjects)
-            blendDeco->Late_Tick(m_pGameInstance->Get_FirstTimer());*/
     }
     else if (LEVEL_PARK == *m_pCurrentLevelID)
     {
@@ -523,7 +524,7 @@ void CBasicMap::InsertMapDecos()
         }
         else if (CMapToolObject::MAPOBJ_ACTOR == iMapObjType)
         {
-            pModel->CreateStaticActor(matWorld);
+            m_vecDecoStaticActors.push_back(pModel->ReturnStaticActor(matWorld));
             vecActors.push_back(pModel);
         }
     }
@@ -567,7 +568,7 @@ PxRigidStatic* CBasicMap::AddTriggerActorForAnimDeco(const string& _strModelName
     m_pGameInstance->AddActor(*pStaticActor);
     m_vecAnimDecoTriggersActors.emplace_back(pStaticActor);
     pShape->release();
-    //m_vecShapes.emplace_back(pShape);
+
     return pStaticActor;
 }
 
@@ -668,10 +669,8 @@ void CBasicMap::ReadDecos_ForSmallLevels()
             tBlendObjDesc.setBlendMeshIndices = mapIter->second;
             CBlendMapObject* pBlendMapObj =  dynamic_cast<CBlendMapObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BlendMapObject"), &tBlendObjDesc));
 
-            if (nullptr != pBlendMapObj) {
+            if (nullptr != pBlendMapObj)
                 m_vecBlendObjects.push_back(pBlendMapObj);
-                //pModel->Set_BlendObject(pBlendMapObj);
-            }
 
             pModel->RemoveBlendMeshes(mapIter->second);
 
@@ -767,6 +766,8 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
                 return E_FAIL;
             if (FAILED(nonAnim->Bind_ShaderResource(m_pNonAnimShaderCom, m_vecConstantNames[2].c_str(), i, TextureType_METALNESS)))
                 return E_FAIL;
+            if (FAILED(nonAnim->Bind_ShaderResource(m_pNonAnimShaderCom, "g_EmissiveTexture", i, TextureType_EMISSIVE)))
+                return E_FAIL;
             if (FAILED(m_pNonAnimShaderCom->Begin(iModelPassIndex)))
                 return E_FAIL;
             if (FAILED(nonAnim->Render(i)))
@@ -806,9 +807,6 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
                 return E_FAIL;
         }
     }
-
-    /*for (auto& blendDeco : m_vecBlendObjects)
-        blendDeco->Late_Tick(m_pGameInstance->Get_FirstTimer());*/
 
     return S_OK;
 }

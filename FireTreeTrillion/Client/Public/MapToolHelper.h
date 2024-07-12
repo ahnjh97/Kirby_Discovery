@@ -126,6 +126,8 @@ private:
 	_bool CheckEnumStrings();
 
 	HRESULT Bind_boolToShader(_bool bMaptool);
+	_uint Get_EmissivePassIndex(const string& _strModelName);
+	_uint DeterminePassIndex_ForEmissive(CModel* pModel);
 
 private:
 	vector<string>	m_vecLevelName; 
@@ -168,6 +170,10 @@ private:
 
 	unordered_map<string, unordered_set<_uint>> m_mapBlendDecoInfos;
 
+	unordered_map<string, _uint> m_mapEmissiveModels;
+	vector<wstring>	m_vecBaseEmissiveRequiredModels;
+	vector<wstring> m_vecBaseNormalRequiredModels;
+
 	string m_strSelectedTxt;
 	string m_strCurModel;
 	CGameObject* m_pPickedObject = { nullptr };
@@ -176,6 +182,7 @@ private:
 	class CShader* m_pModelShaderCom = { nullptr };
 	class CShader* m_pMapShaderCom = { nullptr };
 	_bool		   m_bisClone = { false };
+
 public:
 	static	CMapToolHelper*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*	Clone(void* pArg) override;

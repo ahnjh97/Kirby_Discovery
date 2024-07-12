@@ -59,7 +59,7 @@ void CWasteCan::Late_Tick(_float fTimeDelta)
 
 	if (m_bActivatePhysX)
 	{
-		m_pModelCom->Update_ActorTransform(m_pTransformCom);
+		//m_pModelCom->Update_ActorTransform(m_pTransformCom);
 		//m_pGameInstance->Add_Force(_float3(0.f, -0.5f, 0.f));
 
 		m_fLifeTime += m_fTimeDelta;
@@ -122,8 +122,8 @@ void CWasteCan::Render_IMGUI()
 
 void CWasteCan::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	HRESULT hr = m_pModelCom->CreateDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
-	CHECK_FAILED(hr);
+	//HRESULT hr = m_pModelCom->CreateDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
+	//CHECK_FAILED(hr);
 
 	m_bActivatePhysX = true;
 	

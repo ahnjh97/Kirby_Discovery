@@ -42,7 +42,7 @@ HRESULT CBox::Initialize(void* pArg)
 
 	unordered_set<_uint> setExcludedMesh = { m_iParticleMesh };
 
-	m_pDynamicActor = m_pNonAnimModelCom->ReturnDynamicActor_ExcludeByIndex(m_pTransformCom->Get_WorldFloat4x4(), setExcludedMesh);
+	m_pDynamicActor = m_pNonAnimModelCom->ReturnDynamicActor_FilterByIndex(m_pTransformCom->Get_WorldFloat4x4(), setExcludedMesh, false);
 	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 
 	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));

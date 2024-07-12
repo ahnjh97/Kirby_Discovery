@@ -35,14 +35,14 @@ private:
 	HRESULT				Bind_ShaderResources();
 
 private:
-	CShader*		m_pShaderCom = { nullptr };
-	CModel*			m_pModelCom = { nullptr };
-	CModel*			m_pNonAnimModelCom = { nullptr };
-	PxRigidDynamic* m_pDynamicActor = { nullptr };
+	CShader*			m_pShaderCom = { nullptr };
+	CModel*				m_pModelCom = { nullptr };
+	CModel*				m_pNonAnimModelCom = { nullptr };
+	PxRigidDynamic*		m_pDynamicActor = { nullptr };
 
-	_bool			m_bPlayAnim = { false };
-	_uint			m_iParticleMesh = {};
-	_float			m_fWhiteColorDiffuse = {};
+	_bool				m_bPlayAnim = { false };
+	_uint				m_iParticleMesh = {};
+	_float				m_fWhiteColorDiffuse = {};
 
 public:
 	static CBox* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

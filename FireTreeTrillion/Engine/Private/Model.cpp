@@ -335,28 +335,6 @@ HRESULT CModel::RenderMergedMesh()
 	return S_OK;
 }
 
-HRESULT CModel::CreateDynamicActor(_float4x4& matWorld)
-{
-	for (auto& mesh : m_Meshes)
-		mesh->CreateDynamicActor(matWorld);
-
-	return S_OK;
-}
-
-void CModel::Update_ActorTransform(CTransform* pTransform)
-{
-	for (auto& mesh : m_Meshes)
-		mesh->Update_ActorTransform(pTransform);
-}
-
-HRESULT CModel::CreateStaticActor(_float4x4& matWorld)
-{
-	for (auto& mesh : m_Meshes)
-		mesh->CreateStaticActor(matWorld);
-
-	return S_OK;
-}
-
 PxRigidStatic* CModel::ReturnStaticActor(_float4x4& matWorld)
 {
 	PxPhysics* pPhysics = m_pGameInstance->Get_Physics();
@@ -397,7 +375,7 @@ PxRigidStatic* CModel::ReturnStaticActor(_float4x4& matWorld)
 	return pStaticActor;
 }
 
-PxRigidStatic* CModel::ReturnStaticActor_ExcludeByIndex(_float4x4& matWorld, unordered_set<_uint>& _setExcludedMesh)
+PxRigidStatic* CModel::ReturnStaticActor_FilterByIndex(_float4x4& matWorld, unordered_set<_uint>& _setExcludedMesh, _bool bInclude)
 {
 	PxPhysics* pPhysics = m_pGameInstance->Get_Physics();
 	if (nullptr == pPhysics)
@@ -420,7 +398,14 @@ PxRigidStatic* CModel::ReturnStaticActor_ExcludeByIndex(_float4x4& matWorld, uno
 
 	for (_uint i = 0; i < m_iNumMeshes; i++)
 	{
-		if (nullptr == m_Meshes[i] || _setExcludedMesh.end() != _setExcludedMesh.find(i))
+		if (nullptr == m_Meshes[i])
+			continue;
+
+		_bool IsInSet = { false };
+		if (_setExcludedMesh.end() != _setExcludedMesh.find(i))
+			IsInSet = true;
+
+		if (IsInSet != bInclude) // Exclude인 경우 true일때 continue, Include인 경우 false일때 continue
 			continue;
 
 		PxTriangleMesh* pTriMesh = m_Meshes[i]->CreateTriangleMesh();
@@ -484,7 +469,7 @@ PxRigidDynamic* CModel::ReturnDynamicActor(_float4x4& matWorld)
 	return pDynamicActor;
 }
 
-PxRigidDynamic* CModel::ReturnDynamicActor_ExcludeByIndex(_float4x4& matWorld, unordered_set<_uint>& _setExcludedMesh)
+PxRigidDynamic* CModel::ReturnDynamicActor_FilterByIndex(_float4x4& matWorld, unordered_set<_uint>& _setExcludedMesh, _bool bInclude)
 {
 	PxPhysics* pPhysics = m_pGameInstance->Get_Physics();
 	if (nullptr == pPhysics)
@@ -509,7 +494,11 @@ PxRigidDynamic* CModel::ReturnDynamicActor_ExcludeByIndex(_float4x4& matWorld, u
 
 	for (_uint i = 0; i < m_iNumMeshes; i++)
 	{
+		_bool IsInSet = { false };
 		if (_setExcludedMesh.end() != _setExcludedMesh.find(i))
+			IsInSet = true;
+
+		if (IsInSet != bInclude) // Exclude인 경우 true일때 continue, Include인 경우 false일때 continue
 			continue;
 
 		PxConvexMesh* pConvexMesh = m_Meshes[i]->CreateConvexMesh();
@@ -534,77 +523,11 @@ PxRigidDynamic* CModel::ReturnDynamicActor_ExcludeByIndex(_float4x4& matWorld, u
 	return pDynamicActor;
 }
 
-HRESULT CModel::CreateStaticActors_Exclude(unordered_set<string>& _setNonColMesh, _float4x4& matWorld)
-{
-	for (auto& mesh : m_Meshes)
-	{
-		string strMeshName = mesh->Get_Name();
-		if (_setNonColMesh.end() == _setNonColMesh.find(strMeshName))
-			mesh->CreateStaticActor(matWorld);
-	}
-
-	return S_OK;
-}
-
-HRESULT CModel::CreateStaticActors_Include(unordered_set<string>& _setColMesh, _float4x4& matWorld)
-{
-	for (auto& mesh : m_Meshes)
-	{
-		string strMeshName = mesh->Get_Name();
-		if (_setColMesh.end() != _setColMesh.find(strMeshName))
-			mesh->CreateStaticActor(matWorld);
-	}
-
-	return S_OK;
-}
-
-void CModel::DisableActors()
-{
-	PxScene* pScene = m_pGameInstance->Get_Scene();
-	for (auto& mesh : m_Meshes)
-		mesh->DisableActor(pScene);
-}
-
-void CModel::DisableActors(unordered_set<string>& _setMeshNames)
-{
-	PxScene* pScene = m_pGameInstance->Get_Scene();
-	for (auto& mesh : m_Meshes)
-	{
-		if (nullptr == mesh)
-			continue;
-
-		string strMeshName = mesh->Get_Name();
-		if(_setMeshNames.end() != _setMeshNames.find(strMeshName))
-			mesh->DisableActor(pScene);
-	}
-}
-
-void CModel::ReAddActors()
-{
-	PxScene* pScene = m_pGameInstance->Get_Scene();
-	for (auto& mesh : m_Meshes)
-		mesh->ReAddActor(pScene);
-}
-
-void CModel::ReAddActors(unordered_set<string>& _setMeshNames)
-{
-	PxScene* pScene = m_pGameInstance->Get_Scene();
-	for (auto& mesh : m_Meshes)
-	{
-		if (nullptr == mesh)
-			continue;
-
-		string strMeshName = mesh->Get_Name();
-		if (_setMeshNames.end() != _setMeshNames.find(strMeshName))
-			mesh->ReAddActor(pScene);
-	}
-}
-
-_float4 CModel::Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const
+_float4 CModel::Check_Meshes(const class CTransform* pTransform, _int& iMeshIndex) const
 {
 	if (m_Meshes.empty())
 		return _float4();
-
+	iMeshIndex = 0;
 	vector<pair<_float4, _int>> vecPickPosAndMeshIdx;
 	for (_int i = 0; i < static_cast<_int>(m_iNumMeshes); i++)
 	{
@@ -914,7 +837,7 @@ void CModel::RemoveBlendMeshes(const unordered_set<_uint>& _vecBlendingMeshIndic
 	m_iNumMeshes = vecMeshes.size();
 }
 
-_bool CModel::DoesNormalTextureExist(_uint iMeshIndex)
+_bool CModel::DoesTextureExist(_uint iTextureType, _uint iMeshIndex)
 {
 	if (iMeshIndex >= m_iNumMeshes)
 		return false;
@@ -924,50 +847,10 @@ _bool CModel::DoesNormalTextureExist(_uint iMeshIndex)
 	if (iMeshMaterialIndex >= m_iNumMaterials)
 		return false;
 
-	if (nullptr != m_Materials[iMeshMaterialIndex].MaterialTextures[TextureType_NORMALS])
+	if (nullptr != m_Materials[iMeshMaterialIndex].MaterialTextures[iTextureType])
 		return true;
 	else
 		return false;
-}
-
-void CModel::DeterminePassIndices(vector<_uint>& _vecPassIndices)
-{
-	for (_uint i = 0; i < m_iNumMeshes; i++)
-	{
-		if (true == DoesNormalTextureExist(i))
-			_vecPassIndices.push_back(13); // AlphaBlend Normal O
-		else
-			_vecPassIndices.push_back(14); // AlphaBlend Normal X
-	}
-}
-
-void CModel::AddBlendObjectToRenderGroup()
-{
-	if (nullptr == m_pBlendObject)
-		return;
-
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, m_pBlendObject);
-}
-
-unordered_set<PxRigidActor*> CModel::Get_ActorsSet()
-{
-	unordered_set<PxRigidActor*> setActors;
-	for (auto& mesh : m_Meshes)
-		setActors.insert(mesh->Get_Actor());
-
-	return setActors;
-}
-
-vector<PxRigidActor*> CModel::Get_Actors()
-{
-	vector<PxRigidActor*> vecActors;
-	for (auto& mesh : m_Meshes) {
-		PxRigidActor* pActor = mesh->Get_Actor();
-		if(nullptr != pActor)
-			vecActors.push_back(pActor);
-	}
-		
-	return vecActors;
 }
 
 void CModel::AlignMeshMaterialIndicesWithMeshIndices()

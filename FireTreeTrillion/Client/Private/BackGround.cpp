@@ -53,7 +53,7 @@ void CBackGround::Late_Tick(_float fTimeDelta)
 
 HRESULT CBackGround::Render()
 {
-	if (FAILED(Bind_ShaderResources(m_pShaderCom, PS_DEFAULT, m_pTransformCom, m_pTextureCom, 0)))
+	if (FAILED(Bind_ShaderResources(m_pShaderCom, POSTEX_DEFAULT, m_pTransformCom, m_pTextureCom, 0)))
 		return E_FAIL;
 
 	return S_OK;
