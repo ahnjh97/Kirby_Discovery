@@ -379,7 +379,7 @@ void CAwoofy_LookAroundAfterBrake_State::Free()
 #pragma endregion
 
 
-#pragma region LOOKAROUNDAFTERBRAKE STATE
+#pragma region BRAKE STATE
 //*******************************************************
 //						 BRAKE STATE
 //*******************************************************
