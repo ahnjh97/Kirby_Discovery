@@ -19,6 +19,9 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_bool	m_bTimeCrashTrigger = { true };
+	_float	m_fTime = { 0.f };
+
 	static	CKirbyCrash_Attack_State*		Create();
 	virtual void								Free() override;
 };
@@ -38,6 +41,12 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_bool m_bTimeCrashTrigger = { true };
+	_float m_fTime = { 0.f };
+	_float m_fGravity = { 0.f };
+	_bool m_bTerrainOn = { false };
+	_float m_fTerrainTime = { 0.f };
+
 	static	CKirbyCrash_BigAttack_State* Create();
 	virtual void								Free() override;
 };
@@ -57,6 +66,8 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_float	m_fTime = { 0.f };
+	_float	m_fChargeTime = { 0.f };
 	static	CKirbyCrash_Charge_State* Create();
 	virtual void								Free() override;
 };
@@ -74,7 +85,9 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+	
 public:
+	_float	m_fTime = { 0.f };
 	static	CKirbyCrash_BigCharge_State* Create();
 	virtual void								Free() override;
 };

@@ -15,6 +15,10 @@ public:
 	HRESULT Initialize();
 	void	Update_TimeController(_float fTimeDelta);
 
+	_float Get_OriginalTimer() {
+		return m_fTimeDelta;
+	}
+
 	_float	Get_FirstTimer() {
 		return m_fTimeDelta * m_fFirstTimerRatio;
 	}

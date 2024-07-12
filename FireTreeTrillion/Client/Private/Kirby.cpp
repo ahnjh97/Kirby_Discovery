@@ -79,7 +79,6 @@ HRESULT CKirby::Initialize(void* pArg)
 	m_pControllerCom->RegisterAsPlayer();
 	Set_WeaponAnim(3);
 
-
 	return S_OK;
 }
 
@@ -236,7 +235,7 @@ void CKirby::Render_IMGUI()
 
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	ImGui::Text("m_isKirbyAttacking(overpower) : %d", m_isKirbyAttacking);
-	ImGui::Text("m_bisDeforming : %d", INFO(m_bisDeforming));
+	ImGui::Text("m_fCrashChargeTime : %.2f", INFO(m_fCrashChargeTime));
 	ImGui::Text("m_bBlockOtherVacuum : %d", INFO(m_bBlockOtherVacuum));
 	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
 	ImGui::Text("m_vLadderLook.x : %.2f, m_vLadderLook.y : %.2f m_vLadderLook.z : %.2f", INFO(m_vLadderLook).x, INFO(m_vLadderLook).y, INFO(m_vLadderLook).z);
@@ -1832,6 +1831,34 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		if (INFO(m_fDumpAbilityTime) < 0.f)
 			INFO(m_fDumpAbilityTime) = 0.f;
 	}
+
+	if (INFO(m_iCrashTimeSlow) == 1)
+	{
+		m_fCrashRestoreTime += fTimeDelta;
+
+
+		if (m_fCrashRestoreTime > 4.f)
+		{
+			INFO(m_iCrashTimeSlow) = 0;
+			m_pGameInstance->Restore_FirstTimer();
+			m_pGameInstance->Restore_SecondTimer();
+			m_fCrashRestoreTime = 0.f;
+		}
+	}
+	else if (INFO(m_iCrashTimeSlow) == 2)
+	{
+		m_fCrashRestoreTime += fTimeDelta;
+
+		if (m_fCrashRestoreTime > 7.f)
+		{
+			INFO(m_iCrashTimeSlow) = 0;
+			m_pGameInstance->Restore_FirstTimer();
+			m_pGameInstance->Restore_SecondTimer();
+			m_fCrashRestoreTime = 0.f;
+		}
+	}
+
+
 }
 
 HRESULT CKirby::Kirby_SystemInitialize()

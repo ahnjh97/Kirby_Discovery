@@ -36,6 +36,9 @@ float g_fMaskUVAngle = { 0.f };
 float g_fWhiteColorDiffuse;
 float g_fOverPowerColor;
 
+bool g_bEmissive = { false };
+float g_fEmissivePower;
+
 
 // 회전된 UV를 계산
 float2 RotateUV(float2 vCoord, float fAngle)
@@ -220,7 +223,7 @@ PS_OUT FOR_KIRBY_PARTOBJECT(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
 
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    if (0.3f >= vMtrlDiffuse.a)
+    if (0.05f >= vMtrlDiffuse.a)
         discard;
 
     vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
@@ -231,11 +234,18 @@ PS_OUT FOR_KIRBY_PARTOBJECT(PS_IN In)
 
     float3 vWorldNormal = mul(vNormal, WorldMatrix);
 
-    Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse + g_fOverPowerColor;
+    if (g_bEmissive == true)
+    {
+        Out.vDiffuse = vector(0.35f, 0.75f, 0.4f, 0.05f);
+        Out.vDiffuse *= g_fEmissivePower;
+    }
+    else
+        Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse + g_fOverPowerColor;
+    
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
-    
+        
     if (g_bStencil == true)
         Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
     
