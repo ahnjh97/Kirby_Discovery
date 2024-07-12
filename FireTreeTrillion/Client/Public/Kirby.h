@@ -203,6 +203,9 @@ public:
 	_float4			Get_BulbLightPos();
 
 	// 기타 세부적인 제어
+	void Set_ControllerPos(_float4 _vPosition);
+
+
 private:
 	// 커비의 움직임을 담은 구조체
 	KIRBY_INFODESC  m_tKirbyInfo;

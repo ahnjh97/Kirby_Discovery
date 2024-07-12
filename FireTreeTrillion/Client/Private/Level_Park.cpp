@@ -89,6 +89,8 @@ void CLevel_Park::Teleport_Player()
 	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
 	pTransingStar->Set_NextLevel(LEVEL_END);
 	pTransingStar->Activate(CTransingStar::CLOSE);
+	pTransingStar->Set_LargeColor(_float3(85.f / 255.f, 93.f / 255.f, 183.f / 255.f));
+	pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
 }
 
 void CLevel_Park::Tick(_float fTimeDelta)

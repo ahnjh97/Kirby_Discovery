@@ -2,6 +2,8 @@
 #include "TransingStar.h"
 
 #include "Level_Loading.h"
+#include "Kirby.h"
+#include "Camera_Main.h"
 #include "Utils.h"
 
 const _float	g_fPosOffset        = 18.f;
@@ -210,9 +212,7 @@ void CTransingStar::Tick_YeonDooStar(_float fTimeDelta)
         if (m_InitialSize.x <= m_fDecreaseValue)
         {
             CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], 0.f, 0.f, 1.f);
-            m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, m_eNextLevel));
-            //HRESULT hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, m_eNextLevel));
-            //CHECK_FAILED(hr);
+            On_Event();
         }
     }
     else // 연두별 배경 대기
@@ -222,6 +222,18 @@ void CTransingStar::Tick_YeonDooStar(_float fTimeDelta)
 void CTransingStar::Tick_GreenStar(_float fTimeDelta)
 {
     CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
+    if (*m_pCurrentLevelID == LEVEL_PARK)
+    {
+        if (m_InitialSize.x <= m_fDecreaseValue)
+        {
+            m_fParkTime += m_fTimeDelta;
+            if (m_fParkTime >= 2.f)
+            {
+                m_fParkTime = 0.f;
+                Activate(OPEN);
+            }
+        }
+    }
 }
 
 void CTransingStar::RenderClose()
@@ -304,11 +316,19 @@ void CTransingStar::RenderOpen()
     }
 }
 
-void CTransingStar::Change_Level(LEVEL eLevel)
+void CTransingStar::On_Event()
 {
-    HRESULT hr(S_OK);
-    hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, eLevel));
-    CHECK_FAILED(hr);
+    if(m_eNextLevel != LEVEL_END)
+        m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, m_eNextLevel));
+    else
+    {
+        CGameObject* pPlayer = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
+        CKirby* pKirby = dynamic_cast<CKirby*>(pPlayer);
+        pKirby->Set_ControllerPos(_float4(5.4f, 39.f, -26.36f, 1.f));
+        
+        CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+        pCameraMain->Set_FOVY(30);
+	}
 }
 
 HRESULT CTransingStar::Add_Components()

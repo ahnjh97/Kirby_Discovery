@@ -1574,6 +1574,11 @@ _float4 CKirby::Get_BulbLightPos()
 	return vPos;
 }
 
+void CKirby::Set_ControllerPos(_float4 _vPosition)
+{
+	m_pControllerCom->Set_Position(m_pTransformCom, _vPosition);
+}
+
 void CKirby::OverPower()
 {
 	if (m_fPreHp > m_fHp)
