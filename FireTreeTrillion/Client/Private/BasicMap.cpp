@@ -163,9 +163,6 @@ HRESULT CBasicMap::Render()
         m_iRenderAll = m_iRenderMyMesh = 0;
         m_pOcTree->Culling(m_pGameInstance, m_pShaderCom, m_pNonAnimShaderCom, m_pAnimShaderCom
             , m_iRenderAll, m_iRenderMyMesh);
-
-       /* for (auto& blendDeco : m_vecBlendObjects)
-            blendDeco->Late_Tick(m_pGameInstance->Get_FirstTimer());*/
     }
     else if (LEVEL_PARK == *m_pCurrentLevelID)
     {
@@ -768,6 +765,8 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
             if (FAILED(nonAnim->Bind_ShaderResource(m_pNonAnimShaderCom, m_vecConstantNames[1].c_str(), i, TextureType_NORMALS)))
                 return E_FAIL;
             if (FAILED(nonAnim->Bind_ShaderResource(m_pNonAnimShaderCom, m_vecConstantNames[2].c_str(), i, TextureType_METALNESS)))
+                return E_FAIL;
+            if (FAILED(nonAnim->Bind_ShaderResource(m_pNonAnimShaderCom, "g_EmissiveTexture", i, TextureType_EMISSIVE)))
                 return E_FAIL;
             if (FAILED(m_pNonAnimShaderCom->Begin(iModelPassIndex)))
                 return E_FAIL;
