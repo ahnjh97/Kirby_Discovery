@@ -193,19 +193,20 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 			_float2 vSrcXZ = { vSrcPos.x, vSrcPos.z };
 
 			// 위로 보았을 때, 서로의 거리를 구한다.
-			_float vXZDistance = (vDstXZ - vSrcXZ).Length();
+			_float vDistance = (vDstPos - vSrcPos).Length();
 
 			// 위에서 봤을 때, 서로의 범위보다 멀다면, 무조건 충돌은 아니다.
-			if (vXZDistance > pDstDesc->fRadius + pSrcDesc->fRadius)
+			if (vDistance > pDstDesc->fRadius + pSrcDesc->fRadius)
 				return false;
 
 			CTransform* pConeTransform = Src->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
 			vConeLookDir.Normalize();
-			_float4 vDir = XMVector3Normalize(vDstPos - vSrcPos);
+			_float2 vDir = XMVector2Normalize(vDstXZ - vSrcXZ);
+			_float2 vConeDir = XMVector2Normalize(_float2(vConeLookDir.x, vConeLookDir.z));
 
 			// 중점간의 각도를 구하였다.
-			_float fAngle = ToDegree(acos(vConeLookDir.Dot(vDir)));
+			_float fAngle = ToDegree(acos(vConeDir.Dot(vDir)));
 
 			// 만약, 실제 앵글의 범위가 내가 설정한 각도보다 작을 경우
 			if (fAngle < pSrcDesc->fAngle * 0.5f)
@@ -274,19 +275,20 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 			_float2 vSrcXZ = { vSrcPos.x, vSrcPos.z };
 
 			// 위로 보았을 때, 서로의 거리를 구한다.
-			_float vXZDistance = (vDstXZ - vSrcXZ).Length();
+			_float vDistance = (vDstPos - vSrcPos).Length();
 
 			// 위에서 봤을 때, 서로의 범위보다 멀다면, 무조건 충돌은 아니다.
-			if (vXZDistance > pDstDesc->fRadius + pSrcDesc->fRadius)
+			if (vDistance > pDstDesc->fRadius + pSrcDesc->fRadius)
 				return false;
 
 			CTransform* pConeTransform = Src->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
 			vConeLookDir.Normalize();
-			_float4 vDir = XMVector3Normalize(vDstPos - vSrcPos);
+			_float2 vDir = XMVector2Normalize(vDstXZ - vSrcXZ);
+			_float2 vConeDir = XMVector2Normalize(_float2(vConeLookDir.x, vConeLookDir.z));
 
 			// 중점간의 각도를 구하였다.
-			_float fAngle = ToDegree(acos(vConeLookDir.Dot(vDir)));
+			_float fAngle = ToDegree(acos(vConeDir.Dot(vDir)));
 
 			// 만약, 실제 앵글의 범위가 내가 설정한 각도보다 작을 경우
 			if (fAngle < pSrcDesc->fAngle * 0.5f)
@@ -313,19 +315,20 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 			_float2 vSrcXZ = { vSrcPos.x, vSrcPos.z };
 
 			// 위로 보았을 때, 서로의 거리를 구한다.
-			_float vXZDistance = (vDstXZ - vSrcXZ).Length();
+			_float vDistance = (vDstPos - vSrcPos).Length();
 
 			// 위에서 봤을 때, 서로의 범위보다 멀다면, 무조건 충돌은 아니다.
-			if (vXZDistance > pDstDesc->fRadius + pSrcDesc->fRadius)
+			if (vDistance > pDstDesc->fRadius + pSrcDesc->fRadius)
 				return false;
 
 			CTransform* pConeTransform = Dst->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
 			vConeLookDir.Normalize();
-			_float4 vDir = XMVector3Normalize(vSrcPos - vDstPos);
+			_float2 vDir = XMVector2Normalize(vSrcXZ - vDstXZ);
+			_float2 vConeDir = XMVector2Normalize(_float2(vConeLookDir.x, vConeLookDir.z));
 
 			// 중점간의 각도를 구하였다.
-			_float fAngle = ToDegree(acos(vConeLookDir.Dot(vDir)));
+			_float fAngle = ToDegree(acos(vConeDir.Dot(vDir)));
 
 			// 만약, 실제 앵글의 범위가 내가 설정한 각도보다 작을 경우
 			if (fAngle < pDstDesc->fAngle * 0.5f)
@@ -345,19 +348,20 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 			_float2 vSrcXZ = { vSrcPos.x, vSrcPos.z };
 
 			// 위로 보았을 때, 서로의 거리를 구한다.
-			_float vXZDistance = (vDstXZ - vSrcXZ).Length();
+			_float vDistance = (vDstPos - vSrcPos).Length();
 
 			// 위에서 봤을 때, 서로의 범위보다 멀다면, 무조건 충돌은 아니다.
-			if (vXZDistance > pDstDesc->fRadius + pSrcDesc->fRadius)
+			if (vDistance > pDstDesc->fRadius + pSrcDesc->fRadius)
 				return false;
 
 			CTransform* pConeTransform = Dst->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
 			vConeLookDir.Normalize();
-			_float4 vDir = XMVector3Normalize(vSrcPos - vDstPos);
+			_float2 vDir = XMVector2Normalize(vSrcXZ - vDstXZ);
+			_float2 vConeDir = XMVector2Normalize(_float2(vConeLookDir.x, vConeLookDir.z));
 
 			// 중점간의 각도를 구하였다.
-			_float fAngle = ToDegree(acos(vConeLookDir.Dot(vDir)));
+			_float fAngle = ToDegree(acos(vConeDir.Dot(vDir)));
 
 			// 만약, 실제 앵글의 범위가 내가 설정한 각도보다 작을 경우
 			if (fAngle < pDstDesc->fAngle * 0.5f)
@@ -878,7 +882,7 @@ void CCollisionCenter::Body_To_Body_Collision()
 			pKirby->Get_KirbyInfo()->m_bBlockOtherVacuum = true;
 		});
 
-
+	// 디벨롭중
 	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[NPC], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -918,12 +922,11 @@ void CCollisionCenter::Body_To_Body_Collision()
 				SrcHit->Set_Alive(false);
 			}
 		});
-
 }
 
 void CCollisionCenter::Hitbox_Collision()
 {
-	// 덜 완료되었음. 다양한 분기 필요 80%
+	// 완료.
 	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[MONSTER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -983,7 +986,7 @@ void CCollisionCenter::Hitbox_Collision()
 			DstHit->Set_Alive(false);
 		});
 
-	// 덜 완료되었음. 다양한 분기 필요 80%
+	// 완료.
 	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[OBJECT], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -1001,7 +1004,24 @@ void CCollisionCenter::Hitbox_Collision()
 			DstHit->Set_Alive(false);
 		});
 
-	// 완벽하게 구현하였음.
+	// 완료.
+	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[OBJECT], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			// 폭발물
+			CPhysXObject* pDst = static_cast<CPhysXObject*>(Src);
+			// 오브젝트
+			CPhysXObject* pObject = static_cast<CPhysXObject*>(Src);
+			pObject->Collision(CONTENT_ATTACK, pDst);
+			Dst->Set_Dead();
+		});
+
+	// 완료.
 	Collision_Collider(m_GameObjects[HITBOX_MONSTER], m_GameObjects[PLAYER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -1042,7 +1062,7 @@ void CCollisionCenter::Hitbox_Collision()
 			}
 		});
 
-	// 깔끔하게 완료되었음
+	// 완료.
 	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[PLAYERBULLET], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -1051,12 +1071,12 @@ void CCollisionCenter::Hitbox_Collision()
 			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
 				return;
 
+			pthis->Camera_Shaking(1.2f);
 			Dst->Set_Dead();
 			Src->Set_Dead();
-
 		});
 
-
+	// 완료.
 	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[MONSTER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -1092,7 +1112,7 @@ void CCollisionCenter::Hitbox_Collision()
 			Dst->Set_Dead();
 		});
 
-
+	// 완료.
 	Collision_Collider(m_GameObjects[MONSTERBULLET], m_GameObjects[PLAYER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -1130,6 +1150,8 @@ void CCollisionCenter::Hitbox_Collision()
 			// 별도의 충돌로직이 발생할 것이다.
 			pKirby->Collision(CONTENT_ATTACK, pMonsterBullet);
 		});
+
+
 
 	// 풀 등과 플레이어
 	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[ANIMDECO], this,
@@ -1196,7 +1218,9 @@ _bool CCollisionCenter::Up_KnockBack(_uint uKirbyState)
 
 _bool CCollisionCenter::FlyAway_KnockBack(_uint uKirbyState)
 {
-	return uKirbyState == CKirby::HAMMERSTATE_ONIGOROSIHAMMEREND;
+	return uKirbyState == CKirby::HAMMERSTATE_ONIGOROSIHAMMEREND ||
+		uKirbyState == CKirby::CRASHSTATE_ATTACK ||
+		uKirbyState == CKirby::CRASHSTATE_BIGATTACKFIRE;
 }
 
 void CCollisionCenter::HitStop_Rogic(CKirby* pKirby, _float fStopTime)
@@ -1325,6 +1349,23 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		Camera_Shaking();
 	}
 	break;
+	// 해머 공중 회전 공격
+	case CKirby::CRASHSTATE_ATTACK:
+	{
+		fAttack = 20.f;
+		//HitStop_Rogic(pKirby);
+		Camera_Shaking(0.5f);
+	}
+	break;
+	// 해머 공중 회전 공격
+	case CKirby::CRASHSTATE_BIGATTACK:
+	{
+		fAttack = 20.f;
+		//HitStop_Rogic(pKirby);
+		Camera_Shaking(0.5f);
+	}
+	break;
+
 	default:
 		fAttack = 5.f;
 		break;

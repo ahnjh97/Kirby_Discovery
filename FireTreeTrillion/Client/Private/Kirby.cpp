@@ -71,7 +71,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용
-	//m_eAbilityType = ABILITY_CRASH;
+	m_eAbilityType = ABILITY_CRASH;
 
 	// 커비의 상태에 따라, 애니메이션이 시작된다.
 	Kirby_StateInitialize();
@@ -301,6 +301,30 @@ void CKirby::Add_AnimEvent()
 		HitBoxChanger(m_pFSM->Get_State());
 		});
 
+	m_pModelCom[BODY_CRASHDEFAULT]->Add_Event("ApplyDamage", [this]() {
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		Activate_SphereCollider(1.f, 15.f);
+		});
+
+	m_pModelCom[BODY_CRASHDEFAULT]->Add_Event("ApplyDamage1", [this]() {
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		Activate_SphereCollider(1.f, 22.f);
+		});
+
+	m_pModelCom[BODY_CRASHDEFAULT]->Add_Event("ApplyDamage2", [this]() {
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		Activate_SphereCollider(1.f, 29.f);
+		});
+
+	m_pModelCom[BODY_CRASHDEFAULT]->Add_Event("ApplyDamage3", [this]() {
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		Activate_SphereCollider(1.f, 36.f);
+		});
+
+	m_pModelCom[BODY_CRASHDEFAULT]->Add_Event("ApplyDamage4", [this]() {
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		Activate_SphereCollider(1.f, 42.f);
+		});
 
 
 	// 사운드 처리
@@ -1523,6 +1547,15 @@ void CKirby::HitBoxChanger(_uint eState)
 	case HAMMERSTATE_WHEELHAMMER:
 		Activate_SphereCollider(0.5f, 5.f);
 		break;
+		// 해머 공중 회전 공격
+	case CRASHSTATE_ATTACK:
+		Activate_SphereCollider(1.f, 15.f);
+		break;
+		// 해머 공중 회전 공격
+	case CRASHSTATE_BIGATTACK:
+		Activate_SphereCollider(1.f, 15.f);
+		break;
+
 	default:
 		break;
 	}
