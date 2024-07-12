@@ -1979,9 +1979,36 @@ void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
 
 void CCamera_Main::Control(_float fTimeDelta)
 {
-	/*
-	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+	if (m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) &&
+		m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
+		if (m_pGameInstance->Get_KeyState(DIK_L, KEY_DOWN))
+		{
+			//Lock_All({ 109.9f, 25.2f, 108.5f }, { 1.f, .15f, -.12f });
+			//Set_TargetAnchor({ 0.f, 6.f, 0.f });
+			//Unlock();
+
+			CAMACTION newAct = {};
+			newAct.fTime = 0.f;
+			newAct.eCamCut = CUT_HARD;
+			
+			newAct.eCamPos = POS_ABSOLUTE;
+			newAct.vPos = { 109.9f, 25.2f, 108.5f };
+			
+			newAct.eCamDir = DIR_ABSOLUTE;
+			newAct.vDir = { 1.f, -.15f, -.12f };
+
+			Make_One_Sequence(newAct);
+			//Make_Sequence(SEQ_SOFTCUT_TEST);
+		}
+
+		if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
+		{
+			//SEQ_HARDCUT_TEST
+			//Make_Sequence(SEQ_SOFTCUT_TEST);
+		}
+	}
+	/*
 		if (m_pGameInstance->Get_KeyState(DIK_T, KEY_DOWN))
 		{
 			//SEQ_HARDCUT_TEST
@@ -2288,7 +2315,7 @@ void CCamera_Main::Render_IMGUI()
 	ImGui::SeparatorText(u8"카메라 트리거 설정");
 	ImGui::Text(u8"보간 ratio: %.2f", m_fTriggerRatio);
 
-	if (m_iMatrixIndex != -1)
+	if (0 < m_iMatrixIndex)
 	{
 		_float3 vFrontDir = m_vecFrontDirRadius[m_iMatrixIndex].first;
 		_float3 vRearDir = m_vecRearDirRadius[m_iMatrixIndex].first;

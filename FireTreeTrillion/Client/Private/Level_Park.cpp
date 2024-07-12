@@ -76,6 +76,13 @@ HRESULT CLevel_Park::Initialize()
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet_ByIndex(6);
 
+	// PARK 도착했으면 오픈해주세요
+	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
+	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
+	pTransingStar->Set_LargeColor(_float3(85.f / 255.f, 93.f / 255.f, 183.f / 255.f));
+	pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
+	pTransingStar->Activate(CTransingStar::OPEN);
+
 	// 레벨전환 트리거
 	function<void(_int)> func = bind(&CLevel_Park::Teleport_Player, this);
 	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_STAR, func);

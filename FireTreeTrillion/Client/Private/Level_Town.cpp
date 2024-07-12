@@ -18,6 +18,7 @@
 #include "BG.h"
 #include "HUD.h"
 #include "Dialog.h"
+#include "TransingStar.h"
 
 CLevel_Town::CLevel_Town(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -53,6 +54,8 @@ HRESULT CLevel_Town::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Items();
 	CHECK_FAILED(hr);
+	hr = Ready_Objects();
+	CHECK_FAILED(hr);
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
@@ -73,11 +76,39 @@ HRESULT CLevel_Town::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DeeDeeDee"), TEXT("Prototype_GameObject_DeeDeeDee"), &ObjDesc)))
 		return E_FAIL;
 
-
+	// 셰이더 트리거
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet_ByIndex(4);
 
+	// 레벨전환 트리거
+	function<void(_int)> func = bind(&CLevel_Town::Change_Levels, this);
+	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_LEVELCHANGER, func);
+
+	// 이동 트리거
+	/*function<void(_int)> func = bind(&CLevel_Town::Change_Levels, this);
+	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_STAR, func);*/
+
 	return S_OK;
+}
+
+void CLevel_Town::Change_Levels()
+{
+	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
+	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
+	pTransingStar->Set_NextLevel(LEVEL_PARK);
+	pTransingStar->Set_LargeColor(_float3(85.f / 255.f, 93.f / 255.f, 183.f / 255.f));
+	pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
+	pTransingStar->Activate(CTransingStar::CLOSE);
+}
+
+void CLevel_Town::Teleport_Player()
+{
+	//CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
+	//CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
+	//pTransingStar->Set_NextLevel(LEVEL_END);
+	//pTransingStar->Activate(CTransingStar::CLOSE);
+	//pTransingStar->Set_LargeColor(_float3(85.f / 255.f, 93.f / 255.f, 183.f / 255.f));
+	//pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
 }
 
 void CLevel_Town::Tick(_float fTimeDelta)
@@ -726,6 +757,59 @@ HRESULT CLevel_Town::Ready_Kickables()
 
 		if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Item"), TEXT("Prototype_GameObject_KickableRock"), &tDesc)))
 			return E_FAIL;
+	}
+
+	fileInput.close();
+
+	return S_OK;
+}
+
+HRESULT CLevel_Town::Ready_Objects()
+{
+	//Map, Triggers, Kickables.. 분류 제외 잔존 오브젝트들
+
+	string strFileName = "../../../objects_txt/Town.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : Town.txt"));
+		return E_FAIL;
+	}
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	while (!fileInput.eof())
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		if (fileInput.eof())
+			break;
+
+		CGameObject::GAMEOBJECT_DESC tDesc{};
+		tDesc.matWorld = matWorld;
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.iShaderVars = iShaderVars;
+		tDesc.fRimWidth = fRimWidth;
+
+#pragma region GIMMICK_OBJECT
+
+		if ("FhEntranceAlien_NonAnim" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkFhEntranceAlien"), &tDesc)))
+				continue;
+		}
+
+#pragma endregion
 	}
 
 	fileInput.close();
