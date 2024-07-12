@@ -183,7 +183,7 @@ public:
 
 	void			Set_HitStop(_float fHitStopMaxTime = 0.12f) { m_bHitStop = true; m_fHitStopMaxTime = fHitStopMaxTime; }
 	_bool			Is_Attacking() { return m_isKirbyAttacking; }
-	void			RegisterActorsToPlayer(PxRigidActor* pActor, CGameObject* pGameObject) { 
+	void			RegisterActorToPlayer(PxRigidActor* pActor, CGameObject* pGameObject) { 
 		m_mapToppleableBridges.insert_or_assign(pActor, pGameObject);
 		Safe_AddRef(pGameObject);
 	}

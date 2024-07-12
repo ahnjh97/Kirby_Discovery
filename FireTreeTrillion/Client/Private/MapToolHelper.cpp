@@ -28,8 +28,8 @@ static _int s_iTriggerIdx = -1;
 static _int s_iMapMeshIndex = -1;
 static _int s_iSelectedMeshIndex = -1; 
 
-static const _char* s_ShaderPasses[] = { "0. Normal O", "1. Normal X", "2. LightDepth", "3. AlphaBlend", 
-	"4. Discard X" , "5. Masked, NormalO" };
+static const _char* s_ShaderPasses[] = { "0. Normal O", "1. Normal X", "2. LightDepth", "3. AlphaBlend",
+	"4. Discard X" , "5. Masked, Normal O", "6. Emissive, Normal O", "7. Emissive, Normal X" };
 static vector<vector<_int>> s_vecPassIndices;
 static vector<vector<_float>> s_vecSamplingFactors;
 static _int s_iMapIndex = 0;
@@ -48,7 +48,7 @@ static _bool s_bHideWalls = { false };
 static _int s_iConnectedMonster = -1;
 static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. LIGHTDEPTH", "3. SKY", "4. BLOOM", "5. NON_BLUR"
 	,"6. TRIGGER", "7. ALPHABLEND", "8. DEFERREDINFO", "9. NEARCLIP", "10. KIRBYPART", "11. MONSTERPARTOBJECT", "12. DEFAULT_FX"
-	,"13. BLEND_FX", "14. WHITE_FX_LINEAR", "15. WHITE_FX_CLAMP" };
+	,"13. BLEND_FX", "14. WHITE_FX_LINEAR", "15. WHITE_FX_CLAMP", "16. Emissive, Normal O", "17. Emissive, Normal X" };
 
 static const _char* s_PosTexPasses[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
 	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX"};
@@ -1352,6 +1352,20 @@ void CMapToolHelper::Save_Level()
 	else
 		wstrSave += L"BlendDecoInfos X\n";
 
+	if (false == m_vecBaseEmissiveRequiredModels.empty())
+	{
+		wstrSave += L"\n***BaseEmissive-Required Models***\n\n";
+		for (auto& modelName : m_vecBaseEmissiveRequiredModels)
+			wstrSave += modelName + L"\n";
+	}
+
+	if (false == m_vecBaseNormalRequiredModels.empty())
+	{
+		wstrSave += L"***BaseNormal-Required Models***\n\n";
+		for (auto& modelName : m_vecBaseNormalRequiredModels)
+			wstrSave += modelName + L"\n";
+	}
+
 	MSG_BOX(wstrSave.c_str());
 }
 
@@ -1958,6 +1972,59 @@ HRESULT CMapToolHelper::Bind_boolToShader(_bool _bMaptool)
 	return S_OK;
 }
 
+_uint CMapToolHelper::Get_EmissivePassIndex(const string& _strModelName)
+{
+	auto& pair = m_mapEmissiveModels.find(_strModelName);
+	if (m_mapEmissiveModels.end() == pair)
+		return 0; // Find 실패시 -1 반환
+	
+	return pair->second;
+}
+
+_uint CMapToolHelper::DeterminePassIndex_ForEmissive(CModel* pModel)
+{
+	_uint iEmmissiveCount{};
+	_uint iNumMeshes = pModel->Get_NumMeshes();
+	for (_uint i = 0; i < iNumMeshes; i++)
+	{
+		if (true == pModel->DoesTextureExist(TextureType_EMISSIVE, i))
+			iEmmissiveCount++;
+	}
+	
+	if (0 == iEmmissiveCount)
+		return MODEL_NORMAL_O;
+
+	string strModelName = pModel->Get_ModelName();
+	_uint iPassIndex = Get_EmissivePassIndex(strModelName);
+
+	if (0 != iPassIndex)
+		return iPassIndex;
+
+	if (iEmmissiveCount != iNumMeshes)
+		m_vecBaseEmissiveRequiredModels.push_back(CUtils::StrToWstr(strModelName));
+
+	_uint iNormalCount{};
+	for (_uint i = 0; i < iNumMeshes; i++)
+	{
+		if (true == pModel->DoesTextureExist(TextureType_NORMALS, i))
+			iNormalCount++;
+	}
+
+	if (0 != iNormalCount)
+	{
+		if (iNormalCount != iNumMeshes)
+			m_vecBaseNormalRequiredModels.push_back(CUtils::StrToWstr(strModelName));
+
+		m_mapEmissiveModels.insert_or_assign(strModelName, MODEL_EMISSIVE_NORMAL_O);
+		return MODEL_EMISSIVE_NORMAL_O;
+	}
+	else
+	{
+		m_mapEmissiveModels.insert_or_assign(strModelName, MODEL_EMISSIVE_NORMAL_X);
+		return MODEL_EMISSIVE_NORMAL_X;
+	}
+}
+
 void CMapToolHelper::Reset_MapShaderInfo()
 {
 	if (nullptr == m_pPickedObject)
@@ -2205,8 +2272,8 @@ _bool CMapToolHelper::Save_Decos(const string& _strLevel, vector<CGameObject*>& 
 		if (true == IsTree(strModelName))
 			iPassIndex = MODEL_NEARCLIP;
 		else
-			iPassIndex = 0;
-
+			iPassIndex = DeterminePassIndex_ForEmissive(pModel);
+			
 		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
 		outputFile.write(strModelName.c_str(), iStrLength);
 		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));

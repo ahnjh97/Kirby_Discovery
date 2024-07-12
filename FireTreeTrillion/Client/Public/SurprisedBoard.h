@@ -54,6 +54,9 @@ public:
 	_bool				IsAnimFinished();
 	_bool				IsAnimFinished(_uint iCurrentAnimIndex);
 
+	void				Go_Left_Rigid(_float fOffset = 1.f);
+	void				Go_Right_Rigid(_float fOffset = 1.f);
+
 private:
 	HRESULT				Add_Components();
 	HRESULT				Add_HitBoxes(_float3 vPos);
@@ -63,8 +66,13 @@ private:
 	void				SetUp_FSM(ANIM_STATE eSta);
 
 private:
+	PxRigidDynamic*		m_pDynamicActor = { nullptr };
+	CRigidBody*			m_pRigidBodyCom = { nullptr };
 	array<CModel*, 3>	m_arrModelCom;
+	array<CModel*, 3>	m_arrNonModelCom;
+
 	MODEL_COLOR			m_eModelColor;
+	_float4x4			m_matWorld = _float4x4();
 
 public:
 	static CSurprisedBoard* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

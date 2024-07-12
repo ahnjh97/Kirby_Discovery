@@ -10,8 +10,7 @@ CMesh::CMesh(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, ifstream& f
 CMesh::CMesh(const CMesh & rhs)
 	: CVIBuffer(rhs), 
 	m_iFaces{ rhs.m_iFaces }, 
-	m_InputFile(ifstream())//,
-	//m_pActor{ rhs.m_pActor }
+	m_InputFile(ifstream())
 {
 
 }
@@ -257,50 +256,6 @@ HRESULT CMesh::Stock_Matrices(const vector<CBone*>& Bones, _float4x4 * pMeshBone
 	{
 		XMStoreFloat4x4(&pMeshBoneMatrices[i], XMLoadFloat4x4(&m_OffsetMatrices[i]) * XMLoadFloat4x4(Bones[m_Bones[i]]->Get_CombinedTransformationMatrix()));
 	}
-
-	return S_OK;
-}
-
-HRESULT CMesh::CreateDynamicActor(_float4x4& matWorld)
-{
-	m_pActor = m_pGameInstance->CreateDynamicActor(matWorld, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
-	if (m_pActor == nullptr)
-		return E_FAIL;
-
-	return S_OK;
-}
-
-// 물리 시뮬레이션 결과를 가져오는 함수
-void CMesh::Update_ActorTransform(CTransform* pTransform)
-{
-	// PhysX 변환 행렬을 가져옴
-	PxTransform transform = m_pActor->getGlobalPose();
-	PxMat44 mat(transform);
-	
-	// PhysX 행렬을 DirectX 행렬로 변환
-	pTransform->Set_WorldMatrix(CUtils::To_Float4x4(mat));
-}
-
-void CMesh::DisableActor(PxScene* pScene)
-{
-	if(nullptr != m_pActor)
-		pScene->removeActor(*m_pActor);
-}
-
-void CMesh::ReAddActor(PxScene* pScene)
-{
-	if (nullptr != m_pActor)
-		pScene->addActor(*m_pActor);
-}
-
-HRESULT CMesh::CreateStaticActor(_float4x4& matWorld)
-{
-	/*if (nullptr != m_pActor)
-		m_pActor->release();*/
-
-	m_pActor = m_pGameInstance->CreateStaticActor(matWorld, m_pVerticesPos, m_iNumVertices, m_pIndices, m_iNumIndices);
-	if (m_pActor == nullptr)
-		return E_FAIL;
 
 	return S_OK;
 }
@@ -570,19 +525,5 @@ void CMesh::Free()
 		Safe_Delete_Array(m_pNormals);
 		Safe_Delete_Array(m_pTexCoords);
 		Safe_Delete_Array(m_pTangents);
-
-		if (nullptr != m_pActor) {
-			PxScene* scene = m_pGameInstance->Get_Scene();
-			if (nullptr != scene) {
-				scene->removeActor(*m_pActor);
-				m_pActor->release();
-				m_pActor = nullptr;
-			}
-		}
-
-		if (nullptr != m_pTriangleMesh) {
-			m_pTriangleMesh->release();
-			m_pActor = nullptr;
-		}
 	}
 }

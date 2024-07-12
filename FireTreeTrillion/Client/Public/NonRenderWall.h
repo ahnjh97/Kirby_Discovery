@@ -20,10 +20,11 @@ public:
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override {};
-	virtual HRESULT Render() override;
+	virtual HRESULT Render() override { return S_OK; }
 
 private:
-	CModel* m_pModelCom = { nullptr };
+	CModel*			m_pModelCom = { nullptr };
+	PxRigidStatic*	m_pStaticActor = { nullptr };
 
 private:
 	HRESULT Add_Components();

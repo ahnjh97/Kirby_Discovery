@@ -1960,9 +1960,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SpookStep", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("GhostGordo", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("Bomber", TYPE_ANIM, 1.f, 180.f);
+
 		m_vecModelInfo.emplace_back("SurprisedBoardBlue", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("NonAnim_SurprisedBoardBlue",	TYPE_NONANIM, 1.f, 0.f, 0, string("Monsters/"));
 		m_vecModelInfo.emplace_back("SurprisedBoardGreen", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("NonAnim_SurprisedBoardGreen",	TYPE_NONANIM, 1.f, 0.f, 0, string("Monsters/"));
 		m_vecModelInfo.emplace_back("SurprisedBoardRed", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("NonAnim_SurprisedBoardRed",	TYPE_NONANIM, 1.f, 0.f, 0, string("Monsters/"));
 
 		// Gimmick
 		m_vecModelInfo.emplace_back("Crumble", TYPE_ANIM);

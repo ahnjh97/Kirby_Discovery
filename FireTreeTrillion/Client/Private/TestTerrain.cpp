@@ -32,9 +32,6 @@ HRESULT CTestTerrain::Initialize(void* pArg)
     _vector vPos = XMVectorSet(0.f, 0.f, 0.f, 1.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
-    if (FAILED(m_pModelCom->CreateStaticActor(GameObjectDesc.matWorld)))
-        return E_FAIL;
-
     return S_OK;
 }
 

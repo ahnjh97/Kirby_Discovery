@@ -18,7 +18,6 @@ public:
 	_float3* Get_NormalsPtr() { return m_pNormals; }
 	_float2* Get_TexCoordsPtr() { return m_pTexCoords; }
 	_float3* Get_TangentsPtr() { return m_pTangents; }
-	PxRigidActor* Get_Actor() { return m_pActor; }
 
 	void Set_MaterialIndex(_uint iMaterialIndex) { m_iMaterialIndex = iMaterialIndex; }
 
@@ -37,20 +36,12 @@ public:
 public:
 	HRESULT Stock_Matrices(const vector<CBone*>& Bones, _float4x4* pMeshBoneMatrices);
 
-	HRESULT CreateDynamicActor(_float4x4& matWorld);
-	HRESULT CreateStaticActor(_float4x4& matWorld);
 	PxRigidActor* ReturnStaticActor(_float4x4& matWorld);
 	PxRigidDynamic* ReturnDynamicActor(_float4x4& matWorld);
 	PxTriangleMesh* CreateTriangleMesh();
 	PxConvexMesh* CreateConvexMesh();
-	void	Update_ActorTransform(class CTransform* pTransform);
-	void	DisableActor(PxScene* pScene);
-	void	ReAddActor(PxScene* pScene);
-	//void		Update_PhysX(class CTransform* pTransform);
-	//_float4x4	Get_PxWorldMatrix();
 
 	_float4 Get_PickPos(const class CTransform* pTransform) const;
-
 	void Find_MinMax(_float3& vMin, _float3& vMax);
 
 private:
@@ -75,10 +66,6 @@ private:
 	_float3*	m_pNormals = { nullptr };
 	_float2*	m_pTexCoords = { nullptr };
 	_float3*	m_pTangents = { nullptr };
-
-	class PxTriangleMeshGeometry m_TriangleMeshGeometry;
-	class PxTriangleMesh* m_pTriangleMesh = { nullptr };
-	class PxRigidActor* m_pActor = { nullptr };
 
 private:
 	HRESULT Ready_Vertices_For_NonAnimModel(_fmatrix TransformationMatrix, _bool bOcTree);

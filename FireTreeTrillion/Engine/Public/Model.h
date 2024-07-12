@@ -89,25 +89,12 @@ public:
 	HRESULT Render(_uint iMeshIndex);
 	HRESULT RenderMergedMesh();
 
-	HRESULT CreateDynamicActor(_float4x4& matWorld);
-	HRESULT CreateStaticActor(_float4x4& matWorld);
-
 	PxRigidStatic* ReturnStaticActor(_float4x4& matWorld);
-	PxRigidStatic* ReturnStaticActor_ExcludeByIndex(_float4x4& matWorld, unordered_set<_uint>& _setExcludedMesh);
+	PxRigidStatic* ReturnStaticActor_FilterByIndex(_float4x4& matWorld, unordered_set<_uint>& _setExcludedMesh, _bool bInclude);
 	PxRigidDynamic* ReturnDynamicActor(_float4x4& matWorld);
-	PxRigidDynamic* ReturnDynamicActor_ExcludeByIndex(_float4x4& matWorld, unordered_set<_uint>& _setExcludedMesh);
+	PxRigidDynamic* ReturnDynamicActor_FilterByIndex(_float4x4& matWorld, unordered_set<_uint>& _setExcludedMesh, _bool bInclude);
 
-	HRESULT	CreateStaticActors_Exclude(unordered_set<string>& _setNonColMesh, _float4x4& matWorld);
-	HRESULT CreateStaticActors_Include(unordered_set<string>& _setColMesh, _float4x4& matWorld);
-	void	DisableActors();
-	void	DisableActors(unordered_set<string>& _setMeshNames);
-	void	ReAddActors();
-	void	ReAddActors(unordered_set<string>& _setMeshNames);
-
-	void	Update_ActorTransform(class CTransform* pTransform);
-
-
-	_float4 Check_Meshes(const class CTransform* pTransform, _Out_ _int& iMeshIndex) const;
+	_float4 Check_Meshes(const class CTransform* pTransform, _int& iMeshIndex) const;
 	void	Add_Event(const string& EventName, function<void()>&& Callback);
 	void	CallEvent(const string& EventName);
 
@@ -137,12 +124,7 @@ public:
 	_uint Find_MeshIndex(const string& _strMeshName);
 	void RemoveNonBlendMeshes(const unordered_set<_uint>& _vecBlendingMeshIndices);
 	void RemoveBlendMeshes(const unordered_set<_uint>& _vecBlendingMeshIndices);
-	_bool DoesNormalTextureExist(_uint iMeshIndex);
-	void DeterminePassIndices(vector<_uint>& _vecPassIndices);
-	void Set_BlendObject(class CGameObject* pBlendObject) { m_pBlendObject = pBlendObject; }
-	void AddBlendObjectToRenderGroup();
-	unordered_set<PxRigidActor*> Get_ActorsSet();
-	vector<PxRigidActor*> Get_Actors();
+	_bool DoesTextureExist(_uint iTextureType, _uint iMeshIndex);
 
 	void AlignMeshMaterialIndicesWithMeshIndices();
 	string ExtractDigitsAfterUnderScore(_uint iMeshIndex);
