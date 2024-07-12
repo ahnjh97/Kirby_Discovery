@@ -179,6 +179,7 @@ public:
 	virtual HRESULT Render() override;
 #ifdef _DEBUG
 	virtual void Render_IMGUI() override;
+	void Render_GraphicIMGUI(_float4x4 worldMat);
 #endif
 
 
@@ -339,6 +340,9 @@ private:
 
 	//포커징 기준점을 업데이트한다.
 	void Update_Anchor(_float fTimeDelta);
+
+	//타겟 위치를 받는다
+	_float3 Make_TargetPos();
 
 	void Interpolate_CamSet(_float fTimeDelta);
 	void Update_CurCamPos(_float fTimeDelta);

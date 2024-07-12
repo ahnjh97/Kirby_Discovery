@@ -116,6 +116,13 @@ void CCharacterController::Set_Position(CTransform* pTransform, const _float4& v
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(vPos, 1.f));
 }
 
+void CCharacterController::Set_CapsulePosition(const _float4& vPos)
+{
+	// 내가 원하는 곳에 physX 위치 이동
+	m_pController->setPosition({ (_double)vPos.x, (_double)vPos.y, (_double)vPos.z });
+
+}
+
 void CCharacterController::Set_FootPosition(const _float4& vPos)
 {
 	m_pController->setFootPosition({ (_double)vPos.x, (_double)vPos.y, (_double)vPos.z });
