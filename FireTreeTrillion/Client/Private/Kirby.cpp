@@ -1597,6 +1597,14 @@ _float4 CKirby::Get_BulbLightPos()
 	return vPos;
 }
 
+void CKirby::Large_Light(_float4 vDiffuse, _float fRange, _float fTime)
+{
+	if (m_pArmours == nullptr)
+		return;
+
+	m_pArmours->Large_Light(vDiffuse, fRange, fTime);
+}
+
 void CKirby::OverPower()
 {
 	if (m_fPreHp > m_fHp)

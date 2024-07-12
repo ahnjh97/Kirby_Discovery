@@ -205,6 +205,7 @@ public:
 	CGameObject*	FindBox(PxRigidActor* pActor);
 	void			Set_WeaponAnim(_uint index);
 	_float4			Get_BulbLightPos();
+	void			Large_Light(_float4 vDiffuse, _float fRange, _float fTime);
 
 	// 扁鸥 技何利牢 力绢
 private:

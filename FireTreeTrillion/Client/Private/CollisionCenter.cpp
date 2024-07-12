@@ -45,14 +45,15 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 		Hitbox_Collision();
 	}
 
+	// 디디디와 싸우는 특수한 충돌로직들 모아두었습니다.
 	if (eLevel == LEVEL_DEEDEEDEE)
-		// 디디디와 싸우는 특수한 충돌로직들 모아두었습니다.
 		DeeDeeDee_Battle();
 
+	// 파이널 보스와 싸우는 특수한 충돌로직들 모아두었습니다.
 	if (eLevel == LEVEL_FINALBOSS)
 		FinalStage_Battle();
 
-	if(LEVEL_SIMBA == eLevel)
+	if(eLevel == LEVEL_SIMBA)
 		Simba_Battle();
 
 	if (eLevel == LEVEL_FINALE)
