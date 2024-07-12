@@ -24,6 +24,9 @@ float g_fWhiteColorDiffuse;
 float g_fOverPowerColor;
 
 float4 g_vBulbColor;
+bool g_isBulb;
+bool g_bBulbOn;
+float4 g_BulbPosition;
 
 
 struct VS_IN
@@ -205,6 +208,52 @@ PS_OUT FOR_KIRBY_PS_MAIN(PS_IN In)
     Out.vNormal = vector(In.vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     Out.vMRA = vector(0.f, 1.f, 1.f, 1.f);
+    
+    if (g_isBulb == true)
+    {
+        float4 vBulbWorldPos = g_BulbPosition;
+        vBulbWorldPos = mul(vBulbWorldPos, g_ViewMatrix);
+        vBulbWorldPos = mul(vBulbWorldPos, g_ProjMatrix);
+        vBulbWorldPos /= vBulbWorldPos.w;
+        vBulbWorldPos.x *= g_fTexW / g_fTexH;
+        
+        float4 vProjPos = In.vProjPos;
+        vProjPos /= vProjPos.w;
+        vProjPos.x *= g_fTexW / g_fTexH;
+        
+        
+        float fViewZ = In.vProjPos.w;
+        
+        float fLightRange = 0;
+        float fRedRange = 0;
+        float4 vTotal = 0;
+        // ¹ß±¤
+        if (g_bBulbOn == true)
+        {
+            fLightRange = 5.f / fViewZ;
+            fRedRange = 10.f / fViewZ;
+            
+            float fDistance = length(vProjPos.xy - vBulbWorldPos.xy);
+            float fLightAtt = saturate((fLightRange - fDistance) / fLightRange);
+            float fRedAtt = saturate((fRedRange - fDistance) / fRedRange);
+            vTotal = saturate(float4(1.f, 1.f, 1.f, 1.f) * fLightAtt + float4(1.f, 0.f, 0.8f, 1.f) * fRedAtt);
+
+        }
+        else
+        {
+            fLightRange = 3.5f / fViewZ;
+            fRedRange = 10.f / fViewZ;
+            
+            float fDistance = length(vProjPos.xy - vBulbWorldPos.xy);
+            float fLightAtt = saturate((fLightRange - fDistance) / fLightRange);
+            float fRedAtt = saturate((fRedRange - fDistance) / fRedRange);
+            vTotal = saturate(float4(1.f, 0.8f, 0.f, 1.f) * fLightAtt + float4(1.f, .1f, .3f, 1.f) * fRedAtt);
+        }
+        
+        vTotal /= 2.f;
+        Out.vEmissive = vTotal;
+
+    }
     
     if (g_bStencil == true)
         Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);

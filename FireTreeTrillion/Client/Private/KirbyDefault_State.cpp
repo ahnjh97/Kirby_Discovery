@@ -130,6 +130,11 @@ _bool CKirbyDefault_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelt
 			pKirby->Set_WeaponAnim(5);
 			return true;
 		}
+		else if (pKirby->Get_AbilityType() == ABILITY_CRASH)
+		{
+			pKirby->Change_State(CKirby::CRASHSTATE_ATTACKCHARGESTART, 60.f, false, false, CKirby::BODY_CRASHDEFAULT, CKirby::OFFSET_CRASH);
+			return true;
+		}
 		else
 		{
 			DESC(m_fVacuumTime) = 0.f;
@@ -141,7 +146,6 @@ _bool CKirbyDefault_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelt
 				return true;
 			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 			pKirby->Change_State(CKirby::STATE_INHALESTART, 60.f, false, false, CKirby::BODY_VACUUM);
-
 			return true;
 		}
 
@@ -331,6 +335,11 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			if (FAILED(m_pGameInstance->Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Bomb"), TEXT("Prototype_GameObject_KirbyBomb"), &desc)))
 				return;
 
+			return;
+		}
+		else if (pKirby->Get_AbilityType() == ABILITY_CRASH)
+		{
+			pKirby->Change_State(CKirby::CRASHSTATE_ATTACKCHARGESTART, 60.f, false, false, CKirby::BODY_CRASHDEFAULT, CKirby::OFFSET_CRASH);
 			return;
 		}
 		else
@@ -765,6 +774,11 @@ _bool CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelt
 			DESC(m_fJumpVelocity) = 10.f;
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			pKirby->Change_State(CKirby::SWORDSTATE_SWORDSPINSTART, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			return true;
+		}
+		else if (pKirby->Get_AbilityType() == ABILITY_CRASH)
+		{
+			pKirby->Change_State(CKirby::CRASHSTATE_ATTACKCHARGESTART, 60.f, false, false, CKirby::BODY_CRASHDEFAULT, CKirby::OFFSET_CRASH);
 			return true;
 		}
 		else if (pKirby->Get_AbilityType() == ABILITY_BOMB)

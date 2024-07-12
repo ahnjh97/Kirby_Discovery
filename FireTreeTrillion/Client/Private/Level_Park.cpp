@@ -17,7 +17,7 @@
 #include "BG.h"
 #include "HUD.h"
 #include "SkySphere.h"
-//#include "Kirby.h"
+#include "TransingStar.h"
 
 CLevel_Park::CLevel_Park(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -74,20 +74,23 @@ HRESULT CLevel_Park::Initialize()
 		return E_FAIL;
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet_ByIndex(5);
+	m_pGameInstance->Set_ColorSet_ByIndex(6);
 
-
-	// 해당 위치의 행렬을 넘긴다.
-	//surprisedDesc.matWorld = transformationMatrix;
-	//surprisedDesc.eColor = CSurprisedBoard::RED;
-	//surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
-	//surprisedDesc.vPosition = _float3(32.f, 5.1f, -92.f);//21.39f, 5.08f, -87.56f);
-	//hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
-	//CHECK_FAILED(hr);
-
-
+	// 레벨전환 트리거
+	function<void(_int)> func = bind(&CLevel_Park::Teleport_Player, this);
+	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_STAR, func);
 
 	return S_OK;
+}
+
+void CLevel_Park::Teleport_Player()
+{
+	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
+	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
+	pTransingStar->Set_NextLevel(LEVEL_END);
+	pTransingStar->Activate(CTransingStar::CLOSE);
+	pTransingStar->Set_LargeColor(_float3(85.f / 255.f, 93.f / 255.f, 183.f / 255.f));
+	pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
 }
 
 void CLevel_Park::Tick(_float fTimeDelta)
@@ -125,9 +128,9 @@ HRESULT CLevel_Park::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.f, -1.f, -.3f, 0.f);
 
-	LightDesc.vDiffuse = _float4(0.6f, 0.5f, 0.3f, 1.f);
-	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
-	LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
+	LightDesc.vDiffuse = _float4(0.f, 0.f, 0.f, 1.f);
+	//LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
+	//LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
@@ -559,6 +562,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 
 		// 해당 위치의 행렬을 넘긴다.
 		CSurprisedBoard::SURPRISED_DESC surprisedDesc = {};
+		surprisedDesc.fSpeedPerSec = 7.f;
 		surprisedDesc.matWorld = transformationMatrix;
 	
 		surprisedDesc.eColor = CSurprisedBoard::RED;

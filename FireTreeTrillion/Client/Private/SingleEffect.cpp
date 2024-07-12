@@ -128,6 +128,7 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 		}
 	}
 
+
 	//true 반환하면 lifetime 끝난 것.
 	if (Calculate_Lifetime(fMyTimeDelta))
 	{
@@ -135,6 +136,7 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 			m_bNoRender = true;
 	}
 
+	Compute_ViewZ();
 
 	m_vCurPos = Calculate_CurValue_Lerp(fMyTimeDelta, KF_POS);
 

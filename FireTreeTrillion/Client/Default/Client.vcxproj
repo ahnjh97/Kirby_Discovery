@@ -197,6 +197,7 @@
     <ClInclude Include="..\Public\Bomber_State.h" />
     <ClInclude Include="..\Public\BombOrbit.h" />
     <ClInclude Include="..\Public\BombOrbitGlow.h" />
+    <ClInclude Include="..\Public\BossChimera.h" />
     <ClInclude Include="..\Public\BossClone.h" />
     <ClInclude Include="..\Public\BreakableBlock.h" />
     <ClInclude Include="..\Public\BreakableRock.h" />
@@ -233,6 +234,8 @@
     <ClInclude Include="..\Public\Gm_ParkSolarPanelCharge.h" />
     <ClInclude Include="..\Public\Gm_ParkSolarPanelOnce.h" />
     <ClInclude Include="..\Public\KirbyBulb_State.h" />
+    <ClInclude Include="..\Public\KirbyCrash_State.h" />
+    <ClInclude Include="..\Public\KirbyDump_State.h" />
     <ClInclude Include="..\Public\Level_Park.h" />
     <ClInclude Include="..\Public\Disaster_Master.h" />
     <ClInclude Include="..\Public\Phanta.h" />
@@ -397,7 +400,6 @@
     <ClInclude Include="..\public\WaddleDee.h" />
     <ClInclude Include="..\Public\WasteCan.h" />
     <ClInclude Include="Box.h" />
-    <ClInclude Include="CKirbyDump_State.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -432,6 +434,7 @@
     <ClCompile Include="..\Private\Bomber_State.cpp" />
     <ClCompile Include="..\Private\BombOrbit.cpp" />
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
+    <ClCompile Include="..\Private\BossChimera.cpp" />
     <ClCompile Include="..\Private\BossClone.cpp" />
     <ClCompile Include="..\Private\Box.cpp" />
     <ClCompile Include="..\Private\BreakableBlock.cpp" />
@@ -468,6 +471,8 @@
     <ClCompile Include="..\Private\Gm_ParkSolarPanelCharge.cpp" />
     <ClCompile Include="..\Private\Gm_ParkSolarPanelOnce.cpp" />
     <ClCompile Include="..\Private\KirbyBulb_State.cpp" />
+    <ClCompile Include="..\Private\KirbyCrash_State.cpp" />
+    <ClCompile Include="..\Private\KirbyDump_State.cpp" />
     <ClCompile Include="..\Private\Level_Park.cpp" />
     <ClCompile Include="..\Private\Disaster_Master.cpp" />
     <ClCompile Include="..\Private\Phanta.cpp" />
@@ -629,7 +634,6 @@
     <ClCompile Include="..\Private\UI_PartTimeResult.cpp" />
     <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="..\Private\WasteCan.cpp" />
-    <ClCompile Include="CKirbyDump_State.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

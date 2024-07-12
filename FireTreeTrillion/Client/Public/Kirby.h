@@ -134,8 +134,12 @@ public:
 		// 전구 폼
 		_bool			m_bLightOn = { false };
 		_bool			m_bBulbJump = { false };
-
 		class CLight*	m_pLight = { nullptr };
+
+		// 크래쉬 폼
+		_float			m_fTimeRatio = { 0.f };
+		_int			m_iCrashTimeSlow = { 0 };
+		_float			m_fCrashChargeTime = { 0.f };
 	}KIRBY_INFODESC;
 
 
@@ -183,7 +187,7 @@ public:
 
 	void			Set_HitStop(_float fHitStopMaxTime = 0.12f) { m_bHitStop = true; m_fHitStopMaxTime = fHitStopMaxTime; }
 	_bool			Is_Attacking() { return m_isKirbyAttacking; }
-	void			RegisterActorsToPlayer(PxRigidActor* pActor, CGameObject* pGameObject) { 
+	void			RegisterActorToPlayer(PxRigidActor* pActor, CGameObject* pGameObject) { 
 		m_mapToppleableBridges.insert_or_assign(pActor, pGameObject);
 		Safe_AddRef(pGameObject);
 	}
@@ -200,8 +204,12 @@ public:
 	CGameObject*	FindStarBox(PxRigidActor* pActor);
 	CGameObject*	FindBox(PxRigidActor* pActor);
 	void			Set_WeaponAnim(_uint index);
+	_float4			Get_BulbLightPos();
 
 	// 기타 세부적인 제어
+	void Set_ControllerPos(_float4 _vPosition);
+
+
 private:
 	// 커비의 움직임을 담은 구조체
 	KIRBY_INFODESC  m_tKirbyInfo;
@@ -280,6 +288,9 @@ private:
 	_float				  m_fOrbitRenderDelay = { 0.f };
 
 	_int				  m_iTestAnim = { 0 };
+
+	// For Crash
+	_float				  m_fCrashRestoreTime = { 0.f };
 
 	unordered_map<PxRigidActor*, CGameObject*> m_mapToppleableBridges;
 	unordered_map<PxRigidActor*, CGameObject*> m_mapStarBoxes;

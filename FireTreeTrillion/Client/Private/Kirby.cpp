@@ -14,6 +14,7 @@
 #include "KirbyCar_State.h"
 #include "KirbyHammer_State.h"
 #include "KirbyBulb_State.h"
+#include "KirbyCrash_State.h"
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
@@ -70,14 +71,13 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용
-	m_eAbilityType = ABILITY_HAMMER;
+	m_eAbilityType = ABILITY_CRASH;
 
 	// 커비의 상태에 따라, 애니메이션이 시작된다.
 	Kirby_StateInitialize();
 
 	m_pControllerCom->RegisterAsPlayer();
 	Set_WeaponAnim(3);
-
 
 	return S_OK;
 }
@@ -182,6 +182,24 @@ HRESULT CKirby::Render()
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_fOverPowerColor", &m_fOverPowerColor, sizeof(_float))))
 			return E_FAIL;
 
+		if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
+		{
+			_bool bOn = true;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_isBulb", &bOn, sizeof(_bool))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_bBulbOn", &INFO(m_bLightOn), sizeof(_bool))))
+				return E_FAIL;
+			_float4 vBulbPos = Get_BulbLightPos();
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_BulbPosition", &vBulbPos, sizeof(_float4))))
+				return E_FAIL;
+		}
+		else
+		{
+			_bool bOff = false;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_isBulb", &bOff, sizeof(_bool))))
+				return E_FAIL;
+		}
+
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_KIRBY)))
@@ -217,7 +235,7 @@ void CKirby::Render_IMGUI()
 
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	ImGui::Text("m_isKirbyAttacking(overpower) : %d", m_isKirbyAttacking);
-	ImGui::Text("m_bisDeforming : %d", INFO(m_bisDeforming));
+	ImGui::Text("m_fCrashChargeTime : %.2f", INFO(m_fCrashChargeTime));
 	ImGui::Text("m_bBlockOtherVacuum : %d", INFO(m_bBlockOtherVacuum));
 	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
 	ImGui::Text("m_vLadderLook.x : %.2f, m_vLadderLook.y : %.2f m_vLadderLook.z : %.2f", INFO(m_vLadderLook).x, INFO(m_vLadderLook).y, INFO(m_vLadderLook).z);
@@ -903,6 +921,10 @@ HRESULT CKirby::Add_Components()
 		TEXT("Com_Model_BulbVacuum"), (CComponent**)&m_pModelCom[BODY_BULBVACUUM]);
 	CHECK_FAILED(hr);
 
+	// 커비의 Crash Default 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyCrashDefault"),
+		TEXT("Com_Model_CrashDefault"), (CComponent**)&m_pModelCom[BODY_CRASHDEFAULT]);
+	CHECK_FAILED(hr);
 
 #pragma endregion
 
@@ -1031,9 +1053,11 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 {
 	if (m_iRenderCount == 0)
 	{
-		if ((_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 2) ||
+		if (
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 2) ||
 			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 3) ||
-			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 1))
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 1)
+			)
 		{
 			//m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -1047,6 +1071,21 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 			m_pShaderCom->Begin(ANIMMODEL_BULBLIGHT);
 			m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 			return true;
+		}
+		else if ((_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 4))
+		{
+			m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
+			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
+			m_pEyeTexture[INFO(m_eEyeState)]->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", 0);
+
+			m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float));
+			m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+			m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+
+			m_pShaderCom->Begin(ANIMMODEL_KIRBYEYE);
+			m_pModelCom[INFO(m_eBodyState)]->Render(_iMeshIndex);
 		}
 	}
 	else
@@ -1360,6 +1399,25 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(BULBSTATE_FALL, CKirbyBulb_Jump_State::Create());
 #pragma endregion
 
+#pragma region 크래쉬 애니메이션
+	m_pFSM->Add_State(CRASHSTATE_ATTACKCHARGE, CKirbyCrash_Charge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_ATTACKCHARGEMOVE, CKirbyCrash_Charge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_ATTACKCHARGESTART, CKirbyCrash_Charge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_ATTACK, CKirbyCrash_Attack_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_ATTACKEND, CKirbyCrash_Attack_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_ATTACKSTART, CKirbyCrash_Attack_State::Create());
+
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKCHARGE, CKirbyCrash_BigCharge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKCHARGEMOVE, CKirbyCrash_BigCharge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKCHARGESTART, CKirbyCrash_BigCharge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACK, CKirbyCrash_BigAttack_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKEND, CKirbyCrash_BigAttack_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKSTART, CKirbyCrash_BigAttack_State::Create());
+
+	// 이게 왜있어??
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKFIRE, CKirbyCrash_BigAttack_State::Create());
+#pragma endregion
+
 
 	CFSM::FSM_INFO		FSM_Info_Desc = {};
 	FSM_Info_Desc.iState = STATE_IDLE;
@@ -1527,6 +1585,21 @@ void CKirby::Bone_Rotation(_float fTimeDelta)
 void CKirby::Set_WeaponAnim(_uint index)
 {
 	m_pWeapons->Change_My_WeaponAnim((CKirbyWeapons::ANIM_TYPE)index);
+}
+
+_float4 CKirby::Get_BulbLightPos()
+{
+	CBone* pBone = m_pModelCom[BODY_BULBDEFAULT]->Get_BonePtr("LightL");
+	_float4x4 CombineMatrix = *pBone->Get_CombinedTransformationMatrix();
+	_float4 vPos = CUtils::Get_State_Vector_Matrix(CombineMatrix, CUtils::STATE_POSITION);
+	vPos = _float4::Transform(vPos, m_pTransformCom->Get_WorldFloat4x4());
+
+	return vPos;
+}
+
+void CKirby::Set_ControllerPos(_float4 _vPosition)
+{
+	m_pControllerCom->Set_Position(m_pTransformCom, _vPosition);
 }
 
 void CKirby::OverPower()
@@ -1730,6 +1803,7 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 			m_vBulbColor += (vTargetColor - m_vBulbColor) / (fTimeDelta * 300.f);
 
 			m_pBulbFlare->Set_Position(m_pTransformCom->Get_State(CTransform::STATE_POSITION), true);
+
 		}
 		else if (INFO(m_bLightOn) == false)
 		{
@@ -1762,6 +1836,34 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		if (INFO(m_fDumpAbilityTime) < 0.f)
 			INFO(m_fDumpAbilityTime) = 0.f;
 	}
+
+	if (INFO(m_iCrashTimeSlow) == 1)
+	{
+		m_fCrashRestoreTime += fTimeDelta;
+
+
+		if (m_fCrashRestoreTime > 4.f)
+		{
+			INFO(m_iCrashTimeSlow) = 0;
+			m_pGameInstance->Restore_FirstTimer();
+			m_pGameInstance->Restore_SecondTimer();
+			m_fCrashRestoreTime = 0.f;
+		}
+	}
+	else if (INFO(m_iCrashTimeSlow) == 2)
+	{
+		m_fCrashRestoreTime += fTimeDelta;
+
+		if (m_fCrashRestoreTime > 7.f)
+		{
+			INFO(m_iCrashTimeSlow) = 0;
+			m_pGameInstance->Restore_FirstTimer();
+			m_pGameInstance->Restore_SecondTimer();
+			m_fCrashRestoreTime = 0.f;
+		}
+	}
+
+
 }
 
 HRESULT CKirby::Kirby_SystemInitialize()

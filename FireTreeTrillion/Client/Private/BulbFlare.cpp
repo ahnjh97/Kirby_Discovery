@@ -87,7 +87,7 @@ void CBulbFlare::Late_Tick(_float fTimeDelta)
 	Effect_Billboard(fTimeDelta);
 
 	if (m_fBigScale > 0.f)
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
 }
 
 HRESULT CBulbFlare::Render()

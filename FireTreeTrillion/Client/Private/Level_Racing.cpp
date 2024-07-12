@@ -72,9 +72,6 @@ HRESULT CLevel_Racing::Initialize()
 	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
 	pTransingStar->Activate(CTransingStar::OPEN);
 
-	hr = Ready_Layer_UI(TEXT("Layer_UI"));
-	CHECK_FAILED(hr);
-
 
 	return S_OK;
 }
