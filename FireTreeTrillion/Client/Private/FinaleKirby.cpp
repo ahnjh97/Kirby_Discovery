@@ -12,7 +12,7 @@
 
 #include "LevelChanger.h"
 
-#include "CKirbyDump_State.h"
+#include "KirbyDump_State.h"
 #include "Hitbox.h"
 #include "Bone.h"
 

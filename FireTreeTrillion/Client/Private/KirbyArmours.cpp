@@ -2,6 +2,8 @@
 #include "KirbyArmours.h"
 #include "Bone.h"
 
+#include "Light.h"
+
 CKirbyArmours::CKirbyArmours(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPartObject{ pDevice, pContext }
 {
@@ -44,6 +46,36 @@ _int CKirbyArmours::Tick(_float fTimeDelta)
 
     m_WorldMatrix = m_pTransformCom->Get_WorldMatrix() **m_pBoneMatrix **m_pParentMatrix;
 
+
+    if (m_pLight == nullptr && *m_pAbilityType == ABILITY_CRASH)
+    {
+        LIGHT_DESC			LightDesc{};
+        LightDesc.eType = LIGHT_DESC::TYPE_HORONG;
+        _float4 vLightPos = CUtils::Get_State_Vector_Matrix(m_WorldMatrix, CUtils::STATE_POSITION);
+        LightDesc.vPosition = vLightPos;
+        LightDesc.fRange = 5.f;
+        LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+        LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
+        LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
+        if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+            return OBJ_NOEVENT;
+        m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
+        Safe_AddRef(m_pLight);
+    }
+
+    if (m_pLight != nullptr && *m_pAbilityType == ABILITY_CRASH)
+    {
+        m_pLight->Update_LightPos(CUtils::Get_State_Vector_Matrix(m_WorldMatrix, CUtils::STATE_POSITION));
+    }
+
+    if (m_pLight != nullptr && *m_pAbilityType != ABILITY_CRASH)
+    {
+        m_pLight->Set_DeadLight(true);
+        Safe_Release(m_pLight);
+        m_pLight = nullptr;
+    }
+
+
     return OBJ_NOEVENT;
 }
 
@@ -56,6 +88,12 @@ void CKirbyArmours::Late_Tick(_float fTimeDelta)
             m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
             m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
             m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
+
+            if (*m_pAbilityType == ABILITY_CRASH)
+            {
+                m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+                m_iRenderCount = 1;
+            }
         }
     }
 }
@@ -72,18 +110,54 @@ HRESULT CKirbyArmours::Render()
 
     for (size_t i = 0; i < iNumMeshes; i++)
     {
-        if (FAILED(m_pModelCom[*m_pAbilityType]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
-            return E_FAIL;
-        if (FAILED(m_pModelCom[*m_pAbilityType]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
-            return E_FAIL;
-        if (FAILED(m_pModelCom[*m_pAbilityType]->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
-            return E_FAIL;
+        if (m_iRenderCount == 0)
+        {
+            if (i == 0)
+            {
+                if (FAILED(m_pModelCom[*m_pAbilityType]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+                    return E_FAIL;
+                if (FAILED(m_pModelCom[*m_pAbilityType]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+                    return E_FAIL;
+                if (FAILED(m_pModelCom[*m_pAbilityType]->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+                    return E_FAIL;
+                _bool bEmissive = true;
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_bEmissive", &bEmissive, sizeof(_bool))))
+                    return E_FAIL;
+                m_fEmissivePower = CUtils::Make_RandomFloat(0.8f, 1.f);
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_fEmissivePower", &m_fEmissivePower, sizeof(_float))))
+                    return E_FAIL;
+            }
+            else
+                continue;
+        }
+        else
+        {
+            if (*m_pAbilityType == ABILITY_CRASH)
+            {
+                if (i == 0)
+                    continue;
+            }
 
-        /* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+            if (FAILED(m_pModelCom[*m_pAbilityType]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom[*m_pAbilityType]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom[*m_pAbilityType]->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+                return E_FAIL;
+            _bool bEmissive = false;
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_bEmissive", &bEmissive, sizeof(_bool))))
+                return E_FAIL;
+        }
+
         if (FAILED(m_pShaderCom->Begin(MODEL_KIRBYPART)))
             return E_FAIL;
-
         m_pModelCom[*m_pAbilityType]->Render(i);
+    }
+
+
+    if (*m_pAbilityType == ABILITY_CRASH)
+    {
+        m_iRenderCount--;
     }
 
     return S_OK;
@@ -128,6 +202,12 @@ HRESULT CKirbyArmours::Render_DeferredInfo()
     return S_OK;
 }
 
+_bool CKirbyArmours::Render_Emissive()
+{
+
+    return true;
+}
+
 HRESULT CKirbyArmours::Add_Components()
 {
     HRESULT hr;
@@ -151,6 +231,10 @@ HRESULT CKirbyArmours::Add_Components()
         TEXT("Com_Model_Hammer"), (CComponent**)&m_pModelCom[ABILITY_HAMMER]);
     CHECK_FAILED(hr);
 
+    /* For.Com_Model */
+    hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyArmour_Crash"),
+        TEXT("Com_Model_Crash"), (CComponent**)&m_pModelCom[ABILITY_CRASH]);
+    CHECK_FAILED(hr);
 
     return S_OK;
 }
@@ -241,5 +325,8 @@ void CKirbyArmours::Free()
 
     for (auto& pModel : m_pModelCom)
         Safe_Release(pModel);
+
+    if (m_pLight != nullptr)
+        Safe_Release(m_pLight);
 
 }

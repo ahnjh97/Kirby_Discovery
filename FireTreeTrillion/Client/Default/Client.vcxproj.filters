@@ -463,9 +463,6 @@
     <Filter Include="02.GameObjects\UI\MessageWindow">
       <UniqueIdentifier>{bcd8d01b-4475-4a52-aafd-de2aee6510c4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyGun_State">
-      <UniqueIdentifier>{a88b1b9f-6498-430b-9234-dce1f19a7962}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyCrash_State">
       <UniqueIdentifier>{2b564633-9ff1-4590-9555-1e64d92e3ea2}</UniqueIdentifier>
     </Filter>
@@ -1120,9 +1117,6 @@
     <ClInclude Include="..\Public\UI_MessageWindow.h">
       <Filter>02.GameObjects\UI\MessageWindow</Filter>
     </ClInclude>
-    <ClInclude Include="CKirbyDump_State.h">
-      <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Level_Finale.h">
       <Filter>01.Levels\12. Finale</Filter>
     </ClInclude>
@@ -1279,7 +1273,13 @@
     <ClInclude Include="..\Public\Gm_ParkSolarPanelOnce.h">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Once</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BossChimera.h">
+    <ClInclude Include="..\Public\KirbyCrash_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCrash_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyDump_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\BossChimera.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossChimera</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1737,9 +1737,6 @@
     <ClCompile Include="..\Private\UI_MessageWindow.cpp">
       <Filter>02.GameObjects\UI\MessageWindow</Filter>
     </ClCompile>
-    <ClCompile Include="CKirbyDump_State.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Level_Finale.cpp">
       <Filter>01.Levels\12. Finale</Filter>
     </ClCompile>
@@ -1899,7 +1896,13 @@
     <ClCompile Include="..\Private\Gm_ParkSolarPanelOnce.cpp">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Once</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BossChimera.cpp">
+    <ClCompile Include="..\Private\KirbyCrash_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCrash_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyDump_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\BossChimera.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossChimera</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1229,6 +1229,14 @@ void CGameInstance::Restore_SecondTimer(_float fRestoreRatio)
 	m_pTimeController->Restore_SecondTimer(fRestoreRatio);
 }
 
+_float CGameInstance::Get_OriginalTimer()
+{
+	if (nullptr == m_pTimeController)
+		return _float();
+
+	return m_pTimeController->Get_OriginalTimer();
+}
+
 _bool CGameInstance::Is_PassingGroup(CGameObject* pObj)
 {
 	return pObj->Get_CollisionType() >= PASSING_GROUP;

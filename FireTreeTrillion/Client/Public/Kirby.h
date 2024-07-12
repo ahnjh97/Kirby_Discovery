@@ -134,8 +134,12 @@ public:
 		// Àü±¸ Æû
 		_bool			m_bLightOn = { false };
 		_bool			m_bBulbJump = { false };
-
 		class CLight*	m_pLight = { nullptr };
+
+		// Å©·¡½¬ Æû
+		_float			m_fTimeRatio = { 0.f };
+		_int			m_iCrashTimeSlow = { 0 };
+		_float			m_fCrashChargeTime = { 0.f };
 	}KIRBY_INFODESC;
 
 
@@ -284,6 +288,9 @@ private:
 	_float				  m_fOrbitRenderDelay = { 0.f };
 
 	_int				  m_iTestAnim = { 0 };
+
+	// For Crash
+	_float				  m_fCrashRestoreTime = { 0.f };
 
 	unordered_map<PxRigidActor*, CGameObject*> m_mapToppleableBridges;
 	unordered_map<PxRigidActor*, CGameObject*> m_mapStarBoxes;

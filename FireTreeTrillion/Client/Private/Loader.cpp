@@ -2575,6 +2575,7 @@ void CLoader::Load_KirbyBodyModels()
 	m_vecModelInfo.emplace_back("KirbyDumpDefault", TYPE_ANIM, 0.8f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyBulbDefault", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyBulbVacuum", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyCrashDefault", TYPE_ANIM, 1.f, 180.f);
 
 	m_vecModelInfo.emplace_back("KirbyDumpVacuum", TYPE_ANIM, 0.8f);
 	m_vecModelInfo.emplace_back("KirbyDumpCut", TYPE_ANIM, 0.8f);
@@ -2589,6 +2590,7 @@ void CLoader::Load_KirbyWeaponModels()
 	m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
 	m_vecModelInfo.emplace_back("KirbyWeapon_Hammer", TYPE_ANIM, 1.f);
 	m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
+
 }
 
 void CLoader::Load_KirbyArmourModels()
@@ -2597,6 +2599,7 @@ void CLoader::Load_KirbyArmourModels()
 	m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
 	m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 	m_vecModelInfo.emplace_back("KirbyArmour_Hammer", TYPE_NONANIM, 1.f);
+	m_vecModelInfo.emplace_back("KirbyArmour_Crash", TYPE_NONANIM, 1.f);
 }
 
 string CLoader::Remove_BeforeLastPipe(const string& str)

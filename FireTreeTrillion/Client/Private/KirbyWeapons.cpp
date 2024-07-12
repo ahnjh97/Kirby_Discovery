@@ -144,6 +144,9 @@ HRESULT CKirbyWeapons::Render_NonAnimWeapon()
             return E_FAIL;
         if (FAILED(m_pModelCom[*m_pAbilityType]->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
             return E_FAIL;
+        _bool bEmissive = false;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_bEmissive", &bEmissive, sizeof(_bool))))
+            return E_FAIL;
 
         /* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
         if (FAILED(m_pShaderCom->Begin(MODEL_KIRBYPART)))
