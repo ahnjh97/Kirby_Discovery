@@ -56,7 +56,7 @@ _int CBuildingCluster_A::Tick(_float fTimeDelta)
 	CFinaleCut_ControlCenter* pCenter =
 		static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
 	if (nullptr == pCenter)
-		return;
+		return OBJ_NOEVENT;
 
 
 	return OBJ_NOEVENT;
