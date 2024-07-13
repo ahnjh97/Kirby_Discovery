@@ -226,7 +226,7 @@ public: /* For. TimeController */
 	void	Set_SecondTimerRatio(_float fRatio);
 	void	Restore_FirstTimer(_float fRestoreRatio = 1.f);
 	void	Restore_SecondTimer(_float fRestoreRatio = 1.f);
-
+	_float	Get_OriginalTimer();
 
 	/* For. OcTree */
 	_uint Get_NumOctree() { return g_iNumOctree; }

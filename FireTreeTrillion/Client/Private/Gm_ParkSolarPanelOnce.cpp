@@ -173,15 +173,12 @@ void CGm_ParkSolarPanelOnce::Render_IMGUI()
 void CGm_ParkSolarPanelOnce::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	m_IsInteraction = TRUE;
-
+	
 	//충전 대기 상태에서 키꾹 > 충전 시작
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && STATE_OFFWAIT == m_eCurState)
 	{
-		if (STATE_OFFWAIT == m_eCurState)
-		{
-			m_pModelCom->Set_Animation(STATE_CHARGE, 30.f, FALSE, TRUE);
-			m_eCurState = STATE_CHARGE;
-		}
+		m_pModelCom->Set_Animation(STATE_CHARGE, 30.f, FALSE, TRUE);
+		m_eCurState = STATE_CHARGE;
 	}
 
 #pragma region KEY_FRAME CUSTOM 1 SCOOP
@@ -236,7 +233,7 @@ HRESULT CGm_ParkSolarPanelOnce::Add_Components()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 
-	Set_BodyCollider(COLLIDER_CYLINDER, 0.f, 2.5f, 5.f);
+	Set_BodyCollider(COLLIDER_CYLINDER, 0.f, 5.f, 5.f);
 
 #pragma endregion
 
@@ -314,5 +311,5 @@ void CGm_ParkSolarPanelOnce::Free()
 	Safe_Release(m_pNonAnimModelCom);
 
 	Safe_Release(m_pShaderCom);
-
+	//Safe_Release(m_pTextureCom);
 }

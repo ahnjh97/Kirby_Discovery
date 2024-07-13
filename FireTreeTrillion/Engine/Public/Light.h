@@ -45,6 +45,9 @@ private:
 	_float				m_fRatioTime = { 0.f };
 	_bool				m_bInterpolate = { false };
 
+	_float4				m_vOriginHorongPower = { 0.f, 0.f, 0.f, 0.f };
+	_float				m_fOriginRange = { 0.f };
+
 public:
 	static CLight* Create(const LIGHT_DESC& LightDesc);
 	virtual void Free() override;
