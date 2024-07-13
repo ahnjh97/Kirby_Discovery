@@ -14,7 +14,6 @@ public:
 	typedef struct DialogMessage
 	{
 		_uint	uLevel = LEVEL_END;
-		wstring wstrNPC = { TEXT("") };
 		string strPath = "";
 
 	}DIALOG_DESC;

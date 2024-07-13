@@ -129,33 +129,49 @@ void CTransingStar::Activate(TYPE _eActivateType)
     // 활성화 시키는 부울값 ON
     m_eActivateType = _eActivateType;
 
-    // Activate한 순간의 Player의 위치를 받아온다.
-    CGameObject* pObj = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
-    _float4 vPlayerPos = pObj->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
-
     // 뷰-투영 변환 행렬
     _matrix ViewMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW);
     _matrix ProjMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
     _matrix ComMatrix = ViewMatrix * ProjMatrix;
-    
-    // 3D 위치를 다시 2D 위치로 바꾸는 과정
-    _float4 vPlayerNewPos = XMVector3TransformCoord(XMLoadFloat4(&vPlayerPos), ComMatrix);
-    _float4 vFinalPos = _float4((vPlayerNewPos.x * g_iWinSizeX) * 0.5f,
-                                (vPlayerNewPos.y * g_iWinSizeY) * 0.5f + g_fPosOffset,
-                                0.f, 1.f);
 
-    fill(m_arrayStarMatrix.begin(), m_arrayStarMatrix.end(), _float4x4());
-    for (_int i = 0; i < 3; ++i)
+    switch (m_eActivateType)
     {
-        _float4 vFinalPoswithZ = _float4(vFinalPos.x, vFinalPos.y, vFinalPos.z + i * 0.1f, 1.f);
-        CUtils::Set_State_Matrix(m_arrayStarMatrix[i], CUtils::STATE_POSITION, vFinalPoswithZ);
-        CUtils::Rotation(m_arrayStarMatrix[i], _float4(0.f, 0.f, 1.f, 0.f), 0.f);
-    }
+    case OPEN:
+    {
+        fill(m_arrayStarMatrix.begin(), m_arrayStarMatrix.end(), _float4x4());
+        
 
-    if (_eActivateType == OPEN)
-    {
+        for (_int i = 0; i < 3; ++i)
+        {
+            CUtils::Set_State_Matrix(m_arrayStarMatrix[i], CUtils::STATE_POSITION, _float4(0.f, 0.f, i * 0.1f, 1.f));
+            //CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[i], m_InitialSize.x, m_InitialSize.y, 1.f);
+            CUtils::Rotation(m_arrayStarMatrix[i], _float4(0.f, 0.f, 1.f, 0.f), 0.f);
+        }
         CUtils::Set_State_Matrix(m_arrayStarMatrix[2], CUtils::STATE_POSITION, _float4(0.f, 0.f, 0.2f, 1.f));
         CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
+    }
+    break;
+    case CLOSE:
+    {
+        // Activate한 순간의 Player의 위치를 받아온다.
+        CGameObject* pObj = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
+        _float4 vPlayerPos = pObj->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+
+        // 3D 위치를 다시 2D 위치로 바꾸는 과정
+        _float4 vPlayerNewPos = XMVector3TransformCoord(XMLoadFloat4(&vPlayerPos), ComMatrix);
+        _float4 vFinalPos = _float4((vPlayerNewPos.x * g_iWinSizeX) * 0.5f,
+                                    (vPlayerNewPos.y * g_iWinSizeY) * 0.5f + g_fPosOffset,
+                                    0.f, 1.f);
+
+        fill(m_arrayStarMatrix.begin(), m_arrayStarMatrix.end(), _float4x4());
+        for (_int i = 0; i < 3; ++i)
+        {
+            _float4 vFinalPoswithZ = _float4(vFinalPos.x, vFinalPos.y, vFinalPos.z + i * 0.1f, 1.f);
+            CUtils::Set_State_Matrix(m_arrayStarMatrix[i], CUtils::STATE_POSITION, vFinalPoswithZ);
+            CUtils::Rotation(m_arrayStarMatrix[i], _float4(0.f, 0.f, 1.f, 0.f), 0.f);
+        }
+    }
+    break;
     }
 }
 
@@ -222,14 +238,16 @@ void CTransingStar::Tick_YeonDooStar(_float fTimeDelta)
 void CTransingStar::Tick_GreenStar(_float fTimeDelta)
 {
     CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
-    if (*m_pCurrentLevelID == LEVEL_PARK)
+    if (m_eNextLevel != LEVEL_END) return;
+
+    if (*m_pCurrentLevelID == LEVEL_PARK || *m_pCurrentLevelID == LEVEL_TOWN )
     {
         if (m_InitialSize.x <= m_fDecreaseValue)
         {
-            m_fParkTime += m_fTimeDelta;
-            if (m_fParkTime >= 2.f)
+            m_fMovingTime += m_fTimeDelta;
+            if (m_fMovingTime >= 2.f)
             {
-                m_fParkTime = 0.f;
+                m_fMovingTime = 0.f;
                 Activate(OPEN);
             }
         }
@@ -281,7 +299,7 @@ void CTransingStar::Tick_OpenAlphaStar(_float fTimeDelta)
     }
     else // 커지면서 돌리기
     {
-        m_fAlphaTime += m_fTimeDelta * TIMEDELTA_OFFSET; // *1.5f;
+        m_fAlphaTime += m_fTimeDelta * TIMEDELTA_OFFSET;
         CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * m_fAlphaTime, m_InitialSize.y * m_fAlphaTime, 1.f);
         CUtils::Turn_OtherMatrix(m_arrayStarMatrix[0], _float4(0.f, 0.f, 1.f, 0.f), m_fTimeDelta, 135.f);
     }
@@ -325,12 +343,25 @@ void CTransingStar::On_Event()
         m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, m_eNextLevel));
     else
     {
-        CGameObject* pPlayer = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
-        CKirby* pKirby = dynamic_cast<CKirby*>(pPlayer);
-        pKirby->Set_ControllerPos(_float4(5.4f, 39.f, -26.36f, 1.f));
-        
-        CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
-        pCameraMain->Set_FOVY(30);
+        if (*CGameInstance::Get_Instance()->Get_CurrentLevelID() == LEVEL_PARK)
+        {
+            CGameObject* pPlayer = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
+            CKirby* pKirby = dynamic_cast<CKirby*>(pPlayer);
+            pKirby->Set_ControllerPos(_float4(5.4f, 39.f, -26.36f, 1.f));
+
+            CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+            pCameraMain->Set_FOVY(30);
+        }
+        else if (*m_pCurrentLevelID == LEVEL_TOWN)
+        {
+            CGameObject* pPlayer = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
+            CKirby* pKirby = dynamic_cast<CKirby*>(pPlayer);
+            pKirby->Set_ControllerPos(_float4(140.3f, 23.2f, 104.7f, 1.f));
+
+            CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+            pCameraMain->Set_FOVY(38);
+            pCameraMain->Move_ForTrigger(m_fTimeDelta);
+        }
 	}
 }
 
