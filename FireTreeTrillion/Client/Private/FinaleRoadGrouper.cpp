@@ -98,7 +98,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 	case RTYPE_BUILDINGA:
 	{
 		CFinaleRoad::ROAD_DESC roadDesc{};
-		roadDesc.wstrModelName = TEXT("MovableBuildingA");
+		roadDesc.wstrModelName = TEXT("BigMovableBuildingA");
 		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		roadDesc.eCollideType = CFinaleRoad::CTYPE_STOP;
 
@@ -115,7 +115,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 	case RTYPE_BUILDINGB:
 	{
 		CFinaleRoad::ROAD_DESC roadDesc{};
-		roadDesc.wstrModelName = TEXT("MovableBuildingB");
+		roadDesc.wstrModelName = TEXT("BigMovableBuildingB");
 		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		roadDesc.eCollideType = CFinaleRoad::CTYPE_STOP;
 
@@ -131,7 +131,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 	case RTYPE_BUILDINGC:
 	{
 		CFinaleRoad::ROAD_DESC roadDesc{};
-		roadDesc.wstrModelName = TEXT("MovableBuildingC");
+		roadDesc.wstrModelName = TEXT("BigMovableBuildingC");
 		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		roadDesc.eCollideType = CFinaleRoad::CTYPE_STOP;
 
@@ -147,7 +147,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 	case RTYPE_BUILDINGD:
 	{
 		CFinaleRoad::ROAD_DESC roadDesc{};
-		roadDesc.wstrModelName = TEXT("MovableBuildingD");
+		roadDesc.wstrModelName = TEXT("BigMovableBuildingD");
 		roadDesc.pSocketMat = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		roadDesc.eCollideType = CFinaleRoad::CTYPE_STOP;
 
