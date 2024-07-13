@@ -514,7 +514,8 @@ void CCamera_Main::Track_Anchor(_float fTimeDelta)
 	// 두 타겟을 잡을 때의 설정
 	if (m_eCamFocus == FOCUS_BOTH)
 		Compute_Set_BothFocus(fTimeDelta);
-
+	else if(m_eCamFocus == FOCUS_BATTLE)
+		Compute_Set_BattleFocus(fTimeDelta);
 	//트리거 안에 들어가 있을 경우 트리거 사이에서의 카메라 설정
 	else if (m_bLerpByTriggerInfo)
 		Compute_Set_Trigger(m_iMatrixIndex);
@@ -838,6 +839,22 @@ void CCamera_Main::Compute_Set_BothFocus(_float fTimeDelta)
 	m_vDestCamDir.Normalize();
 
 	m_fDestDistance = m_fOrigDistance * .5f + (m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - m_pSecondTarget->Get_State(CTransform::STATE_POSITION)).Length() * 1.2f /** .7f*/;
+
+}
+
+void CCamera_Main::Compute_Set_BattleFocus(_float fTimeDelta)
+{
+
+	_float3 vKirbyToBoss = FINALEBOSS->Get_RootPos() - FINALEKIRBY->m_vBonePos;
+	_float3 vBossToKirby = FINALEKIRBY->m_vBonePos - FINALEBOSS->Get_RootPos();
+
+	m_vDestCamDir = _float3::Lerp(vKirbyToBoss, vBossToKirby, m_fBothFocusRatio);
+	m_vDestCamDir.Normalize();
+
+	_float fDistRatio = (.5f < m_fBothFocusRatio)?
+		m_fBothFocusRatio * 2.f : 1.f - (m_fBothFocusRatio * 2.f - 1.f);
+
+	m_fDestDistance = 20.f + (20.f * fDistRatio);
 
 }
 
@@ -1712,47 +1729,37 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//보스를 뒤에서 본다
 	case SEQ_FINALECUT8:
 	{
-		//시작, 끝 위치 탐색 필요
-
-		_float3 vStartPos = (_float3)FINALEKIRBY->m_vBonePos;
+	_float3 vStartPos = (_float3)FINALEKIRBY->m_vBonePos;
 
 		_float fDuration = m_FinaleSeqBTime.front();
 
 		CAMACTION newAction = {};
-		newAction.fTime = 0.f;
-		newAction.eCamCut = CUT_HARD;
-		newAction.fFOVY = 45.f;
+		Fill_HardCutSet(newAction, 0.f);
 
-		_float3 vActionDir = _float3{ 1.5f, .3f, -.5f };
-		Fill_ActionDir(newAction, DIR_ABSOLUTE,	vActionDir);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ -15.f, -20.f, 10.f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -1.5f, -2.f, 1.f } * -1.f);
 		newAction.vDir.Normalize();
 
-		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - newAction.vDir * 40.f);
-
+		newAction.fFOVY = 45.f;
 		m_CamSeq.push_back(newAction);
 
-		
+
 		//
 		newAction = {};
-		Fill_InterpolateCutSet(newAction, 0.f, EASE_LINEAR, fDuration);
-		m_CamSeq.push_back(newAction);
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT_FAST, fDuration);
 
-		/*
-		Fill_ActionPos(newAction, POS_ABSOLUTE,
-			vStartPos -(newAction.vDir * 40.f) + _float3{ 20.f, 10.f, 0.f });
-
-		Fill_ActionDir(newAction, DIR_ABSOLUTE,
-			vActionDir);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ -15.f, -20.f, 10.f } /*+ _float3{ 10.f, 10.f, 0.f}*/ );
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -1.5f, -2.f, 1.f } * -1.f);
 		newAction.vDir.Normalize();
-		*/
 
+		m_CamSeq.push_back(newAction);
 	}
 	break;
 	//보스 얼굴 줌인
 	case SEQ_FINALECUT9:
 	{
 		_float fDuration = m_FinaleSeqBTime.front();
-		_float3 vStartPos = BOSS_POS;
+		_float3 vStartPos = BOSS_POS + _float3{0.f, 1.f, 0.f};
 
 
 		CAMACTION newAction = {};
@@ -1779,6 +1786,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	case SEQ_FINALECUT10:
 	{
 		_float fDuration = m_FinaleSeqBTime.front();
+		_float3 vStartPos = BOSS_POS + _float3{ 0.f, 1.f, 0.f };
 
 		//얼굴 컷
 		CAMACTION newAction = {};
@@ -1787,7 +1795,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		Fill_ActionDir(newAction, DIR_ABSOLUTE,	{ 1.f, 0.f, 0.f });
 		newAction.vDir.Normalize();
 
-		Fill_ActionPos(newAction, POS_ABSOLUTE, BOSS_POS + _float3{ -5.f, 2.f, 0.f });
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ -5.f, 2.f, 0.f });
 
 		m_CamSeq.push_back(newAction);
 
@@ -1804,7 +1812,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		//
 		newAction = {};
-		Fill_InterpolateCutSet(newAction, 1.f, EASE_INOUT_FAST, 2.f);
+		Fill_InterpolateCutSet(newAction, 1.f, EASE_INOUT_FAST, 4.f);
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE, BOSS_POS + _float3{ -60.f, 10.f, 0.f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 1.f, 0.f, 0.f });
@@ -1813,7 +1821,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 
 		//
-		Fill_InterpolateCutSet(newAction, 3.f, EASE_INOUT, fDuration - 3.f);
+		Fill_InterpolateCutSet(newAction, 5.f, EASE_INOUT, fDuration - 5.f);
+		newAction.fFOVY = 50.f;
 		m_CamSeq.push_back(newAction);
 
 	}
@@ -1832,6 +1841,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -1.5f, -2.f, 1.f } * -1.f);
 		newAction.vDir.Normalize();
 
+		newAction.fFOVY = 45.f;
 		m_CamSeq.push_back(newAction);
 
 
@@ -1840,7 +1850,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT_FAST, fDuration);
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ -15.f, -20.f, 10.f } /*+ _float3{ 10.f, 10.f, 0.f}*/ );
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -.5f, -1.f, 1.f } * -1.f);
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -1.5f, -2.f, 1.f } * -1.f);
 		newAction.vDir.Normalize();
 
 		m_CamSeq.push_back(newAction);
@@ -1857,7 +1867,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		CAMACTION newAction = {};
 		Fill_HardCutSet(newAction, 0.f);
 
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -.23f, -.34f, -.91f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -1.f, -.3f, -.2f });
 		newAction.vDir.Normalize();
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - (newAction.vDir * 30.f));
 
@@ -1871,7 +1881,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction = {};
 		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT_FAST, fDuration);
 
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -.23f, -.34f, -.91f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ 0.f, 0.f, -1.f });
 		newAction.vDir.Normalize();
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - (newAction.vDir * 30.f));
 
@@ -2172,15 +2182,31 @@ _float3 CCamera_Main::Make_TargetPos()
 		vTargetPos = (_float3)m_pSecondTarget->Get_State(CTransform::STATE_POSITION);
 	//두 타겟 사이의 중심점.
 	else if (m_eCamFocus == FOCUS_BOTH)
+	{
 		vTargetPos =
 		(_float3)m_pFirstTarget->Get_State(CTransform::STATE_POSITION)
-		+ (m_pSecondTarget->Get_State(CTransform::STATE_POSITION) - m_pFirstTarget->Get_State(CTransform::STATE_POSITION)) * .4f;
+		+ (m_pSecondTarget->Get_State(CTransform::STATE_POSITION) - m_pFirstTarget->Get_State(CTransform::STATE_POSITION)) * m_fBothFocusRatio;
+	}
+
 	//피날레 카메라 포커스
 	else if (m_eCamFocus == FOCUS_FINALE)
 	{
 		CFinaleKirby* pKirby = dynamic_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0));
 		if (nullptr != pKirby)
 			vTargetPos = (_float3)pKirby->m_vBonePos;
+	}
+	//피날레 배틀 포커스
+	else if (m_eCamFocus == FOCUS_BATTLE)
+	{
+		CFinaleKirby* pKirby = FINALEKIRBY;
+		CHECK_NULLPTR(pKirby);
+		_float3 vKirbyPos = (_float3)pKirby->m_vBonePos;
+
+		CFinaleBoss* pBoss = FINALEBOSS;
+		CHECK_NULLPTR(pBoss);
+		_float3 vBossPos = (_float3)pBoss->Get_RootPos();
+
+		vTargetPos = vKirbyPos * (1.f - m_fBothFocusRatio) + vBossPos * (m_fBothFocusRatio);
 	}
 
 	return vTargetPos;

@@ -1,21 +1,25 @@
+#include "stdafx.h"
 #include "Finale_SpecialDebris.h"
 
 CFinale_SpecialDebris::CFinale_SpecialDebris(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	: CPhysXObject{ pDevice, pContext }
+
 {
 }
 
 CFinale_SpecialDebris::CFinale_SpecialDebris(const CFinale_SpecialDebris& rhs)
+	: CPhysXObject{rhs}
 {
 }
 
 HRESULT CFinale_SpecialDebris::Initialize_Prototype()
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 HRESULT CFinale_SpecialDebris::Initialize(void* pArg)
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 _int CFinale_SpecialDebris::Tick(_float fTimeDelta)
@@ -29,12 +33,12 @@ void CFinale_SpecialDebris::Late_Tick(_float fTimeDelta)
 
 HRESULT CFinale_SpecialDebris::Render()
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 HRESULT CFinale_SpecialDebris::Render_LightDepth()
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 void CFinale_SpecialDebris::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
@@ -43,12 +47,12 @@ void CFinale_SpecialDebris::Collision(CCollisionCenter::CONTENT_TYPE eContent, C
 
 HRESULT CFinale_SpecialDebris::Add_Components(wstring wstrModelProtoTag)
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 HRESULT CFinale_SpecialDebris::Bind_ShaderResources()
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 _int CFinale_SpecialDebris::Make_Partical()
@@ -72,4 +76,5 @@ CGameObject* CFinale_SpecialDebris::Clone(void* pArg)
 
 void CFinale_SpecialDebris::Free()
 {
+	__super::Free();
 }

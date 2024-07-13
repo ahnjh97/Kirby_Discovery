@@ -3,6 +3,7 @@
 #include "FSM.h"
 #include "FinaleBoss_State.h"
 #include "Bone.h"
+#include "Camera_Main.h"
 
 CFinaleBoss::CFinaleBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -22,6 +23,7 @@ HRESULT CFinaleBoss::Initialize_Prototype()
 HRESULT CFinaleBoss::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC		GameObjectDesc{};
+
 	if (nullptr != pArg)
 		GameObjectDesc = *(GAMEOBJECT_DESC*)pArg;
 
@@ -35,6 +37,14 @@ HRESULT CFinaleBoss::Initialize(void* pArg)
 		return E_FAIL;
 
 	//m_bRimLight = false;
+
+	// 게임플레이 스테이지라면 카메라에 자신을 세팅한다.
+	if (LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END)
+	{
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+		pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_FINALE);
+	}
+
 	m_pModelCom->Set_Animation(FINALEBOSS_DEMOWAITAIR, 50.f, true, true);
 
 	return S_OK;
