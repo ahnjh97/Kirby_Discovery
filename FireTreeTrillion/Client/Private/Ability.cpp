@@ -368,6 +368,7 @@ void CAbility::AbilityType(ABILITYTYPE eAbilityType)
 		m_strComponentTag = TEXT("Prototype_Component_Model_Item_Bomb");
 		break;
 	case ABILITY_CRASH:
+		m_strComponentTag = TEXT("Prototype_Component_Model_Item_Crash");
 		break;
 	case ABILITY_END:
 		break;
