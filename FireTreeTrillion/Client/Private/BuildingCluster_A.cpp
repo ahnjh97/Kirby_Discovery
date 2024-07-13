@@ -35,6 +35,7 @@ HRESULT CBuildingCluster_A::Initialize(void* pArg)
 
 	m_bMotionBlur = false;
 	m_bRimLight = true;
+	//m_fRimWidth = .1f;
 	m_bStencil = true;
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(2550.f, 255.f, -136.f, 1.f));

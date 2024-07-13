@@ -1649,7 +1649,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		//
 		newAction = {};
-		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, fDuration);
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, fDuration - .1f);
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE,
 			BOSS_POS + _float3{ -15.f, -3.f, 20.f });
@@ -1658,6 +1658,16 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 			vActionDir);
 
 		newAction.fFOVY = 60.f;
+		m_CamSeq.push_back(newAction);
+
+
+		newAction = {};
+		Fill_HardCutSet(newAction, fDuration);
+
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 1.f, .08f, -.12f });
+		newAction.vDir.Normalize();
+
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 1990.f, 27.f, -136.3f });
 		m_CamSeq.push_back(newAction);
 
 	}
@@ -1677,7 +1687,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		CAMACTION newAction = {};
 		Fill_HardCutSet(newAction, 0.f);
 
-		_float3 vActionDir = XMVector3Normalize(_float3{ 0.f, 0.f, -1.f });
+		_float3 vActionDir = XMVector3Normalize(_float3{ .24f, .37f, -.9f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE,
 			vActionDir);
 		newAction.vDir.Normalize();
@@ -1692,8 +1702,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		//앵글 유지용 더미
 		Fill_InterpolateCutSet(newAction, 0.f, EASE_LINEAR, fDuration);
 
-		Fill_ActionPos(newAction, POS_ABSOLUTE,
-			vStartPos + -newAction.vDir * 80.f);
+		//Fill_ActionPos(newAction, POS_ABSOLUTE,
+		//	vStartPos + -newAction.vDir * 80.f);
 
 		m_CamSeq.push_back(newAction);
 
@@ -1702,14 +1712,14 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//보스를 뒤에서 본다
 	case SEQ_FINALECUT8:
 	{
-		_float3 vStartPos = BATTLE_POS;
+		_float3 vStartPos = (_float3)FINALEKIRBY->m_vBonePos;
 
 		_float fDuration = m_FinaleSeqBTime.front();
 
 		CAMACTION newAction = {};
 		Fill_HardCutSet(newAction, 0.f);
 
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 1.f, .5f, -.2f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { .74f, .61f, -.29f });
 		newAction.vDir.Normalize();
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - newAction.vDir * 40.f);
 
@@ -1721,9 +1731,9 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction = {};
 		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, fDuration);
 
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 1.f, .5f, -.2f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, {.72f, .66f, -.22f });
 		newAction.vDir.Normalize();
-		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - newAction.vDir * 35.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - newAction.vDir * 40.f);
 
 		m_CamSeq.push_back(newAction);
 	}
@@ -1800,15 +1810,16 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	case SEQ_FINALECUT11:
 	{
 		_float3 vStartPos = (_float3)FINALEKIRBY->m_vBonePos;
+		vStartPos = _float3{ 2479.f, 187.f, -136.f };
 
 		_float fDuration = m_FinaleSeqBTime.front();
 
 		CAMACTION newAction = {};
 		Fill_HardCutSet(newAction, 0.f);
 
-		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ -15.f, -20.f, 10.f });
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -1.5f, -2.f, 1.f } *-1.f);
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ .74f, .67f, -.05f });
 		newAction.vDir.Normalize();
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - newAction.vDir * 40.f);
 
 		newAction.fFOVY = 45.f;
 		m_CamSeq.push_back(newAction);
@@ -1817,10 +1828,11 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		//
 		newAction = {};
 		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT_FAST, fDuration);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - newAction.vDir * 30.f);
 
-		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ -15.f, -20.f, 10.f } /*+ _float3{ 10.f, 10.f, 0.f}*/);
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -1.5f, -2.f, 1.f } *-1.f);
-		newAction.vDir.Normalize();
+		//Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ -15.f, -20.f, 10.f } /*+ _float3{ 10.f, 10.f, 0.f}*/);
+		//Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -1.5f, -2.f, 1.f } *-1.f);
+		//newAction.vDir.Normalize();
 
 		m_CamSeq.push_back(newAction);
 
@@ -1836,9 +1848,9 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		CAMACTION newAction = {};
 		Fill_HardCutSet(newAction, 0.f);
 
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -1.f, -.3f, -.2f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -.57f, -.27f, -.77f });
 		newAction.vDir.Normalize();
-		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - (newAction.vDir * 30.f));
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - (newAction.vDir * 60.f));
 
 		m_CamSeq.push_back(newAction);
 
@@ -1852,7 +1864,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ 0.f, 0.f, -1.f });
 		newAction.vDir.Normalize();
-		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - (newAction.vDir * 30.f));
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - (newAction.vDir * 50.f));
 
 		m_CamSeq.push_back(newAction);
 
@@ -1871,8 +1883,9 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		CAMACTION newAction = {};
 		Fill_HardCutSet(newAction, 0.f);
 
-		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ -15.f, -4.f, 20.f });
-		//Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -.5f, -1.f, 1.f } *-1.f);
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ .94f, .05f, -.32f });
+		newAction.vDir.Normalize();
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - newAction.vDir * 15.f);
 
 		newAction.fFOVY = 45.f;
 		m_CamSeq.push_back(newAction);
@@ -1892,7 +1905,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		Fill_HardCutSet(newAction, 0.f);
 
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -.1f, -.3f, -1.f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ .32f, .29f, -.9f });
 		newAction.vDir.Normalize();
 		Fill_ActionPos(newAction, POS_ABSOLUTE, BATTLE_POS - newAction.vDir * 40.f);
 
@@ -1911,7 +1924,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		CAMACTION newAction = {};
 		Fill_HardCutSet(newAction, 0.f);
 
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -1.f, -.3f, -.1f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -.8f, -.4f, -.45f});
 		newAction.vDir.Normalize();
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - newAction.vDir * 20.f);
@@ -1922,12 +1935,13 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction = {};
 		Fill_InterpolateCutSet(newAction, 3.f, EASE_INOUT, 3.f);
 
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -.4f, -.3f, -.7f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -.42f, -.17f, -.9f });
 		newAction.vDir.Normalize();
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - newAction.vDir * 20.f);
 		m_CamSeq.push_back(newAction);
 
+		//
 		Fill_InterpolateCutSet(newAction, 6.f, EASE_INOUT, fDuration - 6.f);
 		m_CamSeq.push_back(newAction);
 
