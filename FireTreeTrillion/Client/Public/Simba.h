@@ -121,6 +121,8 @@ private:
 	class CBone*	m_pLipBone = { nullptr };
 	_bool			m_bHpBarCreated = { false };
 
+	unordered_set<SIMBA_ANIM> m_setAppear1Anims;
+
 private:
 	HRESULT		Add_Components();
 	HRESULT		Bind_ShaderResources();

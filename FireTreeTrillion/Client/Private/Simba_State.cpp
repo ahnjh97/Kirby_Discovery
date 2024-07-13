@@ -5,7 +5,7 @@
 
 static _float s_fOffsetY = {};
 
-// *********************** APPEAR1 ***********************
+// *********************** APPEAR1 ***********************  // 구현해라 정현아
 void CSimba_Appear1::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -27,7 +27,7 @@ void CSimba_Appear1::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** APPEAR2 ***********************
+// *********************** APPEAR2 *********************** // 완료
 void CSimba_Appear2::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -84,7 +84,7 @@ void CSimba_Appear2::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** WALK ***********************
+// *********************** WALK *********************** // 완료
 void CSimba_Walk::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -112,7 +112,7 @@ void CSimba_Walk::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** QUICKCLAW ***********************
+// *********************** QUICKCLAW *********************** // 공격하면서 대쉬 기능 구현필요
 void CSimba_QuickClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -184,7 +184,7 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	}
 }
 
-// *********************** FinalCrusher ***********************
+// *********************** FinalCrusher *********************** // 이펙트 및 퍼지는 원 충돌로직 필요
 void CSimba_FinalCrusher::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -227,7 +227,7 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	}
 }
 
-// *********************** DoubleClaw ***********************
+// *********************** DoubleClaw *********************** // 완료
 void CSimba_DoubleClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -285,7 +285,7 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	}
 }
 
-// *********************** Jump ***********************
+// *********************** Jump *********************** // 점프로직 수정필요
 void CSimba_Jump::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -355,7 +355,7 @@ void CSimba_Jump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** BackStep ***********************
+// *********************** BackStep *********************** // 이동로직 구현 필요
 void CSimba_BackStep::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -390,7 +390,7 @@ void CSimba_BackStep::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** AttackJump ***********************
+// *********************** AttackJump *********************** // 점프 및 이동로직 필요
 void CSimba_AttackJump::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);

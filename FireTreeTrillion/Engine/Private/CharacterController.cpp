@@ -411,7 +411,7 @@ _float CCharacterController::Compute_Height(_fvector vAxis)
 		fHeight = rayOrigin.y - hit.position.y;
 	}
 	else
-		return 20.f;
+		fHeight = RayCastToDynamicActor(XMVectorSet(0, -1, 0, 0));
 
 	return fHeight;
 }

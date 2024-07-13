@@ -51,7 +51,6 @@ HRESULT CSimba::Initialize(void* pArg)
 	if (nullptr != pArg)
 	{
 		pMonDesc = (MONSTER_DESC*)pArg;
-
 		pMonDesc->fSpeedPerSec = 7.f;
 		pMonDesc->fRotationPerSec = XMConvertToRadians(90.0f);
 		m_eMonState = pMonDesc->eMonState;
@@ -118,6 +117,8 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_pLipBone = m_pModelCom->Get_BonePtr("T_LLip0J");
 	Safe_AddRef(m_pLipBone);
 
+	//m_setAppear1Anims = {}
+
 	return S_OK;
 }
 
@@ -164,6 +165,8 @@ _int CSimba::Tick(_float fTimeDelta)
 	}
 
 	Check_HitBoxActivation();
+
+	//if()
 
 	return OBJ_NOEVENT;
 }
