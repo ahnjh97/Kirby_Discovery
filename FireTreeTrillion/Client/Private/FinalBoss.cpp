@@ -145,81 +145,81 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	else
 		m_fGlideTime = 0.f;
 
-	////풀링임
-	//if (true == m_bGully)
-	//{
-	//	//m_fGullyTime += m_fTimeDelta;
+	//풀링임
+	if (true == m_bGully)
+	{
+		//m_fGullyTime += m_fTimeDelta;
 
-	//	if (false == m_bShake)
-	//	{
-	//		m_fTimeDelay = 0.8f;
-	//		m_bShake = true;
-	//		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
-	//		if (pCamera != nullptr)
-	//			pCamera->Make_Shake(1.f, 1.f);
-	//	}
+		if (false == m_bShake)
+		{
+			m_fTimeDelay = 0.8f;
+			m_bShake = true;
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+			if (pCamera != nullptr)
+				pCamera->Make_Shake(1.f, 1.f);
+		}
 
-	//	//if(0.1f < m_fGullyTime)
-	//	//{
-	//		//m_fGullyTime = 0.f;
+		//if(0.1f < m_fGullyTime)
+		//{
+			//m_fGullyTime = 0.f;
 
-	//	// 쟁기질
-	//	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
-	//	vPos.m128_f32[1] = 0.f;
-	//	m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
-	//	++m_iGullyCnt;
-	//	vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
+		// 쟁기질
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
+		vPos.m128_f32[1] = 0.f;
+		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
+		++m_iGullyCnt;
+		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
 
-	//	vPos.m128_f32[1] = 0.f;
-	//	m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
-	//	++m_iGullyCnt;
-	//	if (m_vecGully.size() <= m_iGullyCnt)
-	//		m_iGullyCnt = 0;
+		vPos.m128_f32[1] = 0.f;
+		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
+		++m_iGullyCnt;
+		if (m_vecGully.size() <= m_iGullyCnt)
+			m_iGullyCnt = 0;
 
-	//	vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	//	vPos.m128_f32[1] -= 6.f;
+		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		vPos.m128_f32[1] -= 6.f;
 
-	//	// 파편 파티클 튀는거 
-	//	if (m_vecDebris.size() > m_iDebrsiMaxCnt)
-	//		m_iDebrsiMaxCnt += DEBRISCNT;
-	//	else
-	//	{
-	//		m_iDebrsiMaxCnt = DEBRISCNT;
-	//		m_iDebrisCnt = 0;
-	//	}
+		// 파편 파티클 튀는거 
+		if (m_vecDebris.size() > m_iDebrsiMaxCnt)
+			m_iDebrsiMaxCnt += DEBRISCNT;
+		else
+		{
+			m_iDebrsiMaxCnt = DEBRISCNT;
+			m_iDebrisCnt = 0;
+		}
 
-	//	// 파편 파티클 살리기
-	//	for (m_iDebrisCnt; m_iDebrisCnt < m_iDebrsiMaxCnt; ++m_iDebrisCnt)
-	//		m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vPos);
+		// 파편 파티클 살리기
+		for (m_iDebrisCnt; m_iDebrisCnt < m_iDebrsiMaxCnt; ++m_iDebrisCnt)
+			m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vPos);
 
-	//	//}
-	//}
-	//else
-	//{
-	//	m_fTimeDelay = 1.f;
-	//	m_bShake = false;
-	//}
+		//}
+	}
+	else
+	{
+		m_fTimeDelay = 1.f;
+		m_bShake = false;
+	}
 
-	//if (true == m_bEffect)
-	//{
-	//	m_bEffect = false;
-	//	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
-	//	vPos.m128_f32[1] -= 0.5f;
-	//	m_vecMagneticDebris[0]->Set_ParticleEffect(XMVectorSetW(vPos, 1.f), 2.5f);
+	if (true == m_bEffect)
+	{
+		m_bEffect = false;
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+		vPos.m128_f32[1] -= 0.5f;
+		m_vecMagneticDebris[0]->Set_ParticleEffect(XMVectorSetW(vPos, 1.f), 2.5f);
 
-	//	// 파편 파티클 튀는거 
-	//	if (m_vecDebris.size() > m_iDebrsiMaxCnt)
-	//		m_iDebrsiMaxCnt += DEBRISCNT;
-	//	else
-	//	{
-	//		m_iDebrsiMaxCnt = DEBRISCNT;
-	//		m_iDebrisCnt = 0;
-	//	}
+		// 파편 파티클 튀는거 
+		if (m_vecDebris.size() > m_iDebrsiMaxCnt)
+			m_iDebrsiMaxCnt += DEBRISCNT;
+		else
+		{
+			m_iDebrsiMaxCnt = DEBRISCNT;
+			m_iDebrisCnt = 0;
+		}
 
-	//	// 파편 파티클 살리기
-	//	for (m_iDebrisCnt; m_iDebrisCnt < m_iDebrsiMaxCnt; ++m_iDebrisCnt)
-	//		m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vPos, 1.f, _float2(5.f , 10.f));
-	//}
+		// 파편 파티클 살리기
+		for (m_iDebrisCnt; m_iDebrisCnt < m_iDebrsiMaxCnt; ++m_iDebrisCnt)
+			m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vPos, 1.f, _float2(5.f , 10.f));
+	}
 
 	__super::Tick(m_fTimeDelta);
 

@@ -326,7 +326,10 @@ HRESULT CAbility::Add_Components()
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = ABILITYITEM;
+	if(ABILITY_DEFAULT == m_eAbilityType)
+		HitBox.pCollisionType = BATTLEDEE;
+	else
+		HitBox.pCollisionType = ABILITYITEM;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 	Set_BodyCollider(COLLIDER_SPHERE, 0.5f, 0.f, 0.7f);
