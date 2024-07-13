@@ -12,7 +12,7 @@
 
 #include "LevelChanger.h"
 
-#include "CKirbyDump_State.h"
+#include "KirbyDump_State.h"
 #include "Hitbox.h"
 #include "Bone.h"
 
@@ -117,7 +117,14 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
     {
         // 유틸업데이트가 들어가있다. (FSM)
         __super::Tick(m_fTimeDelta);
+
+        m_EffectSocket = _float4x4::Identity;
+        CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_vBonePos);
+
         m_vBonePos = Compute_RootPos();
+
+        //m_pControllerCom->Move(m_pTransformCom, m_vBonePos, m_fTimeDelta);
+        m_pControllerCom->Set_CapsulePosition(m_vBonePos);
     }
 
 
@@ -204,6 +211,12 @@ void CFinaleKirby::Render_IMGUI()
     _float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
     ImGui::Text("m_vPos.x : %.2f, m_vPos.y : %.2f m_vPos.z : %.2f", vPos.x, vPos.y, vPos.z);
     ImGui::Text("m_vRPos.x : %.2f, m_vRPos.y : %.2f m_vRPos.z : %.2f", m_vBonePos.x, m_vBonePos.y, m_vBonePos.z);
+
+    //GetWindowDrawList()->AddCircleFilled(vCurPos, 6.0f, IM_COL32(255, 255, 100, 255));
+
+    //ImDrawList* drawList = ImGui::GetForegroundDrawList();
+    ImGui::GetForegroundDrawList()->AddCircleFilled(
+        CUtils::WorldPosTo_ImguiProjPos((_float3)m_vBonePos), 10.f, IM_COL32(255, 255, 100, 255));
     __super::Render_IMGUI();
 
 }
@@ -784,11 +797,6 @@ CGameObject* CFinaleKirby::Clone(void* pArg)
 
 void CFinaleKirby::Free()
 {
-    CLevelChanger::LEVEL_DATA tLevelData = {};
-    tLevelData.fKirbyCoin = (_float)m_uCoin;
-    tLevelData.fKirbyHP = m_fHp;
-    CLevelChanger::Get_Instance()->Save(tLevelData);
-
     __super::Free();
 
     for (auto& pModelCom : m_pModelCom)

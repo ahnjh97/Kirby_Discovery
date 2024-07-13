@@ -2,6 +2,8 @@
 #include "TransingStar.h"
 
 #include "Level_Loading.h"
+#include "Kirby.h"
+#include "Camera_Main.h"
 #include "Utils.h"
 
 const _float	g_fPosOffset        = 18.f;
@@ -101,7 +103,6 @@ HRESULT CTransingStar::Render()
     hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
     CHECK_FAILED(hr);
 
-    // g_vSmallStarColor && g_vLargeStarColor
     m_pShaderCom->Bind_RawValue("g_vSmallStarColor", &m_vSmallColor, sizeof(_float3));
     m_pShaderCom->Bind_RawValue("g_vLargeStarColor", &m_vLargeColor, sizeof(_float3));
 
@@ -122,6 +123,9 @@ void CTransingStar::Render_IMGUI()
 /// <summary> 텍스쳐들의 위치를 초기화 시킨다. </summary>
 void CTransingStar::Activate(TYPE _eActivateType)
 {
+    if (_eActivateType == OPEN && m_eActivateType != CLOSE)
+        return;
+    
     // 활성화 시키는 부울값 ON
     m_eActivateType = _eActivateType;
 
@@ -141,14 +145,17 @@ void CTransingStar::Activate(TYPE _eActivateType)
                                 0.f, 1.f);
 
     fill(m_arrayStarMatrix.begin(), m_arrayStarMatrix.end(), _float4x4());
-    if(_eActivateType == OPEN)
-        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
-    
     for (_int i = 0; i < 3; ++i)
     {
         _float4 vFinalPoswithZ = _float4(vFinalPos.x, vFinalPos.y, vFinalPos.z + i * 0.1f, 1.f);
         CUtils::Set_State_Matrix(m_arrayStarMatrix[i], CUtils::STATE_POSITION, vFinalPoswithZ);
         CUtils::Rotation(m_arrayStarMatrix[i], _float4(0.f, 0.f, 1.f, 0.f), 0.f);
+    }
+
+    if (_eActivateType == OPEN)
+    {
+        CUtils::Set_State_Matrix(m_arrayStarMatrix[2], CUtils::STATE_POSITION, _float4(0.f, 0.f, 0.2f, 1.f));
+        CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
     }
 }
 
@@ -205,9 +212,7 @@ void CTransingStar::Tick_YeonDooStar(_float fTimeDelta)
         if (m_InitialSize.x <= m_fDecreaseValue)
         {
             CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], 0.f, 0.f, 1.f);
-            m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, m_eNextLevel));
-            //HRESULT hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, m_eNextLevel));
-            //CHECK_FAILED(hr);
+            On_Event();
         }
     }
     else // 연두별 배경 대기
@@ -217,6 +222,18 @@ void CTransingStar::Tick_YeonDooStar(_float fTimeDelta)
 void CTransingStar::Tick_GreenStar(_float fTimeDelta)
 {
     CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
+    if (*m_pCurrentLevelID == LEVEL_PARK)
+    {
+        if (m_InitialSize.x <= m_fDecreaseValue)
+        {
+            m_fParkTime += m_fTimeDelta;
+            if (m_fParkTime >= 2.f)
+            {
+                m_fParkTime = 0.f;
+                Activate(OPEN);
+            }
+        }
+    }
 }
 
 void CTransingStar::RenderClose()
@@ -257,8 +274,11 @@ void CTransingStar::Tick_OpenAlphaStar(_float fTimeDelta)
     CUtils::Set_State_Matrix(m_arrayStarMatrix[0], CUtils::STATE_POSITION, _float4(0.f, 0.f, 0.f, 1.f));
     
     // 한바퀴 다 돌았으면 사이즈 고정
-    if(m_fAlphaTime > 1.f)
+    if (m_fAlphaTime > 1.f)
+    {
         CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * 1.5f, m_InitialSize.y * 1.5f, 1.f);
+        Deactivate();
+    }
     else // 커지면서 돌리기
     {
         m_fAlphaTime += m_fTimeDelta * TIMEDELTA_OFFSET; // *1.5f;
@@ -299,11 +319,19 @@ void CTransingStar::RenderOpen()
     }
 }
 
-void CTransingStar::Change_Level(LEVEL eLevel)
+void CTransingStar::On_Event()
 {
-    HRESULT hr(S_OK);
-    hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, eLevel));
-    CHECK_FAILED(hr);
+    if(m_eNextLevel != LEVEL_END)
+        m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, m_eNextLevel));
+    else
+    {
+        CGameObject* pPlayer = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
+        CKirby* pKirby = dynamic_cast<CKirby*>(pPlayer);
+        pKirby->Set_ControllerPos(_float4(5.4f, 39.f, -26.36f, 1.f));
+        
+        CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+        pCameraMain->Set_FOVY(30);
+	}
 }
 
 HRESULT CTransingStar::Add_Components()

@@ -14,6 +14,7 @@
 #include "KirbyCar_State.h"
 #include "KirbyHammer_State.h"
 #include "KirbyBulb_State.h"
+#include "KirbyCrash_State.h"
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
@@ -70,14 +71,13 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용
-	m_eAbilityType = ABILITY_HAMMER;
+	m_eAbilityType = ABILITY_CRASH;
 
 	// 커비의 상태에 따라, 애니메이션이 시작된다.
 	Kirby_StateInitialize();
 
 	m_pControllerCom->RegisterAsPlayer();
 	Set_WeaponAnim(3);
-
 
 	return S_OK;
 }
@@ -235,7 +235,7 @@ void CKirby::Render_IMGUI()
 
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	ImGui::Text("m_isKirbyAttacking(overpower) : %d", m_isKirbyAttacking);
-	ImGui::Text("m_bisDeforming : %d", INFO(m_bisDeforming));
+	ImGui::Text("m_fCrashChargeTime : %.2f", INFO(m_fCrashChargeTime));
 	ImGui::Text("m_bBlockOtherVacuum : %d", INFO(m_bBlockOtherVacuum));
 	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
 	ImGui::Text("m_vLadderLook.x : %.2f, m_vLadderLook.y : %.2f m_vLadderLook.z : %.2f", INFO(m_vLadderLook).x, INFO(m_vLadderLook).y, INFO(m_vLadderLook).z);
@@ -301,6 +301,30 @@ void CKirby::Add_AnimEvent()
 		HitBoxChanger(m_pFSM->Get_State());
 		});
 
+	m_pModelCom[BODY_CRASHDEFAULT]->Add_Event("ApplyDamage", [this]() {
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		Activate_SphereCollider(1.f, 15.f);
+		});
+
+	m_pModelCom[BODY_CRASHDEFAULT]->Add_Event("ApplyDamage1", [this]() {
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		Activate_SphereCollider(1.f, 22.f);
+		});
+
+	m_pModelCom[BODY_CRASHDEFAULT]->Add_Event("ApplyDamage2", [this]() {
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		Activate_SphereCollider(1.f, 29.f);
+		});
+
+	m_pModelCom[BODY_CRASHDEFAULT]->Add_Event("ApplyDamage3", [this]() {
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		Activate_SphereCollider(1.f, 36.f);
+		});
+
+	m_pModelCom[BODY_CRASHDEFAULT]->Add_Event("ApplyDamage4", [this]() {
+		// 커비의 히트박스를 실시간으로 변화시킨다.
+		Activate_SphereCollider(1.f, 42.f);
+		});
 
 
 	// 사운드 처리
@@ -921,6 +945,10 @@ HRESULT CKirby::Add_Components()
 		TEXT("Com_Model_BulbVacuum"), (CComponent**)&m_pModelCom[BODY_BULBVACUUM]);
 	CHECK_FAILED(hr);
 
+	// 커비의 Crash Default 상태 모델
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyCrashDefault"),
+		TEXT("Com_Model_CrashDefault"), (CComponent**)&m_pModelCom[BODY_CRASHDEFAULT]);
+	CHECK_FAILED(hr);
 
 #pragma endregion
 
@@ -1395,6 +1423,25 @@ void CKirby::SetUp_FSM()
 	m_pFSM->Add_State(BULBSTATE_FALL, CKirbyBulb_Jump_State::Create());
 #pragma endregion
 
+#pragma region 크래쉬 애니메이션
+	m_pFSM->Add_State(CRASHSTATE_ATTACKCHARGE, CKirbyCrash_Charge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_ATTACKCHARGEMOVE, CKirbyCrash_Charge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_ATTACKCHARGESTART, CKirbyCrash_Charge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_ATTACK, CKirbyCrash_Attack_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_ATTACKEND, CKirbyCrash_Attack_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_ATTACKSTART, CKirbyCrash_Attack_State::Create());
+
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKCHARGE, CKirbyCrash_BigCharge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKCHARGEMOVE, CKirbyCrash_BigCharge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKCHARGESTART, CKirbyCrash_BigCharge_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACK, CKirbyCrash_BigAttack_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKEND, CKirbyCrash_BigAttack_State::Create());
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKSTART, CKirbyCrash_BigAttack_State::Create());
+
+	// 이게 왜있어??
+	m_pFSM->Add_State(CRASHSTATE_BIGATTACKFIRE, CKirbyCrash_BigAttack_State::Create());
+#pragma endregion
+
 
 	CFSM::FSM_INFO		FSM_Info_Desc = {};
 	FSM_Info_Desc.iState = STATE_IDLE;
@@ -1500,6 +1547,15 @@ void CKirby::HitBoxChanger(_uint eState)
 	case HAMMERSTATE_WHEELHAMMER:
 		Activate_SphereCollider(0.5f, 5.f);
 		break;
+		// 해머 공중 회전 공격
+	case CRASHSTATE_ATTACK:
+		Activate_SphereCollider(1.f, 15.f);
+		break;
+		// 해머 공중 회전 공격
+	case CRASHSTATE_BIGATTACK:
+		Activate_SphereCollider(1.f, 15.f);
+		break;
+
 	default:
 		break;
 	}
@@ -1572,6 +1628,19 @@ _float4 CKirby::Get_BulbLightPos()
 	vPos = _float4::Transform(vPos, m_pTransformCom->Get_WorldFloat4x4());
 
 	return vPos;
+}
+
+void CKirby::Set_ControllerPos(_float4 _vPosition)
+{
+	m_pControllerCom->Set_Position(m_pTransformCom, _vPosition);
+}
+
+void CKirby::Large_Light(_float4 vDiffuse, _float fRange, _float fTime)
+{
+	if (m_pArmours == nullptr)
+		return;
+
+	m_pArmours->Large_Light(vDiffuse, fRange, fTime);
 }
 
 void CKirby::OverPower()
@@ -1808,6 +1877,32 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		if (INFO(m_fDumpAbilityTime) < 0.f)
 			INFO(m_fDumpAbilityTime) = 0.f;
 	}
+
+	if (INFO(m_iCrashTimeSlow) == 1)
+	{
+		m_fCrashRestoreTime += fTimeDelta;
+
+
+		if (m_fCrashRestoreTime > 4.f)
+		{
+			INFO(m_iCrashTimeSlow) = 0;
+			m_pGameInstance->Restore_FirstTimer();
+			m_pGameInstance->Restore_SecondTimer();
+			m_fCrashRestoreTime = 0.f;
+		}
+	}
+	else if (INFO(m_iCrashTimeSlow) == 2)
+	{
+		m_fCrashRestoreTime += fTimeDelta;
+
+		if (m_fCrashRestoreTime > 7.f)
+		{
+			INFO(m_iCrashTimeSlow) = 0;
+			m_pGameInstance->Restore_FirstTimer();
+			m_pGameInstance->Restore_SecondTimer();
+			m_fCrashRestoreTime = 0.f;
+		}
+	}
 }
 
 HRESULT CKirby::Kirby_SystemInitialize()
@@ -1827,10 +1922,13 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	// 파싱으로 레벨전환될때 HP와 COIN개수를 이동시킵니다.
 	CLevelChanger::LEVEL_DATA tLevelData = CLevelChanger::Get_Instance()->Load();
 	m_fHp = tLevelData.fKirbyHP;
-	m_uCoin = (_uint)tLevelData.fKirbyCoin;
-	// m_eAbilityType = ;
+	m_uCoin = static_cast<_uint>(tLevelData.fKirbyCoin);
 	m_fAttack = 5.f; // 고정
 
+	//m_eAbilityType = static_cast<ABILITYTYPE>(tLevelData.iKirbyState);
+	//static_cast<LEVEL>(tLevelData.iLatestLevel);
+	//_float3 vNewPos = tLevelData.vLastPos;
+	//m_pControllerCom->Set_Position(m_pTransformCom, _float4{ vNewPos.x, vNewPos.y, vNewPos.z, 1.f });
 
 	// 임시로 능력 디폴트 화
 	if (*m_pCurrentLevelID == LEVEL_INTRO)
@@ -1981,11 +2079,21 @@ CGameObject* CKirby::Clone(void* pArg)
 
 void CKirby::Free()
 {
-	CLevelChanger::LEVEL_DATA tLevelData = {};
-	tLevelData.fKirbyCoin = (_float)m_uCoin;
-	tLevelData.fKirbyHP = m_fHp;
-	CLevelChanger::Get_Instance()->Save(tLevelData);
+#pragma region 레벨 전환용 데이터 파싱
+	if (m_bCloned == true)
+	{
+		CLevelChanger::LEVEL_DATA tLevelData = {};
+		tLevelData.fKirbyCoin = (_float)m_uCoin;
+		tLevelData.fKirbyHP = m_fHp;
 
+		// 커비 능력
+		tLevelData.iKirbyState  = m_eAbilityType; // QZR
+		tLevelData.iLatestLevel = *CGameInstance::Get_Instance()->Get_CurrentLevelID();
+		_float4 vPos = GET_POS;
+		tLevelData.vLastPos = _float3{ vPos.x, vPos.y, vPos.z };
+		CLevelChanger::Get_Instance()->Save(tLevelData);
+	}
+#pragma endregion
 
 	CEventCenter::Get_Instance()->Unsubscribe(this);
 

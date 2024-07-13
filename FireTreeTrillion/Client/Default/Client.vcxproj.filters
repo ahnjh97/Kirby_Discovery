@@ -265,9 +265,6 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State">
       <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State">
-      <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State">
       <UniqueIdentifier>{67963c50-7e60-41a8-bf16-e2649eab3a93}</UniqueIdentifier>
     </Filter>
@@ -463,9 +460,6 @@
     <Filter Include="02.GameObjects\UI\MessageWindow">
       <UniqueIdentifier>{bcd8d01b-4475-4a52-aafd-de2aee6510c4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyGun_State">
-      <UniqueIdentifier>{a88b1b9f-6498-430b-9234-dce1f19a7962}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyCrash_State">
       <UniqueIdentifier>{2b564633-9ff1-4590-9555-1e64d92e3ea2}</UniqueIdentifier>
     </Filter>
@@ -636,6 +630,18 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Once">
       <UniqueIdentifier>{1d07bb83-aab5-4f0c-9c11-2c69099db84d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossChimera">
+      <UniqueIdentifier>{f1701de4-78bb-4ad2-a907-3000e2c43777}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\BossChimera\State">
+      <UniqueIdentifier>{2ab78432-08ae-459b-aebd-548e73d1a2f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Finale_SpecialDebris">
+      <UniqueIdentifier>{874c768e-0036-49b7-b251-80dbc1e9cc75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\Finale_SpeicalBuilding">
+      <UniqueIdentifier>{e99f6f3f-aec5-4d34-9c56-25fbe8ea2270}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1114,9 +1120,6 @@
     <ClInclude Include="..\Public\UI_MessageWindow.h">
       <Filter>02.GameObjects\UI\MessageWindow</Filter>
     </ClInclude>
-    <ClInclude Include="CKirbyDump_State.h">
-      <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Level_Finale.h">
       <Filter>01.Levels\12. Finale</Filter>
     </ClInclude>
@@ -1272,6 +1275,30 @@
     </ClInclude>
     <ClInclude Include="..\Public\Gm_ParkSolarPanelOnce.h">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Once</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyCrash_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCrash_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyDump_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BossChimera.h">
+      <Filter>02.GameObjects\PhysXObject\Character\BossChimera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Finale_SpecialDebris_A.h">
+      <Filter>02.GameObjects\Map\Finale_SpecialDebris</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Finale_SpecialDebris_B.h">
+      <Filter>02.GameObjects\Map\Finale_SpecialDebris</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Finale_SpecialDebris_C.h">
+      <Filter>02.GameObjects\Map\Finale_SpecialDebris</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BuildingCluster_A.h">
+      <Filter>02.GameObjects\Map\Finale_SpeicalBuilding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BuildingCluster_B.h">
+      <Filter>02.GameObjects\Map\Finale_SpeicalBuilding</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1728,9 +1755,6 @@
     <ClCompile Include="..\Private\UI_MessageWindow.cpp">
       <Filter>02.GameObjects\UI\MessageWindow</Filter>
     </ClCompile>
-    <ClCompile Include="CKirbyDump_State.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Level_Finale.cpp">
       <Filter>01.Levels\12. Finale</Filter>
     </ClCompile>
@@ -1889,6 +1913,30 @@
     </ClCompile>
     <ClCompile Include="..\Private\Gm_ParkSolarPanelOnce.cpp">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\SolarPanel\Once</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyCrash_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyCrash_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyDump_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BossChimera.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\BossChimera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Finale_SpecialDebris_A.cpp">
+      <Filter>02.GameObjects\Map\Finale_SpecialDebris</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Finale_SpecialDebris_B.cpp">
+      <Filter>02.GameObjects\Map\Finale_SpecialDebris</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Finale_SpecialDebris_C.cpp">
+      <Filter>02.GameObjects\Map\Finale_SpecialDebris</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BuildingCluster_A.cpp">
+      <Filter>02.GameObjects\Map\Finale_SpeicalBuilding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BuildingCluster_B.cpp">
+      <Filter>02.GameObjects\Map\Finale_SpeicalBuilding</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

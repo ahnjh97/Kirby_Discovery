@@ -46,7 +46,10 @@ public:
 private:
 	map<const wstring, CPartObject*>	m_PartObjects;
 
+	_float4x4							m_SwordMatrix = {};
 	BLADEKNIGHT_ANIM					m_eCurrentState = { BLADEKNIGHT_END };
+
+	_uint								m_iEffectCnt = { 0 };
 
 private:
 	HRESULT Add_Components();
@@ -56,6 +59,7 @@ private:
 	// FSM
 	void SetUp_FSM();
 	void HitBoxChanger(_uint eState);
+	void EffectChanger(_uint eState);
 
 public:
 	static CBladeKnight* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -180,6 +180,20 @@ void CBladeKnight::Add_AnimEvent()
 		// 커비의 히트박스를 실시간으로 변화시킨다.
 		HitBoxChanger(m_pFSM->Get_State());
 		});
+
+	m_pModelCom->Add_Event("Effect", [this]() {
+		EffectChanger(m_pModelCom->Get_CurAnimIndex());
+		});
+
+	m_pModelCom->Add_Event("Effect2", [this]() {
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = _float3(0.f, 0.5f, 0.8f);
+		FXDesc.vInitRot = { 0.f, 45.f, 0.f };
+		FXDesc.vInitScale = { 5.f, 5.f, 5.f };
+		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BladeKnightTrail2"), &FXDesc)))
+			return;
+		});
 }
 
 void CBladeKnight::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
@@ -233,7 +247,7 @@ HRESULT CBladeKnight::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.fOffset = 0.8f;
+	desc.fOffset = 0.6f;
 	desc.tCapsuleShape.fRadius = 0.4f;
 	desc.tCapsuleShape.fHeight = 0.4f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
@@ -278,6 +292,7 @@ HRESULT CBladeKnight::Add_PartObjects()
 	if (nullptr == pWeaponObject)
 		return E_FAIL;
 
+	m_SwordMatrix = dynamic_cast<CBladeKnightSword*>(pWeaponObject)->Get_WorldMatrix();
 	m_PartObjects.emplace(TEXT("Part_Weapon"), pWeaponObject);
 
 	return S_OK;
@@ -354,6 +369,40 @@ void CBladeKnight::HitBoxChanger(_uint eState)
 		break;
 	case BLADEKNIGHT_TORNADOATTACK:
 		Activate_SphereCollider(0.5f, 3.5f);
+		break;
+	default:
+		break;
+	}
+}
+
+void CBladeKnight::EffectChanger(_uint eState)
+{
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
+
+	switch (eState)
+	{
+	case BLADEKNIGHT_ATTACK:
+		FXDesc.vInitPos = _float3(0.f, 0.5f, 0.2f);
+		//FXDesc.vInitRot = { 0.f, -90.f 0.f };
+		FXDesc.vInitScale = { 5.f, 5.f, 5.f };
+		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BladeKnightTrail"), &FXDesc)))
+			return;
+		break;
+	case BLADEKNIGHT_TORNADOATTACK:
+		FXDesc.vInitPos = _float3{ 0.f, 0.95f, 0.f };
+		FXDesc.vInitScale = { 5.f, 5.f, 5.f };
+		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BladeKnightSpin"), &FXDesc)))
+			return;
+		break;
+	case BLADEKNIGHT_DOUBLEATTACK:
+		FXDesc.vInitPos = _float3(0.f, 0.5f, 0.8f);
+		FXDesc.vInitRot = { 0.f, 30.f, 0.f };
+		FXDesc.vInitScale = { 5.f, 5.f, 5.f };
+		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BladeKnightTrail"), &FXDesc)))
+			return;
 		break;
 	default:
 		break;

@@ -1213,20 +1213,28 @@ void CGameInstance::Set_SecondTimerRatio(_float fRatio)
 	m_pTimeController->Set_SecondTimerRatio(fRatio);
 }
 
-void CGameInstance::Restore_FirstTimer(_float fRestoreRatio)
+void CGameInstance::Restore_FirstTimer(_float fRestoreTime)
 {
 	if (nullptr == m_pTimeController)
 		return;
 
-	m_pTimeController->Restore_FirstTimer(fRestoreRatio);
+	m_pTimeController->Restore_FirstTimer(fRestoreTime);
 }
 
-void CGameInstance::Restore_SecondTimer(_float fRestoreRatio)
+void CGameInstance::Restore_SecondTimer(_float fRestoreTime)
 {
 	if (nullptr == m_pTimeController)
 		return;
 
-	m_pTimeController->Restore_SecondTimer(fRestoreRatio);
+	m_pTimeController->Restore_SecondTimer(fRestoreTime);
+}
+
+_float CGameInstance::Get_OriginalTimer()
+{
+	if (nullptr == m_pTimeController)
+		return _float();
+
+	return m_pTimeController->Get_OriginalTimer();
 }
 
 _bool CGameInstance::Is_PassingGroup(CGameObject* pObj)

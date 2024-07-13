@@ -101,7 +101,6 @@
 #include "DeeDeeDee.h"
 #include "DeeDeeDeeHammer.h"
 
-
 //와들디
 #include "Dee_Part.h"
 #include "OriginalDee.h"
@@ -162,9 +161,17 @@
 #include "FinalePartical_Maker.h"
 #include "FinaleCut_ControlCenter.h"
 
-//기믹
+#pragma region LEVEL_FINALBOSS (LAB_DISCOVERA)
+//BOSS
+#include "BossChimera.h"
+
+//GIMMICK
 #include "Gm_LabAntenna.h"
 #include "Gm_LabBossRoomDoor.h"
+
+#pragma endregion
+
+//기믹
 #include "Gm_ParkFhEntranceAlien.h"
 #include "Gm_ParkSolarPanelCharge.h"
 #include "Gm_ParkSolarPanelOnce.h"
@@ -488,8 +495,12 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Box"), CBox);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Debris"), CDebris);
 
-	#pragma region GIMMICK::LEVEL_FINALBOSS
+	#pragma region LEVEL_FINALBOSS :: LAB_DISCOVERA
 
+	//BOSS
+	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossChimera"), CBossChimera);
+
+	//GIMMICK
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_LabAntenna"), CGm_LabAntenna);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_LabBossRoomDoor"), CGm_LabBossRoomDoor);
 
@@ -502,7 +513,6 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkSolarPanelOnce"), CGm_ParkSolarPanelOnce);
 
 	#pragma endregion
-
 
 	// 미니게임 in 와들디마을
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimeFood"), CPartTimeFood);
@@ -1520,7 +1530,7 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Line", "Effects/Basic/common_line_0.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Jump", "Effects/Basic/common_jump.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Sparkle", "Effects/Basic/common_sparkle.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Lead", "Effects/Basic/leaf.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Leaf", "Effects/Basic/leaf.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Collide", "Effects/Basic/common_hit.png");	CHECK_FAILED(hr);
 
 
@@ -1750,6 +1760,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.3f);
 
+		//기믹 오브젝트
+		m_vecModelInfo.emplace_back("FhEntranceAlien_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("FhEntranceAlien_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
@@ -2029,6 +2042,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		Load_ItemModels();
 		Load_KickableModels();
 
+		// 액체괴물 :: Fecto_Forgo
+		//m_vecModelInfo.emplace_back("", TYPE_ANIM, 1.f, 180.f);
+
 		// For Boss 
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_ANIM, 1.f);
@@ -2216,7 +2232,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.f, 0.f);
 		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 0.f);
 		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 0.f);
-		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 0.f);
+		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 0.f);
 		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 2.f, 0.f);
@@ -2562,6 +2578,7 @@ void CLoader::Load_KirbyBodyModels()
 	m_vecModelInfo.emplace_back("KirbyDumpDefault", TYPE_ANIM, 0.8f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyBulbDefault", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("KirbyBulbVacuum", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("KirbyCrashDefault", TYPE_ANIM, 1.f, 180.f);
 
 	m_vecModelInfo.emplace_back("KirbyDumpVacuum", TYPE_ANIM, 0.8f);
 	m_vecModelInfo.emplace_back("KirbyDumpCut", TYPE_ANIM, 0.8f);
@@ -2576,6 +2593,7 @@ void CLoader::Load_KirbyWeaponModels()
 	m_vecModelInfo.emplace_back("KirbyWeapon_Sword", TYPE_NONANIM, 1.f);
 	m_vecModelInfo.emplace_back("KirbyWeapon_Hammer", TYPE_ANIM, 1.f);
 	m_vecModelInfo.emplace_back("KirbyBombDefault", TYPE_ANIM, 1.3f, 180.f);
+
 }
 
 void CLoader::Load_KirbyArmourModels()
@@ -2584,6 +2602,7 @@ void CLoader::Load_KirbyArmourModels()
 	m_vecModelInfo.emplace_back("KirbyArmour_Boom", TYPE_NONANIM, 1.f);
 	m_vecModelInfo.emplace_back("KirbyArmour_Sword", TYPE_NONANIM, 1.f);
 	m_vecModelInfo.emplace_back("KirbyArmour_Hammer", TYPE_NONANIM, 1.f);
+	m_vecModelInfo.emplace_back("KirbyArmour_Crash", TYPE_NONANIM, 1.f);
 }
 
 string CLoader::Remove_BeforeLastPipe(const string& str)

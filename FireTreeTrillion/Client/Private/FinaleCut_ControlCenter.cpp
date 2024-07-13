@@ -114,40 +114,6 @@ HRESULT CFinaleCut_ControlCenter::Render()
 void CFinaleCut_ControlCenter::Set_CutScene(_uint iScene)
 {
 	m_iCutScene = iScene;
-
-	if (iScene != 6 && iScene != 8)
-	{
-		//카메라 컷신
-		CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
-		CHECK_NULLPTR(pCameraMain);
-		pCameraMain->Make_Sequence(CCamera_Main::CAMSEQ((_uint)CCamera_Main::SEQ_FINALECUT1 - 1 + iScene));
-	}
-	/*
-	else if (iScene == 6)
-	{
-		//카메라 받기
-		CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
-		CHECK_NULLPTR(pCameraMain);
-
-		CCamera_Main::CAMACTION newAction = {};
-		newAction.fTime = 0.f;
-		newAction.eCamCut = CCamera_Main::CUT_HARD;
-
-		//피날레 커비
-		CFinaleKirby* pKirby =
-			dynamic_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0));
-		CHECK_NULLPTR(pKirby);
-
-		newAction.fFOVY = 45.f;
-		newAction.eCamPos = CCamera_Main::POS_ABSOLUTE;
-		newAction.vPos = pKirby->m_vBonePos + _float3{ -20.f, -2.f, 0.f };
-		newAction.eCamDir = CCamera_Main::DIR_ABSOLUTE;
-		newAction.vDir = _float3{ 1.f, .15f, -.03f };
-
-
-		pCameraMain->Make_One_Sequence(newAction);
-	}
-	*/
 }
 
 CFinaleCut_ControlCenter* CFinaleCut_ControlCenter::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

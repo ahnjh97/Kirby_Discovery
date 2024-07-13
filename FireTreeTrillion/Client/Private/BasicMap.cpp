@@ -360,7 +360,7 @@ void CBasicMap::SetUpShaderInfo(const wstring& _wstrModelTag)
             return;
         }
             
-        m_vecPassIndices[i] = iPassIndex;  // 8; JYWI QZR 지영아 여기야
+        m_vecPassIndices[i] = iPassIndex;
         m_vecSamplingFactors[i] = fSamplingFactor;
     }
 
@@ -689,7 +689,7 @@ void CBasicMap::ReadDecos_ForSmallLevels()
             iShaderVars |= 4;
         }
 
-        pModel->SetUpStencilRimLightMotionBlurPassIndex(iShaderVars, fRimWidth, iPassIndex); // 16 JYWI QZR 지영아 여기야
+        pModel->SetUpStencilRimLightMotionBlurPassIndex(iShaderVars, fRimWidth, iPassIndex);
 
         if (CMapToolObject::MAPOBJ_NONCOL == iMapObjType)
             m_vecNonAnimDecos.push_back(pModel);

@@ -90,6 +90,9 @@ private:
 
 	_float				m_fMoveTime = { 0.f };
 	_float				m_fSpeed = { 0.f };
+	_float				m_bbongTime1 = { 0.f };
+	_float				m_bbongTime2 = { 0.f };
+	_float				m_bbongTime3 = { 0.f };
 
 private:
 	HRESULT Add_Components();
