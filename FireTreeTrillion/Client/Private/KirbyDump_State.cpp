@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "CKirbyDump_State.h"
+#include "KirbyDump_State.h"
 #include "Kirby_State_Function.h"
 #include "FinaleKirby.h"
 #include "FinalePartical_Maker.h"

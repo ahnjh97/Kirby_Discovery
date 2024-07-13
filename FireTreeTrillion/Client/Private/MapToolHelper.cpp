@@ -206,23 +206,32 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 #pragma region LEVEL_PARK (WONDARIA REMAINS) OBJECT
 
+		, "CmLightFollowParts01L", "CmLightFollowParts02L"
+
 		// 필드 오브젝트
 		, "FhArchWayAL", "FhArchWayBL", "FhArchWayCL", "FhArchWayDL" 
 		, "FhFence01L", "FhFence02L", "FhFence03L", "FhFence04L", "FhFence05L", "FhFence06L" 
 		, "FhOrnamentGroundAL", "FhOrnamentGroundBL"
 		, "FhOrnamentRoofAL", "FhOrnamentRoofBL", "FhOrnamentRoofCL", "FhOrnamentRoofDL", "FhOrnamentRoofEL"
-		, "FhPillarAL", "FhPillarATopDec2L", "FhPillarBL", "FhPillarBTopDec2L", "FhPillarCL", "FhPillarCTopDec2L"
-		, "FhPlanetOrnamentAL"
+
+		, "FhPillarAL", "FhPillarATopDec2L", "FhPillarATopDecL"
+		, "FhPillarBL", "FhPillarBottomAL", "FhPillarBottomBL", "FhPillarBottomCL", "FhPillarBTopDec2L", "FhPillarBTopDecL"
+		, "FhPillarCL", "FhPillarCTopDec2L", "FhPillarCTopDecL"
+
+		, "FhPlanetOrnamentAL", "FhPlanetOrnamentBL", "FhPlanetOrnamentCL", "FhPlanetOrnamentDL"
 		, "FhStackOrnamentAL", "FhStackOrnamentBL", "FhStackOrnamentCL", "FhStackOrnamentDL", "FhStackOrnamentEL"
+		, "FhWallDecorationAL", "FhWallDecorationBL", "FhWallDecorationCL", "FhWallDecorationDL"
+
+		, "FhWallDecorationStickAL", "FhWallDecorationStickBL", "FhWallDecorationStickCL"
+		, "ParkDoor"
 		
-		// 채우기용 잡오브젝트
-		, "DollKirby"
-		, "PkParkShowWindowObj01AL", "PkParkShowWindowObj01BL", "PkParkShowWindowObj02AL", "PkParkShowWindowObj02BL"
-		, "PkParkShowWindowObj03AL", "PkParkShowWindowObj03BL", "PkParkShowWindowObj04AL", "PkParkShowWindowObj04BL"
-		, "PkParkShowWindowObj05AL", "PkParkShowWindowObj05BL", "PkParkShowWindowObj06L"
-		, "PkParkShowWindowObj07AL", "PkParkShowWindowObj07BL", "PkParkShowWindowObj08AL", "PkParkShowWindowObj08BL"
-		, "ParkOutsideDoor", "PkRoof01"
-		, "CmLightFollowParts01L", "CmLightFollowParts02L"
+		// 현재 사용안함. 추후 사용을 대비해 주석 처리
+		//, "DollKirby"
+		//, "PkParkShowWindowObj01AL", "PkParkShowWindowObj01BL", "PkParkShowWindowObj02AL", "PkParkShowWindowObj02BL"
+		//, "PkParkShowWindowObj03AL", "PkParkShowWindowObj03BL", "PkParkShowWindowObj04AL", "PkParkShowWindowObj04BL"
+		//, "PkParkShowWindowObj05AL", "PkParkShowWindowObj05BL", "PkParkShowWindowObj06L"
+		//, "PkParkShowWindowObj07AL", "PkParkShowWindowObj07BL", "PkParkShowWindowObj08AL", "PkParkShowWindowObj08BL"
+		//, "ParkOutsideDoor", "PkRoof01"
 
 #pragma endregion
 

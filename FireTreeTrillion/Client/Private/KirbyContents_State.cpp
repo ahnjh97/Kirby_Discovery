@@ -53,6 +53,8 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 				pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
 			else if (pKirby->Get_AbilityType() == ABILITY_HAMMER)
 				pKirby->Change_State(CKirby::HAMMERSTATE_IDLE, 60.f, true, true, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			else if (pKirby->Get_AbilityType() == ABILITY_CRASH)
+				pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
 
 			return;
 		}

@@ -10,6 +10,13 @@ HRESULT CLight::Initialize(const LIGHT_DESC & LightDesc)
 {
 	m_LightDesc = LightDesc;
 
+	if (LIGHT_DESC::TYPE_HORONG == m_LightDesc.eType)
+	{
+		m_vOriginHorongPower = m_LightDesc.vAmbient;
+		m_fOriginRange = m_LightDesc.fRange;
+	}
+
+
 	return S_OK;
 }
 
@@ -51,7 +58,6 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bFor
 		
 		iPassIndex = bForTool == true ? DEFERRED_DIRECTLIGHT_TOOL : DEFERRED_DIRECTLIGHT;
 	}
-
 	else if (LIGHT_DESC::TYPE_POINT == m_LightDesc.eType)
 	{
 
@@ -64,6 +70,26 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bFor
 		iPassIndex = DEFERRED_POINTLIGHT;
 
 	}
+	else if (LIGHT_DESC::TYPE_HORONG == m_LightDesc.eType)
+	{
+		_float fRandom = CUtils::Make_RandomFloat(0.8f, 1.f);
+
+		_vector vLightAmbient = XMLoadFloat4(&m_vOriginHorongPower);
+		vLightAmbient *= fRandom;
+		XMStoreFloat4(&m_LightDesc.vAmbient, vLightAmbient);
+
+		_float fRange = m_fOriginRange;
+		fRange *= fRandom;
+		m_LightDesc.fRange = fRange;
+
+		if (FAILED(pShader->Bind_RawValue("g_vLightPos", &m_LightDesc.vPosition, sizeof(_float4))))
+			return E_FAIL;
+		if (FAILED(pShader->Bind_RawValue("g_fLightRange", &m_LightDesc.fRange, sizeof(_float))))
+			return E_FAIL;
+
+		iPassIndex = DEFERRED_POINTLIGHT;
+	}
+
 	else if (LIGHT_DESC::TYPE_FLASH == m_LightDesc.eType)
 	{
 		m_LightDesc.fRange -= (m_LightDesc.fRange / (fTimeDelta * 700.f));

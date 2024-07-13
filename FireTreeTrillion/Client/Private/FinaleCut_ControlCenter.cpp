@@ -115,6 +115,7 @@ void CFinaleCut_ControlCenter::Set_CutScene(_uint iScene)
 {
 	m_iCutScene = iScene;
 
+	/*
 	if (iScene != 6 && iScene != 8)
 	{
 		//카메라 컷신
@@ -122,7 +123,7 @@ void CFinaleCut_ControlCenter::Set_CutScene(_uint iScene)
 		CHECK_NULLPTR(pCameraMain);
 		pCameraMain->Make_Sequence(CCamera_Main::CAMSEQ((_uint)CCamera_Main::SEQ_FINALECUT1 - 1 + iScene));
 	}
-	/*
+
 	else if (iScene == 6)
 	{
 		//카메라 받기

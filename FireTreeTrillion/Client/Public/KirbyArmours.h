@@ -55,6 +55,13 @@ private:
 	_float* m_pWhiteColorDiffuse = { nullptr };
 	_float* m_fOverPowerColor = { nullptr };
 
+	_float	m_fEmissivePower = { 0.f };
+
+	_int	m_iRenderCount = { 0 };
+	_bool	Render_Emissive();
+
+	class CLight* m_pLight = { nullptr };
+
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
