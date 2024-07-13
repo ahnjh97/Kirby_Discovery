@@ -57,10 +57,12 @@ private:
 	AWOOFYEYE_STATE		m_eEyeState = { AWOOFYEYE_END };
 
 	_float				m_fAngle = { 0.f };
+	_float				m_fEffectTime = { 0.f };
 	_float4				m_vPos = {};
 
 	_bool				m_bRenderEye = { true };
 	_bool				m_bRenderBody = { true };
+	_bool				m_bEffect = { false };
 
 private:
 	HRESULT			Add_Components();

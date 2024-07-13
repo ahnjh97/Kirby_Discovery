@@ -208,6 +208,9 @@ public:
 	void			Large_Light(_float4 vDiffuse, _float fRange, _float fTime);
 
 	// 기타 세부적인 제어
+	void Set_ControllerPos(_float4 _vPosition);
+
+
 private:
 	// 커비의 움직임을 담은 구조체
 	KIRBY_INFODESC  m_tKirbyInfo;

@@ -82,6 +82,24 @@ _int CAwoofy::Tick(_float fTimeDelta)
 	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
 		Change_State(CAwoofy::AWOOFY_DAMAGE, 120.f, true, false);
 
+	if (AWOOFY_BRAKE == Get_State())
+	{
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		m_fEffectTime += m_fTimeDelta;
+		if (0.2f < Get_AnimRatio())
+		{
+			CEffect::FX_DESC FXDesc{};
+
+			vPos.m128_f32[0] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
+			vPos.m128_f32[2] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
+			FXDesc.vInitPos = vPos;
+			FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 90.f), 0.f };
+			FXDesc.vInitScale = { CUtils::Make_RandomFloat(1.f, 2.f), CUtils::Make_RandomFloat(1.f, 2.f), CUtils::Make_RandomFloat(1.f, 2.f) };
+			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+			Add_Effect("BBongBBongE", FXDesc);
+		}
+	}
 
 	__super::Tick(m_fTimeDelta);
 

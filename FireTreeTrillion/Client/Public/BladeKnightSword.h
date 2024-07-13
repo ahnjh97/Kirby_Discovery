@@ -23,6 +23,9 @@ private:
 	CBladeKnightSword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CBladeKnightSword(const CBladeKnightSword& rhs);
 	virtual ~CBladeKnightSword() = default;
+	
+public:
+	_float4x4 Get_WorldMatrix() { return m_WorldMatrix; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
