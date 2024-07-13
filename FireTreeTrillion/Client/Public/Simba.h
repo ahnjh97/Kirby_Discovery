@@ -135,6 +135,9 @@ private:
 	void		Reset_HitBoxTimingMap(SIMBA_ANIM eAnimIdx);
 
 	void		OnAppearStart(CGameObject* pObj);
+	void		OnNextDialog1(CGameObject* pObj);
+	void		OnNextDialog2(CGameObject* pObj);
+	void		OnLastDialog(CGameObject* pObj);
 	void		OnAppearEnd(CGameObject* pObj);
 	void		OnWave1Dead(CGameObject* pObj);
 	void		OnWave2Dead(CGameObject* pObj);

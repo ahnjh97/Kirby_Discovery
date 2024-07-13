@@ -85,7 +85,7 @@ HRESULT CSimba::Initialize(void* pArg)
 		m_vecMeshes.push_back(i);
 	}
 
-	m_pModelCom->Set_Animation(Simba_DemoAppear1Cut2, 66.66f, true, true);
+	m_pModelCom->Set_Animation(Simba_DemoAppear1Cut2, 66.66f, true, false);
 
 	m_pModelCom->EmplaceBackPartialAnim(Simba_DamageFaceSub);
 	m_pModelCom->EmplaceBackPartialAnim(Simba_LipSyncSub);
@@ -96,6 +96,15 @@ HRESULT CSimba::Initialize(void* pArg)
 	function<void(CGameObject*)> func{};
 	func = bind(&CSimba::OnAppearStart, this, placeholders::_1);
 	pEventCenter->Subscribe(KEVENT_SIMBA_APPEAR_START, this, func);
+
+	func = bind(&CSimba::OnNextDialog1, this, placeholders::_1);
+	pEventCenter->Subscribe(KEVENT_SIMBA_NEXT_DIALOG1, this, func);
+
+	func = bind(&CSimba::OnNextDialog2, this, placeholders::_1);
+	pEventCenter->Subscribe(KEVENT_SIMBA_NEXT_DIALOG2, this, func);
+
+	func = bind(&CSimba::OnLastDialog, this, placeholders::_1);
+	pEventCenter->Subscribe(KEVENT_SIMBA_LAST_DIALOG, this, func);
 
 	func = bind(&CSimba::OnAppearEnd, this, placeholders::_1);
 	pEventCenter->Subscribe(KEVENT_SIMBA_APPEAR_END, this, func);
@@ -117,7 +126,7 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_pLipBone = m_pModelCom->Get_BonePtr("T_LLip0J");
 	Safe_AddRef(m_pLipBone);
 
-	//m_setAppear1Anims = {}
+	m_setAppear1Anims = { Simba_DemoAppear1Cut2 };
 
 	return S_OK;
 }
@@ -166,8 +175,13 @@ _int CSimba::Tick(_float fTimeDelta)
 
 	Check_HitBoxActivation();
 
-	//if()
-
+	if (m_setAppear1Anims.end() != m_setAppear1Anims.find(SIMBA_ANIM(Get_State())) && m_pGameInstance->Get_KeyState(DIK_A, KEY_DOWN)) {
+		if (false == m_bPlayPartialAnim) {
+			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSub, 50.f, false, false);
+			m_bPlayPartialAnim = true;
+		}
+	}
+	
 	return OBJ_NOEVENT;
 }
 
@@ -538,7 +552,27 @@ void CSimba::Reset_HitBoxTimingMap(SIMBA_ANIM eAnimIdx)
 
 void CSimba::OnAppearStart(CGameObject* pObj)
 {
-	// 대사 웅얼웅얼 
+	// 대사 시작
+	Change_State(Simba_DemoAppear1Cut2, 66.66f, false, false);
+	TransformToDefault();
+}
+
+void CSimba::OnNextDialog1(CGameObject* pObj)
+{
+	TransformToDefault();
+	_int a = 0; // 상태변경
+}
+
+void CSimba::OnNextDialog2(CGameObject* pObj)
+{
+	TransformToDefault();
+	_int a = 0; // 상태변경
+}
+
+void CSimba::OnLastDialog(CGameObject* pObj)
+{
+	TransformToDefault();
+	_int a = 0; // 손 뻗는 애니메이션으로 상태변경
 }
 
 void CSimba::OnAppearEnd(CGameObject* pObj)

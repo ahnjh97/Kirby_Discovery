@@ -66,6 +66,7 @@ private:
 #pragma region GETTER/SETTER
 public:
 	MESSAGEWINDOW_STATE Get_MWindowState() { return m_eCurState; }
+	void Reset_MessageIndex(CGameObject* pObj) { m_iCurMessageIndex = 0; } 
 #pragma endregion
 
 public:
@@ -124,5 +125,8 @@ private:
 	_bool						m_bSignalHightlight = false;
 	_bool						m_bSignalPostHightlight = false;
 
+	_bool						m_bNextDialog1Notified = { false };
+	_bool						m_bNextDialog2Notified = { false };
+	_bool						m_bLastDialogNotified = { false };
 };
 END
