@@ -225,7 +225,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	m_fParticalDelay += fTimeDelta;
 
-	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f || (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN)))
+	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f || (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))  )
 	{
 		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
 		ToCut_Reset_Kirby(pTransformCom, pController);
@@ -759,6 +759,8 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 	CFinaleCut_ControlCenter* pCenter = static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 
 	_int iAnimIndex = pCenter->Get_CutScene();
 
@@ -804,6 +806,12 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	// ÄÆ¾À ÁøÀÔ¼Ò. Á¡ÇÁ Á¡ÇÁ
 	if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT1)
 	{
+		_float4 NewLook = _float4(1.f, 0.f, 0.f, 0.f);
+		_float4 NewUp = _float4(0.f, 1.f, 0.f, 0.f);
+		_float4 NewRight = XMVector3Cross(NewUp, NewLook);
+		pTransformCom->Set_State(CTransform::STATE_LOOK, NewLook);
+		pTransformCom->Set_State(CTransform::STATE_UP, NewUp);
+		pTransformCom->Set_State(CTransform::STATE_RIGHT, NewRight);
 
 		if (pKirby->isAnimFinish())
 		{
