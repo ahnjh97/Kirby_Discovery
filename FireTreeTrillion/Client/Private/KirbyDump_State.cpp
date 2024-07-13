@@ -1049,7 +1049,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (m_bShakeTrigger1 == true)
 		{
-			pCamera->Make_Shake(2.5f, 0.5f);
+			pCamera->Make_Shake(5.f, 0.5f);
 			m_bShakeTrigger1 = false;
 		}
 		else if (m_fTime > 0.3f && m_bShakeTrigger2 == true)
@@ -1072,7 +1072,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		CHECK_NULLPTR(pCamera);
 		pCamera->Set_BothFocusRatio(1.f - (m_fQTERatio * .033f));
 
-		if (m_fQTERatio > 14.f)
+		if (m_fQTERatio > 30.f)
 		{
 			pCenter->Set_CutScene(19);
 		}
