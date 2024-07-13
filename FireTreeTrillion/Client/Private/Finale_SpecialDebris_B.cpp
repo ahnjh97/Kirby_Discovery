@@ -1,23 +1,23 @@
 #include "stdafx.h"
-#include "PopStar.h"
-#include "MultiEffect.h"
+#include "Finale_SpecialDebris_B.h"
 
-CPopStar::CPopStar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CFinale_SpecialDebris_B::CFinale_SpecialDebris_B(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 {
 }
 
-CPopStar::CPopStar(const CPopStar& rhs)
+CFinale_SpecialDebris_B::CFinale_SpecialDebris_B(const CFinale_SpecialDebris_B& rhs)
 	: CGameObject{ rhs }
 {
 }
 
-HRESULT CPopStar::Initialize_Prototype()
+HRESULT CFinale_SpecialDebris_B::Initialize_Prototype()
 {
+
 	return S_OK;
 }
 
-HRESULT CPopStar::Initialize(void* pArg)
+HRESULT CFinale_SpecialDebris_B::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC* Desc = nullptr;
 
@@ -30,51 +30,19 @@ HRESULT CPopStar::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	// юс╫ц
-	m_pModelCom->Set_Animation(1, 10.f, false, false);
-
 	m_bMotionBlur = false;
 	m_bRimLight = true;
-	m_fRimWidth = 5.f;
 	m_bStencil = true;
-
-	m_pTransformCom->Turn(_float4(0.f, 1.f, 0.f, 0.f), 1.f, 90.f);
-	m_pTransformCom->Turn(_float4(0.f, 0.f, 1.f, 0.f), 1.f, 50.f);
-
-	m_pTransformCom->Set_Scaled(8.f, 8.f, 8.f);
-
-	//StarRiver
-	CEffect::FX_DESC FXDesc{};
-
-	FXDesc.vInitPos = _float3{15.f, -10.f, 0.f};
-	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-	FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
-	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_StarRiver"), &FXDesc)))
-		return E_FAIL;
-
-	FXDesc.vInitPos = _float3{ 15.f, -40.f, 0.f };
-	FXDesc.vInitScale = { 6.f, 6.f, 6.f };
-	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_star dash test 3"), &FXDesc)))
-		return E_FAIL;
-
-	GAMEOBJECT_DESC Smalldesc = {};
-	Smalldesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
-	_float4 vSmallLook = CUtils::Get_State_Vector_Matrix(Smalldesc.matWorld, CUtils::STATE_LOOK);
-	_float4 vSmallRight = CUtils::Get_State_Vector_Matrix(Smalldesc.matWorld, CUtils::STATE_RIGHT);
-	_float4 vSmallPos = CUtils::Get_State_Vector_Matrix(Smalldesc.matWorld, CUtils::STATE_POSITION);
-
-	_float4 vNewSmallPos = vSmallPos + (vSmallLook * -200.f) + vSmallRight * 30.f; //+ (vSmallUp * -50.f);
-	CUtils::Set_State_Matrix(Smalldesc.matWorld, CUtils::STATE_POSITION, vNewSmallPos);
-	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_PopStar"), TEXT("Prototype_GameObject_PopStar_StarSmall"), &Smalldesc)))
-		return E_FAIL;
 
 	return S_OK;
 }
 
-_int CPopStar::Tick(_float fTimeDelta)
+_int CFinale_SpecialDebris_B::Tick(_float fTimeDelta)
 {
-	if (true == m_bDead)
+	if (m_bDead == true)
 		return OBJ_DEAD;
+
+	m_fAccTime = m_pGameInstance->Get_SecondTimer();
 
 
 
@@ -82,13 +50,15 @@ _int CPopStar::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-void CPopStar::Late_Tick(_float fTimeDelta)
+void CFinale_SpecialDebris_B::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(fTimeDelta);
+	m_pModelCom->Play_Animation(m_fAccTime);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+
 }
 
-HRESULT CPopStar::Render()
+HRESULT CFinale_SpecialDebris_B::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -126,7 +96,15 @@ HRESULT CPopStar::Render()
 	return S_OK;
 }
 
-HRESULT CPopStar::Add_Components()
+HRESULT CFinale_SpecialDebris_B::Render_LightDepth()
+{
+	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CFinale_SpecialDebris_B::Add_Components()
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -141,7 +119,7 @@ HRESULT CPopStar::Add_Components()
 	return S_OK;
 }
 
-HRESULT CPopStar::Bind_ShaderResources()
+HRESULT CFinale_SpecialDebris_B::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -158,33 +136,40 @@ HRESULT CPopStar::Bind_ShaderResources()
 	return S_OK;
 }
 
-CPopStar* CPopStar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+_int CFinale_SpecialDebris_B::Make_Partical()
 {
-	CPopStar* pInstance = new CPopStar(pDevice, pContext);
+
+
+	return 0;
+}
+
+CFinale_SpecialDebris_B* CFinale_SpecialDebris_B::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+	CFinale_SpecialDebris_B* pInstance = new CFinale_SpecialDebris_B(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Create : CPopStar"));
+		MSG_BOX(TEXT("Failed To Create : CFinale_SpecialDebris_B"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CPopStar::Clone(void* pArg)
+CGameObject* CFinale_SpecialDebris_B::Clone(void* pArg)
 {
-	CPopStar* pInstance = new CPopStar(*this);
+	CFinale_SpecialDebris_B* pInstance = new CFinale_SpecialDebris_B(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Clone : CPopStar"));
+		MSG_BOX(TEXT("Failed To Clone : CFinale_SpecialDebris_B"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CPopStar::Free()
+void CFinale_SpecialDebris_B::Free()
 {
 	__super::Free();
 	Safe_Release(m_pModelCom);

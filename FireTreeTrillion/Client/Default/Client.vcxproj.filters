@@ -640,6 +640,9 @@
     <Filter Include="02.GameObjects\Map\Finale_SpecialDebris">
       <UniqueIdentifier>{874c768e-0036-49b7-b251-80dbc1e9cc75}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Finale_SpeicalBuilding">
+      <UniqueIdentifier>{e99f6f3f-aec5-4d34-9c56-25fbe8ea2270}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1282,8 +1285,20 @@
     <ClInclude Include="..\Public\BossChimera.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossChimera</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Finale_SpecialDebris.h">
+    <ClInclude Include="..\public\Finale_SpecialDebris_A.h">
       <Filter>02.GameObjects\Map\Finale_SpecialDebris</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Finale_SpecialDebris_B.h">
+      <Filter>02.GameObjects\Map\Finale_SpecialDebris</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Finale_SpecialDebris_C.h">
+      <Filter>02.GameObjects\Map\Finale_SpecialDebris</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BuildingCluster_A.h">
+      <Filter>02.GameObjects\Map\Finale_SpeicalBuilding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BuildingCluster_B.h">
+      <Filter>02.GameObjects\Map\Finale_SpeicalBuilding</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1908,8 +1923,20 @@
     <ClCompile Include="..\Private\BossChimera.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossChimera</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Finale_SpecialDebris.cpp">
+    <ClCompile Include="..\private\Finale_SpecialDebris_A.cpp">
       <Filter>02.GameObjects\Map\Finale_SpecialDebris</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Finale_SpecialDebris_B.cpp">
+      <Filter>02.GameObjects\Map\Finale_SpecialDebris</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Finale_SpecialDebris_C.cpp">
+      <Filter>02.GameObjects\Map\Finale_SpecialDebris</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BuildingCluster_A.cpp">
+      <Filter>02.GameObjects\Map\Finale_SpeicalBuilding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BuildingCluster_B.cpp">
+      <Filter>02.GameObjects\Map\Finale_SpeicalBuilding</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
