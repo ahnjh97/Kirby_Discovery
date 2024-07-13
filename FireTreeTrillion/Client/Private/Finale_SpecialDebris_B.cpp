@@ -36,7 +36,7 @@ HRESULT CFinale_SpecialDebris_B::Initialize(void* pArg)
 	m_bRimLight = true;
 	m_bStencil = true;
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(2550.f, 255.f, -136.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(2550.f, 239.f, -136.f, 1.f));
 	_float4 NewLook = _float4(1.f, 0.f, 0.f, 0.f);
 	_float4 NewUp = _float4(0.f, 1.f, 0.f, 0.f);
 	_float4 NewRight = XMVector3Cross(NewUp, NewLook);
