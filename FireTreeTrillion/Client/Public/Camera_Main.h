@@ -107,6 +107,8 @@ private:
 public:
 	virtual void Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS eFocus, _float3 vAnchorOffset = _float3{ 0.f, 0.f, 0.f }, _float fInterpolateSpeed = -1.f) override;
 
+	void Set_TargetAnchor(_float3 vAnchorOffset) { m_vAnchorOffset = vAnchorOffset; }
+
 	void Set_CamFocus(CAMFOCUS eFocus) { m_eCamFocus = eFocus; }
 
 	//FOV를 세팅한다.
