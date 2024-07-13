@@ -794,9 +794,9 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	else if (iAnimIndex == 18)
 		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT18, 50.f, true, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
 	else if (iAnimIndex == 19)
-		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT19, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT19, 50.f, false, true, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
 	else if (iAnimIndex == 20)
-		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT20, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT20, 50.f, false, true, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
 
 
 

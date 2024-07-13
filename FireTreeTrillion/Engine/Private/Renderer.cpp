@@ -771,7 +771,7 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 		m_DestColorData = Find_ColorSet("Town");
 		m_fRimLightRatio.second = .7f;
 		m_vRimColor.second = _float3(1.f, .5f, 0.f);
-		Update_Option(OPTION_DOF, false);
+		Update_Option(OPTION_DOF, true);
 	}
 	break;
 	case 6:

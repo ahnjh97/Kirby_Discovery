@@ -184,7 +184,7 @@ HRESULT CFinaleRoad::Render()
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS); CHECK_FAILED(hr);
 
 		//투명 패스
-		if ((m_wstrModelName == L"MovableBuildingA" || m_wstrModelName == L"MovableBuildingB" || m_wstrModelName == L"MovableBuildingC"|| m_wstrModelName == L"MovableBuildingD")
+		if ((m_wstrModelName == L"BigMovableBuildingA" || m_wstrModelName == L"BigMovableBuildingB" || m_wstrModelName == L"BigMovableBuildingC"|| m_wstrModelName == L"BigMovableBuildingD")
 			&& i == 0)
 		{
 			continue;
