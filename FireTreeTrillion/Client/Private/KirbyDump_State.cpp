@@ -832,8 +832,8 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 					(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 				CHECK_NULLPTR(pCameraMain);
 				pCameraMain->Set_FOVY(40.f);
-				m_pGameInstance->Set_FirstTimerRatio(.1f);
-				m_pGameInstance->Set_SecondTimerRatio(.1f);
+				m_pGameInstance->Set_FirstTimerRatio(0.f);
+				m_pGameInstance->Set_SecondTimerRatio(0.f);
 			}
 		}
 		//QTE 1
@@ -860,14 +860,14 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				CHECK_NULLPTR(pCameraMain);
 				pCameraMain->Set_FOVY(50.f);
 
-				m_fQTERatio = 0.f;
+				//m_fQTERatio = 0.f;
 			}
 
-			if (2330.f < pKirby->m_vBonePos.x)
+			if (10.f < m_fQTERatio && 2380.f < pKirby->m_vBonePos.x)
 			{
 				m_iQTECnt++;
-				m_pGameInstance->Set_FirstTimerRatio(.1f);
-				m_pGameInstance->Set_SecondTimerRatio(.1f);
+				m_pGameInstance->Set_FirstTimerRatio(0.f);
+				m_pGameInstance->Set_SecondTimerRatio(0.f);
 				CCamera_Main* pCameraMain = static_cast<CCamera_Main*>
 					(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 				CHECK_NULLPTR(pCameraMain);
