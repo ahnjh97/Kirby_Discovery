@@ -450,10 +450,9 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Finale",
 		COLOR_DATA{
-1.54028f, 1.f, 1.08018f, 1.08951f, 0.559999f, 1.10999f, 1.50095f, 0.919976f, 0.969425f,
-0.969425f, 1.01024f, 0.819999f, 1.23982f, 0.366863f, 0.0322149f, 0.319418f, 0.02978f,
-0.579137f, 0.633162f, 0.769912f, 0.0295837f, 1.f, 0.847059f, 0.254902f, 0.0295075f,
-0.280444f, 0.670456f
+		1.3f, 1.f, 1.00971f, 1.26984f, 1.29039f, 1.3f, 1.2f, 0.890027f,
+		0.749999f, 0.7f, 1.33994f, 1.08f, 1.2f, 0.416831f, 0.078232f, 0.161517f,
+		0.0762417f, 0.902655f, 0.68634f, 0.543191f, 0.00980521f, 0.499961f, 0.912908f, 0.99115f, 0.0099959f, 0.190006f, 0.359918f
 		});
 
 	Save_ColorSet("Horror",
@@ -767,10 +766,10 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 		break;
 	case 5:
 	{
-		//m_DestColorData = Find_ColorSet("Finale");
-		m_DestColorData = Find_ColorSet("Town");
+		m_DestColorData = Find_ColorSet("Finale");
+		//m_DestColorData = Find_ColorSet("Town");
 		m_fRimLightRatio.second = .7f;
-		m_vRimColor.second = _float3(1.f, .5f, 0.f);
+		m_vRimColor.second = _float3(.7f, .3f, 0.f);
 		Update_Option(OPTION_DOF, true);
 	}
 	break;
@@ -1334,6 +1333,14 @@ HRESULT CRenderer::Render_Result()
 	if (FAILED(m_pShader->Bind_RawValue("g_vRimColor", &m_vRimColor.first, sizeof(_float3))))
 		return E_FAIL;
 
+	// DOF 강도
+	if (FAILED(m_pShader->Bind_RawValue("g_fDOFIntensity", &m_fDOFIntensity, sizeof(_float))))
+		return E_FAIL;
+
+	// DOF 컬러
+	if (FAILED(m_pShader->Bind_RawValue("g_vDOFColor", &m_vDOFColor, sizeof(_float3))))
+		return E_FAIL;
+
 	// 섞을 스카이 박스
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Sky"), "g_SkyTexture")))
 		return E_FAIL;
@@ -1775,6 +1782,15 @@ void CRenderer::Render_IMGUI()
 	ImGui::SeparatorText(u8"림 라이트");
 
 	ImGui::DragFloat(u8"림 라이트 배율", &m_fRimLightRatio.second, .01f, 0.f, 1.f, "%.2f");
+	ImGui::DragFloat(u8"림 라이트 범위", &(m_fRimLightRadius.second), .01f, 0.f, 10.f, "%.2f");
+	ImGui::DragFloat3(u8"림 라이트 색상", &(m_vRimColor.second.x), .01f, 0.f, 1.f, "%.2f");
+
+	//ImGui::DragFloat3(u8"림 라이트 색상", m_vRimColor.second, .01f, 0.f, 3.f, "%.2f");
+
+	ImGui::SeparatorText(u8"DOF");
+
+	ImGui::DragFloat(u8"DOF 강도", &m_fDOFIntensity, .01f, 0.f, 10.f, "%.2f");
+	ImGui::DragFloat3(u8"DOF 색상", &(m_vDOFColor.x), .01f, -1.f, 1.f, "%.2f");
 
 	ImGui::SeparatorText(u8"컬러코렉션");
 

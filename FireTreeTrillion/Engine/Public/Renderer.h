@@ -229,6 +229,8 @@ private:
 	pair<_float, _float> m_fRimLightRadius = { 1.f, 1.f };
 	pair<_float3, _float3> m_vRimColor = {_float3(1.f, 1.f, 1.f), _float3(1.f, 1.f, 1.f)};
 
+	_float m_fDOFIntensity = { 0.1f };
+	_float3 m_vDOFColor = { .03f, 0.f, .05f };
 
 	_float m_fSSAOScale = { 0.5f };
 	_float m_fSSAOBias = { 0.f };

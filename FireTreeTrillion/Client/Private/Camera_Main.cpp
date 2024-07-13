@@ -1712,6 +1712,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//보스를 뒤에서 본다
 	case SEQ_FINALECUT8:
 	{
+		//위치 상수로
 		_float3 vStartPos = (_float3)FINALEKIRBY->m_vBonePos;
 
 		_float fDuration = m_FinaleSeqBTime.front();
@@ -1828,6 +1829,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		//
 		newAction = {};
 		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT_FAST, fDuration);
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ .74f, .67f, -.05f });
+		newAction.vDir.Normalize();
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - newAction.vDir * 30.f);
 
 		//Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ -15.f, -20.f, 10.f } /*+ _float3{ 10.f, 10.f, 0.f}*/);
@@ -1908,7 +1911,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ .32f, .29f, -.9f });
 		newAction.vDir.Normalize();
 		Fill_ActionPos(newAction, POS_ABSOLUTE, BATTLE_POS - newAction.vDir * 40.f);
-
+		m_CamSeq.push_back(newAction);
 
 		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, fDuration);
 		m_CamSeq.push_back(newAction);
@@ -2399,7 +2402,7 @@ void CCamera_Main::Orbit_Target(_float fTimeDelta)
 #ifdef _DEBUG
 void CCamera_Main::Render_IMGUI()
 {
-
+	ImGui::Begin(u8"메인 카메라");
 	_float4x4 WorldMat = m_pTransformCom->Get_WorldMatrix();
 	_float4 vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
@@ -2479,6 +2482,7 @@ void CCamera_Main::Render_IMGUI()
 	ImGui::DragFloat(u8"현재 줌 오프셋", &m_fCurZoomOffset, .05f, -20.f, 20.f, "%.1f", ImGuiSliderFlags_NoInput);
 	ImGui::DragFloat(u8"현재 줌 오프셋", &m_fDestZoomOffset, .05f, -20.f, 20.f, "%.1f");
 
+	ImGui::End();
 
 }
 void CCamera_Main::Render_GraphicIMGUI(_float4x4 _worldMat)
