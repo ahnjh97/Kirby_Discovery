@@ -149,7 +149,6 @@ void CAnimation::Lerp_TransformMatrix(_float fTimeDelta, const vector<class CBon
 
 	if (fPartialAnimLerpTime > m_fLerpTime)
 	{
-		pModel->Reset_TrackPosition(iPartialAnimIdx);
 		fPartialAnimLerpTime = 0.f;
 		pModel->Set_LerpPartialAnim(false);
 	}

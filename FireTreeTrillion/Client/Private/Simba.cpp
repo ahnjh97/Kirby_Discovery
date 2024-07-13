@@ -6,6 +6,7 @@
 #include "HitBox.h"
 #include "Bone.h"
 #include "EventCenter.h"
+#include "Bone.h"
 
 CSimba::CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -17,19 +18,22 @@ CSimba::CSimba(const CSimba& rhs)
 {
 }
 
-void CSimba::InsertHitboxActivationTiming(_uint iAnimIdx, vector<tuple<_float, _bool, COLLISION_VALUE>>& _vecTimings)
+void CSimba::InsertHitboxActivationTiming(SIMBA_ANIM eAnimIdx, vector<tuple<_float, _bool, COLLISION_VALUE>>& _vecTimings)
 {
 	sort(_vecTimings.begin(), _vecTimings.end(), [](const tuple<float, bool, COLLISION_VALUE>& a, const tuple<float, bool, COLLISION_VALUE>& b) {
 		return get<0>(a) < get<0>(b);
 		});
 
-	m_mapHitBoxTiming.insert_or_assign(iAnimIdx, _vecTimings);
+	m_mapHitBoxTiming.insert_or_assign(eAnimIdx, _vecTimings);
 }
 
 void CSimba::TransformToDefault()
 {
-	m_pTransformCom->Set_WorldMatrix(m_matDefault);
+	_float4x4 matWorld = m_matDefault;
+	matWorld._42 = m_matDefault._42 - 2.005f;
+	m_pTransformCom->Set_WorldMatrix(matWorld);
 	m_pControllerCom->Set_Position(m_pTransformCom, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	m_pControllerCom->FreeFall(m_pTransformCom, m_pGameInstance->Get_SecondTimer(), 6.f, -0.3f);
 	m_bRenderMant = true;
 }
 
@@ -82,7 +86,7 @@ HRESULT CSimba::Initialize(void* pArg)
 		m_vecMeshes.push_back(i);
 	}
 
-	m_pModelCom->Set_Animation(Simba_DemoAppear1Cut2, 66.66f, false, true);
+	m_pModelCom->Set_Animation(Simba_DemoAppear1Cut2, 66.66f, true, true);
 
 	m_pModelCom->EmplaceBackPartialAnim(Simba_DamageFaceSub);
 	m_pModelCom->EmplaceBackPartialAnim(Simba_LipSyncSub);
@@ -105,12 +109,14 @@ HRESULT CSimba::Initialize(void* pArg)
 
 	Add_AnimEvent();
 
-	vector<tuple<_float, _bool, COLLISION_VALUE>> vecTiming = { tuple<_float, _bool, COLLISION_VALUE>(0, false, ATTACK) };
-	InsertHitboxActivationTiming(Simba_DemoAppear1Cut2, vecTiming);
+	SetUpHitBoxTimings();
 
 	Set_Slope(false);
 
 	m_matDefault = m_pTransformCom->Get_WorldFloat4x4();
+
+	m_pLipBone = m_pModelCom->Get_BonePtr("T_LLip0J");
+	Safe_AddRef(m_pLipBone);
 
 	return S_OK;
 }
@@ -121,30 +127,15 @@ _int CSimba::Tick(_float fTimeDelta)
 		return Ready_Dead();
 
 	if (true == m_pModelCom->IsFinished() || m_pModelCom->Get_Trackposition() == 0.f) // IsAnimFinished
-		Reset_HitBoxTimingMap(m_pModelCom->Get_CurAnimIndex());
+		Reset_HitBoxTimingMap(SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex()));
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 	__super::Tick(m_fTimeDelta);
 
-	if (true == m_pModelCom->IsFinished(Simba_DamageFaceSub)) {
-		if(true == m_bPlayDamageFaceSub)
-			m_pModelCom->Set_LerpPartialAnim(true);
-		m_bPlayDamageFaceSub = false;
-	}
-		
-	if (true == m_pModelCom->IsFinished(Simba_LipSyncSub)) {
-		if (true == m_bPlayLipSyncSub)
-			m_pModelCom->Set_LerpPartialAnim(true);
-		m_bPlayLipSyncSub = false;
-	}
-		
-	if (true == m_pModelCom->IsFinished(Simba_LipSyncSubA)) {
-		if (true == m_bPlayLipSyncSubA)
-			m_pModelCom->Set_LerpPartialAnim(true);
-		m_bPlayLipSyncSubA = false;
-	}
-		
+	if (true == m_pModelCom->IsPartialAnimFinished())
+		m_bPlayPartialAnim = false;
+
 	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 		if (m_pGameInstance->Get_KeyState(DIK_SPACE, KEY_DOWN))
@@ -163,12 +154,12 @@ _int CSimba::Tick(_float fTimeDelta)
 		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD3, KEY_DOWN))
 			Activate_Attack(ATTACK3);
 		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD7, KEY_DOWN)) {
-			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSub, 66.66f, false, false);
-			m_bPlayLipSyncSub = true;
+			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSub, 50.f, false, false);
+			m_bPlayPartialAnim = true;
 		}
 		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD8, KEY_DOWN)) {
-			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSubA, 66.66f, false, false);
-			m_bPlayLipSyncSubA = true;
+			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSubA, 50.f, false, false);
+			m_bPlayPartialAnim = true;
 		}
 	}
 
@@ -182,16 +173,18 @@ void CSimba::Late_Tick(_float fTimeDelta)
 	_bool bIsFinished = m_pModelCom->IsFinished();
 	m_pModelCom->Play_Animation(m_fTimeDelta);
 
-	/*if (true == m_pModelCom->Get_LerpPartialAnim())
-		m_pModelCom->Lerp_PartialAnim(m_fTimeDelta);
-	else
-	{	*/
-		if (false == bIsFinished)
-		{
-			if (true == m_bPlayDamageFaceSub || true == m_bPlayLipSyncSub || true == m_bPlayLipSyncSubA)
+	if (false == bIsFinished)
+	{
+		if (true == m_bPlayPartialAnim) {
+
+			_float fPartialAnimRatio = m_pModelCom->Get_PartialAnimRatio();
+			_float4x4 matLipTransformMatrix = m_pLipBone->Get_TransformationMatrix();
+			if (0.6f < fPartialAnimRatio && (-0.05f > matLipTransformMatrix._42 && -0.08f < matLipTransformMatrix._42))
+				m_bPlayPartialAnim = false;
+			else
 				m_pModelCom->Play_PartialAnimation(m_fTimeDelta);
 		}
-	//}
+	}
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
@@ -306,11 +299,11 @@ void CSimba::Render_IMGUI()
 
 void CSimba::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	if (true == m_bPlayDamageFaceSub)
+	if (true == m_bPlayPartialAnim)
 		return;
 
-	m_pModelCom->Reset_PartialAnimation(Simba_DamageFaceSub, 50.f, false, false);
-	m_bPlayDamageFaceSub = true;
+	m_pModelCom->Reset_PartialAnimation(Simba_DamageFaceSub, 40.f, false, false);
+	m_bPlayPartialAnim = true;
 }
 
 void CSimba::Change_State(SIMBA_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -361,18 +354,19 @@ HRESULT CSimba::Add_Components()
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
 	HitBox.pCollisionType = BOSS_SIMBA;
-	HitBox.pSocket = m_pModelCom->Get_BonePtr("ControlL");
+	HitBox.pSocket = m_pModelCom->Get_BonePtr("C_BodyJ");
 
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 
-	Set_BodyCollider(COLLIDER_CYLINDER, -3.f, 7.f, 3.f);
+	Set_BodyCollider(COLLIDER_SPHERE, 2.f, 7.f, 5.5f);
 
 	CHitBox::HITBOX_DESC tAttack{};
 	tAttack.pOwner = this;
 	tAttack.pDesc = &m_tColliderDesc[ATTACK]; // Left Hand
 	tAttack.pCollisionType = HITBOX_MONSTER;
 	tAttack.pSocket = m_pModelCom->Get_BonePtr("L_HaveL");
+	//tAttack.vBoneOffset = _float3(0, 0, -3);
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
 		return E_FAIL;
 	
@@ -381,15 +375,15 @@ HRESULT CSimba::Add_Components()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
 		return E_FAIL;
 
-	tAttack.pDesc = &m_tColliderDesc[ATTACK3]; // Feet
-	tAttack.pSocket = m_pModelCom->Get_BonePtr("C_PelvisJ");
+	tAttack.pDesc = &m_tColliderDesc[ATTACK3]; // Body
+	tAttack.pSocket = m_pModelCom->Get_BonePtr("C_BodyJ");
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
 		return E_FAIL;
 
-	Activate_SphereCollider(0.6f, 2.5f);
-	Activate_SphereCollider(0.6f, 2.5f, ATTACK2);
-	Activate_CylinderCollider(-2.f, 2.2f, 3.2f, ATTACK3);
-
+	Activate_SphereCollider(0.f, 4.5f);
+	Activate_SphereCollider(0.f, 4.5f, ATTACK2);
+	//Activate_SphereCollider(2.f, 8.f, ATTACK3);
+	Activate_FrustumCollider(0.01f, 8.f, 180.f, ATTACK3);
 	return S_OK;
 }
 
@@ -446,6 +440,12 @@ void CSimba::SetUp_FSM()
 	m_pFSM->Add_State(Simba_JumpStart, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 	m_pFSM->Add_State(Simba_Landing, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
+	for(_uint i = Simba_BackStep; i <= Simba_BackStepStart; i++)
+		m_pFSM->Add_State(i, CSimba_BackStep::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
+	for(_uint i = Simba_AttackJump; i <= Simba_AttackJumpWait; i++)
+		m_pFSM->Add_State(i, CSimba_AttackJump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
 	//ป๓ลย Initialize
 	CFSM::FSM_INFO	FSM_Desc = {};
 	FSM_Desc.iState = Simba_DemoAppear1Cut2;
@@ -453,19 +453,51 @@ void CSimba::SetUp_FSM()
 	m_pFSM->Initialize(&FSM_Desc);
 }
 
+void CSimba::SetUpHitBoxTimings()
+{
+	vector<tuple<_float, _bool, COLLISION_VALUE>> vecTiming;
+
+	for(_uint i = 1; i < 9; i++)
+		vecTiming.emplace_back(tuple<_float, _bool, COLLISION_VALUE>(i * 0.1f, false, ATTACK));
+	InsertHitboxActivationTiming(Simba_QuickClawL, vecTiming);
+	InsertHitboxActivationTiming(Simba_QuickClaw2L, vecTiming);
+	vecTiming.clear();
+
+	for (_uint i = 1; i < 9; i++)
+		vecTiming.emplace_back(tuple<_float, _bool, COLLISION_VALUE>(i * 0.1f, false, ATTACK2));
+	InsertHitboxActivationTiming(Simba_QuickClawR, vecTiming);
+	InsertHitboxActivationTiming(Simba_QuickClaw2R, vecTiming);
+	vecTiming.clear();
+
+	for (_uint i = 1; i < 9; i++) {
+		vecTiming.emplace_back(tuple<_float, _bool, COLLISION_VALUE>(i * 0.1f, false, ATTACK));
+		vecTiming.emplace_back(tuple<_float, _bool, COLLISION_VALUE>(i * 0.1f, false, ATTACK2));
+	}
+	InsertHitboxActivationTiming(Simba_DoubleClaw, vecTiming);
+	vecTiming.clear();
+
+	for (_uint i = 1; i < 5; i++) {
+		vecTiming.emplace_back(tuple<_float, _bool, COLLISION_VALUE>(i * 0.1f, false, ATTACK));
+		vecTiming.emplace_back(tuple<_float, _bool, COLLISION_VALUE>(i * 0.1f, false, ATTACK2));
+		vecTiming.emplace_back(tuple<_float, _bool, COLLISION_VALUE>(i * 0.1f, false, ATTACK3));
+	}
+	InsertHitboxActivationTiming(Simba_FinalCrusher, vecTiming);
+	vecTiming.clear();
+}
+
 void CSimba::Check_HitBoxActivation()
 {
-	_uint iAnimIdx = m_pModelCom->Get_CurAnimIndex();
-	_float fTrackPosition = m_pModelCom->Get_AnimTrackPosition();
+	SIMBA_ANIM eAnimIdx = SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex());
+	_float fAnimRatio = m_pModelCom->Get_AnimRatio();
 
-	auto pair = m_mapHitBoxTiming.find(iAnimIdx);
+	auto pair = m_mapHitBoxTiming.find(eAnimIdx);
 	if (pair != m_mapHitBoxTiming.end())
 	{
 		auto& vecHitBoxTiming = pair->second;
 
 		for (auto& tuple : vecHitBoxTiming)
 		{
-			if (get<0>(tuple) >= fTrackPosition)
+			if (get<0>(tuple) <= fAnimRatio)
 			{
 				if (false == get<1>(tuple))
 				{
@@ -478,9 +510,9 @@ void CSimba::Check_HitBoxActivation()
 	}
 }
 
-void CSimba::Reset_HitBoxTimingMap(_uint iAnimIdx)
+void CSimba::Reset_HitBoxTimingMap(SIMBA_ANIM eAnimIdx)
 {
-	auto pair = m_mapHitBoxTiming.find(iAnimIdx);
+	auto pair = m_mapHitBoxTiming.find(eAnimIdx);
 	if (pair != m_mapHitBoxTiming.end())
 	{
 		auto& vecHitBoxTiming = pair->second;
@@ -540,10 +572,10 @@ CGameObject* CSimba::Clone(void* pArg)
 void CSimba::Free()
 {
 	CEventCenter::Get_Instance()->Unsubscribe(this);
+	Safe_Release(m_pLipBone);
+	Safe_Release(m_pKirby);
 
 	__super::Free();
-
-	Safe_Release(m_pKirby);
 
 	for(_uint i = 0; i < EYETEX_END; i++)
 		Safe_Release(m_pEyeTextureCom[i]);

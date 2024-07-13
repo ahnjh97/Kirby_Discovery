@@ -59,6 +59,9 @@ public:
 	void		Update_TransformationMatrix_ForPartialAnim(_float fTimeDelta, const vector<class CBone*>& Bones, unordered_set<_uint>& _setValidIndices);
 	void		Lerp_TransformMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, CModel* pModel
 					, _uint iPartialAnimIdx, _float& fPartialAnimLerpTime, unordered_set<_uint>& _setValidIndices);
+
+
+	// ForAnimTool
 	void		Read_AnimationData(ifstream& fileStream);
 
 private:

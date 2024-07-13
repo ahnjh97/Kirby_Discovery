@@ -68,7 +68,7 @@ public:
 	void Set_SimbaEye(SIMBA_EYESTATE eEyeState) { m_eEyeState = eEyeState; }
 	_float4 Get_Pos() { return m_vPos; }
 
-	void InsertHitboxActivationTiming(_uint iAnimIdx, vector<tuple<_float, _bool, COLLISION_VALUE>>& _vecTimings);
+	void InsertHitboxActivationTiming(SIMBA_ANIM eAnimIdx, vector<tuple<_float, _bool, COLLISION_VALUE>>& _vecTimings);
 	void TransformToDefault();
 
 	SIMBA_ANIM Get_PreState() { return m_ePreState; }
@@ -110,20 +110,14 @@ private:
 	vector<_uint>	m_vecMantMeshes;
 	_bool			m_bRenderMant = { true };
 
-	_bool			m_bPlayDamageFaceSub = { false };
-	_bool			m_bPlayLipSyncSub = { false };
-	_bool			m_bPlayLipSyncSubA = { false };
+	_bool			m_bPlayPartialAnim = { false };
 
-	vector<_uint>	m_vecDamageFaceSubBones;
-	unordered_set<_uint> m_setDamageFaceSubBones;
-	vector<_uint>	m_vecLipSyncSubBones;
-	vector<_uint>	m_vecLipSyncSubABones;
-
-	unordered_map<_uint, vector<tuple<_float, _bool, COLLISION_VALUE>>> m_mapHitBoxTiming; // 애니메이션 인덱스와, 활성화시킬 KeyFrame들.
+	unordered_map<SIMBA_ANIM, vector<tuple<_float, _bool, COLLISION_VALUE>>> m_mapHitBoxTiming; // 애니메이션 인덱스와, 활성화시킬 KeyFrame들.
 
 	_float			m_fAngle = { 0.f };
 	_float4			m_vPos = {};
 	_float4x4		m_matDefault = {};
+	class CBone*	m_pLipBone = { nullptr };
 
 private:
 	HRESULT		Add_Components();
@@ -131,9 +125,10 @@ private:
 
 	// FSM
 	void		SetUp_FSM();
+	void		SetUpHitBoxTimings();
 
 	void		Check_HitBoxActivation();
-	void		Reset_HitBoxTimingMap(_uint iAnimIdx);
+	void		Reset_HitBoxTimingMap(SIMBA_ANIM eAnimIdx);
 
 	void		OnAppearStart(CGameObject* pObj);
 	void		OnAppearEnd(CGameObject* pObj);

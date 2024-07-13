@@ -21,11 +21,13 @@ public:
 
 	_bool IsFinished() { return m_Animations[m_iCurrentAnimIndex]->IsFinished(); }
 	_bool IsFinished(_uint iCurrentAnimIndex) { return m_Animations[iCurrentAnimIndex]->IsFinished(); }
+	_bool IsPartialAnimFinished() { return m_Animations[m_iCurPartialAnim]->IsFinished(); }
 
 	string Get_MeshName(_uint iMeshIndex);
 	_float Get_Duration() { return m_Animations[m_iCurrentAnimIndex]->Get_Duration(); }
 	_float Get_Trackposition() { return m_Animations[m_iCurrentAnimIndex]->Get_TrackPosition(); }
 	_float Get_AnimRatio() { return m_Animations[m_iCurrentAnimIndex]->Get_AnimRatio(); }
+	_float Get_PartialAnimRatio() { return m_Animations[m_iCurPartialAnim]->Get_AnimRatio(); }
 	
 	CModel* CreateModelFromMesh(_uint iMeshIndex, _float3& vOffset
 		, unordered_set<string>& _setCheckedStrings, unordered_set<string>& _setExcludedMesh);
