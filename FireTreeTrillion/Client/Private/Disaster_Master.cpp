@@ -223,6 +223,16 @@ void CDisaster_Master::Make_CutAirParticle()
 				1.f);
 			m_pMaker->Make_Partical(1, vNewMyPos, 0.f, 2.f, 1.f, _float4(0.f, 1.f, 0.f, 0.f), 10.f, CUtils::Make_RandomFloat(15.f, 30.f), true);
 		}
+
+		for (_int i = 0; i < 30; i++)
+		{
+			_float4 vNewMyPos = _float4(
+				vKirbyPos.x + CUtils::Make_RandomFloat(200.f, 600.f),
+				vKirbyPos.y + CUtils::Make_RandomFloat(-300.f, 500.f),
+				vKirbyPos.z + CUtils::Make_RandomFloat(-500.f, 500.f),
+				1.f);
+			m_pMaker->Make_BuildingPartical(vNewMyPos);
+		}
 		m_bCutInitializeParticle = false;
 	}
 
@@ -241,6 +251,26 @@ void CDisaster_Master::Make_CutAirParticle()
 		m_pMaker->Make_Partical(1, vKirbyPos, 0.f, 2.f, 1.f, _float4(0.f, 1.f, 0.f, 0.f), 10.f, CUtils::Make_RandomFloat(15.f, 30.f), true);
 		m_fAirParticleDelay = 0.f;
 	}
+
+	if (m_fBuildingParticleDelay > 5.f)
+	{
+		_float4 vKirbyPos = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+
+		_float fZOffSet = { 0.f };
+		fZOffSet = CUtils::Make_RandomInt(0, 1) == 0 ? CUtils::Make_RandomFloat(-600.f, -150.f) : CUtils::Make_RandomFloat(150.f, 600.f);
+		_float fXOffSet = { 0.f };
+		fXOffSet = CUtils::Make_RandomInt(0, 1) == 0 ? CUtils::Make_RandomFloat(-600.f, -150.f) : CUtils::Make_RandomFloat(150.f, 600.f);
+		_float fYOffSet = { 0.f };
+		fYOffSet = CUtils::Make_RandomFloat(-500.f, 500.f);
+
+		vKirbyPos.x += fXOffSet;
+		vKirbyPos.y += fYOffSet;
+		vKirbyPos.z += fZOffSet;
+
+		m_pMaker->Make_BuildingPartical(vKirbyPos);
+		m_fBuildingParticleDelay = 0.f;
+	}
+
 
 
 }

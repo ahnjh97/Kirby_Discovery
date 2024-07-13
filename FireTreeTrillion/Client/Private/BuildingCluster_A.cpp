@@ -91,6 +91,7 @@ _int CBuildingCluster_A::Tick(_float fTimeDelta)
 	{
 		m_bRender = true;
 		m_eCurCut = CUT1;
+		m_pGameInstance->Setting_RadialBlur(3.f, 10.f);
 	}
 	else if (iCutIndex == 2)
 	{
