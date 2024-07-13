@@ -58,7 +58,7 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 	m_pSolarPanel = dynamic_cast<CGm_ParkSolarPanelOnce*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc));
 	if (nullptr == m_pSolarPanel)
 		return E_FAIL;
-	Safe_AddRef(m_pSolarPanel);
+	//Safe_AddRef(m_pSolarPanel);
 
 	//림라이트 OFF
 	//m_bRimLight = FALSE;
@@ -212,36 +212,6 @@ void CGm_DynamicField::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysX
 
 
 	m_IsInteraction = TRUE;
-	
-	//충전 대기 상태에서 키꾹 > 충전 시작
-	/*
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && STATE_OFFWAIT == m_eCurState)
-	{
-		m_pModelCom->Set_Animation(STATE_CHARGE, 30.f, FALSE, TRUE);
-		m_eCurState = STATE_CHARGE;
-	}
-	*/
-
-#pragma region KEY_FRAME CUSTOM 1 SCOOP
-
-	/*
-	else //키꾹 해제 시 충전 해제 (현재 사용x)
-	{
-		if (STATE_CHARGE == m_pModelCom->Get_CurAnimIndex())
-		{
-			_float fDuration = m_pModelCom->Get_Duration(); //전체 재생길이에서 현재 재생시점을 체크
-			_float fTrackPos = m_pModelCom->Get_Trackposition();
-			_float fSubTrackPos = fDuration - fTrackPos; //감산하여 충전 해제 애니메이션 자연스럽게 보정
-
-			m_pModelCom->Set_Animation(STATE_DECREASES, 60.f, FALSE, FALSE);
-			m_pModelCom->Set_TrackPosition(fSubTrackPos);
-			m_eCurState = STATE_DECREASES;
-		}
-	}
-	*/
-
-#pragma endregion
-
 }
 
 HRESULT CGm_DynamicField::Add_Components(const wstring& _wstrModelTag)

@@ -126,17 +126,17 @@ HRESULT CGm_ParkSolarPanelOnce::Render()
 		hr = m_pShaderCom->Begin(ANIMMODEL_LINEAR_NORMAL_O);
 		CHECK_FAILED(hr);
 
-		//LAMP_TYPE eLampType = { LAMP_RED };
+		LAMP_TYPE eLampType = { LAMP_RED };
 
-		////특정 애님 상태에 따라 텍스처 변경할 메쉬를 체크
-		//if (STATE_OFFWAIT == m_eCurState)
-		//{
-		//	if (m_setUpdateMeshs.find(i) != m_setUpdateMeshs.end())
-		//	{
-		//		hr = m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", eLampType);
-		//		CHECK_FAILED(hr);
-		//	}
-		//}
+		//특정 애님 상태에 따라 텍스처 변경할 메쉬를 체크
+		if (STATE_OFFWAIT == m_eCurState)
+		{
+			if (m_setUpdateMeshs.find(i) != m_setUpdateMeshs.end())
+			{
+				hr = m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", eLampType);
+				CHECK_FAILED(hr);
+			}
+		}
 		
 		hr = m_pModelCom->Render(i);
 		CHECK_FAILED(hr);
@@ -219,9 +219,9 @@ HRESULT CGm_ParkSolarPanelOnce::Add_Components()
 	CHECK_FAILED(hr);
 
 	//TEXTURE :: Lamp에 붙일 텍스처
-	//CHECK_FAILED(hr);	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_SolarPanelCharge_Lamp"),
-	//	TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
-	//CHECK_FAILED(hr);
+	CHECK_FAILED(hr);	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_SolarPanelCharge_Lamp"),
+		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
+	CHECK_FAILED(hr);
 
 #pragma region HITBOX
 
@@ -311,5 +311,5 @@ void CGm_ParkSolarPanelOnce::Free()
 	Safe_Release(m_pNonAnimModelCom);
 
 	Safe_Release(m_pShaderCom);
-	//Safe_Release(m_pTextureCom);
+	Safe_Release(m_pTextureCom);
 }
