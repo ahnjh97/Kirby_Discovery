@@ -829,6 +829,8 @@ HRESULT CLevel_Park::Ready_Objects()
 				continue;
 		}
 
+
+
 #pragma endregion
 	}
 	fileInput.close();
