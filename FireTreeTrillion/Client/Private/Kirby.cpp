@@ -72,7 +72,8 @@ HRESULT CKirby::Initialize(void* pArg)
 
 	// 디버깅 용
 	m_eAbilityType = ABILITY_CRASH;
-
+	if (LEVEL_SIMBA == *m_pCurrentLevelID)
+		m_eAbilityType = ABILITY_HAMMER;
 	// 커비의 상태에 따라, 애니메이션이 시작된다.
 	Kirby_StateInitialize();
 

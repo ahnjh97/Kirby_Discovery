@@ -77,6 +77,7 @@ void CSimba_Appear2::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 				_vector vLook = XMVector3Normalize(m_pTransform->Get_State(CTransform::STATE_LOOK));
 				_vector vNewPos = vPos - vLook * 16.f;
 				m_pController->Set_Position(m_pTransform, vNewPos);
+				pSimba->CreateHpBar();
 			}
 			break;
 		}
@@ -326,10 +327,9 @@ void CSimba_Jump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 
 			if (CSimba::Simba_DoubleClawEnd == iPreState)
 			{
-				// 거리 멀면 백스탭
-
-				// 아니면 점프공격
+				// 거리 멀면 점프공격
 				pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, true);
+				// 아니면 백스탭
 			}
 				
 			else

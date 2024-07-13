@@ -74,6 +74,7 @@ void CRoomGlass::Late_Tick(_float fTimeDelta)
 {
 	if (false == m_bHide) 
 	{
+		Compute_ViewZ();
 		m_pModelCom->Play_Animation(fTimeDelta);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
 	}

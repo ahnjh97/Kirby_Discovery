@@ -94,6 +94,7 @@ public:
 	void			Change_State(SIMBA_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);
 	_bool			IsAnimFinished() { return m_pModelCom->IsFinished(); }
 	_bool			IsAnimFinished(_uint iCurrentAnimIndex) { return m_pModelCom->IsFinished(iCurrentAnimIndex); }
+	void			CreateHpBar();
 
 private:
 	CTexture* m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
@@ -118,6 +119,7 @@ private:
 	_float4			m_vPos = {};
 	_float4x4		m_matDefault = {};
 	class CBone*	m_pLipBone = { nullptr };
+	_bool			m_bHpBarCreated = { false };
 
 private:
 	HRESULT		Add_Components();

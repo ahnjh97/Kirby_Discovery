@@ -311,6 +311,16 @@ void CSimba::Change_State(SIMBA_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _
 	m_pFSM->ChangeState(eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
+void CSimba::CreateHpBar()
+{
+	if (false == m_bHpBarCreated)
+	{
+		m_bHpBarCreated = true;
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_BossUI"), TEXT("Prototype_GameObject_HUD_BossHpBar"), this)))
+			return;
+	}
+}
+
 HRESULT CSimba::Add_Components()
 {
 	HRESULT hr;
@@ -380,10 +390,12 @@ HRESULT CSimba::Add_Components()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
 		return E_FAIL;
 
-	Activate_SphereCollider(0.f, 4.5f);
-	Activate_SphereCollider(0.f, 4.5f, ATTACK2);
+	//Activate_SphereCollider(0.f, 4.5f);
+	//Activate_SphereCollider(0.f, 4.5f, ATTACK2);
 	//Activate_SphereCollider(2.f, 8.f, ATTACK3);
-	Activate_FrustumCollider(0.01f, 8.f, 180.f, ATTACK3);
+	Activate_FrustumCollider(0.f, 8.f, 150.f, ATTACK);
+	Activate_FrustumCollider(0.f, 8.f, 150.f, ATTACK2);
+	Activate_FrustumCollider(0.f, 11.5f, 150.f, ATTACK3);
 	return S_OK;
 }
 

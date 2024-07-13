@@ -128,6 +128,7 @@ private:
 	HRESULT Bind_boolToShader(_bool bMaptool);
 	_uint Get_EmissivePassIndex(const string& _strModelName);
 	_uint DeterminePassIndex_ForEmissive(CModel* pModel);
+	_bool IsNonEmissive(const string& _strModelName);
 
 private:
 	vector<string>	m_vecLevelName; 
@@ -173,6 +174,8 @@ private:
 	unordered_map<string, _uint> m_mapEmissiveModels;
 	vector<wstring>	m_vecBaseEmissiveRequiredModels;
 	vector<wstring> m_vecBaseNormalRequiredModels;
+
+	unordered_set<string> m_setNonEmissiveModels;
 
 	string m_strSelectedTxt;
 	string m_strCurModel;

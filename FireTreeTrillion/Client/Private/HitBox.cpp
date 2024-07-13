@@ -64,9 +64,12 @@ _int CHitBox::Tick(_float fTimeDelta)
 		CUtils::Set_Scaled_Matrix(pWorldMatrix, 1.f, 1.f, 1.f);
 	}
 	else if (nullptr != m_pSocket) {
-		pWorldMatrix = m_pOwnerTransform->ComputeBoneWorldMatrix(m_pSocket, m_vBoneOffset);
+		pWorldMatrix = m_pOwnerTransform->Get_WorldFloat4x4();
+		_float4x4 matBoneWorld = m_pOwnerTransform->ComputeBoneWorldMatrix(m_pSocket, m_vBoneOffset);
 		CUtils::Set_Scaled_Matrix(pWorldMatrix, 1.f, 1.f, 1.f);
-		pWorldMatrix._42 += m_pOwnerCollisionDesc->fOffSetY;
+		pWorldMatrix._41 = matBoneWorld._41;
+		pWorldMatrix._42 = matBoneWorld._42 + m_pOwnerCollisionDesc->fOffSetY;
+		pWorldMatrix._43 = matBoneWorld._43;
 	}
 	else
 	{
