@@ -26,10 +26,14 @@ public:
 private:
 	HRESULT			Add_Components();
 	enum CUT		{ CUT1, CUT2, CUT_END};
+	CUT				m_eCurCut = { CUT_END };
+	CUT				m_ePreCut = { CUT_END };
+	_bool			m_bRender = { false };
 	void			Set_Animation();
 
+	_bool			m_btest = { false };
+
 private:
-	CShader* m_pShaderAnimModelCom = { nullptr };
 	CModel* m_pBuildingCluster = { nullptr };
 
 	// 배열로 들고 있는다.

@@ -40,6 +40,10 @@ HRESULT CLevel_Finale::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_ControlCenter"), TEXT("Prototype_GameObject_FinaleCut_ControlCenter"))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_BuildingCluster_A"), TEXT("Prototype_GameObject_BuildingCluster_A"))))
+		return E_FAIL;
+
+
 	// 환경맵을 추가한다.
 	hr = Add_EnvMap();
 	CHECK_FAILED(hr);
@@ -252,7 +256,7 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 		-10.f);
 
 
-
+	/*
 	//cut scene start building
 	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_STOP,
 		{ 1619.6f, -84.37f, -152.71f }, { .87f, .5f, .02f },
@@ -275,8 +279,7 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_ROTATE,
 		{ 1842.2f, 7.f, -211.8f }, { .92f, .18f, .36f },
 		{ 1842.2f, 7.f, -211.8f }, { .92f, .18f, .36f }, -120.f);
-
-	/*
+		
 	//(아래) 도로 B
 	roadGrouperDesc = {};
 	roadGrouperDesc.eRoadType = RTYPE_ROADB;

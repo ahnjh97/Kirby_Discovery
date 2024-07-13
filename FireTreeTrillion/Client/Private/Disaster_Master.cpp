@@ -127,7 +127,8 @@ _int CDisaster_Master::Tick(_float fTimeDelta)
 		}
 
 		
-
+		// 공기 중에 날아댕기는 파티클을 구현하였다.
+		Make_CutAirParticle();
 	}
 
 	return OBJ_NOEVENT;
@@ -205,6 +206,43 @@ void CDisaster_Master::Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoadGrouper"),
 		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
 		return;
+}
+
+void CDisaster_Master::Make_CutAirParticle()
+{
+	_float4 vKirbyPos = m_pKirby->Compute_RootPos();
+
+	if (m_bCutInitializeParticle == true)
+	{
+		for (_int i = 0; i < 100; i++)
+		{
+			_float4 vNewMyPos = _float4(
+				vKirbyPos.x + CUtils::Make_RandomFloat(100.f, 500.f),
+				vKirbyPos.y + CUtils::Make_RandomFloat(-300.f, 300.f),
+				vKirbyPos.z + CUtils::Make_RandomFloat(-300.f, 300.f),
+				1.f);
+			m_pMaker->Make_Partical(1, vNewMyPos, 0.f, 2.f, 1.f, _float4(0.f, 1.f, 0.f, 0.f), 10.f, CUtils::Make_RandomFloat(15.f, 30.f), true);
+		}
+		m_bCutInitializeParticle = false;
+	}
+
+	if (m_fAirParticleDelay > 0.1f)
+	{
+		_float fZOffSet = { 0.f };
+		fZOffSet = CUtils::Make_RandomInt(0, 1) == 0 ? CUtils::Make_RandomFloat(-200.f, -50.f) : CUtils::Make_RandomFloat(50.f, 200.f);
+		_float fXOffSet = { 0.f };
+		fXOffSet = CUtils::Make_RandomFloat(20.f, 500.f);
+		_float fYOffSet = { 0.f };
+		fYOffSet = CUtils::Make_RandomFloat(-200.f, 10.f);
+
+		vKirbyPos.x += fXOffSet;
+		vKirbyPos.y += fYOffSet;
+		vKirbyPos.z += fZOffSet;
+		m_pMaker->Make_Partical(1, vKirbyPos, 0.f, 2.f, 1.f, _float4(0.f, 1.f, 0.f, 0.f), 10.f, CUtils::Make_RandomFloat(15.f, 30.f), true);
+		m_fAirParticleDelay = 0.f;
+	}
+
+
 }
 
 void CDisaster_Master::Make_AirParticle()
