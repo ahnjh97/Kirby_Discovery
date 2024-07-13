@@ -320,7 +320,7 @@ void CCappyBody_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	m_fDeadMaxTime = CUtils::Make_RandomFloat(0.35f, 0.7f);
-
+	m_fEffectTime = 0.f;
 }
 
 void CCappyBody_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -345,6 +345,21 @@ void CCappyBody_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
 		pCappy->Set_DamageJumpPower(fDamageJumpPower);
 
+		m_fEffectTime += fTimeDelta;
+		if (0.1f < m_fEffectTime)
+		{
+			m_fEffectTime = 0.f;
+			_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			CEffect::FX_DESC FXDesc{};
+
+			vPos.m128_f32[1] += 0.5f;
+			FXDesc.vInitPos = vPos;
+			FXDesc.vInitRot = { CUtils::Make_RandomFloat(0.f, 90.f), 0.f, 0.f };
+			FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+			pCappy->Add_Effect("Flying", FXDesc);
+		}
 
 		if (pController->Is_Terrain())
 		{
