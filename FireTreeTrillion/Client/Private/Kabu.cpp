@@ -78,6 +78,59 @@ _int CKabu::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
+	_vector vPos = GET_POS;
+
+	m_bbongTime1 += m_fTimeDelta;
+	_float fRandTime = CUtils::Make_RandomFloat(0.2f, 1.f);
+	if (fRandTime < m_bbongTime1)
+	{
+		m_bbongTime1 = 0.f;
+		CEffect::FX_DESC FXDesc{};
+
+		vPos.m128_f32[0] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
+		vPos.m128_f32[2] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
+		FXDesc.vInitPos = vPos;
+		FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 90.f), 0.f };
+		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+		Add_Effect("BBongBBongE", FXDesc);
+	}
+
+	m_bbongTime2 += m_fTimeDelta;
+	fRandTime = CUtils::Make_RandomFloat(0.2f, 0.4f);
+	if (fRandTime < m_bbongTime2)
+	{
+		m_bbongTime2 = 0.f;
+		CEffect::FX_DESC FXDesc{};
+
+		vPos.m128_f32[0] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
+		vPos.m128_f32[2] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
+		FXDesc.vInitPos = vPos;
+		//FXDesc.vInitRot = { 0.f, 45.f, 0.f };
+		FXDesc.vInitScale = { CUtils::Make_RandomFloat(1.f, 1.5f), CUtils::Make_RandomFloat(1.f, 1.5f), CUtils::Make_RandomFloat(1.f, 1.5f) };
+		//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+		Add_Effect("BBongBBongE2", FXDesc);
+	}
+
+	m_bbongTime3 += m_fTimeDelta;
+	fRandTime = CUtils::Make_RandomFloat(0.2f, 1.f);
+	if (fRandTime < m_bbongTime3)
+	{
+		m_bbongTime3 = 0.f;
+		CEffect::FX_DESC FXDesc{};
+
+		vPos.m128_f32[0] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
+		vPos.m128_f32[2] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
+		FXDesc.vInitPos = vPos;
+		FXDesc.vInitRot = { CUtils::Make_RandomFloat(0.f, 90.f), 0.f, 0.f };
+		FXDesc.vInitScale = { 2.5f, 2.5f, 2.5f };
+		//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+		Add_Effect("BBongBBongE", FXDesc);
+	}
+
 	// ¸¸¾à, ¹âÈ÷¸é ±× ¼ø°£ ±×³É Âð»§µÇ°í Á×´Â´Ù.
 	if (m_ePhyXState == PO_PRESSED)
 	{

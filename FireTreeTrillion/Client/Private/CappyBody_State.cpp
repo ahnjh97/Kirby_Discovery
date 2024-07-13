@@ -26,12 +26,12 @@ void CCappyBody_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
-
+	
 	pCappyBody->Set_Render(true);
 
 	// 몬스터, 플레이어 위치
-	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	vPos.m128_f32[1] = 0.f;
+	_vector vPosistion = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	vPosistion.m128_f32[1] = 0.f;
 	_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	vKirbyPos.m128_f32[1] = 0.f;
 
@@ -39,7 +39,7 @@ void CCappyBody_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	// 플레이어와 몬스터의 거리 계산
-	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
+	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPosistion, vKirbyPos)));
 
 	if (8.f > fDistance)
 		pCappyBody->Change_State(CCappyBody::CAPPYBODY_KASAUP1, 60.f, false, true);
@@ -111,7 +111,40 @@ void CCappyBody_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	pCappyBody->Set_Render(false);
 
 	if (true == pCappyBody->IsAnimFinished())
+	{
+		_float4 vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+		//m_fAngle += m_fTimeDelta * 80.f;
+
+		for(_uint i = 0; i < 3; ++i)
+		{
+			_float4 vRotatePos = {};
+			_float fAngle = CUtils::Make_RandomFloat(10.f, 90.f);
+			vRotatePos.x = vPos.x + (0.3f * sin(XMConvertToRadians((_float)i * 120.f + fAngle)));
+			vRotatePos.y = vPos.y;
+			vRotatePos.z = vPos.z - (0.3f * cos(XMConvertToRadians((_float)i * 120.f + fAngle)));
+
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitPos = { vRotatePos.x, vRotatePos.y + 1.f, vRotatePos.z };
+			FXDesc.vInitScale = { 1.1f, 1.1f, 1.1f };
+
+			_float3 vDir = vPos - vRotatePos;
+			vDir.Normalize();
+			_float3 vLook = { 0.f, 0.f, 1.f };
+
+			_float fAngleLook = atan2f(vLook.z, vLook.x);
+			_float fAngleDiff = fAngleLook - atan2f(vDir.z, vDir.x);
+			fAngleDiff = ToDegree(fAngleDiff);
+
+			_float3 vAngle = { 10.f, fAngleDiff, 0.f };
+			FXDesc.vInitRot = vAngle;
+
+			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SmokeMix"), &FXDesc)))
+				return;
+		}
+
 		pCappyBody->Change_State(CCappyBody::CAPPYBODY_WAIT, 60.f, true, true);
+	}
 
 	// 플레이어를 향해 바라본다
 	//pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
@@ -159,8 +192,8 @@ void CCappyBody_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	pCappyBody->Set_Render(true);
 
 	// 몬스터, 플레이어 위치
-	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	vPos.m128_f32[1] = 0.f;
+	_vector vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	vPosition.m128_f32[1] = 0.f;
 	_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	vKirbyPos.m128_f32[1] = 0.f;
 
@@ -168,35 +201,55 @@ void CCappyBody_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	// 플레이어와 몬스터의 거리 계산
-	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
+	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPosition, vKirbyPos)));
 
 	if (15.f < fDistance)
 		pCappyBody->Change_State(CCappyBody::CAPPYBODY_HIDINGWAITA, 60.f, false, true);
 
 	// 커비를 바라보며 쫒아감
-	_vector		vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - vPos;
+	_vector		vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - vPosition;
 
 	m_fTimeDelta += fTimeDelta;
 
-	if(2.f > m_fTimeDelta)
+	if (2.f > m_fTimeDelta)
 	{
 		if (0.5f <= XMVector3Length(vLook).m128_f32[0])
-			vPos += XMVector3Normalize(vLook) * fTimeDelta * 2.f;
+			vPosition += XMVector3Normalize(vLook) * fTimeDelta * 2.f;
 
 		// 플레이어를 향해 바라본다
 		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
 
-		pController->Move(pTransformCom, vPos, fTimeDelta);
+		pController->Move(pTransformCom, vPosition, fTimeDelta);
 	}
 	else
 	{
 		m_fTimeDelta = 0.f;
 
-		if(rand() % 3 == 0)
+		for(_uint i = 0; i < 6; ++i)
+		{
+			_float4 vRotatePos = {};
+			_float4 vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+			_float fAngle = CUtils::Make_RandomFloat(10.f, 90.f);
+			vRotatePos.x = vPos.x + (0.4f * sin(XMConvertToRadians((_float)i * 60.f + fAngle)));
+			vRotatePos.y = vPos.y;
+			vRotatePos.z = vPos.z - (0.4f * cos(XMConvertToRadians((_float)i * 60.f + fAngle)));
+
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.vInitPos = { vRotatePos.x, vRotatePos.y + 0.25f, vRotatePos.z };
+			//FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 90.f), 0.f };
+			FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+			pCappyBody->Add_Effect("BBongBBongE", FXDesc);
+		}
+
+		_uint iRand = rand() % 3;
+		if(iRand == 0)
 			pCappyBody->Change_State(CCappyBody::CAPPYBODY_KASAUP1, 45.f, false, true);
-		else if(rand() % 3 == 1)
+		else if(iRand == 1)
 			pCappyBody->Change_State(CCappyBody::CAPPYBODY_KASAUP2, 45.f, false, true);
-		else if (rand() % 3 == 2)
+		else if (iRand == 2)
 			pCappyBody->Change_State(CCappyBody::CAPPYBODY_KASAUP3, 65.f, false, true);
 	}
 }
@@ -267,7 +320,7 @@ void CCappyBody_Damage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	m_fDeadMaxTime = CUtils::Make_RandomFloat(0.35f, 0.7f);
-
+	m_fEffectTime = 0.f;
 }
 
 void CCappyBody_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -292,6 +345,21 @@ void CCappyBody_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		fDamageJumpPower -= GRAVITY * fTimeDelta * 3.f;
 		pCappy->Set_DamageJumpPower(fDamageJumpPower);
 
+		m_fEffectTime += fTimeDelta;
+		if (0.1f < m_fEffectTime)
+		{
+			m_fEffectTime = 0.f;
+			_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			CEffect::FX_DESC FXDesc{};
+
+			vPos.m128_f32[1] += 0.5f;
+			FXDesc.vInitPos = vPos;
+			FXDesc.vInitRot = { CUtils::Make_RandomFloat(0.f, 90.f), 0.f, 0.f };
+			FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+			pCappy->Add_Effect("Flying", FXDesc);
+		}
 
 		if (pController->Is_Terrain())
 		{

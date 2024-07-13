@@ -265,9 +265,6 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\State">
       <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword\State">
-      <UniqueIdentifier>{c3509440-bbe1-439c-b743-a205693e77b6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyCar_State">
       <UniqueIdentifier>{67963c50-7e60-41a8-bf16-e2649eab3a93}</UniqueIdentifier>
     </Filter>
@@ -1278,8 +1275,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\KirbyDump_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\BossChimera.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\BossChimera.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossChimera</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1901,8 +1898,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\KirbyDump_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\FinaleKirby\State\KirbyDump_State</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\BossChimera.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\BossChimera.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\BossChimera</Filter>
     </ClCompile>
   </ItemGroup>
