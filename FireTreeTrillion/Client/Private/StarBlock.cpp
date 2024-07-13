@@ -80,7 +80,6 @@ _int CStarBlock::Tick(_float fTimeDelta)
 		m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), m_fTimeDelta, 360.f);
 		m_fFlyTime += m_fTimeDelta;
 
-
 		if (RayCast_Terrain(XMVector3Normalize(vDamegeDir)) == true)
 			m_bDead = true;
 
@@ -181,7 +180,19 @@ void CStarBlock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 		_float4 vDir = vPos - vPlayerPos;
 		vDir.Normalize();
 		m_vDamegeDir = (_float3)vDir;
-		m_fHitPower = 9.f;
+		m_fHitPower = 12.f;
+		m_bDead = true;
+	}
+	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
+	{
+		if (pObject == nullptr)
+			return;
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float4 vMonsterPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+		_float4 vDir = vPos - vMonsterPos;
+		vDir.Normalize();
+		m_vDamegeDir = (_float3)vDir;
+		m_fHitPower = 20.f;
 		m_bDead = true;
 	}
 }

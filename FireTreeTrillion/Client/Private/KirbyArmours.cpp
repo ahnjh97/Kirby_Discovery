@@ -54,7 +54,7 @@ _int CKirbyArmours::Tick(_float fTimeDelta)
         _float4 vLightPos = CUtils::Get_State_Vector_Matrix(m_WorldMatrix, CUtils::STATE_POSITION);
         LightDesc.vPosition = vLightPos;
         LightDesc.fRange = 5.f;
-        LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+        LightDesc.vDiffuse = _float4(0.6f, 1.f, 1.f, 1.f);
         LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
         LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
         if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
@@ -110,7 +110,8 @@ HRESULT CKirbyArmours::Render()
 
     for (size_t i = 0; i < iNumMeshes; i++)
     {
-        if (m_iRenderCount == 0)
+        // For Crash
+        if (m_iRenderCount == 0 && *m_pAbilityType == ABILITY_CRASH)
         {
             if (i == 0)
             {
@@ -202,10 +203,12 @@ HRESULT CKirbyArmours::Render_DeferredInfo()
     return S_OK;
 }
 
-_bool CKirbyArmours::Render_Emissive()
+void CKirbyArmours::Large_Light(_float4 vDiffuse, _float fRange, _float fTime)
 {
+    if (m_pLight == nullptr)
+        return;
 
-    return true;
+    m_pLight->Interpolate_Light(vDiffuse, fRange, fTime);
 }
 
 HRESULT CKirbyArmours::Add_Components()

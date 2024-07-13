@@ -86,7 +86,7 @@ private:
 	_float3						m_vLargeColor = _float3(1.f, 1.f, 1.f);
 
 	// time
-	_float						m_fParkTime = _float();
+	_float						m_fMovingTime = _float();
 
 public:
 	static CTransingStar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
