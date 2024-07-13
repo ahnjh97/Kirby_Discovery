@@ -84,7 +84,7 @@ _int CKickableRock::Tick(_float fTimeDelta)
 
 		if (RayCast_Terrain(XMVector3Normalize(vDamegeDir)) == true)
 		{
-			m_ePhyXState = PO_FLYDEADAWAY;
+			Set_PhyXState(PO_FLYDEADAWAY);
 			Set_DamageMoving(-1.f * vDamegeDir, 10.f);
 		}
 		if (m_fFlyTime > 2.f)
@@ -205,7 +205,7 @@ void CKickableRock::Render_IMGUI()
 
 void CKickableRock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	if (eContent == CCollisionCenter::CONTENT_KICK)
+	if (eContent == CCollisionCenter::CONTENT_KICK || CCollisionCenter::CONTENT_ATTACK)
 	{
 		// 노말 상태일 경우에만 톡 쳤을때 반응하게 하고, 나머진 서로 충돌이 되면 안 된다.
 		if (m_ePhyXState == PO_NORMAL && m_bLockCollision == false)

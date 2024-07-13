@@ -239,17 +239,16 @@ float4 Blur_X(float2 vTexCoord)
 
     float2 vUV = (float2) 0;
     
-    
-    if (1.f == g_BlendTexture.Sample(ClampSampler, vTexCoord).g)
-        return vOut;
+    //if (1.f == g_BlendTexture.Sample(ClampSampler, vTexCoord).g)
+    //    return vOut;
     
     float fTotal = 0.0;
     
     for (int i = -6; i < 7; ++i)
     {
         vUV = vTexCoord + float2(1.f / (g_fTexW / 2) * i, 0);
-        if (1.f == g_BlendTexture.Sample(ClampSampler, vUV).g)
-            continue;
+        //if (1.f == g_BlendTexture.Sample(ClampSampler, vUV).g)
+        //    continue;
         
         vOut += fWeight[6 + i] * (g_EffectTexture.Sample(ClampSampler, vUV) + g_SpecularTexture.Sample(ClampSampler, vUV));
         fTotal += fWeight[6 + i];
@@ -285,16 +284,16 @@ float4 Blur_Y(float2 vTexCoord)
 
     float2 vUV = (float2) 0;
     
-    if (1.f == g_BlendTexture.Sample(ClampSampler, vTexCoord).g)
-        return vOut;
+    //if (1.f == g_BlendTexture.Sample(ClampSampler, vTexCoord).g)
+    //    return vOut;
 
     float fTotal = 0.0;
     
     for (int i = -6; i < 7; ++i)
     {
         vUV = vTexCoord + float2(0, 1.f / (g_fTexH / 2) * i);
-        if (1.f == g_BlendTexture.Sample(ClampSampler, vUV).g)
-            continue;
+        //if (1.f == g_BlendTexture.Sample(ClampSampler, vUV).g)
+        //    continue;
 
         vOut += fWeight[6 + i] * g_EffectTexture.Sample(ClampSampler, vUV);
         fTotal += fWeight[6 + i];
@@ -1109,7 +1108,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
         Out.vColor = vNonLight;
         
     // Blend 라는 뜻
-    if (vBlend.g == 1.f)
+    //if (vBlend.g == 1.f)
         Out.vColor *= (1.f - vEffect.a);
 
     // 기존 디퓨즈와 가산되어 그려진다.
@@ -1214,8 +1213,8 @@ PS_OUT PS_MAIN_FINAL_FOR_TOOL(PS_IN In)
     if (0.0f < vNonLight.a)
         Out.vColor = vNonLight;
         
-    // Blend 라는 뜻
-    if (vBlend.g == 1.f)
+    //// Blend 라는 뜻
+    //if (vBlend.g == 1.f)
         Out.vColor *= (1.f - vEffect.a);
 
     // 기존 디퓨즈와 가산되어 그려진다.

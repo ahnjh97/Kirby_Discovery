@@ -36,6 +36,7 @@ public:
 	virtual HRESULT	Render_DeferredInfo() override;
 
 
+	void	Large_Light(_float4 vDiffuse, _float fRange, _float fTime);
 private:
 	// 랜더가 되지 않아야 하는 것들
 	_bool Block_Render() {
@@ -58,7 +59,6 @@ private:
 	_float	m_fEmissivePower = { 0.f };
 
 	_int	m_iRenderCount = { 0 };
-	_bool	Render_Emissive();
 
 	class CLight* m_pLight = { nullptr };
 

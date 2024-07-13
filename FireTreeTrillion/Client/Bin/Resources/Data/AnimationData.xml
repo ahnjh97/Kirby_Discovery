@@ -168,4 +168,29 @@
         <Count>1</Count>
         <Data0 EventName="ApplyDamage" StartFrame="27" EndFrame="28"/>
     </ModelName>
+    <ModelName>KirbyCrashDefault
+        <Animation>Attack</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>3</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="3" EndFrame="4"/>
+        <Data1 EventName="ApplyDamage" StartFrame="14" EndFrame="15"/>
+        <Data2 EventName="ApplyDamage" StartFrame="25" EndFrame="26"/>
+        <Animation>AttackStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>BigAttacklFire</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>5</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="6" EndFrame="7"/>
+        <Data1 EventName="ApplyDamage1" StartFrame="21" EndFrame="23"/>
+        <Data2 EventName="ApplyDamage2" StartFrame="36" EndFrame="37"/>
+        <Data3 EventName="ApplyDamage3" StartFrame="49" EndFrame="51"/>
+        <Data4 EventName="ApplyDamage4" StartFrame="61" EndFrame="62"/>
+        <Animation>Attack</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>3</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="0" EndFrame="1"/>
+        <Data1 EventName="ApplyDamage1" StartFrame="11" EndFrame="12"/>
+        <Data2 EventName="ApplyDamage2" StartFrame="26" EndFrame="27"/>
+    </ModelName>
 </Root>

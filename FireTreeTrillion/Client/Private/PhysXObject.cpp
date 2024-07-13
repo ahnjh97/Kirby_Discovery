@@ -115,6 +115,7 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 
 	if (ePreState == PO_KIRBYMOUTH && eState == PO_FLYAWAY)
 	{
+
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 
 		//TODO: 버블 날라갈 때 스케일 맞춰야 함
@@ -127,6 +128,8 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 			return;
 
 		Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+
 	}
 	else if (ePreState == PO_FLYAWAY && eState == PO_FLYDEADAWAY)
 	{

@@ -68,7 +68,7 @@ public:
 
 	const _float4x4* Get_WorldFloat4x4_Ptr() const {return &m_WorldMatrix;}
 
-	_float4x4	ComputeBoneWorldMatrix(class CBone* pBone, _bool bMultiplyScale = false);
+	_float4x4	ComputeBoneWorldMatrix(class CBone* pBone, _float3 vOffset = _float3(), _bool bMultiplyScale = false);
 
 
 	//±¸¹öÀü

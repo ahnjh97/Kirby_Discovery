@@ -1530,7 +1530,7 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Line", "Effects/Basic/common_line_0.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Jump", "Effects/Basic/common_jump.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Sparkle", "Effects/Basic/common_sparkle.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Lead", "Effects/Basic/leaf.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Leaf", "Effects/Basic/leaf.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Collide", "Effects/Basic/common_hit.png");	CHECK_FAILED(hr);
 
 
