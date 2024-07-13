@@ -2111,6 +2111,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BigMovableBuildingC", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("BigMovableBuildingD", TYPE_NONANIM, 1.f, 0.f, 0);
 
+		m_vecModelInfo.emplace_back("CutDebrisA", TYPE_ANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("CutDebrisB", TYPE_ANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("CutDebrisC", TYPE_ANIM, 0.8f, 0.f, 0);
+
+
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
 		m_vecModelInfo.emplace_back("LbBrokenBuildingAC", TYPE_NONANIM, 1.f, 0.f, 0, string("LabDiscovera_Deco/"));

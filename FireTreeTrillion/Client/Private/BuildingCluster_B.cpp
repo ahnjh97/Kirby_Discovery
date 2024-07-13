@@ -37,6 +37,16 @@ HRESULT CBuildingCluster_B::Initialize(void* pArg)
 	m_bRimLight = true;
 	m_bStencil = true;
 
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(2550.f, 255.f, -136.f, 1.f));
+	_float4 NewLook = _float4(1.f, 0.f, 0.f, 0.f);
+	_float4 NewUp = _float4(0.f, 1.f, 0.f, 0.f);
+	_float4 NewRight = XMVector3Cross(NewUp, NewLook);
+
+	m_pTransformCom->Set_State(CTransform::STATE_LOOK, NewLook);
+	m_pTransformCom->Set_State(CTransform::STATE_UP, NewUp);
+	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, NewRight);
+
+
 	// 초기화 해준다.
 	for (auto& BuildingMatrix : m_BuildingMatrix)
 	{
@@ -58,16 +68,52 @@ _int CBuildingCluster_B::Tick(_float fTimeDelta)
 	if (nullptr == pCenter)
 		return OBJ_NOEVENT;
 
+	_int iCutIndex = pCenter->Get_CutScene();
+
+	if (iCutIndex == 12)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT12;
+	}
+	else if (iCutIndex == 13)
+	{
+		m_bRender = true;
+	}
+	else if (iCutIndex == 15)
+	{
+		m_bRender = true;
+	}
+	else if (iCutIndex == 6)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT6;
+	}
+	else if (iCutIndex == 7)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT7;
+	}
+	else if (iCutIndex == 8)
+	{
+		m_bRender = true;
+	}
+	else
+	{
+		m_bRender = false;
+	}
+	Set_Animation();
 
 	return OBJ_NOEVENT;
 }
 
 void CBuildingCluster_B::Late_Tick(_float fTimeDelta)
 {
+	if (m_bRender == false)
+		return;
+
+
 	m_pBuildingCluster->Play_Animation(m_fAccTime);
-
 	Update_BuildingMatrix();
-
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
@@ -87,6 +133,44 @@ void CBuildingCluster_B::Update_BuildingMatrix()
 		pBoneLocalMatrix = *pBone->Get_CombinedTransformationMatrix();
 		pBoneWorldMatrix = pBoneLocalMatrix * m_pTransformCom->Get_WorldFloat4x4();
 		m_BuildingMatrix[i] = pBoneWorldMatrix;
+
+		if (i == C3)
+		{
+			m_BuildingMatrix[i]._42 -= 30.f;
+		}
+		else if (i == C1)
+		{
+			m_BuildingMatrix[i]._42 -= 26.5f;
+			m_BuildingMatrix[i]._41 += 20.f;
+		}
+		else if (i == A2)
+		{
+			m_BuildingMatrix[i]._42 -= 30.f;
+		}
+		else if (i == C4)
+		{
+			m_BuildingMatrix[i]._41 -= 5.f;
+			m_BuildingMatrix[i]._42 -= 6.f;
+		}
+		else if (i == C2)
+		{
+			m_BuildingMatrix[i]._42 -= 6.f;
+		}
+		else if (i == A1)
+		{
+			m_BuildingMatrix[i]._41 += 6.f;
+			m_BuildingMatrix[i]._42 -= 33.f;
+			m_BuildingMatrix[i]._43 += 30.f;
+		}
+		else if (i == D1)
+		{
+			m_BuildingMatrix[i]._42 -= 29.f;
+		}
+		else if (i == B1)
+		{
+			m_BuildingMatrix[i]._42 -= 80.f;
+		}
+
 	}
 }
 
@@ -103,50 +187,69 @@ HRESULT CBuildingCluster_B::Add_Components()
 {
 	HRESULT hr;
 	/* For.Com_Shader */
-	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
-		TEXT("Com_Shader"), (CComponent**)&m_pShaderAnimModelCom);
-	CHECK_FAILED(hr);
-	/* For.Com_Shader */
 	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderModelCom);
 	CHECK_FAILED(hr);
 
 
 	// 메인 뼈대. 이것이 움직임으로서 다른 빌딩들이 움직일 수 있다.
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingA"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_BuildingCluster02"),
 		TEXT("Com_Model"), (CComponent**)&m_pBuildingCluster);
 	CHECK_FAILED(hr);
 
 
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingA"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom[A1]);
-	CHECK_FAILED(hr);
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingA"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom[A2]);
-	CHECK_FAILED(hr);
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingB"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom[B1]);
+		TEXT("Com_ModelA1"), (CComponent**)&m_pModelCom[A1]);
 	CHECK_FAILED(hr);
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingC"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom[C1]);
+		TEXT("Com_ModelA2"), (CComponent**)&m_pModelCom[A2]);
 	CHECK_FAILED(hr);
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingC"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom[C2]);
+		TEXT("Com_ModelB1"), (CComponent**)&m_pModelCom[B1]);
 	CHECK_FAILED(hr);
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingC"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom[C3]);
+		TEXT("Com_ModelC1"), (CComponent**)&m_pModelCom[C1]);
 	CHECK_FAILED(hr);
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingC"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom[C4]);
+		TEXT("Com_ModelC2"), (CComponent**)&m_pModelCom[C2]);
 	CHECK_FAILED(hr);
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingD"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom[D1]);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingC"),
+		TEXT("Com_ModelC3"), (CComponent**)&m_pModelCom[C3]);
 	CHECK_FAILED(hr);
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingD"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom[D2]);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingC"),
+		TEXT("Com_ModelC4"), (CComponent**)&m_pModelCom[C4]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingC"),
+		TEXT("Com_ModelD1"), (CComponent**)&m_pModelCom[D1]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingC"),
+		TEXT("Com_ModelD2"), (CComponent**)&m_pModelCom[D2]);
 	CHECK_FAILED(hr);
 
 	return S_OK;
+}
+
+void CBuildingCluster_B::Set_Animation()
+{
+	if (m_eCurCut == m_ePreCut)
+		return;
+
+	switch (m_eCurCut)
+	{
+	case CUT6:
+		m_pBuildingCluster->Set_Animation(CUT6, 50.f, false, false);
+		break;
+	case CUT7:
+		m_pBuildingCluster->Set_Animation(CUT7, 50.f, false, false);
+		break;
+	case CUT12:
+		m_pBuildingCluster->Set_Animation(CUT12, 50.f, false, false);
+		break;
+	default:
+		break;
+	}
+
+	m_ePreCut = m_eCurCut;
 }
 
 
@@ -165,6 +268,9 @@ HRESULT CBuildingCluster_B::Rendering_Building(BUILDING eType)
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+		if (i == 0)
+			continue;
+
 		if (FAILED(m_pModelCom[eType]->Bind_ShaderResource(m_pShaderModelCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom[eType]->Bind_ShaderResource(m_pShaderModelCom, "g_NormalTexture", i, TextureType_NORMALS)))
@@ -224,6 +330,6 @@ void CBuildingCluster_B::Free()
 	for (auto& pModel : m_pModelCom)
 		Safe_Release(pModel);
 
-	Safe_Release(m_pShaderAnimModelCom);
 	Safe_Release(m_pShaderModelCom);
+	Safe_Release(m_pBuildingCluster);
 }

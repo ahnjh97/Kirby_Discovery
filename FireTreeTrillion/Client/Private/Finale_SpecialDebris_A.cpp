@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Finale_SpecialDebris_A.h"
+#include "FinaleCut_ControlCenter.h"
+
 
 CFinale_SpecialDebris_A::CFinale_SpecialDebris_A(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{pDevice, pContext}
@@ -34,6 +36,16 @@ HRESULT CFinale_SpecialDebris_A::Initialize(void* pArg)
 	m_bRimLight = true;
 	m_bStencil = true;
 
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(2550.f, 255.f, -136.f, 1.f));
+	_float4 NewLook = _float4(1.f, 0.f, 0.f, 0.f);
+	_float4 NewUp = _float4(0.f, 1.f, 0.f, 0.f);
+	_float4 NewRight = XMVector3Cross(NewUp, NewLook);
+
+	m_pTransformCom->Set_State(CTransform::STATE_LOOK, NewLook);
+	m_pTransformCom->Set_State(CTransform::STATE_UP, NewUp);
+	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, NewRight);
+
+
 	return S_OK;
 }
 
@@ -44,12 +56,47 @@ _int CFinale_SpecialDebris_A::Tick(_float fTimeDelta)
 	
 	m_fAccTime = m_pGameInstance->Get_SecondTimer();
 
+	CFinaleCut_ControlCenter* pCenter =
+		static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
+	if (nullptr == pCenter)
+		return OBJ_NOEVENT;
+
+	_int iCutIndex = pCenter->Get_CutScene();
+
+	if (iCutIndex == 4)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT4;
+	}
+	else if (iCutIndex == 5)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT5;
+	}
+	else if (iCutIndex == 6)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT6;
+	}
+	else if (iCutIndex == 7)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT7;
+	}
+	else
+		m_bRender = false;
+
+	Set_Animation();
 
 	return OBJ_NOEVENT;
 }
 
 void CFinale_SpecialDebris_A::Late_Tick(_float fTimeDelta)
 {
+	if (m_bRender == false)
+		return;
+
+
 	m_pModelCom->Play_Animation(m_fAccTime);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
@@ -110,7 +157,7 @@ HRESULT CFinale_SpecialDebris_A::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_PopStar"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_CutDebrisA"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
@@ -139,6 +186,32 @@ _int CFinale_SpecialDebris_A::Make_Partical()
 
 
 	return 0;
+}
+
+void CFinale_SpecialDebris_A::Set_Animation()
+{
+	if (m_eCurCut == m_ePreCut)
+		return;
+
+	switch (m_eCurCut)
+	{
+	case CUT4:
+		m_pModelCom->Set_Animation(CUT4, 50.f, false, false);
+		break;
+	case CUT5:
+		m_pModelCom->Set_Animation(CUT5, 50.f, false, false);
+		break;
+	case CUT6:
+		m_pModelCom->Set_Animation(CUT6, 50.f, false, false);
+		break;
+	case CUT7:
+		m_pModelCom->Set_Animation(CUT7, 50.f, false, false);
+		break;
+	default:
+		break;
+	}
+
+	m_ePreCut = m_eCurCut;
 }
 
 CFinale_SpecialDebris_A* CFinale_SpecialDebris_A::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -117,14 +117,15 @@ _int CDisaster_Master::Tick(_float fTimeDelta)
 	}
 	else if (m_bKirbyCutSceneStart == true)
 	{
-		if (m_pLight != nullptr)
+	/*	if (m_pLight != nullptr)
 		{
-			_float4 vLightPos = vKirbyPos;
+			
+			_float4 vLightPos = m_pKirby->Compute_RootPos();
 			vLightPos.x += 50.f;
 			vLightPos.y += 40.f;
 			m_pLight->Update_LightPos(vLightPos);
 			m_pGameInstance->Update_LightShadow(vLightPos, vKirbyPos);
-		}
+		}*/
 
 		
 		// 공기 중에 날아댕기는 파티클을 구현하였다.

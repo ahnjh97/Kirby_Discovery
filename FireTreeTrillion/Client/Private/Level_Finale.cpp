@@ -40,7 +40,18 @@ HRESULT CLevel_Finale::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_ControlCenter"), TEXT("Prototype_GameObject_FinaleCut_ControlCenter"))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_BuildingCluster_A"), TEXT("Prototype_GameObject_BuildingCluster_A"))))
+	// ºôµù ÄÆ¾À A, B
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_BuildingCluster"), TEXT("Prototype_GameObject_BuildingCluster_A"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_BuildingCluster"), TEXT("Prototype_GameObject_BuildingCluster_B"))))
+		return E_FAIL;
+
+	// µ¥ºê¸®½º ÄÆ¾À A, B, C
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_Debris"), TEXT("Prototype_GameObject_Finale_SpecialDebris_A"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_Debris"), TEXT("Prototype_GameObject_Finale_SpecialDebris_B"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_Debris"), TEXT("Prototype_GameObject_Finale_SpecialDebris_C"))))
 		return E_FAIL;
 
 
