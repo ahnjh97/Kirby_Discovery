@@ -521,7 +521,7 @@ void CCamera_Main::Late_Tick(_float fTimeDelta)
 void CCamera_Main::Track_Anchor(_float fTimeDelta)
 {
 
-	if (nullptr ` m_pFirstTarget)
+	if (nullptr == m_pFirstTarget)
 		return;
 
 	//**** Å¸°Ù À§Ä¡¸¦ ¸¸µë ****//
