@@ -107,6 +107,8 @@ private:
 public:
 	virtual void Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS eFocus, _float3 vAnchorOffset = _float3{ 0.f, 0.f, 0.f }, _float fInterpolateSpeed = -1.f) override;
 
+	void Set_TargetAnchor(_float3 vAnchorOffset) { m_vAnchorOffset = vAnchorOffset; }
+
 	void Set_CamFocus(CAMFOCUS eFocus) { m_eCamFocus = eFocus; }
 
 	//FOV를 세팅한다.
@@ -124,6 +126,11 @@ public:
 	//줌 수치를 설정한다.
 	void Zoom(_float fZoom)	{ m_fCurZoomOffset = fZoom; }
 
+	//(두 타겟팅일 경우) 기준점 세팅 비율을 설정한다.
+	void Set_BothFocusRatio(_float fRatio)
+	{
+		m_fBothFocusRatio = SATURATE(fRatio);
+	}
 
 	//카메라 쉐이크 주기
 	virtual void Make_Shake(_float fPower = 1.f, _float fTime = .5f, _float2 vDir = _float2(0.f, -1.f));
@@ -150,6 +157,7 @@ public:
 
 	//카메라 목표 수치 계산
 	void Compute_Set_BothFocus(_float fTimeDelta);
+	void Compute_Set_BattleFocus(_float fTimeDelta);
 	void Compute_Set_CamLock(_float fTimeDelta);
 	void Compute_Set_Trigger(_int iTriggerIndex);
 
@@ -179,6 +187,7 @@ public:
 	virtual HRESULT Render() override;
 #ifdef _DEBUG
 	virtual void Render_IMGUI() override;
+	void Render_GraphicIMGUI(_float4x4 worldMat);
 #endif
 
 
@@ -197,6 +206,11 @@ private:
 	vector<_float4x4>	m_vecCamMatrices;
 	_int				m_iMatrixIndex = { -1 };
 
+
+	list<_float>		m_FinaleSeqATime;
+	list<_float>		m_FinaleSeqBTime;
+	list<_float>		m_FinaleSeqCTime;
+	list<_float>		m_FinaleSeqDTime;
 
 	_float3 m_vCurKirbyTriggerLocalPos = { 0.f, 0.f, 0.f };
 	vector<pair<_vector, _float>>	m_vecFrontDirRadius;
@@ -225,6 +239,9 @@ private:
 
 	//카메라가 포커징할 기준점 
 	_float3 m_vAnchor = { 0.f, 0.f, 0.f };
+
+	//두 타겟을 포커징할 때, 어디 부분으로 가중치 줄 것이냐?
+	_float m_fBothFocusRatio = { .5f };
 
 	//카메라의 실제 목표 위치
 	_float3 m_vDestCamPos = { 0.f, 0.f, 0.f };
@@ -335,6 +352,9 @@ private:
 	//포커징 기준점을 업데이트한다.
 	void Update_Anchor(_float fTimeDelta);
 
+	//타겟 위치를 받는다
+	_float3 Make_TargetPos();
+
 	void Interpolate_CamSet(_float fTimeDelta);
 	void Update_CurCamPos(_float fTimeDelta);
 
@@ -344,8 +364,12 @@ private:
 
 	void System_Tick(_float fTimeDelta);
 	void Check_FinaleScene(_float fTimeDelta);
-	//void Orbit_Target(_float fTimeDelta);
 
+	void Fill_HardCutSet(CAMACTION& Action, _float fTime);
+	void Fill_InterpolateCutSet(CAMACTION& Action, _float fTime, EASING eEase, _float fInterpolateSpeed);
+
+	void Fill_ActionPos(CAMACTION& Action, CAMPOS eCamPos, _float3 vPos);
+	void Fill_ActionDir(CAMACTION& Action, CAMDIR eCamDir, _float3 vDir);
 
 public:
 	static CCamera_Main* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

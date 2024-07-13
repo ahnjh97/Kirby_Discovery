@@ -278,6 +278,9 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setBlendDecos = { "LbOutBuildingWallL", "LbOutBuildingFenceL", "GsCarFloor", "LbBossCapsule02L"
 		, "LbBossCapsuleGlass01L", "LbBossCapsuleGlass02L", "LbBossCapsuleGlass03L" };
 
+	// Emissive가 입혀져 있지만, Emissive용 Pass로 하고 싶지 않은 모델들
+	m_setNonEmissiveModels = {};
+
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
 
@@ -2034,6 +2037,14 @@ _uint CMapToolHelper::DeterminePassIndex_ForEmissive(CModel* pModel)
 	}
 }
 
+_bool CMapToolHelper::IsNonEmissive(const string& _strModelName)
+{
+	if (m_setNonEmissiveModels.end() != m_setNonEmissiveModels.find(_strModelName))
+		return true;
+
+	return _bool();
+}
+
 void CMapToolHelper::Reset_MapShaderInfo()
 {
 	if (nullptr == m_pPickedObject)
@@ -2281,7 +2292,12 @@ _bool CMapToolHelper::Save_Decos(const string& _strLevel, vector<CGameObject*>& 
 		if (true == IsTree(strModelName))
 			iPassIndex = MODEL_NEARCLIP;
 		else
-			iPassIndex = DeterminePassIndex_ForEmissive(pModel);
+		{
+			if (true == IsNonEmissive(strModelName))
+				iPassIndex = MODEL_NORMAL_O;
+			else
+				iPassIndex = DeterminePassIndex_ForEmissive(pModel);
+		}
 			
 		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
 		outputFile.write(strModelName.c_str(), iStrLength);

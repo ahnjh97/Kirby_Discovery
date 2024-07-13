@@ -39,7 +39,7 @@ vector<_uint> CAnimation::Get_ValidBoneIndices()
 	for (auto& channel : m_Channels)
 		if (true == channel->IsValid())
 			vecValidChannelIndices.push_back(channel->Get_ChannelBoneIndex());
-
+			
 	return vecValidChannelIndices;
 }
 
@@ -57,19 +57,6 @@ HRESULT CAnimation::Initialize(const vector<class CBone*>& Bones, ifstream& file
 		m_Channels.emplace_back(pChannel);
 	}
 
-	//string strName = m_szName;
-	//if (strName.find(string("DamageFaceSub")) != string::npos)
-	//{
-	//	vector<CChannel*> vecValidChannels;
-	//	for (auto& channel : m_Channels) {
-	//		if (channel->IsValid())
-	//			vecValidChannels.push_back(channel);
-	//	}
-	//		
-	//	_int a = 0;
-	//	_int b = 0;
-	//}
-
 	return S_OK;
 }
 
@@ -81,11 +68,8 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 		// 재생바를 계속 증가시킨다.
 		m_fRatioTime += fTimeDelta;
 
-		for (_uint i = 0; i < m_iNumChannels; ++i)
-		{
-			//Channel의 뼈 
+		for (_uint i = 0; i < m_iNumChannels; ++i)  //Channel의 뼈 
 			m_Channels[i]->Ratio_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
-		}
 
 		if (m_fRatioTime > m_fLerpTime)
 		{
@@ -99,10 +83,7 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 		return;
 	}
 
-
 	m_IsFinished = false;
-
-	//_float preTrackPosition = m_fTrackPosition;
 	m_fTrackPosition += m_fTickPerSecond * fTimeDelta;
 
 	// 해당 애니메이션에서, 프레임 사이에 있는 이벤트 이름을 알아온다.
@@ -131,10 +112,45 @@ void CAnimation::Invalidate_TransformationMatrix(_float fTimeDelta, const vector
 		m_fTrackPosition = 0.f;
 	}
 
-	for (_uint i = 0; i < m_iNumChannels; ++i)
-	{
-		/* 이 뼈의 상태행렬을 만들어서 CBone의 TransformationMatrix를 바꿔라. */
+	/* 이 뼈의 상태행렬을 만들어서 CBone의 TransformationMatrix를 바꿔라. */
+	for (_uint i = 0; i < m_iNumChannels; ++i) 
 		m_Channels[i]->Invalidate_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
+}
+
+void CAnimation::Update_TransformationMatrix_ForPartialAnim(_float fTimeDelta, const vector<class CBone*>& Bones, unordered_set<_uint>& _setValidIndices)
+{
+	m_IsFinished = false;
+	m_fTrackPosition += m_fTickPerSecond * fTimeDelta;
+
+	if (m_fDuration <= m_fTrackPosition) {
+		m_IsFinished = true;
+		return;
+	}
+
+	/* 이 뼈의 상태행렬을 만들어서 CBone의 TransformationMatrix를 바꿔라. */
+	for (_uint i = 0; i < m_iNumChannels; ++i) {
+		_uint iChannelBoneIdx = m_Channels[i]->Get_ChannelBoneIndex();
+		if(_setValidIndices.end() != _setValidIndices.find(iChannelBoneIdx))
+			m_Channels[i]->Invalidate_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
+	}
+}
+
+void CAnimation::Lerp_TransformMatrix(_float fTimeDelta, const vector<class CBone*>& Bones, CModel* pModel
+	, _uint iPartialAnimIdx, _float& fPartialAnimLerpTime, unordered_set<_uint>& _setValidIndices)
+{
+	// 재생바를 계속 증가시킨다.
+	fPartialAnimLerpTime += fTimeDelta;
+
+	for (_uint i = 0; i < m_iNumChannels; ++i) { //Channel의 뼈
+		_uint iChannelBoneIdx = m_Channels[i]->Get_ChannelBoneIndex();
+		if (_setValidIndices.end() != _setValidIndices.find(iChannelBoneIdx))
+			m_Channels[i]->Ratio_TransformationMatrix(Bones, m_fTrackPosition, &m_CurrentKeyFrameIndices[i]);
+	}
+
+	if (fPartialAnimLerpTime > m_fLerpTime)
+	{
+		fPartialAnimLerpTime = 0.f;
+		pModel->Set_LerpPartialAnim(false);
 	}
 }
 

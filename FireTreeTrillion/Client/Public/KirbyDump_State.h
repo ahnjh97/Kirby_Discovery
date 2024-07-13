@@ -84,7 +84,8 @@ public:
 	_bool	m_bShakeTrigger1 = { true };
 	_bool	m_bShakeTrigger2 = { true };
 
-	_uint	m_iQTECount = { 0 };
+	_int	m_iQTECnt = { 0 };
+	_float	m_fQTERatio = { 0.f };
 
 	static	CKirbyDump_Cut2_State* Create();
 	virtual void				  Free() override;

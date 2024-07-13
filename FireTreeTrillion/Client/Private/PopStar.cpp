@@ -86,7 +86,6 @@ void CPopStar::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom->Play_Animation(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-	//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
 }
 
 HRESULT CPopStar::Render()

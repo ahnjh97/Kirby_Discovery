@@ -163,9 +163,9 @@ void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
 	CHECK_NULLPTR(pCharacter);
 	m_vecCharacter.push_back(pCharacter);
 
-	//pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Awoofy")));
-	//CHECK_NULLPTR(pCharacter);
-	//m_vecCharacter.push_back(pCharacter);
+	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Awoofy")));
+	CHECK_NULLPTR(pCharacter);
+	m_vecCharacter.push_back(pCharacter);
 
 	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BladeKnight")));
 	CHECK_NULLPTR(pCharacter);
@@ -459,7 +459,6 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 		m_bOnce = false;
 	}
 
-	// QZR : 어떠한 이벤트가 없을때의 처리
 	if (mySequence.m_vecSequenceItems.empty())
 	{
 		// (1) 이벤트 이름 (2) 프레임 처음 (3) 프레임 마지막

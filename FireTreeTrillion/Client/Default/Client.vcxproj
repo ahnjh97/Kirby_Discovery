@@ -206,6 +206,8 @@
     <ClInclude Include="..\Public\BrontoBurt_State.h" />
     <ClInclude Include="..\Public\Buffahorn.h" />
     <ClInclude Include="..\Public\Buffahorn_State.h" />
+    <ClInclude Include="..\Public\BuildingCluster_A.h" />
+    <ClInclude Include="..\Public\BuildingCluster_B.h" />
     <ClInclude Include="..\Public\Bulb.h" />
     <ClInclude Include="..\Public\BulbFlare.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
@@ -224,6 +226,9 @@
     <ClInclude Include="..\Public\Crumble.h" />
     <ClInclude Include="..\Public\Debris.h" />
     <ClInclude Include="..\public\DecoObject.h" />
+    <ClInclude Include="..\public\Finale_SpecialDebris_A.h" />
+    <ClInclude Include="..\Public\Finale_SpecialDebris_B.h" />
+    <ClInclude Include="..\Public\Finale_SpecialDebris_C.h" />
     <ClInclude Include="..\Public\GhostGordo.h" />
     <ClInclude Include="..\Public\GhostGordo_State.h" />
     <ClInclude Include="..\Public\Deform.h" />
@@ -445,6 +450,8 @@
     <ClCompile Include="..\Private\BrontoBurt_State.cpp" />
     <ClCompile Include="..\Private\Buffahorn.cpp" />
     <ClCompile Include="..\Private\Buffahorn_State.cpp" />
+    <ClCompile Include="..\Private\BuildingCluster_A.cpp" />
+    <ClCompile Include="..\Private\BuildingCluster_B.cpp" />
     <ClCompile Include="..\Private\Bulb.cpp" />
     <ClCompile Include="..\Private\BulbFlare.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
@@ -462,6 +469,9 @@
     <ClCompile Include="..\Private\Crumble.cpp" />
     <ClCompile Include="..\Private\Debris.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
+    <ClCompile Include="..\private\Finale_SpecialDebris_A.cpp" />
+    <ClCompile Include="..\Private\Finale_SpecialDebris_B.cpp" />
+    <ClCompile Include="..\Private\Finale_SpecialDebris_C.cpp" />
     <ClCompile Include="..\Private\GhostGordo.cpp" />
     <ClCompile Include="..\Private\GhostGordo_State.cpp" />
     <ClCompile Include="..\Private\Deform.cpp" />

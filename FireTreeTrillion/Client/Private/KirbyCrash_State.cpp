@@ -44,6 +44,10 @@ void CKirbyCrash_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			m_pGameInstance->Set_FirstTimerRatio(0.f);
 			m_pGameInstance->Set_SecondTimerRatio(0.f);
 			m_bTimeCrashTrigger = false;
+
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+			pCamera->Make_Shake(0.7f, 3.f);
+
 		}
 
 		if (m_fTime > 1.f)
@@ -185,6 +189,8 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 			m_pGameInstance->Set_FirstTimerRatio(0.f);
 			m_pGameInstance->Set_SecondTimerRatio(0.f);
 			m_bTimeCrashTrigger = false;
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
+			pCamera->Make_Shake(0.7f, 4.f);
 		}
 
 		if (m_fTime > 1.f)
@@ -200,14 +206,31 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 
 		m_fGravity += fTimeDelta;
 		_float fOffset = -DESC(m_fCrashChargeTime) + 2.5f;
-		DESC(m_fCrashChargeTime) += fTimeDelta * 16.f - (0.35f * m_fGravity);
+		DESC(m_fCrashChargeTime) += fTimeDelta * 20.f - (0.35f * m_fGravity);
+
+
 
 		if (fOffset > 0.f)
 			fOffset = 0.f;
 
+		if (m_bLightRangeInv == false)
+		{
+			m_fLightRange += fTimeDelta * 20.f;
+			if (m_fLightRange > 15.f)
+			{
+				m_bLightRangeInv = true;
+			}
+		}
+		else
+		{
+			m_fLightRange -= fTimeDelta * 20.f;
+			if (m_fLightRange < 0.f)
+				m_fLightRange = 0.f;
+
+		}
+
+		pKirby->Large_Light(_float4(0.6f, 1.f, 1.f, 1.f), 5.f + (m_fLightRange * 5.f), 0.001f);
 		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), fOffset);
-
-
 
 		if (pKirby->isAnimFinish())
 		{
@@ -217,7 +240,7 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 		if (m_bTerrainOn == true)
 		{
 			m_fTerrainTime += fTimeDelta;
-			if (m_fTerrainTime > 1.5f)
+			if (m_fTerrainTime > 0.7f)
 			{
 				DESC(m_fTimeRatio) = 0.f;
 				// 여기에서나 초기화 해준다.
@@ -225,6 +248,7 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 				DESC(m_iCrashTimeSlow) = 2;
 				m_pGameInstance->Restore_FirstTimer();
 				Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
+				pKirby->Large_Light(_float4(0.6f, 1.f, 1.f, 1.f), 5.f, 0.001f);
 				return;
 			}
 		}
@@ -239,6 +263,9 @@ void CKirbyCrash_BigAttack_State::OnStateExit()
 
 	m_bTerrainOn = false;
 	m_fTerrainTime = 0.f;
+
+	m_bLightRangeInv = false;
+	m_fLightRange = 0.f;
 }
 
 CKirbyCrash_BigAttack_State* CKirbyCrash_BigAttack_State::Create()

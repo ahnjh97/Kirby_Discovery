@@ -589,11 +589,11 @@ HRESULT CLevel_Finale::Ready_Monsters()
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &RabbitDesc)))
 				return E_FAIL;
 		}
-		else if (L"Buffahorn" == tempDesc.wstrModelName)
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Buffahorn"), &tempDesc)))
-				return E_FAIL;
-		}
+		//else if (L"Buffahorn" == tempDesc.wstrModelName)
+		//{
+		//	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Buffahorn"), &tempDesc)))
+		//		return E_FAIL;
+		//}
 		else if (L"BladeKnight" == tempDesc.wstrModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))

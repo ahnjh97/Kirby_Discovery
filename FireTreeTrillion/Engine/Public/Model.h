@@ -21,11 +21,13 @@ public:
 
 	_bool IsFinished() { return m_Animations[m_iCurrentAnimIndex]->IsFinished(); }
 	_bool IsFinished(_uint iCurrentAnimIndex) { return m_Animations[iCurrentAnimIndex]->IsFinished(); }
+	_bool IsPartialAnimFinished() { return m_Animations[m_iCurPartialAnim]->IsFinished(); }
 
 	string Get_MeshName(_uint iMeshIndex);
 	_float Get_Duration() { return m_Animations[m_iCurrentAnimIndex]->Get_Duration(); }
 	_float Get_Trackposition() { return m_Animations[m_iCurrentAnimIndex]->Get_TrackPosition(); }
 	_float Get_AnimRatio() { return m_Animations[m_iCurrentAnimIndex]->Get_AnimRatio(); }
+	_float Get_PartialAnimRatio() { return m_Animations[m_iCurPartialAnim]->Get_AnimRatio(); }
 	
 	CModel* CreateModelFromMesh(_uint iMeshIndex, _float3& vOffset
 		, unordered_set<string>& _setCheckedStrings, unordered_set<string>& _setExcludedMesh);
@@ -64,6 +66,7 @@ public:
 	_uint Get_AnimCnt() const { return m_Animations.size(); }
 	vector<class CAnimation*>* const Get_Animations() { return &m_Animations; }
 	_uint Get_CurAnimIndex() { return m_iCurrentAnimIndex; }
+	void Reset_TrackPosition(_uint iAnimIndex) { m_Animations[iAnimIndex]->Reset_TrackPosition(); }
 	
 public:
 	virtual HRESULT Initialize_Prototype(MODEL tModel);
@@ -78,13 +81,14 @@ public:
 	HRESULT Bind_ShaderResource(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, _uint iTextureType);
 	
 	HRESULT Play_Animation(_float fTimeDelta);
-	HRESULT Play_PartialAnimation(_uint iAnimIndex, vector<_uint>& _vecValidBoneIndices, _float fTimeDelta, _bool bLoop = false);
+
+	HRESULT Lerp_PartialAnim(_float fTimeDelta);
+	void	EmplaceBackPartialAnim(_uint iAnimIndex);
+	HRESULT Play_PartialAnimation(_float fTimeDelta);
 	void	Reset_PartialAnimation(_uint iAnimIndex, _float fTickPerSecond, _bool bIsLooping, _bool bInterpolation = false, _float fLerpTime = 0.1f);
 
 	void	Stop_Animation() { m_bStop = true; }
 	void	Replay_Animation() { m_bStop = false; }
-
-	vector<_uint> Get_ValidBoneIndices(_uint iAnimIndex);
 
 	HRESULT Render(_uint iMeshIndex);
 	HRESULT RenderMergedMesh();
@@ -118,7 +122,7 @@ public:
 	HRESULT Bind_WorldMatrixForOctree(class CShader* pShader, string& strConstantName = string("g_WorldMatrix"));
 	void SetUp_ModelIdleAnimForOctree(_uint iAnimIndex, _float fTickPerSec) { m_iIdleAnimIndex = iAnimIndex; m_fIdleAnimTickPerSec = fTickPerSec; }
 	void ReturnToIdle() { Set_Animation(m_iIdleAnimIndex, m_fIdleAnimTickPerSec, true, true, 0.1f); }
-	//void Invalidate_Bones();
+	
 	void Set_Hide(_bool bHide) { m_bHide = bHide; }
 	_bool IsHidden() { return m_bHide; }
 	_uint Find_MeshIndex(const string& _strMeshName);
@@ -130,6 +134,8 @@ public:
 	string ExtractDigitsAfterUnderScore(_uint iMeshIndex);
 
 	_float Get_CurTrackPosition() { return m_Animations[m_iCurrentAnimIndex]->Get_TrackPosition(); }
+	_bool Get_LerpPartialAnim() { return m_bLerpPartialAnim; }
+	void Set_LerpPartialAnim(_bool bLerpPartialAnim) { m_bLerpPartialAnim = bLerpPartialAnim; }
 
 private:
 	_uint						m_iNumMeshes = { 0 };
@@ -177,7 +183,13 @@ private:
 	_uint						m_iIdleAnimIndex = {};
 	_float						m_fIdleAnimTickPerSec = {};
 	_bool						m_bHide = { false };
-	class CGameObject*			m_pBlendObject = { nullptr };
+
+	unordered_map<_uint, pair<vector<_uint>, unordered_set<_uint>>>	m_mapValidBones;
+
+	_uint m_iCurPartialAnim = {};
+	_bool m_bPlayPartialAnim = { false };
+	_bool m_bLerpPartialAnim = { false };
+	_float m_fPartialAnimLerpTime = {};
 
 private:
 	HRESULT Ready_Meshes(_bool bOctree);

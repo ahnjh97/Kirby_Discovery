@@ -12,7 +12,7 @@ HRESULT CLight::Initialize(const LIGHT_DESC & LightDesc)
 
 	if (LIGHT_DESC::TYPE_HORONG == m_LightDesc.eType)
 	{
-		m_vOriginHorongPower = m_LightDesc.vAmbient;
+		m_vOriginHorongPower = m_LightDesc.vDiffuse;
 		m_fOriginRange = m_LightDesc.fRange;
 	}
 
@@ -36,14 +36,32 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bFor
 		_float4 vDiffuse = m_vCurDiffuse + (m_vTargetDiffuse - m_vCurDiffuse) * SaturateEasing;
 		_float fRange = m_fCurRange + (m_fTargetRange - m_fCurRange) * SaturateEasing;
 
-		m_LightDesc.vDiffuse = vDiffuse;
-		m_LightDesc.fRange = fRange;
+		if (LIGHT_DESC::TYPE_HORONG == m_LightDesc.eType)
+		{
+			m_vOriginHorongPower = vDiffuse;
+			m_fOriginRange = fRange;
+		}
+		else
+		{
+			m_LightDesc.vDiffuse = vDiffuse;
+			m_LightDesc.fRange = fRange;
+		}
+
 
 		if (m_fInterpolateTime <= 0.f)
 		{
 			m_bInterpolate = false;
-			m_LightDesc.vDiffuse = m_vTargetDiffuse;
-			m_LightDesc.fRange = m_fTargetRange;
+			if (LIGHT_DESC::TYPE_HORONG == m_LightDesc.eType)
+			{
+				m_vOriginHorongPower = m_vTargetDiffuse;
+				m_fOriginRange = m_fTargetRange;
+			}
+			else
+			{
+				m_LightDesc.vDiffuse = m_vTargetDiffuse;
+				m_LightDesc.fRange = m_fTargetRange;
+			}
+
 		}
 	}
 
@@ -76,7 +94,7 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bFor
 
 		_vector vLightAmbient = XMLoadFloat4(&m_vOriginHorongPower);
 		vLightAmbient *= fRandom;
-		XMStoreFloat4(&m_LightDesc.vAmbient, vLightAmbient);
+		XMStoreFloat4(&m_LightDesc.vDiffuse, vLightAmbient);
 
 		_float fRange = m_fOriginRange;
 		fRange *= fRandom;

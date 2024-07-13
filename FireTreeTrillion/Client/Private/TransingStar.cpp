@@ -274,8 +274,11 @@ void CTransingStar::Tick_OpenAlphaStar(_float fTimeDelta)
     CUtils::Set_State_Matrix(m_arrayStarMatrix[0], CUtils::STATE_POSITION, _float4(0.f, 0.f, 0.f, 1.f));
     
     // 한바퀴 다 돌았으면 사이즈 고정
-    if(m_fAlphaTime > 1.f)
+    if (m_fAlphaTime > 1.f)
+    {
         CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[0], m_InitialSize.x * 1.5f, m_InitialSize.y * 1.5f, 1.f);
+        Deactivate();
+    }
     else // 커지면서 돌리기
     {
         m_fAlphaTime += m_fTimeDelta * TIMEDELTA_OFFSET; // *1.5f;

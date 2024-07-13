@@ -46,6 +46,8 @@ public:
 	_float m_fGravity = { 0.f };
 	_bool m_bTerrainOn = { false };
 	_float m_fTerrainTime = { 0.f };
+	_float m_fLightRange = { 0.f };
+	_bool  m_bLightRangeInv = { false };
 
 	static	CKirbyCrash_BigAttack_State* Create();
 	virtual void								Free() override;

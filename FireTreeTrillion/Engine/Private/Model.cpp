@@ -281,18 +281,47 @@ HRESULT CModel::Play_Animation(_float fTimeDelta)
 	return S_OK;
 }
 
-HRESULT CModel::Play_PartialAnimation(_uint iAnimIndex, vector<_uint>& _vecValidBoneIndices, _float fTimeDelta, _bool bLoop)
+HRESULT CModel::Lerp_PartialAnim(_float fTimeDelta)
 {
-	if (true == m_bStop) 
+	if (true == m_bStop)
+		return S_OK;
+	
+	auto& pair = m_mapValidBones.find(m_iCurPartialAnim);
+	if (pair == m_mapValidBones.end())
+		return E_FAIL;
+
+	m_Animations[m_iCurrentAnimIndex]->Lerp_TransformMatrix(fTimeDelta, m_Bones, this, pair->first, m_fPartialAnimLerpTime, pair->second.second); // set 전달
+
+	for (auto& Idx : pair->second.first) // vector 순회
+		m_Bones[Idx]->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix), false);
+
+	return S_OK;
+}
+
+void CModel::EmplaceBackPartialAnim(_uint iAnimIndex)
+{
+	vector<_uint> vecValidBoneIndices = m_Animations[iAnimIndex]->Get_ValidBoneIndices();
+	unordered_set<_uint> setValidBoneIndices;
+	for (auto& idx : vecValidBoneIndices)
+		setValidBoneIndices.insert(idx);
+
+	m_mapValidBones.insert_or_assign(iAnimIndex, pair<vector<_uint>, unordered_set<_uint>>(vecValidBoneIndices, setValidBoneIndices));
+}
+
+HRESULT CModel::Play_PartialAnimation(_float fTimeDelta)
+{
+	if (true == m_bStop)
 		return S_OK;
 
-	m_Animations[iAnimIndex]->Invalidate_TransformationMatrix(fTimeDelta, m_Bones, bLoop, this);
+	auto& pair = m_mapValidBones.find(m_iCurPartialAnim);
+	if (pair == m_mapValidBones.end())
+		return E_FAIL;
 
-	for (_uint i = 0; i < _vecValidBoneIndices.size(); i++) {
-		m_Bones[_vecValidBoneIndices[i]]->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix)
-			, m_Animations[m_iCurrentAnimIndex]->Is_Ratio());
-	}
-	
+	m_Animations[m_iCurPartialAnim]->Update_TransformationMatrix_ForPartialAnim(fTimeDelta, m_Bones, pair->second.second); // set 전달
+
+	for (auto& Idx : pair->second.first) // vector 순회
+		m_Bones[Idx]->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix), false);
+
 	return S_OK;
 }
 
@@ -309,11 +338,10 @@ void CModel::Reset_PartialAnimation(_uint iAnimIndex, _float fTickPerSecond, _bo
 		m_Animations[iAnimIndex]->Reset_RatioTime();
 		m_Animations[iAnimIndex]->Set_LerpTime(fLerpTime);
 	}
-}
 
-vector<_uint> CModel::Get_ValidBoneIndices(_uint iAnimIndex)
-{
-	return m_Animations[iAnimIndex]->Get_ValidBoneIndices();
+	m_iCurPartialAnim = iAnimIndex;
+	m_bPlayPartialAnim = true;
+	m_bLerpPartialAnim = false;
 }
 
 HRESULT CModel::Render(_uint iMeshIndex)
@@ -783,13 +811,6 @@ HRESULT CModel::Bind_WorldMatrixForOctree(CShader* pShader, string& strConstantN
 	return S_OK;
 }
 
-
-//void CModel::Invalidate_Bones()
-//{
-//	for (auto& pBone : m_Bones)
-//		pBone->Invalidate_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_TransformMatrix));
-//}
-
 _uint CModel::Find_MeshIndex(const string& _strMeshName)
 {
 	for (_uint i = 0; i < m_iNumMeshes; i++)
@@ -1055,8 +1076,6 @@ CComponent * CModel::Clone(void * pArg)
 void CModel::Free()
 {
 	__super::Free();
-
-	Safe_Release(m_pBlendObject);
 
 	for (auto& pAnimation : m_Animations)
 		Safe_Release(pAnimation);

@@ -84,7 +84,6 @@ void CChannel::Invalidate_TransformationMatrix(const vector<class CBone*>& Bones
 
 void CChannel::Ratio_TransformationMatrix(const vector<class CBone*>& Bones, _float fTrackPosition, _uint* pCurrentKeyFrameIndex)
 {
-
 	if (fTrackPosition == 0.f)
 	{
 		// 현재 상태를 그대로 받아옴.
@@ -126,7 +125,6 @@ void CChannel::Ratio_TransformationMatrix(const vector<class CBone*>& Bones, _fl
 		XMLoadFloat4(&vRotation),
 		// 4인자 : 평행 이동 벡터
 		XMVectorSetW(XMLoadFloat3(&vTranslation), 1.f));
-
 
 	Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
 }

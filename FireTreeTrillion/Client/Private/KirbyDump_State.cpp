@@ -210,7 +210,7 @@ CKirbyDump_Run_State::CKirbyDump_Run_State()
 
 void CKirbyDump_Run_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-    __super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 }
 
 void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -232,7 +232,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		pKirby->Start_CutScene();
 		DESC(m_bBooster) = false;
 		//pKirby->Delete_Effect("Come On Dash");
-		pKirby->Delete_AllEffect();
+		//pKirby->Delete_AllEffect();
 		return;
 	}
 
@@ -357,7 +357,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			fxDesc.vInitPos += (_float3)pTransformCom->Get_State(CTransform::STATE_RIGHT) * (2.3f + CUtils::Make_RandomFloat(-.2f, .2f));
 			fxDesc.vInitPos += (_float3)pTransformCom->Get_State(CTransform::STATE_UP) * 7.2f;
 
-			_float fScale = CUtils::Make_RandomFloat( 1.5f, 3.f);
+			_float fScale = CUtils::Make_RandomFloat(1.5f, 3.f);
 			fxDesc.vInitScale = { fScale, fScale, fScale };
 			pKirby->Add_Effect("dump dash smoke", fxDesc);
 
@@ -365,7 +365,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			fxDesc.vInitPos -= (_float3)pTransformCom->Get_State(CTransform::STATE_RIGHT) * (2.3f + CUtils::Make_RandomFloat(-.2f, .2f));
 			fxDesc.vInitPos += (_float3)pTransformCom->Get_State(CTransform::STATE_UP) * 7.2f;
 
-			fScale = CUtils::Make_RandomFloat( 1.5f, 3.f);
+			fScale = CUtils::Make_RandomFloat(1.5f, 3.f);
 			fxDesc.vInitScale = { fScale, fScale, fScale };
 			pKirby->Add_Effect("dump dash smoke", fxDesc);
 			fBoostTime = 0.f;
@@ -379,13 +379,13 @@ void CKirbyDump_Run_State::OnStateExit()
 
 CKirbyDump_Run_State* CKirbyDump_Run_State::Create()
 {
-    CKirbyDump_Run_State* pInstance = new CKirbyDump_Run_State();
-    return pInstance;
+	CKirbyDump_Run_State* pInstance = new CKirbyDump_Run_State();
+	return pInstance;
 }
 
 void CKirbyDump_Run_State::Free()
 {
-    __super::Free();
+	__super::Free();
 }
 
 #pragma endregion
@@ -399,7 +399,7 @@ CKirbyDump_Jump_State::CKirbyDump_Jump_State()
 
 void CKirbyDump_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-    __super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 
 }
 
@@ -419,7 +419,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		pKirby->Start_CutScene();
 		DESC(m_bBooster) = false;
 		//pKirby->Delete_Effect("Come On Dash");
-		pKirby->Delete_AllEffect();
+		//pKirby->Delete_AllEffect();
 
 		return;
 	}
@@ -545,13 +545,13 @@ void CKirbyDump_Jump_State::OnStateExit()
 
 CKirbyDump_Jump_State* CKirbyDump_Jump_State::Create()
 {
-    CKirbyDump_Jump_State* pInstance = new CKirbyDump_Jump_State();
-    return pInstance;
+	CKirbyDump_Jump_State* pInstance = new CKirbyDump_Jump_State();
+	return pInstance;
 }
 
 void CKirbyDump_Jump_State::Free()
 {
-    __super::Free();
+	__super::Free();
 }
 
 #pragma endregion
@@ -566,36 +566,36 @@ CKirbyDump_Cut_State::CKirbyDump_Cut_State()
 
 void CKirbyDump_Cut_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
-    __super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 
 }
 
 void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
-    CFinaleKirby* pKirby = static_cast<CFinaleKirby*>(pGameObject);
-    CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
-    CTransform* pTransformCom = pGameObject->Get_TransformCom();
-    CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
-    CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+	CFinaleKirby* pKirby = static_cast<CFinaleKirby*>(pGameObject);
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
-    if (pKirby->Get_State() == CFinaleKirby::STATE_IDLE)
-    {
+	if (pKirby->Get_State() == CFinaleKirby::STATE_IDLE)
+	{
 		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 		pKirby->Change_State(CFinaleKirby::STATE_RUN, 120.f, true, true, CFinaleKirby::BODY_DEFAULT);
 		return;
-    }
-    else if (pKirby->Get_State() == CFinaleKirby::STATE_RUN)
-    {
+	}
+	else if (pKirby->Get_State() == CFinaleKirby::STATE_RUN)
+	{
 		m_fRunTime += fTimeDelta;
 
-        Bbong_FX(fTimeDelta, pTransformCom);
+		Bbong_FX(fTimeDelta, pTransformCom);
 
 		DESC(m_vTargetDir) = _float4(1.f, 0.f, 0.f, 0.f);
 		Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
 		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
-        pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
 		if (m_fRunTime > 1.35f)
 		{
@@ -612,7 +612,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 			return;
 		}
-    }
+	}
 	else if (pKirby->Get_State() == CFinaleKirby::STATE_INHALESTART)
 	{
 		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
@@ -722,13 +722,13 @@ void CKirbyDump_Cut_State::OnStateExit()
 
 CKirbyDump_Cut_State* CKirbyDump_Cut_State::Create()
 {
-    CKirbyDump_Cut_State* pInstance = new CKirbyDump_Cut_State();
-    return pInstance;
+	CKirbyDump_Cut_State* pInstance = new CKirbyDump_Cut_State();
+	return pInstance;
 }
 
 void CKirbyDump_Cut_State::Free()
 {
-    __super::Free();
+	__super::Free();
 }
 
 #pragma endregion
@@ -744,6 +744,13 @@ CKirbyDump_Cut2_State::CKirbyDump_Cut2_State()
 void CKirbyDump_Cut2_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+	if (_iAnimIndex == 13)
+		//15로 설정한 뒤, 보스가 밀어낼 때 각도도 바뀌도록 한다.
+		m_fQTERatio = 15.f;
+	else if (_iAnimIndex == 18)
+		//보스 쪽으로 더 치우치도록.
+		m_fQTERatio = 8.f;
 }
 
 void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -807,10 +814,6 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT2)
 	{
 
-
-
-
-
 		//if (pKirby->isAnimFinish())
 		//{
 		//	pCenter->Set_CutScene(3);
@@ -819,14 +822,79 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	// 큐티 모션 후 점프
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT6)
 	{
-
-
-
-
-
-		if (pKirby->isAnimFinish())
+		//평쇼
+		if (m_iQTECnt == 0)
 		{
-			pCenter->Set_CutScene(7);
+			if (2160.f < pKirby->m_vBonePos.x)
+			{
+				m_iQTECnt++;
+				CCamera_Main* pCameraMain = static_cast<CCamera_Main*>
+					(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+				CHECK_NULLPTR(pCameraMain);
+				pCameraMain->Set_FOVY(40.f);
+				m_pGameInstance->Set_FirstTimerRatio(.1f);
+				m_pGameInstance->Set_SecondTimerRatio(.1f);
+			}
+		}
+		//QTE 1
+		else if (m_iQTECnt == 1)
+		{
+			if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) == true)
+			{
+				m_fQTERatio += 1.f;
+
+				CCamera_Main* pCameraMain = static_cast<CCamera_Main*>
+					(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+				CHECK_NULLPTR(pCameraMain);
+				pCameraMain->Set_FOVY(40.f - m_fQTERatio);
+
+			}
+
+			if (m_fQTERatio > 10.f)
+			{
+				m_pGameInstance->Restore_FirstTimer();
+				m_pGameInstance->Restore_SecondTimer();
+
+				CCamera_Main* pCameraMain = static_cast<CCamera_Main*>
+					(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+				CHECK_NULLPTR(pCameraMain);
+				pCameraMain->Set_FOVY(50.f);
+
+				m_fQTERatio = 0.f;
+			}
+
+			if (2330.f < pKirby->m_vBonePos.x)
+			{
+				m_iQTECnt++;
+				m_pGameInstance->Set_FirstTimerRatio(.1f);
+				m_pGameInstance->Set_SecondTimerRatio(.1f);
+				CCamera_Main* pCameraMain = static_cast<CCamera_Main*>
+					(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+				CHECK_NULLPTR(pCameraMain);
+				pCameraMain->Set_FOVY(40.f);
+			}
+		}
+		//QTE 2
+		else if (m_iQTECnt == 2)
+		{
+			if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
+			{
+				m_iQTECnt++;
+				m_pGameInstance->Restore_FirstTimer();
+				m_pGameInstance->Restore_SecondTimer();
+				CCamera_Main* pCameraMain = static_cast<CCamera_Main*>
+					(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+				CHECK_NULLPTR(pCameraMain);
+				pCameraMain->Set_FOVY(50.f);
+			}
+		}
+		else
+		//QTE 끝
+		{
+			if (pKirby->isAnimFinish())
+			{
+				pCenter->Set_CutScene(7);
+			}
 		}
 	}
 	//
@@ -883,7 +951,12 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (pKirby->isAnimFinish())
 		{
+			//QTE 장면
 			pCenter->Set_CutScene(13);
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+			CHECK_NULLPTR(pCamera);
+			pCamera->Set_CamFocus(CCamera::FOCUS_BATTLE);
+		
 		}
 
 	}
@@ -901,15 +974,24 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			pCamera->Make_Shake(0.3f, 1000.f);
 			m_bShakeTrigger2 = false;
 		}
+		
+		
+		m_fQTERatio -= fTimeDelta;
 
+		if (m_fQTERatio < 0.f)
+			m_fQTERatio = 0.f;
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) == true)
 		{
-			m_iQTECount++;
+			m_fQTERatio += 1.f;
 		}
 
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+		CHECK_NULLPTR(pCamera);
+		pCamera->Set_BothFocusRatio(1.f - (m_fQTERatio * .033f));
 
-		if (m_iQTECount > 14)
+
+		if (30.f < m_fQTERatio)
 		{
 			pCenter->Set_CutScene(14);
 		}
@@ -957,6 +1039,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		if (pKirby->isAnimFinish())
 		{
 			pCenter->Set_CutScene(18);
+
 		}
 
 	}
@@ -975,14 +1058,21 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			m_bShakeTrigger2 = false;
 		}
 
+		m_fQTERatio -= fTimeDelta * 2.f;
+
+		if (m_fQTERatio < 0.f)
+			m_fQTERatio = 0.f;
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) == true)
 		{
-			m_iQTECount++;
+			m_fQTERatio += 1.f;
 		}
 
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+		CHECK_NULLPTR(pCamera);
+		pCamera->Set_BothFocusRatio(1.f - (m_fQTERatio * .033f));
 
-		if (m_iQTECount > 14)
+		if (m_fQTERatio > 14.f)
 		{
 			pCenter->Set_CutScene(19);
 		}
@@ -992,11 +1082,13 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	{
 
 
-
-
 		if (pKirby->isAnimFinish())
 		{
 			pCenter->Set_CutScene(20);
+
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+			CHECK_NULLPTR(pCamera);
+			pCamera->Set_CamFocus(CCamera::FOCUS_FINALE);
 		}
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT20)
@@ -1012,7 +1104,9 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 void CKirbyDump_Cut2_State::OnStateExit()
 {
 	m_fTime = 0.f;
-	m_iQTECount = 0;
+	m_fQTERatio = 0.f;
+	m_iQTECnt = 0;
+
 	m_bShakeTrigger1 = true;
 	m_bShakeTrigger2 = true;
 }
