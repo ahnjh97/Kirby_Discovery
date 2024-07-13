@@ -100,6 +100,7 @@ protected:
 	_uint*									m_pCurrentLevelID = { nullptr };
 	// 객체 상태처리를 위해
 	_bool									m_bDead = { false };
+	_bool									m_bCloned = { false };
 	_bool									m_bPoolingDead = { false };
 	// prototypeName을 들고 있는다.
 	wstring									m_wstrPrototypeTag = wstring();

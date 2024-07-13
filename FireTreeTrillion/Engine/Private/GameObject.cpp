@@ -77,7 +77,7 @@ HRESULT CGameObject::Initialize(void* pArg)
 	}
 		
 	m_pCurrentLevelID = m_pGameInstance->Get_CurrentLevelID();
-
+	m_bCloned = true;
 	return S_OK;
 }
 

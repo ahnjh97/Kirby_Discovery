@@ -14,7 +14,10 @@ public:
 		string	strObjectName;
 		_float	fKirbyHP;
 		_float	fKirbyCoin;
-		//_uint	uKirbyState; // 커비 변신 상태
+
+		_int	iKirbyState;	// 커비 변신 상태
+		_int	iLatestLevel;	// 마지막으로 들어간 레벨
+		_float3	vLastPos;		// 커비 변신 상태
 	};
 
 private:

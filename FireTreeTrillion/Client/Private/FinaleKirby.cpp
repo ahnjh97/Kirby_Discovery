@@ -784,11 +784,6 @@ CGameObject* CFinaleKirby::Clone(void* pArg)
 
 void CFinaleKirby::Free()
 {
-    CLevelChanger::LEVEL_DATA tLevelData = {};
-    tLevelData.fKirbyCoin = (_float)m_uCoin;
-    tLevelData.fKirbyHP = m_fHp;
-    CLevelChanger::Get_Instance()->Save(tLevelData);
-
     __super::Free();
 
     for (auto& pModelCom : m_pModelCom)

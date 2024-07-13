@@ -73,9 +73,9 @@ void CDialog::Save()
 	data["NPC"] = "Parttimer_Dee";
 
 	vector<wstring> messages = {
-		L"안녕 나는 위지영이야.",
-		L"오늘의 점심은 무얼까.",
-		L"두부일까 짬뽕일까?"
+		L"a.",
+		L"b.",
+		L"c"
 	};
 
 	for (const auto& message : messages) 

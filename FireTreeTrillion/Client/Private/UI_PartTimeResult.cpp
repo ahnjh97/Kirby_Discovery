@@ -245,7 +245,6 @@ void CUI_PartTimeResult::Render_TotalScore()
 		if (fTimeAcc >= 1.f)
 		{
 			// 효선아 여기야 >> 게임 점수 다 뜨고 이펙트 나오는 구간
-			// QZR 다이얼로그 출력 : 게임 수고했습니다 어쩌구
 		}
 	}
 
