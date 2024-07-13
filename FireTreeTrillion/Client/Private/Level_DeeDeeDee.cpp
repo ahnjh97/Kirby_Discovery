@@ -76,6 +76,8 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DeeDeeDee"), TEXT("Prototype_GameObject_DeeDeeDee"), &ObjDesc)))
 		return E_FAIL;
 
+	// QZR : 페이드인
+
 	return S_OK;
 }
 

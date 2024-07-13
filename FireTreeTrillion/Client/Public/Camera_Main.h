@@ -177,7 +177,9 @@ public:
 
 	_vector SlerpDirVec(_fvector vStart, _fvector vEnd, _float fRatio);
 
-
+	// 레벨 내에서 커비 이동제어
+	void	Move_ForTrigger(_float fTimeDelta, _float3 vPos = _float3(), _float3 vDir = _float3());
+	//void	_ForTrigger(_float fTimeDelta, _float3 vPos = _float3(), _float3 vDir = _float3());
 
 
 	virtual HRESULT Initialize_Prototype() override;
@@ -371,6 +373,12 @@ private:
 	void Fill_ActionPos(CAMACTION& Action, CAMPOS eCamPos, _float3 vPos);
 	void Fill_ActionDir(CAMACTION& Action, CAMDIR eCamDir, _float3 vDir);
 
+	// [임시] 레이싱맵에서 level전환하는 함수 written by JYWI
+	void Change_LevelTrigger();
+
+#ifdef _DEBUG
+	_float		m_fFovyTemp = _float();
+#endif
 public:
 	static CCamera_Main* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

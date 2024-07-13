@@ -241,10 +241,16 @@ HRESULT CLevel_Town::Ready_Layer_UI(const wstring& _wstrLayerTag)
 
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
 
-	//다이얼로그 
+	// 다이얼로그 1 : 파트타임
 	CDialog::DIALOG_DESC tDialogDesc{};
 	tDialogDesc.strPath = "../Bin/Resources/Data/Dialog_Town.json";
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_Dialog"), &tDialogDesc);
+	
+	// 다이얼로그 2 : 파크데려가는 디디디
+	CDialog::DIALOG_DESC tDialogDDD_Desc{};
+	tDialogDDD_Desc.strPath = "../Bin/Resources/Data/Dialog_TownToPark.json";
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_Dialog"), &tDialogDDD_Desc);
+
 
 	return S_OK;
 }

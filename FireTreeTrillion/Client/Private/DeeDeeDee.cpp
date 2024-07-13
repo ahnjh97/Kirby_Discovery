@@ -10,6 +10,7 @@
 #include "EventCenter.h"
 
 #include "Ability.h"
+#include "UI_MessageWindow.h"
 
 #define INFO(Dst) m_tInfo.Dst
 
@@ -57,7 +58,7 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 	{
 		m_pModelCom->Set_Animation(STATE_WAIT, 60.f, true, false);
 	}
-
+	 
 	_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	m_vNeckLook = m_vLEyeLook = m_vREyeLook = m_tInfo.m_vMoveDir = m_tInfo.m_vTargetDir = vLook;
 
@@ -202,8 +203,19 @@ void CDeeDeeDee::Add_AnimEvent()
 
 void CDeeDeeDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+	// PARK로 이동하기 위한 다이얼로그 출력
+	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
+	{
+		//CUI_MessageWindow* pMWindow = dynamic_cast<CUI_MessageWindow*>(m_pGameInstance->Get_LastGameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg")));
+		CUI_MessageWindow* pMWindow = dynamic_cast<CUI_MessageWindow*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_DeeDeeDee"), 0));
+		CHECK_NULLPTR(pMWindow);
+		pMWindow->Show_DialogMessage();
 
-
+		CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+		CHECK_NULLPTR(pCameraMain);
+		pCameraMain->Lock_All({ -10.014f, 38.f, 30.908f }, { 0.f, -0.148f, 0.989f }, true);
+		//pCameraMain->Unlock();
+	}
 }
 
 void CDeeDeeDee::Change_State(STATE_TYPE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
@@ -425,6 +437,17 @@ HRESULT CDeeDeeDee::Add_Components()
 		WeaponDesc.pWhite = &m_fWhiteColorDiffuse;
 		m_pWeapons = static_cast<CDeeDeeDeeHammer*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeeDeeDeeHammer"), &WeaponDesc));
 		CHECK_NULLPTR(m_pWeapons);
+	}
+	// 마을엔 히트박스를 갖고 있다.
+	else
+	{
+		CHitBox::HITBOX_DESC HitBox{};
+		HitBox.pOwner = this;
+		HitBox.pDesc = &m_tColliderDesc[BODY];
+		HitBox.pCollisionType = NPC;
+		hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox);
+		CHECK_FAILED(hr);
+		Set_BodyCollider(COLLIDER_SPHERE, 3.f, 0.f, 10.f);
 	}
 
 	return S_OK;
@@ -734,7 +757,6 @@ void CDeeDeeDee::Dead_Animation(_float fTimeDelta)
 		}
 	}
 }
-
 
 CDeeDeeDee* CDeeDeeDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

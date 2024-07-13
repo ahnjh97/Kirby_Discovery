@@ -3,6 +3,8 @@
 #include "UI_BtnIcon.h"
 #include "Kirby.h"
 #include "Level_Loading.h"
+#include "TransingStar.h"
+#include "EventCenter.h"
 
 CUI_MessageWindow::CUI_MessageWindow(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CUIObject { _pDevice, _pContext }
@@ -80,6 +82,14 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	// 하이라이트 처리를 하기 위한 문자열 정리하는 함수
 	Split_Message();
 
+	if (*m_pCurrentLevelID == LEVEL_SIMBA)
+	{
+		CEventCenter* pEventCenter = CEventCenter::Get_Instance();
+		function<void(CGameObject*)> func{};
+		func = bind(&CUI_MessageWindow::Start_Message, this, placeholders::_1);
+		pEventCenter->Subscribe(KEVENT_SIMBA_APPEAR_START, this, func);
+	}
+
 	return S_OK;
 }
 
@@ -92,7 +102,7 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 		Show_DialogMessage();
 	
 	//A 버튼 입력 시, 다음 스크립트 문단을 준비하여 출력
-	if (m_pGameInstance->Get_DIKeyState(DIK_4, KEY_DOWN) && WINDOW_SHOW == m_eCurState)
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && WINDOW_SHOW == m_eCurState)
 	{
 		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_SELECT); //버튼 상태 동기화
 
@@ -506,20 +516,40 @@ void CUI_MessageWindow::OnEvent()
 	{
 	case LEVEL_DEEDEEDEE:
 	{
-		//Fade-out 처리
-		m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_FX));
+		// QZR : 페이드아웃 처리
+		m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOWN));
 	}
 	break;
 	case LEVEL_TOWN:
 	{
-		//Fade-out 처리
-		m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOOL_ANIM));
+		if (m_tMessageDesc.wstrNPC == L"DeeDeeDee")
+		{
+			CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
+			CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
+			pTransingStar->Set_NextLevel(LEVEL_END);
+			pTransingStar->Activate(CTransingStar::CLOSE);
+			pTransingStar->Set_LargeColor(_float3(95.f / 255.f,  28.f / 255.f, 128.f / 255.f));
+			pTransingStar->Set_SmallColor(_float3(167.f / 255.f, 42.f / 255.f, 168.f / 255.f));
+		}
+		else
+		{
+			// QZR : 페이드아웃 처리
+			m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_PARTTIME));
+		}
 	}
 	break;
 	case LEVEL_SIMBA:
-	{}
+	{
+		CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_APPEAR_END);
+	}
 	break;
 	}
+}
+
+//for simba
+void CUI_MessageWindow::Start_Message(CGameObject* pObj)
+{
+	Show_DialogMessage();
 }
 
 
@@ -551,6 +581,8 @@ CGameObject* CUI_MessageWindow::Clone(void* pArg)
 
 void CUI_MessageWindow::Free()
 {
+	CEventCenter::Get_Instance()->Unsubscribe(this);
+
 	__super::Free();
 
 	m_tMessageDesc.vecMsg.clear();
