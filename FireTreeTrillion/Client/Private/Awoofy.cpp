@@ -41,8 +41,13 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	
 	wstring wstrModelName = TEXT("Awoofy");
 	if (LEVEL_TOOL_ANIM != *m_pCurrentLevelID)
+	{
 		wstrModelName = pMonDesc->wstrModelName;
-
+		size_t underscorePos = wstrModelName.find(L'_');
+		if (underscorePos != wstring::npos)
+			wstrModelName = wstrModelName.substr(underscorePos + 1);
+	}
+		
 	if (FAILED(Add_Components(wstrModelName)))
 		return E_FAIL;
 
