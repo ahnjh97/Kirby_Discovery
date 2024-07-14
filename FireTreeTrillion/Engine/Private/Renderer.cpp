@@ -668,6 +668,13 @@ void CRenderer::Set_ColorSet(COLOR_DATA destColorData)
 	m_DestColorData = destColorData;
 }
 
+void CRenderer::Set_ColorSet(string strColorName)
+{
+	//일단 -1로 초기화
+	m_DestColorData = {};
+	m_DestColorData = Find_ColorSet(strColorName);
+}
+
 void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 {
 	switch (iSetIdx)
@@ -781,7 +788,6 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	{
 		m_DestColorData = Find_ColorSet("Horror");
 		m_fRimLightRatio.second = 0.f;
-		//m_vRimColor.second = _float3(1.f, .5f, 0.f);
 		Update_Option(OPTION_DOF, true);
 	}
 	break;
