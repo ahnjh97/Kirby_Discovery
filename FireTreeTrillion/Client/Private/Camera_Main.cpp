@@ -1498,7 +1498,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 
 		newAction.eCamPos = POS_RELATIVE;
-		newAction.vPos = -newAction.vDir * 15.f;
+		newAction.vPos = -newAction.vDir * 25.f;
 
 		newAction.fFOVY = 55.f;
 		m_CamSeq.push_back(newAction);
@@ -2181,7 +2181,7 @@ void CCamera_Main::Control(_float fTimeDelta)
 
 		if (m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN))
 		{
-			Make_Shake(1.f, 2.f);
+			Make_Shake(10.f, 2.f);
 		}
 
 	}

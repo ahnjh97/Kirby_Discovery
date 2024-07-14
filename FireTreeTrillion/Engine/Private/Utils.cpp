@@ -153,6 +153,11 @@ Quaternion CUtils::Make_Quat_FromDir(const _float3& _dir)
 	return Quaternion::FromToRotation(vStartDir, vDestDir);
 }
 
+_float3 CUtils::Degree_ToRadian(_float3 vDegree)
+{
+	return  _float3(ToRadian(vDegree.x), ToRadian(vDegree.y), ToRadian(vDegree.z));
+}
+
 _float3 CUtils::Make_Degree_FromDir(const _float4& _dir)
 {
 	Quaternion vQuat = Make_Quat_FromDir(_dir);

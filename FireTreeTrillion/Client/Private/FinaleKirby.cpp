@@ -97,6 +97,15 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
         // 유틸업데이트가 들어가있다. (FSM)
         __super::Tick(m_fTimeDelta);
 
+        //이펙트 소켓의 회전을 업데이트한다.
+        m_EffectSocket = _float4x4::Identity;
+        _float3 vAngle = CUtils::Make_Degree_FromDir(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+        vAngle = _float3{ ToRadian(vAngle.x), ToRadian(vAngle.y), ToRadian(vAngle.z) };
+        _float4x4 RotMat = _float4x4::CreateFromYawPitchRoll(vAngle);
+        m_EffectSocket *= RotMat;
+
+        CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
         // 지면의 up벡터
         PxVec3 slope = m_pControllerCom->Compute_Slope_DynamicActor(m_pTransformCom);
         _vector vTerrainNormal = CUtils::To_Vector(slope);
@@ -120,10 +129,16 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
         if (m_pFSM != nullptr)
             m_pFSM->Update(this, fTimeDelta);
 
-        m_EffectSocket = _float4x4::Identity;
-        CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_vBonePos);
-
+        
         m_vBonePos = Compute_RootPos();
+        //이펙트 소켓의 회전을 업데이트한다.
+        m_EffectSocket = m_pTransformCom->ComputeBoneWorldMatrix(m_pModelCom[BODY_DUMPCUT]->Get_BonePtr("TopL"));
+
+        _float3 vAngle = {90.f, 0.f, 0.f};
+        _float4x4 RotMat = _float4x4::CreateFromYawPitchRoll(CUtils::Degree_ToRadian(vAngle));
+        m_EffectSocket *= RotMat;
+
+        //캡슐의 위치만 업데이트한다.
         m_pControllerCom->Set_CapsulePosition(m_vBonePos);
     }
 
