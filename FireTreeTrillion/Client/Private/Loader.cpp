@@ -192,6 +192,7 @@
 #include "TransingStar.h"
 #include "UI_MessageWindow.h"
 #include "UI_BtnIcon.h"
+#include "UI_Fading.h"
 
 // 아이템
 #include "Food.h"
@@ -381,6 +382,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTimeResult"), CUI_PartTimeResult);
 	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_TransingStar"), CTransingStar);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Fading"), CUI_Fading);
 
 	//DIALOG
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Dialog"), CDialog);
@@ -969,7 +971,6 @@ HRESULT CLoader::Loading_For_Parttime()
 
 	// 결과 안내
 	hr = Add_Texture(eLevel, "Parttime_Finish",				"UI/Parttime/Text/Finish.png");
-	hr = Add_Texture(eLevel, "Fade",						"UI/Fade.png");
 
 	// 결과창
 	hr = Add_Texture(eLevel, "GameFoodUI_ResultBar",		"UI/MGameFood/result bar.png");
@@ -1603,6 +1604,10 @@ HRESULT CLoader::Add_StaticUITexture()
 	//UI_Button
 	hr = Add_Texture(LEVEL_STATIC, "UI_BtnIconBase", "UI/BtnIcon/BtnIcon_Base_%d.dds", 3); CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "UI_BtnIconBright", "UI/BtnIcon/BtnIcon_Bright.dds"); CHECK_FAILED(hr);
+	
+	//UI_Fading
+	hr = Add_Texture(LEVEL_STATIC, "Fade", "UI/Fade.png");
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }

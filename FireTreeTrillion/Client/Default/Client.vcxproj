@@ -400,6 +400,7 @@
     <ClInclude Include="..\Public\Turbine.h" />
     <ClInclude Include="..\Public\UI_BtnIcon.h" />
     <ClInclude Include="..\Public\UI_MessageWindow.h" />
+    <ClInclude Include="..\Public\UI_Fading.h" />
     <ClInclude Include="..\Public\UI_PartTime.h" />
     <ClInclude Include="..\Public\UI_PartTimeDee.h" />
     <ClInclude Include="..\Public\UI_PartTimeResult.h" />
@@ -641,6 +642,7 @@
     <ClCompile Include="..\Private\Turbine.cpp" />
     <ClCompile Include="..\Private\UI_BtnIcon.cpp" />
     <ClCompile Include="..\Private\UI_MessageWindow.cpp" />
+    <ClCompile Include="..\Private\UI_Fading.cpp" />
     <ClCompile Include="..\Private\UI_PartTime.cpp" />
     <ClCompile Include="..\Private\UI_PartTimeDee.cpp" />
     <ClCompile Include="..\Private\UI_PartTimeResult.cpp" />

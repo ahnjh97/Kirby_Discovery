@@ -11,6 +11,7 @@
 #include "FinaleCut_ControlCenter.h"
 
 #include "Level_loading.h"
+#include "UI_Fading.h"
 
 #define ORIG_POS _float3(2550.f, 242.f, -136.f)
 #define BATTLE_POS _float3(2525.f, 220.f, -136.f)
@@ -461,15 +462,26 @@ void CCamera_Main::Fill_ActionDir(CAMACTION& Action, CAMDIR eCamDir, _float3 vDi
 // 임시입니다. 효선아 여기야
 void CCamera_Main::Change_LevelTrigger()
 {
-	static _bool bOnce = false;
+	static _bool bOnceFade = false;
+	static _bool bOnceChangeLevel = false;
 	_float4 vPos = GET_POS;
 	if (vPos.y >= 95.f)
 	{
-		if (bOnce == false)
+		CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+		CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
+		if (bOnceFade == false)
 		{
-			//  QZR : 페이드아웃
-			m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_DEEDEEDEE));
-			bOnce = true;
+			pFadingUI->Set_InOutState(CUI_Fading::FADEOUT);
+			pFadingUI->Set_IsRender(true);
+			bOnceFade = true;
+		}
+		else if (pFadingUI->Get_FadeRatio() <= 0.f)
+		{
+			if (bOnceChangeLevel == false)
+			{
+				m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_DEEDEEDEE));
+				bOnceChangeLevel = true;
+			}
 		}
 	}
 }

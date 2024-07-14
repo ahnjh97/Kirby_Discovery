@@ -646,6 +646,9 @@
     <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria\Dynamic_Field">
       <UniqueIdentifier>{e8b3e9b8-adc4-4c69-84a8-0a828ea1dda8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\Fading">
+      <UniqueIdentifier>{b3aa3c4e-817c-484b-8310-7e41a0bf044b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1306,6 +1309,9 @@
     <ClInclude Include="..\Public\BuildingCluster_B.h">
       <Filter>02.GameObjects\Map\Finale_SpeicalBuilding</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\UI_Fading.h">
+      <Filter>02.GameObjects\UI\Fading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1946,6 +1952,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Gm_DynamicField.cpp">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\Dynamic_Field</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_Fading.cpp">
+      <Filter>02.GameObjects\UI\Fading</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
