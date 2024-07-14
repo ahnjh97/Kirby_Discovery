@@ -83,7 +83,7 @@ private:
 	_float2						m_SizeScoreBar2D = _float2(438.f, 156.f);
 	_float2						m_SizeCategory2D = _float2(256.f, 256.f);
 	_float2						m_SizeDeeFace2D = _float2(200.f, 116.f);
-	_float2						m_SizeDigits2D = _float2(50.f, 60.f);
+	_float2						m_SizeDigits2D = _float2(72.f, 72.f);
 
 	// TimeBar Ratio
 	_float						m_fRatioTimeBar = 1.f;

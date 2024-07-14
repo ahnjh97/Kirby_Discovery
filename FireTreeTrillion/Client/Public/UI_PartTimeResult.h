@@ -35,6 +35,8 @@ public:
 	void							Initialize_TexturePos();
 	void							Set_Score(_float _fScore) { m_fScore = _fScore; }
 
+	// 10 11    타임 숫자
+	// 12 13 14 스코어 숫자
 private:
 	HRESULT							Add_Components();
 	_int							Change_ScoreTextures(_int iNum);
@@ -49,7 +51,7 @@ private:
 
 	_float2							m_SizeScoreBar2D = _float2(438.f, 156.f);
 	_float2							m_SizeScoreResult2D = _float2(720.f, 102.f);
-	_float2							m_SizeDigits2D = _float2(50.f, 60.f);
+	_float2							m_SizeDigits2D = _float2(72.f, 72.f);
 	// Score-Digits
 	_float							m_fScore = _float();
 	array<_int, 3>					m_arrScoreDigits;
@@ -62,10 +64,9 @@ private:
 
 	_bool							m_bRenderTotalScore = false;
 
-
 	// -------------- for IMGUI
 	array<_float2,   TEXTURECNT>	m_arrOriginalSize;
-	array<_float,    TEXTURECNT>	m_arrSizeRatio;
+	array<_float2,   TEXTURECNT>	m_arrSizeRatio;
 	_float2							m_posTemp = _float2();
 
 public:

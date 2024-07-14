@@ -5,6 +5,7 @@
 #include "Dee_Part.h"
 #include "Dee_State.h"
 #include "UI_MessageWindow.h"
+#include "Camera_Main.h"
 
 CFoodShopDee::CFoodShopDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CWaddleDee{ pDevice, pContext }
@@ -147,21 +148,28 @@ void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 {
 	m_bIsKirbyInZone = true;
 	m_fResetHiTime = 5.f;
-
+	
+	static _bool bOnce = false;
 	//DEE NPC 상호작용 시, MessageWindow UI 출력
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
+	if (bOnce == false && m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
 	{
 		// 07.14) 크래시 버그 수정 (Layer 명확하게 검색)
 		CUI_MessageWindow* pMWindow =  dynamic_cast<CUI_MessageWindow*>
 			(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_Parttimer_Dee")));
 		CHECK_NULLPTR(pMWindow);
 		pMWindow->Show_DialogMessage();
+
+		CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+		CHECK_NULLPTR(pCameraMain);
+		pCameraMain->Lock_All({ 12.f, 30.f, 1.9f }, { 0.09f, -0.18f, 0.98f }, true);
+
+		bOnce = true;
 	}
 }
 
 HRESULT CFoodShopDee::Add_Components()
 {
-	HRESULT hr;
+	HRESULT hr(S_OK);
 
 
 	//쉐이더
