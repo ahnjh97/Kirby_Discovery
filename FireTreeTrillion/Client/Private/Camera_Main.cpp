@@ -938,7 +938,7 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 
 
 	//카메라 보는 기준점 위로 올려주는 놈
-	if (*m_pCurrentLevelID == LEVEL_INTRO || *m_pCurrentLevelID == LEVEL_FINALE)
+	if (*m_pCurrentLevelID == LEVEL_PARTTIME || *m_pCurrentLevelID == LEVEL_FINALE)
 	{
 		m_fDestUpOffset = m_CamTriggerUpOffsets[*m_pCurrentLevelID][m_iMatrixIndex];
 	}
@@ -1297,7 +1297,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ -.15f, 0.f, 1.f };
 		m_CamSeq.push_back(newAction);
-
+		  
 		newAction = {};
 		newAction.fTime = 0.f;
 		newAction.eCamCut = CUT_INTERPOLATE;

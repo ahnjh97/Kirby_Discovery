@@ -263,8 +263,8 @@ HRESULT CLoader::Start()
 
 		SetUp_ModelScaleRotation(LEVEL_STATIC);
 		hr = Loading_StaticComponentAll();
-
 		CHECK_FAILED(hr);
+
 		hr = Loading_For_Logo();
 	}
 	break;
@@ -272,7 +272,7 @@ HRESULT CLoader::Start()
 	case LEVEL_GAMEPLAY:
 		hr = Loading_For_GamePlay();
 		break;
-	// 05.20) UI Tool 레벨 추가
+
 	case LEVEL_TOOL_UI:
 		hr = Loading_For_Tool_UI();
 		break;
@@ -322,9 +322,7 @@ HRESULT CLoader::Start()
 	}
 
 	LeaveCriticalSection(&m_Critical_Section);
-
-	if (FAILED(hr))
-		return E_FAIL;
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -1307,7 +1305,6 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 	//if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
 	//	return E_FAIL;
 	Add_KirbyFaceTexture(eLevel);
-
 	#pragma region 와들디 주문 말풍선
 	hr = Add_Texture(eLevel, "OrderCloud", "UI/MGameFood/OrderCloud.png");
 	CHECK_FAILED(hr);
@@ -2208,14 +2205,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("StarBlockPiece", TYPE_NONANIM, 0.5f, 180.f);
 		m_vecModelInfo.emplace_back("StarBlockPieceStar", TYPE_NONANIM, 0.5f, 180.f);
 
-
 		// For Item
 		Load_ItemModels();
 		Load_KickableModels();
 
 		// 와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
-
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{
@@ -2260,8 +2255,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SpookStep", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("GhostGordo", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("Bomber", TYPE_ANIM, 1.f, 180.f);
-
 		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f);
+		
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
