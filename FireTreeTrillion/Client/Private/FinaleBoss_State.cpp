@@ -149,7 +149,7 @@ void CFinaleBoss_CutScene_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	else if (19 == pCenter->Get_CutScene())
 		pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT19, 50.f, false, false);
 	else if (20 == pCenter->Get_CutScene())
-		pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT20, 50.f, false, false);
+		pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT20, 50.f, false, true);
 
 
 

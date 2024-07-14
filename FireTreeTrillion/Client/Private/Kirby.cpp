@@ -235,7 +235,7 @@ void CKirby::Render_IMGUI()
 	}
 
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	ImGui::Text("m_isKirbyAttacking(overpower) : %d", m_isKirbyAttacking);
+	ImGui::Text("m_fHp : %.2f", m_fHp);
 	ImGui::Text("m_fCrashChargeTime : %.2f", INFO(m_fCrashChargeTime));
 	ImGui::Text("m_bBlockOtherVacuum : %d", INFO(m_bBlockOtherVacuum));
 	ImGui::Text("m_vLadderPoint.x : %.2f, m_vLadderPoint.y : %.2f m_vLadderPoint.z : %.2f", INFO(m_vLadderPoint).x, INFO(m_vLadderPoint).y, INFO(m_vLadderPoint).z);
@@ -426,7 +426,6 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				AbilityItemDesc.eAbilityType = m_eAbilityType;
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 				CHECK_FAILED(hr);
-
 				m_eAbilityType = ABILITY_DEFAULT;
 			}
 

@@ -814,6 +814,7 @@ HRESULT CLoader::Loading_For_DeeDeeDee()
 
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
+	hr = Add_Texture(eLevel, "HUD_BossName_DeeDeeDee", "UI/HUD/Boss/BossName_Dedede.png");
 
 	// 얼굴, 눈 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
@@ -1042,9 +1043,6 @@ HRESULT CLoader::Loading_For_Park()
 	
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 
-	//HUD_BOSSHPBAR
-	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
-
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
 
@@ -1103,6 +1101,8 @@ HRESULT CLoader::Loading_For_Simba()
 
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
+	hr = Add_Texture(eLevel, "HUD_BossName_Leongar", "UI/HUD/Boss/BossName_Leongar.png");
+
 
 	if (FAILED(Add_Texture(eLevel, "SimbaEye_Diffuse", "SimbaEye/Eye_BaseColor%d.dds", 3)))
 		return E_FAIL;
@@ -1174,6 +1174,8 @@ HRESULT CLoader::Loading_For_FinalBoss()
 
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
+	hr = Add_Texture(eLevel, "HUD_BossName_Elfilis", "UI/HUD/Boss/BossName_Elfilis.png");
+
 
 #pragma region SKYSPHERE::LEVEL_FINALBOSS
 
@@ -1253,9 +1255,6 @@ HRESULT CLoader::Loading_For_Finale()
 
 
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
-
-	//HUD_BOSSHPBAR
-	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
 
 #pragma region SKYSPHERE::LEVEL_FINALE
 

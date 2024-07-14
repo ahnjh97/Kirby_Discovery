@@ -44,6 +44,11 @@ private:
 	_float4x4				m_BarMatrix[UI_END];
 	_float3					m_vColor[UI_END];
 	_float					m_fAlpha = { 0.f };
+
+	CTexture*				m_pTextureNameCom = { nullptr };
+	_float4x4				m_NameMatrix;
+	_float					m_fNameOriginY = { 0.f };
+	_float3					m_vNameColor = { 0.f, 0.f, 0.f };
 private:
 	class CMonster*			m_pMyMonster = { nullptr };
 	_float4x4				m_ViewMatrix, m_ProjMatrix;
