@@ -153,7 +153,6 @@ void CCamera_Main::Lock_All(_float3 vPos, _float3 vLook, _bool bInterpolate)
 
 void CCamera_Main::Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS eFocus, _float3 vAnchorOffset, _float fInterpolateSpeed)
 {
-
 	if (nullptr == pTarget)
 		return;
 
@@ -304,7 +303,6 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 	m_EffectSocket = _float4x4::Identity;
 	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
-	Check_FinaleScene(fTimeDelta);
 }
 
 void CCamera_Main::Check_FinaleScene(_float fTimeDelta)
@@ -316,11 +314,20 @@ void CCamera_Main::Check_FinaleScene(_float fTimeDelta)
 		return;
 
 
-	//이전 인덱스 갱신하는데
+	//이전 인덱스 갱신
 	m_iPreSceneIdx = m_iCurSceneIdx;
 
-	//지금 신 변화 안 했고, 현재 인덱스와 동일하다면 아무런 변화 없음.
+	//현재 인덱스 확인
 	m_iCurSceneIdx = pCenter->Get_CutScene();
+
+
+	if (m_iPreSceneIdx != m_iCurSceneIdx
+		&& (m_iCurSceneIdx != QTE1 && m_iCurSceneIdx != QTE2 && m_iCurSceneIdx != QTE3))
+	{
+		Make_Sequence(CAMSEQ((_uint)SEQ_FINALECUT1 + m_iCurSceneIdx - 1));
+	}
+
+	/*
 
 	//시퀀스 a 시간 체크
 	if (1 <= m_iCurSceneIdx && !m_FinaleSeqATime.empty())
@@ -332,6 +339,7 @@ void CCamera_Main::Check_FinaleScene(_float fTimeDelta)
 		if (m_FinaleSeqATime.front() <= 0.f)
 		{
 			m_FinaleSeqATime.pop_front();
+
 			if (!m_FinaleSeqATime.empty())
 				Make_Sequence(CAMSEQ((_uint)SEQ_FINALECUT1 + 5 - m_FinaleSeqATime.size()));
 		}
@@ -394,65 +402,81 @@ void CCamera_Main::Check_FinaleScene(_float fTimeDelta)
 
 	if (20 == m_iCurSceneIdx && m_iPreSceneIdx != m_iCurSceneIdx)
 	{
-		/*m_FinaleSeqDTime.front() -= fTimeDelta;
+		m_FinaleSeqDTime.front() -= fTimeDelta;
 		m_fSeqPlayedTime = m_FinaleSeqDTime.front();
 
 		if (m_FinaleSeqDTime.front() <= 0.f)
 		{
 			m_FinaleSeqDTime.pop_front();
 
-			if (!m_FinaleSeqDTime.empty())*/
+			if (!m_FinaleSeqDTime.empty())
 		Make_Sequence(SEQ_FINALECUT20);
 		//}
 
 	}
-
-	/*
-	if (ISDEFAULTCNT(m_iSceneCnt) && m_iPreSceneIdx == m_iCurSceneIdx)
-		return;
-
-
-	//만약에 받았는데 다르다면, 카운트 값 초기화한다.
-	if (m_iPreSceneIdx != m_iCurSceneIdx)
-		m_iSceneCnt = 2;
-
-	if (ISDEFAULTCNT(m_iSceneCnt))
-		return;
-
-
-
-	//지금 신 변화 하는 중이면 카운트 깎는다.
-	//다 깎였으면(2틱 돌았으면 여기서 시퀀스 세팅한다.)
-	if (0 < m_iSceneCnt)
-		m_iSceneCnt--;
-	else
-	{
-		//여기에서 make seq 한다.
-		//if (m_iCurSceneIdx == QTE1)
-		//{
-		//	CAMACTION newAction = {};
-		//	Fill_HardCutSet(newAction, 0.f);
-
-		//	Fill_ActionDir(newAction, DIR_ABSOLUTE,
-		//		FINALEKIRBY->m_vBonePos + _float3{ .5f, .15f, -.3f });
-		//	newAction.vDir.Normalize();
-
-		//	Fill_ActionPos(newAction, POS_ABSOLUTE,
-		//		FINALEKIRBY->m_vBonePos + newAction.vDir * 20.f);
-
-
-
-		//	newAction.fFOVY = 50.f;
-		//	Make_One_Sequence(newAction);
-
-		//}
-
-
-		//값 초기화
-		m_iSceneCnt = -1;
-	}
 	*/
+}
 
+
+void CCamera_Main::Check_FinaleTime(_float fTimeDelta)
+{
+	CFinaleCut_ControlCenter* pCenter =
+		static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
+	if (nullptr == pCenter)
+		return;
+
+	//이전 인덱스 갱신하는데
+	m_iPreSceneIdx = m_iCurSceneIdx;
+
+	//지금 신 변화 안 했고, 현재 인덱스와 동일하다면 아무런 변화 없음.
+	m_iCurSceneIdx = pCenter->Get_CutScene();
+
+	//시퀀스 a 시간 체크
+	if (1 <= m_iCurSceneIdx && !m_FinaleSeqATime.empty())
+	{
+		m_FinaleSeqATime.front() -= fTimeDelta;
+
+		m_fSeqPlayedTime = m_FinaleSeqATime.front();
+
+		if (m_FinaleSeqATime.front() <= 0.f)
+		{
+			m_FinaleSeqATime.pop_front();
+
+			if (!m_FinaleSeqATime.empty())
+				pCenter->Set_CutScene(1 + (5 - m_FinaleSeqATime.size()));
+		}
+
+	}
+
+	if (7 <= m_iCurSceneIdx && !m_FinaleSeqBTime.empty())
+	{
+		m_FinaleSeqBTime.front() -= fTimeDelta;
+		m_fSeqPlayedTime = m_FinaleSeqBTime.front();
+
+		if (m_FinaleSeqBTime.front() <= 0.f)
+		{
+			m_FinaleSeqBTime.pop_front();
+
+			if (!m_FinaleSeqBTime.empty())
+				pCenter->Set_CutScene(7 + (6 - m_FinaleSeqBTime.size()));
+		}
+
+	}
+
+	if (14 <= m_iCurSceneIdx && !m_FinaleSeqCTime.empty())
+	{
+		m_FinaleSeqCTime.front() -= fTimeDelta;
+		m_fSeqPlayedTime = m_FinaleSeqCTime.front();
+
+		if (m_FinaleSeqCTime.front() <= 0.f)
+		{
+			m_FinaleSeqCTime.pop_front();
+
+			if (!m_FinaleSeqCTime.empty())
+				pCenter->Set_CutScene(14 + (3 - m_FinaleSeqCTime.size()));
+		}
+
+	}
 }
 
 void CCamera_Main::Fill_HardCutSet(CAMACTION& Action, _float fTime)
@@ -518,6 +542,8 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 
 	System_Tick(fTimeDelta);
 
+	Check_FinaleScene(fTimeDelta);
+
 	Control(fRealTimeDelta);
 
 	//후보정 카메라 설정 값을 초기화한다.
@@ -548,7 +574,7 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 
 void CCamera_Main::Late_Tick(_float fTimeDelta)
 {
-
+	Check_FinaleTime(fTimeDelta);
 }
 
 //타겟 위치로부터 카메라 위치를 갱신, 보간한다.
@@ -2144,6 +2170,7 @@ void CCamera_Main::Reset_DeferredCamSet()
 			|| m_iCurSceneIdx == 8
 			|| m_iCurSceneIdx == 11
 			|| m_iCurSceneIdx == 12
+			|| m_iCurSceneIdx == 14
 			|| m_iCurSceneIdx == 15
 			|| m_iCurSceneIdx == 16
 			|| m_iCurSceneIdx == 17)
