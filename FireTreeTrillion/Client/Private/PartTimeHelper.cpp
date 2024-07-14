@@ -117,7 +117,7 @@ _bool CPartTimeHelper::Handle_LunchTime()
 	// 카메라이동하고 ui띄우고 다시 카메라 돌아오면 true반환해주시면 됩니다.
 	// true를 받으면 secondTimer로 돌아가고 있던 커비와 디가 다시 움직이기 시작합니다~
 
-	m_pCamera->Make_Sequence(CCamera_Main::SEQ_LUNCHTIME);
+	//m_pCamera->Make_Sequence(CCamera_Main::SEQ_LUNCHTIME);
 
 	return true;
 }

@@ -102,7 +102,10 @@ private:
 	array<_int, 3>				m_arrScoreDigits;
 
 	_float						m_fTimeDelta = 0.f;
-	
+
+	//점심시간용
+	_bool						m_bLunchTimeTrigger = { true };
+	_float						m_fLunchTimeStartTime = { 0.f };
 	// GAME-OVER 텍스트
 	_float						m_fSizeRatio = 0.f;
 	_float2						m_fStandardSize2D = _float2();
