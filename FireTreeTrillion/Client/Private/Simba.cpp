@@ -27,16 +27,6 @@ void CSimba::InsertHitboxActivationTiming(SIMBA_ANIM eAnimIdx, vector<tuple<_flo
 	m_mapHitBoxTiming.insert_or_assign(eAnimIdx, _vecTimings);
 }
 
-void CSimba::TransformToDefault()
-{
-	_float4x4 matWorld = m_matDefault;
-	matWorld._42 = m_matDefault._42 - 2.005f;
-	m_pTransformCom->Set_WorldMatrix(matWorld);
-	m_pControllerCom->Set_Position(m_pTransformCom, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-	m_pControllerCom->FreeFall(m_pTransformCom, m_pGameInstance->Get_SecondTimer(), 6.f, -0.3f);
-	m_bRenderMant = true;
-}
-
 HRESULT CSimba::Initialize_Prototype()
 {
 	m_eCollisionGroup = MONSTER;
@@ -85,7 +75,7 @@ HRESULT CSimba::Initialize(void* pArg)
 		m_vecMeshes.push_back(i);
 	}
 
-	m_pModelCom->Set_Animation(Simba_DemoAppear1Cut2, 66.66f, true, false);
+	m_pModelCom->Set_Animation(Simba_DemoAppear1Cut2, 66.66f, false, false);
 
 	m_pModelCom->EmplaceBackPartialAnim(Simba_DamageFaceSub);
 	m_pModelCom->EmplaceBackPartialAnim(Simba_LipSyncSub);
@@ -126,7 +116,8 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_pLipBone = m_pModelCom->Get_BonePtr("T_LLip0J");
 	Safe_AddRef(m_pLipBone);
 
-	m_setAppear1Anims = { Simba_DemoAppear1Cut2 };
+	m_setAppear1Anims = { Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait, Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait, 
+		Simba_DemoAppear1Cut4, Simba_DemoAppear1Cut4Wait };
 
 	return S_OK;
 }
@@ -142,6 +133,9 @@ _int CSimba::Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 	__super::Tick(m_fTimeDelta);
+
+	if (LEVEL_TOOL_ANIM == *m_pCurrentLevelID)
+		return OBJ_NOEVENT;
 
 	if (true == m_pModelCom->IsPartialAnimFinished())
 		m_bPlayPartialAnim = false;
@@ -363,15 +357,15 @@ HRESULT CSimba::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
-	m_vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
-	desc.vInitialPos = m_vPos;
+	desc.vInitialPos = vPos;
 	desc.fOffset = 1.255f;
 	desc.tCapsuleShape.fHeight = 0.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"), TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPos);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
 	/* FSM */
 	if(LEVEL_SIMBA == *m_pGameInstance->Get_CurrentLevelID())
@@ -451,7 +445,8 @@ void CSimba::SetUp_FSM()
 
 	m_pFSM = CFSM::Create();
 
-	m_pFSM->Add_State(Simba_DemoAppear1Cut2, CSimba_Appear1::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+	for (_uint i = Simba_DemoAppear1Cut10; i <= Simba_DemoAppear1Cut9Wait; i++)
+		m_pFSM->Add_State(i, CSimba_Appear1::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
 	m_pFSM->Add_State(Simba_DemoAppear2Cut1, CSimba_Appear2::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 	m_pFSM->Add_State(Simba_DemoAppear2Cut2, CSimba_Appear2::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
@@ -550,45 +545,83 @@ void CSimba::Reset_HitBoxTimingMap(SIMBA_ANIM eAnimIdx)
 	}
 }
 
+void CSimba::TransformToDefault(_float fOffsetY)
+{
+	_float4x4 matWorld = m_matDefault;
+	matWorld._42 = m_matDefault._42 - 2.005f;
+	m_pTransformCom->Set_WorldMatrix(matWorld);
+	m_pControllerCom->Set_Position(m_pTransformCom, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	m_pControllerCom->FreeFall(m_pTransformCom, m_pGameInstance->Get_SecondTimer(), 6.f, fOffsetY);
+	m_bRenderMant = true;
+}
+
 void CSimba::OnAppearStart(CGameObject* pObj)
 {
 	// 대사 시작
 	Change_State(Simba_DemoAppear1Cut2, 66.66f, false, false);
-	TransformToDefault();
+	TransformToDefault(0);
 }
 
 void CSimba::OnNextDialog1(CGameObject* pObj)
 {
-	TransformToDefault();
-	_int a = 0; // 상태변경
+	Change_State(Simba_DemoAppear1Cut4, 66.66f, false, true);
+	TransformToDefault(0);
 }
 
 void CSimba::OnNextDialog2(CGameObject* pObj)
 {
-	TransformToDefault();
-	_int a = 0; // 상태변경
+	Change_State(Simba_DemoAppear1Cut3, 66.66f, false, true);
+	TransformToDefault(0);
 }
 
 void CSimba::OnLastDialog(CGameObject* pObj)
 {
-	TransformToDefault();
-	_int a = 0; // 손 뻗는 애니메이션으로 상태변경
+	Change_State(Simba_DemoAppear1Cut10, 50.f, false, true);
+	TransformToDefault(0);
 }
 
 void CSimba::OnAppearEnd(CGameObject* pObj)
 {
-	// 몬스터 소환로직
+	Change_State(Simba_DemoAppear1Cut9, 50.f, false, true);
+	TransformToDefault(0);
+	SpawnMonsters(11);
 }
 
 void CSimba::OnWave1Dead(CGameObject* pObj)
 {
-	// 몬스터 소환로직
+	SpawnMonsters(12);
 }
 
 void CSimba::OnWave2Dead(CGameObject* pObj)
 {
 	Change_State(Simba_DemoAppear2Cut1, 66.66f, false, false);
-	TransformToDefault();
+	TransformToDefault(-0.3f);
+}
+
+void CSimba::SpawnMonsters(_uint iTriggerIndex)
+{
+	wstring wstrLayerTag = TEXT("Layer_Wave");
+	if (11 == iTriggerIndex)
+		wstrLayerTag += TEXT("1");
+	else if(12 == iTriggerIndex)
+		wstrLayerTag += TEXT("2");
+	
+	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
+
+	for (auto& monsterDesc : m_vecMonsterDescs)
+	{
+		if (iTriggerIndex == monsterDesc.eMonState)
+		{
+			wstring wstrTag;
+			if (TEXT("Awoofy") == monsterDesc.wstrModelName || TEXT("AwoofyWild") == monsterDesc.wstrModelName)
+				wstrTag = wstrPrototypeTag + TEXT("Awoofy");
+			else if(TEXT("Rabbit") == monsterDesc.wstrModelName || TEXT("RabbitBig") == monsterDesc.wstrModelName)
+				wstrTag = wstrPrototypeTag + TEXT("Rabbit");
+
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SIMBA, wstrLayerTag, wstrTag, &monsterDesc)))
+				return;
+		}
+	}
 }
 
 CSimba* CSimba::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

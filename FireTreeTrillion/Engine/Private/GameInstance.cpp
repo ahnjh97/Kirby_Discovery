@@ -546,7 +546,7 @@ CGameObject* CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring& wst
 	return m_pObject_Manager->Get_GameObject(iLevelIndex, wstrLayerTag);
 }
 
-CGameObject* CGameInstance::Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag)
+CGameObject* CGameInstance::Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, const wstring& _tag)
 {
 	CHECK_NULLPTR(m_pObject_Manager);
 	return m_pObject_Manager->Get_GameObject_ByTag(iLevelIndex, strLayerTag, _tag);

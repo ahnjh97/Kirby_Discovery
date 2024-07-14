@@ -120,18 +120,14 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 
 		if(LEVEL_SIMBA == *m_pCurrentLevelID)
 		{ 
-			if (3 == m_iCurMessageIndex && false ==  m_bNextDialog1Notified) {
-				m_bNextDialog1Notified = true;
+			if (3 == m_iCurMessageIndex)
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_NEXT_DIALOG1);
-			}
-			if (7 == m_iCurMessageIndex && false == m_bNextDialog2Notified) {
-				m_bNextDialog2Notified = true;
+			if (7 == m_iCurMessageIndex)
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_NEXT_DIALOG2);
-			}
-			if (m_iCurMessageIndex == m_tMessageDesc.vecMsg.size() - 1 && false == m_bLastDialogNotified) {
-				m_bLastDialogNotified = true;
+			if (m_iCurMessageIndex == m_tMessageDesc.vecMsg.size() - 1)
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_LAST_DIALOG);
-			}
+			if (m_iCurMessageIndex == m_tMessageDesc.vecMsg.size())
+				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_APPEAR_END);
 		}
 	}
 
@@ -570,7 +566,7 @@ void CUI_MessageWindow::Start_Message(CGameObject* pObj)
 	m_bNextDialog1Notified = false;
 	m_bNextDialog2Notified = false;
 	m_bLastDialogNotified = false;
-
+	m_eCurState = WINDOW_SHOW;
 	Show_DialogMessage();
 }
 

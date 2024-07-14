@@ -66,16 +66,16 @@ private:
 
 public:
 	void Set_SimbaEye(SIMBA_EYESTATE eEyeState) { m_eEyeState = eEyeState; }
-	_float4 Get_Pos() { return m_vPos; }
 
 	void InsertHitboxActivationTiming(SIMBA_ANIM eAnimIdx, vector<tuple<_float, _bool, COLLISION_VALUE>>& _vecTimings);
-	void TransformToDefault();
 
 	SIMBA_ANIM Get_PreState() { return m_ePreState; }
 	void Set_PreState(_uint _ePreState) { m_ePreState = SIMBA_ANIM(_ePreState); }
 
 	_bool Get_RenderMant() { return m_bRenderMant; }
 	void Set_RenderMant(_bool _bRenderMant) { m_bRenderMant = _bRenderMant; }
+
+	void RegisterMonstersToSimba(vector<MONSTER_DESC>& _vecMonsterDescs) { m_vecMonsterDescs = _vecMonsterDescs; }
 
 public:
 	virtual HRESULT Initialize_Prototype()			override;
@@ -116,12 +116,12 @@ private:
 	unordered_map<SIMBA_ANIM, vector<tuple<_float, _bool, COLLISION_VALUE>>> m_mapHitBoxTiming; // 애니메이션 인덱스와, 활성화시킬 KeyFrame들.
 
 	_float			m_fAngle = { 0.f };
-	_float4			m_vPos = {};
 	_float4x4		m_matDefault = {};
 	class CBone*	m_pLipBone = { nullptr };
 	_bool			m_bHpBarCreated = { false };
 
 	unordered_set<SIMBA_ANIM> m_setAppear1Anims;
+	vector<MONSTER_DESC> m_vecMonsterDescs;
 
 private:
 	HRESULT		Add_Components();
@@ -134,6 +134,8 @@ private:
 	void		Check_HitBoxActivation();
 	void		Reset_HitBoxTimingMap(SIMBA_ANIM eAnimIdx);
 
+	void		TransformToDefault(_float fOffsetY);
+
 	void		OnAppearStart(CGameObject* pObj);
 	void		OnNextDialog1(CGameObject* pObj);
 	void		OnNextDialog2(CGameObject* pObj);
@@ -141,6 +143,8 @@ private:
 	void		OnAppearEnd(CGameObject* pObj);
 	void		OnWave1Dead(CGameObject* pObj);
 	void		OnWave2Dead(CGameObject* pObj);
+
+	void		SpawnMonsters(_uint iTriggerIndex);
 
 public:
 	static CSimba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

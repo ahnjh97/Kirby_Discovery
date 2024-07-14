@@ -39,7 +39,7 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pMonDesc)))
 		return E_FAIL;
 
-	if (FAILED(Add_Components()))
+	if (FAILED(Add_Components(pMonDesc->wstrModelName)))
 		return E_FAIL;
 
 	if(MON_WAIT == m_eMonState)
@@ -56,8 +56,16 @@ HRESULT CAwoofy::Initialize(void* pArg)
 	m_eAbilityType = ABILITY_DEFAULT;
 	m_eEyeState = AWOOFYEYE_IDLE;
 
+	m_iEyeMeshIdx = m_pModelCom->Find_MeshIndex(string("Eye"));
+
 	Add_AnimEvent();
 
+	if (10 < m_eMonState) {
+		m_pModelCom->Set_Animation(AWOOFY_FIND, 40.f, false, false);
+		Change_State(AWOOFY_FIND, 40.f, false, false);
+		Set_Slope(false);
+	}
+		
 	return S_OK;
 }
 
@@ -135,7 +143,7 @@ HRESULT CAwoofy::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		if (Custom_Face(i) == true)
+		if (i == m_iEyeMeshIdx)
 			continue;
 
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
@@ -147,22 +155,13 @@ HRESULT CAwoofy::Render()
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
-		//¸öÅë(1)Àº normal O, ´«±î¸®(0)´Â normal x ÆÐ½º
-		if (i == 0 && m_bRenderBody)
-		{
-			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
-				return E_FAIL;
-			if (FAILED(m_pModelCom->Render(i)))
-				return E_FAIL;
-		}
-		else if (i == 1 && m_bRenderEye)
-		{
-			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
-				return E_FAIL;
-			if (FAILED(m_pModelCom->Render(i)))
-				return E_FAIL;
-		}
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render(i)))
+			return E_FAIL;
 	}
+
+	Custom_Face(m_iEyeMeshIdx);
 
 	return S_OK;
 }
@@ -304,7 +303,7 @@ void CAwoofy::Compute_Angle(_vector vOrginLook, _vector vTargetLook)
 
 _bool CAwoofy::Custom_Face(_uint iMeshIndex)
 {
-	if (iMeshIndex == 1)
+	if (iMeshIndex == m_iEyeMeshIdx)
 	{
 		HRESULT hr;
 
@@ -333,7 +332,7 @@ _bool CAwoofy::Custom_Face(_uint iMeshIndex)
 	return false;
 }
 
-HRESULT CAwoofy::Add_Components()
+HRESULT CAwoofy::Add_Components(const wstring& wstrModelName)
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -342,8 +341,8 @@ HRESULT CAwoofy::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_Model */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Awoofy"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	wstring wstrPrototypeTag = TEXT("Prototype_Component_Model_") + wstrModelName;
+	hr = __super::Add_Component(wstrPrototypeTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom;
@@ -359,6 +358,12 @@ HRESULT CAwoofy::Add_Components()
 	desc.vInitialPos = m_vPos;
 	desc.fOffset = 0.8f;
 	desc.tCapsuleShape.fHeight = 0.5f;
+	if (LEVEL_SIMBA == *m_pCurrentLevelID) {
+		desc.fOffset = 1.2f;
+		//desc.tCapsuleShape.fHeight = 0.01f;
+		desc.tCapsuleShape.fRadius = 0.9f;
+	}
+		
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);
@@ -376,7 +381,8 @@ HRESULT CAwoofy::Add_Components()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 	Set_BodyCollider(COLLIDER_CYLINDER, 1.f, 1.5f, 0.85f);
-
+	if (LEVEL_SIMBA == *m_pCurrentLevelID)
+		Set_BodyCollider(COLLIDER_CYLINDER, 1.5f, 2.15f, 0.85f);
 	return S_OK;
 }
 

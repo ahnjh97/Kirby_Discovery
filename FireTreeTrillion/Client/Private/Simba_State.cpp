@@ -5,15 +5,16 @@
 
 static _float s_fOffsetY = {};
 
-// *********************** APPEAR1 ***********************  // 구현해라 정현아
+// *********************** APPEAR1 ***********************  // 완료
 void CSimba_Appear1::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+	s_fOffsetY = 0.f;
 }
 
 void CSimba_Appear1::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
-	m_pController->FreeFall(m_pTransform, fTimeDelta);
+	m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
 
 	CSimba* pSimba = static_cast<CSimba*>(pGameObject);
 	if (true == pSimba->IsAnimFinished())
@@ -21,9 +22,21 @@ void CSimba_Appear1::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 		switch (pSimba->Get_State())
 		{
 		case CSimba::Simba_DemoAppear1Cut2:
+			pSimba->Change_State(CSimba::Simba_DemoAppear1Cut2Wait, 66.66f, true, false);
+			break;
+		case CSimba::Simba_DemoAppear1Cut3:
+			pSimba->Change_State(CSimba::Simba_DemoAppear1Cut3Wait, 66.66f, true, false);
+			break;
+		case CSimba::Simba_DemoAppear1Cut4:
+			pSimba->Change_State(CSimba::Simba_DemoAppear1Cut4Wait, 66.66f, true, false);
+			break;
+		case CSimba::Simba_DemoAppear1Cut9:
+			pSimba->Change_State(CSimba::Simba_DemoAppear1Cut9Wait, 66.66f, true, false);
+			break;
+		case CSimba::Simba_DemoAppear1Cut10:
+			pSimba->Change_State(CSimba::Simba_DemoAppear1Cut10Wait, 66.66f, true, false);
 			break;
 		}
-		pSimba->Change_State(CSimba::Simba_DemoAppear1Cut2, 66.66f, false, true);
 	}
 }
 

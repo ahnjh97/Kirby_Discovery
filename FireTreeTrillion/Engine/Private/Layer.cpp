@@ -60,7 +60,7 @@ CGameObject* CLayer::Get_GameObject()
 	return nullptr;
 }
 
-CGameObject* CLayer::Get_GameObject_ByTag(wstring _tag)
+CGameObject* CLayer::Get_GameObject_ByTag(const wstring& _tag)
 {
 	for (auto& obj : m_GameObjects)
 	{
