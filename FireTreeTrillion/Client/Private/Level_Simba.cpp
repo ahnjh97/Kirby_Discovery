@@ -66,6 +66,7 @@ HRESULT CLevel_Simba::Initialize()
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
+	//m_pGameInstance->ShowAllAnimations("Simba");
 
 	return S_OK;
 }

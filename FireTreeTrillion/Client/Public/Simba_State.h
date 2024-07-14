@@ -432,4 +432,32 @@ public:
 	virtual void Free() override { __super::Free(); Safe_Release(m_pController); Safe_Release(m_pTransform); Safe_Release(m_pKirby); Safe_Release(m_pKirbyTransform); }
 };
 
+// *********************** Death ***********************
+class CSimba_Death final : public CFSM_State
+{
+private:
+	CSimba_Death(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
+	{
+		m_pController = pController; m_pTransform = pTransform; m_pKirby = pKirby; m_pKirbyTransform = pKirbyTransform;
+		Safe_AddRef(m_pController); Safe_AddRef(m_pTransform); Safe_AddRef(m_pKirby); Safe_AddRef(m_pKirbyTransform);
+	}
+	virtual ~CSimba_Death() = default;
+
+public:
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset) override;
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override {}
+
+private:
+	CCharacterController* m_pController = { nullptr };
+	CTransform* m_pTransform = { nullptr };
+	CGameObject* m_pKirby = { nullptr };
+	CTransform* m_pKirbyTransform = { nullptr };
+
+public:
+	static	CSimba_Death* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
+		{ return new CSimba_Death(pController, pTransform, pKirby, pKirbyTransform); }
+	virtual void Free() override { __super::Free(); Safe_Release(m_pController); Safe_Release(m_pTransform); Safe_Release(m_pKirby); Safe_Release(m_pKirbyTransform); }
+};
+
 END

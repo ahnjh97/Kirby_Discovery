@@ -581,6 +581,12 @@ CComponent_Manager::PROTOTYPES* CGameInstance::Get_ComMap(_uint iLevelIdx)
 	return m_pComponent_Manager->Get_ComMap(iLevelIdx);
 }
 
+void CGameInstance::ShowAllAnimations(const string& strModelName)
+{
+	if (nullptr != m_pComponent_Manager)
+		m_pComponent_Manager->ShowAllAnimations(m_iCurrentLevelID, TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(strModelName));
+}
+
 HRESULT CGameInstance::Add_Timer(const wstring& strTimerTag)
 {
 	if (nullptr == m_pTimer_Manager)

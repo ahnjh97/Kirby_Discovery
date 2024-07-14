@@ -57,6 +57,8 @@ HRESULT CSimba::Initialize(void* pArg)
 
 	m_fMaxHp = 500.f;
 	m_fHp = 500.f;
+	m_fMaxHp = 50.f;
+	m_fHp = 50.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eEyeState = SIMBAEYE_LONG;
@@ -123,6 +125,8 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_setAppear1Anims = { Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait, Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait, 
 		Simba_DemoAppear1Cut4, Simba_DemoAppear1Cut4Wait };
 
+	m_setUndamagableAnims = { Simba_Death, Simba_DemoDeadCut1, Simba_DemoDeadCut2 };
+
 	return S_OK;
 }
 
@@ -172,11 +176,18 @@ _int CSimba::Tick(_float fTimeDelta)
 		}
 	}
 
-	if (m_fHpRatio < 0.45f && m_bPhaseTwo == false) {
+	if (m_fHp <= 0.f && false == m_bDeathAnimPlayed)
+	{
+		m_bDeathAnimPlayed = true;
+		TransformToDefault(0.f);
+		Change_State(Simba_Death, 2.f, false, true);
+	}
+
+	if (0.45f > m_fHpRatio && 0.f < m_fHpRatio && m_bPhaseTwo == false) {
 		m_bPhaseTwo = true;
 		Change_State(Simba_Damage, 50.f, false, true);
 	}
-		
+
 	return OBJ_NOEVENT;
 }
 
@@ -187,7 +198,8 @@ void CSimba::Late_Tick(_float fTimeDelta)
 
 	if (false == bIsFinished)
 	{
-		if (true == m_bPlayPartialAnim) {
+		_uint iAnimIdx = m_pModelCom->Get_CurAnimIndex();
+		if (true == m_bPlayPartialAnim && m_setUndamagableAnims.end() == m_setUndamagableAnims.find(SIMBA_ANIM(iAnimIdx))) {
 
 			_float fPartialAnimRatio = m_pModelCom->Get_PartialAnimRatio();
 			_float4x4 matLipTransformMatrix = m_pLipBone->Get_TransformationMatrix();
@@ -260,6 +272,23 @@ HRESULT CSimba::Render()
 			if (FAILED(m_pModelCom->Render(idx)))
 				return E_FAIL;
 		}
+	}
+
+	if (true == m_bRenderEyeLid)
+	{
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_iEyeLidMesh, TextureType_DIFFUSE)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", m_iEyeLidMesh, TextureType_NORMALS)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", m_iEyeLidMesh, TextureType_METALNESS)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", m_iEyeLidMesh)))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render(m_iEyeLidMesh)))
+			return E_FAIL;
 	}
 	
 	return S_OK;
@@ -503,6 +532,9 @@ void CSimba::SetUp_FSM()
 	for (_uint i = Simba_DimensionLaser; i <= Simba_DimensionLaserWait; i++)
 		m_pFSM->Add_State(i, CSimba_DimensionLaser::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
+	m_pFSM->Add_State(Simba_Death, CSimba_Death::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+	m_pFSM->Add_State(Simba_DemoDeadCut1, CSimba_Death::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+	m_pFSM->Add_State(Simba_DemoDeadCut2, CSimba_Death::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
 	//상태 Initialize
 	CFSM::FSM_INFO	FSM_Desc = {};
@@ -586,13 +618,13 @@ void CSimba::TransformToDefault(_float fOffsetY)
 	m_pTransformCom->Set_WorldMatrix(matWorld);
 	m_pControllerCom->Set_Position(m_pTransformCom, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 	m_pControllerCom->FreeFall(m_pTransformCom, m_pGameInstance->Get_SecondTimer(), 6.f, fOffsetY);
-	m_bRenderMant = true;
 	m_bPhaseTwo = false;
 }
 
 void CSimba::OnAppearStart(CGameObject* pObj)
 {
 	// 대사 시작
+	m_bRenderMant = true;
 	Change_State(Simba_DemoAppear1Cut2, 66.66f, false, false);
 	TransformToDefault(0);
 }
@@ -629,6 +661,8 @@ void CSimba::OnWave1Dead(CGameObject* pObj)
 
 void CSimba::OnWave2Dead(CGameObject* pObj)
 {
+	m_bRenderMant = true;
+	m_bRenderEyeLid = false;
 	Change_State(Simba_DemoAppear2Cut1, 66.66f, false, false);
 	TransformToDefault(-0.3f);
 }

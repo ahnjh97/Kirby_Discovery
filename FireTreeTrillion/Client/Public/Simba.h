@@ -80,6 +80,9 @@ public:
 
 	void RegisterMonstersToSimba(vector<MONSTER_DESC>& _vecMonsterDescs) { m_vecMonsterDescs = _vecMonsterDescs; }
 
+	_bool Get_RenderEyeLid() { return m_bRenderEyeLid; }
+	void Set_RenderEyeLid(_bool _bRenderEyeLid) { m_bRenderEyeLid = _bRenderEyeLid; }
+
 public:
 	virtual HRESULT Initialize_Prototype()			override;
 	virtual HRESULT Initialize(void* pArg)			override;
@@ -128,10 +131,14 @@ private:
 	_bool			m_bHpBarCreated = { false };
 
 	unordered_set<SIMBA_ANIM> m_setAppear1Anims;
+	unordered_set<SIMBA_ANIM> m_setUndamagableAnims;
+
 	vector<MONSTER_DESC> m_vecMonsterDescs;
 
 	_float			m_fHpRatio = { 1.f };
 	_bool			m_bPhaseTwo = { false };
+	_bool			m_bDeathAnimPlayed = { false };
+	_bool			m_bRenderEyeLid = { false };
 
 private:
 	HRESULT		Add_Components();

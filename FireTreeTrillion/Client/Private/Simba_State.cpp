@@ -2,6 +2,7 @@
 #include "Simba_State.h"
 #include "Simba.h"
 #include "Kirby.h"
+#include "EventCenter.h"
 
 static _float s_fOffsetY = {};
 static _uint s_iAttackCount = {};
@@ -293,7 +294,8 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 				pSimba->Change_State(CSimba::Simba_AttackJumpPre, 50.f, false, true); // 점프공격
 			}
 			else
-				pSimba->Change_State(CSimba::Simba_BackStepStart, 70.f, false, true); 
+				//pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 50.f, false, true);
+				pSimba->Change_State(CSimba::Simba_BackStepStart, 70.f, false, true);
 			break;
 		}
 	}
@@ -320,7 +322,7 @@ void CSimba_Jump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	else if (CSimba::Simba_Jump == iState)
 	{
 		m_pController->Jump(m_pTransform, m_fJumpPower, fTimeDelta);
-		m_fJumpPower -= GRAVITY * fTimeDelta * 27.f;
+		m_fJumpPower -= GRAVITY * fTimeDelta * 33.3f;
 	
 		_float fDis = m_pGameInstance->Compute_Distance(m_pKirby, pSimba);
 		_vector vLook = m_pTransform->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * fDis * 1.5f;
@@ -495,7 +497,6 @@ void CSimba_Roar::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 		// 커비기준 오른쪽에 있을때
 		//pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 50.f, false, true);
 	}
-		
 }
 
 // *********************** BiteRushJump *********************** // 이동로직 필요, 각도에 따라 BiteRushStart / BiteRushStartStraight 판단로직 필요
@@ -527,7 +528,7 @@ void CSimba_BiteRushJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			pSimba->Turn_RotationBoneMatrix(0);
 
 			if (CSimba::Simba_Roar2 == iPreState)
-				pSimba->Change_State(CSimba::Simba_DimensionClawStart, 50.f, false, true);
+				pSimba->Change_State(CSimba::Simba_DimensionClawStart, 60.f, false, true);
 			else if(CSimba::Simba_DimensionClawEnd == iPreState)
 			{
 				pSimba->Turn_RotationBoneMatrix(-8.f);
@@ -535,7 +536,7 @@ void CSimba_BiteRushJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 				//pSimba->Change_State(CSimba::Simba_BiteRushStartStraight, 50.f, false, true);
 			}
 			else if (CSimba::Simba_DimensionLaserEnd == iPreState)
-				pSimba->Change_State(CSimba::Simba_DimensionClawStart, 50.f, false, true);
+				pSimba->Change_State(CSimba::Simba_DimensionClawStart, 60.f, false, true);
 		}
 	}
 }
@@ -557,24 +558,24 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	if (pSimba->IsAnimFinished())
 	{
 		if (CSimba::Simba_DimensionClawStart == iState)
-			pSimba->Change_State(CSimba::Simba_DimensionClaw, 50.f, false, false);
+			pSimba->Change_State(CSimba::Simba_DimensionClaw, 60.f, false, false);
 		
 		else if (CSimba::Simba_DimensionClaw == iState) {
-			pSimba->Change_State(CSimba::Simba_DimensionClawStartContinue, 50.f, false, false);
+			pSimba->Change_State(CSimba::Simba_DimensionClawStartContinue, 60.f, false, false);
 			s_iAttackCount++;
 		}
 
 		else if (CSimba::Simba_DimensionClawStartContinue == iState) {
-			pSimba->Change_State(CSimba::Simba_DimensionClawContinue, 50.f, false, false);
+			pSimba->Change_State(CSimba::Simba_DimensionClawContinue, 60.f, false, false);
 			s_iAttackCount++;
 		}
 
 		else if (CSimba::Simba_DimensionClawContinue == iState)
 		{
 			if(3 > s_iAttackCount)
-				pSimba->Change_State(CSimba::Simba_DimensionClawStartContinue, 50.f, false, false);
+				pSimba->Change_State(CSimba::Simba_DimensionClawStartContinue, 60.f, false, false);
 			else
-				pSimba->Change_State(CSimba::Simba_DimensionClawEnd, 50.f, false, false);
+				pSimba->Change_State(CSimba::Simba_DimensionClawEnd, 60.f, false, false);
 		}
 
 		else if (CSimba::Simba_DimensionClawEnd == iState)
@@ -606,8 +607,14 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 		_vector vLook = m_pTransform->Get_State(CTransform::STATE_LOOK);
 		_vector vLook2 = CUtils::TurnDirectionVector(vLook, _float3(0, 1, 0), 30.f);
 		_vector vLook3 = CUtils::TurnDirectionVector(vLook, _float3(0, 1, 0), -30.f);
-		if (20.f > m_pController->RayCastToStaticActor(vLook) || 20.f > m_pController->RayCastToStaticActor(vLook2)
-			|| 20.f > m_pController->RayCastToStaticActor(vLook3))
+
+		_vector vDir = XMVector3Normalize(vLook) * fTimeDelta * 13.5f;
+		m_pController->Move_Dir(m_pTransform, vDir, fTimeDelta, s_fOffsetY);
+		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 3.f);
+
+		_float fDis = 10.f;
+		if (fDis > m_pController->RayCastToStaticActor(vLook) || fDis > m_pController->RayCastToStaticActor(vLook2)
+			|| fDis > m_pController->RayCastToStaticActor(vLook3))
 			pSimba->Change_State(CSimba::Simba_BiteRushEnd, 50.f, false, true);
 	}
 
@@ -618,7 +625,7 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 		else if (CSimba::Simba_BiteRushEnd == iState) {
 			pSimba->Turn_RotationBoneMatrix(0.f);
 			pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 50.f, false, true);
-		}	
+		}
 	}
 }
 
@@ -637,17 +644,46 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	if (pSimba->IsAnimFinished())
 	{
 		if (CSimba::Simba_DimensionLaserStart == iState)
-			pSimba->Change_State(CSimba::Simba_DimensionLaser, 50.f, false, false);
+			pSimba->Change_State(CSimba::Simba_DimensionLaser, 60.f, false, false);
 		else if (CSimba::Simba_DimensionLaser == iState)
-			pSimba->Change_State(CSimba::Simba_DimensionLaserEnd, 50.f, false, false);
+			pSimba->Change_State(CSimba::Simba_DimensionLaserEnd, 60.f, false, false);
 		else if (CSimba::Simba_DimensionLaserEnd == iState)
 		{
 			pSimba->Set_PreState(iState);
 			pSimba->Turn_RotationBoneMatrix(-6.5f);
 			// 커비기준 왼쪽에 있을때
-			pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);
+			pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 60.f, false, true);
 			// 커비기준 오른쪽에 있을때
-			//pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 50.f, false, true);
+			//pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 60.f, false, true);
 		}
+	}
+}
+
+// *********************** Death *********************** // 완료
+void CSimba_Death::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+}
+
+void CSimba_Death::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
+
+	CSimba* pSimba = static_cast<CSimba*>(pGameObject);
+	_uint iState = pSimba->Get_State();
+	if (CSimba::Simba_DemoDeadCut2 == iState && 0.83f < pSimba->Get_AnimRatio())
+	{
+		if (false == pSimba->Get_RenderEyeLid())
+			pSimba->Set_RenderEyeLid(true);
+	}
+
+	if (pSimba->IsAnimFinished())
+	{
+		if (CSimba::Simba_Death == iState) {
+			pSimba->Change_State(CSimba::Simba_DemoDeadCut1, 50.f, false, true);
+			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_THRONEBREAK);
+		}
+		else if (CSimba::Simba_DemoDeadCut1 == iState)
+			pSimba->Change_State(CSimba::Simba_DemoDeadCut2, 60.f, false, false);
 	}
 }

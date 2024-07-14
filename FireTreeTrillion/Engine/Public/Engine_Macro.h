@@ -97,6 +97,9 @@
 #define MSG_BOX(message)										\
 ::MessageBox(nullptr, message, L"error", MB_OK)
 
+#define MB(text, caption)										\
+::MessageBox(nullptr, text, caption, MB_OK)					
+
 #define NO_COPY(ClassName)										\
 ClassName(const ClassName&) = delete;							\
 ClassName& operator=(const ClassName&) = delete;
