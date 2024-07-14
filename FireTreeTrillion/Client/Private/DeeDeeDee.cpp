@@ -43,7 +43,7 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 
 	m_fMaxHp = 200.f;
 	//m_fHp = 200.f;
-	m_fHp = 10.f; //디버깅용 세팅
+	m_fHp = 10.f;
 	m_fAttack = 15.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eAbilityType = ABILITY_DEFAULT;
