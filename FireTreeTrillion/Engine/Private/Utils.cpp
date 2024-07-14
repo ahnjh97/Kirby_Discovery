@@ -184,6 +184,17 @@ _float3 CUtils::SlerpDirVec(_float3 vStart, _float3 vEnd, _float fRatio)
 	return XMVector3Normalize( vStart * cosf(fTheta) + vRelative * sinf(fTheta) );
 }
 
+_vector CUtils::TurnDirectionVector(_fvector vDirVec, _float3 vAxis, _float fAngle)
+{
+	_float fRadian = XMConvertToRadians(fAngle);
+	_vector vRotationAxis = XMVectorSet(vAxis.x, vAxis.y, vAxis.z, 0.0f);
+	_matrix matRotation = XMMatrixRotationAxis(vRotationAxis, fRadian);
+
+	_vector vResult = XMVector3TransformNormal(vDirVec, matRotation);
+
+	return vResult;
+}
+
 void CUtils::Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, _fvector vState)
 {
 	_float4		vTemp;

@@ -27,16 +27,6 @@ void CSimba::InsertHitboxActivationTiming(SIMBA_ANIM eAnimIdx, vector<tuple<_flo
 	m_mapHitBoxTiming.insert_or_assign(eAnimIdx, _vecTimings);
 }
 
-void CSimba::TransformToDefault()
-{
-	_float4x4 matWorld = m_matDefault;
-	matWorld._42 = m_matDefault._42 - 2.005f;
-	m_pTransformCom->Set_WorldMatrix(matWorld);
-	m_pControllerCom->Set_Position(m_pTransformCom, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-	m_pControllerCom->FreeFall(m_pTransformCom, m_pGameInstance->Get_SecondTimer(), 6.f, -0.3f);
-	m_bRenderMant = true;
-}
-
 HRESULT CSimba::Initialize_Prototype()
 {
 	m_eCollisionGroup = MONSTER;
@@ -67,6 +57,8 @@ HRESULT CSimba::Initialize(void* pArg)
 
 	m_fMaxHp = 500.f;
 	m_fHp = 500.f;
+	m_fMaxHp = 50.f;
+	m_fHp = 50.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eEyeState = SIMBAEYE_LONG;
@@ -85,7 +77,7 @@ HRESULT CSimba::Initialize(void* pArg)
 		m_vecMeshes.push_back(i);
 	}
 
-	m_pModelCom->Set_Animation(Simba_DemoAppear1Cut2, 66.66f, true, true);
+	m_pModelCom->Set_Animation(Simba_DemoAppear1Cut2, 66.66f, false, false);
 
 	m_pModelCom->EmplaceBackPartialAnim(Simba_DamageFaceSub);
 	m_pModelCom->EmplaceBackPartialAnim(Simba_LipSyncSub);
@@ -96,6 +88,15 @@ HRESULT CSimba::Initialize(void* pArg)
 	function<void(CGameObject*)> func{};
 	func = bind(&CSimba::OnAppearStart, this, placeholders::_1);
 	pEventCenter->Subscribe(KEVENT_SIMBA_APPEAR_START, this, func);
+
+	func = bind(&CSimba::OnNextDialog1, this, placeholders::_1);
+	pEventCenter->Subscribe(KEVENT_SIMBA_NEXT_DIALOG1, this, func);
+
+	func = bind(&CSimba::OnNextDialog2, this, placeholders::_1);
+	pEventCenter->Subscribe(KEVENT_SIMBA_NEXT_DIALOG2, this, func);
+
+	func = bind(&CSimba::OnLastDialog, this, placeholders::_1);
+	pEventCenter->Subscribe(KEVENT_SIMBA_LAST_DIALOG, this, func);
 
 	func = bind(&CSimba::OnAppearEnd, this, placeholders::_1);
 	pEventCenter->Subscribe(KEVENT_SIMBA_APPEAR_END, this, func);
@@ -117,7 +118,14 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_pLipBone = m_pModelCom->Get_BonePtr("T_LLip0J");
 	Safe_AddRef(m_pLipBone);
 
-	//m_setAppear1Anims = {}
+	m_pRotationBone = m_pModelCom->Get_BonePtr("RotL");
+	Safe_AddRef(m_pRotationBone);
+	m_pRotationBoneMatrix = m_pRotationBone->Get_EditMatrixPtr();
+
+	m_setAppear1Anims = { Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait, Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait, 
+		Simba_DemoAppear1Cut4, Simba_DemoAppear1Cut4Wait };
+
+	m_setUndamagableAnims = { Simba_Death, Simba_DemoDeadCut1, Simba_DemoDeadCut2 };
 
 	return S_OK;
 }
@@ -127,12 +135,17 @@ _int CSimba::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return Ready_Dead();
 
+	m_fHpRatio =  m_fHp / m_fMaxHp;
+
 	if (true == m_pModelCom->IsFinished() || m_pModelCom->Get_Trackposition() == 0.f) // IsAnimFinished
 		Reset_HitBoxTimingMap(SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex()));
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 	__super::Tick(m_fTimeDelta);
+
+	if (LEVEL_TOOL_ANIM == *m_pCurrentLevelID)
+		return OBJ_NOEVENT;
 
 	if (true == m_pModelCom->IsPartialAnimFinished())
 		m_bPlayPartialAnim = false;
@@ -148,25 +161,32 @@ _int CSimba::Tick(_float fTimeDelta)
 				iNewAnimIndex = 0;
 			m_pModelCom->Set_Animation(iNewAnimIndex, 40.f, true, false);
 		}
-		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD1, KEY_DOWN))
-			Activate_Attack();
-		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD2, KEY_DOWN))
-			Activate_Attack(ATTACK2);
-		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD3, KEY_DOWN))
-			Activate_Attack(ATTACK3);
-		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD7, KEY_DOWN)) {
-			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSub, 50.f, false, false);
-			m_bPlayPartialAnim = true;
-		}
-		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD8, KEY_DOWN)) {
-			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSubA, 50.f, false, false);
-			m_bPlayPartialAnim = true;
+		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD1, KEY_DOWN)) {
+			m_bPhaseTwo = true;
+			Change_State(Simba_Damage, 50.f, false, true);
 		}
 	}
 
 	Check_HitBoxActivation();
 
-	//if()
+	if (m_setAppear1Anims.end() != m_setAppear1Anims.find(SIMBA_ANIM(Get_State())) && m_pGameInstance->Get_KeyState(DIK_A, KEY_DOWN)) {
+		if (false == m_bPlayPartialAnim) {
+			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSub, 50.f, false, false);
+			m_bPlayPartialAnim = true;
+		}
+	}
+
+	if (m_fHp <= 0.f && false == m_bDeathAnimPlayed)
+	{
+		m_bDeathAnimPlayed = true;
+		TransformToDefault(0.f);
+		Change_State(Simba_Death, 2.f, false, true);
+	}
+
+	if (0.45f > m_fHpRatio && 0.f < m_fHpRatio && m_bPhaseTwo == false) {
+		m_bPhaseTwo = true;
+		Change_State(Simba_Damage, 50.f, false, true);
+	}
 
 	return OBJ_NOEVENT;
 }
@@ -178,7 +198,8 @@ void CSimba::Late_Tick(_float fTimeDelta)
 
 	if (false == bIsFinished)
 	{
-		if (true == m_bPlayPartialAnim) {
+		_uint iAnimIdx = m_pModelCom->Get_CurAnimIndex();
+		if (true == m_bPlayPartialAnim && m_setUndamagableAnims.end() == m_setUndamagableAnims.find(SIMBA_ANIM(iAnimIdx))) {
 
 			_float fPartialAnimRatio = m_pModelCom->Get_PartialAnimRatio();
 			_float4x4 matLipTransformMatrix = m_pLipBone->Get_TransformationMatrix();
@@ -252,6 +273,23 @@ HRESULT CSimba::Render()
 				return E_FAIL;
 		}
 	}
+
+	if (true == m_bRenderEyeLid)
+	{
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_iEyeLidMesh, TextureType_DIFFUSE)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", m_iEyeLidMesh, TextureType_NORMALS)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", m_iEyeLidMesh, TextureType_METALNESS)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", m_iEyeLidMesh)))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render(m_iEyeLidMesh)))
+			return E_FAIL;
+	}
 	
 	return S_OK;
 }
@@ -324,6 +362,19 @@ void CSimba::CreateHpBar()
 	}
 }
 
+void CSimba::Turn_RotationBoneMatrix(_float fAngle)
+{
+	_float4x4 RotationMatrix = _float4x4::Identity;
+	if (0 == fAngle) 
+	{
+		*m_pRotationBoneMatrix = RotationMatrix;
+		return;
+	}
+
+	CUtils::Turn_OtherMatrix(RotationMatrix, _float4(1, 0, 0, 0), 1.f, fAngle);
+	*m_pRotationBoneMatrix = RotationMatrix;
+}
+
 HRESULT CSimba::Add_Components()
 {
 	HRESULT hr;
@@ -349,15 +400,15 @@ HRESULT CSimba::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
-	m_vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
-	desc.vInitialPos = m_vPos;
+	desc.vInitialPos = vPos;
 	desc.fOffset = 1.255f;
 	desc.tCapsuleShape.fHeight = 0.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"), TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	CHECK_FAILED(hr);
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPos);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
 	/* FSM */
 	if(LEVEL_SIMBA == *m_pGameInstance->Get_CurrentLevelID())
@@ -437,7 +488,8 @@ void CSimba::SetUp_FSM()
 
 	m_pFSM = CFSM::Create();
 
-	m_pFSM->Add_State(Simba_DemoAppear1Cut2, CSimba_Appear1::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+	for (_uint i = Simba_DemoAppear1Cut10; i <= Simba_DemoAppear1Cut9Wait; i++)
+		m_pFSM->Add_State(i, CSimba_Appear1::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
 	m_pFSM->Add_State(Simba_DemoAppear2Cut1, CSimba_Appear2::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 	m_pFSM->Add_State(Simba_DemoAppear2Cut2, CSimba_Appear2::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
@@ -453,6 +505,7 @@ void CSimba::SetUp_FSM()
 
 	m_pFSM->Add_State(Simba_Jump, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 	m_pFSM->Add_State(Simba_JumpStart, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+	m_pFSM->Add_State(Simba_Fall, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 	m_pFSM->Add_State(Simba_Landing, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
 	for(_uint i = Simba_BackStep; i <= Simba_BackStepStart; i++)
@@ -460,6 +513,28 @@ void CSimba::SetUp_FSM()
 
 	for(_uint i = Simba_AttackJump; i <= Simba_AttackJumpWait; i++)
 		m_pFSM->Add_State(i, CSimba_AttackJump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
+	m_pFSM->Add_State(Simba_Damage, CSimba_Damage::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
+	m_pFSM->Add_State(Simba_Roar2, CSimba_Roar::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
+	for(_uint i = Simba_BiteRushJumpL; i<= Simba_BiteRushLandingR; i++)
+		m_pFSM->Add_State(i, CSimba_BiteRushJump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
+	for(_uint i = Simba_DimensionClaw; i<= Simba_DimensionClawWait; i++)
+		m_pFSM->Add_State(i, CSimba_DimensionClaw::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
+	for(_uint i = Simba_BiteRush; i<= Simba_BiteRushEnd; i++)
+		m_pFSM->Add_State(i, CSimba_BiteRush::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+	for (_uint i = Simba_BiteRushStart; i <= Simba_BiteRushStartStraight; i++)
+		m_pFSM->Add_State(i, CSimba_BiteRush::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
+	for (_uint i = Simba_DimensionLaser; i <= Simba_DimensionLaserWait; i++)
+		m_pFSM->Add_State(i, CSimba_DimensionLaser::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
+	m_pFSM->Add_State(Simba_Death, CSimba_Death::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+	m_pFSM->Add_State(Simba_DemoDeadCut1, CSimba_Death::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+	m_pFSM->Add_State(Simba_DemoDeadCut2, CSimba_Death::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
 	//상태 Initialize
 	CFSM::FSM_INFO	FSM_Desc = {};
@@ -536,25 +611,86 @@ void CSimba::Reset_HitBoxTimingMap(SIMBA_ANIM eAnimIdx)
 	}
 }
 
+void CSimba::TransformToDefault(_float fOffsetY)
+{
+	_float4x4 matWorld = m_matDefault;
+	matWorld._42 = m_matDefault._42 - 2.005f;
+	m_pTransformCom->Set_WorldMatrix(matWorld);
+	m_pControllerCom->Set_Position(m_pTransformCom, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	m_pControllerCom->FreeFall(m_pTransformCom, m_pGameInstance->Get_SecondTimer(), 6.f, fOffsetY);
+	m_bPhaseTwo = false;
+}
+
 void CSimba::OnAppearStart(CGameObject* pObj)
 {
-	// 대사 웅얼웅얼 
+	// 대사 시작
+	m_bRenderMant = true;
+	Change_State(Simba_DemoAppear1Cut2, 66.66f, false, false);
+	TransformToDefault(0);
+}
+
+void CSimba::OnNextDialog1(CGameObject* pObj)
+{
+	Change_State(Simba_DemoAppear1Cut4, 66.66f, false, true);
+	TransformToDefault(0);
+}
+
+void CSimba::OnNextDialog2(CGameObject* pObj)
+{
+	Change_State(Simba_DemoAppear1Cut3, 66.66f, false, true);
+	TransformToDefault(0);
+}
+
+void CSimba::OnLastDialog(CGameObject* pObj)
+{
+	Change_State(Simba_DemoAppear1Cut10, 50.f, false, true);
+	TransformToDefault(0);
 }
 
 void CSimba::OnAppearEnd(CGameObject* pObj)
 {
-	// 몬스터 소환로직
+	Change_State(Simba_DemoAppear1Cut9, 50.f, false, true);
+	TransformToDefault(0);
+	SpawnMonsters(11);
 }
 
 void CSimba::OnWave1Dead(CGameObject* pObj)
 {
-	// 몬스터 소환로직
+	SpawnMonsters(12);
 }
 
 void CSimba::OnWave2Dead(CGameObject* pObj)
 {
+	m_bRenderMant = true;
+	m_bRenderEyeLid = false;
 	Change_State(Simba_DemoAppear2Cut1, 66.66f, false, false);
-	TransformToDefault();
+	TransformToDefault(-0.3f);
+}
+
+void CSimba::SpawnMonsters(_uint iTriggerIndex)
+{
+	wstring wstrLayerTag = TEXT("Layer_Wave");
+	if (11 == iTriggerIndex)
+		wstrLayerTag += TEXT("1");
+	else if(12 == iTriggerIndex)
+		wstrLayerTag += TEXT("2");
+	
+	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
+
+	for (auto& monsterDesc : m_vecMonsterDescs)
+	{
+		if (iTriggerIndex == monsterDesc.eMonState)
+		{
+			wstring wstrTag;
+			if (TEXT("Awoofy") == monsterDesc.wstrModelName || TEXT("AwoofyWild") == monsterDesc.wstrModelName)
+				wstrTag = wstrPrototypeTag + TEXT("Awoofy");
+			else if(TEXT("Rabbit") == monsterDesc.wstrModelName || TEXT("RabbitBig") == monsterDesc.wstrModelName)
+				wstrTag = wstrPrototypeTag + TEXT("Rabbit");
+
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SIMBA, wstrLayerTag, wstrTag, &monsterDesc)))
+				return;
+		}
+	}
 }
 
 CSimba* CSimba::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -588,6 +724,7 @@ void CSimba::Free()
 {
 	CEventCenter::Get_Instance()->Unsubscribe(this);
 	Safe_Release(m_pLipBone);
+	Safe_Release(m_pRotationBone);
 	Safe_Release(m_pKirby);
 
 	__super::Free();

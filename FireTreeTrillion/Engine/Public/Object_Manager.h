@@ -19,7 +19,7 @@ public:
 	const class CComponent* Get_Component(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strComTag, _uint iIndex);
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex);
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag);
-	class CGameObject*		Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag);
+	class CGameObject*		Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, const wstring& _tag);
 	class CGameObject*		Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag);
 	list<CGameObject*>*		Get_List(_uint iLevelIndex, const wstring& strLayerTag);
 

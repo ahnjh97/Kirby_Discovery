@@ -37,7 +37,7 @@ CGameObject* CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring& w
 	return pLayer->Get_GameObject();
 }
 
-CGameObject* CObject_Manager::Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag)
+CGameObject* CObject_Manager::Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, const wstring& _tag)
 {
 	CLayer* pLayer = Find_Layer(iLevelIndex, strLayerTag);
 	if (nullptr == pLayer)

@@ -545,7 +545,7 @@ CGameObject* CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring& wst
 	return m_pObject_Manager->Get_GameObject(iLevelIndex, wstrLayerTag);
 }
 
-CGameObject* CGameInstance::Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag)
+CGameObject* CGameInstance::Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, const wstring& _tag)
 {
 	CHECK_NULLPTR(m_pObject_Manager);
 	return m_pObject_Manager->Get_GameObject_ByTag(iLevelIndex, strLayerTag, _tag);
@@ -578,6 +578,12 @@ CComponent* CGameInstance::Clone_Component(_uint iLevelIndex, const wstring& str
 CComponent_Manager::PROTOTYPES* CGameInstance::Get_ComMap(_uint iLevelIdx)
 {
 	return m_pComponent_Manager->Get_ComMap(iLevelIdx);
+}
+
+void CGameInstance::ShowAllAnimations(const string& strModelName)
+{
+	if (nullptr != m_pComponent_Manager)
+		m_pComponent_Manager->ShowAllAnimations(m_iCurrentLevelID, TEXT("Prototype_Component_Model_") + CUtils::StrToWstr(strModelName));
 }
 
 HRESULT CGameInstance::Add_Timer(const wstring& strTimerTag)

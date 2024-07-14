@@ -25,7 +25,7 @@ public:
 public:
 	class CGameObject*				Get_GameObject(_uint iIndex);
 	class CGameObject*				Get_GameObject();
-	class CGameObject*				Get_GameObject_ByTag(wstring _tag);
+	class CGameObject*				Get_GameObject_ByTag(const wstring& _tag);
 	class CGameObject*				Get_LastGameObject();
 	const list<class CGameObject*>& Get_GameObjectList() { return m_GameObjects; }
 	_uint Get_GameObject_Num()		{ return m_GameObjects.size(); }

@@ -93,10 +93,11 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	// 하이라이트 처리를 하기 위한 문자열 정리하는 함수
 	Split_Message();
 
-	if (*m_pCurrentLevelID == LEVEL_SIMBA)
+	function<void(CGameObject*)> func{};
+	CEventCenter* pEventCenter = CEventCenter::Get_Instance();
+
+	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 	{
-		CEventCenter* pEventCenter = CEventCenter::Get_Instance();
-		function<void(CGameObject*)> func{};
 		func = bind(&CUI_MessageWindow::Start_Message, this, placeholders::_1);
 		pEventCenter->Subscribe(KEVENT_SIMBA_APPEAR_START, this, func);
 	}
@@ -129,6 +130,18 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 			m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_HIDE);
 			OnEvent(); //모든 스크립트 재생 종료 시, 해당 이벤트를 수행
 			m_bEventCall = true;
+		}
+
+		if(LEVEL_SIMBA == *m_pCurrentLevelID)
+		{ 
+			if (3 == m_iCurMessageIndex)
+				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_NEXT_DIALOG1);
+			if (7 == m_iCurMessageIndex)
+				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_NEXT_DIALOG2);
+			if (m_iCurMessageIndex == m_tMessageDesc.vecMsg.size() - 1)
+				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_LAST_DIALOG);
+			if (m_iCurMessageIndex == m_tMessageDesc.vecMsg.size())
+				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_APPEAR_END);
 		}
 	}
 
@@ -600,6 +613,11 @@ void CUI_MessageWindow::OnEvent()
 //for simba
 void CUI_MessageWindow::Start_Message(CGameObject* pObj)
 {
+	Reset_MessageIndex(nullptr);
+	m_bNextDialog1Notified = false;
+	m_bNextDialog2Notified = false;
+	m_bLastDialogNotified = false;
+	m_eCurState = WINDOW_SHOW;
 	Show_DialogMessage();
 }
 
