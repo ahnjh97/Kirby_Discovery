@@ -151,9 +151,9 @@ void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	//DEE NPC 상호작용 시, MessageWindow UI 출력
 	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
 	{
-		//Prototype_GameObject_UI_MessageWindow
 		// 07.14) 크래시 버그 수정 (Layer 명확하게 검색)
-		CUI_MessageWindow* pMWindow =  dynamic_cast<CUI_MessageWindow*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_Parttimer_Dee"), 0));
+		CUI_MessageWindow* pMWindow =  dynamic_cast<CUI_MessageWindow*>
+			(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_Parttimer_Dee")));
 		CHECK_NULLPTR(pMWindow);
 		pMWindow->Show_DialogMessage();
 	}
