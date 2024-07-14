@@ -214,7 +214,6 @@ void CDeeDeeDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 		CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 		CHECK_NULLPTR(pCameraMain);
 		pCameraMain->Lock_All({ -10.014f, 38.f, 30.908f }, { 0.f, -0.148f, 0.989f }, true);
-		//pCameraMain->Unlock();
 	}
 }
 

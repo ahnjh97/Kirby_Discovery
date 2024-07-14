@@ -1920,12 +1920,6 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	// 커비가 레벨별로 시작할 때, 바라보는 방향을 정해준다.
 	Kirby_LookInitialize();
 
-	// 파싱으로 레벨전환될때 HP와 COIN개수를 이동시킵니다.
-	CLevelChanger::LEVEL_DATA tLevelData = CLevelChanger::Get_Instance()->Load();
-	m_fHp = tLevelData.fKirbyHP;
-	m_uCoin = static_cast<_uint>(tLevelData.fKirbyCoin);
-	m_fAttack = 5.f; // 고정
-
 	//m_eAbilityType = static_cast<ABILITYTYPE>(tLevelData.iKirbyState);
 	//static_cast<LEVEL>(tLevelData.iLatestLevel);
 	//_float3 vNewPos = tLevelData.vLastPos;
@@ -1938,16 +1932,24 @@ HRESULT CKirby::Kirby_SystemInitialize()
 		m_fMaxHp = 100.f;
 		m_eAbilityType = ABILITY_DEFAULT;
 	}
-	if (*m_pCurrentLevelID == LEVEL_RACING)
-	{
-		m_eAbilityType = ABILITY_DEFAULT;
-		m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, _float3{0.f, 0.f, 1.f}, 5.f);
-	}
 	else
 	{
-		m_fHp = 100.f; // 기존 사용하던 HP입니다.
-		m_fMaxHp = 100.f;
-		m_eAbilityType = ABILITY_DEFAULT;
+		CLevelChanger::LEVEL_DATA tLevelData = CLevelChanger::Get_Instance()->Load();
+		m_fHp	  = tLevelData.fKirbyHP;
+		m_uCoin	  = static_cast<_uint>(tLevelData.fKirbyCoin);
+		m_fAttack = 5.f; // 고정
+
+		if (*m_pCurrentLevelID == LEVEL_RACING)
+		{
+			m_eAbilityType = ABILITY_DEFAULT;
+			m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, _float3{0.f, 0.f, 1.f}, 5.f);
+		}
+		else
+		{
+			//m_fHp = 100.f; // 기존 사용하던 HP입니다.
+			//m_fMaxHp = 100.f;
+			m_eAbilityType = ABILITY_DEFAULT;
+		}
 	}
 
 	// 폭탄 궤적을 만들어 놓는다.
