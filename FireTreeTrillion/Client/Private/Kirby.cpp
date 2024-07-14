@@ -1942,7 +1942,7 @@ HRESULT CKirby::Kirby_SystemInitialize()
 			m_eAbilityType = ABILITY_DEFAULT;
 			m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, _float3{0.f, 0.f, 1.f}, 5.f);
 		}
-		else if (LEVEL_PARK == eLEVEL)
+		else if (LEVEL_TOWN == eLEVEL && LEVEL_TOWN == *m_pCurrentLevelID)
 		{
 			_float3 vNewPos = tLevelData.vLastPos;
 			m_pControllerCom->Set_Position(m_pTransformCom, _float4{ vNewPos.x, vNewPos.y, vNewPos.z, 1.f });

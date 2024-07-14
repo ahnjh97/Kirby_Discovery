@@ -81,7 +81,7 @@ public: /* For.Object_Manager */
 
 	class CGameObject*	Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex);
 	class CGameObject*	Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag);
-	class CGameObject*	Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag);
+	class CGameObject*	Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, const wstring& _tag);
 	class CGameObject*	Get_LastGameObject(_uint iLevelIndex, const wstring& strLayerTag);
 	class CGameObject* Find_Prototype(const wstring& strPrototypeTag);
 
@@ -94,6 +94,7 @@ public: /* For.Component_Manager */
 	HRESULT			  Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);
 	class CComponent* Clone_Component(_uint iLevelIndex, const wstring& strPrototypeTag, void* pArg = nullptr);
 	CComponent_Manager::PROTOTYPES* Get_ComMap(_uint iLevelIdx);
+	void				ShowAllAnimations(const string& strModelName);
 
 public: /* For.Timer_Manager */
 	HRESULT Add_Timer(const wstring& strTimerTag);

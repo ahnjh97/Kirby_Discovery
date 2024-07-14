@@ -38,13 +38,19 @@ void CRabbit_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	{
 		// 플레이어와 몬스터의 거리 계산
 		_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
-
+		
 		_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
 		vLook.m128_f32[1] = 0.f;
 
 		// 몬스터와 플레이어 사이의 각도 계산
 		_float fAngle = XMVectorGetX(XMVector3AngleBetweenVectors(XMVector3Normalize(vLook), XMVector3Normalize(XMVectorSubtract(vKirbyPos, vPos))));
 
+		if (LEVEL_SIMBA == *m_pGameInstance->Get_CurrentLevelID()) {
+			if (15.f < fDistance)
+				fDistance = 7.1f;
+			fAngle = 0.f;
+		}
+			
 		// 몬스터가 타겟을 찾았을 때
 		if (true == pRabbit->Get_Find())
 		{
@@ -53,8 +59,13 @@ void CRabbit_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 			{
 				// 플레이어를 향해 회전
 				pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
-
-				if (true == pRabbit->IsAnimFinished())
+				_bool IsAnimFinished = pRabbit->IsAnimFinished();
+				if (LEVEL_SIMBA == *m_pGameInstance->Get_CurrentLevelID()) {
+					if(pRabbit->Get_AnimRatio() > 0.2f)
+						IsAnimFinished = true;
+				}
+					
+				if (true == IsAnimFinished)
 				{
 					pRabbit->Set_TimeDelta(0.f);
 

@@ -4,7 +4,9 @@
 
 #include "Ability.h"
 #include "UI_MessageWindow.h"
-
+#include "Camera_Main.h"
+#include "Kirby.h"
+#include "UI_Fading.h"
 
 CDeeDeeDeeHammer::CDeeDeeDeeHammer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPartObject{ pDevice, pContext }
@@ -24,7 +26,6 @@ HRESULT CDeeDeeDeeHammer::Initialize_Prototype()
 HRESULT CDeeDeeDeeHammer::Initialize(void* pArg)
 {
 	DEEDEEDEEHAMMER_DESC* pWeaponDesc = (DEEDEEDEEHAMMER_DESC*)pArg;
-
 	m_pBoneMatrix = pWeaponDesc->pBoneMatrix;
 	m_pWhiteColorDiffuse = pWeaponDesc->pWhite;
 
@@ -60,15 +61,12 @@ _int CDeeDeeDeeHammer::Tick(_float fTimeDelta)
 	}
 
 	//특정 시간 경과 후 다이얼로그 출력
-	if (m_bShowDialog) //== TRUE;
+	if (m_bShowDialog)
 	{
 		m_fShowDialog += fTimeDelta;
 		if (m_fShowDialog > 3.f)
 		{
-			CUI_MessageWindow* pMWindow = dynamic_cast<CUI_MessageWindow*>
-				(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_DeeDeeDee")));
-			CHECK_NULLPTR(pMWindow);
-			pMWindow->Show_DialogMessage();
+			(m_bFadeOutEnd == false) ? Ready_FadeOut() : Ready_FadeIn();
 			m_fShowDialog = 0.f;
 		}
 	}
@@ -179,6 +177,65 @@ void CDeeDeeDeeHammer::Compute_MotionBlur()
 	m_vMotionVelocity.x = (m_vPreScreenPos - vCurScreenPos).x;
 	m_vMotionVelocity.y = (m_vPreScreenPos - vCurScreenPos).y;
 	m_vPreScreenPos = vCurScreenPos;
+}
+
+void CDeeDeeDeeHammer::Ready_FadeIn()
+{
+	static _bool bOnceFade = false;
+	static _bool bOnceChanger = false;
+
+	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+	CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
+
+	if (bOnceFade == false)
+	{
+		pFadingUI->Set_InOutState(CUI_Fading::FADEIN);
+		pFadingUI->Set_IsRender(true);
+		bOnceFade = true;
+	}
+	else if (pFadingUI->Get_FadeRatio() >= 1.f)
+	{
+		if (bOnceChanger == false)
+		{
+			CUI_MessageWindow* pMWindow = static_cast<CUI_MessageWindow*>
+				(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_DeeDeeDee")));
+			CHECK_NULLPTR(pMWindow);
+			pMWindow->Show_DialogMessage();
+			bOnceChanger = true;
+		}
+
+	}
+}
+
+void CDeeDeeDeeHammer::Ready_FadeOut()
+{
+	static _bool bOnceFade = false;
+
+	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+	CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
+	if (bOnceFade == false)
+	{
+		pFadingUI->Set_InOutState(CUI_Fading::FADEOUT);
+		pFadingUI->Set_IsRender(true);
+		bOnceFade = true;
+	}
+	else if (pFadingUI->Get_FadeRatio() <= 0.f)
+	{
+#pragma region 카메라 컷신 조정
+		CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+		CHECK_NULLPTR(pCameraMain);
+
+		CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
+		CHECK_NULLPTR(pKirby);
+
+		CTransform* pTransCom = pKirby->Get_TransformCom();
+		_float4 vPos = pTransCom->Get_State_Float4(CTransform::STATE_POSITION);
+		_float4 vNormLook = XMVector4Normalize(pTransCom->Get_State_Float4(CTransform::STATE_LOOK));
+		pCameraMain->Lock_All({ vPos.x - 0.1f,  vPos.y + 3.f,  vPos.z - 0.1f }, { vNormLook.x, -0.2f, vNormLook.z }, true);
+#pragma endregion
+		m_bFadeOutEnd = true;
+
+	}
 }
 
 CDeeDeeDeeHammer* CDeeDeeDeeHammer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

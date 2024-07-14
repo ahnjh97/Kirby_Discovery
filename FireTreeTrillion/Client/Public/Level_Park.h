@@ -28,6 +28,7 @@ private:
 	HRESULT Ready_UI();
 
 	void	Teleport_Player();
+	void	Change_Levels();
 
 	HRESULT Add_EnvMap();
 	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };

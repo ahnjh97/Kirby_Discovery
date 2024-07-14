@@ -37,7 +37,7 @@ CGameObject* CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring& w
 	return pLayer->Get_GameObject();
 }
 
-CGameObject* CObject_Manager::Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag)
+CGameObject* CObject_Manager::Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, const wstring& _tag)
 {
 	CLayer* pLayer = Find_Layer(iLevelIndex, strLayerTag);
 	if (nullptr == pLayer)
@@ -167,19 +167,6 @@ void CObject_Manager::Tick(_float fTimeDelta)
 		}		
 	}
 }
-
-void CObject_Manager::Event_Tick(_float fTimeDelta)
-{
-	for (size_t i = 0; i < m_iNumLevels; i++)
-	{
-		for (auto& Pair : m_pLayers[i])
-		{
-			/* 필요한 위치의 갱신작어블 수행한다. */
-			Pair.second->Event_Tick(fTimeDelta);
-		}
-	}
-}
-
 
 void CObject_Manager::Late_Tick(_float fTimeDelta)
 {

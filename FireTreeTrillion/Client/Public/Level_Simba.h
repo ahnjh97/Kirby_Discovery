@@ -32,7 +32,8 @@ private:
 	CTexture* m_pEnvTexture[TYPE_END] = { nullptr, nullptr, nullptr };
 
 private:
-	_bool bWave1DeadNotified = { false };
+	_bool m_bWave1DeadNotified = { false };
+	_bool m_bWave2DeadNotified = { false };
 
 public:
 	static CLevel_Simba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

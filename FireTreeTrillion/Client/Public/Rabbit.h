@@ -35,25 +35,13 @@ private:
 	virtual ~CRabbit() = default;
 
 public:
-	void Set_RabbitEye(RABBITEYE_STATE eEyeState) {
-		m_eEyeState = eEyeState;
-	}
-	void Set_Find(_bool bFind) {
-		m_bFind = bFind;
-	}
-	void Set_TimeDelta(_float fTimeDelta) {
-		m_fTempTime = fTimeDelta;
-	}
+	void Set_RabbitEye(RABBITEYE_STATE eEyeState) { m_eEyeState = eEyeState; }
+	void Set_Find(_bool bFind) { m_bFind = bFind; }
+	void Set_TimeDelta(_float fTimeDelta) { m_fTempTime = fTimeDelta; }
 
-	_bool Get_Find() {
-		return m_bFind;
-	}
-	_float Get_TimeDelta() {
-		return m_fTempTime;
-	}
-	RABBIT_STATE Get_RabbitState() {
-		return m_eRabbitState;
-	}
+	_bool Get_Find() { return m_bFind; }
+	_float Get_TimeDelta() { return m_fTempTime; }
+	RABBIT_STATE Get_RabbitState() { return m_eRabbitState; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -108,9 +96,10 @@ private:
 	// 점프공격
 	_float4						m_vGoPos = {}; // 포물선을 그릴 때 포물선 공식을 계속 더해줄 값
 
+	_uint						m_iEyeMeshIdx = {};
 
 private:
-	HRESULT Add_Components();
+	HRESULT Add_Components(const wstring& _wstrModelName);
 	HRESULT Bind_ShaderResources();
 
 	// FSM
