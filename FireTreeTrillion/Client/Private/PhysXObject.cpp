@@ -52,7 +52,7 @@ _int CPhysXObject::Tick(_float fTimeDelta)
 			CMultiEffect::MULTI_FX_DESC FXDesc{};
 
 			FXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_LOOK));
-			FXDesc.vInitPos += static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_RIGHT))* CUtils::Make_RandomFloat(-1.f, 1.f);
+			FXDesc.vInitPos += static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_RIGHT)) * CUtils::Make_RandomFloat(-1.f, 1.f);
 
 			FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_FlyingStarYellow"), &FXDesc)))
@@ -120,7 +120,7 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 
 		//TODO: 버블 날라갈 때 스케일 맞춰야 함
 		FXDesc.vInitPos = { 0.f, 0.5f, 0.f };
-		FXDesc.vInitRot = {-90.f, 0.f, 0.f};
+		FXDesc.vInitRot = { -90.f, 0.f, 0.f };
 		FXDesc.vInitScale = { 4.f, 4.f, 4.f };
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
@@ -164,13 +164,21 @@ void CPhysXObject::Add_Effect(string strName, CEffect::FX_DESC fxDesc, _bool bAd
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strProtoTag, &fxDesc)))
 		return;
 
-	if(bAddToList)
+	if (bAddToList)
 		Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
 }
 
 void CPhysXObject::Add_Effect(string strName, CMultiEffect::MULTI_FX_DESC fxDesc, _bool bAddToList)
 {
+	wstring strProtoTag = TEXT("Prototype_GameObject_");
+	strProtoTag += CUtils::StrToWstr(strName);
+
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strProtoTag, &fxDesc)))
+		return;
+
+	if (bAddToList)
+		Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 }
 
 void CPhysXObject::Add_Effect(CEffect* pEffect)

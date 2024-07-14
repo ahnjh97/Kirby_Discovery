@@ -317,8 +317,15 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBooster) == false)
 	{
 		//ºÎšÀ ÀÌÆåÆ®
-		ComeOn_Dash_For_Dump(pTransformCom);
-		pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+		//ComeOn_Dash_For_Dump(pTransformCom);
+
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.vInitPos = { 0.f, 3.5f, -10.f };
+		FXDesc.vInitScale = { 15.f, 15.f, 30.f };
+		FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+		pKirby->Add_Effect("Come On Dash", FXDesc, true);
+
+		//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 		DESC(m_bBooster) = true;
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 		pCamera->Make_Shake(0.6f, 2.f);
@@ -428,8 +435,14 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBooster) == false)
 	{
 		//ºÎšÀ ÀÌÆåÆ®
-		ComeOn_Dash_For_Dump(pTransformCom);
-		pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+		//ComeOn_Dash_For_Dump(pTransformCom);
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.vInitPos = { 0.f, 3.5f, -10.f };
+		FXDesc.vInitScale = { 15.f, 15.f, 30.f };
+		FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+		pKirby->Add_Effect("Come On Dash", FXDesc, true);
+
+		//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 		DESC(m_bBooster) = true;
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 		pCamera->Make_Shake(1.f, 2.f);

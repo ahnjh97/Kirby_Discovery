@@ -37,7 +37,7 @@ _int CFinaleCut_ControlCenter::Tick(_float fTimeDelta)
 	if (m_bDead == true)
 		return OBJ_DEAD;
 
-
+	/*
 	if (m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 
@@ -98,7 +98,7 @@ _int CFinaleCut_ControlCenter::Tick(_float fTimeDelta)
 		if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
 			Set_CutScene(20);
 	}
-
+	*/
 	return OBJ_NOEVENT;
 }
 

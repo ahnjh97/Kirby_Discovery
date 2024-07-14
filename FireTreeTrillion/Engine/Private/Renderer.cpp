@@ -534,7 +534,6 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 	if (m_eRenderMode == MODE_GAMEPLAY)
 	{
-
 		// 갓 레이 적용
 		if (FAILED(Render_GodRay()))
 			return E_FAIL;

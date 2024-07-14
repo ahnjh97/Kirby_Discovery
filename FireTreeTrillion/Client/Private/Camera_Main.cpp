@@ -2178,6 +2178,12 @@ void CCamera_Main::Control(_float fTimeDelta)
 			//SEQ_HARDCUT_TEST
 			//Make_Sequence(SEQ_SOFTCUT_TEST);
 		}
+
+		if (m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN))
+		{
+			Make_Shake(1.f, 2.f);
+		}
+
 	}
 	/*
 		if (m_pGameInstance->Get_KeyState(DIK_T, KEY_DOWN))
@@ -2187,10 +2193,6 @@ void CCamera_Main::Control(_float fTimeDelta)
 			//Make_Sequence(SEQ_SOFTCUT_TEST);
 		}
 
-		if (m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN))
-		{
-			Make_Shake(1.f, 2.f);
-		}
 
 
 		if (m_pGameInstance->Get_KeyState(DIK_U, KEY_DOWN))
