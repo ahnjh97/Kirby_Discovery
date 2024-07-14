@@ -99,9 +99,6 @@ void CFinale_SpecialDebris_B::Late_Tick(_float fTimeDelta)
 
 	m_pModelCom->Play_Animation(m_fAccTime);
 
-	if (m_eCurCut == CUT7)
-		return;
-
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 
