@@ -414,7 +414,27 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN In)
     return Out;
 }
 
-PS_OUT_EFFECT PS_MAIN_BLEND_FX(PS_IN In)
+PS_OUT_EFFECT PS_MAIN_BLEND_FX_LINEARDIFFUSE(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
+    MaskTest(vMask);
+    
+
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    AlphaTest(vDiffuse);
+
+    Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
+    Out.vColor.a = vDiffuse.a * vMask.r * g_fAlpha;
+
+    //소프트 이펙트 보정
+    Out.vColor.a = SoftEffect(Out.vColor.a, In.vProjPos);
+    Out.vNonBlur = vector(0, 1, 0, 1);
+    return Out;
+}
+
+PS_OUT_EFFECT PS_MAIN_BLEND_FX_CLAMPDIFFUSE(PS_IN In)
 {
     PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
 
@@ -480,6 +500,8 @@ PS_OUT_EFFECT PS_MAIN_WHITE_FX_CLAMPDIFFUSE(PS_IN In)
     
     return Out;
 }
+
+
 
 PS_OUT_LIGHTDEPTH PS_MAIN_DEFERREDINFO(PS_IN In)
 {
@@ -849,8 +871,8 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_FX();
     }
 
-    //블렌드되는 이펙트. 알파 블렌딩 + 마스크 + 소프트 이펙트 ( 8 -> 13 )
-    pass BlendFX
+    //블렌드되는 이펙트. 알파 블렌딩 + 마스크 + 소프트 이펙트 ( 13 )
+    pass BlendFX_LinearDiffuse
     {
         SetRasterizerState(RS_NonCull);
         SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
@@ -860,11 +882,25 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX();
+        PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX_LINEARDIFFUSE();
+    }
+
+    //블렌드되는 이펙트. 알파 블렌딩 + 마스크 + 소프트 이펙트 ( 14 )
+    pass BlendFX_ClampDiffuse
+    {
+        SetRasterizerState(RS_NonCull);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX_CLAMPDIFFUSE();
     }
 
 
-    //화이트 이펙트. 알파 블렌딩 + 마스크 + 디퓨즈 리니어샘플( 10 -> 14 )
+    //화이트 이펙트. 알파 블렌딩 + 마스크 + 디퓨즈 리니어샘플( 10 -> 15 )
     pass WhiteFX_LinearDiffuse
     {
         SetRasterizerState(RS_NonCull);
@@ -878,7 +914,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX_LINEARDIFFUSE();
     }
 
-    ////화이트 이펙트. 알파 블렌딩 + 마스크 + 디퓨즈 클램프샘플 ( 10 -> 15 )
+    ////화이트 이펙트. 알파 블렌딩 + 마스크 + 디퓨즈 클램프샘플 ( 10 -> 16 )
     pass WhiteFX_ClampDiffuse
     {
         SetRasterizerState(RS_NonCull);

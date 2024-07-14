@@ -2542,6 +2542,8 @@ void CCamera_Main::Orbit_Target(_float fTimeDelta)
 #ifdef _DEBUG
 void CCamera_Main::Render_IMGUI()
 {
+	ImGui::Begin(u8"메인 카메라");
+
 	if (ImGui::TreeNode("Revise Offset"))
 	{
 		string strPos = "pos";
