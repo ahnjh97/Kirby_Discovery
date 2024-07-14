@@ -161,6 +161,13 @@
 #include "FinalePartical_Maker.h"
 #include "FinaleCut_ControlCenter.h"
 
+#include "Finale_SpecialDebris_A.h"
+#include "Finale_SpecialDebris_B.h"
+#include "Finale_SpecialDebris_C.h"
+#include "BuildingCluster_A.h"
+#include "BuildingCluster_B.h"
+#include "BuildingCluster_C.h"
+
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA)
 //BOSS
 #include "BossChimera.h"
@@ -451,6 +458,14 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalePartical"), CFinalePartical);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleBuildingPartical"), CFinaleBuildingPartical);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleCut_ControlCenter"), CFinaleCut_ControlCenter);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Finale_SpecialDebris_A"), CFinale_SpecialDebris_A);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Finale_SpecialDebris_B"), CFinale_SpecialDebris_B);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Finale_SpecialDebris_C"), CFinale_SpecialDebris_C);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_A"), CBuildingCluster_A);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_B"), CBuildingCluster_B);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_C"), CBuildingCluster_C);
+
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -2102,10 +2117,21 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BuildingPiece", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("StarPiece", TYPE_NONANIM, 1.f, 0.f, 0);
 
-		m_vecModelInfo.emplace_back("MovableBuildingA", TYPE_NONANIM, 1.f, 0.f, 0);
-		m_vecModelInfo.emplace_back("MovableBuildingB", TYPE_NONANIM, 1.f, 0.f, 0);
-		m_vecModelInfo.emplace_back("MovableBuildingC", TYPE_NONANIM, 1.f, 0.f, 0);
-		m_vecModelInfo.emplace_back("MovableBuildingD", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingA", TYPE_NONANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingB", TYPE_NONANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingC", TYPE_NONANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingD", TYPE_NONANIM, 0.8f, 0.f, 0);
+
+		m_vecModelInfo.emplace_back("BigMovableBuildingA", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BigMovableBuildingB", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BigMovableBuildingC", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BigMovableBuildingD", TYPE_NONANIM, 1.f, 0.f, 0);
+
+		m_vecModelInfo.emplace_back("CutDebrisA", TYPE_ANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("CutDebrisB", TYPE_ANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("CutDebrisC", TYPE_ANIM, 0.8f, 0.f, 0);
+
+
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
 		m_vecModelInfo.emplace_back("LbBrokenBuildingAC", TYPE_NONANIM, 1.f, 0.f, 0, string("LabDiscovera_Deco/"));
@@ -2113,8 +2139,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("LbBrokenBuildingCL", TYPE_NONANIM, 1.f, 0.f, 0, string("LabDiscovera_Deco/"));
 		m_vecModelInfo.emplace_back("LbBrokenBuildingDL", TYPE_NONANIM, 1.f, 0.f, 0, string("LabDiscovera_Deco/"));
 
+		m_vecModelInfo.emplace_back("BuildingCluster01", TYPE_ANIM, 0.8f);
+		m_vecModelInfo.emplace_back("BuildingCluster02", TYPE_ANIM, 0.8f);
+		m_vecModelInfo.emplace_back("BuildingSub", TYPE_ANIM, 0.8f);
 
-
+		 
 		m_vecModelInfo.emplace_back("Road", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadEnd", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 0.2f, 0.f, 0);

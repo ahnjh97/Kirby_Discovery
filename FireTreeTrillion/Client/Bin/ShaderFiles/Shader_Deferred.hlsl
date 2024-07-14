@@ -133,6 +133,9 @@ float2 g_fRadialblurCenter;
 texture2D g_DOFBlur;
 texture2D g_DOFBlur_Result;
 float2 g_vDOFFocus;
+float g_fDOFIntensity = 2.f;
+float3 g_vDOFColor = float3(-0.05, 0.01, 0.08);
+
 texture2D g_DiffuseMotionBlur;
 texture2D g_MotionBlur;
 
@@ -161,6 +164,9 @@ float4 g_vCamPosition;
 float4 g_vCamLook;
 
 //////////////////////////////////// For PBR 
+
+bool g_bDeepShadow = false;
+
 
 float ndfGGX(float cosLh, float roughness)
 {
@@ -1059,7 +1065,10 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 	/* vLightDepthDesc.x * 2000.f : 현재 픽셀을 광원기준으로  그릴려고 했던 위치에 이미 그려져있떤 광원 기준의 깊이.  */
         if (vPosition.w > (vLightDepthDesc.x * 2000.f) && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).x == 0.f)
         {
-            Out.vColor *= 0.5f + clamp((vPosition.w - (vLightDepthDesc.x * 2000.f)) * 0.05f, 0.f, 0.5f);
+            if (g_bDeepShadow == false)
+                Out.vColor *= 0.5f + clamp((vPosition.w - (vLightDepthDesc.x * 2000.f)) * 0.05f, 0.f, 0.5f);
+            else
+                Out.vColor *= 0.3f + clamp((vPosition.w - (vLightDepthDesc.x * 2000.f)) * 0.1f, 0.f, 0.5f);
         }
     }
 
@@ -1371,24 +1380,24 @@ PS_OUT PS_MAIN_DOFBlur(PS_IN In)
     {
         float fDOFFar = fKirbyViewZ;
         // DOFWeight 계산 (스케일링 및 클램핑)
-        fDOFWeight = saturate(pow(fDepthDifference / fDOFFar, 5.0) * 20.0);
+        fDOFWeight = saturate(pow(fDepthDifference / fDOFFar, 5.0) * g_fDOFIntensity * 10.f);
     }
     else
     {
         float fDOFFar = g_fFar - fKirbyViewZ;
-        fDOFWeight = saturate(pow(fDepthDifference / 100, 15.0) * 2.0);
+        fDOFWeight = saturate(pow(fDepthDifference / 100, 15.0) * g_fDOFIntensity);
     }
     
     
     Out.vColor = FreeBlur_X(In.vTexcoord, g_DOFBlur, fDOFWeight);
     // 공기 원근법 적용
     float airFactor = saturate(pow(fMyViewZ / 200.0, 3.0) - .4);
-    float3 airColor = float3(-0.05, 0.01, 0.08); // 공기색 (파란색 계열)
+    float3 airColor = g_vDOFColor; // 공기색 (파란색 계열)
     
     Out.vColor += float4(airFactor * airColor, 0.f);
     Out.vColor = saturate(Out.vColor);
-    return Out;
     
+    return Out;
     
 }
 

@@ -1318,6 +1318,9 @@
     <ClInclude Include="..\Public\UI_Fading.h">
       <Filter>02.GameObjects\UI\Fading</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BuildingCluster_C.h">
+      <Filter>02.GameObjects\Map\Finale_SpeicalBuilding</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1961,6 +1964,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_Fading.cpp">
       <Filter>02.GameObjects\UI\Fading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BuildingCluster_C.cpp">
+      <Filter>02.GameObjects\Map\Finale_SpeicalBuilding</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

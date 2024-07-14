@@ -121,6 +121,7 @@ public:
 	_float4					m_vBonePos = { 0.f, 0.f, 0.f, 0.f };
 	_float4					Compute_RootPos();
 
+	_float					Get_AnimTrackPos();
 private:
 	// 커비의 움직임을 담은 구조체
 	FINALEKIRBY_INFODESC	m_tKirbyInfo;
@@ -160,6 +161,7 @@ private:
 	_float				  m_fHitStopMaxTime = { 0.f };
 
 	_bool				  m_bMakeDisaster = { true };
+	_float3				m_vPrePos = {};
 
 public:
 	static CFinaleKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

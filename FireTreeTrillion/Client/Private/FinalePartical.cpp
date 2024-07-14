@@ -31,6 +31,7 @@ HRESULT CFinalePartical::Initialize(void* pArg)
 
     m_bMotionBlur = true;
     m_bRimLight = true;
+    m_fRimWidth = 0.1f;
     m_bStencil = true;
 
 

@@ -29,6 +29,8 @@ private:
 	void			Make_AirParticle();
 	void			Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir, _float fDestZAngle = -1.f);
 
+	void			Make_CutAirParticle();
+	_bool			m_bCutInitializeParticle = { true };
 
 	void			Moving_FinaleRoad(_float fKirbyX);
 	_bool			m_bRoadTrigger[10] = { true, true, true, true, true, true, true, true, true, true };
