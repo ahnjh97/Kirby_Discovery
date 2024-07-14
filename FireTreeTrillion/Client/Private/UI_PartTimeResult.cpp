@@ -4,6 +4,7 @@
 #include "Level_Loading.h"
 #include "PartTimeHelper.h"
 #include "PartTimerKirby.h"
+#include <UI_MessageWindow.h>
 
 CUI_PartTimeResult::CUI_PartTimeResult(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CUIObject{ _pDevice, _pContext }
@@ -37,11 +38,10 @@ HRESULT CUI_PartTimeResult::Initialize_Prototype()
 	m_arrSize[0] = m_SizeScoreBar2D * 0.9f;
 	m_arrSize[1] = m_arrSize[2] = m_arrSize[3] = m_SizeDigits2D;
 	m_arrSize[4] = m_SizeScoreResult2D * 0.9f;
-	m_arrSize[5] = m_arrSize[6] = m_arrSize[7] = m_SizeDigits2D;
+	m_arrSize[5] = m_arrSize[6] = m_arrSize[7] = _float2(m_SizeDigits2D.x * 0.8f, m_SizeDigits2D.y * 0.8f);
 
 	m_arrOriginalSize = m_arrSize;
-	_float fInitialValue = 1.f;
-	fill(m_arrSizeRatio.begin(), m_arrSizeRatio.end(), fInitialValue);
+	fill(m_arrSizeRatio.begin(), m_arrSizeRatio.end(), _float2(1.f, 1.f));
 
 	return S_OK;
 }
@@ -103,7 +103,10 @@ HRESULT CUI_PartTimeResult::Render()
 
 		hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
 		CHECK_FAILED(hr);
-		
+
+		_float fOffset = 1.f;
+		m_pShaderCom->Bind_RawValue("g_fAlpha", &fOffset, sizeof(_float));
+
 		hr = m_pShaderCom->Begin(POSTEX_ALPHABLEND_NOTEST);
 		CHECK_FAILED(hr);
 
@@ -123,22 +126,19 @@ HRESULT CUI_PartTimeResult::Render()
 #ifdef _DEBUG
 void CUI_PartTimeResult::Render_IMGUI()
 {
-	//char ratio[16];
-	////ImGui::DragFloat(ratio, (_float*)&m_fRatioTimeBar, 0.01f, 0.01f, 1.f);
 	//ImGui::Separator(); ImGui::NewLine();
 
 	//for (_int i = 0; i < m_arrPosition.size(); ++i)
 	//{
 	//	char name[16], size[16], color[16];
 	//	sprintf_s(name,  "pos%d",   i);
-	//	//sprintf_s(size,  "size%d",  i);
+	//	sprintf_s(size,  "size%d",  i);
 
 	//	ImGui::DragFloat2(name,  (_float*)&m_arrPosition[i]);
-	//	//ImGui::DragFloat(size,   (_float*)&m_arrSizeRatio[i], 0.05f, 0.1f, 2.f);
+	//	ImGui::DragFloat2(size,   (_float*)&m_arrSizeRatio[i], 0.05f, 1.f, 3.f);
 
-	//	m_arrSize[i].x = m_arrOriginalSize[i].x * m_arrSizeRatio[i];
-	//	m_arrSize[i].y = m_arrOriginalSize[i].y * m_arrSizeRatio[i];
-
+	//	m_arrSize[i].x = m_arrOriginalSize[i].x * m_arrSizeRatio[i].x;
+	//	m_arrSize[i].y = m_arrOriginalSize[i].y * m_arrSizeRatio[i].y;
 	//	m_pTransformCom->Set_Scaled(m_arrSize[i].x, m_arrSize[i].y, 1.f);
 	//	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 	//		XMVectorSet(m_arrPosition[i].x   - g_iWinSizeX * 0.5f,
@@ -148,10 +148,6 @@ void CUI_PartTimeResult::Render_IMGUI()
 
 	//	ImGui::NewLine();
 	//}
-
-	char test[16];//, test2[16];
-	ImGui::DragFloat2(test, (_float*)&m_posTemp, 5.f, 0.f, 1000.f);
-	//ImGui::DragFloat3(test2, (_float*)&m_vTESTCOLOR2, 0.01f, 0.f, 1.f);
 }
 #endif
 
@@ -159,6 +155,7 @@ void CUI_PartTimeResult::Render_Digits()
 {
 	HRESULT hr(S_OK);
 	static _float fTimeAcc = 0.f;
+	static _bool bOnce = false;
 	m_fMoveRatio += m_fTimeDelta * 3.f;
 	if (m_fMoveRatio >= 1.f)
 	{
@@ -166,7 +163,6 @@ void CUI_PartTimeResult::Render_Digits()
 		fTimeAcc += m_fTimeDelta;
 		if (fTimeAcc >= 0.2f)
 		{
-			
 			_int iAddNum = 1;
 			// 와들디 iAddNum만큼 등장 // 효선아 여기야
 
@@ -180,8 +176,12 @@ void CUI_PartTimeResult::Render_Digits()
 					if (m_bRenderTotalScore)
 					{
 						Render_TotalScore();
-						CPartTimerKirby* pKirby = dynamic_cast<CPartTimerKirby*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_PartTimerKirby"));
-						pKirby->Change_State(CPartTimerKirby::FOODSHOP_RESULTWINSTART, 50.f, false, true);
+						if (bOnce == false)
+						{
+							CPartTimerKirby* pKirby = dynamic_cast<CPartTimerKirby*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_PartTimerKirby"));
+							pKirby->Change_State(CPartTimerKirby::FOODSHOP_RESULTWINSTART, 50.f, false, true);
+							bOnce = true;
+						}
 					}
 				}
 				if (fTimeAcc >= 2.5f)
@@ -192,13 +192,10 @@ void CUI_PartTimeResult::Render_Digits()
 				// 다이얼로그 생성
 				if (fTimeAcc >= 4.f)
 				{
-					
-					// 다이얼로그 띄우기 // 이거 a버튼 누르면 town으로 돌아가기
-					if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_A, KEY_DOWN))
-					{
-						hr = m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOWN));
-						CHECK_FAILED(hr);
-					}
+					CUI_MessageWindow* pMWindow = dynamic_cast<CUI_MessageWindow*>
+						(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_Parttimer_Dee")));
+					CHECK_NULLPTR(pMWindow);
+					pMWindow->Show_DialogMessage();
 				}
 			}
 
@@ -286,26 +283,26 @@ void CUI_PartTimeResult::Render_TotalScore()
 void CUI_PartTimeResult::Render_Font()
 {
 	// 폰트
-	wstring wstrFontTag = L"Font_Dialog_KR18spac10";
-	_int iNumDee = m_fScore / 30.f;
+	wstring wstrFontTag = L"Font_KoreanGDB_KR22spac10";
+	_int iNumDee = (_int)(m_fScore / 30.f);
 	wstring wstrMsg = L"합계 " + CUtils::StrToWstr(to_string(iNumDee)) + L"인";
 	_float4 vRGBA = { 75.f / 255.f, 58.f / 255.f, 22.f / 255.f, 1.f };
-	m_pGameInstance->Render_Font(wstrFontTag, wstrMsg, /*m_posTemp*/_float2(530.f, 495.f), vRGBA, 0.f, _float2(15.f, 15.f), _float2(1.f, 1.f));
+	m_pGameInstance->Render_Font(wstrFontTag, wstrMsg, _float2(520.f, 490.f), vRGBA, 0.f, _float2(15.f, 15.f), _float2(1.f, 1.f));
 }
 
 void CUI_PartTimeResult::Initialize_TexturePos()
 {
 	m_arrPosition[0] = _float2(800.f,  222.f);
 									   
-	m_arrPosition[1] = _float2(740.f,  212.f);
-	m_arrPosition[2] = _float2(800.f,  212.f);
-	m_arrPosition[3] = _float2(860.f,  212.f);
+	m_arrPosition[1] = _float2(760.f, 220.f);
+	m_arrPosition[2] = _float2(800.f, 220.f);
+	m_arrPosition[3] = _float2(840.f, 220.f);
 									   
 	m_arrPosition[4] = _float2(800.f,  490.f);
 									   
-	m_arrPosition[5] = _float2(960.f,  482.f);
-	m_arrPosition[6] = _float2(1010.f, 482.f);
-	m_arrPosition[7] = _float2(1060.f, 482.f);
+	m_arrPosition[5] = _float2(1000.f, 490.f);
+	m_arrPosition[6] = _float2(1035.f, 490.f);
+	m_arrPosition[7] = _float2(1070.f, 490.f);
 }
 
 // 받은 스코어 점수를 출력합니다.

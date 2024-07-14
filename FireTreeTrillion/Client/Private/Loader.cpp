@@ -942,9 +942,9 @@ HRESULT CLoader::Loading_For_Parttime()
 	CHECK_FAILED(hr);
 
 	// ∞‘¿” DIGITS
-	hr = Add_Texture(eLevel, "TimeDigits", "UI/Parttime/TimeDigits/%d.png", 10);
+	hr = Add_Texture(eLevel, "TimeDigits", "UI/Parttime/TimeDigits/%d.dds", 10);
 	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "ScoreDigits", "UI/Parttime/ScoreDigits/%d.png", 10);
+	hr = Add_Texture(eLevel, "ScoreDigits", "UI/Parttime/ScoreDigits/%d.dds", 10);
 	CHECK_FAILED(hr);
 
 #pragma endregion

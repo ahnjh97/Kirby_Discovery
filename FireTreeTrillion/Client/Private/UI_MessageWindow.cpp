@@ -586,6 +586,11 @@ void CUI_MessageWindow::OnEvent()
 		}
 	}
 	break;
+	case LEVEL_PARTTIME:
+	{
+		m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOWN));
+	}
+	break;
 	case LEVEL_SIMBA:
 	{
 		CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_APPEAR_END);

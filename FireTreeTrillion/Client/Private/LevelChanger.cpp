@@ -44,7 +44,7 @@ CLevelChanger::LEVEL_DATA CLevelChanger::Load()
     ifstream input_file(file_path);
     if (!input_file.is_open()) 
     {
-        //MSG_BOX(TEXT("파일을 열 수 없습니다: Load"));
+       // MSG_BOX(TEXT("파일을 열 수 없습니다: Load"));
         return tLevelData;
     }
 

@@ -200,38 +200,24 @@ HRESULT CUI_PartTime::Render()
 #ifdef _DEBUG
 void CUI_PartTime::Render_IMGUI()
 {
-	char ratio[16];
-	ImGui::DragFloat(ratio, (_float*)&m_fRatioTimeBar, 0.01f, 0.01f, 1.f);
+	//char ratio[16];
+	//ImGui::DragFloat(ratio, (_float*)&m_fRatioTimeBar, 0.01f, 0.01f, 1.f);
 	ImGui::Separator(); ImGui::NewLine();
 
-	//for (_int i = 10; i < m_arrPosition.size(); ++i)
-	//{
-	//	_int i = 15;
-	//	char name[16], size[16], color[16];
-	//	sprintf_s(name, "pos%d", i);
-	//	sprintf_s(size, "size%d", i);
-	//	sprintf_s(color, "color%d", i);
+	for (_int i = 10; i < 15; ++i)
+	{
+		char name[16];
+		sprintf_s(name, "pos%d", i);
+		ImGui::DragFloat2(name, (_float*)&m_arrPosition[i]);
 
-	//	ImGui::DragFloat(size,   (_float*)&m_arrSizeRatio[i], 0.05f, 0.1f, 2.f);
-	//	ImGui::DragFloat2(name,  (_float*)&m_arrPosition[i]);
-	//	ImGui::DragFloat3(color, (_float*)&m_arrColor[i], 0.01f, 0.f, 1.f);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+			XMVectorSet(m_arrPosition[i].x - g_iWinSizeX * 0.5f,
+						- m_arrPosition[i].y + g_iWinSizeY * 0.5f,
+						0.f,
+						1.f));
 
-	//	m_arrSize[i].x = m_arrOriginalSize[i].x * m_arrSizeRatio[i];
-	//	m_arrSize[i].y = m_arrOriginalSize[i].y * m_arrSizeRatio[i];
-
-	//	m_pTransformCom->Set_Scaled(m_arrSize[i].x, m_arrSize[i].y, 1.f);
-	//	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-	//		XMVectorSet(m_arrPosition[i].x - g_iWinSizeX * 0.5f,
-	//					- m_arrPosition[i].y + g_iWinSizeY * 0.5f,
-	//					0.f,
-	//					1.f));
-
-	//	ImGui::NewLine();
-	//}
-
-	//char test[16], test2[16];
-	//ImGui::DragFloat3(test, (_float*)&m_vTESTCOLOR, 0.01f, 0.f, 1.f);
-	//ImGui::DragFloat3(test2, (_float*)&m_vTESTCOLOR2, 0.01f, 0.f, 1.f);
+		ImGui::NewLine();
+	}
 }
 #endif
 
@@ -434,33 +420,31 @@ void CUI_PartTime::Setup_PosSizeColor(_int iTextureNum)
 		m_arrPosition[iTextureNum] = _float2(180.f, 817.f);
 	}
 	break;
-	case 7: // 와들디 얼굴
-	case 8: // 와들디 얼굴
-	case 9: // 와들디 얼굴
+	//////////////////////// ↓ 와들디 얼굴 ↓ /////////////////////////
+	case 7:
+	case 8:
+	case 9:
 	{
 		m_arrSize[iTextureNum] = m_SizeDeeFace2D * 0.9f;
 		m_arrPosition[iTextureNum] = _float2(213.f, 61.f);
 	}
 	break;
-	////////////////////// ↓ ↓ Digits ↓ ↓ /////////////////////////
+	//////////////////////// ↓ ↓ Digits ↓ ↓ /////////////////////////
 	case 10: // 타임판 digits 00
-		m_arrPosition[iTextureNum] = _float2(1467.f, 74.f);
+		m_arrPosition[iTextureNum] = _float2(1463.f, 82.f);
 	break;
 	case 11: // 타임판 digits 0
-		m_arrPosition[iTextureNum] = _float2(1510.f, 74.f);
+		m_arrPosition[iTextureNum] = _float2(1507.f, 82.f);
 	break;
 	case 12: // 점수판 digits 000
-		m_arrPosition[iTextureNum] = _float2(140.f, 810.f);
+		m_arrPosition[iTextureNum] = _float2(135.f, 817.f);
 	break;
 	case 13: // 점수판 digits 00
-		m_arrPosition[iTextureNum] = _float2(185.f, 810.f);
+		m_arrPosition[iTextureNum] = _float2(180.f, 817.f);
 	break;
 	case 14: // 점수판 digits 0
-		m_arrPosition[iTextureNum] = _float2(230.f, 810.f);
+		m_arrPosition[iTextureNum] = _float2(225.f, 817.f);
 	break;
-	case 15: // GAME OVER
-		//m_arrPosition[iTextureNum] = _float2(830.f, 200.f);
-		break;
 	case 18: // go!
 		m_arrPosition[iTextureNum] = _float2(830.f, 200.f);
 		break;
@@ -500,8 +484,8 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 	m_fStandardTime += fTimeDelta;
 	if (m_fStandardTime - m_fBeforeTime >= 1.f)
 	{
-		m_fCurTime = 5.f - m_fStandardTime;
-		//m_fCurTime = 50.f - m_fStandardTime;
+		//m_fCurTime = 5.f - m_fStandardTime;
+		m_fCurTime = 50.f - m_fStandardTime;
 		if (m_fCurTime <= 0.f) m_fCurTime = 0.f;
 		Change_TimeTexures(m_fCurTime);
 		

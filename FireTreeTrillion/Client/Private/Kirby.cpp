@@ -1920,10 +1920,6 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	// 커비가 레벨별로 시작할 때, 바라보는 방향을 정해준다.
 	Kirby_LookInitialize();
 
-	//m_eAbilityType = static_cast<ABILITYTYPE>(tLevelData.iKirbyState);
-	//static_cast<LEVEL>(tLevelData.iLatestLevel);
-	//_float3 vNewPos = tLevelData.vLastPos;
-	//m_pControllerCom->Set_Position(m_pTransformCom, _float4{ vNewPos.x, vNewPos.y, vNewPos.z, 1.f });
 
 	// 임시로 능력 디폴트 화
 	if (*m_pCurrentLevelID == LEVEL_INTRO)
@@ -1939,10 +1935,18 @@ HRESULT CKirby::Kirby_SystemInitialize()
 		m_uCoin	  = static_cast<_uint>(tLevelData.fKirbyCoin);
 		m_fAttack = 5.f; // 고정
 
+		//m_eAbilityType = static_cast<ABILITYTYPE>(tLevelData.iKirbyState);
+		LEVEL eLEVEL = static_cast<LEVEL>(tLevelData.iLatestLevel);
+
 		if (*m_pCurrentLevelID == LEVEL_RACING)
 		{
 			m_eAbilityType = ABILITY_DEFAULT;
 			m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, _float3{0.f, 0.f, 1.f}, 5.f);
+		}
+		else if (LEVEL_PARK == eLEVEL)
+		{
+			_float3 vNewPos = tLevelData.vLastPos;
+			m_pControllerCom->Set_Position(m_pTransformCom, _float4{ vNewPos.x, vNewPos.y, vNewPos.z, 1.f });
 		}
 		else
 		{
