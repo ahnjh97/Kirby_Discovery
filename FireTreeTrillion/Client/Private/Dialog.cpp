@@ -175,7 +175,7 @@ void CDialog::Load(string strPath)
 	tMessageDesc.vecHighlight	= vecHighlight;
 	tMessageDesc.vHighlightRGBA = { data["HighLightRGBA"][0], data["HighLightRGBA"][1], data["HighLightRGBA"][2], data["HighLightRGBA"][3] };
 	
-	// 한 레이어에 같이 안담겨서, 같은 레벨에 여러 메세지를 생성하는 경우 일단 레이어 나눠서 담는 방식 채택
+	/// 한 레이어에 같이 안담겨서, 같은 레벨에 여러 메세지를 생성하는 경우 일단 레이어 나눠서 담는 방식 채택
 	wstring wstrLayerName = TEXT("Layer_UI_Msg_") + CUtils::StrToWstr(npc);
 	hr = m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), wstrLayerName,
 									TEXT("Prototype_GameObject_UI_MessageWindow"), &tMessageDesc);

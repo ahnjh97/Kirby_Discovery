@@ -276,14 +276,13 @@ HRESULT CLevel_Park::Ready_Map()
 			tDesc.matWorld = matWorld;
 
 			//동적 필드
-			if ("Gimmick_PkFunHouseDarkness01" == strModelName )
-				//|| "Gimmick_PkFunHouseDarkness02" == strModelName
-				//|| "Gimmick_PkFunHouseDarkness03" == strModelName || "Gimmick_PkFunHouseDarkness04" == strModelName
-				//|| "Gimmick_PkFunHouseDarkness05" == strModelName || "Gimmick_PkFunHouse06" == strModelName
-				//|| "Gimmick_PkFunHouse07" == strModelName)
+			if ("Gimmick_PkFunHouseDarkness01" == strModelName
+				|| "Gimmick_PkFunHouseDarkness02" == strModelName
+				|| "Gimmick_PkFunHouseDarkness03" == strModelName || "Gimmick_PkFunHouseDarkness04" == strModelName
+				|| "Gimmick_PkFunHouseDarkness05" == strModelName || "Gimmick_PkFunHouse06" == strModelName
+				|| "Gimmick_PkFunHouse07" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicMap"), 
-					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicMap"), TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
 		}

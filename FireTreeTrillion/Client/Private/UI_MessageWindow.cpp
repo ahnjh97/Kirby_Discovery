@@ -98,8 +98,8 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 	m_pUIBtn->Tick(fTimeDelta);
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_IDLE == m_eCurState) //테스트용
-		Show_DialogMessage();
+	//if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_IDLE == m_eCurState) //테스트용
+	//	Show_DialogMessage();
 	
 	//A 버튼 입력 시, 다음 스크립트 문단을 준비하여 출력
 	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && WINDOW_SHOW == m_eCurState)
@@ -222,6 +222,13 @@ HRESULT CUI_MessageWindow::Render()
 #ifdef DEBUG
 void CUI_MessageWindow::Render_IMGUI()
 {
+	switch (m_eCurState)
+	{
+	case WINDOW_IDLE:			ImGui::Text(u8"MWINDOW_IDLE"); break;
+	case WINDOW_HIDE:		ImGui::Text(u8"MWINDOW_HIDE"); break;
+	case WINDOW_SHOW:		ImGui::Text(u8"MWINDOW_SHOW"); break;
+	case WINDOW_NONE:	default: ImGui::Text(u8"MWINDOW_NONE"); break;
+	}
 }
 
 #endif // DEBUG
