@@ -29,7 +29,7 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 
 	if (FAILED(__super::Initialize(&DynamicFieldDesc)))
 		return E_FAIL;
-	
+
 	wstring wstrModelTag = DynamicFieldDesc.wstrModelName;
 	if (FAILED(Add_Components(wstrModelTag))) //모델 별 컴포넌트 생성
 		return E_FAIL;
@@ -37,14 +37,25 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 	if (FAILED(SetUp_ShaderInfo(wstrModelTag))) //셰이더 정보 로드 및 세팅
 		return E_FAIL;
 
-	//m_eCurState = STATE_OFFWAIT;
-	//m_pModelCom->Set_Animation(STATE_OFFWAIT, 30.f, FALSE, FALSE);
+	//모델 별 타입 지정
+	if (TEXT("Gimmick_PkFunHouseDarkness01") == wstrModelTag 
+		|| TEXT("Gimmick_PkFunHouseDarkness04") == wstrModelTag
+		|| TEXT("Gimmick_PkFunHouseDarkness05") == wstrModelTag)
+		m_eDFieldType = DFMOVE_UPDOWN;
+
+	if (TEXT("Gimmick_PkFunHouseDarkness02") == wstrModelTag || TEXT("Gimmick_PkFunHouseDarkness03") == wstrModelTag)
+		m_eDFieldType = DFMOVE_LEFTRIGHT;
+
+	if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
+		m_eDFieldType = DFMOVE_FRONTBACK;
 
 	m_IsInteraction = FALSE;
 
 	//피직스 추가
 	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
 	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+
+#pragma region CREATE_SOLARPANEL
 
 	//상호작용할 태양전지판 생성
 	CGameObject::GAMEOBJECT_DESC tDesc{};
@@ -58,7 +69,8 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 	m_pSolarPanel = dynamic_cast<CGm_ParkSolarPanelOnce*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc));
 	if (nullptr == m_pSolarPanel)
 		return E_FAIL;
-	//Safe_AddRef(m_pSolarPanel);
+
+#pragma endregion
 
 	//림라이트 OFF
 	//m_bRimLight = FALSE;
@@ -72,6 +84,7 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 	//	return OBJ_DEAD;
 	if (nullptr != m_pSolarPanel)
 		m_pSolarPanel->Tick(fTimeDelta);
+
 	/*
 	switch (m_eCurState)
 	{
@@ -173,19 +186,16 @@ void CGm_DynamicField::Render_IMGUI()
 	if (nullptr != m_pSolarPanel)
 		m_pSolarPanel->Render_IMGUI();
 
-	/*
-	switch (m_eCurState)
+	switch (m_eDFieldType)
 	{
-	case STATE_OFFWAIT:			ImGui::Text(u8"STATE_OFFWAIT"); break;
-	case STATE_CHARGE:			ImGui::Text(u8"STATE_CHARGE"); break;
-	case STATE_ONWAITSTART:	ImGui::Text(u8"STATE_ONWAITSTART"); break;
-	case STATE_ONWAIT:		ImGui::Text(u8"STATE_ONWAIT"); break;
-	case STATE_NONE:	default: ImGui::Text(u8"STATE_NONE"); break;
+	case DFMOVE_UPDOWN:			ImGui::Text(u8"DFMOVE_UPDOWN"); break;
+	case DFMOVE_LEFTRIGHT:		ImGui::Text(u8"DFMOVE_LEFTRIGHT"); break;
+	case DFMOVE_FRONTBACK:		ImGui::Text(u8"DFMOVE_FRONTBACK"); break;
+	case DFMOVE_NONE:	default: ImGui::Text(u8"DFMOVE_NONE"); break;
 	}
 	
-	if (m_IsInteraction) ImGui::Text(u8"IsInteraction : TRUE");
-	else ImGui::Text(u8"IsInteraction : FALSE");
-	*/
+	if (m_IsInteraction) ImGui::Text(u8"Gm_DynamicFiled :: IsInteraction : TRUE");
+	else ImGui::Text(u8"Gm_DynamicFiled :: IsInteraction : FALSE");
 
 #pragma region IMGUI GIZMO
 
@@ -209,7 +219,6 @@ void CGm_DynamicField::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysX
 {
 	if (nullptr != m_pSolarPanel)
 		m_pSolarPanel->Collision(eContent, pObject);
-
 
 	m_IsInteraction = TRUE;
 }
