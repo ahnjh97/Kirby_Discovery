@@ -218,7 +218,9 @@ void CFinale_SpecialDebris_B::Make_Particle()
 			}
 
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
-			pCamera->Make_Shake(4.f, 0.5f);
+			pCamera->Make_Shake(8.f, 0.7f);
+			m_pGameInstance->Setting_RadialBlur(50.f, 60.f);
+
 
 			m_bParticleTrigger = false;
 		}
@@ -239,7 +241,7 @@ void CFinale_SpecialDebris_B::Set_Animation()
 		m_pModelCom->Set_Animation(CUT5, 40.f, false, false);
 		break;
 	case CUT6:
-		m_pModelCom->Set_Animation(CUT6, 50.f, false, false);
+		m_pModelCom->Set_Animation(CUT6, 70.f, false, false);
 		break;
 	case CUT7:
 		m_pModelCom->Set_Animation(CUT7, 50.f, false, false);

@@ -6,6 +6,7 @@
 #include "Particle.h"
 
 #include "FinalePartical_Maker.h"
+#include "FinaleCut_ControlCenter.h"
 
 CDisaster_Master::CDisaster_Master(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -37,7 +38,7 @@ HRESULT CDisaster_Master::Initialize(void* pArg)
 	LIGHT_DESC			LightDesc{};
 	LightDesc.eType = LIGHT_DESC::TYPE_POINT;
 	LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-	LightDesc.fRange = 90.f;
+	LightDesc.fRange = 70.f;
 	LightDesc.vDiffuse = _float4(.8f, .3f, .06f, 1.f);
 	LightDesc.vAmbient = _float4(0.3f, .3f, .3f, 1.f);
 	LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
@@ -127,6 +128,7 @@ _int CDisaster_Master::Tick(_float fTimeDelta)
 			m_pLight->Update_LightPos(vLightPos);
 			m_pGameInstance->Update_LightShadow(vLightPos, vLightKirbyPos);
 		}
+
 
 		m_fAirParticleDelay += fTimeDelta;
 		//m_fBuildingParticleDelay += fTimeDelta;

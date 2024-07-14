@@ -239,7 +239,7 @@ void CBuildingCluster_B::Set_Animation()
 	switch (m_eCurCut)
 	{
 	case CUT6:
-		m_pBuildingCluster->Set_Animation(CUT6, 50.f, false, false);
+		m_pBuildingCluster->Set_Animation(CUT6, 70.f, false, false);
 		break;
 	case CUT7:
 		m_pBuildingCluster->Set_Animation(CUT7, 50.f, false, false);

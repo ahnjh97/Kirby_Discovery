@@ -121,6 +121,7 @@ public:
 	_float4					m_vBonePos = { 0.f, 0.f, 0.f, 0.f };
 	_float4					Compute_RootPos();
 
+	_float					Get_AnimTrackPos();
 private:
 	// 커비의 움직임을 담은 구조체
 	FINALEKIRBY_INFODESC	m_tKirbyInfo;
