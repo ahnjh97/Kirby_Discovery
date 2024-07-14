@@ -53,11 +53,31 @@ HRESULT CAbility::Initialize(void* pArg)
 		m_fPower = 2.f;
 		m_fSpeed = 3.f;
 		m_fScale = 1.f;
+		m_fRimWidth = 5.f;
+
+		CEffect::FX_DESC FXDesc{};
+
+		FXDesc.vInitPos = { 0.f, 0.f, 0.f };
+		//FXDesc.vInitRot = { 0.f, 0.f, 0.f };
+		FXDesc.vInitScale = { 1.7f, 1.7f, 1.7f };
+		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+		Add_Effect("ItemStar", FXDesc);
 	}
 	else
 	{
 		m_fJumpPower = 7.f;
 		m_fPower = 2.f;
+
+
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = { 0.f, .3f, 0.f };
+		FXDesc.pSocketMatrix = &m_EffectSocket;
+		FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
+			return E_FAIL;
+		Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
 	}
 
 	AbilityType(m_eAbilityType);
@@ -71,15 +91,6 @@ HRESULT CAbility::Initialize(void* pArg)
 	CTransform* pTransform = pKirby->Get_TransformCom();
 	m_vLookDir = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
 
-	/*
-	CMultiEffect::MULTI_FX_DESC FXDesc{};
-	FXDesc.vInitPos = { 0.f, .3f, 0.f };
-	FXDesc.pSocketMatrix = &m_EffectSocket;
-	FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
-	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
-		return E_FAIL;
-	Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
-	*/
 	return S_OK;
 }
 
@@ -97,7 +108,6 @@ _int CAbility::Tick(_float fTimeDelta)
 
 		CTransform* pCameraTransform = pCameraMain->Get_TransformCom();
 		_vector vCameraLook = pCameraTransform->Get_State_Vector(CTransform::STATE_LOOK);
-		vCameraLook.m128_f32[1] = 0.f;
 
 		// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
 		if (m_ePhyXState == PO_FLYAWAY)
