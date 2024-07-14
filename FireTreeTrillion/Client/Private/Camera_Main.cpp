@@ -270,7 +270,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_FinaleSeqBTime =
 	{
 		0.f,
-		134.f / 50.f, //cut7 - cut8. 2배 느림
+		120.f / 50.f, //cut7 - cut8. 2배 느림
 		142.f / 50.f, //cut8 - cut9
 		139.f / 50.f, //cut9 - cut10
 		319.f / 50.f, //cut10 - cut11
@@ -337,6 +337,13 @@ void CCamera_Main::Check_FinaleTime(_float fTimeDelta)
 
 	//현재 인덱스 확인
 	m_iCurSceneIdx = pCenter->Get_CutScene();
+
+	if (m_iPreSceneIdx == QTE3 + 1 && m_iCurSceneIdx == QTE3 + 2)
+	{
+
+		Make_Sequence(SEQ_FINALECUT20);
+		return;
+	}
 
 	//시퀀스 a 시간 체크
 	if (1 <= m_iCurSceneIdx && !m_FinaleSeqATime.empty())
@@ -414,7 +421,6 @@ void CCamera_Main::Check_FinaleTime(_float fTimeDelta)
 			}
 
 		}
-
 	}
 }
 

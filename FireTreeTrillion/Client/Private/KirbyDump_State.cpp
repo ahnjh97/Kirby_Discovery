@@ -1176,7 +1176,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (pKirby->isAnimFinish())
 		{
-			//pCenter->Set_CutScene(18);
+			pCenter->Set_CutScene(18);
 
 		}
 
@@ -1223,7 +1223,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (pKirby->isAnimFinish())
 		{
-			//pCenter->Set_CutScene(20);
+			pCenter->Set_CutScene(20);
 
 			//CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 			//CHECK_NULLPTR(pCamera);
