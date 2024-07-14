@@ -692,7 +692,8 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	{
 		m_DestColorData = Find_ColorSet("Stage1");
 		m_fRimLightRatio.second = 1.f;
-		m_bRenderOption[OPTION_DOF] = true;
+		m_vRimColor.second = _float3(1.f, .5f, .3f);
+		Update_Option(OPTION_DOF, true);
 
 		if (m_iCurColorIdx != iSetIdx)
 		{
@@ -769,8 +770,8 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	{
 		m_DestColorData = Find_ColorSet("Finale");
 
-		m_fRimLightRatio.second = .7f;
-		m_vRimColor.second = _float3(.7f, .3f, 0.f);
+		m_fRimLightRatio.second = 1.f;
+		m_vRimColor.second = _float3(1.f, .45f, 0.f);
 		m_fDOFIntensity = .1f;
 		m_vDOFColor = _float3{ .08f, .05f, .13f };
 		Update_Option(OPTION_DOF, true);
@@ -821,7 +822,6 @@ void CRenderer::Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fS
 	m_fRadialRadiusSubtraction = fSubtraction;
 
 	m_isRadial = true;
-
 }
 
 void CRenderer::Setting_RadialBlur(_float fRadial, _float fSubtraction)
@@ -831,7 +831,6 @@ void CRenderer::Setting_RadialBlur(_float fRadial, _float fSubtraction)
 	m_fRadialRadiusSubtraction = fSubtraction;
 
 	m_isRadial = true;
-
 }
 
 void CRenderer::Update_DofFocus(_fvector vWorldPos)
@@ -842,6 +841,17 @@ void CRenderer::Update_DofFocus(_fvector vWorldPos)
 	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
 
 	m_vDofFocus = _float2(fScreenX, 1.f - fScreenY);
+}
+
+void CRenderer::Update_RimLight(_float fRimRatio, _float fRimRadius, _float3 vRimColor)
+{
+	m_fRimLightRatio.second = fRimRatio;
+
+	if (ISDEFAULTFLOAT(fRimRadius) == false)
+		m_fRimLightRadius.second = fRimRadius;
+
+	if (ISDEFAULTFLOAT3(vRimColor) == false)
+		m_vRimColor.second = vRimColor;
 }
 
 void CRenderer::Setting_GodRay(_fvector vWorldPos, _float fRayExposure, _float fRayDecay, _float fRayIlluminationDecay, _float fRayDensity, _float fWeight)
