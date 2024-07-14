@@ -450,10 +450,10 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Finale",
 		COLOR_DATA{
-1.54028f, 1.f, 1.08018f, 1.08951f, 0.559999f, 1.10999f, 1.50095f, 0.919976f, 0.969425f,
-0.969425f, 1.01024f, 0.819999f, 1.23982f, 0.366863f, 0.0322149f, 0.319418f, 0.02978f,
-0.579137f, 0.633162f, 0.769912f, 0.0295837f, 1.f, 0.847059f, 0.254902f, 0.0295075f,
-0.280444f, 0.670456f
+		1.3f, 1.f, 0.999745f, 1.27947f, 1.28048f, 1.10965f, 1.2099f, 0.880135f, 0.742923f,
+		0.695283f, 1.33026f, 1.07625f, 1.195f, 0.407189f, 0.0743245f, 0.152986f, 0.0859433f,
+		0.902655f, 0.68634f, 0.543191f, 0.0196147f, 0.499961f, 0.912908f, 0.99115f, 0.0198914f,
+		0.180384f, 0.369633f
 		});
 
 	Save_ColorSet("Horror",
@@ -534,7 +534,6 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 	if (m_eRenderMode == MODE_GAMEPLAY)
 	{
-
 		// 갓 레이 적용
 		if (FAILED(Render_GodRay()))
 			return E_FAIL;
@@ -668,6 +667,13 @@ void CRenderer::Set_ColorSet(COLOR_DATA destColorData)
 	m_DestColorData = destColorData;
 }
 
+void CRenderer::Set_ColorSet(string strColorName)
+{
+	//일단 -1로 초기화
+	m_DestColorData = {};
+	m_DestColorData = Find_ColorSet(strColorName);
+}
+
 void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 {
 	switch (iSetIdx)
@@ -692,7 +698,8 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	{
 		m_DestColorData = Find_ColorSet("Stage1");
 		m_fRimLightRatio.second = 1.f;
-		m_bRenderOption[OPTION_DOF] = true;
+		m_vRimColor.second = _float3(1.f, .5f, .3f);
+		Update_Option(OPTION_DOF, true);
 
 		if (m_iCurColorIdx != iSetIdx)
 		{
@@ -767,18 +774,19 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 		break;
 	case 5:
 	{
-		//m_DestColorData = Find_ColorSet("Finale");
-		m_DestColorData = Find_ColorSet("Town");
-		m_fRimLightRatio.second = .7f;
-		m_vRimColor.second = _float3(1.f, .5f, 0.f);
-		Update_Option(OPTION_DOF, false);
+		m_DestColorData = Find_ColorSet("Finale");
+
+		m_fRimLightRatio.second = 1.f;
+		m_vRimColor.second = _float3(1.f, .45f, 0.f);
+		m_fDOFIntensity = .1f;
+		m_vDOFColor = _float3{ .08f, .05f, .13f };
+		Update_Option(OPTION_DOF, true);
 	}
 	break;
 	case 6:
 	{
 		m_DestColorData = Find_ColorSet("Horror");
 		m_fRimLightRatio.second = 0.f;
-		//m_vRimColor.second = _float3(1.f, .5f, 0.f);
 		Update_Option(OPTION_DOF, true);
 	}
 	break;
@@ -819,7 +827,6 @@ void CRenderer::Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fS
 	m_fRadialRadiusSubtraction = fSubtraction;
 
 	m_isRadial = true;
-
 }
 
 void CRenderer::Setting_RadialBlur(_float fRadial, _float fSubtraction)
@@ -829,7 +836,6 @@ void CRenderer::Setting_RadialBlur(_float fRadial, _float fSubtraction)
 	m_fRadialRadiusSubtraction = fSubtraction;
 
 	m_isRadial = true;
-
 }
 
 void CRenderer::Update_DofFocus(_fvector vWorldPos)
@@ -840,6 +846,17 @@ void CRenderer::Update_DofFocus(_fvector vWorldPos)
 	_float fScreenY = (XMVectorGetY(vScreenPos) + 1.f) * 0.5f;
 
 	m_vDofFocus = _float2(fScreenX, 1.f - fScreenY);
+}
+
+void CRenderer::Update_RimLight(_float fRimRatio, _float fRimRadius, _float3 vRimColor)
+{
+	m_fRimLightRatio.second = fRimRatio;
+
+	if (ISDEFAULTFLOAT(fRimRadius) == false)
+		m_fRimLightRadius.second = fRimRadius;
+
+	if (ISDEFAULTFLOAT3(vRimColor) == false)
+		m_vRimColor.second = vRimColor;
 }
 
 void CRenderer::Setting_GodRay(_fvector vWorldPos, _float fRayExposure, _float fRayDecay, _float fRayIlluminationDecay, _float fRayDensity, _float fWeight)
@@ -1334,6 +1351,14 @@ HRESULT CRenderer::Render_Result()
 	if (FAILED(m_pShader->Bind_RawValue("g_vRimColor", &m_vRimColor.first, sizeof(_float3))))
 		return E_FAIL;
 
+	// DOF 강도
+	if (FAILED(m_pShader->Bind_RawValue("g_fDOFIntensity", &m_fDOFIntensity, sizeof(_float))))
+		return E_FAIL;
+
+	// DOF 컬러
+	if (FAILED(m_pShader->Bind_RawValue("g_vDOFColor", &m_vDOFColor, sizeof(_float3))))
+		return E_FAIL;
+
 	// 섞을 스카이 박스
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Sky"), "g_SkyTexture")))
 		return E_FAIL;
@@ -1775,6 +1800,15 @@ void CRenderer::Render_IMGUI()
 	ImGui::SeparatorText(u8"림 라이트");
 
 	ImGui::DragFloat(u8"림 라이트 배율", &m_fRimLightRatio.second, .01f, 0.f, 1.f, "%.2f");
+	ImGui::DragFloat(u8"림 라이트 범위", &(m_fRimLightRadius.second), .01f, 0.f, 10.f, "%.2f");
+	ImGui::DragFloat3(u8"림 라이트 색상", &(m_vRimColor.second.x), .01f, 0.f, 1.f, "%.2f");
+
+	//ImGui::DragFloat3(u8"림 라이트 색상", m_vRimColor.second, .01f, 0.f, 3.f, "%.2f");
+
+	ImGui::SeparatorText(u8"DOF");
+
+	ImGui::DragFloat(u8"DOF 강도", &m_fDOFIntensity, .01f, 0.f, 10.f, "%.2f");
+	ImGui::DragFloat3(u8"DOF 색상", &(m_vDOFColor.x), .01f, -1.f, 1.f, "%.2f");
 
 	ImGui::SeparatorText(u8"컬러코렉션");
 

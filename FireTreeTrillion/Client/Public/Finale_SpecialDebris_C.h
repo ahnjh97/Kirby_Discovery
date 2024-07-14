@@ -31,6 +31,12 @@ private:
 	HRESULT			Bind_ShaderResources();
 	_int			Make_Partical();
 
+	enum CUT { CUT10, CUT11, CUT12, CUT13, CUT14, CUT15, CUT16, CUT17, CUT18, CUT19, CUT20, CUT_END };
+	CUT				m_eCurCut = { CUT_END };
+	CUT				m_ePreCut = { CUT_END };
+	_bool			m_bRender = { false };
+	void			Set_Animation();
+
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };

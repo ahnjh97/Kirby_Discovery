@@ -28,6 +28,7 @@ bool g_isBulb;
 bool g_bBulbOn;
 float4 g_BulbPosition;
 
+float4 g_vCamPosition;
 
 struct VS_IN
 {
@@ -374,7 +375,6 @@ PS_OUT FOR_KIRBYMOUTH_PS_MAIN(PS_IN In)
 
     
     return Out;
-
 }
 
 PS_OUT FOR_EYE_PS_MAIN(PS_IN In)
@@ -676,6 +676,50 @@ PS_OUT PS_BULBLIGHT(PS_IN In)
 }
 
 
+PS_OUT PS_FOR_POPSTAR(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+
+    vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+    float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
+    float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+    float3 vWorldNormal = mul(vNormal, WorldMatrix);
+    
+    float4 vWorldPos = In.vWorldPos;
+    
+    Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
+    
+    float4 vLook = float4(g_vCamPosition.xyz, 1.f) - float4(vWorldPos.xyz, 1.f);
+    float vDot = dot(normalize(vLook), normalize(float4(vWorldNormal, 0.f)));
+    
+    vDot = 1.0f - saturate(vDot); // 내적 값이 0에 가까울수록 vDot이 1에 가까워지도록 변환
+    //vDot = vDot < 0.5 ? pow(2, 20 * vDot - 10) : (2 - pow(2, -20 * vDot + 10)) * 100;
+    vDot = vDot < 0.5 ? 
+    2 * vDot * vDot :
+    1 - pow(-2 * vDot + 2, 2) / 3;
+    
+    
+    vector vRimLightColor = 0;
+    
+    // 밝은 부분
+    if (vDot > 0.5)
+        vRimLightColor = float4(1.f, 0.9f, 0.6f, 1.f) * vDot;
+    // 밝지 않은 부분
+    else if (vDot < 0.5)
+        vRimLightColor = clamp(vDot, float4(1.f, 0.075f, 0.075f, 1.f), float4(1.f, 0.9, 0.6f, 1.f)) * (1.f - vDot);
+
+    Out.vDiffuse = saturate(vMtrlDiffuse * vRimLightColor);
+    
+    return Out;
+}
+
+
+
 technique11 DefaultTechnique
 {
     // 기본적인 애니메이션 모델 ( 0 )
@@ -936,6 +980,20 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_BULBLIGHT();
+    }
+
+    // Popstar ( 19 )
+    pass Popstar
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_FOR_POPSTAR();
     }
 
 }

@@ -55,15 +55,18 @@ HRESULT CPartTimerKirby::Initialize(void* pArg)
 	m_bMotionBlur = true;
 	Set_Slope(false);
 
-	// 타겟 카메라를 만들어준다.
-	if (FAILED(Make_TargetToCams()))
-		return E_FAIL;
+	if (LEVEL_TOOL_ANIM != *m_pCurrentLevelID)
+	{
+		// 타겟 카메라를 만들어준다.
+		if (FAILED(Make_TargetToCams()))
+			return E_FAIL;
+		
+		CPartTimeHelper::Get_Instance()->Register_PartTimerKirby(this);
+	}
 
 	// 완전히 기본상태로 먼저 세팅한다.
 	m_eMouthState = MOUTH_HAPPY;
 	m_eEyeState = EYE_IDLE;
-
-	CPartTimeHelper::Get_Instance()->Register_PartTimerKirby(this);
 
 	return S_OK;
 }
@@ -74,7 +77,6 @@ _int CPartTimerKirby::Tick(_float fTimeDelta)
 		return Ready_Dead();
 	 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
-
 	__super::Tick(m_fTimeDelta);
 
 	// Dof 초점을 커비에게 맞춘다.
@@ -83,13 +85,16 @@ _int CPartTimerKirby::Tick(_float fTimeDelta)
 	vDOFPos.m128_f32[1] += 0.5f;
 	m_pGameInstance->Update_DofFocus(vDOFPos);
 
-	if (m_pPartTimeFood != nullptr)
+	if (LEVEL_TOOL_ANIM != *m_pCurrentLevelID)
 	{
-		m_pPartTimeFood->Tick(fTimeDelta);
-		m_pPartTimeFood->Update_Position(Compute_BoneWorldMatrix());
+		if (m_pPartTimeFood != nullptr)
+		{
+			m_pPartTimeFood->Tick(fTimeDelta);
+			m_pPartTimeFood->Update_Position(Compute_BoneWorldMatrix());
+		}
+		if (m_pHat != nullptr)
+			m_pHat->Tick(fTimeDelta);
 	}
-	if (m_pHat != nullptr)
-		m_pHat->Tick(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -106,10 +111,13 @@ void CPartTimerKirby::Late_Tick(_float fTimeDelta)
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
 	}
 
-	if (m_pPartTimeFood != nullptr)
-		m_pPartTimeFood->Late_Tick(m_fTimeDelta);
-	if (m_pHat != nullptr)
-		m_pHat->Late_Tick(m_fTimeDelta);
+	if (LEVEL_TOOL_ANIM != *m_pCurrentLevelID)
+	{
+		if (m_pPartTimeFood != nullptr)
+			m_pPartTimeFood->Late_Tick(m_fTimeDelta);
+		if (m_pHat != nullptr)
+			m_pHat->Late_Tick(m_fTimeDelta);
+	}
 }
 
 HRESULT CPartTimerKirby::Render()
@@ -193,7 +201,7 @@ HRESULT CPartTimerKirby::Make_TargetToCams()
 	if (m_pCamera == nullptr)
 	{
 		//인트로, 게임플레이 스테이지라면 카메라로 main camera를 저장한다.
-		(LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END) ?
+		(LEVEL_PARTTIME <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END) ?
 			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main"))) :
 			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free"))); //나머지 레벨이라면 다른 카메라를 저장한다.
 
@@ -209,7 +217,7 @@ HRESULT CPartTimerKirby::Make_TargetToCams()
 	static_cast<CCamera_Main*>(m_pCamera)->Make_Sequence(CCamera_Main::SEQ_PARTTIMESTART);
 
 	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
-	if (LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END)
+	if (LEVEL_PARTTIME <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END)
 	{
 		CCamera* pCameraFree = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
 		if (pCameraFree != nullptr)

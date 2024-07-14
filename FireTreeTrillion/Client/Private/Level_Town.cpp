@@ -240,25 +240,25 @@ HRESULT CLevel_Town::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
 
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
+	CHECK_FAILED(hr);
 
 	// 다이얼로그 1 : 파트타임
 	CDialog::DIALOG_DESC tDialogDesc{};
 	tDialogDesc.strPath = "../Bin/Resources/Data/Dialog_Town.json";
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_Dialog"), &tDialogDesc);
-	
+	CHECK_FAILED(hr);
+
 	// 다이얼로그 2 : 파크데려가는 디디디
 	CDialog::DIALOG_DESC tDialogDDD_Desc{};
 	tDialogDDD_Desc.strPath = "../Bin/Resources/Data/Dialog_TownToPark.json";
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_Dialog"), &tDialogDDD_Desc);
-
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
 
 HRESULT CLevel_Town::Ready_Map()
 {
-
-
 	string strFileName = "../../../objects_txt/Town_Map.txt";
 	ifstream fileInput(strFileName, ios::binary);
 	if (fileInput.is_open() == false)
@@ -315,7 +315,6 @@ HRESULT CLevel_Town::Ready_Map()
 
 HRESULT CLevel_Town::Ready_Triggers()
 {
-
 	string strFileName = "../../../objects_txt/Town_Triggers.txt";
 	ifstream fileInput(strFileName, ios::binary);
 	if (fileInput.is_open() == false)
@@ -447,9 +446,6 @@ HRESULT CLevel_Town::Ready_Triggers()
 
 HRESULT CLevel_Town::Ready_Dees()
 {
-
-
-
 	CWaddleDee::DEE_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);

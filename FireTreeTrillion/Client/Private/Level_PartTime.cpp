@@ -20,6 +20,7 @@
 #include "BG.h"
 #include "HUD.h"
 #include "PartTimeHelper.h"
+#include "Dialog.h"
 
 
 CLevel_PartTime::CLevel_PartTime(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -251,6 +252,13 @@ HRESULT CLevel_PartTime::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	CHECK_FAILED(hr);
 	hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, _wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTimeResult"));
 	CHECK_FAILED(hr);
+
+	// 다이얼로그 1 : 파트타임
+	CDialog::DIALOG_DESC tDialogDesc{};
+	tDialogDesc.strPath = "../Bin/Resources/Data/Dialog_Parttime.json";
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_Dialog"), &tDialogDesc);
+	CHECK_FAILED(hr);
+
 	return S_OK;
 }
 

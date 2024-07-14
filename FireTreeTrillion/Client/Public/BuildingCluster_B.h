@@ -2,7 +2,6 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 
-
 BEGIN(Engine)
 class CModel;
 class CShader;
@@ -26,11 +25,13 @@ public:
 
 private:
 	HRESULT			Add_Components();
-	enum CUT { CUT1, CUT2, CUT_END };
+	enum CUT { CUT12, CUT6, CUT7, CUT7XXX, CUT_END };
+	CUT				m_eCurCut = { CUT_END };
+	CUT				m_ePreCut = { CUT_END };
+	_bool			m_bRender = { false };
 	void			Set_Animation();
 
 private:
-	CShader* m_pShaderAnimModelCom = { nullptr };
 	CModel* m_pBuildingCluster = { nullptr };
 
 	// 배열로 들고 있는다.

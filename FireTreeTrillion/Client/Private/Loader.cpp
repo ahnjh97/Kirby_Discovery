@@ -161,6 +161,13 @@
 #include "FinalePartical_Maker.h"
 #include "FinaleCut_ControlCenter.h"
 
+#include "Finale_SpecialDebris_A.h"
+#include "Finale_SpecialDebris_B.h"
+#include "Finale_SpecialDebris_C.h"
+#include "BuildingCluster_A.h"
+#include "BuildingCluster_B.h"
+#include "BuildingCluster_C.h"
+
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA)
 //BOSS
 #include "BossChimera.h"
@@ -263,8 +270,8 @@ HRESULT CLoader::Start()
 
 		SetUp_ModelScaleRotation(LEVEL_STATIC);
 		hr = Loading_StaticComponentAll();
-
 		CHECK_FAILED(hr);
+
 		hr = Loading_For_Logo();
 	}
 	break;
@@ -272,7 +279,7 @@ HRESULT CLoader::Start()
 	case LEVEL_GAMEPLAY:
 		hr = Loading_For_GamePlay();
 		break;
-	// 05.20) UI Tool 레벨 추가
+
 	case LEVEL_TOOL_UI:
 		hr = Loading_For_Tool_UI();
 		break;
@@ -322,9 +329,7 @@ HRESULT CLoader::Start()
 	}
 
 	LeaveCriticalSection(&m_Critical_Section);
-
-	if (FAILED(hr))
-		return E_FAIL;
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -453,6 +458,14 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalePartical"), CFinalePartical);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleBuildingPartical"), CFinaleBuildingPartical);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleCut_ControlCenter"), CFinaleCut_ControlCenter);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Finale_SpecialDebris_A"), CFinale_SpecialDebris_A);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Finale_SpecialDebris_B"), CFinale_SpecialDebris_B);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Finale_SpecialDebris_C"), CFinale_SpecialDebris_C);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_A"), CBuildingCluster_A);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_B"), CBuildingCluster_B);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_C"), CBuildingCluster_C);
+
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -929,9 +942,9 @@ HRESULT CLoader::Loading_For_Parttime()
 	CHECK_FAILED(hr);
 
 	// 게임 DIGITS
-	hr = Add_Texture(eLevel, "TimeDigits", "UI/Parttime/TimeDigits/%d.png", 10);
+	hr = Add_Texture(eLevel, "TimeDigits", "UI/Parttime/TimeDigits/%d.dds", 10);
 	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "ScoreDigits", "UI/Parttime/ScoreDigits/%d.png", 10);
+	hr = Add_Texture(eLevel, "ScoreDigits", "UI/Parttime/ScoreDigits/%d.dds", 10);
 	CHECK_FAILED(hr);
 
 #pragma endregion
@@ -1307,7 +1320,6 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 	//if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
 	//	return E_FAIL;
 	Add_KirbyFaceTexture(eLevel);
-
 	#pragma region 와들디 주문 말풍선
 	hr = Add_Texture(eLevel, "OrderCloud", "UI/MGameFood/OrderCloud.png");
 	CHECK_FAILED(hr);
@@ -2111,10 +2123,21 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BuildingPiece", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("StarPiece", TYPE_NONANIM, 1.f, 0.f, 0);
 
-		m_vecModelInfo.emplace_back("MovableBuildingA", TYPE_NONANIM, 1.f, 0.f, 0);
-		m_vecModelInfo.emplace_back("MovableBuildingB", TYPE_NONANIM, 1.f, 0.f, 0);
-		m_vecModelInfo.emplace_back("MovableBuildingC", TYPE_NONANIM, 1.f, 0.f, 0);
-		m_vecModelInfo.emplace_back("MovableBuildingD", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingA", TYPE_NONANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingB", TYPE_NONANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingC", TYPE_NONANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingD", TYPE_NONANIM, 0.8f, 0.f, 0);
+
+		m_vecModelInfo.emplace_back("BigMovableBuildingA", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BigMovableBuildingB", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BigMovableBuildingC", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BigMovableBuildingD", TYPE_NONANIM, 1.f, 0.f, 0);
+
+		m_vecModelInfo.emplace_back("CutDebrisA", TYPE_ANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("CutDebrisB", TYPE_ANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("CutDebrisC", TYPE_ANIM, 0.8f, 0.f, 0);
+
+
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
 		m_vecModelInfo.emplace_back("LbBrokenBuildingAC", TYPE_NONANIM, 1.f, 0.f, 0, string("LabDiscovera_Deco/"));
@@ -2122,8 +2145,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("LbBrokenBuildingCL", TYPE_NONANIM, 1.f, 0.f, 0, string("LabDiscovera_Deco/"));
 		m_vecModelInfo.emplace_back("LbBrokenBuildingDL", TYPE_NONANIM, 1.f, 0.f, 0, string("LabDiscovera_Deco/"));
 
+		m_vecModelInfo.emplace_back("BuildingCluster01", TYPE_ANIM, 0.8f);
+		m_vecModelInfo.emplace_back("BuildingCluster02", TYPE_ANIM, 0.8f);
+		m_vecModelInfo.emplace_back("BuildingSub", TYPE_ANIM, 0.8f);
 
-
+		 
 		m_vecModelInfo.emplace_back("Road", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadEnd", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 0.2f, 0.f, 0);
@@ -2215,14 +2241,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("StarBlockPiece", TYPE_NONANIM, 0.5f, 180.f);
 		m_vecModelInfo.emplace_back("StarBlockPieceStar", TYPE_NONANIM, 0.5f, 180.f);
 
-
 		// For Item
 		Load_ItemModels();
 		Load_KickableModels();
 
 		// 와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
-
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{
@@ -2267,8 +2291,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SpookStep", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("GhostGordo", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("Bomber", TYPE_ANIM, 1.f, 180.f);
-
 		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f);
+		
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);

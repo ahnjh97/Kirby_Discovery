@@ -38,8 +38,12 @@
 //느림 - 빠름 ease(빠름)
 #define EASE_IN_FAST(t)	(_float)pow(t, 6)
 
-//느림 - 빠름 - 느림 ease+
+//느림 - 빠름 - 느림 ease
 #define EASE_INOUT(t) (_float)(-(cos(3.14159f * t) - 1) / 2)
+
+#define EASE_INOUT_REVERSE(t) (_float)( 1.f - ( t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t) )
+
+
 //느림 - 빠름 - 느림 ease(빠름)
 #define EASE_INOUT_FAST(t) (_float)((t < 0.5) ? (4 * t * t * t) : 1 - pow(-2 * t + 2, 3) / 2)
 

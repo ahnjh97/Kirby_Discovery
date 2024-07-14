@@ -10,6 +10,12 @@ END
 
 #define PARTTIME_TEX_CNT	19
 
+// 15 : FINISH
+// 17 : READY
+// 18 : GO
+// ---------------------------
+// 16 : FADE-INOUT
+
 BEGIN(Client)
 class CUI_PartTime : public CUIObject
 {
@@ -53,7 +59,7 @@ private:
 
 	void						Render_READY();
 	void						Render_GO();
-	void						Render_GameOver();
+	void						Render_Finish();
 	void						Render_Fade();
 
 	void						Reset_ShaderValue();
@@ -77,7 +83,7 @@ private:
 	_float2						m_SizeScoreBar2D = _float2(438.f, 156.f);
 	_float2						m_SizeCategory2D = _float2(256.f, 256.f);
 	_float2						m_SizeDeeFace2D = _float2(200.f, 116.f);
-	_float2						m_SizeDigits2D = _float2(50.f, 60.f);
+	_float2						m_SizeDigits2D = _float2(72.f, 72.f);
 
 	// TimeBar Ratio
 	_float						m_fRatioTimeBar = 1.f;
@@ -100,7 +106,6 @@ private:
 	// GAME-OVER 텍스트
 	_float						m_fSizeRatio = 0.f;
 	_float2						m_fStandardSize2D = _float2();
-	_float2						m_fRealTimeSize2D = _float2();
 	// 시작할 때 텍스트
 	_float						m_fMoveRatio = 0.f;
 	_float2						m_fMovePosition2D = _float2(); // this
