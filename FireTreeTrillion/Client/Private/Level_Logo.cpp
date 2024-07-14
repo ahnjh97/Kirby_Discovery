@@ -21,10 +21,7 @@ HRESULT CLevel_Logo::Initialize()
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
-	HRESULT hr(S_OK);
-	hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
-	CHECK_FAILED(hr);
-
+	Ready_StaticObject();
 
 	return S_OK;
 }
@@ -68,6 +65,19 @@ HRESULT CLevel_Logo::Ready_Layer_BackGround(const wstring& strLayerTag)
 
 HRESULT CLevel_Logo::Ready_Layer_UI()
 {
+	return S_OK;
+}
+
+HRESULT CLevel_Logo::Ready_StaticObject()
+{
+	HRESULT hr(S_OK);
+	
+	hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
+	CHECK_FAILED(hr);
+	
+	hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+	CHECK_FAILED(hr);
+
 	return S_OK;
 }
 
