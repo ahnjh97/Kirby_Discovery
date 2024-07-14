@@ -891,7 +891,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (pKirby->isAnimFinish())
 		{
-			pCenter->Set_CutScene(2);
+			//pCenter->Set_CutScene(2);
 		}
 	}
 	// ¸Ö¸®¼­ ºÎ¸ªºÎ¸ª
@@ -1009,7 +1009,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if (pKirby->isAnimFinish())
 			{
-				pCenter->Set_CutScene(7);
+				//pCenter->Set_CutScene(7);
 
 			}
 		}
@@ -1042,7 +1042,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (pKirby->isAnimFinish())
 		{
-			pCenter->Set_CutScene(8);
+			//pCenter->Set_CutScene(8);
 
 		}
 	}
@@ -1055,7 +1055,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (pKirby->isAnimFinish())
 		{
-			pCenter->Set_CutScene(9);
+			//pCenter->Set_CutScene(9);
 		}
 
 	}
@@ -1077,7 +1077,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	{
 		if (pKirby->isAnimFinish())
 		{
-			pCenter->Set_CutScene(12);
+			//pCenter->Set_CutScene(12);
 		}
 
 	}
@@ -1132,7 +1132,6 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		if (30.f < m_fQTERatio)
 		{
 			pCenter->Set_CutScene(14);
-
 		}
 
 	}
@@ -1152,7 +1151,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (pKirby->isAnimFinish())
 		{
-			pCenter->Set_CutScene(16);
+			//pCenter->Set_CutScene(16);
 		}
 
 	}
@@ -1164,7 +1163,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (pKirby->isAnimFinish())
 		{
-			pCenter->Set_CutScene(17);
+			//pCenter->Set_CutScene(17);
 		}
 
 	}
@@ -1177,7 +1176,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (pKirby->isAnimFinish())
 		{
-			pCenter->Set_CutScene(18);
+			//pCenter->Set_CutScene(18);
 
 		}
 
@@ -1224,16 +1223,22 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (pKirby->isAnimFinish())
 		{
-			pCenter->Set_CutScene(20);
+			//pCenter->Set_CutScene(20);
 
-			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
-			CHECK_NULLPTR(pCamera);
-			pCamera->Set_CamFocus(CCamera::FOCUS_FINALE);
+			//CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+			//CHECK_NULLPTR(pCamera);
+			//pCamera->Set_CamFocus(CCamera::FOCUS_FINALE);
 		}
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT20)
 	{
-
+		//if (m_bShakeTrigger1 == true)
+		//{
+		//	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+		//	CHECK_NULLPTR(pCamera);
+		//	pCamera->Set_CamFocus(CCamera::FOCUS_FINALE);
+		//	m_bShakeTrigger1 = false;
+		//}
 
 
 		// °í»ýÇÏ¼Ì½À´Ï´Ù.

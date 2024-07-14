@@ -202,7 +202,8 @@ void CFinale_SpecialDebris_A::Make_Particle()
 			vEffectPos.y -= 10.f;
 
 			CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_FinalePartical_Maker")));
-			pMaker->Make_Partical(50, vPos, 15.f, 6.f, 3.f, _float4(1.f, 1.f, 0.f, 0.f), 180.f, CUtils::Make_RandomFloat(100.f, 150.f));
+			pMaker->Make_Partical(40, vPos, 15.f, 6.f, 3.f, _float4(1.f, 1.f, 0.f, 0.f), 180.f, CUtils::Make_RandomFloat(100.f, 150.f));
+			pMaker->Make_Partical(15, vPos, 40.f, 6.f, 3.f, _float4(1.f, 0.2f, 0.f, 0.f), 180.f, CUtils::Make_RandomFloat(120.f, 150.f));
 
 			for (_int i = 0; i < 15; ++i)
 			{
