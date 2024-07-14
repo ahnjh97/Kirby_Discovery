@@ -29,7 +29,8 @@ public:
 private:
 	HRESULT			Add_Components();
 	HRESULT			Bind_ShaderResources();
-	_int			Make_Partical();
+	void			Make_Particle();
+	_bool			m_bParticleTrigger = { true };
 
 	enum CUT { CUT4, CUT5, CUT6, CUT7, CUT_END };
 	CUT				m_eCurCut = { CUT_END };
