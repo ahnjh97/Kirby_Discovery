@@ -190,11 +190,11 @@ HRESULT CUI_MessageWindow::Render()
 		switch (*m_pCurrentLevelID)
 		{
 		case LEVEL_TOWN: case LEVEL_DEEDEEDEE: 
-			eTexType = TYPE_DEFAULT;
+				eTexType = TYPE_DEFAULT;
 			break;
 
 		case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE:
-			if (TEXMW_BTNBASE == iTEXIx)
+			if (TEXMW_BTNBASE == iTEXIx) //해당 레벨에서는 출력x
 				continue;
 
 			else
@@ -220,6 +220,30 @@ HRESULT CUI_MessageWindow::Render()
 	}
 
 #pragma endregion
+
+#pragma region BASE_CLAW
+	
+	switch (*m_pCurrentLevelID)
+	{
+	case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE:
+		if (FAILED(m_pTransCom[TEXMW_BASE]->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+			return E_FAIL;
+
+		hr = Bind_ShaderResources(m_pShaderCom, POSTEX_UIMWBASE_CLAW, m_pTexClaw, 0);
+		CHECK_FAILED(hr);
+	break;
+
+	default: break;
+	}
+
+#pragma endregion
+
 	
 	//버튼 렌더링
 	m_pUIBtn->Render();
@@ -280,6 +304,10 @@ HRESULT CUI_MessageWindow::Add_Components()
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_UI_MessageWindow_Base"),
 		TEXT("Com_TexBase"), (CComponent**)&m_pTexCom[TEXMW_BASE])))
+		return E_FAIL;
+
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_UI_MessageWindow_Base_Claw"),
+		TEXT("Com_TexBase_Claw"), (CComponent**)&m_pTexClaw)))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_UI_MessageWindow_BtnBase"),
@@ -388,7 +416,7 @@ HRESULT CUI_MessageWindow::Render_Message()
 							{0.f, -3.f} ,
 							{0.f, 3.f} };
 
-		_float4 vMessageShadowRGBA = { 0.025f, 0.025f, 0.025f, 0.025f };
+		_float4 vMessageShadowRGBA = { 0.05f, 0.05f, 0.05f, 0.05f };
 		_float2 vMessageShadowScale = { 1.01f, 1.01f };
 
 		// 스크립트 그림자
@@ -612,6 +640,7 @@ void CUI_MessageWindow::Free()
 	for (auto& iTex : m_pTexCom)
 		Safe_Release(iTex);
 
+	Safe_Release(m_pTexClaw);
 	Safe_Release(m_pUIBtn);
 }
 

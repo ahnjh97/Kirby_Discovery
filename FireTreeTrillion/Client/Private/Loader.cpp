@@ -1598,6 +1598,7 @@ HRESULT CLoader::Add_StaticUITexture()
 
 	//UI_MessageWindow
 	hr = Add_Texture(LEVEL_STATIC, "UI_MessageWindow_Base", "UI/MessageWindow/MessageWindow_Base_%d.dds", 3); CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "UI_MessageWindow_Base_Claw", "UI/MessageWindow/MessageWindow_Base_Claw.dds"); CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "UI_MessageWindow_BtnBase", "UI/MessageWindow/MessageWindow_BtnBase_%d.dds", 3); CHECK_FAILED(hr);
 
 	//UI_Button

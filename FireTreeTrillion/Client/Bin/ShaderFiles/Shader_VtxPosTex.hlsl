@@ -530,6 +530,25 @@ PS_OUT PS_FADE_INOUT(PS_IN_ALPHABLEND In)
     return Out;
 }
 
+PS_OUT PS_CLAW(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    
+    //알파 값 예외처리
+    if (Out.vColor.a < 0.01f)
+        discard;
+    
+    Out.vColor.rgb *= g_vRColor * 0.9f;
+    Out.vColor.a *= g_fAlpha;
+
+    if (0.01f <= Out.vColor.a)
+        Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
+	
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	// 기본 패스. 알파 테스팅 ( 0 )
@@ -795,4 +814,19 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_FADE_INOUT();
     }
+
+    // UI_MessageWindow Claw (19)
+    pass CLAW
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_CLAW();
+    }
+
 }
