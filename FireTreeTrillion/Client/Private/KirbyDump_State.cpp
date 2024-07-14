@@ -864,6 +864,9 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				CHECK_NULLPTR(pCameraMain);
 				pCameraMain->Set_FOVY(40.f - m_fQTERatio);
 
+				_float fYOffset = 2.f - (m_fQTERatio * .1f);
+				pCamera->Set_TargetAnchor(_float3{ 0.f, fYOffset, 0.f });
+
 			}
 
 			if (15.f <= m_fQTERatio)
@@ -875,6 +878,8 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 					(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 				CHECK_NULLPTR(pCameraMain);
 				pCameraMain->Set_FOVY(50.f);
+				pCamera->Set_TargetAnchor(_float3{ 0.f, 2.f, 0.f });
+
 				m_iQTECnt++;
 			}
 

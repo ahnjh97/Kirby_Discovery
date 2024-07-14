@@ -58,6 +58,28 @@ _float3 vertices[] = {
    {  1.0f, -1.0f, -1.0f },
 };
 
+float SmoothStep(float edge0, float edge1, float x) {
+	// Scale, bias and saturate x to 0..1 range
+	x = (x - edge0) / (edge1 - edge0);
+	x = max(0.0f, min(1.0f, x));
+	// Evaluate polynomial
+	return x * x * (3 - 2 * x);
+}
+
+XMVECTOR CustomLerp(XMVECTOR A, XMVECTOR B, XMVECTOR C, float t) {
+	t = SmoothStep(0.0f, 1.0f, t); // 매끄러운 비율 적용
+	if (t < 0.5f) {
+		// A와 C 사이 보간
+		float localT = t / 0.5f;
+		return _float3::Lerp(A, C, localT);
+	}
+	else {
+		// C와 B 사이 보간
+		float localT = (t - 0.5f) / 0.5f;
+		return _float3::Lerp(C, B, localT);
+	}
+}
+
 CCamera_Main::CCamera_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera{ pDevice, pContext }
 {
@@ -223,7 +245,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_CamTriggerUpOffsets.reserve(LEVEL_END);
 	m_CamTriggerUpOffsets.resize(LEVEL_END);
 	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f };
-	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, .4f , .4f , .7f , 0.2f , 0.2f, 0.f };
+	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, .4f , .4f , .5f , 0.2f , 0.2f, 0.f };
 
 
 	//별 이펙트 테스트용
@@ -846,11 +868,24 @@ void CCamera_Main::Compute_Set_BothFocus(_float fTimeDelta)
 void CCamera_Main::Compute_Set_BattleFocus(_float fTimeDelta)
 {
 
-	_float3 vKirbyToBoss = FINALEBOSS->Get_RootPos() + _float4{ 0.f, 0.f, -3.f, 0.f } - FINALEKIRBY->m_vBonePos;
-	_float3 vBossToKirby = FINALEKIRBY->m_vBonePos + _float4{ 0.f, 0.f, -3.f, 0.f } - FINALEBOSS->Get_RootPos();
+	_float3 vKirbyToBoss = FINALEBOSS->Get_RootPos() + _float4{ 0.f, 0.f, -10.f, 0.f } - FINALEKIRBY->m_vBonePos;
+	_float3 vBossToKirby = FINALEKIRBY->m_vBonePos + _float4{ 0.f, 0.f, -10.f, 0.f } - FINALEBOSS->Get_RootPos();
+
+	_float3 vCenterDir = _float3(0.f, 0.f, -1.f);
 
 
 	_float fRatio{ .5f };
+
+
+	_float3 vAxis = {-.3f, 1.f, 0.f};
+	vAxis.Normalize();
+
+	Quaternion vQuat = Quaternion::CreateFromAxisAngle(vAxis, ToRadian((m_fBothFocusRatio - .5f) * 140.f));
+	_float3 vResultVector = _float3::Transform(vCenterDir, vQuat);
+
+	/*
+	//_float3 interpolatedVector = CustomLerp(vKirbyToBoss, vBossToKirby, vCenterDir, m_fBothFocusRatio);
+
 	if (abs(m_fBothFocusRatio - .5f) < .4f)
 	{
 		fRatio = (m_fBothFocusRatio - .1f) * .5f + .2f;
@@ -859,8 +894,9 @@ void CCamera_Main::Compute_Set_BattleFocus(_float fTimeDelta)
 		fRatio = EASE_IN(m_fBothFocusRatio) * .3f;
 	else if (.9f < m_fBothFocusRatio)
 		fRatio = .9f + (EASE_OUT(m_fBothFocusRatio) - .9f) * .3f;
+	*/
 
-	m_vDestCamDir = _float3::Lerp(vKirbyToBoss, vBossToKirby, fRatio);
+	m_vDestCamDir = vResultVector;
 	m_vDestCamDir.Normalize();
 
 	_float fDistRatio = (.5f < m_fBothFocusRatio) ?
@@ -1683,7 +1719,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 
 		newAction = {};
-		Fill_HardCutSet(newAction, fDuration - .2f);
+		Fill_HardCutSet(newAction, fDuration);
 
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 1.f, .08f, -.12f });
 		newAction.vDir.Normalize();
@@ -1691,8 +1727,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		Fill_ActionPos(newAction, POS_ABSOLUTE, _float3{ 2062.f, 24.5f, -136.f } - newAction.vDir * 20.f);
 		m_CamSeq.push_back(newAction);
 
-		Fill_InterpolateCutSet(newAction, fDuration - .2f, EASE_INOUT, .2f);
-		m_CamSeq.push_back(newAction);
+		//Fill_InterpolateCutSet(newAction, fDuration - .2f, EASE_INOUT, .2f);
+		//m_CamSeq.push_back(newAction);
 
 	}
 	break;
@@ -2247,7 +2283,7 @@ _float3 CCamera_Main::Make_TargetPos()
 		_float3 vBossPos = (_float3)pBoss->Get_RootPos();
 
 		//vTargetPos = vKirbyPos * (1.f - m_fBothFocusRatio) + vBossPos * (m_fBothFocusRatio);
-		vTargetPos = vKirbyPos * .5f + vBossPos * .5f;
+		vTargetPos = vKirbyPos * .5f + vBossPos * .5f + _float3{0.f, -10.f, 0.f};
 	}
 
 	return vTargetPos;
@@ -2271,8 +2307,8 @@ void CCamera_Main::Interpolate_CamSet(_float fTimeDelta)
 
 	//각도 보간
 	fSlerpSpeed = (m_eCamFocus == FOCUS_BOTH || m_eCamFocus == FOCUS_BATTLE) ? 12.f : 4.f;
-	//if (m_eCamFocus == FOCUS_BATTLE)
-	//	fSlerpSpeed = 12.f;
+	if (m_eCamFocus == FOCUS_BATTLE)
+		fSlerpSpeed = 10.f;
 	m_vCurCamDir = CUtils::SlerpDirVec(m_vCurCamDir, m_vDestCamDir, clamp(fTimeDelta * fSlerpSpeed, 0.f, 1.f));
 
 	//z angle 보간
@@ -2356,6 +2392,14 @@ void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
 
 
 	_float fInterpolateSpeed = (m_eCamFocus == FOCUS_BOTH) ? 12.f : m_fInterpolateSpeed;
+	_float fInterpolateYSpeed = fInterpolateSpeed * 1.2f;
+
+
+	if (m_eCamFocus == FOCUS_BATTLE)
+	{
+		fInterpolateSpeed = 20.f;
+		fInterpolateYSpeed = 20.f;
+	}
 
 	//x 가기
 	if (.1f <= vDestXZDir.Length())
@@ -2366,7 +2410,7 @@ void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
 	{
 		//위쪽으로 이동하는 거라면 일단 절대값으로.
 		if (0.f < vDestYDir.y)
-			m_pTransformCom->Move(vDestYDir * fTimeDelta * (fInterpolateSpeed * 1.2f));
+			m_pTransformCom->Move(vDestYDir * fTimeDelta * fInterpolateYSpeed);
 		else
 		{
 			_float4 vDir = _float4();
@@ -2380,6 +2424,11 @@ void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
 	}
 
 	fInterpolateSpeed = (m_eCamFocus == FOCUS_BOTH) ? 10.f : 1.f;
+
+	if (m_eCamFocus == FOCUS_BATTLE)
+	{
+		fInterpolateSpeed = 20.f;
+	}
 
 	//보간하여 바라보기
 	m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir) + _float4{ 0.f, m_fCurUpOffset, 0.f, 0.f },
@@ -2447,6 +2496,9 @@ void CCamera_Main::Render_IMGUI()
 
 
 	ImGui::Dummy(ImVec2(0, 10));
+
+	ImGui::DragFloat(u8"배틀 포커스 비율", &m_fBothFocusRatio, .01f, 0.f, 1.f, "%.2f");
+
 
 	ImGui::SeparatorText(u8"시퀀스");
 	ImGui::Text(u8"지나간 시퀀스 시간: %.2f", m_fSeqPlayedTime);
