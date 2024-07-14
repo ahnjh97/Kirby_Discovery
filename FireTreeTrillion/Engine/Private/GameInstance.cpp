@@ -163,7 +163,6 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 
 void CGameInstance::LateTick_Engine(_float fTimeDelta)
 {
-	m_pObject_Manager->Event_Tick(fTimeDelta);
 	m_pObject_Manager->Late_Tick(fTimeDelta);
 }
 

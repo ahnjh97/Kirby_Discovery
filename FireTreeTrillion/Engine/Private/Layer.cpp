@@ -93,15 +93,6 @@ void CLayer::Tick(_float fTimeDelta)
 	}
 }
 
-void CLayer::Event_Tick(_float fTimeDelta)
-{
-	for (auto& pGameObject : m_GameObjects)
-	{
-		if (nullptr != pGameObject)
-			pGameObject->Event_Tick(fTimeDelta);
-	}
-}
-
 void CLayer::Late_Tick(_float fTimeDelta)
 {
 	for (auto& pGameObject : m_GameObjects)

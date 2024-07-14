@@ -5,6 +5,7 @@
 #include "Level_Loading.h"
 #include "TransingStar.h"
 #include "EventCenter.h"
+#include "UI_Fading.h"
 
 CUI_MessageWindow::CUI_MessageWindow(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CUIObject { _pDevice, _pContext }
@@ -89,7 +90,6 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 #pragma endregion
 
 	m_pCurrentLevelID = m_pGameInstance->Get_CurrentLevelID();
-
 	// 하이라이트 처리를 하기 위한 문자열 정리하는 함수
 	Split_Message();
 
@@ -101,6 +101,7 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 		pEventCenter->Subscribe(KEVENT_SIMBA_APPEAR_START, this, func);
 	}
 
+	m_bEventCall = false;
 	return S_OK;
 }
 
@@ -127,8 +128,12 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 			m_eCurState = WINDOW_HIDE;
 			m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_HIDE);
 			OnEvent(); //모든 스크립트 재생 종료 시, 해당 이벤트를 수행
+			m_bEventCall = true;
 		}
 	}
+
+	if (m_bEventCall && *m_pCurrentLevelID == LEVEL_DEEDEEDEE)
+		Event_Tick(fTimeDelta);
 
 	_float3 vOffset = { 0.9f, 0.9f, 1.f };
 	_float3 vShowScale{};
@@ -163,10 +168,9 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 		return OBJ_NOEVENT;
 	}	
 
+
 	return OBJ_NOEVENT;
 }
-
-
 
 void CUI_MessageWindow::Late_Tick(_float fTimeDelta)
 {
@@ -562,12 +566,6 @@ void CUI_MessageWindow::OnEvent()
 {
 	switch(*m_pCurrentLevelID)
 	{
-	case LEVEL_DEEDEEDEE:
-	{
-		// QZR : 페이드아웃 처리
-		m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOWN));
-	}
-	break;
 	case LEVEL_TOWN:
 	{
 		if (m_tMessageDesc.wstrNPC == L"DeeDeeDee")
@@ -604,6 +602,40 @@ void CUI_MessageWindow::Start_Message(CGameObject* pObj)
 {
 	Show_DialogMessage();
 }
+
+// for Fade-Out
+void CUI_MessageWindow::Event_Tick(_float fTimeDelta)
+{
+	static _float fTimeAcc = 0.f;
+	fTimeAcc += fTimeDelta;
+	if (fTimeAcc > 2.f) // 2초뒤 페이드인
+		Ready_FadeOut();
+}
+
+void CUI_MessageWindow::Ready_FadeOut()
+{
+	static _bool bOnceFade = false;
+	static _bool bOnceChanger = false;
+	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+	CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
+
+	if (bOnceFade == false)
+	{
+		pFadingUI->Set_InOutState(CUI_Fading::FADEOUT);
+		pFadingUI->Set_IsRender(true);
+		bOnceFade = true;
+	}
+	else if (pFadingUI->Get_FadeRatio() <= 0.f)
+	{
+		if (bOnceChanger == false)
+		{
+			m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOWN));
+			pFadingUI->Set_IsRender(false);
+			bOnceChanger = true;
+		}
+	}
+}
+
 
 CUI_MessageWindow* CUI_MessageWindow::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

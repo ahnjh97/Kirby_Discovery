@@ -56,7 +56,6 @@ public:
 	virtual HRESULT		Initialize_Prototype();
 	virtual HRESULT		Initialize(void* pArg);
 	virtual _int		Tick(_float fTimeDelta);
-	virtual void		Event_Tick(_float fTimeDelta);
 	virtual void		Late_Tick(_float fTimeDelta);
 	virtual HRESULT		Render();
 	virtual HRESULT		Render_LightDepth() { return S_OK; }

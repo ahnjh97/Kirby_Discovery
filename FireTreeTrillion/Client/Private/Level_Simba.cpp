@@ -16,9 +16,10 @@
 #include "BG.h"
 #include "HUD.h"
 #include "SkySphere.h"
+
 #include "Dialog.h"
-//#include "Kirby.h"
 #include "EventCenter.h"
+#include "TransingStar.h"
 #include "GameObject.h"
 
 CLevel_Simba::CLevel_Simba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -65,6 +66,12 @@ HRESULT CLevel_Simba::Initialize()
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
+	// SIMBA 도착했으면 오픈해주세요
+	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
+	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
+	pTransingStar->Set_LargeColor(_float3(85.f / 255.f, 93.f / 255.f, 183.f / 255.f));
+	pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
+	pTransingStar->Activate(CTransingStar::OPEN);
 
 	return S_OK;
 }

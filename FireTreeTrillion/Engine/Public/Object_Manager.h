@@ -35,7 +35,6 @@ public:
 	CGameObject*			Add_CloneReturn(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg);
 	class CGameObject*		Clone_GameObject(const wstring& strPrototypeTag, void* pArg);
 	void					Tick(_float fTimeDelta);
-	void					Event_Tick(_float fTimeDelta);
 	void					Late_Tick(_float fTimeDelta);
 	void					Clear(_uint iLevelIndex);
 	void					Clear_Layer(_uint iLevelIndex, const wstring& strLayerTag);
