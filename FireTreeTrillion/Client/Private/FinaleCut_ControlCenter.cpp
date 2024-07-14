@@ -114,6 +114,17 @@ HRESULT CFinaleCut_ControlCenter::Render()
 void CFinaleCut_ControlCenter::Set_CutScene(_uint iScene)
 {
 	m_iCutScene = iScene;
+
+	if (iScene == 7)
+	{
+		m_pGameInstance->Set_FirstTimerRatio(.5f);
+		m_pGameInstance->Set_SecondTimerRatio(.5f);
+	}
+	else if (iScene == 8)
+	{
+		m_pGameInstance->Restore_FirstTimer(.2f);
+		m_pGameInstance->Restore_SecondTimer(.2f);
+	}
 }
 
 CFinaleCut_ControlCenter* CFinaleCut_ControlCenter::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

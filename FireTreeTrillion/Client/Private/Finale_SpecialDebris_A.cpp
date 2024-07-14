@@ -98,6 +98,10 @@ void CFinale_SpecialDebris_A::Late_Tick(_float fTimeDelta)
 
 
 	m_pModelCom->Play_Animation(m_fAccTime);
+
+	if (m_eCurCut == CUT7)
+		return;
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 
@@ -196,10 +200,10 @@ void CFinale_SpecialDebris_A::Set_Animation()
 	switch (m_eCurCut)
 	{
 	case CUT4:
-		m_pModelCom->Set_Animation(CUT4, 50.f, false, false);
+		m_pModelCom->Set_Animation(CUT4, 40.f, false, false);
 		break;
 	case CUT5:
-		m_pModelCom->Set_Animation(CUT5, 50.f, false, false);
+		m_pModelCom->Set_Animation(CUT5, 40.f, false, false);
 		break;
 	case CUT6:
 		m_pModelCom->Set_Animation(CUT6, 50.f, false, false);

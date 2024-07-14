@@ -193,7 +193,7 @@ HRESULT CPartTimerKirby::Make_TargetToCams()
 	if (m_pCamera == nullptr)
 	{
 		//인트로, 게임플레이 스테이지라면 카메라로 main camera를 저장한다.
-		(LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END) ?
+		(LEVEL_PARTTIME <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END) ?
 			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main"))) :
 			m_pCamera = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free"))); //나머지 레벨이라면 다른 카메라를 저장한다.
 
@@ -209,7 +209,7 @@ HRESULT CPartTimerKirby::Make_TargetToCams()
 	static_cast<CCamera_Main*>(m_pCamera)->Make_Sequence(CCamera_Main::SEQ_PARTTIMESTART);
 
 	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
-	if (LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END)
+	if (LEVEL_PARTTIME <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END)
 	{
 		CCamera* pCameraFree = static_cast<CCamera*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Free")));
 		if (pCameraFree != nullptr)

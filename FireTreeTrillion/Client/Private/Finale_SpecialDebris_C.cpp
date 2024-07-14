@@ -95,8 +95,8 @@ _int CFinale_SpecialDebris_C::Tick(_float fTimeDelta)
 	}
 	else if (iCutIndex == 16)
 	{
-		m_bRender = true;
-		m_eCurCut = CUT16;
+		m_bRender = false;
+		//m_eCurCut = CUT16;
 	}
 	else if (iCutIndex == 17)
 	{
@@ -133,6 +133,7 @@ void CFinale_SpecialDebris_C::Late_Tick(_float fTimeDelta)
 		return;
 
 	m_pModelCom->Play_Animation(m_fAccTime);
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 
@@ -231,37 +232,37 @@ void CFinale_SpecialDebris_C::Set_Animation()
 	switch (m_eCurCut)
 	{
 	case CUT10:
-		m_pModelCom->Set_Animation(CUT10, 50.f, false, false);
+		m_pModelCom->Set_Animation(CUT10, 40.f, false, false);
 		break;
 	case CUT11:
-		m_pModelCom->Set_Animation(CUT11, 50.f, false, false);
+		m_pModelCom->Set_Animation(CUT11, 40.f, false, false);
 		break;
 	case CUT12:
-		m_pModelCom->Set_Animation(CUT12, 50.f, false, false);
+		m_pModelCom->Set_Animation(CUT12, 40.f, false, false);
 		break;
 	case CUT13:
-		m_pModelCom->Set_Animation(CUT13, 50.f, false, false);
+		m_pModelCom->Set_Animation(CUT13, 40.f, false, false);
 		break;
 	case CUT14:
-		m_pModelCom->Set_Animation(CUT14, 50.f, false, false);
+		m_pModelCom->Set_Animation(CUT14, 40.f, false, false);
 		break;
 	case CUT15:
-		m_pModelCom->Set_Animation(CUT15, 50.f, false, false);
+		m_pModelCom->Set_Animation(CUT15, 40.f, false, false);
 		break;
 	case CUT16:
-		m_pModelCom->Set_Animation(CUT16, 50.f, false, false);
+		m_pModelCom->Set_Animation(CUT16, 40.f, false, false);
 		break;
 	case CUT17:
-		m_pModelCom->Set_Animation(CUT17, 50.f, false, false);
+		m_pModelCom->Set_Animation(CUT17, 40.f, false, false);
 		break;
 	case CUT18:
-		m_pModelCom->Set_Animation(CUT18, 50.f, false, false);
+		m_pModelCom->Set_Animation(CUT18, 40.f, false, false);
 		break;
 	case CUT19:
-		m_pModelCom->Set_Animation(CUT19, 50.f, false, false);
+		m_pModelCom->Set_Animation(CUT19, 40.f, false, false);
 		break;
 	case CUT20:
-		m_pModelCom->Set_Animation(CUT20, 50.f, false, false);
+		m_pModelCom->Set_Animation(CUT20, 40.f, false, false);
 		break;
 	default:
 		break;

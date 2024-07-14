@@ -72,7 +72,6 @@ _int CBuildingCluster_A::Tick(_float fTimeDelta)
 	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
 	{
 		m_btest = !m_btest;
-	}
 
 	if (m_btest == true)
 	{
@@ -85,6 +84,9 @@ _int CBuildingCluster_A::Tick(_float fTimeDelta)
 		m_pGameInstance->Set_SecondTimerRatio(1.f);
 
 	}
+
+	}
+
 
 	_int iCutIndex = pCenter->Get_CutScene();
 
