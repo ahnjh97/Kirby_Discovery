@@ -2250,7 +2250,7 @@ void CCamera_Main::Move_ForTrigger(_float fTimeDelta, _float3 vPos, _float3 vDir
 	if (LEVEL_TOWN == *m_pCurrentLevelID)
 	{
 		vPos = { 109.9f, 25.2f, 108.5f };
-		vDir = { 1.f, -.15f, -.12f };
+		vDir = { 1.f, .15f, -.12f };
 		CAMACTION newAct = {};
 		newAct.fTime = 0.f;
 		newAct.eCamCut = CUT_HARD;
@@ -2262,6 +2262,8 @@ void CCamera_Main::Move_ForTrigger(_float fTimeDelta, _float3 vPos, _float3 vDir
 		newAct.vDir = vDir;
 
 		Make_One_Sequence(newAct);
+		Set_TargetAnchor({0.f, 5.f, 0.f});
+
 	}
 	//else if()
 }

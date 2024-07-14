@@ -39,7 +39,7 @@ private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 	_int	m_RenderCount = { 0 };
-
+	_float4x4 m_EffectSocket = {_float4x4::Identity};
 
 public:
 	static CPopStar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -45,17 +45,17 @@ HRESULT CPopStar::Initialize(void* pArg)
 	m_pTransformCom->Set_Scaled(8.f, 8.f, 8.f);
 
 
-	//StarRiver
+	//StarRiver	
 	CEffect::FX_DESC FXDesc{};
 
-	FXDesc.vInitPos = _float3{15.f, -10.f, 0.f};
-	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-	FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+	//FXDesc.vInitPos = _float3{15.f, -10.f, 0.f};
+	FXDesc.pSocketMatrix = &m_EffectSocket;
+	//FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_StarRiver"), &FXDesc)))
 		return E_FAIL;
 
-	FXDesc.vInitPos = _float3{ 15.f, -40.f, 0.f };
-	FXDesc.vInitScale = { 6.f, 6.f, 6.f };
+	//FXDesc.vInitPos = _float3{ 15.f, -40.f, 0.f };
+	FXDesc.vInitScale = { 4.f, 4.f, 4.f };
 	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_star dash test 3"), &FXDesc)))
 		return E_FAIL;
 
@@ -85,6 +85,13 @@ _int CPopStar::Tick(_float fTimeDelta)
 		return OBJ_NOEVENT;
 
 	_int iCutIndex = pCenter->Get_CutScene();
+
+
+	m_EffectSocket = m_pTransformCom->ComputeBoneWorldMatrix(m_pModelCom->Get_BonePtr("PopStarL"), _float3(), true);
+	//_float3 vAngle = { 90.f, 0.f, 0.f };
+	//_float4x4 RotMat = _float4x4::CreateFromYawPitchRoll(CUtils::Degree_ToRadian(vAngle));
+	//m_EffectSocket *= RotMat;
+
 
 	if (iCutIndex == 1)
 	{
