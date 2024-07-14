@@ -45,6 +45,9 @@ HRESULT CLevel_Finale::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_BuildingCluster"), TEXT("Prototype_GameObject_BuildingCluster_B"))))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_BuildingCluster"), TEXT("Prototype_GameObject_BuildingCluster_C"))))
+		return E_FAIL;
+
 
 	// µ¥ºê¸®½º ÄÆ¾À A, B, C
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_Debris"), TEXT("Prototype_GameObject_Finale_SpecialDebris_A"))))
