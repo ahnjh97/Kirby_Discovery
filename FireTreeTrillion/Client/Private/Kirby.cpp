@@ -1937,6 +1937,8 @@ HRESULT CKirby::Kirby_SystemInitialize()
 		m_fMaxHp = 100.f;
 		m_eAbilityType = ABILITY_DEFAULT;
 	}
+
+
 	if (*m_pCurrentLevelID == LEVEL_RACING)
 	{
 		m_eAbilityType = ABILITY_DEFAULT;

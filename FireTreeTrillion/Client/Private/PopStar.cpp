@@ -2,6 +2,8 @@
 #include "PopStar.h"
 #include "MultiEffect.h"
 
+#include "FinaleCut_ControlCenter.h"
+
 CPopStar::CPopStar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 {
@@ -31,7 +33,7 @@ HRESULT CPopStar::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 임시
-	m_pModelCom->Set_Animation(1, 10.f, false, false);
+	m_pModelCom->Set_Animation(WAIT, 10.f, false, false);
 
 	m_bMotionBlur = false;
 	m_bRimLight = true;
@@ -40,8 +42,8 @@ HRESULT CPopStar::Initialize(void* pArg)
 
 	m_pTransformCom->Turn(_float4(0.f, 1.f, 0.f, 0.f), 1.f, 90.f);
 	m_pTransformCom->Turn(_float4(0.f, 0.f, 1.f, 0.f), 1.f, 50.f);
-
 	m_pTransformCom->Set_Scaled(8.f, 8.f, 8.f);
+
 
 	//StarRiver
 	CEffect::FX_DESC FXDesc{};
@@ -77,15 +79,114 @@ _int CPopStar::Tick(_float fTimeDelta)
 		return OBJ_DEAD;
 
 
+	CFinaleCut_ControlCenter* pCenter =
+		static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
+	if (nullptr == pCenter)
+		return OBJ_NOEVENT;
 
+	_int iCutIndex = pCenter->Get_CutScene();
+
+	if (iCutIndex == 1)
+	{
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(2550.f, 255.f, -136.f, 1.f));
+		_float4 NewLook = _float4(1.f, 0.f, 0.f, 0.f);
+		_float4 NewUp = _float4(0.f, 1.f, 0.f, 0.f);
+		_float4 NewRight = XMVector3Cross(NewUp, NewLook);
+		m_pTransformCom->Set_State(CTransform::STATE_LOOK, NewLook);
+		m_pTransformCom->Set_State(CTransform::STATE_UP, NewUp);
+		m_pTransformCom->Set_State(CTransform::STATE_RIGHT, NewRight);
+
+		m_eCurCut = CUT1;
+	}
+	else if (iCutIndex == 2)
+	{
+		m_eCurCut = CUT2;
+	}
+	else if (iCutIndex == 3)
+	{
+		m_eCurCut = CUT3;
+	}
+	else if (iCutIndex == 4)
+	{
+		m_eCurCut = CUT4;
+	}
+	else if (iCutIndex == 5)
+	{
+		m_eCurCut = CUT5;
+	}
+	else if (iCutIndex == 6)
+	{
+		m_eCurCut = CUT6;
+	}
+	else if (iCutIndex == 7)
+	{
+		m_eCurCut = CUT7;
+	}
+	else if (iCutIndex == 8)
+	{
+		m_eCurCut = CUT8;
+	}
+	else if (iCutIndex == 9)
+	{
+		m_eCurCut = CUT9;
+	}
+	else if (iCutIndex == 10)
+	{
+		m_eCurCut = CUT10;
+	}
+	else if (iCutIndex == 11)
+	{
+		m_eCurCut = CUT11;
+	}
+	else if (iCutIndex == 12)
+	{
+		m_eCurCut = CUT12;
+	}
+	else if (iCutIndex == 13)
+	{
+		m_eCurCut = CUT13;
+	}
+	else if (iCutIndex == 14)
+	{
+		m_eCurCut = CUT14;
+	}
+	else if (iCutIndex == 15)
+	{
+		m_eCurCut = CUT15;
+	}
+	else if (iCutIndex == 16)
+	{
+
+	}
+	else if (iCutIndex == 17)
+	{
+		m_eCurCut = CUT17;
+	}
+	else if (iCutIndex == 18)
+	{
+		m_eCurCut = CUT18;
+	}
+	else if (iCutIndex == 19)
+	{
+		m_eCurCut = CUT19;
+	}
+	else if (iCutIndex == 20)
+	{
+		m_eCurCut = CUT20;
+	}
+
+	Set_Animation();
 
 	return OBJ_NOEVENT;
 }
 
 void CPopStar::Late_Tick(_float fTimeDelta)
 {
+	Compute_ViewZ();
 	m_pModelCom->Play_Animation(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+	m_RenderCount = 1;
 }
 
 HRESULT CPopStar::Render()
@@ -95,35 +196,69 @@ HRESULT CPopStar::Render()
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-	for (size_t i = 0; i < iNumMeshes; i++)
+	if (m_RenderCount == 1)
 	{
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
-			return E_FAIL;
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+				return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
-			return E_FAIL;
-		_float fWhiteColorDiffuse = 0.f;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColorDiffuse, sizeof(_float))))
-			return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+				return E_FAIL;
+			_float fWhiteColorDiffuse = 0.f;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColorDiffuse, sizeof(_float))))
+				return E_FAIL;
 
-		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
-			return E_FAIL;
-		m_pModelCom->Render(i);
+			/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+				return E_FAIL;
+			m_pModelCom->Render(i);
+		}
+		m_RenderCount = 0;
+	}
+	else if (m_RenderCount == 0)
+	{
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+				return E_FAIL;
+
+			/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_POPSTAR)))
+				return E_FAIL;
+			m_pModelCom->Render(i);
+		}
+		m_RenderCount = 0;
 	}
 	return S_OK;
+}
+
+void CPopStar::Set_Animation()
+{
+	if (m_eCurCut == m_ePreCut)
+		return;
+
+	m_pModelCom->Set_Animation(m_eCurCut, 50.f, false, false);
+	m_ePreCut = m_eCurCut;
+
 }
 
 HRESULT CPopStar::Add_Components()

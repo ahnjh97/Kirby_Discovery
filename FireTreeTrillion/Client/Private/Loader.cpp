@@ -166,6 +166,7 @@
 #include "Finale_SpecialDebris_C.h"
 #include "BuildingCluster_A.h"
 #include "BuildingCluster_B.h"
+#include "BuildingCluster_C.h"
 
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA)
 //BOSS
@@ -461,6 +462,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Finale_SpecialDebris_C"), CFinale_SpecialDebris_C);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_A"), CBuildingCluster_A);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_B"), CBuildingCluster_B);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_C"), CBuildingCluster_C);
 
 
 	//Dee
@@ -2125,8 +2127,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("BuildingCluster01", TYPE_ANIM, 0.8f);
 		m_vecModelInfo.emplace_back("BuildingCluster02", TYPE_ANIM, 0.8f);
+		m_vecModelInfo.emplace_back("BuildingSub", TYPE_ANIM, 0.8f);
 
-
+		 
 		m_vecModelInfo.emplace_back("Road", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadEnd", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 0.2f, 0.f, 0);
