@@ -106,6 +106,7 @@ private:
 	//점심시간용
 	_bool						m_bLunchTimeTrigger = { true };
 	_float						m_fLunchTimeStartTime = { 0.f };
+
 	// GAME-OVER 텍스트
 	_float						m_fSizeRatio = 0.f;
 	_float2						m_fStandardSize2D = _float2();

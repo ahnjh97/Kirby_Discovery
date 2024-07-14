@@ -125,6 +125,11 @@ void CFinaleCut_ControlCenter::Set_CutScene(_uint iScene)
 		m_pGameInstance->Restore_FirstTimer(.2f);
 		m_pGameInstance->Restore_SecondTimer(.2f);
 	}
+
+	if (iScene == 14)
+	{
+		int a = 0;
+	}
 }
 
 CFinaleCut_ControlCenter* CFinaleCut_ControlCenter::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

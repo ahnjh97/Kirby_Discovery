@@ -199,8 +199,8 @@ private:
 	//for Finale
 	_int				m_iPreSceneIdx =	{ 0 };
 	_int				m_iCurSceneIdx =	{ 0 };
+	_bool				m_bChangedScene = { false };
 
-	//_bool				m_bChangedScene = { false };
 	_int				m_iSceneCnt =		{ -1 };
 
 

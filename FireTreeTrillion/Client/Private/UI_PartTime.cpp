@@ -509,12 +509,23 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 
 			//유아이 숨기기
 			m_arrRenderState[BASIC] = false;
+			m_fLunchTimeStartTime = 5.f;
 
 			// 커비랑 와들디에게 점심시간 알리기
 
 			CPartTimeHelper::Get_Instance()->NotifyObserver();
 
 			m_bLunchTimeTrigger = false;
+		}
+
+		if (0.f < m_fLunchTimeStartTime)
+		{
+			m_fLunchTimeStartTime -= fTimeDelta;
+			if (m_fLunchTimeStartTime < 0.f)
+			{
+				m_arrRenderState[BASIC] = true;
+				m_fLunchTimeStartTime = 0.f;
+			}
 		}
 		m_fBeforeTime = m_fStandardTime;
 	}

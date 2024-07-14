@@ -1009,7 +1009,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if (pKirby->isAnimFinish())
 			{
-				//pCenter->Set_CutScene(7);
+				pCenter->Set_CutScene(7);
 
 			}
 		}
