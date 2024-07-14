@@ -256,6 +256,8 @@
     <ClInclude Include="..\public\FinaleRoadGrouper.h" />
     <ClInclude Include="..\Public\PopStar_StarSmall.h" />
     <ClInclude Include="..\Public\OriginCage.h" />
+    <ClInclude Include="..\public\QTE.h" />
+    <ClInclude Include="..\Public\QTE_Effect.h" />
     <ClInclude Include="..\Public\RoomGlass.h" />
     <ClInclude Include="..\Public\ShadowDeco.h" />
     <ClInclude Include="..\Public\DeeDeeDee.h" />
@@ -502,6 +504,8 @@
     <ClCompile Include="..\Private\KirbyBoom_State.cpp" />
     <ClCompile Include="..\Private\PopStar_StarSmall.cpp" />
     <ClCompile Include="..\Private\OriginCage.cpp" />
+    <ClCompile Include="..\private\QTE.cpp" />
+    <ClCompile Include="..\Private\QTE_Effect.cpp" />
     <ClCompile Include="..\Private\RoomGlass.cpp" />
     <ClCompile Include="..\Private\ShadowDeco.cpp" />
     <ClCompile Include="..\Private\DeeDeeDee.cpp" />

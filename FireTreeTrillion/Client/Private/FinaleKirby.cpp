@@ -18,7 +18,6 @@
 
 #include "FinalePartical_Maker.h"
 
-
 CFinaleKirby::CFinaleKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
 {

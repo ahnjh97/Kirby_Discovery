@@ -168,6 +168,9 @@
 #include "BuildingCluster_B.h"
 #include "BuildingCluster_C.h"
 
+#include "QTE.h"
+#include "QTE_Effect.h"
+
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA)
 //BOSS
 #include "BossChimera.h"
@@ -466,6 +469,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_B"), CBuildingCluster_B);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_C"), CBuildingCluster_C);
 
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("QTE"), CQTE);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("QTE_Effect"), CQTE_Effect);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -1231,6 +1236,19 @@ HRESULT CLoader::Loading_For_Finale()
 	if (FAILED(Add_Texture(eLevel, "Terrain_Fog", "Map/Fog/Sand_%d.png", 4)))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "FinalePartical", "FinalePartical/Finale_%d.dds", 9)))
+		return E_FAIL;
+
+	if (FAILED(Add_Texture(eLevel, "QTE_A", "UI/QTE/QTE_A.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "QTE_B", "UI/QTE/QTE_B.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "QTE_JoyOn", "UI/QTE/QTE_JoyOn.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "QTE_JoyOff", "UI/QTE/QTE_JoyOff.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "QTE_Plate", "UI/QTE/QTE_Plate.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "QTE_Effect", "UI/QTE/QTE_Effect.png")))
 		return E_FAIL;
 
 

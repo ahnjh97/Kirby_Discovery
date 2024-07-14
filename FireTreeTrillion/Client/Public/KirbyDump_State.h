@@ -88,6 +88,8 @@ public:
 	_int	m_iQTECnt = { 0 };
 	_float	m_fQTERatio = { 0.f };
 
+
+
 	static	CKirbyDump_Cut2_State* Create();
 	virtual void				  Free() override;
 };
