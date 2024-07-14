@@ -272,7 +272,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 		0.f,
 		120.f / 50.f, //cut7 - cut8. 2¹è ´À¸²
 		142.f / 50.f, //cut8 - cut9
-		139.f / 50.f, //cut9 - cut10
+		135.f / 50.f, //cut9 - cut10
 		319.f / 50.f, //cut10 - cut11
 		110.f / 50.f, //cut11 - cut12
 		80.f / 50.f, /*70.f*/
@@ -1885,7 +1885,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		//
 		newAction = {};
-		Fill_InterpolateCutSet(newAction, 1.f, EASE_INOUT_FAST, fDuration - 1.f);
+		Fill_InterpolateCutSet(newAction, 1.f, EASE_OUT, fDuration - 1.f);
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE, BOSS_POS + _float3{ -60.f, 10.f, 0.f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 1.f, 0.f, 0.f });
