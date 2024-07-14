@@ -42,12 +42,14 @@ private:
 private:
 	_float2			m_vPreScreenPos = { 0.f, 0.f };
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
+	_float			m_fShowDialog = { 0.f };
 
 
 	_float4x4* m_pBoneMatrix = { nullptr };
 	_float* m_pWhiteColorDiffuse = { nullptr };
 
 	_bool	m_bItemTrigger = { true };
+	_bool	m_bShowDialog = { FALSE };
 
 private:
 	HRESULT Add_Components();

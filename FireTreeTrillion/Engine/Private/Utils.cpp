@@ -153,6 +153,11 @@ Quaternion CUtils::Make_Quat_FromDir(const _float3& _dir)
 	return Quaternion::FromToRotation(vStartDir, vDestDir);
 }
 
+_float3 CUtils::Degree_ToRadian(_float3 vDegree)
+{
+	return  _float3(ToRadian(vDegree.x), ToRadian(vDegree.y), ToRadian(vDegree.z));
+}
+
 _float3 CUtils::Make_Degree_FromDir(const _float4& _dir)
 {
 	Quaternion vQuat = Make_Quat_FromDir(_dir);
@@ -173,13 +178,10 @@ _float3 CUtils::SlerpDirVec(_float3 vStart, _float3 vEnd, _float fRatio)
 {
 	_float fDot = vStart.Dot(vEnd);
 	fDot = clamp(fDot, -1.f, 1.f);
-	_float fTheta = acos(fDot) * fRatio;
+	_float fTheta = acosf(fDot) * fRatio;
+	_float3 vRelative = XMVector3Normalize(vEnd - vStart * fRatio);
 
-	_float3 vRelative = vEnd - vStart * fDot;
-	vRelative.Normalize();
-
-	_float3 vResult = XMVector3Normalize(vStart * cos(fTheta) + vRelative * sin(fTheta));
-	return vResult;
+	return XMVector3Normalize( vStart * cosf(fTheta) + vRelative * sinf(fTheta) );
 }
 
 void CUtils::Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, _fvector vState)

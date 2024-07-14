@@ -3,6 +3,7 @@
 #include "Bone.h"
 
 #include "Ability.h"
+#include "UI_MessageWindow.h"
 
 
 CDeeDeeDeeHammer::CDeeDeeDeeHammer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -45,7 +46,6 @@ _int CDeeDeeDeeHammer::Tick(_float fTimeDelta)
 
 	m_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * *m_pBoneMatrix * *m_pParentMatrix;
 
-
 	if (m_bItemTrigger == true && CUtils::Get_Scaled_Matrix(m_WorldMatrix).x < 0.1f)
 	{
 		HRESULT hr = S_OK;
@@ -55,6 +55,22 @@ _int CDeeDeeDeeHammer::Tick(_float fTimeDelta)
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);
 		m_bItemTrigger = false;
+
+		m_bShowDialog = TRUE;
+	}
+
+	//특정 시간 경과 후 다이얼로그 출력
+	if (m_bShowDialog) //== TRUE;
+	{
+		m_fShowDialog += fTimeDelta;
+		if (m_fShowDialog > 3.f)
+		{
+			CUI_MessageWindow* pMWindow = dynamic_cast<CUI_MessageWindow*>
+				(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_DeeDeeDee")));
+			CHECK_NULLPTR(pMWindow);
+			pMWindow->Show_DialogMessage();
+			m_fShowDialog = 0.f;
+		}
 	}
 
 	return OBJ_NOEVENT;

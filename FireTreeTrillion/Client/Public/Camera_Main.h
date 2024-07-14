@@ -214,6 +214,7 @@ private:
 	list<_float>		m_FinaleSeqCTime;
 	list<_float>		m_FinaleSeqDTime;
 
+
 	_float3 m_vCurKirbyTriggerLocalPos = { 0.f, 0.f, 0.f };
 	vector<pair<_vector, _float>>	m_vecFrontDirRadius;
 	vector<pair<_vector, _float>>	m_vecRearDirRadius;

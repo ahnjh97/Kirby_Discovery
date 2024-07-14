@@ -74,6 +74,7 @@ public:
 
 
 	void Set_ColorSet(COLOR_DATA destColorData);
+	void Set_ColorSet(string strColorName);
 	void Set_ColorSet_ByIndex(_int iSetIdx);
 	void Save_ColorSet(string strTag, COLOR_DATA destColorData);
 	COLOR_DATA& Find_ColorSet(string strTag);
@@ -83,6 +84,7 @@ public:
 	void Setting_RadialBlur(_float fRadial, _float fSubtraction);
 	// DOF 초점을 업데이트한다.
 	void Update_DofFocus(_fvector vWorldPos);
+	void Update_RimLight(_float fRimRatio, _float fRimRadius = -1.f, _float3 vRimColor = {-1.f, -1.f, -1.f});
 	// GodRay 위치를 설정한다.
 	void Setting_GodRay(_fvector vWorldPos, 
 		_float fRayExposure = 0.15f, _float fRayDecay = 0.96815f, _float fRayIlluminationDecay = 0.8f, _float fRayDensity = 0.5f, _float fWeight = 0.5f);
@@ -229,6 +231,8 @@ private:
 	pair<_float, _float> m_fRimLightRadius = { 1.f, 1.f };
 	pair<_float3, _float3> m_vRimColor = {_float3(1.f, 1.f, 1.f), _float3(1.f, 1.f, 1.f)};
 
+	_float m_fDOFIntensity = { 0.1f };
+	_float3 m_vDOFColor = { .03f, 0.f, .05f };
 
 	_float m_fSSAOScale = { 0.5f };
 	_float m_fSSAOBias = { 0.f };

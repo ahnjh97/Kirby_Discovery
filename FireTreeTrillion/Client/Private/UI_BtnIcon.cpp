@@ -35,8 +35,18 @@ HRESULT CUI_BtnIcon::Initialize(void* _pArg)
 	m_vOrigScale = vScale * vOffset;
 	m_pTransformCom->Set_Scaled(m_vOrigScale);
 
-	//_float4 vTrans = { 478.f, -388.f, 1.f, 1.f };
-	_float4 vTrans = { 508.f, -393.f, 1.f, 1.f };
+	_float4 vTrans{};
+	switch (*m_pCurrentLevelID)
+	{
+	case LEVEL_TOWN: case LEVEL_DEEDEEDEE:
+		vTrans = { 502.f, -393.f, 1.f, 1.f };
+		break;
+
+	case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE: default:
+		vTrans = { 508.f, -393.f, 1.f, 1.f };
+		break;
+	}
+
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTrans);
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
@@ -136,11 +146,11 @@ HRESULT CUI_BtnIcon::Render()
 			
 			switch (*m_pCurrentLevelID)
 			{
-			case LEVEL_TOWN:
+			case LEVEL_TOWN: case LEVEL_DEEDEEDEE:
 				eTexType = TYPE_DEFAULT;
 				break;
 
-			case LEVEL_DEEDEEDEE: case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE:
+			case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE:
 				eTexType = TYPE_BOSS;
 				break;
 

@@ -3,6 +3,7 @@
 
 #include "Level_Loading.h"
 #include "PartTimeHelper.h"
+#include "PartTimerKirby.h"
 
 CUI_PartTimeResult::CUI_PartTimeResult(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CUIObject{ _pDevice, _pContext }
@@ -114,7 +115,7 @@ HRESULT CUI_PartTimeResult::Render()
 	}
 
 	Render_Digits();
-
+	Render_Font();
 
 	return S_OK;
 }
@@ -148,8 +149,8 @@ void CUI_PartTimeResult::Render_IMGUI()
 	//	ImGui::NewLine();
 	//}
 
-	//char test[16], test2[16];
-	//ImGui::DragFloat3(test, (_float*)&m_vTESTCOLOR, 0.01f, 0.f, 1.f);
+	char test[16];//, test2[16];
+	ImGui::DragFloat2(test, (_float*)&m_posTemp, 5.f, 0.f, 1000.f);
 	//ImGui::DragFloat3(test2, (_float*)&m_vTESTCOLOR2, 0.01f, 0.f, 1.f);
 }
 #endif
@@ -163,8 +164,9 @@ void CUI_PartTimeResult::Render_Digits()
 	{
 		m_fMoveRatio = 1.f;
 		fTimeAcc += m_fTimeDelta;
-		if (fTimeAcc >= 1.f)
+		if (fTimeAcc >= 0.2f)
 		{
+			
 			_int iAddNum = 1;
 			// 와들디 iAddNum만큼 등장 // 효선아 여기야
 
@@ -176,7 +178,11 @@ void CUI_PartTimeResult::Render_Digits()
 				{
 					// 최종 점수만큼 ScoreTextures가 채워져 있다.
 					if (m_bRenderTotalScore)
+					{
 						Render_TotalScore();
+						CPartTimerKirby* pKirby = dynamic_cast<CPartTimerKirby*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_PartTimerKirby"));
+						pKirby->Change_State(CPartTimerKirby::FOODSHOP_RESULTWINSTART, 50.f, false, true);
+					}
 				}
 				if (fTimeAcc >= 2.5f)
 				{
@@ -186,6 +192,7 @@ void CUI_PartTimeResult::Render_Digits()
 				// 다이얼로그 생성
 				if (fTimeAcc >= 4.f)
 				{
+					
 					// 다이얼로그 띄우기 // 이거 a버튼 누르면 town으로 돌아가기
 					if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_A, KEY_DOWN))
 					{
@@ -228,8 +235,6 @@ void CUI_PartTimeResult::Render_Digits()
 		hr = m_pVIBufferCom->Render();
 		CHECK_FAILED(hr);
 	}
-
-
 }
 
 void CUI_PartTimeResult::Render_TotalScore()
@@ -276,6 +281,16 @@ void CUI_PartTimeResult::Render_TotalScore()
 		hr = m_pVIBufferCom->Render();
 		CHECK_FAILED(hr);
 	}
+}
+
+void CUI_PartTimeResult::Render_Font()
+{
+	// 폰트
+	wstring wstrFontTag = L"Font_Dialog_KR18spac10";
+	_int iNumDee = m_fScore / 30.f;
+	wstring wstrMsg = L"합계 " + CUtils::StrToWstr(to_string(iNumDee)) + L"인";
+	_float4 vRGBA = { 75.f / 255.f, 58.f / 255.f, 22.f / 255.f, 1.f };
+	m_pGameInstance->Render_Font(wstrFontTag, wstrMsg, /*m_posTemp*/_float2(530.f, 495.f), vRGBA, 0.f, _float2(15.f, 15.f), _float2(1.f, 1.f));
 }
 
 void CUI_PartTimeResult::Initialize_TexturePos()

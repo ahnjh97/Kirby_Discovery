@@ -208,6 +208,7 @@
     <ClInclude Include="..\Public\Buffahorn_State.h" />
     <ClInclude Include="..\Public\BuildingCluster_A.h" />
     <ClInclude Include="..\Public\BuildingCluster_B.h" />
+    <ClInclude Include="..\Public\BuildingCluster_C.h" />
     <ClInclude Include="..\Public\Bulb.h" />
     <ClInclude Include="..\Public\BulbFlare.h" />
     <ClInclude Include="..\public\Camera_Free.h" />
@@ -400,6 +401,7 @@
     <ClInclude Include="..\Public\Turbine.h" />
     <ClInclude Include="..\Public\UI_BtnIcon.h" />
     <ClInclude Include="..\Public\UI_MessageWindow.h" />
+    <ClInclude Include="..\Public\UI_Fading.h" />
     <ClInclude Include="..\Public\UI_PartTime.h" />
     <ClInclude Include="..\Public\UI_PartTimeDee.h" />
     <ClInclude Include="..\Public\UI_PartTimeResult.h" />
@@ -452,6 +454,7 @@
     <ClCompile Include="..\Private\Buffahorn_State.cpp" />
     <ClCompile Include="..\Private\BuildingCluster_A.cpp" />
     <ClCompile Include="..\Private\BuildingCluster_B.cpp" />
+    <ClCompile Include="..\Private\BuildingCluster_C.cpp" />
     <ClCompile Include="..\Private\Bulb.cpp" />
     <ClCompile Include="..\Private\BulbFlare.cpp" />
     <ClCompile Include="..\private\Camera_Free.cpp" />
@@ -641,6 +644,7 @@
     <ClCompile Include="..\Private\Turbine.cpp" />
     <ClCompile Include="..\Private\UI_BtnIcon.cpp" />
     <ClCompile Include="..\Private\UI_MessageWindow.cpp" />
+    <ClCompile Include="..\Private\UI_Fading.cpp" />
     <ClCompile Include="..\Private\UI_PartTime.cpp" />
     <ClCompile Include="..\Private\UI_PartTimeDee.cpp" />
     <ClCompile Include="..\Private\UI_PartTimeResult.cpp" />
