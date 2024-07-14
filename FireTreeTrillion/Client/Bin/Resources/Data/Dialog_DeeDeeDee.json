@@ -22,13 +22,12 @@
     "FontTag": "Font_Dialog_SubKR18spac10",
     "Level": 11,
     "Messages": [
-        "안녕 나는 커비야. \n디디디야, 함께 마을복귀에 힘을 써주련.",
-        "마을이 엉망이 됐네.",
-        "마을 청소하자!"
+        "우리는 더 이상 디디디 대왕의 지배에 굴복하지 않을 것이다. \n우리의 마지막 숨까지 싸울 것이다."
+        , "이 세상은 타락했고, \n우리는 그 잿더미 속에서 새로이 태어날 것이다."
     ],
-    "NPC": "Parttimer_Dee",
+    "NPC": "DeeDeeDee",
     "Radian": 0.0,
-    "TitleText": "카페 점장 웨이들 디",
+    "TitleText": "웨이들 디",
     "TitleTag" : "Font_Dialog_Title_KR22spac10",
     "TitlePos": [
         370.0,
@@ -49,9 +48,8 @@
         1.0
     ],
     "HighLight": [
-        "\n디디디",
-		"-",
-		"-"
+        "-"
+        , "-"
     ],
     "HighLightRGBA": [
         0.921, 

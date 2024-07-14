@@ -28,13 +28,24 @@ void CTransform::Set_Scaled(_float3 vScale)
 	Set_Scaled(vScale.x, vScale.y, vScale.z);
 }
 
-_float4x4 CTransform::ComputeBoneWorldMatrix(CBone* pBone, _bool bMultiplyScale)
+_float4x4 CTransform::ComputeBoneWorldMatrix(CBone* pBone, _float3 vOffset, _bool bMultiplyScale)
 {
 	if (nullptr == pBone)
 		return _float4x4();
 
 	_float4x4 matResult{};
 	_float4x4 matBoneCombined = *pBone->Get_CombinedTransformationMatrix();
+
+	_vector vRight = XMVector3Normalize(XMLoadFloat3(reinterpret_cast<const _float3*>(&matBoneCombined._11)));
+	_vector vUp = XMVector3Normalize(XMLoadFloat3(reinterpret_cast<const _float3*>(&matBoneCombined._21)));
+	_vector vLook = XMVector3Normalize(XMLoadFloat3(reinterpret_cast<const _float3*>(&matBoneCombined._31)));
+
+	_vector vOffsetVector = vRight * vOffset.x + vUp * vOffset.y + vLook * vOffset.z;
+
+	matBoneCombined._41 += XMVectorGetX(vOffsetVector);
+	matBoneCombined._42 += XMVectorGetY(vOffsetVector);
+	matBoneCombined._43 += XMVectorGetZ(vOffsetVector);
+
 	Safe_AddRef(pBone);
 	if (true == bMultiplyScale) // »À Scale ¹Ý¿µ
 		XMStoreFloat4x4(&matResult, XMLoadFloat4x4(&matBoneCombined) * XMLoadFloat4x4(&m_WorldMatrix));

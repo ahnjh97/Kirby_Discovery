@@ -206,23 +206,32 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 #pragma region LEVEL_PARK (WONDARIA REMAINS) OBJECT
 
+		, "CmLightFollowParts01L", "CmLightFollowParts02L"
+
 		// 필드 오브젝트
 		, "FhArchWayAL", "FhArchWayBL", "FhArchWayCL", "FhArchWayDL" 
 		, "FhFence01L", "FhFence02L", "FhFence03L", "FhFence04L", "FhFence05L", "FhFence06L" 
 		, "FhOrnamentGroundAL", "FhOrnamentGroundBL"
 		, "FhOrnamentRoofAL", "FhOrnamentRoofBL", "FhOrnamentRoofCL", "FhOrnamentRoofDL", "FhOrnamentRoofEL"
-		, "FhPillarAL", "FhPillarATopDec2L", "FhPillarBL", "FhPillarBTopDec2L", "FhPillarCL", "FhPillarCTopDec2L"
-		, "FhPlanetOrnamentAL"
+
+		, "FhPillarAL", "FhPillarATopDec2L", "FhPillarATopDecL"
+		, "FhPillarBL", "FhPillarBottomAL", "FhPillarBottomBL", "FhPillarBottomCL", "FhPillarBTopDec2L", "FhPillarBTopDecL"
+		, "FhPillarCL", "FhPillarCTopDec2L", "FhPillarCTopDecL"
+
+		, "FhPlanetOrnamentAL", "FhPlanetOrnamentBL", "FhPlanetOrnamentCL", "FhPlanetOrnamentDL"
 		, "FhStackOrnamentAL", "FhStackOrnamentBL", "FhStackOrnamentCL", "FhStackOrnamentDL", "FhStackOrnamentEL"
+		, "FhWallDecorationAL", "FhWallDecorationBL", "FhWallDecorationCL", "FhWallDecorationDL"
+
+		, "FhWallDecorationStickAL", "FhWallDecorationStickBL", "FhWallDecorationStickCL"
+		, "ParkDoor"
 		
-		// 채우기용 잡오브젝트
-		, "DollKirby"
-		, "PkParkShowWindowObj01AL", "PkParkShowWindowObj01BL", "PkParkShowWindowObj02AL", "PkParkShowWindowObj02BL"
-		, "PkParkShowWindowObj03AL", "PkParkShowWindowObj03BL", "PkParkShowWindowObj04AL", "PkParkShowWindowObj04BL"
-		, "PkParkShowWindowObj05AL", "PkParkShowWindowObj05BL", "PkParkShowWindowObj06L"
-		, "PkParkShowWindowObj07AL", "PkParkShowWindowObj07BL", "PkParkShowWindowObj08AL", "PkParkShowWindowObj08BL"
-		, "ParkOutsideDoor", "PkRoof01"
-		, "CmLightFollowParts01L", "CmLightFollowParts02L"
+		// 현재 사용안함. 추후 사용을 대비해 주석 처리
+		//, "DollKirby"
+		//, "PkParkShowWindowObj01AL", "PkParkShowWindowObj01BL", "PkParkShowWindowObj02AL", "PkParkShowWindowObj02BL"
+		//, "PkParkShowWindowObj03AL", "PkParkShowWindowObj03BL", "PkParkShowWindowObj04AL", "PkParkShowWindowObj04BL"
+		//, "PkParkShowWindowObj05AL", "PkParkShowWindowObj05BL", "PkParkShowWindowObj06L"
+		//, "PkParkShowWindowObj07AL", "PkParkShowWindowObj07BL", "PkParkShowWindowObj08AL", "PkParkShowWindowObj08BL"
+		//, "ParkOutsideDoor", "PkRoof01"
 
 #pragma endregion
 
@@ -268,6 +277,9 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	//블렌드 적용이 필요한 데코오브젝트
 	m_setBlendDecos = { "LbOutBuildingWallL", "LbOutBuildingFenceL", "GsCarFloor", "LbBossCapsule02L"
 		, "LbBossCapsuleGlass01L", "LbBossCapsuleGlass02L", "LbBossCapsuleGlass03L" };
+
+	// Emissive가 입혀져 있지만, Emissive용 Pass로 하고 싶지 않은 모델들
+	m_setNonEmissiveModels = {};
 
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
@@ -2025,6 +2037,14 @@ _uint CMapToolHelper::DeterminePassIndex_ForEmissive(CModel* pModel)
 	}
 }
 
+_bool CMapToolHelper::IsNonEmissive(const string& _strModelName)
+{
+	if (m_setNonEmissiveModels.end() != m_setNonEmissiveModels.find(_strModelName))
+		return true;
+
+	return _bool();
+}
+
 void CMapToolHelper::Reset_MapShaderInfo()
 {
 	if (nullptr == m_pPickedObject)
@@ -2272,7 +2292,12 @@ _bool CMapToolHelper::Save_Decos(const string& _strLevel, vector<CGameObject*>& 
 		if (true == IsTree(strModelName))
 			iPassIndex = MODEL_NEARCLIP;
 		else
-			iPassIndex = DeterminePassIndex_ForEmissive(pModel);
+		{
+			if (true == IsNonEmissive(strModelName))
+				iPassIndex = MODEL_NORMAL_O;
+			else
+				iPassIndex = DeterminePassIndex_ForEmissive(pModel);
+		}
 			
 		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
 		outputFile.write(strModelName.c_str(), iStrLength);

@@ -18,6 +18,7 @@
 #include "HUD.h"
 #include "SkySphere.h"
 #include "TransingStar.h"
+#include "Gm_DynamicField.h"
 
 CLevel_Park::CLevel_Park(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -244,17 +245,60 @@ HRESULT CLevel_Park::Ready_Map()
 
 		if ("BG0" == strModelName || "BG1" == strModelName)
 			wstrGameObjectTag = TEXT("BG");
+
+		//기믹 등으로 활성화되는 동적 필드에 대한 예외처리
+		else if ("Gimmick_PkFunHouseDarkness01" == strModelName || "Gimmick_PkFunHouseDarkness02" == strModelName 
+			|| "Gimmick_PkFunHouseDarkness03" == strModelName || "Gimmick_PkFunHouseDarkness04" == strModelName 
+			|| "Gimmick_PkFunHouseDarkness05" == strModelName || "Gimmick_PkFunHouse06" == strModelName 
+			|| "Gimmick_PkFunHouse07" == strModelName)
+			wstrGameObjectTag = TEXT("DynamicField");
+			
 		else
 			wstrGameObjectTag = TEXT("BasicMap");
 
 		if (wstrGameObjectTag == TEXT("BasicMap"))
 			int a = 0;
-		if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tMapDesc)))
+
+		if (TEXT("BasicMap") == wstrGameObjectTag || TEXT("BG") == wstrGameObjectTag)
 		{
-			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
-			MSG_BOX(wstrErrorMsg.c_str());
-			fileInput.close();
-			return E_FAIL;
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Map"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tMapDesc)))
+			{
+				wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
+				MSG_BOX(wstrErrorMsg.c_str());
+				fileInput.close();
+				return E_FAIL;
+			}
+		}
+		else
+		{
+			CGameObject::GAMEOBJECT_DESC tDesc{};
+			tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			tDesc.matWorld = matWorld;
+
+			//동적 필드
+			if ("Gimmick_PkFunHouseDarkness01" == strModelName
+				|| "Gimmick_PkFunHouseDarkness04" == strModelName
+				|| "Gimmick_PkFunHouseDarkness05" == strModelName)
+			{
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_Updown"), 
+					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
+					continue;
+			}
+
+			if ("Gimmick_PkFunHouseDarkness02" == strModelName ||
+				"Gimmick_PkFunHouseDarkness03" == strModelName)
+			{
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_LeftRight"),
+					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
+					continue;
+			}
+
+			if ("Gimmick_PkFunHouse06" == strModelName)
+			{
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_FrontBack"),
+					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
+					continue;
+			}
 		}
 	}
 
@@ -670,6 +714,10 @@ HRESULT CLevel_Park::Ready_Items()
 	_uint iShaderVars{};
 	_float fRimWidth{};
 
+	unordered_set<string> vecCoins = { "Item_Coin", "Item_BlueCoin", "Item_RedCoin" };
+	unordered_set<string> vecFood = { "Item_Bread", "Item_Cake", "Item_Cocktail", "Item_EnergyDrink"
+		, "Item_Makaron", "Item_Meat", "Item_Omelet", "Item_Onigiri", "Item_Steak", "Item_Sushi" };
+
 	for (_uint i = 0; i < iNumObjects; i++)
 	{
 		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
@@ -685,14 +733,14 @@ HRESULT CLevel_Park::Ready_Items()
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 
-		if ("Item_Coin" == strModelName)
+		if (vecCoins.end() != vecCoins.find(strModelName))
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Coin"), &tDesc)))
 				return E_FAIL;
 		}
-		else if ("Item_EnergyDrink" == strModelName)
+		else if (vecFood.end() != vecFood.find(strModelName))
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_EnergyDrink"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_NoVacuumItem"), TEXT("Prototype_GameObject_Food"), &tDesc)))
 				return E_FAIL;
 		}
 	}
@@ -785,12 +833,14 @@ HRESULT CLevel_Park::Ready_Objects()
 
 #pragma region GIMMICK_OBJECT
 
+		//원더리아 입구
 		if ("FhEntranceAlien_NonAnim" == strModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkFhEntranceAlien"), &tDesc)))
 				continue;
 		}
 
+		//태양광 패널 기믹
 		if ("SolarPanelCharge_NonAnim" == strModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkSolarPanelCharge"), &tDesc)))
@@ -802,6 +852,8 @@ HRESULT CLevel_Park::Ready_Objects()
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc)))
 				continue;
 		}
+
+
 
 #pragma endregion
 	}

@@ -30,7 +30,6 @@ CUI_PartTime::CUI_PartTime(const CUI_PartTime& rhs)
 	, m_SizeDeeFace2D(rhs.m_SizeDeeFace2D)
 
 	, m_fSizeRatio(rhs.m_fSizeRatio)
-	, m_fRealTimeSize2D(rhs.m_fRealTimeSize2D)
 	, m_fStandardSize2D(rhs.m_fStandardSize2D)
 	, m_arrRenderState(rhs.m_arrRenderState)
 {
@@ -45,14 +44,18 @@ HRESULT CUI_PartTime::Initialize_Prototype()
 	m_arrSize[0] = m_arrSize[4] = m_SizeBar2D;
 	m_arrSize[1] = m_arrSize[2] = m_arrSize[3] = m_SizeTimeBarBlank2D;
 	m_arrSize[5] = m_SizeCategory2D;
-	m_arrSize[6] = m_arrSize[15] = m_arrSize[17] = m_arrSize[18] = m_SizeScoreBar2D;
+	m_arrSize[6] = m_SizeScoreBar2D;
 	m_arrSize[7] = m_SizeDeeFace2D;
 	m_arrSize[10] = m_arrSize[11] = m_arrSize[12] = m_arrSize[13] = m_arrSize[14] = m_SizeDigits2D;
 	m_arrSize[16] = _float2(g_iWinSizeX, g_iWinSizeY * 2.f);
+	m_arrSize[15] = _float2(207.f, 59.f); // FINISH
+	m_arrSize[17] = _float2(199.f, 59.f); // READY
+	m_arrSize[18] = _float2(95.f, 58.f);  // GO
+
 	m_arrOriginalSize = m_arrSize;
 
-	m_fStandardSize2D = m_fRealTimeSize2D = _float2(m_SizeScoreBar2D.x * 2.f, m_SizeScoreBar2D.y * 2.f);
-	
+	m_fStandardSize2D = _float2(m_SizeScoreBar2D.x * 2.f, m_SizeScoreBar2D.y * 2.f);
+
 	_float2 temp2D = _float2();
 	fill(m_arrPosition.begin(), m_arrPosition.end(), temp2D);
 	_float3 temp3D = _float3(1.f, 1.f, 1.f);
@@ -188,7 +191,7 @@ HRESULT CUI_PartTime::Render()
 
 	if (m_arrRenderState[FADE] == true)
 	{
-		Render_GameOver();
+		Render_Finish();
 	}
 
 	return S_OK;
@@ -317,7 +320,7 @@ HRESULT CUI_PartTime::Add_Components()
 	CHECK_FAILED(hr);
 
 	// FADE 텍스쳐
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Fade"),
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Fade"),
 		TEXT("Com_Texture_Fade"), (CComponent**)&m_arrTexures[16]);
 	CHECK_FAILED(hr);
 
@@ -431,9 +434,9 @@ void CUI_PartTime::Setup_PosSizeColor(_int iTextureNum)
 		m_arrPosition[iTextureNum] = _float2(180.f, 817.f);
 	}
 	break;
-	case 7: // 테스트용 와들디 얼굴
-	case 8: // 테스트용 와들디 얼굴
-	case 9: // 테스트용 와들디 얼굴
+	case 7: // 와들디 얼굴
+	case 8: // 와들디 얼굴
+	case 9: // 와들디 얼굴
 	{
 		m_arrSize[iTextureNum] = m_SizeDeeFace2D * 0.9f;
 		m_arrPosition[iTextureNum] = _float2(213.f, 61.f);
@@ -471,8 +474,7 @@ void CUI_PartTime::Setup_PosSizeColor(_int iTextureNum)
 										1.f));
 }
 
-// 현재 남아있는 Ratio에 따른 와들디 표정 변화
-// 7 : angry, 8 : idle, 9 : sad
+// 현재 남아있는 Ratio에 따른 와들디 표정 변화. - 7 : angry, 8 : idle, 9 : sad
 _bool CUI_PartTime::Setup_DeeFace(_int iTextureNum)
 {
 	_int iCurFaceNum(8);
@@ -498,8 +500,8 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 	m_fStandardTime += fTimeDelta;
 	if (m_fStandardTime - m_fBeforeTime >= 1.f)
 	{
-		//m_fCurTime = 5.f - m_fStandardTime;
-		m_fCurTime = 50.f - m_fStandardTime;
+		m_fCurTime = 5.f - m_fStandardTime;
+		//m_fCurTime = 50.f - m_fStandardTime;
 		if (m_fCurTime <= 0.f) m_fCurTime = 0.f;
 		Change_TimeTexures(m_fCurTime);
 		
@@ -614,8 +616,9 @@ void CUI_PartTime::Render_READY()
 	}
 
 	_float2 standardPos2D = _float2(830.f, 200.f);
-	_float fPosRatio = EASE_OUT_CIRC(m_fMoveRatio); // m_fRealTimeSize2D
+	_float fPosRatio = (_float)EASE_OUT_CIRC(m_fMoveRatio);
 	m_fMovePosition2D = _float2(standardPos2D.x * fPosRatio, standardPos2D.y);
+	m_pTransformCom->Set_Scaled(m_arrSize[iNum].x * 2.f, m_arrSize[iNum].y * 1.75f, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 								XMVectorSet(m_fMovePosition2D.x - g_iWinSizeX * 0.5f,
 											- m_fMovePosition2D.y + g_iWinSizeY * 0.5f,
@@ -642,9 +645,10 @@ void CUI_PartTime::Render_READY()
 
 void CUI_PartTime::Render_GO()
 {
+	_int iNum = 18;
 	static _float fTimeAcc = 0.f;
-	_int iNum = 18; // READY 17, GO 18
-
+	static _float2 standardSize2D = m_arrSize[iNum];
+	
 	m_fSizeRatio += m_fTimeDelta * 2.f;
 	if (m_fSizeRatio >= 1.f)
 	{
@@ -659,17 +663,15 @@ void CUI_PartTime::Render_GO()
 		}
 	}
 
-	_float fSizeRatio = 1.f - EaseOutBounce(m_fSizeRatio); // m_fRealTimeSize2D
-	m_fRealTimeSize2D = _float2(m_fStandardSize2D.x * fSizeRatio + m_SizeScoreBar2D.x, m_fStandardSize2D.y * fSizeRatio + m_SizeScoreBar2D.y);
-	m_arrSize[iNum] = m_fRealTimeSize2D;
-	m_pTransformCom->Set_Scaled(m_arrSize[iNum].x, m_arrSize[iNum].y, 1.f);
+	_float fSizeRatio = 1.f - EaseOutBounce(m_fSizeRatio);
+	_float2 ChangedSize2D = _float2(standardSize2D.x * fSizeRatio + m_arrSize[iNum].x * 2.f
+								  , standardSize2D.y * fSizeRatio + m_arrSize[iNum].y * 2.f);
+	m_pTransformCom->Set_Scaled(ChangedSize2D.x, ChangedSize2D.y, 1.f);
 	m_arrPosition[iNum] = _float2(830.f, 200.f);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 		XMVectorSet(m_arrPosition[iNum].x - g_iWinSizeX * 0.5f,
-			-m_arrPosition[iNum].y + g_iWinSizeY * 0.5f,
-			0.f,
-			1.f));
+					- m_arrPosition[iNum].y + g_iWinSizeY * 0.5f, 0.f, 1.f));
 
 	// UI별 포지션, 사이즈, 컬러 조정
 	HRESULT hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
@@ -689,27 +691,29 @@ void CUI_PartTime::Render_GO()
 	CHECK_FAILED(hr);
 }
 
-void CUI_PartTime::Render_GameOver()
+void CUI_PartTime::Render_Finish()
 {
+	_int iNum = 15;
 	static _float fTimeAcc = 0.f;
-	_int iNum = 15; // GAMEOVER TEXTURE NUM == 15
+	static _float2 standardFSize2D = m_arrSize[iNum];
 
 	m_fSizeRatio += m_fTimeDelta;
 	if (m_fSizeRatio >= 1.f)
 	{
 		m_fSizeRatio = 1.f;
 		fTimeAcc += m_fTimeDelta;
-		if (fTimeAcc >= 1.f)
+		if (fTimeAcc >= 3.f)
 		{
 			Render_Fade();
 			return;
 		}
 	}
 
-	_float fSizeRatio = 1.f - EaseOutBounce(m_fSizeRatio); // m_fRealTimeSize2D
-	m_fRealTimeSize2D = _float2(m_fStandardSize2D.x * fSizeRatio + m_SizeScoreBar2D.x, m_fStandardSize2D.y * fSizeRatio + m_SizeScoreBar2D.y);
-	m_arrSize[iNum] = m_fRealTimeSize2D;
-	m_pTransformCom->Set_Scaled(m_arrSize[iNum].x, m_arrSize[iNum].y, 1.f);
+	_float fSizeRatio = 1.f - EaseOutBounce(m_fSizeRatio);
+
+	_float2 ChangedSize2D = _float2(standardFSize2D.x * fSizeRatio + m_arrSize[iNum].x * 2.f
+									, standardFSize2D.y * fSizeRatio + m_arrSize[iNum].y * 2.f);
+	m_pTransformCom->Set_Scaled(ChangedSize2D.x, ChangedSize2D.y, 1.f);
 	m_arrPosition[iNum] = _float2(830.f, 200.f);
 	
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,

@@ -71,6 +71,39 @@ public:
 	FINALBOSS_STATE Get_BossState() { return m_eBossState; }
 	_bool Get_Chain() { return m_bChain; }
 
+	// 임구이용
+	void Set_Stab(_bool bStab) { m_bStab = bStab; }
+	_bool Get_Stab() { return m_bStab; }
+
+	void Set_Slash(_bool bSlash) { m_bSlash = bSlash; }
+	_bool Get_Slash() { return m_bSlash; }
+
+	void Set_Meteor(_bool bMeteor) { m_bMeteor = bMeteor; }
+	_bool Get_Meteor() { return m_bMeteor; }
+
+	void Set_Laser(_bool bLaser) { m_bLaser = bLaser; }
+	_bool Get_Laser() { return m_bLaser; }
+
+	void Set_Side(_bool bSide) { m_bSide = bSide; }
+	_bool Get_Side() { return m_bSide; }
+
+	void Set_AirArrow(_bool bArrowAir) { m_bArrowAir = bArrowAir; }
+	_bool Get_AirArrow() { return m_bArrowAir; }
+
+	void Set_GroundArrow(_bool bArrowGround) { m_bArrowGround = bArrowGround; }
+	_bool Get_GroundArrow() { return m_bArrowGround; }
+
+	void Set_BackStep(_bool bBackStep) { m_bBackStep = bBackStep; }
+	_bool Get_BackStep() { return m_bBackStep; }
+
+	void Set_Swing(_bool bSwing) { m_bSwing = bSwing; }
+	_bool Get_Swing() { return m_bSwing; }
+
+	void Set_Thrust(_bool bThrust) { m_bThrust = bThrust; }
+	_bool Get_Thrust() { return m_bThrust; }
+
+	void Set_Spike(_bool bSpike) { m_bSpike = bSpike; }
+	_bool Get_Spike() { return m_bSpike; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -108,6 +141,19 @@ private:
 	_bool				m_bGully = { false };
 	_bool				m_bShake = { false };
 	_bool				m_bEffect = { false };
+
+	// 임구이용
+	_bool				m_bStab = { false };
+	_bool				m_bSlash = { false };
+	_bool				m_bMeteor = { false };
+	_bool				m_bLaser = { false };
+	_bool				m_bSide = { false };
+	_bool				m_bArrowAir = { false };
+	_bool				m_bArrowGround = { false };
+	_bool				m_bBackStep = { false };
+	_bool				m_bSwing = { false };
+	_bool				m_bThrust = { false };
+	_bool				m_bSpike = { false };
 
 	_float				m_fGlideTime = { 0.f };
 	//_float				m_fGullyTime = { 0.f };

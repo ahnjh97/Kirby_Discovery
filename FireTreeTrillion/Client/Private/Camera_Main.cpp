@@ -10,6 +10,8 @@
 #include "Particle.h"
 #include "FinaleCut_ControlCenter.h"
 
+#include "Level_loading.h"
+#include "UI_Fading.h"
 
 #define ORIG_POS _float3(2550.f, 242.f, -136.f)
 #define BATTLE_POS _float3(2525.f, 220.f, -136.f)
@@ -213,7 +215,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	//트리거 세팅
 	_uint iLevel = *m_pGameInstance->Get_CurrentLevelID();
 
-	if (iLevel >= LEVEL_INTRO && iLevel < LEVEL_END)
+	if (iLevel >= LEVEL_PARTTIME && iLevel < LEVEL_END)
 	{
 		function<void(_int)> func = bind(&CCamera_Main::StartLerpByTriggerInfo, this, placeholders::_1);
 		m_pGameInstance->Emplace_TriggerFunc(TRIGGER_CAMERA, func);
@@ -294,7 +296,6 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 
 	return S_OK;
 }
-
 
 
 void CCamera_Main::System_Tick(_float fTimeDelta)
@@ -480,6 +481,33 @@ void CCamera_Main::Fill_ActionDir(CAMACTION& Action, CAMDIR eCamDir, _float3 vDi
 	Action.vDir = vDir;
 }
 
+// 임시입니다. 효선아 여기야
+void CCamera_Main::Change_LevelTrigger()
+{
+	static _bool bOnceFade = false;
+	static _bool bOnceChangeLevel = false;
+	_float4 vPos = GET_POS;
+	if (vPos.y >= 95.f)
+	{
+		CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+		CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
+		if (bOnceFade == false)
+		{
+			pFadingUI->Set_InOutState(CUI_Fading::FADEOUT);
+			pFadingUI->Set_IsRender(true);
+			bOnceFade = true;
+		}
+		else if (pFadingUI->Get_FadeRatio() <= 0.f)
+		{
+			if (bOnceChangeLevel == false)
+			{
+				m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_DEEDEEDEE));
+				bOnceChangeLevel = true;
+			}
+		}
+	}
+}
+
 _int CCamera_Main::Tick(_float fTimeDelta)
 {
 
@@ -512,6 +540,9 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 	Set_DeferredCamSet(fRealTimeDelta);
 
 
+	// 임시입니다.
+	if(*m_pCurrentLevelID == LEVEL_RACING)
+		Change_LevelTrigger();
 	return OBJ_NOEVENT;
 }
 
@@ -911,8 +942,13 @@ void CCamera_Main::Compute_Set_CamLock(_float fTimeDelta)
 	if (m_eCamLockMode == LOCK_POS)
 		Update_Anchor(fTimeDelta);
 
-	/*if(m_eCamLockMode == LOCK_DIR)*/
-
+	//Interpolate_CamSet(fTimeDelta);
+	if (.05f < _float3::Distance(m_vDestCamPos, m_vCurCamPos))
+	{
+		m_vCurCamPos += (m_vDestCamPos - m_vCurCamPos) * fTimeDelta * m_fInterpolateSpeed;
+		if (_float3::Distance(m_vDestCamPos, m_vCurCamPos) < .05f)
+			m_vCurCamPos = m_vDestCamPos;
+	}
 
 	MoveTo_CurCamPos_Interpolate(fTimeDelta);
 
@@ -950,7 +986,7 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 
 
 	//카메라 보는 기준점 위로 올려주는 놈
-	if (*m_pCurrentLevelID == LEVEL_INTRO || *m_pCurrentLevelID == LEVEL_FINALE)
+	if (*m_pCurrentLevelID == LEVEL_PARTTIME || *m_pCurrentLevelID == LEVEL_FINALE)
 	{
 		m_fDestUpOffset = m_CamTriggerUpOffsets[*m_pCurrentLevelID][m_iMatrixIndex];
 	}
@@ -1309,7 +1345,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ -.15f, 0.f, 1.f };
 		m_CamSeq.push_back(newAction);
-
+		  
 		newAction = {};
 		newAction.fTime = 0.f;
 		newAction.eCamCut = CUT_INTERPOLATE;
@@ -2147,7 +2183,6 @@ void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
 
 }
 
-
 void CCamera_Main::Control(_float fTimeDelta)
 {
 	if (m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) &&
@@ -2209,6 +2244,29 @@ void CCamera_Main::Control(_float fTimeDelta)
 		}
 	}
 	*/
+}
+
+// 맵내 커비 이동제어할때 사용되는 카메라 제어 함수입니다.
+// written by JYWI
+void CCamera_Main::Move_ForTrigger(_float fTimeDelta, _float3 vPos, _float3 vDir)
+{
+	if (LEVEL_TOWN == *m_pCurrentLevelID)
+	{
+		vPos = { 109.9f, 25.2f, 108.5f };
+		vDir = { 1.f, -.15f, -.12f };
+		CAMACTION newAct = {};
+		newAct.fTime = 0.f;
+		newAct.eCamCut = CUT_HARD;
+
+		newAct.eCamPos = POS_ABSOLUTE;
+		newAct.vPos = vPos;
+
+		newAct.eCamDir = DIR_ABSOLUTE;
+		newAct.vDir = vDir;
+
+		Make_One_Sequence(newAct);
+	}
+	//else if()
 }
 
 void CCamera_Main::Update_Anchor(_float fTimeDelta)
@@ -2434,7 +2492,7 @@ void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
 
 	//보간하여 바라보기
 	m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir) + _float4{ 0.f, m_fCurUpOffset, 0.f, 0.f },
-		fTimeDelta * fInterpolateSpeed);
+		fTimeDelta* fInterpolateSpeed);
 
 	//m_pTransformCom->Move(Dir(Make_ShakeDir(fTimeDelta)));
 }
@@ -2485,7 +2543,27 @@ void CCamera_Main::Orbit_Target(_float fTimeDelta)
 #ifdef _DEBUG
 void CCamera_Main::Render_IMGUI()
 {
-	ImGui::Begin(u8"메인 카메라");
+	if (ImGui::TreeNode("Revise Offset"))
+	{
+		string strPos = "pos";
+		_float4 vCurPos = GET_POS;
+		ImGui::DragFloat3(strPos.c_str(), (_float*)&vCurPos, -10.f, 50);
+		
+		string strLook = "look";
+		_float4 vLook = m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK);
+		ImGui::DragFloat3(strLook.c_str(), (_float*)&vLook, 0.f, 10);
+
+		Lock_All(_float3(vCurPos.x, vCurPos.y, vCurPos.z), _float3(vLook.x, vLook.y, vLook.z));
+		ImGui::Separator(); ImGui::NewLine();
+
+		//----------------------------------------------------------------
+		ImGui::DragFloat("fovy", &m_fFovyTemp, .1f, 10.f, 50.f, "%.1f");
+		m_fDestFovy = XMConvertToRadians(m_fFovyTemp);
+
+		ImGui::Separator(); ImGui::NewLine();
+		ImGui::TreePop();
+	}
+
 	_float4x4 WorldMat = m_pTransformCom->Get_WorldMatrix();
 	_float4 vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 

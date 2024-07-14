@@ -15,6 +15,7 @@ class CUI_MessageWindow : public CUIObject
 public:
 	struct MESSAGE_DESC
 	{
+		wstring wstrNPC = { TEXT("") };
 		wstring wstrFontTag = { TEXT("") };
 		_float2	vFontPos = { 0.f, 0.f };
 		_float4	vFontRGBA = { 0.f, 0.f, 0.f, 0.f };
@@ -90,6 +91,7 @@ private:
 	void						Split_Message();
 	_float2						Repose_Fonts(_float2 fontPos, wstring wstrHighlightMsg);
 	void						OnEvent();
+	void						Start_Message(CGameObject* pObj = nullptr);
 
 public:
 	static CUI_MessageWindow*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -99,6 +101,7 @@ public:
 private:
 	CTransform*					m_pTransCom[TEXMW_NONE] = { nullptr };
 	CTexture*					m_pTexCom[TEXMW_NONE] = { nullptr };
+	CTexture*					m_pTexClaw = { nullptr };
 
 	class CUI_BtnIcon*			m_pUIBtn = { nullptr };
 	

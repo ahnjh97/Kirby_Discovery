@@ -1,0 +1,60 @@
+{
+    "DisplayTime": 0.10000000149011612,
+    "ElapsedyTime": 0.0,
+    "FontPos": [
+        410.0,
+        725.0
+    ],
+    "FontRGBA": [
+        0.0,
+        0.541,
+        0.474,
+        1.0
+    ],
+    "FontScale": [
+        1.200,
+        1.200
+    ],
+    "FontSize": [
+        1.0,
+        1.0
+    ],
+    "FontTag": "Font_Dialog_SubKR18spac10",
+    "Level": 12,
+    "Messages": [
+        "커비야. 파크에 연구소가 숨겨져있대.",
+        "GO!"
+    ],
+    "NPC": "DeeDeeDee",
+    "Radian": 0.0,
+    "TitleText": "대왕 디디디",
+    "TitleTag" : "Font_Dialog_Title_KR22spac10",
+    "TitlePos": [
+        370.0,
+        670.0 
+    ],
+    "TitleRGBA": [
+        0.691, 
+        0.047,
+        0.094,
+        1.0
+    ],
+    "TitleSize": [
+        1.0,
+        1.0
+    ],
+    "TitleScale": [
+        1.0,
+        1.0
+    ],
+    "HighLight": [
+        "-",
+		"GO!"
+    ],
+    "HighLightRGBA": [
+        0.921, 
+        0.686,
+        0.0,
+        1.0
+    ]
+}

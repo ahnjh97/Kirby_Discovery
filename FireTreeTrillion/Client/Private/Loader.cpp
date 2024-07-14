@@ -182,6 +182,7 @@
 #include "Gm_ParkFhEntranceAlien.h"
 #include "Gm_ParkSolarPanelCharge.h"
 #include "Gm_ParkSolarPanelOnce.h"
+#include "Gm_DynamicField.h"
 
 //UI
 #include "BackGround.h"
@@ -198,6 +199,7 @@
 #include "TransingStar.h"
 #include "UI_MessageWindow.h"
 #include "UI_BtnIcon.h"
+#include "UI_Fading.h"
 
 // 아이템
 #include "Food.h"
@@ -268,8 +270,8 @@ HRESULT CLoader::Start()
 
 		SetUp_ModelScaleRotation(LEVEL_STATIC);
 		hr = Loading_StaticComponentAll();
-
 		CHECK_FAILED(hr);
+
 		hr = Loading_For_Logo();
 	}
 	break;
@@ -277,7 +279,7 @@ HRESULT CLoader::Start()
 	case LEVEL_GAMEPLAY:
 		hr = Loading_For_GamePlay();
 		break;
-	// 05.20) UI Tool 레벨 추가
+
 	case LEVEL_TOOL_UI:
 		hr = Loading_For_Tool_UI();
 		break;
@@ -327,9 +329,7 @@ HRESULT CLoader::Start()
 	}
 
 	LeaveCriticalSection(&m_Critical_Section);
-
-	if (FAILED(hr))
-		return E_FAIL;
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -387,6 +387,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTimeResult"), CUI_PartTimeResult);
 	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_TransingStar"), CTransingStar);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Fading"), CUI_Fading);
 
 	//DIALOG
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Dialog"), CDialog);
@@ -395,6 +396,7 @@ HRESULT CLoader::Loading_ObjectAll()
 
 #pragma endregion
 	
+
 #pragma region FOR CLIENT
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleKirby"), CFinaleKirby);
@@ -523,9 +525,13 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	#pragma region GIMMICK::LEVEL_PARK
 
+	//기믹 오브젝트
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkFhEntranceAlien"), CGm_ParkFhEntranceAlien);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkSolarPanelCharge"), CGm_ParkSolarPanelCharge);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkSolarPanelOnce"), CGm_ParkSolarPanelOnce);
+
+	//기믹 활성화 시 이동하는 동적 필드
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_DynamicField"), CGm_DynamicField);
 
 	#pragma endregion
 
@@ -542,7 +548,6 @@ HRESULT CLoader::Loading_ObjectAll()
 	#pragma endregion
 
 #pragma endregion
-
 	return S_OK;
 }
 
@@ -979,7 +984,6 @@ HRESULT CLoader::Loading_For_Parttime()
 
 	// 결과 안내
 	hr = Add_Texture(eLevel, "Parttime_Finish",				"UI/Parttime/Text/Finish.png");
-	hr = Add_Texture(eLevel, "Fade",						"UI/Fade.png");
 
 	// 결과창
 	hr = Add_Texture(eLevel, "GameFoodUI_ResultBar",		"UI/MGameFood/result bar.png");
@@ -1316,7 +1320,6 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 	//if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
 	//	return E_FAIL;
 	Add_KirbyFaceTexture(eLevel);
-
 	#pragma region 와들디 주문 말풍선
 	hr = Add_Texture(eLevel, "OrderCloud", "UI/MGameFood/OrderCloud.png");
 	CHECK_FAILED(hr);
@@ -1608,11 +1611,16 @@ HRESULT CLoader::Add_StaticUITexture()
 
 	//UI_MessageWindow
 	hr = Add_Texture(LEVEL_STATIC, "UI_MessageWindow_Base", "UI/MessageWindow/MessageWindow_Base_%d.dds", 3); CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "UI_MessageWindow_Base_Claw", "UI/MessageWindow/MessageWindow_Base_Claw.dds"); CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "UI_MessageWindow_BtnBase", "UI/MessageWindow/MessageWindow_BtnBase_%d.dds", 3); CHECK_FAILED(hr);
 
 	//UI_Button
 	hr = Add_Texture(LEVEL_STATIC, "UI_BtnIconBase", "UI/BtnIcon/BtnIcon_Base_%d.dds", 3); CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "UI_BtnIconBright", "UI/BtnIcon/BtnIcon_Bright.dds"); CHECK_FAILED(hr);
+	
+	//UI_Fading
+	hr = Add_Texture(LEVEL_STATIC, "Fade", "UI/Fade.png");
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -1936,6 +1944,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_PARK)
 	{
+		// For Item
+		Load_ItemModels();
+
+		// For Kickables
+		Load_KickableModels();
+
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		
@@ -2221,14 +2235,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("StarBlockPiece", TYPE_NONANIM, 0.5f, 180.f);
 		m_vecModelInfo.emplace_back("StarBlockPieceStar", TYPE_NONANIM, 0.5f, 180.f);
 
-
 		// For Item
 		Load_ItemModels();
 		Load_KickableModels();
 
 		// 와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
-
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{
@@ -2273,8 +2285,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SpookStep", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("GhostGordo", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("Bomber", TYPE_ANIM, 1.f, 180.f);
-
 		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f);
+		
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
@@ -2567,6 +2579,7 @@ void CLoader::Load_ItemModels()
 	m_vecModelInfo.emplace_back("Item_Sword", TYPE_NONANIM, 1.f, 0.f);
 	m_vecModelInfo.emplace_back("Item_Bomb", TYPE_NONANIM, 1.f, 0.f);
 	m_vecModelInfo.emplace_back("Item_Hammer", TYPE_NONANIM, 1.f, 0.f);
+	m_vecModelInfo.emplace_back("Item_Crash", TYPE_NONANIM, 1.f, 0.f);
 	m_vecModelInfo.emplace_back("Item_Star", TYPE_NONANIM, 0.5f, 0.f);
 }
 
