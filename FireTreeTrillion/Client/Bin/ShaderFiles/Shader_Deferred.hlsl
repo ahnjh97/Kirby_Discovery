@@ -1062,7 +1062,8 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 	/* vLightDepthDesc.x * 2000.f : 현재 픽셀을 광원기준으로  그릴려고 했던 위치에 이미 그려져있떤 광원 기준의 깊이.  */
         if (vPosition.w > (vLightDepthDesc.x * 2000.f) && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).x == 0.f)
         {
-            Out.vColor *= 0.5f + clamp((vPosition.w - (vLightDepthDesc.x * 2000.f)) * 0.05f, 0.f, 0.5f);
+            //Out.vColor *= 0.5f + clamp((vPosition.w - (vLightDepthDesc.x * 2000.f)) * 0.05f, 0.f, 0.5f);
+            Out.vColor *= 0.3f + clamp((vPosition.w - (vLightDepthDesc.x * 2000.f)) * 0.1f, 0.f, 0.5f);
         }
     }
 

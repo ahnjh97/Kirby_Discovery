@@ -2,6 +2,10 @@
 #include "Finale_SpecialDebris_B.h"
 #include "FinaleCut_ControlCenter.h"
 
+#include "Bone.h"
+#include "FinalePartical_Maker.h"
+#include "MultiEffect.h"
+#include "Camera_Main.h"
 
 CFinale_SpecialDebris_B::CFinale_SpecialDebris_B(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -36,7 +40,7 @@ HRESULT CFinale_SpecialDebris_B::Initialize(void* pArg)
 	m_bRimLight = true;
 	m_bStencil = true;
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(2550.f, 239.f, -136.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(2550.f, 229.f, -136.f, 1.f));
 	_float4 NewLook = _float4(1.f, 0.f, 0.f, 0.f);
 	_float4 NewUp = _float4(0.f, 1.f, 0.f, 0.f);
 	_float4 NewRight = XMVector3Cross(NewUp, NewLook);
@@ -87,7 +91,7 @@ _int CFinale_SpecialDebris_B::Tick(_float fTimeDelta)
 		m_bRender = false;
 
 	Set_Animation();
-
+	Make_Particle();
 
 	return OBJ_NOEVENT;
 }
@@ -182,11 +186,43 @@ HRESULT CFinale_SpecialDebris_B::Bind_ShaderResources()
 	return S_OK;
 }
 
-_int CFinale_SpecialDebris_B::Make_Partical()
+void CFinale_SpecialDebris_B::Make_Particle()
 {
 
+	if (m_eCurCut == CUT6 && m_pModelCom->Get_CurTrackPosition() >= 375.f)
+	{
+		if (m_bParticleTrigger == true)
+		{
+			CBone* pBone = m_pModelCom->Get_BonePtr("AllL");
+			_float4x4 pBoneLocalMatrix = *pBone->Get_CombinedTransformationMatrix();
+			_float4x4 pBoneWorldMatrix = pBoneLocalMatrix * m_pTransformCom->Get_WorldFloat4x4();
+			_float4 vPos = CUtils::Get_State_Vector_Matrix(pBoneWorldMatrix, CUtils::STATE_POSITION);
 
-	return 0;
+			_float4 vEffectPos = vPos;
+			vEffectPos.y -= 25.f;
+
+			CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_FinalePartical_Maker")));
+			pMaker->Make_Partical(50, vPos, 20.f, 6.f, 3.f, _float4(1.f, 1.f, 0.f, 0.f), 180.f, CUtils::Make_RandomFloat(100.f, 150.f));
+
+			for (_int i = 0; i < 15; ++i)
+			{
+				CEffect::FX_DESC FXDesc{};
+
+				FXDesc.vInitPos = static_cast<_float3>(vEffectPos) + (_float3)CUtils::Make_Random_Vector(3.f);
+				FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+
+				_float fScale = CUtils::Make_RandomFloat(30.f, 40.f);
+				FXDesc.vInitScale = { fScale, fScale, fScale };
+				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
+					return;
+			}
+
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+			pCamera->Make_Shake(4.f, 0.5f);
+
+			m_bParticleTrigger = false;
+		}
+	}
 }
 
 void CFinale_SpecialDebris_B::Set_Animation()
