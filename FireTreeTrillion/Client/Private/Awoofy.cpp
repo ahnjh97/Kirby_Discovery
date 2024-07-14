@@ -38,8 +38,12 @@ HRESULT CAwoofy::Initialize(void* pArg)
 
 	if (FAILED(__super::Initialize(pMonDesc)))
 		return E_FAIL;
+	
+	wstring wstrModelName = TEXT("Awoofy");
+	if (LEVEL_TOOL_ANIM != *m_pCurrentLevelID)
+		wstrModelName = pMonDesc->wstrModelName;
 
-	if (FAILED(Add_Components(pMonDesc->wstrModelName)))
+	if (FAILED(Add_Components(wstrModelName)))
 		return E_FAIL;
 
 	if(MON_WAIT == m_eMonState)

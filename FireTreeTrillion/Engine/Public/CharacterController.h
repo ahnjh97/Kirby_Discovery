@@ -80,6 +80,7 @@ public:
 	_float			Compute_Wall(_fvector vLook, _float fOffSet = 1.f);									// StaticActor¿¡ Raycast
 	_float			Compute_Wall(_fvector vLook, _float3 vOffset);									// StaticActor¿¡ Raycast
 
+	_float			RayCastToStaticActor(_fvector vDir, _float fRayDistance = 25.f, _float3 vOffset = _float3()); // StaticActor¿¡ Raycast
 	_float			RayCastToDynamicActor(_fvector vLook, _float3 vOffset = _float3());
 	PxVec3			Compute_TerrainPosition();
 	_vector			Compute_TerrainPosition_Vector();

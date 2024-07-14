@@ -16,9 +16,11 @@ public:
 	enum SIMBA_ANIM {
 		Simba_AttackJump, Simba_AttackJumpEnd, Simba_AttackJumpHit, Simba_AttackJumpPre, Simba_AttackJumpStart, Simba_AttackJumpWait,
 		Simba_BackStep, Simba_BackStepEnd, Simba_BackStepLanding, Simba_BackStepStart,
-		Simba_BiteRush, Simba_BiteRushEnd, Simba_BiteFallL, Simba_BiteFallR,
+		Simba_BiteRush, Simba_BiteRushEnd, 
+		Simba_BiteFallL, Simba_BiteFallR,
 		Simba_BiteRushJumpL, Simba_BiteRushJumpR, Simba_BiteRushJumpStartL, Simba_BiteRushJumpStartR,
-		Simba_BiteRushLandingL, Simba_BiteRushLandingR, Simba_BiteRushStart, Simba_BiteRushStartStraight,
+		Simba_BiteRushLandingL, Simba_BiteRushLandingR,
+		Simba_BiteRushStart, Simba_BiteRushStartStraight,
 		Simba_BiteRushTiredAttackStart, Simba_BiteRushTiredAttackStartStraight,
 		Simba_BiteRushTiredEnd, Simba_BiteRushTiredStart, Simba_BiteRushTiredWait,
 		Simba_Command,
@@ -35,7 +37,8 @@ public:
 		Simba_DemoExAppearCut1, Simba_DemoExAppearCut2, Simba_DemoExAppearCut3, Simba_DemoExAppearCut4, Simba_DemoExAppearCut5,
 		Simba_DemoExAppearCut6, Simba_DemoExAppearCut6Multi, Simba_DemoExAppearCut7, Simba_DemoExAppearCutPreWait,
 		Simba_DemoMorphoKnightAppearCut1, Simba_DemoMorphoKnightAppearCut2, Simba_DemoMorphoKnightAppearCut3, Simba_DemoMorphoKnightAppearCut4, Simba_DemoMorphoKnightAppearCut5,
-		Simba_DemoSoulAppearCut1, Simba_DimensionClaw, Simba_DimensionClawContinue, Simba_DimensionClawEnd, Simba_DimensionClawStart, Simba_DimensionClawStartContinue, SIMBA_DIMENSIONCLAWWAIT,
+		Simba_DemoSoulAppearCut1, 
+		Simba_DimensionClaw, Simba_DimensionClawContinue, Simba_DimensionClawEnd, Simba_DimensionClawStart, Simba_DimensionClawStartContinue, Simba_DimensionClawWait,
 		Simba_DimensionLaser, Simba_DimensionLaserEnd, Simba_DimensionLaserStart, Simba_DimensionLaserWait,
 		Simba_DoubleClaw, Simba_DoubleClawChargeStart, Simba_DoubleClawChargeWait, Simba_DoubleClawDash, Simba_DoubleClawDashStart, Simba_DoubleClawEnd,
 		Simba_Fall,
@@ -95,10 +98,14 @@ public:
 	_bool			IsAnimFinished() { return m_pModelCom->IsFinished(); }
 	_bool			IsAnimFinished(_uint iCurrentAnimIndex) { return m_pModelCom->IsFinished(iCurrentAnimIndex); }
 	void			CreateHpBar();
+	void			Turn_RotationBoneMatrix(_float fAngle);
 
 private:
-	CTexture* m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
-	CGameObject* m_pKirby = { nullptr };
+	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
+	CGameObject*	m_pKirby = { nullptr };
+	class CBone*	m_pLipBone = { nullptr };
+	class CBone*	m_pRotationBone = { nullptr };
+	_float4x4*		m_pRotationBoneMatrix = { nullptr };
 
 	SIMBA_ANIM		m_eCurrentState = { SIMBA_END };
 	SIMBA_ANIM		m_ePreState = { SIMBA_END };
@@ -117,11 +124,14 @@ private:
 
 	_float			m_fAngle = { 0.f };
 	_float4x4		m_matDefault = {};
-	class CBone*	m_pLipBone = { nullptr };
+
 	_bool			m_bHpBarCreated = { false };
 
 	unordered_set<SIMBA_ANIM> m_setAppear1Anims;
 	vector<MONSTER_DESC> m_vecMonsterDescs;
+
+	_float			m_fHpRatio = { 1.f };
+	_bool			m_bPhaseTwo = { false };
 
 private:
 	HRESULT		Add_Components();

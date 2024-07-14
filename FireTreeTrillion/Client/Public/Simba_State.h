@@ -264,4 +264,172 @@ public:
 	virtual void Free() override { __super::Free(); Safe_Release(m_pController); Safe_Release(m_pTransform); Safe_Release(m_pKirby); Safe_Release(m_pKirbyTransform); }
 };
 
+// *********************** Damage ***********************
+class CSimba_Damage final : public CFSM_State
+{
+private:
+	CSimba_Damage(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
+	{
+		m_pController = pController; m_pTransform = pTransform; m_pKirby = pKirby; m_pKirbyTransform = pKirbyTransform;
+		Safe_AddRef(m_pController); Safe_AddRef(m_pTransform); Safe_AddRef(m_pKirby); Safe_AddRef(m_pKirbyTransform);
+	}
+	virtual ~CSimba_Damage() = default;
+
+public:
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset) override;
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override {}
+
+private:
+	CCharacterController* m_pController = { nullptr };
+	CTransform* m_pTransform = { nullptr };
+	CGameObject* m_pKirby = { nullptr };
+	CTransform* m_pKirbyTransform = { nullptr };
+
+public:
+	static	CSimba_Damage* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
+		{ return new CSimba_Damage(pController, pTransform, pKirby, pKirbyTransform); }
+	virtual void Free() override { __super::Free(); Safe_Release(m_pController); Safe_Release(m_pTransform); Safe_Release(m_pKirby); Safe_Release(m_pKirbyTransform); }
+};
+
+// *********************** Roar ***********************
+class CSimba_Roar final : public CFSM_State
+{
+private:
+	CSimba_Roar(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
+	{
+		m_pController = pController; m_pTransform = pTransform; m_pKirby = pKirby; m_pKirbyTransform = pKirbyTransform;
+		Safe_AddRef(m_pController); Safe_AddRef(m_pTransform); Safe_AddRef(m_pKirby); Safe_AddRef(m_pKirbyTransform);
+	}
+	virtual ~CSimba_Roar() = default;
+
+public:
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset) override;
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override {}
+
+private:
+	CCharacterController* m_pController = { nullptr };
+	CTransform* m_pTransform = { nullptr };
+	CGameObject* m_pKirby = { nullptr };
+	CTransform* m_pKirbyTransform = { nullptr };
+
+public:
+	static	CSimba_Roar* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
+		{ return new CSimba_Roar(pController, pTransform, pKirby, pKirbyTransform);	}
+	virtual void Free() override { __super::Free(); Safe_Release(m_pController); Safe_Release(m_pTransform); Safe_Release(m_pKirby); Safe_Release(m_pKirbyTransform); }
+};
+
+// *********************** BiteRushJump ***********************
+class CSimba_BiteRushJump final : public CFSM_State
+{
+private:
+	CSimba_BiteRushJump(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
+	{
+		m_pController = pController; m_pTransform = pTransform; m_pKirby = pKirby; m_pKirbyTransform = pKirbyTransform;
+		Safe_AddRef(m_pController); Safe_AddRef(m_pTransform); Safe_AddRef(m_pKirby); Safe_AddRef(m_pKirbyTransform);
+	}
+	virtual ~CSimba_BiteRushJump() = default;
+
+public:
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset) override;
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override {}
+
+private:
+	CCharacterController* m_pController = { nullptr };
+	CTransform* m_pTransform = { nullptr };
+	CGameObject* m_pKirby = { nullptr };
+	CTransform* m_pKirbyTransform = { nullptr };
+
+public:
+	static	CSimba_BiteRushJump* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
+		{ return new CSimba_BiteRushJump(pController, pTransform, pKirby, pKirbyTransform); }
+	virtual void Free() override { __super::Free(); Safe_Release(m_pController); Safe_Release(m_pTransform); Safe_Release(m_pKirby); Safe_Release(m_pKirbyTransform); }
+};
+
+// *********************** DimensionClaw ***********************
+class CSimba_DimensionClaw final : public CFSM_State
+{
+private:
+	CSimba_DimensionClaw(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
+	{
+		m_pController = pController; m_pTransform = pTransform; m_pKirby = pKirby; m_pKirbyTransform = pKirbyTransform;
+		Safe_AddRef(m_pController); Safe_AddRef(m_pTransform); Safe_AddRef(m_pKirby); Safe_AddRef(m_pKirbyTransform);
+	}
+	virtual ~CSimba_DimensionClaw() = default;
+
+public:
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset) override;
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override {}
+
+private:
+	CCharacterController* m_pController = { nullptr };
+	CTransform* m_pTransform = { nullptr };
+	CGameObject* m_pKirby = { nullptr };
+	CTransform* m_pKirbyTransform = { nullptr };
+
+public:
+	static	CSimba_DimensionClaw* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
+		{ return new CSimba_DimensionClaw(pController, pTransform, pKirby, pKirbyTransform); }
+	virtual void Free() override { __super::Free(); Safe_Release(m_pController); Safe_Release(m_pTransform); Safe_Release(m_pKirby); Safe_Release(m_pKirbyTransform); }
+};
+
+// *********************** BiteRush ***********************
+class CSimba_BiteRush final : public CFSM_State
+{
+private:
+	CSimba_BiteRush(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
+	{
+		m_pController = pController; m_pTransform = pTransform; m_pKirby = pKirby; m_pKirbyTransform = pKirbyTransform;
+		Safe_AddRef(m_pController); Safe_AddRef(m_pTransform); Safe_AddRef(m_pKirby); Safe_AddRef(m_pKirbyTransform);
+	}
+	virtual ~CSimba_BiteRush() = default;
+
+public:
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset) override;
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override {}
+
+private:
+	CCharacterController* m_pController = { nullptr };
+	CTransform* m_pTransform = { nullptr };
+	CGameObject* m_pKirby = { nullptr };
+	CTransform* m_pKirbyTransform = { nullptr };
+
+public:
+	static	CSimba_BiteRush* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
+		{ return new CSimba_BiteRush(pController, pTransform, pKirby, pKirbyTransform); }
+	virtual void Free() override { __super::Free(); Safe_Release(m_pController); Safe_Release(m_pTransform); Safe_Release(m_pKirby); Safe_Release(m_pKirbyTransform); }
+};
+
+// *********************** DimensionLaser ***********************
+class CSimba_DimensionLaser final : public CFSM_State
+{
+private:
+	CSimba_DimensionLaser(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
+	{
+		m_pController = pController; m_pTransform = pTransform; m_pKirby = pKirby; m_pKirbyTransform = pKirbyTransform;
+		Safe_AddRef(m_pController); Safe_AddRef(m_pTransform); Safe_AddRef(m_pKirby); Safe_AddRef(m_pKirbyTransform);
+	}
+	virtual ~CSimba_DimensionLaser() = default;
+
+public:
+	virtual void OnStateEnter(class CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset) override;
+	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
+	virtual void OnStateExit()														override {}
+
+private:
+	CCharacterController* m_pController = { nullptr };
+	CTransform* m_pTransform = { nullptr };
+	CGameObject* m_pKirby = { nullptr };
+	CTransform* m_pKirbyTransform = { nullptr };
+
+public:
+	static	CSimba_DimensionLaser* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
+		{ return new CSimba_DimensionLaser(pController, pTransform, pKirby, pKirbyTransform); }
+	virtual void Free() override { __super::Free(); Safe_Release(m_pController); Safe_Release(m_pTransform); Safe_Release(m_pKirby); Safe_Release(m_pKirbyTransform); }
+};
+
 END

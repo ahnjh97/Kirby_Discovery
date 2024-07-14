@@ -116,6 +116,10 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_pLipBone = m_pModelCom->Get_BonePtr("T_LLip0J");
 	Safe_AddRef(m_pLipBone);
 
+	m_pRotationBone = m_pModelCom->Get_BonePtr("RotL");
+	Safe_AddRef(m_pRotationBone);
+	m_pRotationBoneMatrix = m_pRotationBone->Get_EditMatrixPtr();
+
 	m_setAppear1Anims = { Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait, Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait, 
 		Simba_DemoAppear1Cut4, Simba_DemoAppear1Cut4Wait };
 
@@ -126,6 +130,8 @@ _int CSimba::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return Ready_Dead();
+
+	m_fHpRatio =  m_fHp / m_fMaxHp;
 
 	if (true == m_pModelCom->IsFinished() || m_pModelCom->Get_Trackposition() == 0.f) // IsAnimFinished
 		Reset_HitBoxTimingMap(SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex()));
@@ -151,19 +157,9 @@ _int CSimba::Tick(_float fTimeDelta)
 				iNewAnimIndex = 0;
 			m_pModelCom->Set_Animation(iNewAnimIndex, 40.f, true, false);
 		}
-		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD1, KEY_DOWN))
-			Activate_Attack();
-		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD2, KEY_DOWN))
-			Activate_Attack(ATTACK2);
-		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD3, KEY_DOWN))
-			Activate_Attack(ATTACK3);
-		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD7, KEY_DOWN)) {
-			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSub, 50.f, false, false);
-			m_bPlayPartialAnim = true;
-		}
-		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD8, KEY_DOWN)) {
-			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSubA, 50.f, false, false);
-			m_bPlayPartialAnim = true;
+		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD1, KEY_DOWN)) {
+			m_bPhaseTwo = true;
+			Change_State(Simba_Damage, 50.f, false, true);
 		}
 	}
 
@@ -175,7 +171,12 @@ _int CSimba::Tick(_float fTimeDelta)
 			m_bPlayPartialAnim = true;
 		}
 	}
-	
+
+	if (m_fHpRatio < 0.45f && m_bPhaseTwo == false) {
+		m_bPhaseTwo = true;
+		Change_State(Simba_Damage, 50.f, false, true);
+	}
+		
 	return OBJ_NOEVENT;
 }
 
@@ -332,6 +333,19 @@ void CSimba::CreateHpBar()
 	}
 }
 
+void CSimba::Turn_RotationBoneMatrix(_float fAngle)
+{
+	_float4x4 RotationMatrix = _float4x4::Identity;
+	if (0 == fAngle) 
+	{
+		*m_pRotationBoneMatrix = RotationMatrix;
+		return;
+	}
+
+	CUtils::Turn_OtherMatrix(RotationMatrix, _float4(1, 0, 0, 0), 1.f, fAngle);
+	*m_pRotationBoneMatrix = RotationMatrix;
+}
+
 HRESULT CSimba::Add_Components()
 {
 	HRESULT hr;
@@ -462,6 +476,7 @@ void CSimba::SetUp_FSM()
 
 	m_pFSM->Add_State(Simba_Jump, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 	m_pFSM->Add_State(Simba_JumpStart, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+	m_pFSM->Add_State(Simba_Fall, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 	m_pFSM->Add_State(Simba_Landing, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
 	for(_uint i = Simba_BackStep; i <= Simba_BackStepStart; i++)
@@ -469,6 +484,25 @@ void CSimba::SetUp_FSM()
 
 	for(_uint i = Simba_AttackJump; i <= Simba_AttackJumpWait; i++)
 		m_pFSM->Add_State(i, CSimba_AttackJump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
+	m_pFSM->Add_State(Simba_Damage, CSimba_Damage::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
+	m_pFSM->Add_State(Simba_Roar2, CSimba_Roar::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
+	for(_uint i = Simba_BiteRushJumpL; i<= Simba_BiteRushLandingR; i++)
+		m_pFSM->Add_State(i, CSimba_BiteRushJump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
+	for(_uint i = Simba_DimensionClaw; i<= Simba_DimensionClawWait; i++)
+		m_pFSM->Add_State(i, CSimba_DimensionClaw::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
+	for(_uint i = Simba_BiteRush; i<= Simba_BiteRushEnd; i++)
+		m_pFSM->Add_State(i, CSimba_BiteRush::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+	for (_uint i = Simba_BiteRushStart; i <= Simba_BiteRushStartStraight; i++)
+		m_pFSM->Add_State(i, CSimba_BiteRush::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
+	for (_uint i = Simba_DimensionLaser; i <= Simba_DimensionLaserWait; i++)
+		m_pFSM->Add_State(i, CSimba_DimensionLaser::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+
 
 	//ป๓ลย Initialize
 	CFSM::FSM_INFO	FSM_Desc = {};
@@ -553,6 +587,7 @@ void CSimba::TransformToDefault(_float fOffsetY)
 	m_pControllerCom->Set_Position(m_pTransformCom, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 	m_pControllerCom->FreeFall(m_pTransformCom, m_pGameInstance->Get_SecondTimer(), 6.f, fOffsetY);
 	m_bRenderMant = true;
+	m_bPhaseTwo = false;
 }
 
 void CSimba::OnAppearStart(CGameObject* pObj)
@@ -655,6 +690,7 @@ void CSimba::Free()
 {
 	CEventCenter::Get_Instance()->Unsubscribe(this);
 	Safe_Release(m_pLipBone);
+	Safe_Release(m_pRotationBone);
 	Safe_Release(m_pKirby);
 
 	__super::Free();

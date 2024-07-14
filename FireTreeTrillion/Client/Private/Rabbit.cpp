@@ -35,6 +35,8 @@ HRESULT CRabbit::Initialize(void* pArg)
 		if (FAILED(__super::Initialize(&tDesc)))
 			return E_FAIL;
 	}
+	if (LEVEL_TOOL_ANIM == *m_pGameInstance->Get_CurrentLevelID())
+		wstrModelName = TEXT("Rabbit");
 	else
 	{
 		RABBIT_DESC* pRabbitDesc = nullptr;
