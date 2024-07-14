@@ -904,6 +904,10 @@ HRESULT CLevel_Finale::Add_EnvMap()
 	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_NORMAL], "g_RandomNormalTexture")))
 		return E_FAIL;
 
+	_bool	bDeepShadow = true;
+	if (FAILED(m_pGameInstance->Bind_DeferredRawValue("g_bDeepShadow", &bDeepShadow, sizeof(_bool))))
+		return E_FAIL;
+
 	return S_OK;
 }
 

@@ -144,6 +144,7 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
 
 
 
+
     return OBJ_NOEVENT;
 }
 
@@ -698,6 +699,11 @@ _bool CFinaleKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
     }
 
     return false;
+}
+
+_float CFinaleKirby::Get_AnimTrackPos()
+{
+    return m_pModelCom[INFO(m_eBodyState)]->Get_AnimTrackPosition();
 }
 
 void CFinaleKirby::SetUp_FSM()

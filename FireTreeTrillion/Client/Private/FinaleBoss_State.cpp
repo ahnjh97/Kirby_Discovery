@@ -139,7 +139,7 @@ void CFinaleBoss_CutScene_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			break;
 		case CFinaleBoss::FINALEBOSS_CUT5:
 			pCenter->Set_CutScene(6);
-			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT6, 50.f, false, false);
+			pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT6, 70.f, false, false);
 			break;
 		case CFinaleBoss::FINALEBOSS_CUT6:
 			pCenter->Set_CutScene(7);

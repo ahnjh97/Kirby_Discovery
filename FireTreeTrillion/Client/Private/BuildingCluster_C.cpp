@@ -324,7 +324,11 @@ void CBuildingCluster_C::Set_Animation()
 	if (m_eCurCut == m_ePreCut)
 		return;
 
-	m_pBuildingCluster->Set_Animation(m_eCurCut, 50.f, false, false);
+	if (m_eCurCut == CUT6)
+		m_pBuildingCluster->Set_Animation(m_eCurCut, 70.f, false, false);
+	else
+		m_pBuildingCluster->Set_Animation(m_eCurCut, 50.f, false, false);
+
 	m_ePreCut = m_eCurCut;
 }
 

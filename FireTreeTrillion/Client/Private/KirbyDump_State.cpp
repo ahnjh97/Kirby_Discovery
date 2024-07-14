@@ -780,7 +780,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	else if (iAnimIndex == 2)
 		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT2, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
 	else if (iAnimIndex == 6)
-		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT6, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
+		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT6, 70.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
 	else if (iAnimIndex == 7)
 		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT7, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
 	else if (iAnimIndex == 8)
@@ -823,6 +823,72 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		pTransformCom->Set_State(CTransform::STATE_UP, NewUp);
 		pTransformCom->Set_State(CTransform::STATE_RIGHT, NewRight);
 
+
+		m_fEffectTime += fTimeDelta;
+		_float4 vEffectPos = pKirby->m_vBonePos;
+
+
+		if (m_fEffectTime > 0.05f)
+		{
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.vInitPos = static_cast<_float3>(vEffectPos) + (_float3)CUtils::Make_Random_Vector(0.5f);
+			FXDesc.vInitPos.y -= 2.f;
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+
+			_float fScale = CUtils::Make_RandomFloat(0.5f, 1.f);
+			FXDesc.vInitScale = { fScale, fScale, fScale };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
+				return;
+
+			m_fEffectTime = 0.f;
+		}
+
+		if (m_bShakeTrigger1 == true)
+		{
+
+			if (pKirby->Get_AnimTrackPos() > 125.f)
+			{
+				vEffectPos.x -= 5.f;
+
+				for (_int i = 0; i < 15; ++i)
+				{
+					CEffect::FX_DESC FXDesc{};
+					FXDesc.vInitPos = static_cast<_float3>(vEffectPos) + (_float3)CUtils::Make_Random_Vector(0.5f);
+					FXDesc.vInitPos.y -= 2.f;
+					FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+
+					_float fScale = CUtils::Make_RandomFloat(1.f, 3.f);
+					FXDesc.vInitScale = { fScale, fScale, fScale };
+					if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
+						return;
+				}
+				m_bShakeTrigger1 = false;
+			}
+
+		}
+		else if (m_bShakeTrigger2 == true)
+		{
+
+			if (pKirby->Get_AnimTrackPos() > 216.f)
+			{
+				for (_int i = 0; i < 15; ++i)
+				{
+					CEffect::FX_DESC FXDesc{};
+					FXDesc.vInitPos = static_cast<_float3>(vEffectPos) + (_float3)CUtils::Make_Random_Vector(0.5f);
+					FXDesc.vInitPos.y -= 2.f;
+					FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+
+					_float fScale = CUtils::Make_RandomFloat(1.f, 3.f);
+					FXDesc.vInitScale = { fScale, fScale, fScale };
+					if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
+						return;
+				}
+				m_bShakeTrigger2 = false;
+			}
+		}
+
+
+
 		if (pKirby->isAnimFinish())
 		{
 			pCenter->Set_CutScene(2);
@@ -832,14 +898,37 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT2)
 	{
 
-		//if (pKirby->isAnimFinish())
-		//{
-		//	pCenter->Set_CutScene(3);
-		//}
+
+
+
+
+
 	}
 	// 큐티 모션 후 점프
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT6)
 	{
+
+		m_fEffectTime += fTimeDelta;
+		_float4 vEffectPos = pKirby->m_vBonePos;
+
+
+		if (m_fEffectTime > 0.03f)
+		{
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.vInitPos = static_cast<_float3>(vEffectPos) + (_float3)CUtils::Make_Random_Vector(0.5f);
+			FXDesc.vInitPos.y -= 2.f;
+			FXDesc.vInitPos.x -= 3.f;
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+
+			_float fScale = CUtils::Make_RandomFloat(3.f, 4.f);
+			FXDesc.vInitScale = { fScale, fScale, fScale };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
+				return;
+
+			m_fEffectTime = 0.f;
+		}
+
+
 		//평쇼
 		if (m_iQTECnt == 0)
 		{
@@ -928,6 +1017,27 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	//
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT7)
 	{
+
+		m_fEffectTime += fTimeDelta;
+		_float4 vEffectPos = pKirby->m_vBonePos;
+
+
+		if (m_fEffectTime > 0.03f)
+		{
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.vInitPos = static_cast<_float3>(vEffectPos) + (_float3)CUtils::Make_Random_Vector(0.5f);
+			FXDesc.vInitPos.y -= 2.f;
+			FXDesc.vInitPos.x -= 3.f;
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+
+			_float fScale = CUtils::Make_RandomFloat(3.f, 4.f);
+			FXDesc.vInitScale = { fScale, fScale, fScale };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
+				return;
+
+			m_fEffectTime = 0.f;
+		}
+
 
 
 		if (pKirby->isAnimFinish())
