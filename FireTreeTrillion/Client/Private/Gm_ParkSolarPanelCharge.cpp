@@ -197,8 +197,8 @@ void CGm_ParkSolarPanelCharge::Render_IMGUI()
 	case STATE_NONE:	default: ImGui::Text(u8"STATE_NONE"); break;
 	}
 	
-	if (m_IsInteraction) ImGui::Text(u8"IsInteraction : TRUE");
-	else ImGui::Text(u8"IsInteraction : FALSE");
+	if (m_IsInteraction) ImGui::Text(u8"Gm_ParkSolarPanelCharge :: IsInteraction : TRUE");
+	else ImGui::Text(u8"Gm_ParkSolarPanelCharge :: IsInteraction : FALSE");
 }
 #endif
 

@@ -169,13 +169,14 @@ HRESULT CMainApp::Ready_Fonts()
 		TEXT("../Bin/Resources/Fonts/HUD_Sub_KR15.SpriteFont"))))
 		return E_FAIL;
 
-	// FOT-Seurat Pro EB /Fontsize 30 /CharacterRegion: 0x0030-0x0039 (숫자만)
+	// [공통 Flag]
+	// /CharacterRegion: 0x0030-0x0039(숫자) 0xAC00-0xD7AF(한글) 0x0020-0x007E(영어 + 특문)
+
+	// FOT-Seurat Pro EB :: StarPoint 폰트
+	// Fontsize 30
 	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_HUD_StarPoint_NUM30"),
 		TEXT("../Bin/Resources/Fonts/HUD_StarPoint_NUM30.spritefont"))))
 		return E_FAIL;
-
-	// [공통 Flag]
-	// /CharacterRegion: 0x0030-0x0039(숫자) 0xAC00-0xD7AF(한글) 0x0020-0x007E(영어 + 특문)
 	
 	// a대한늬우스L, a대한늬우스M :: 보스 대사 폰트
 	// /Fontsize: 22 /LineSpacing: 10
@@ -185,16 +186,28 @@ HRESULT CMainApp::Ready_Fonts()
 
 	// a신고딕 :: 일반 다이얼로그 대사 폰트
 	// /Fontsize: 20 /LineSpacing: 10
-	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_Dialog_KR18spac10"),
-		TEXT("../Bin/Resources/Fonts/Dialog_KR18spac10.spritefont"))))
+	//if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_Dialog_KR18spac10"),
+	//	TEXT("../Bin/Resources/Fonts/Dialog_KR18spac10.spritefont"))))
+	//	return E_FAIL;
+	
+	// a중고딕 KoreanGDB
+	// /Fontsize: 22 /LineSpacing: 10
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_KoreanGDB_KR22spac10"),
+		TEXT("../Bin/Resources/Fonts/KoreanGDB_KR22spac10.spritefont"))))
 		return E_FAIL;
+
+	// a태고딕 KoreanGDE
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_KoreanGDE_KR22spac10"),
+		TEXT("../Bin/Resources/Fonts/KoreanGDE_KR22spac10.spritefont"))))
+		return E_FAIL;
+
 
 	// a둥근헤드 :: 일반 다이얼로그 타이틀 폰트
 	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_Dialog_Title_KR22spac10"),
 		TEXT("../Bin/Resources/Fonts/Dialog_Title_KR22spac10.spritefont"))))
 		return E_FAIL;
 
-	// 
+	// a자막체 :: 페르소나5 로얄의 잔재... 
 	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_Dialog_SubKR18spac10"),
 		TEXT("../Bin/Resources/Fonts/Dialog_SubKR18spac10.spritefont"))))
 		return E_FAIL;

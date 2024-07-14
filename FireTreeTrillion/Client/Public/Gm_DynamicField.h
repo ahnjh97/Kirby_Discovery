@@ -13,11 +13,13 @@ BEGIN(Client)
 class CGm_DynamicField final : public CPhysXObject
 {
 public: 
-	enum DYNAMICFILED_STATE {	STATE_IDLE, STATE_NONE };
+	enum DYNAMICFILED_TYPE { DFMOVE_UPDOWN, DFMOVE_LEFTRIGHT, DFMOVE_FRONTBACK, DFMOVE_NONE };
+	/*
 	typedef struct : public CGameObject::GAMEOBJECT_DESC
 	{
 		
 	}DYNAMICFILED_DESC;
+	*/
 
 private:
 	CGm_DynamicField(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -52,6 +54,7 @@ private:
 
 	PxRigidDynamic*			m_pDynamicActor = { nullptr };
 	CGm_ParkSolarPanelOnce* m_pSolarPanel = { nullptr };
+	DYNAMICFILED_TYPE		m_eDFieldType = { DFMOVE_NONE };
 
 	_float					m_fTime = { 0.f };
 	

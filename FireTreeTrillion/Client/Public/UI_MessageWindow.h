@@ -102,6 +102,7 @@ public:
 private:
 	CTransform*					m_pTransCom[TEXMW_NONE] = { nullptr };
 	CTexture*					m_pTexCom[TEXMW_NONE] = { nullptr };
+	CTexture*					m_pTexClaw = { nullptr };
 
 	class CUI_BtnIcon*			m_pUIBtn = { nullptr };
 	

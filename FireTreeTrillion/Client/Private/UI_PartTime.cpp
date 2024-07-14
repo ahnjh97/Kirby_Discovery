@@ -317,7 +317,7 @@ HRESULT CUI_PartTime::Add_Components()
 	CHECK_FAILED(hr);
 
 	// FADE ÅØ½ºÃÄ
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Fade"),
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Fade"),
 		TEXT("Com_Texture_Fade"), (CComponent**)&m_arrTexures[16]);
 	CHECK_FAILED(hr);
 

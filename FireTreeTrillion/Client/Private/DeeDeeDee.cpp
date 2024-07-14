@@ -42,7 +42,8 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 	m_tInfo.m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 	m_fMaxHp = 200.f;
-	m_fHp = 200.f;
+	//m_fHp = 200.f;
+	m_fHp = 10.f;
 	m_fAttack = 15.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eAbilityType = ABILITY_DEFAULT;
@@ -204,10 +205,10 @@ void CDeeDeeDee::Add_AnimEvent()
 void CDeeDeeDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	// PARK로 이동하기 위한 다이얼로그 출력
-	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN)) //07.14) 키 변경 C > A
 	{
-		//CUI_MessageWindow* pMWindow = dynamic_cast<CUI_MessageWindow*>(m_pGameInstance->Get_LastGameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg")));
-		CUI_MessageWindow* pMWindow = dynamic_cast<CUI_MessageWindow*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_DeeDeeDee"), 0));
+		CUI_MessageWindow* pMWindow = dynamic_cast<CUI_MessageWindow*>
+			(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_DeeDeeDee")));
 		CHECK_NULLPTR(pMWindow);
 		pMWindow->Show_DialogMessage();
 

@@ -19,6 +19,7 @@
 #include "BG.h"
 #include "HUD.h"
 #include "Dialog.h"
+#include "UI_Fading.h"
 
 
 CLevel_DeeDeeDee::CLevel_DeeDeeDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -76,7 +77,6 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DeeDeeDee"), TEXT("Prototype_GameObject_DeeDeeDee"), &ObjDesc)))
 		return E_FAIL;
 
-	// QZR : 페이드인
 
 	return S_OK;
 }
@@ -85,6 +85,24 @@ void CLevel_DeeDeeDee::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
+
+	static _bool bOnceFade = false;
+
+	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+	CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
+
+	if (bOnceFade == false)
+	{
+		pFadingUI->Set_InOutState(CUI_Fading::FADEIN);
+		pFadingUI->Set_IsRender(true);
+		bOnceFade = true;
+	}
+	else if (pFadingUI->Get_FadeRatio() >= 1.f)
+		pFadingUI->Set_IsRender(false);
+}
+
+void CLevel_DeeDeeDee::Ready_FadeIn()
+{
 }
 
 HRESULT CLevel_DeeDeeDee::Render()
@@ -107,6 +125,7 @@ HRESULT CLevel_DeeDeeDee::Render()
 
 	return S_OK;
 }
+
 
 HRESULT CLevel_DeeDeeDee::Ready_Lights()
 {
@@ -206,7 +225,7 @@ HRESULT CLevel_DeeDeeDee::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
 
-	//다이얼로그 
+	//다이얼로그 :: 망치 루팅 이후 출력
 	CDialog::DIALOG_DESC tDialogDesc{};
 	tDialogDesc.strPath = "../Bin/Resources/Data/Dialog_DeeDeeDee.json";
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_Dialog"), &tDialogDesc);

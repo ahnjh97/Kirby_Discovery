@@ -55,8 +55,18 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	m_pTransCom[TEXMW_BTNBASE]->Set_Scaled(vScale);
 	m_vBtnScale = m_pTransCom[TEXMW_BTNBASE]->Get_Scaled();
 
-	//_float4 vBtnTrans = { 479.f, -390.f, 1.f, 1.f };
-	_float4 vBtnTrans = { 509.f, -394.f, 1.f, 1.f };
+	_float4 vBtnTrans{};
+	switch (*m_pCurrentLevelID)
+	{
+	case LEVEL_TOWN: case LEVEL_DEEDEEDEE:
+		vBtnTrans = { 503.f, -394.f, 1.f, 1.f };
+		break;
+
+	case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE: default:
+		vBtnTrans = { 509.f, -394.f, 1.f, 1.f };
+		break;
+	}
+
 	m_pTransCom[TEXMW_BTNBASE]->Set_State(CTransform::STATE_POSITION, vBtnTrans);
 
 #pragma endregion
@@ -68,6 +78,7 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 
 	m_UIObjDesc.fAlpha = 0.f;
 	m_eCurState = WINDOW_IDLE;
+
 
 #pragma region UI_BUTTON
 
@@ -99,8 +110,9 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 	m_pUIBtn->Tick(fTimeDelta);
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && WINDOW_IDLE == m_eCurState) //테스트용
-		Show_DialogMessage();
+	//테스트용
+	//if (m_pGameInstance->Get_DIKeyState(DIK_GRAVE, KEY_DOWN) && LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
+	//	Show_DialogMessage();
 	
 	//A 버튼 입력 시, 다음 스크립트 문단을 준비하여 출력
 	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && WINDOW_SHOW == m_eCurState)
@@ -115,7 +127,7 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 		{
 			m_eCurState = WINDOW_HIDE;
 			m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_HIDE);
-			OnEvent();
+			OnEvent(); //모든 스크립트 재생 종료 시, 해당 이벤트를 수행
 		}
 
 		if(LEVEL_SIMBA == *m_pCurrentLevelID)
@@ -190,12 +202,12 @@ HRESULT CUI_MessageWindow::Render()
 		TEX_MWTYPE eTexType = { TYPE_DEFAULT };
 		switch (*m_pCurrentLevelID)
 		{
-		case LEVEL_TOWN: 
-			eTexType = TYPE_DEFAULT;
+		case LEVEL_TOWN: case LEVEL_DEEDEEDEE: 
+				eTexType = TYPE_DEFAULT;
 			break;
 
-		case LEVEL_DEEDEEDEE: case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE:
-			if (TEXMW_BTNBASE == iTEXIx)
+		case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE:
+			if (TEXMW_BTNBASE == iTEXIx) //해당 레벨에서는 출력x
 				continue;
 
 			else
@@ -221,6 +233,30 @@ HRESULT CUI_MessageWindow::Render()
 	}
 
 #pragma endregion
+
+#pragma region BASE_CLAW
+	
+	switch (*m_pCurrentLevelID)
+	{
+	case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE:
+		if (FAILED(m_pTransCom[TEXMW_BASE]->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+			return E_FAIL;
+
+		hr = Bind_ShaderResources(m_pShaderCom, POSTEX_UIMWBASE_CLAW, m_pTexClaw, 0);
+		CHECK_FAILED(hr);
+	break;
+
+	default: break;
+	}
+
+#pragma endregion
+
 	
 	//버튼 렌더링
 	m_pUIBtn->Render();
@@ -235,6 +271,13 @@ HRESULT CUI_MessageWindow::Render()
 #ifdef DEBUG
 void CUI_MessageWindow::Render_IMGUI()
 {
+	switch (m_eCurState)
+	{
+	case WINDOW_IDLE:			ImGui::Text(u8"MWINDOW_IDLE"); break;
+	case WINDOW_HIDE:		ImGui::Text(u8"MWINDOW_HIDE"); break;
+	case WINDOW_SHOW:		ImGui::Text(u8"MWINDOW_SHOW"); break;
+	case WINDOW_NONE:	default: ImGui::Text(u8"MWINDOW_NONE"); break;
+	}
 }
 
 #endif // DEBUG
@@ -274,6 +317,10 @@ HRESULT CUI_MessageWindow::Add_Components()
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_UI_MessageWindow_Base"),
 		TEXT("Com_TexBase"), (CComponent**)&m_pTexCom[TEXMW_BASE])))
+		return E_FAIL;
+
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_UI_MessageWindow_Base_Claw"),
+		TEXT("Com_TexBase_Claw"), (CComponent**)&m_pTexClaw)))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_UI_MessageWindow_BtnBase"),
@@ -377,26 +424,26 @@ HRESULT CUI_MessageWindow::Render_Message()
 		wstring wstrMsg = m_tMessageDesc.vecMsg[m_iCurMessageIndex];
 
 		//스크립트 그림자
-		_float2 vOffset[] = { {-2.f, 0.f},
-							{2.f, 0.f},
-							{0.f, -2.f} ,
-							{0.f, 2.f} };
+		_float2 vOffset[] = { {-3.f, 0.f},
+							{3.f, 0.f},
+							{0.f, -3.f} ,
+							{0.f, 3.f} };
 
-		_float4 vMessageShadowRGBA = { 0.025f, 0.025f, 0.025f, 0.025f };
+		_float4 vMessageShadowRGBA = { 0.05f, 0.05f, 0.05f, 0.05f };
 		_float2 vMessageShadowScale = { 1.01f, 1.01f };
 
 		// 스크립트 그림자
-		//for (_uint i = 0; i < 4; ++i)
-		//{
-		//	_float2 vMessageShadowPos = { vFontPos.x + vOffset[i].x, vFontPos.y + vOffset[i].y };
-		//	m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vMessageShadowPos, vMessageShadowRGBA, fRadian, vFontSize, vMessageShadowScale);
-		//}
+		wstring& wstrSubstrMessage = wstrMsg.substr(0, m_iCurCharIndex);
+		for (_uint i = 0; i < 4; ++i)
+		{
+			_float2 vMessageShadowPos = { vFontPos.x + vOffset[i].x, vFontPos.y + vOffset[i].y };
+			m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vMessageShadowPos, vMessageShadowRGBA, fRadian, vFontSize, vMessageShadowScale);
+		}
 
 		const auto& wstrPreHighlightMsg  = get<0>(m_vecSplitMsg[m_iCurMessageIndex]);
 		const auto& wstrHighlightMsg	 = get<1>(m_vecSplitMsg[m_iCurMessageIndex]);
 		const auto& wstrPostHighlightMsg = get<2>(m_vecSplitMsg[m_iCurMessageIndex]);
 
-		wstring& wstrSubstrMessage = wstrMsg.substr(0, m_iCurCharIndex);
 		if (m_iCurCharIndex < wstrPreHighlightMsg.size())	//하이라이트 포지션전까지
 			m_pGameInstance->Render_Font(wstrFontTag, wstrSubstrMessage, vFontPos, vFontRGBA, fRadian, vFontSize, vFontScale);
 		else
@@ -436,7 +483,8 @@ HRESULT CUI_MessageWindow::Render_Message()
 		}
 	}
 
-	if (LEVEL_TOWN == *m_pCurrentLevelID)
+	//타이틀 (스크립트 대화 대상) 출력
+	if (LEVEL_DEEDEEDEE == *m_pCurrentLevelID || LEVEL_TOWN == *m_pCurrentLevelID)
 	{
 		wstring wstrTitleTag = m_tMessageDesc.wstrTitleTag;
 		wstring wstrTitleText = m_tMessageDesc.wstrTitleText;
@@ -570,7 +618,6 @@ void CUI_MessageWindow::Start_Message(CGameObject* pObj)
 	Show_DialogMessage();
 }
 
-
 CUI_MessageWindow* CUI_MessageWindow::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CUI_MessageWindow* pInstance = new CUI_MessageWindow(pDevice, pContext);
@@ -611,6 +658,7 @@ void CUI_MessageWindow::Free()
 	for (auto& iTex : m_pTexCom)
 		Safe_Release(iTex);
 
+	Safe_Release(m_pTexClaw);
 	Safe_Release(m_pUIBtn);
 }
 
