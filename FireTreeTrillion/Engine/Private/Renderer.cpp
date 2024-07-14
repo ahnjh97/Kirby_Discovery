@@ -450,9 +450,10 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Finale",
 		COLOR_DATA{
-		1.3f, 1.f, 1.00971f, 1.26984f, 1.29039f, 1.1f, 1.2f, 0.890027f,
-		0.749999f, 0.7f, 1.33994f, 1.08f, 1.2f, 0.416831f, 0.078232f, 0.161517f,
-		0.0762417f, 0.902655f, 0.68634f, 0.543191f, 0.00980521f, 0.499961f, 0.912908f, 0.99115f, 0.0099959f, 0.190006f, 0.359918f
+		1.09019f, 1.f, 0.999745f, 1.27947f, 1.28048f, 1.10965f, 1.2099f, 0.880135f, 0.742923f,
+		0.695283f, 1.33026f, 1.07625f, 1.195f, 0.407189f, 0.0743245f, 0.152986f, 0.0859433f,
+		0.902655f, 0.68634f, 0.543191f, 0.0196147f, 0.499961f, 0.912908f, 0.99115f, 0.0198914f,
+		0.180384f, 0.369633f
 		});
 
 	Save_ColorSet("Horror",
@@ -767,9 +768,11 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	case 5:
 	{
 		m_DestColorData = Find_ColorSet("Finale");
-		//m_DestColorData = Find_ColorSet("Town");
+
 		m_fRimLightRatio.second = .7f;
 		m_vRimColor.second = _float3(.7f, .3f, 0.f);
+		m_fDOFIntensity = .1f;
+		m_vDOFColor = _float3{ .08f, .05f, .13f };
 		Update_Option(OPTION_DOF, true);
 	}
 	break;
