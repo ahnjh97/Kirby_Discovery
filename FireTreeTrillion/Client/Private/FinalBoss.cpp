@@ -76,7 +76,7 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 		}
 
 		// 파티클 풀링
-		for (_uint j = 0; j < 20; j++)
+		for (_uint j = 0; j < 25; j++)
 		{
 			for (_uint i = 0; i < DEBRISCNT; i++)
 			{
@@ -207,18 +207,21 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		vPos.m128_f32[1] -= 0.5f;
 		m_vecMagneticDebris[0]->Set_ParticleEffect(XMVectorSetW(vPos, 1.f), 2.5f);
 
-		// 파편 파티클 튀는거 
-		if (m_vecDebris.size() > m_iDebrsiMaxCnt)
-			m_iDebrsiMaxCnt += DEBRISCNT;
-		else
+		for (_uint i = 0; i < 2; ++i)
 		{
-			m_iDebrsiMaxCnt = DEBRISCNT;
-			m_iDebrisCnt = 0;
-		}
+			// 파편 파티클 튀는거 
+			if (m_vecDebris.size() > m_iDebrsiMaxCnt)
+				m_iDebrsiMaxCnt += DEBRISCNT;
+			else
+			{
+				m_iDebrsiMaxCnt = DEBRISCNT;
+				m_iDebrisCnt = 0;
+			}
 
-		// 파편 파티클 살리기
-		for (m_iDebrisCnt; m_iDebrisCnt < m_iDebrsiMaxCnt; ++m_iDebrisCnt)
-			m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vPos, 1.f, _float2(5.f , 10.f));
+			// 파편 파티클 살리기
+			for (m_iDebrisCnt; m_iDebrisCnt < m_iDebrsiMaxCnt; ++m_iDebrisCnt)
+				m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vPos, 1.f, _float2(5.f, 10.f));
+		}
 	}
 
 	__super::Tick(m_fTimeDelta);
@@ -293,6 +296,58 @@ void CFinalBoss::Render_IMGUI()
 		ImGui::TreePop();
 	}
 
+
+	ImGui::Text("Air Pattern");
+	if (ImGui::Button("Stab"))
+	{
+		m_bStab = true;
+	}
+	if (ImGui::Button("Gully"))
+	{
+		m_bSlash = true;
+	}
+	if (ImGui::Button("Meteor"))
+	{
+		m_bMeteor = true;
+	}
+	if (ImGui::Button("Laser"))
+	{
+		m_bLaser = true;
+	}
+	if (ImGui::Button("Air Arrow"))
+	{
+		m_bArrowAir = true;
+	}
+	if (ImGui::Button("SideStep(L, R Random)"))
+	{
+		m_bSide = true;
+	}
+
+	ImGui::Text("Ground Pattern");
+	if (ImGui::Button("BackStep"))
+	{
+		m_bBackStep = true;
+	}
+	if (ImGui::Button("Ground Arrow"))
+	{
+		m_bArrowGround = true;
+	}
+	if (ImGui::Button("Swing(Variation 3 Random)"))
+	{
+		m_bSwing = true;
+	}
+	if (ImGui::Button("Thrust"))
+	{
+		m_bThrust = true;
+	}
+	if (ImGui::Button("Spike"))
+	{
+		m_bSpike = true;
+	}
+
+	ImGui::Text("Special Pattern");
+	ImGui::Text("Key K : Spawn Meteor After CutScene");
+	ImGui::Text("Key L : Gimmick Clone");
 	//ImGui::Text("RePress : %d", m_bRePressBlock);
 	//ImGui::Text("Land : %d", INFO(m_isLanding));
 
@@ -302,8 +357,6 @@ void CFinalBoss::Render_IMGUI()
 	//ImGui::Text("FSM : %d", m_pFSM->Get_State());
 	ImGui::Separator(); ImGui::NewLine();
 
-	//	ImGui::Text("MoveDir X : %.2f \tMoveDir Y : %.2f \tMoveDir Z : %.2f ", INFO(m_vMoveDir).x, INFO(m_vMoveDir).y, INFO(m_vMoveDir).z); ImGui::NewLine();
-	//	ImGui::Text("TargetDir X : %.2f \tTargetDir Y : %.2f \tTargetDir Z : %.2f ", INFO(m_vTargetDir).x, INFO(m_vTargetDir).y, INFO(m_vTargetDir).z);
 	__super::Render_IMGUI();
 }
 
