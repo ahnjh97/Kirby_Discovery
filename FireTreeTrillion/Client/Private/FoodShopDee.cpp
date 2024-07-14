@@ -152,7 +152,8 @@ void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
 	{
 		//Prototype_GameObject_UI_MessageWindow
-		CUI_MessageWindow* pMWindow =  dynamic_cast<CUI_MessageWindow*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Dialog"), 0));
+		// 07.14) 크래시 버그 수정 (Layer 명확하게 검색)
+		CUI_MessageWindow* pMWindow =  dynamic_cast<CUI_MessageWindow*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_Parttimer_Dee"), 0));
 		CHECK_NULLPTR(pMWindow);
 		pMWindow->Show_DialogMessage();
 	}
