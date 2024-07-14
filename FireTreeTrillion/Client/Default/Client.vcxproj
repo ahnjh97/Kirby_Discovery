@@ -238,6 +238,7 @@
     <ClInclude Include="..\Public\Gm_ParkFhEntranceAlien.h" />
     <ClInclude Include="..\Public\Gm_ParkSolarPanelCharge.h" />
     <ClInclude Include="..\Public\Gm_ParkSolarPanelOnce.h" />
+    <ClInclude Include="..\Public\Gm_DynamicField.h" />
     <ClInclude Include="..\Public\KirbyBulb_State.h" />
     <ClInclude Include="..\Public\KirbyCrash_State.h" />
     <ClInclude Include="..\Public\KirbyDump_State.h" />
@@ -480,6 +481,7 @@
     <ClCompile Include="..\Private\Gm_ParkFhEntranceAlien.cpp" />
     <ClCompile Include="..\Private\Gm_ParkSolarPanelCharge.cpp" />
     <ClCompile Include="..\Private\Gm_ParkSolarPanelOnce.cpp" />
+    <ClCompile Include="..\Private\Gm_DynamicField.cpp" />
     <ClCompile Include="..\Private\KirbyBulb_State.cpp" />
     <ClCompile Include="..\Private\KirbyCrash_State.cpp" />
     <ClCompile Include="..\Private\KirbyDump_State.cpp" />

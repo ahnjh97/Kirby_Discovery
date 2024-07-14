@@ -354,13 +354,14 @@ void CTransingStar::On_Event()
         }
         else if (*m_pCurrentLevelID == LEVEL_TOWN)
         {
+            CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+            pCameraMain->Unlock();
+            pCameraMain->Set_FOVY(38);
+            pCameraMain->Move_ForTrigger(m_fTimeDelta);
+            
             CGameObject* pPlayer = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
             CKirby* pKirby = dynamic_cast<CKirby*>(pPlayer);
             pKirby->Set_ControllerPos(_float4(140.3f, 23.2f, 104.7f, 1.f));
-
-            CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
-            pCameraMain->Set_FOVY(38);
-            pCameraMain->Move_ForTrigger(m_fTimeDelta);
         }
 	}
 }

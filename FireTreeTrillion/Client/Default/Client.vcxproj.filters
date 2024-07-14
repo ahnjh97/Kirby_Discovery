@@ -643,6 +643,9 @@
     <Filter Include="02.GameObjects\Map\Finale_SpeicalBuilding">
       <UniqueIdentifier>{e99f6f3f-aec5-4d34-9c56-25fbe8ea2270}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Gimmick\Park_Wondaria\Dynamic_Field">
+      <UniqueIdentifier>{e8b3e9b8-adc4-4c69-84a8-0a828ea1dda8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1284,6 +1287,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\BossChimera.h">
       <Filter>02.GameObjects\PhysXObject\Character\BossChimera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Gm_DynamicField.h">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\Dynamic_Field</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Finale_SpecialDebris_A.h">
       <Filter>02.GameObjects\Map\Finale_SpecialDebris</Filter>
@@ -1937,6 +1943,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BuildingCluster_B.cpp">
       <Filter>02.GameObjects\Map\Finale_SpeicalBuilding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_DynamicField.cpp">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria\Dynamic_Field</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

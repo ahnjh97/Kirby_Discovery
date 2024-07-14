@@ -126,17 +126,17 @@ HRESULT CGm_ParkSolarPanelOnce::Render()
 		hr = m_pShaderCom->Begin(ANIMMODEL_LINEAR_NORMAL_O);
 		CHECK_FAILED(hr);
 
-		//LAMP_TYPE eLampType = { LAMP_RED };
+		LAMP_TYPE eLampType = { LAMP_RED };
 
-		////특정 애님 상태에 따라 텍스처 변경할 메쉬를 체크
-		//if (STATE_OFFWAIT == m_eCurState)
-		//{
-		//	if (m_setUpdateMeshs.find(i) != m_setUpdateMeshs.end())
-		//	{
-		//		hr = m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", eLampType);
-		//		CHECK_FAILED(hr);
-		//	}
-		//}
+		//특정 애님 상태에 따라 텍스처 변경할 메쉬를 체크
+		if (STATE_OFFWAIT == m_eCurState)
+		{
+			if (m_setUpdateMeshs.find(i) != m_setUpdateMeshs.end())
+			{
+				hr = m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", eLampType);
+				CHECK_FAILED(hr);
+			}
+		}
 		
 		hr = m_pModelCom->Render(i);
 		CHECK_FAILED(hr);
@@ -173,15 +173,12 @@ void CGm_ParkSolarPanelOnce::Render_IMGUI()
 void CGm_ParkSolarPanelOnce::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	m_IsInteraction = TRUE;
-
+	
 	//충전 대기 상태에서 키꾹 > 충전 시작
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && STATE_OFFWAIT == m_eCurState)
 	{
-		if (STATE_OFFWAIT == m_eCurState)
-		{
-			m_pModelCom->Set_Animation(STATE_CHARGE, 30.f, FALSE, TRUE);
-			m_eCurState = STATE_CHARGE;
-		}
+		m_pModelCom->Set_Animation(STATE_CHARGE, 30.f, FALSE, TRUE);
+		m_eCurState = STATE_CHARGE;
 	}
 
 #pragma region KEY_FRAME CUSTOM 1 SCOOP
@@ -222,9 +219,9 @@ HRESULT CGm_ParkSolarPanelOnce::Add_Components()
 	CHECK_FAILED(hr);
 
 	//TEXTURE :: Lamp에 붙일 텍스처
-	//CHECK_FAILED(hr);	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_SolarPanelCharge_Lamp"),
-	//	TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
-	//CHECK_FAILED(hr);
+	CHECK_FAILED(hr);	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_SolarPanelCharge_Lamp"),
+		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom);
+	CHECK_FAILED(hr);
 
 #pragma region HITBOX
 
@@ -236,7 +233,7 @@ HRESULT CGm_ParkSolarPanelOnce::Add_Components()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 
-	Set_BodyCollider(COLLIDER_CYLINDER, 0.f, 2.5f, 5.f);
+	Set_BodyCollider(COLLIDER_CYLINDER, 0.f, 5.f, 5.f);
 
 #pragma endregion
 
@@ -314,5 +311,5 @@ void CGm_ParkSolarPanelOnce::Free()
 	Safe_Release(m_pNonAnimModelCom);
 
 	Safe_Release(m_pShaderCom);
-
+	Safe_Release(m_pTextureCom);
 }
