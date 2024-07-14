@@ -85,30 +85,13 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 	if (nullptr != m_pSolarPanel)
 		m_pSolarPanel->Tick(fTimeDelta);
 
-	/*
-	switch (m_eCurState)
+	switch (m_eDFieldType) //동적필드 타입에 별 움직임 세분화
 	{
-	case STATE_OFFWAIT: break;//충전 전 대기
-	case STATE_CHARGE: //충전 중
-		if (TRUE == m_pModelCom->IsFinished()) //충전 중 애님 종료 시 충전 완료 상태 변경
-		{
-			m_pModelCom->Set_Animation(STATE_ONWAITSTART, 30.f, FALSE, TRUE);
-			m_eCurState = STATE_ONWAITSTART;
-		}
-		break;
-
-	case STATE_ONWAITSTART: //충전 시작
-		if (TRUE == m_pModelCom->IsFinished())
-		{
-			m_pModelCom->Set_Animation(STATE_ONWAIT, 30.f, FALSE, TRUE);
-			m_eCurState = STATE_ONWAIT;
-		}
-		break;
-		
-	case STATE_ONWAIT: break; //충전 완료
-	case STATE_NONE:	default:	break;
+	case DFMOVE_UPDOWN: break;
+	case DFMOVE_LEFTRIGHT: break;
+	case DFMOVE_FRONTBACK: break;
+	case DFMOVE_NONE: break;
 	}
-	*/
 
 	return OBJ_NOEVENT;
 }
@@ -119,11 +102,7 @@ void CGm_DynamicField::Late_Tick(_float fTimeDelta)
 	if (nullptr != m_pSolarPanel)
 		m_pSolarPanel->Late_Tick(fTimeDelta);
 
-#pragma region FRUSTUM_CULLING
-
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-
-#pragma endregion
 
 	//애니메이션 재생종료 시 Set_Dead
 	//if (TRUE == m_pModelCom->IsFinished())
