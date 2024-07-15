@@ -971,7 +971,12 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 
 	m_fTriggerRatio = SATURATE(vRatio);
 
-
+	//QZR  >> Y값 살짝 올리는거
+	if (*m_pCurrentLevelID == LEVEL_PARK && 3 == m_iMatrixIndex)
+	{
+		//_float4 vPos = GET_POS;
+		//SET_POS(_float4(vPos.x, vPos.y + 0.2f, vPos.z, 1.f));
+	}
 	//CGameObject* pKirby = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0);
 	//if (nullptr == pKirby)
 	//	return;
@@ -2640,6 +2645,7 @@ void CCamera_Main::Render_IMGUI()
 
 	ImGui::End();
 
+	ImGui::End();
 }
 void CCamera_Main::Render_GraphicIMGUI(_float4x4 _worldMat)
 {

@@ -107,7 +107,6 @@ void CLevel_Park::Teleport_Player()
 	pTransingStar->Set_SmallColor(_float3(167.f / 255.f, 42.f / 255.f, 168.f / 255.f));
 }
 
-
 void CLevel_Park::Change_Levels()
 {
 	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
@@ -876,6 +875,7 @@ HRESULT CLevel_Park::Ready_Objects()
 
 HRESULT CLevel_Park::Ready_UI()
 {
+	HRESULT hr = S_OK;
 
 #pragma region PARSING HUD_KIRBYHP, STARPOINT
 	
@@ -962,7 +962,7 @@ HRESULT CLevel_Park::Ready_UI()
 			if ("HUD_StarPoint" == strUITag)
 				wstrLayerTag = TEXT("Layer_UI_HUD_StarPoint");
 
-			HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
+			hr = m_pGameInstance->Add_Clone(m_iLevel, wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
 			CHECK_FAILED(hr);
 		}
 
@@ -976,7 +976,7 @@ HRESULT CLevel_Park::Ready_UI()
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
 	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
 
-	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
 
 	return S_OK;
 }

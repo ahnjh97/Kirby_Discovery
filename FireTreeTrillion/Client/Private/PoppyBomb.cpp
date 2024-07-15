@@ -67,7 +67,19 @@ HRESULT CPoppyBomb::Initialize(void* pArg)
 _int CPoppyBomb::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
+	{
+		LIGHT_DESC         LightDesc{};
+		LightDesc.eType = LIGHT_DESC::TYPE_SUPERFLASH;
+		LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+		LightDesc.fRange = 30.f;
+		LightDesc.vDiffuse = _float4(.8f, .6f, 0.f, 1.f);
+		LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
+		LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
+		if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+			return E_FAIL;
+
 		return Ready_Dead();
+	}
 
 	if (static_cast<CPoppyBrosJr*>(m_pGameObject)->Get_Dead() || CPoppyBrosJr::POPPY_DAMAGE == static_cast<CPoppyBrosJr*>(m_pGameObject)->Get_State())
 		m_bDead = true;
