@@ -1860,6 +1860,22 @@ void CRenderer::Render_IMGUI()
 		Update_Option(OPTION_MOTIONBLUR, m_bRenderOption[OPTION_MOTIONBLUR]);
 
 
+
+	ImGui::SeparatorText(u8"포그");
+
+	ImGui::DragFloat3(u8"가로 포그", &(m_vFogYColor.x), .01f, 0.f, 1.f, "%.2f");
+	ImGui::DragFloat(u8"가로 포그 밑", &m_fFogYBottom, .1f, -1000.f, 1000.f, "%.2f");
+	ImGui::DragFloat(u8"가로 포그 위", &m_fFogYTopY, .1f, -1000.f, 1000.f, "%.2f");
+	ImGui::DragFloat(u8"가로 포그 강도", &m_fFogYIntensity, .01f, 0.f, 1.f, "%.2f");
+
+	ImGui::Dummy({ 0.f, 10.f });
+	ImGui::DragFloat3(u8"뷰 포그", &(m_vFogViewColor.x), .01f, 0.f, 1.f, "%.2f");
+	ImGui::DragFloat(u8"뷰 포그 앞", &m_fFogViewStart, .1f, -1000.f, 1000.f, "%.2f");
+	ImGui::DragFloat(u8"뷰 포그 뒤", &m_fFogViewEnd, .1f, -1000.f, 1000.f, "%.2f");
+	ImGui::DragFloat(u8"뷰 포그 강도", &m_fFogViewIntensity, .01f, 0.f, 1.f, "%.2f");
+
+
+
 	ImGui::SeparatorText(u8"SSAO");
 
 
