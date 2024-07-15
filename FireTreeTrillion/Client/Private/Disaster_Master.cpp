@@ -207,7 +207,7 @@ void CDisaster_Master::Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float
 
 	roadGrouperDesc.vDestPos = vDestPos;
 	roadGrouperDesc.vDestDir = vDestDir;
-
+	roadGrouperDesc.vDestDir.Normalize();
 
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoadGrouper"),
 		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
@@ -300,7 +300,7 @@ void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 	if (m_bRoadTrigger[0] == true && fKirbyX + (fKirbySpeed * 5.f) > 1098.f)
 	{
 		_float3 vDestPos = { 1098.9f, -193.6f, -158.3f };
-		_float3 vStartPos = vDestPos + _float3(100.f, 200.f, 200.f);
+		_float3 vStartPos = vDestPos + _float3(100.f, 300.f, -100.f);
 
 		Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_FLY,
 			vStartPos,	{ .4f, .1f, -.03f },
@@ -312,7 +312,7 @@ void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 	else if (m_bRoadTrigger[1] == true && fKirbyX + (fKirbySpeed * 5.f) > 1225.f)
 	{
 		_float3 vDestPos = { 1225.3f, -131.7f, -140.5f };
-		_float3 vStartPos = vDestPos + _float3(100.f, 200.f, -200.f);
+		_float3 vStartPos = vDestPos + _float3(100.f, 300.f, -200.f);
 
 		Make_FinaleRoad(RTYPE_BUILDINGA, MOVECMD_FLY,
 			vStartPos, { .31f, .32f, -.85f },
@@ -323,7 +323,7 @@ void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 	else if (m_bRoadTrigger[2] == true && fKirbyX + (fKirbySpeed * 5.f) > 1369.6f)
 	{
 		_float3 vDestPos = { 1369.6f,-143.9f, -146.2f };
-		_float3 vStartPos = vDestPos + _float3(100.f, 200.f, 200.f);
+		_float3 vStartPos = vDestPos + _float3(100.f, 300.f, 200.f);
 
 		Make_FinaleRoad(RTYPE_BUILDINGA, MOVECMD_FLY,
 			vStartPos, { .92f, .29f, .06f },
@@ -334,13 +334,25 @@ void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 	else if (m_bRoadTrigger[3] == true && fKirbyX + (fKirbySpeed * 5.f) > 1493.f)
 	{
 		_float3 vDestPos = { 1493.8f, -125.9f, -123.f };
-		_float3 vStartPos = vDestPos + _float3(100.f, 200.f, -200.f);
+		_float3 vStartPos = vDestPos + _float3(100.f, 300.f, -200.f);
 
 		Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_FLY,
 			vStartPos, { .77f, .15f, -.59f },
 			vDestPos, { .95f, .15f, -.18f }, -5.f);
 		
 		m_bRoadTrigger[3] = false;
+	}
+	else if (m_bRoadTrigger[4] == true && fKirbyX + (fKirbySpeed * 5.f) > 1619.6f)
+	{
+		_float3 vDestPos = { 1619.6f, -80.37f, -152.71f };
+		_float3 vStartPos = vDestPos + _float3(100.f, 300.f, -200.f);
+	
+	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_FLY,
+		vStartPos, { -.87f, 0.f, 1.f },
+		vDestPos, { .87f, .5f, .02f }, 0.f);
+
+		m_bRoadTrigger[3] = false;
+
 	}
 	//else if (m_bRoadTrigger[4] == true && fKirbyX + (fKirbySpeed * 5.f) > 1619.6f)
 	//{
