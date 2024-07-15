@@ -93,6 +93,19 @@ HRESULT CUI_PartTime::Initialize(void* _pArg)
 
 _int CUI_PartTime::Tick(_float fTimeDelta)
 {
+	//점심 시간 일시 정지 시간을 체크
+	if (0.f < m_fLunchTimeStartTime)
+	{
+		m_fLunchTimeStartTime -= fTimeDelta;
+		if (m_fLunchTimeStartTime < 0.f)
+		{
+			m_pGameInstance->Restore_FirstTimer();
+			m_pGameInstance->Restore_SecondTimer();
+			m_arrRenderState[BASIC] = true;
+			m_fLunchTimeStartTime = 0.f;
+		}
+	}
+
 	if (m_arrRenderState[BASIC] == false && m_arrRenderState[FADE] == false)
 		return S_OK;
 
@@ -110,6 +123,8 @@ _int CUI_PartTime::Tick(_float fTimeDelta)
 		// 점수를 받음으로써 변화되는 time-bar와 관련된 것을 관리합니다.
 		Compute_TimeScore(fTimeDelta);
 	}
+
+
 
 	return OBJ_NOEVENT;
 }
@@ -487,7 +502,7 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 	if (m_fStandardTime - m_fBeforeTime >= 1.f)
 	{
 		//m_fCurTime = 5.f - m_fStandardTime;
-		m_fCurTime = 21.f - m_fStandardTime;
+		m_fCurTime = 25.f - m_fStandardTime;
 		if (m_fCurTime <= 0.f) m_fCurTime = 0.f;
 		Change_TimeTexures(m_fCurTime);
 
@@ -518,15 +533,7 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 			m_bLunchTimeTrigger = false;
 		}
 
-		if (0.f < m_fLunchTimeStartTime)
-		{
-			m_fLunchTimeStartTime -= fTimeDelta;
-			if (m_fLunchTimeStartTime < 0.f)
-			{
-				m_arrRenderState[BASIC] = true;
-				m_fLunchTimeStartTime = 0.f;
-			}
-		}
+
 		m_fBeforeTime = m_fStandardTime;
 	}
 }
