@@ -823,7 +823,11 @@ HRESULT CKirby::Make_TargetToCams()
 		Safe_AddRef(m_pCamera);
 	}
 
-	m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST);
+	_float3 vAnchor = _float3();
+	if (*m_pCurrentLevelID == LEVEL_SIMBA)
+		vAnchor = { 0.f, 3.f, 0.f };
+
+	m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, vAnchor);
 
 	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
 	if (LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END)
@@ -1902,7 +1906,7 @@ HRESULT CKirby::Kirby_SystemInitialize()
 		else if (LEVEL_TOWN == eLEVEL && LEVEL_TOWN == *m_pCurrentLevelID)
 		{
 			_float3 vNewPos = tLevelData.vLastPos;
-			m_pControllerCom->Set_Position(m_pTransformCom, _float4{ vNewPos.x, vNewPos.y, vNewPos.z, 1.f });
+			//m_pControllerCom->Set_Position(m_pTransformCom, _float4{ vNewPos.x, vNewPos.y, vNewPos.z, 1.f });
 		}
 		else
 		{

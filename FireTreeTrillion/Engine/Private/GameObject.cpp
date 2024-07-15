@@ -205,6 +205,23 @@ HRESULT CGameObject::Compute_ViewZ()
 	return S_OK;
 }
 
+HRESULT CGameObject::Compute_BoneViewZ(CBone* pBone, _float3 vOffset)
+{
+	if (nullptr == pBone)
+		return E_FAIL;
+
+	_float4x4 matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(pBone, vOffset);
+	_vector vPosition = XMVectorSet(matBoneWorld._41, matBoneWorld._42, matBoneWorld._43, 1);
+
+	m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW);
+	vPosition = XMVector3TransformCoord(vPosition, m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW));
+
+	m_fViewZ = XMVectorGetZ(vPosition);
+	XMStoreFloat3(&m_vViewPos, vPosition);
+
+	return S_OK;
+}
+
 void CGameObject::Activate_CylinderCollider(_float fOffSetY, _float fHeight, _float fRadius, COLLISION_VALUE eColVal)
 {
 	m_tColliderDesc[eColVal].bAlive = true;

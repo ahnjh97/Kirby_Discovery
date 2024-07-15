@@ -143,6 +143,7 @@
 #include "SimbaRoomGlass.h"
 #include "RoomGlass.h"
 #include "Throne.h"
+#include "OriginCage.h"
 
 // Simba
 #include "Simba.h"
@@ -548,6 +549,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaRoomGlass"), CSimbaRoomGlass);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("RoomGlass"), CRoomGlass);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Throne"), CThrone);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OriginCage"), COriginCage);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Simba"), CSimba);
 	#pragma endregion

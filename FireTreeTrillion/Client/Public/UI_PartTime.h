@@ -41,7 +41,10 @@ public:
 	void						Add_TimeBar(_float _fTimeBar);
 	void						Add_Score(_int _fPlusScore);
 
+	_float						Get_TimeRatioBar() { return m_fRatioTimeBar; }
 	void						Set_PreRatioBar() { m_fRatioBarSub = m_fRatioTimeBar; }
+
+
 	void						Set_RenderState(STATE _eState, _bool _bState);
 
 	_bool						Get_TimeStart() const { return m_bTimeStart; }

@@ -246,7 +246,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_CamTriggerUpOffsets.reserve(LEVEL_END);
 	m_CamTriggerUpOffsets.resize(LEVEL_END);
 	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f };
-	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, .4f , .4f , .5f , 0.2f , 0.2f, 0.f };
+	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f , .4f , .5f , 0.2f , 0.2f, 0.f };
 
 
 	//º° ÀÌÆåÆ® Å×½ºÆ®¿ë
@@ -285,13 +285,6 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 		55.f / 50.f, //ÄÆ½Å 15
 		499.f / 50.f, //ÄÆ½Å 16
 	};
-
-	//m_FinaleSeqDTime =
-	//{
-	//	0.f,
-	//	63.f / 50.f, //ÄÆ½Å 19
-	//	1029.f / 50.f, //ÄÆ½Å 20
-	//};
 
 	return S_OK;
 }
@@ -1881,9 +1874,9 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		//
 		newAction = {};
-		Fill_InterpolateCutSet(newAction, 1.f, EASE_OUT, fDuration - 1.f);
+		Fill_InterpolateCutSet(newAction, 1.f, EASE_INOUT_FAST, fDuration - 1.f);
 
-		Fill_ActionPos(newAction, POS_ABSOLUTE, BOSS_POS + _float3{ -60.f, 10.f, 0.f });
+		Fill_ActionPos(newAction, POS_ABSOLUTE, BOSS_POS + _float3{ -70.f, 15.f, 0.f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 1.f, 0.f, 0.f });
 
 		newAction.fFOVY = 50.f;
@@ -2102,6 +2095,14 @@ void CCamera_Main::Ready_Cam_DeeDeeDee(CGameObject* pNotifier)
 	Set_Target(pNotifier->Get_TransformCom(), TARGET_SECOND, FOCUS_BOTH);
 }
 
+void CCamera_Main::Ready_Cam_Leongar(CGameObject* pNotifier)
+{
+}
+
+void CCamera_Main::Ready_Cam_FinalBoss(CGameObject* pNotifier)
+{
+}
+
 void CCamera_Main::Start_ShutterSeq(CGameObject* pNotifier)
 {
 	Make_Sequence(SEQ_BREAKCARSHOP);
@@ -2144,7 +2145,7 @@ void CCamera_Main::Reset_DeferredCamSet()
 
 			m_pGameInstance->Update_DofFocus(FINALEKIRBY->m_vBonePos);
 		}
-		if (m_iCurSceneIdx == 2)
+		else if (m_iCurSceneIdx == 2)
 		{
 			(0.f < m_fSeqEventTime) ?
 				m_pGameInstance->Update_DofFocus(FINALEKIRBY->m_vBonePos) :
@@ -2642,8 +2643,6 @@ void CCamera_Main::Render_IMGUI()
 	ImGui::SeparatorText(u8"ÁÜ ¿ÀÇÁ¼Â");
 	ImGui::DragFloat(u8"ÇöÀç ÁÜ ¿ÀÇÁ¼Â", &m_fCurZoomOffset, .05f, -20.f, 20.f, "%.1f", ImGuiSliderFlags_NoInput);
 	ImGui::DragFloat(u8"¸ñÇ¥ ÁÜ ¿ÀÇÁ¼Â", &m_fDestZoomOffset, .05f, -20.f, 20.f, "%.1f");
-
-	ImGui::End();
 
 	ImGui::End();
 }

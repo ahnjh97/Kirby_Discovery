@@ -7,6 +7,7 @@
 #include "PartTimeHelper.h"
 
 #include "UI_PartTimeDee.h"
+#include "UI_PartTime.h"
 
 #define FRONT_WAITPOS 2
 #define SECOND_WAITPOS 3
@@ -124,11 +125,13 @@ _int CHungryDee::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
 
-	//디버깅용
-	if (m_iMyIdx == FRONT_WAITPOS)
-		m_fWaitingTime -= m_fTimeDelta;
 
+	//타임 ratio를 받아 확인한다.
+	CUI_PartTime* pUI = dynamic_cast<CUI_PartTime*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_UI_PartTime"), TEXT("Prototype_GameObject_UI_PartTime")));
+	if (nullptr != pUI)
+		m_fWaitingTime = pUI->Get_TimeRatioBar();
 
+	/*
 	//지영아 여기야
 
 	if (m_pGameInstance->Get_KeyState(DIK_S, KEY_DOWN) && m_iMyIdx == 0)
@@ -148,7 +151,7 @@ _int CHungryDee::Tick(_float fTimeDelta)
 			m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc);
 		}
 	}
-
+	*/
 
 	//나머지 슈퍼틱, 파트 틱 처리
 	__super::Tick(m_fTimeDelta);

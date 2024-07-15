@@ -66,7 +66,7 @@ HRESULT CLevel_Simba::Initialize()
 	CHECK_FAILED(hr);
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-
+	m_pGameInstance->Set_ColorSet_ByIndex(8);
 	// SIMBA 도착했으면 오픈해주세요
 	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
 	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
@@ -74,9 +74,7 @@ HRESULT CLevel_Simba::Initialize()
 	pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
 	pTransingStar->Activate(CTransingStar::OPEN);
 
-
-
-	//m_pGameInstance->ShowAllAnimations("Simba");
+	//m_pGameInstance->ShowAllAnimations("OriginCage_Anim");
 
 	return S_OK;
 }
@@ -156,14 +154,14 @@ HRESULT CLevel_Simba::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
 
-	LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
-	LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
+	LightDesc.vDiffuse = _float4(.2f, .3f, .3f, 1.f);
+	LightDesc.vAmbient = _float4(.5f, .6f, 1.f, 1.f);
 	LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 300.f, 1200.f, 1.f});
+	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 3000.f, 1200.f, 1.f});
 
 	return S_OK;
 }
@@ -177,7 +175,7 @@ HRESULT CLevel_Simba::Ready_Layer_Camera(const wstring& strLayerTag)
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = g_fCamFar;
 	MainCamDesc.vEye = _float4(0.f, 0.f, 0.f, 1.f);
-	MainCamDesc.vAt = _float4(0.f, -.2f, 1.f, 1.f);
+	MainCamDesc.vAt = _float4(0.f, -.1f, 1.f, 1.f);
 	MainCamDesc.fSpeedPerSec = 10.f;
 	MainCamDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	MainCamDesc.fOrigDistance = 28.f;
@@ -738,9 +736,9 @@ HRESULT CLevel_Simba::Ready_Objects()
 		}
 		else if ("OriginCage" == strModelName)
 		{
-			/*tDesc.wstrModelName += L"_Anim";
+			tDesc.wstrModelName += L"_Anim";
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_OriginCage"), &tDesc)))
-				continue;*/
+				continue;
 		}
 	}
 

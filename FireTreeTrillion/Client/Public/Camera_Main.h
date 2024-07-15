@@ -143,6 +143,9 @@ public:
 
 	//카메라의 이벤트 함수들
 	void Ready_Cam_DeeDeeDee(CGameObject* pNotifier);
+	void Ready_Cam_Leongar(CGameObject* pNotifier);
+	void Ready_Cam_FinalBoss(CGameObject* pNotifier);
+
 	void Start_ShutterSeq(CGameObject* pNotifier);
 	void Start_BridgeSeq(CGameObject* pNotifier);
 

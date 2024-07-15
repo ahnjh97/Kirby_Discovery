@@ -82,6 +82,7 @@ private:
 
 	wstring					m_strComponentTag = { L"" };
 
+	class CLight*			m_pStarLight = { nullptr };
 public:
 	static CAbility* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

@@ -45,16 +45,13 @@ HRESULT CPopStar::Initialize(void* pArg)
 	m_pTransformCom->Set_Scaled(8.f, 8.f, 8.f);
 
 
-	//StarRiver	
+	//StarRiver
 	CEffect::FX_DESC FXDesc{};
 
-	//FXDesc.vInitPos = _float3{15.f, -10.f, 0.f};
 	FXDesc.pSocketMatrix = &m_EffectSocket;
-	//FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
-	//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_StarRiver"), &FXDesc)))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_StarRiver"), &FXDesc)))
+		return E_FAIL;
 
-	//FXDesc.vInitPos = _float3{ 15.f, -40.f, 0.f };
 	FXDesc.vInitScale = { 4.f, 4.f, 4.f };
 	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_star dash test 3"), &FXDesc)))
 		return E_FAIL;
