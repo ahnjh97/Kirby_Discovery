@@ -69,7 +69,6 @@ HRESULT CAbility::Initialize(void* pArg)
 		m_fJumpPower = 7.f;
 		m_fPower = 2.f;
 
-
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = { 0.f, .3f, 0.f };
 		FXDesc.pSocketMatrix = &m_EffectSocket;
@@ -77,7 +76,6 @@ HRESULT CAbility::Initialize(void* pArg)
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
 			return E_FAIL;
 		Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
-
 	}
 
 	AbilityType(m_eAbilityType);
