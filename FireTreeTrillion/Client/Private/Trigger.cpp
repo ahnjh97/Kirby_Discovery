@@ -22,7 +22,7 @@ HRESULT CTrigger::Initialize(void * pArg)
 	TRIGGER_DESC tTriggerDesc{};
 	if (nullptr != pArg) {
 		tTriggerDesc = *(TRIGGER_DESC*)pArg;
-		m_eTriggerType		= TRIGGER(tTriggerDesc.iTriggerType);
+		m_eTriggerType		= TRIGGER_TYPE(tTriggerDesc.iTriggerType);
 		m_iTriggerIndex		= tTriggerDesc.iTriggerIndex;
 		m_eCollisionGroup	= tTriggerDesc.eCollisionGroup;
 	}
@@ -113,10 +113,11 @@ HRESULT CTrigger::Add_Components()
 	/* For.Com_RigidBody */
 	switch (m_eTriggerType)
 	{
-	case TRIGGER_CAM:
+	case TRIGGER_CAMERA:
 	case TRIGGER_SHADER:
 	case TRIGGER_STAR:
 	case TRIGGER_LEVELCHANGER:
+	case TRIGGER_MONSTER:
 	{
 		CRigidBody::RIGIDBODY_DESC tRigidDesc(RIGID_BOX, m_pTransformCom->Get_WorldMatrix(), true, false);
 		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),
