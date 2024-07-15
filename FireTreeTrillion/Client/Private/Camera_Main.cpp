@@ -270,10 +270,10 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_FinaleSeqBTime =
 	{
 		0.f,
-		120.f / 50.f, //cut7 - cut8. 2¹è ´À¸²
+		110.f / 50.f, //cut7 - cut8. 2¹è ´À¸²
 		142.f / 50.f, //cut8 - cut9
-		135.f / 50.f, //cut9 - cut10
-		319.f / 50.f, //cut10 - cut11
+		130.f / 50.f, //cut9 - cut10
+		310.f / 50.f, //cut10 - cut11
 		110.f / 50.f, //cut11 - cut12
 		80.f / 50.f, /*70.f*/
 	};
@@ -281,8 +281,8 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_FinaleSeqCTime =
 	{
 		0.f,
-		113.f / 50.f, //ÄÆ½Å 14
-		65.f / 50.f, //ÄÆ½Å 15
+		105.f / 50.f, //ÄÆ½Å 14
+		55.f / 50.f, //ÄÆ½Å 15
 		499.f / 50.f, //ÄÆ½Å 16
 	};
 
@@ -961,12 +961,15 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 	if (m_iMatrixIndex < 0 || m_iMatrixIndex >= m_vecFrontDirRadius.size())
 		return;
 
-	m_fTriggerRatio = Compute_TriggerPosRatio(m_iMatrixIndex);
+	_float vRatio = Compute_TriggerPosRatio(m_iMatrixIndex);
 
-	if (m_fTriggerRatio < 0.f || 1.f < m_fTriggerRatio)
+	if (vRatio < 0.f || 1.f < m_fTriggerRatio)
+	{
+		m_fTriggerRatio = -1.f;
 		return;
+	}
 
-	m_fTriggerRatio = SATURATE(m_fTriggerRatio);
+	m_fTriggerRatio = SATURATE(vRatio);
 
 	//QZR  >> Y°ª »ìÂ¦ ¿Ã¸®´Â°Å
 	if (*m_pCurrentLevelID == LEVEL_PARK && 3 == m_iMatrixIndex)

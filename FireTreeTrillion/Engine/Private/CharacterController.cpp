@@ -206,7 +206,7 @@ void CCharacterController::Move_Dir(CTransform* pTransform, _fvector fDelta, _fl
 /// <param name="pTransform"> 객체의 Transform </param>
 /// <param name="fFallVelocity"> 떨어지는 속도 </param>
 /// <returns> 점프 상태 유무값 </returns>
-_bool CCharacterController::Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta)
+_bool CCharacterController::Jump(CTransform* pTransform, _float fFallVelocity, _float fTimeDelta, _float fOffsetY)
 {
 	// 이동
 	PxVec3 moveVector = PxVec3(0.f, fFallVelocity, 0.f) * fTimeDelta;
@@ -228,7 +228,7 @@ _bool CCharacterController::Jump(CTransform* pTransform, _float fFallVelocity, _
 	PxVec3 pos((_float)pxPos.x, (_float)pxPos.y, (_float)pxPos.z);
 
 	// 객체 FOOT POSITION 조정 using OFFSET
-	_vector xmPos = XMVectorSet(pos.x, pos.y - m_fHeightOffset, pos.z, 0.f);
+	_vector xmPos = XMVectorSet(pos.x, pos.y - (m_fHeightOffset + fOffsetY), pos.z, 0.f);
 
 	// 객체 위치 지정
 	pTransform->Set_State(CTransform::STATE_POSITION, XMVectorSetW(xmPos, 1.f));

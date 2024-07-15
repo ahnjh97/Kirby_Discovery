@@ -233,14 +233,19 @@ void CDisaster_Master::Make_CutAirParticle()
 		m_bCutInitializeParticle = false;
 	}
 
-	if (m_fAirParticleDelay > 0.1f)
+	if (m_fAirParticleDelay > 0.06f)
 	{
+		_int iAnimIndex = { 0 };
+		CFinaleCut_ControlCenter* pCenter = static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
+		if (pCenter != nullptr)
+			iAnimIndex = pCenter->Get_CutScene();
+
 		_float fZOffSet = { 0.f };
 		fZOffSet = CUtils::Make_RandomInt(0, 1) == 0 ? CUtils::Make_RandomFloat(-200.f, -50.f) : CUtils::Make_RandomFloat(50.f, 200.f);
 		_float fXOffSet = { 0.f };
-		fXOffSet = CUtils::Make_RandomFloat(20.f, 500.f);
+		fXOffSet = iAnimIndex >= 7 ? CUtils::Make_RandomFloat(-300.f, 200.f) : CUtils::Make_RandomFloat(20.f, 500.f);
 		_float fYOffSet = { 0.f };
-		fYOffSet = CUtils::Make_RandomFloat(-200.f, 10.f);
+		fYOffSet = CUtils::Make_RandomFloat(-200.f, -10.f);
 
 		vKirbyPos.x += fXOffSet;
 		vKirbyPos.y += fYOffSet;
@@ -344,12 +349,12 @@ void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 	}
 	else if (m_bRoadTrigger[4] == true && fKirbyX + (fKirbySpeed * 5.f) > 1619.6f)
 	{
-		_float3 vDestPos = { 1619.6f, -80.37f, -152.71f };
+		_float3 vDestPos = { 1619.6f, -86.37f, -152.71f };
 		_float3 vStartPos = vDestPos + _float3(100.f, 300.f, -200.f);
 	
 	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_FLY,
 		vStartPos, { -.87f, 0.f, 1.f },
-		vDestPos, { .87f, .5f, .02f }, 0.f);
+		vDestPos, { .87f, .5f, .0f }, 0.f);
 
 		m_bRoadTrigger[4] = false;
 

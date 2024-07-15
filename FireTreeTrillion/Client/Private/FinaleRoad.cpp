@@ -93,7 +93,7 @@ HRESULT CFinaleRoad::Initialize(void* pArg)
 
 
 	m_bMotionBlur = false;
-	m_bStencil = true;
+	m_bStencil = false;
 	m_bRimLight = true;
 	m_fRimWidth = .08f;
 	m_wstrModelName = RoadDesc.wstrModelName;
@@ -169,12 +169,12 @@ HRESULT CFinaleRoad::Render()
 		{
 			if (m_bCollided)
 			{
-				if (i != 0)
+				if ( (_bool)i != (m_wstrModelName == L"RoadLongBreak") ? 0 : 1 )
 					continue;
 			}
 			else
 			{
-				if (i != 1)
+				if ( (_bool)i != (m_wstrModelName == L"RoadLongBreak") ? 1 : 0 )
 					continue;
 			}
 		}
