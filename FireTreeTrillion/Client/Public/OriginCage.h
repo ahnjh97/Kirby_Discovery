@@ -12,7 +12,7 @@ BEGIN(Client)
 class COriginCage final : public CGameObject
 {
 public:
-	enum CAGE_STATE { CAGE_STATE_BEFORE, CAGE_STATE_CRACK, CAGE_STATE_AFTER, CAGE_STATE_END };
+	enum CAGE_STATE { CAGE_STATE_BEFORE, CAGE_STATE_CRACK, CAGE_STATE_AFTER, CAGE_STATE_AFTER_END, CAGE_STATE_END };
 	enum CAGE_ANIM { CAGE_BREAK, CAGE_BREAKAFTER, CAGE_BROKENWAIT, CAGE_WAIT, CAGE_END };
 
 private:
@@ -48,7 +48,11 @@ private:
 
 	CAGE_STATE m_eState = { CAGE_STATE_END };
 
+	_bool m_bActivacted = { false };
+	_float m_fTime = {};
+
 	_uint m_iGlassCrackMesh = {};
+	_uint m_iGlassBreakMesh = {};
 	vector<_uint> m_vecDefaultMeshes;
 	vector<_uint> m_vecBeforeMeshes;
 	vector<_uint> m_vecAfterMeshes;
