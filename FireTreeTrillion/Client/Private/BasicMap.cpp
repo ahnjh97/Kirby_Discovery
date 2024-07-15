@@ -73,6 +73,12 @@ HRESULT CBasicMap::Initialize(void* pArg)
     if (true == m_bBlendMap)
         return S_OK;
 
+    // --- ModelName -- TriggerRadius -- IdleIndex & Speed -- ActionIndex & Speed ----------
+    SetUpAnimDecoInfo("BushL", 1.5f, 2, 60.f, 0, 50.f);
+    SetUpAnimDecoInfo("BushM", 1.1f, 2, 60.f, 0, 50.f);
+    SetUpAnimDecoInfo("BushS", 0.8f, 2, 60.f, 0, 50.f);
+    SetUpAnimDecoInfo("PopFlower", 0.8f, 2, 120.f, 1, 130.f);
+
     // 옥트리를 생성하는 레벨들의 맵
     if(IsOctreeMapModel(wstrModelTag))
     {
@@ -89,13 +95,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
         XMStoreFloat3(&vMaxFloat3, vMax);
 
         m_pOcTree = m_pModelCom->Create_OcTree(vMinFloat3, vMaxFloat3, m_vecPassIndices, m_vecSamplingFactors, m_vecConstantNames);
-        
-        // --- ModelName -- TriggerRadius -- IdleIndex & Speed -- ActionIndex & Speed ----------
-        SetUpAnimDecoInfo("BushL", 1.5f, 2, 60.f, 0, 50.f);
-        SetUpAnimDecoInfo("BushM", 1.1f, 2, 60.f, 0, 50.f);
-        SetUpAnimDecoInfo("BushS", 0.8f, 2, 60.f, 0, 50.f);
-        SetUpAnimDecoInfo("PopFlower", 0.8f, 2, 120.f, 1, 130.f);
-
+       
         InsertMapDecos();
     }
     else
