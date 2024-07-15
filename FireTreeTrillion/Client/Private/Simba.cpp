@@ -185,6 +185,7 @@ _int CSimba::Tick(_float fTimeDelta)
 
 	if (0.45f > m_fHpRatio && 0.f < m_fHpRatio && m_bPhaseTwo == false) {
 		m_bPhaseTwo = true;
+		Turn_RotationBoneMatrix(-2.5f);
 		Change_State(Simba_Damage, 50.f, false, true);
 	}
 
@@ -614,7 +615,8 @@ void CSimba::Reset_HitBoxTimingMap(SIMBA_ANIM eAnimIdx)
 void CSimba::TransformToDefault(_float fOffsetY)
 {
 	_float4x4 matWorld = m_matDefault;
-	matWorld._42 = m_matDefault._42 - 2.005f;
+	//matWorld._42 = m_matDefault._42 - 2.005f;
+	matWorld._42 = m_matDefault._42 - 1.97f;
 	m_pTransformCom->Set_WorldMatrix(matWorld);
 	m_pControllerCom->Set_Position(m_pTransformCom, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 	m_pControllerCom->FreeFall(m_pTransformCom, m_pGameInstance->Get_SecondTimer(), 6.f, fOffsetY);
@@ -674,7 +676,11 @@ void CSimba::SpawnMonsters(_uint iTriggerIndex)
 		wstrLayerTag += TEXT("1");
 	else if(12 == iTriggerIndex)
 		wstrLayerTag += TEXT("2");
-	
+
+	list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_SIMBA, wstrLayerTag);
+	if (nullptr != pObjList && false == pObjList->empty())
+		return;
+		
 	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
 
 	for (auto& monsterDesc : m_vecMonsterDescs)

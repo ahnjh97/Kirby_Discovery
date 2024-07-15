@@ -35,7 +35,7 @@ HRESULT CRabbit::Initialize(void* pArg)
 		if (FAILED(__super::Initialize(&tDesc)))
 			return E_FAIL;
 	}
-	if (LEVEL_TOOL_ANIM == *m_pGameInstance->Get_CurrentLevelID())
+	else if (LEVEL_TOOL_ANIM == *m_pGameInstance->Get_CurrentLevelID())
 		wstrModelName = TEXT("Rabbit");
 	else
 	{
@@ -53,6 +53,13 @@ HRESULT CRabbit::Initialize(void* pArg)
 
 		if (FAILED(__super::Initialize(pRabbitDesc)))
 			return E_FAIL;
+	}
+
+	if (LEVEL_TOOL_ANIM != *m_pCurrentLevelID)
+	{
+		size_t underscorePos = wstrModelName.find(L'_');
+		if (underscorePos != wstring::npos)
+			wstrModelName = wstrModelName.substr(underscorePos + 1);
 	}
 
 	m_eCollisionGroup = MONSTER;

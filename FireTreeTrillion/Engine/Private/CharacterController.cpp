@@ -503,6 +503,7 @@ _float CCharacterController::RayCastToStaticActor(_fvector vDir, _float fRayDist
 		m_pMostRecentActor = hit.actor;
 
 		fDistance = (rayOrigin - hit.position).magnitude();
+		return fDistance;
 	}
 	else
 		return FLT_MAX;
