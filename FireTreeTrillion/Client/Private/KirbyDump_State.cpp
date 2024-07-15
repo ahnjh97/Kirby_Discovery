@@ -1310,6 +1310,12 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT20)
 	{
+		if (m_bShakeTrigger1 == true)
+		{
+			m_pGameInstance->Set_ObjectBlack(0.f, 6.f);
+
+			m_bShakeTrigger1 = false;
+		}
 		//if (m_bShakeTrigger1 == true)
 		//{
 		//	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
