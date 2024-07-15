@@ -375,11 +375,11 @@ void CCamera_Main::Check_FinaleTime(_float fTimeDelta)
 			m_FinaleSeqBTime.pop_front();
 
 			//처음 세팅은 패스
-			if (m_iPreSceneIdx == QTE1 && m_iCurSceneIdx == QTE1+1)
+			if (m_iPreSceneIdx == QTE1 && m_iCurSceneIdx == QTE1 + 1)
 			{
 				Make_Sequence(SEQ_FINALECUT7);
 			}
-			else if(m_iCurSceneIdx != QTE2)
+			else if (m_iCurSceneIdx != QTE2)
 			{
 				m_iCurSceneIdx++;
 				pCenter->Set_CutScene(m_iCurSceneIdx);
@@ -401,7 +401,7 @@ void CCamera_Main::Check_FinaleTime(_float fTimeDelta)
 			m_FinaleSeqCTime.pop_front();
 
 			//처음 세팅은 패스
-			if (m_iPreSceneIdx == QTE2 && m_iCurSceneIdx == QTE2+1)
+			if (m_iPreSceneIdx == QTE2 && m_iCurSceneIdx == QTE2 + 1)
 			{
 				Make_Sequence(SEQ_FINALECUT14);
 			}
@@ -2182,9 +2182,21 @@ void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
 
 void CCamera_Main::Control(_float fTimeDelta)
 {
+	static _bool bStopTimer{ false };
+
 	if (m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) &&
 		m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
+
+		if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
+		{
+			bStopTimer = !bStopTimer;
+
+			m_pGameInstance->Set_FirstTimerRatio((bStopTimer) ? 0.f : 1.f);
+			m_pGameInstance->Set_SecondTimerRatio((bStopTimer) ? 0.f : 1.f);
+		}
+
+
 		if (m_pGameInstance->Get_KeyState(DIK_L, KEY_DOWN))
 		{
 			//Lock_All({ 109.9f, 25.2f, 108.5f }, { 1.f, .15f, -.12f });
@@ -2217,30 +2229,7 @@ void CCamera_Main::Control(_float fTimeDelta)
 		}
 
 	}
-	/*
-		if (m_pGameInstance->Get_KeyState(DIK_T, KEY_DOWN))
-		{
-			//SEQ_HARDCUT_TEST
-			Make_Sequence(SEQ_HARDCUT_TEST);
-			//Make_Sequence(SEQ_SOFTCUT_TEST);
-		}
 
-
-
-		if (m_pGameInstance->Get_KeyState(DIK_U, KEY_DOWN))
-		{
-
-			Lock_All({ 16.4f, 25.7f, 35.75f }, { .16f, -.08f, -1.f });
-			Set_FOVY(38.f);
-
-
-			//CEffect::FX_DESC FXDesc{};
-
-			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Kirby Title Logo"), &FXDesc)))
-			//	return;
-		}
-	}
-	*/
 }
 
 // 맵내 커비 이동제어할때 사용되는 카메라 제어 함수입니다.
@@ -2262,7 +2251,7 @@ void CCamera_Main::Move_ForTrigger(_float fTimeDelta, _float3 vPos, _float3 vDir
 		newAct.vDir = vDir;
 
 		Make_One_Sequence(newAct);
-		Set_TargetAnchor({0.f, 5.f, 0.f});
+		Set_TargetAnchor({ 0.f, 5.f, 0.f });
 
 	}
 	//else if()

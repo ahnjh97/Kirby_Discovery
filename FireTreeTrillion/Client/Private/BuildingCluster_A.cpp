@@ -5,7 +5,7 @@
 #include "FinaleCut_ControlCenter.h"
 
 CBuildingCluster_A::CBuildingCluster_A(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	:CGameObject{pDevice, pContext}
+	:CGameObject{ pDevice, pContext }
 {
 }
 
@@ -68,24 +68,6 @@ _int CBuildingCluster_A::Tick(_float fTimeDelta)
 		static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
 	if (nullptr == pCenter)
 		return OBJ_NOEVENT;
-
-	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
-	{
-		m_btest = !m_btest;
-
-	if (m_btest == true)
-	{
-		m_pGameInstance->Set_FirstTimerRatio(0.f);
-		m_pGameInstance->Set_SecondTimerRatio(0.f);
-	}
-	else
-	{
-		m_pGameInstance->Set_FirstTimerRatio(1.f);
-		m_pGameInstance->Set_SecondTimerRatio(1.f);
-
-	}
-
-	}
 
 
 	_int iCutIndex = pCenter->Get_CutScene();
