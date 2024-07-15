@@ -16,7 +16,7 @@ public:
 	enum DYNAMICFILED_TYPE { DFMOVE_UPDOWN, DFMOVE_LEFTRIGHT, DFMOVE_FRONTBACK, DFMOVE_NONE };
 
 public:
-	void Set_SolarPanel(CGm_ParkSolarPanelOnce* _pSolarPanel) { m_pSolarPanel = _pSolarPanel; }
+	void Set_SolarPanel(CGm_ParkSolarPanelOnce* _pSolarPanel) { m_pSolarPanel = _pSolarPanel; Safe_AddRef(m_pSolarPanel); }
 
 private:
 	CGm_DynamicField(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
