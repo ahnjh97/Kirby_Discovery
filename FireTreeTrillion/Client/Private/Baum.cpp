@@ -10,6 +10,7 @@
 #include "MultiEffect.h"
 
 #include "FinalePartical_Maker.h"
+#include "FinaleCut_ControlCenter.h"
 
 static void DebrisCloud(CTransform* pTransformCom)
 {
@@ -186,6 +187,14 @@ _int CBaum::Tick(_float fTimeDelta)
 			return OBJ_NOEVENT;
 		}
 	}
+
+	_int iAnimIndex = { 0 };
+	CFinaleCut_ControlCenter* pCenter = static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
+	if (pCenter != nullptr)
+		iAnimIndex = pCenter->Get_CutScene();
+	if (iAnimIndex != 0)
+		m_bDead = true;
+
 
 	Compute_MotionBlur();
 

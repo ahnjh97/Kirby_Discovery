@@ -53,6 +53,8 @@ HRESULT CAbility::Initialize(void* pArg)
 		m_fPower = 2.f;
 		m_fSpeed = 3.f;
 		m_fScale = 1.f;
+
+		m_fAttack = 20.f;
 	}
 	else
 	{
@@ -327,7 +329,7 @@ HRESULT CAbility::Add_Components()
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
 	if(ABILITY_DEFAULT == m_eAbilityType)
-		HitBox.pCollisionType = BATTLEDEE;
+		HitBox.pCollisionType = OBJECT;
 	else
 		HitBox.pCollisionType = ABILITYITEM;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
