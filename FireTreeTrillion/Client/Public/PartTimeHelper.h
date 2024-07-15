@@ -30,6 +30,10 @@ public:
 	void				Register_Camera(class CCamera_Main* pCamera);
 	void				NotifyObserver();
 
+	//헝그리 디의 총 줄선 수를 체크, 관리
+	_int				Get_CurDeeWaitingNum() { return m_iDeeWaitingNum; }
+	void				Add_WaitingNum() { m_iDeeWaitingNum++; }
+
 	// 문제 냅니다.
 	void				Make_RandomItem();
 	// 문제 잘 풀었는지 검사합니다.
@@ -53,6 +57,7 @@ private:
 
 	PARTTIME_ITEM				m_eFood	= PARTTIME_ITEM::CAKE;
 	_float						m_fScore = 0.f;
+	_int						m_iDeeWaitingNum = { 0 };
 
 public:
 	virtual void Free() override;
