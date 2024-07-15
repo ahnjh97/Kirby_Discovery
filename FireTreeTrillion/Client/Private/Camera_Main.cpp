@@ -2652,8 +2652,6 @@ void CCamera_Main::Render_IMGUI()
 	ImGui::DragFloat(u8"목표 줌 오프셋", &m_fDestZoomOffset, .05f, -20.f, 20.f, "%.1f");
 
 	ImGui::End();
-
-	ImGui::End();
 }
 void CCamera_Main::Render_GraphicIMGUI(_float4x4 _worldMat)
 {

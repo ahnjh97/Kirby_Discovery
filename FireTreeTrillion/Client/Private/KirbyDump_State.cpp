@@ -1211,8 +1211,16 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT16)
 	{
 
-
-
+		if (pKirby->Get_AnimTrackPosition() < 95.f)
+			DESC(m_eEyeState) = CFinaleKirby::EYE_CLOSE;
+		else if (pKirby->Get_AnimTrackPosition() >= 95.f && pKirby->Get_AnimTrackPosition() < 100.f)
+			DESC(m_eEyeState) = CFinaleKirby::EYE_BLINK;
+		else if (pKirby->Get_AnimTrackPosition() >= 100.f && pKirby->Get_AnimTrackPosition() < 350.f)
+			DESC(m_eEyeState) = CFinaleKirby::EYE_IDLE;
+		else if (pKirby->Get_AnimTrackPosition() >= 350.f && pKirby->Get_AnimTrackPosition() < 360.f)
+			DESC(m_eEyeState) = CFinaleKirby::EYE_BLINK;
+		else if (pKirby->Get_AnimTrackPosition() >= 360.f)
+			DESC(m_eEyeState) = CFinaleKirby::EYE_ANGER;
 
 		if (pKirby->isAnimFinish())
 		{
