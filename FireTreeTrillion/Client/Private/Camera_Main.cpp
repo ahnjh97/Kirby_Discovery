@@ -2106,6 +2106,10 @@ void CCamera_Main::Ready_Cam_Leongar(CGameObject* pNotifier)
 {
 }
 
+void CCamera_Main::Ready_Cam_FinalBoss(CGameObject* pNotifier)
+{
+}
+
 void CCamera_Main::Start_ShutterSeq(CGameObject* pNotifier)
 {
 	Make_Sequence(SEQ_BREAKCARSHOP);

@@ -3,6 +3,7 @@
 #include "Simba.h"
 #include "Kirby.h"
 #include "EventCenter.h"
+#include "Camera_Main.h"
 
 static _float s_fOffsetY = {};
 static _uint s_iAttackCount = {};
@@ -85,8 +86,15 @@ void CSimba_Appear2::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			if (true == pSimba->Get_RenderMant())
 				pSimba->Set_RenderMant(false);
 			m_fTime += fTimeDelta;
+
 			if (m_fTime > 1.5f) {
 				pSimba->Change_State(CSimba::Simba_Walk, 66.66f, true, false);
+				
+				//카메라에게 2번째 타겟으로 등록
+				CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+				if(pCamera!= nullptr)
+					pCamera->Set_Target(pSimba->Get_TransformCom(), CCamera::TARGET_SECOND, CCamera::FOCUS_BOTH);
+
 
 				_vector vPos = m_pTransform->Get_State(CTransform::STATE_POSITION);
 				_vector vLook = XMVector3Normalize(m_pTransform->Get_State(CTransform::STATE_LOOK));
