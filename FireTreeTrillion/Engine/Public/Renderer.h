@@ -126,6 +126,15 @@ public:
 	void Update_Option(OPTION Option, _bool bOn);
 	void Bind_RendererFunc(_int iTriggerType);
 
+	void Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime) {
+		m_bObjectBlack = true;
+		_float fBlackdiff = fObjectBlackTarget - m_fObjectBlack;
+		m_fObjectBlackRatioTime = fBlackdiff / fBlackTime;
+		m_fObjectBlackTarget = fObjectBlackTarget;
+		m_fOBjectBlackTime = 0.f;
+		m_fObjectBlackMaxTime = fBlackTime;
+	}
+
 #ifdef _DEBUG
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderObject);
@@ -273,7 +282,14 @@ private:
 	_float m_fOceanBottomY = { 0.f };
 	_float m_fOceanIntensity = { 0.f };
 
+
+	void   ObjectBlack(_float fTimeDelta);
 	_float m_fObjectBlack = { 1.f };
+	_bool  m_bObjectBlack = { false };
+	_float m_fObjectBlackRatioTime = { 0.f };
+	_float m_fObjectBlackMaxTime = { 0.f };
+	_float m_fOBjectBlackTime = { 0.f };
+	_float m_fObjectBlackTarget = { 0.f };
 
 	_bool  m_bMaptool = { false };
 

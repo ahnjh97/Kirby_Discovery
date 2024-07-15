@@ -613,8 +613,11 @@ void CRenderer::Render_SystemTick(_float fTimeDelta)
 	// 컬러를 보간해준다.
 	Interpolate_ColorData(fTimeDelta);
 
-	// 컨텐츠 색상변화 기능
+	// 컨텐츠 색상변화 기능 (디퍼드 자원 빼고 약하게 어두워지게 됨)
 	Interpolate_BlackBackground(fTimeDelta);
+
+	// 컨텐츠 색상변화 기능 (객체들 전부 어두워짐)
+	ObjectBlack(fTimeDelta);
 
 	Key_Input();
 }
@@ -650,8 +653,6 @@ void CRenderer::Key_Input()
 	if (m_pGameInstance->Get_DIKeyState(DIK_F2, KEY_DOWN))
 		m_IsRenderHitBox = !m_IsRenderHitBox;
 #endif
-	if (m_pGameInstance->Get_DIKeyState(DIK_F3, KEY_DOWN))
-		m_fObjectBlack = m_fObjectBlack == 1.f ? 0.f : 1.f;
 
 	if (m_pGameInstance->Get_KeyState(DIK_F5, KEY_DOWN))
 	{
@@ -2273,6 +2274,30 @@ void CRenderer::Update_Option(OPTION Option, _bool bOn)
 }
 
 #ifdef _DEBUG
+
+void CRenderer::ObjectBlack(_float fTimeDelta)
+{
+	if (m_bObjectBlack == true)
+	{
+		if (m_fObjectBlackMaxTime == 0.f)
+		{
+			m_fObjectBlack = m_fObjectBlackTarget;
+			m_fOBjectBlackTime = 0.f;
+			m_bObjectBlack = false;
+			return;
+		}
+
+		m_fOBjectBlackTime += fTimeDelta;
+		m_fObjectBlack += fTimeDelta * m_fObjectBlackRatioTime;
+
+		if (m_fOBjectBlackTime > m_fObjectBlackMaxTime)
+		{
+			m_fObjectBlack = m_fObjectBlackTarget;
+			m_fOBjectBlackTime = 0.f;
+			m_bObjectBlack = false;
+		}
+	}
+}
 
 HRESULT CRenderer::Render_Debug()
 {

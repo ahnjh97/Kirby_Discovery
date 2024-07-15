@@ -59,6 +59,9 @@ public: /* For.Renderer */
 
 	void Setting_GodRay(_fvector vWorldPos, _float fRayExposure = 0.15f, _float fRayDecay = 0.96815f, _float fRayIlluminationDecay = 0.8f, _float fRayDensity = 0.5f, _float fWeight = 0.5f);
 	void Setting_LensFlare(_bool bOnOff);
+
+	void Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime = 0.f);
+
 #ifdef _DEBUG
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderComponent);
