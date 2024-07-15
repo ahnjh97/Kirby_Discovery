@@ -84,10 +84,10 @@ HRESULT CHungryDee::Initialize(void* pArg)
 	{
 		m_WaitingList.first = pDeeDesc.matWorld.Translation();
 
-		m_iMyIdx = CPartTimeHelper::Get_Instance()->Get_CurDeeWaitingNum();/*  pDeeDesc.iIdx;*/
+		m_iMyIdx = CPartTimeHelper::Get_Instance()->Get_CurDeeWaitingNum();
 
 		_float4 vDir = Dir(m_WaitingList.second[m_iMyIdx].vPos);
-		vDir += (m_iMyIdx < 10) ? _float4 { 18.f, 0.f, -6.f, 0.f } : _float4{ 18.f, 0.f, 0.f, 0.f };
+		vDir += (m_iMyIdx < 10) ? _float4 { 18.f, 0.f, -6.f, 0.f } : _float4{ 18.f, 0.f, -3.f, 0.f };
 
 		m_pTransformCom->Move(vDir);
 		CPartTimeHelper::Get_Instance()->Add_WaitingNum();
