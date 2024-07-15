@@ -64,6 +64,7 @@ private:
 	_bool					m_bTurn = { false };
 
 	_uint					m_iDeathCount = { 0 };
+	_uint					m_iRenderCount = { 0 };
 
 	_float					m_fJumpPower = { 0.f };
 	_float					m_fJumpPowerTemp = { 0.f };
