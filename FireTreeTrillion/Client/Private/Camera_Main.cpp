@@ -286,13 +286,6 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 		499.f / 50.f, //ÄÆ½Å 16
 	};
 
-	//m_FinaleSeqDTime =
-	//{
-	//	0.f,
-	//	63.f / 50.f, //ÄÆ½Å 19
-	//	1029.f / 50.f, //ÄÆ½Å 20
-	//};
-
 	return S_OK;
 }
 
