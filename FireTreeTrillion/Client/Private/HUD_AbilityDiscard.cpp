@@ -54,7 +54,6 @@ HRESULT CHUD_AbilityDiscard::Initialize(void* _pArg)
 		Safe_AddRef(m_pKirby);
 	}
 	
-	Safe_AddRef(m_pKirby);
 	m_eCurState = DISCARD_HIDE;
 	m_UIObjDesc.fAlpha = 0.f;
 
