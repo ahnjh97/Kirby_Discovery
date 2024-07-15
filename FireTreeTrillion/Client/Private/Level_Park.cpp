@@ -864,7 +864,6 @@ HRESULT CLevel_Park::Ready_Objects()
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"), TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc)))
 				continue;
 		}
-
 	}
 	fileInput.close();
 
