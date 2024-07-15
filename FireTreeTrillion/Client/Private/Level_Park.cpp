@@ -20,6 +20,8 @@
 #include "TransingStar.h"
 #include "Gm_DynamicField.h"
 
+#define MONSTER_TRIGGER(index) (index - 11)
+
 CLevel_Park::CLevel_Park(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
@@ -93,6 +95,9 @@ HRESULT CLevel_Park::Initialize()
 	function<void(_int)> funcChanger = bind(&CLevel_Park::Change_Levels, this);
 	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_LEVELCHANGER, funcChanger);
 
+	// 몬스터 트리거
+	function<void(_int)> funcMonster = bind(&CLevel_Park::SummonMonsters, this, placeholders::_1);
+	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_MONSTER, funcMonster);
 
 	return S_OK;
 }
@@ -115,6 +120,30 @@ void CLevel_Park::Change_Levels()
 	pTransingStar->Set_LargeColor(_float3(85.f / 255.f, 93.f / 255.f, 183.f / 255.f));
 	pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
 	pTransingStar->Activate(CTransingStar::CLOSE);
+}
+
+void CLevel_Park::SummonMonsters(_uint iTriggerIndex)
+{
+	if (m_setActivatedMonsterTriggers.end() != m_setActivatedMonsterTriggers.find(iTriggerIndex))
+		return;
+
+	m_setActivatedMonsterTriggers.insert(iTriggerIndex); // 여러번 호출되는거 방지
+
+	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
+	wstring wstrTag;
+
+	for (auto& monsterDesc : m_vecMonsterDescs[MONSTER_TRIGGER(iTriggerIndex)])
+	{
+		wstring wstrModelName = monsterDesc.wstrModelName;
+		size_t underscorePos = wstrModelName.find(L'_');
+		if (underscorePos != wstring::npos)
+			wstrModelName = wstrModelName.substr(underscorePos + 1);
+	
+		wstrTag = wstrPrototypeTag + wstrModelName;
+
+		if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), wstrTag, &monsterDesc)))
+			return;
+	}
 }
 
 void CLevel_Park::Tick(_float fTimeDelta)
@@ -386,8 +415,12 @@ HRESULT CLevel_Park::Ready_Triggers()
 			tTriggerDesc.matWorld = matWorld;
 			tTriggerDesc.iTriggerIndex = iTriggerIndex;
 			tTriggerDesc.iTriggerType = triggerType;
+			
+			wstring wstrLayerTag = TEXT("Layer_Trigger");
+			if(10 < iTriggerIndex)
+				wstrLayerTag = TEXT("Layer_MonsterTrigger");
 
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, wstrLayerTag, TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
 				return E_FAIL;
 			continue;
 		}
@@ -505,6 +538,15 @@ HRESULT CLevel_Park::Ready_Monsters()
 		if (strModelName.size() >= 8) { // NonAnim_ 부분 지우기
 			if ("NonAnim" == strModelName.substr(0, 7))
 				tempDesc.wstrModelName.erase(0, 8);
+		}
+
+		if (10 < iTriggerIndex)
+		{
+			CMonster::MONSTER_DESC tMonsterDesc = *static_cast<CMonster::MONSTER_DESC*>(&tempDesc);
+			tMonsterDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
+
+			m_vecMonsterDescs[MONSTER_TRIGGER(iTriggerIndex)].push_back(tMonsterDesc);
+			continue;
 		}
 
 		if (L"Awoofy" == tempDesc.wstrModelName)
@@ -1008,6 +1050,33 @@ HRESULT CLevel_Park::Ready_UI()
 
 HRESULT CLevel_Park::Add_EnvMap()
 {
+	HRESULT hr(S_OK);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Level_Park_Env"),
+		TEXT("Com_Texture1"), (CComponent**)&m_pEnvTexture[TYPE_ENV]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_BRDF_LUT"),
+		TEXT("Com_Texture2"), (CComponent**)&m_pEnvTexture[TYPE_LUT]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_RandomNormal"),
+		TEXT("Com_Texture3"), (CComponent**)&m_pEnvTexture[TYPE_NORMAL]);
+	CHECK_FAILED(hr);
+
+
+	// 환경맵을 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_ENV], "g_EnvTexture")))
+		return E_FAIL;
+
+	//LUT 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_LUT], "g_LUTTexture")))
+		return E_FAIL;
+
+	//Normal 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_NORMAL], "g_RandomNormalTexture")))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -1028,6 +1097,8 @@ void CLevel_Park::Free()
 {
 	m_pGameInstance->Clear_EventCallBack();
 	__super::Free();
+
+	m_setActivatedMonsterTriggers.clear();
 
 	for (auto& tex : m_pEnvTexture)
 		Safe_Release(tex);

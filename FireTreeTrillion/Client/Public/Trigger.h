@@ -12,9 +12,6 @@ BEGIN(Client)
 class CTrigger final : public CGameObject
 {
 public:
-	enum TRIGGER {  TRIGGER_CAM, TRIGGER_SHADER, TRIGGER_STAR, TRIGGER_LEVELCHANGER, TRIGGER_END };
-
-
 	typedef struct : public GAMEOBJECT_DESC
 	{
 		_uint		iTriggerType;
@@ -49,7 +46,7 @@ private:
 	CRigidBody*		m_pRigidBodyCom = { nullptr };
 
 private:
-	TRIGGER			m_eTriggerType = { TRIGGER_END };
+	TRIGGER_TYPE	m_eTriggerType = { TRIGGER_END };
 	_int			m_iTriggerIndex = { -1 };
 	_float			m_fTriggerOffTime = {0.f};
 

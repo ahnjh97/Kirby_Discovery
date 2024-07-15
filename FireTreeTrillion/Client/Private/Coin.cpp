@@ -38,6 +38,7 @@ HRESULT CCoin::Initialize(void* pArg)
 
 	m_eItemType = ITEM_COIN;
 
+	m_bStencil = true;
 
 	if (GameObjectDesc.wstrModelName == TEXT("Item_Coin"))
 		m_iItemPoint = 1;
@@ -67,8 +68,11 @@ _int CCoin::Tick(_float fTimeDelta)
 
 		m_fCoinTime += m_fTimeDelta;
 		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-
 		_float4 fUpDelta = (m_vTargetPos - vPos);
+
+		_float fTimeTemp = m_fCoinTime * (1.f / 0.7f);
+		_float fScale = 1.f - pow(fTimeTemp, 3.f);
+		m_pTransformCom->Set_Scaled(fScale, fScale, fScale);
 
 		if (m_fCoinTime > 0.7f)
 		{
@@ -90,6 +94,8 @@ void CCoin::Late_Tick(_float fTimeDelta)
 {
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
+		//Compute_ViewZ();
+
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 
@@ -116,6 +122,8 @@ HRESULT CCoin::Render()
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
 			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+			return E_FAIL;
 
 		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
@@ -123,7 +131,7 @@ HRESULT CCoin::Render()
 			return E_FAIL;
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
 
-		if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_O)))
+		if (FAILED(m_pShaderCom->Begin(MODEL_COIN)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);

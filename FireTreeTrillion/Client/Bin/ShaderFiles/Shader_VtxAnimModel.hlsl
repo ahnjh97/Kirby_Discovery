@@ -694,6 +694,8 @@ PS_OUT PS_FOR_POPSTAR(PS_IN In)
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
     
+    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
+    
     float4 vLook = float4(g_vCamPosition.xyz, 1.f) - float4(vWorldPos.xyz, 1.f);
     float vDot = dot(normalize(vLook), normalize(float4(vWorldNormal, 0.f)));
     

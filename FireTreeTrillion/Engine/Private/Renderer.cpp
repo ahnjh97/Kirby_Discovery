@@ -1376,7 +1376,6 @@ HRESULT CRenderer::Render_Result()
 			return E_FAIL;
 	}
 
-
 	// 섞을 이펙트들 (빛 상관 없는 애들)
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Blur_Y"), "g_BlurTexture")))
 		return E_FAIL;
@@ -1384,7 +1383,6 @@ HRESULT CRenderer::Render_Result()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_NonLight"), "g_NonLightTexture")))
 		return E_FAIL;
-
 	//// SSAO 연산
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SSAO_Y"), "g_SSAOTexture")))
 		return E_FAIL;
@@ -1399,27 +1397,43 @@ HRESULT CRenderer::Render_Result()
 	// 림 라이트 배율
 	if (FAILED(m_pShader->Bind_RawValue("g_fRimLightRatio", &m_fRimLightRatio.first, sizeof(_float))))
 		return E_FAIL;
-
 	// 림 라이트 범위
 	if (FAILED(m_pShader->Bind_RawValue("g_fRimLightRadius", &m_fRimLightRadius.first, sizeof(_float))))
 		return E_FAIL;
-
 	// 림 라이트 컬러
 	if (FAILED(m_pShader->Bind_RawValue("g_vRimColor", &m_vRimColor.first, sizeof(_float3))))
 		return E_FAIL;
 
+
 	// DOF 강도
 	if (FAILED(m_pShader->Bind_RawValue("g_fDOFIntensity", &m_fDOFIntensity, sizeof(_float))))
 		return E_FAIL;
-
 	// DOF 컬러
 	if (FAILED(m_pShader->Bind_RawValue("g_vDOFColor", &m_vDOFColor, sizeof(_float3))))
 		return E_FAIL;
 
+	// FOG 데이터
+	if (FAILED(m_pShader->Bind_RawValue("g_vFogYColor", &m_vFogYColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogYBottom", &m_fFogYBottom, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogYTopY", &m_fFogYTopY, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogYIntensity", &m_fFogYIntensity, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_vFogViewColor", &m_vFogViewColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogViewStart", &m_fFogViewStart, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogViewEnd", &m_fFogViewEnd, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogViewIntensity", &m_fFogViewIntensity, sizeof(_float))))
+		return E_FAIL;
+
+
 	// 섞을 스카이 박스
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Sky"), "g_SkyTexture")))
 		return E_FAIL;
-
 	// 각종 디퍼드 자원
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_DeferredInfo"), "g_DeferredInfoTexture")))
 		return E_FAIL;
