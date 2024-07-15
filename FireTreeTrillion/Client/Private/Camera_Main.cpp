@@ -630,6 +630,12 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 			{
 				m_fCurShakeTime = m_fInitialShakeTime = 0.f;
 			}
+
+			if (m_eSpecialSeq == SEQ_FINALECUT5)
+			{
+				Lock_All({ 2057.f, 24.5f, -136.f }, { 1.f, .08f, -.12f });
+				Unlock();
+			}
 		}
 	}
 
@@ -919,18 +925,6 @@ void CCamera_Main::Compute_Set_BattleFocus(_float fTimeDelta)
 	Quaternion vQuat = Quaternion::CreateFromAxisAngle(vAxis, ToRadian((m_fBothFocusRatio - .5f) * 140.f));
 	_float3 vResultVector = _float3::Transform(vCenterDir, vQuat);
 
-	/*
-	//_float3 interpolatedVector = CustomLerp(vKirbyToBoss, vBossToKirby, vCenterDir, m_fBothFocusRatio);
-
-	if (abs(m_fBothFocusRatio - .5f) < .4f)
-	{
-		fRatio = (m_fBothFocusRatio - .1f) * .5f + .2f;
-	}
-	else if (m_fBothFocusRatio < .1f)
-		fRatio = EASE_IN(m_fBothFocusRatio) * .3f;
-	else if (.9f < m_fBothFocusRatio)
-		fRatio = .9f + (EASE_OUT(m_fBothFocusRatio) - .9f) * .3f;
-	*/
 
 	m_vDestCamDir = vResultVector;
 	m_vDestCamDir.Normalize();
@@ -1719,6 +1713,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//운석 던지기
 	case SEQ_FINALECUT5:
 	{
+		m_fSeqEventTime = m_FinaleSeqATime.front();
 		_float fDuration = m_FinaleSeqATime.front();
 
 		CAMACTION newAction = {};
@@ -1750,14 +1745,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 
 
-		newAction = {};
-		Fill_HardCutSet(newAction, fDuration);
 
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 1.f, .08f, -.12f });
-		newAction.vDir.Normalize();
-
-		Fill_ActionPos(newAction, POS_ABSOLUTE, _float3{ 2062.f, 24.5f, -136.f } - newAction.vDir * 20.f);
-		m_CamSeq.push_back(newAction);
 
 		//Fill_InterpolateCutSet(newAction, fDuration - .2f, EASE_INOUT, .2f);
 		//m_CamSeq.push_back(newAction);
@@ -2645,7 +2633,9 @@ void CCamera_Main::Render_IMGUI()
 	ImGui::Dummy(ImVec2(0, 10));
 	ImGui::SeparatorText(u8"줌 오프셋");
 	ImGui::DragFloat(u8"현재 줌 오프셋", &m_fCurZoomOffset, .05f, -20.f, 20.f, "%.1f", ImGuiSliderFlags_NoInput);
-	ImGui::DragFloat(u8"현재 줌 오프셋", &m_fDestZoomOffset, .05f, -20.f, 20.f, "%.1f");
+	ImGui::DragFloat(u8"목표 줌 오프셋", &m_fDestZoomOffset, .05f, -20.f, 20.f, "%.1f");
+
+	ImGui::End();
 
 }
 void CCamera_Main::Render_GraphicIMGUI(_float4x4 _worldMat)
