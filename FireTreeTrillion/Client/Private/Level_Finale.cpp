@@ -86,9 +86,10 @@ HRESULT CLevel_Finale::Initialize()
 	hr = Ready_FinaleRoad();
 	CHECK_FAILED(hr);
 
+	
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
-
+	
 
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;

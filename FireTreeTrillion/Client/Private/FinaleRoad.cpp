@@ -258,6 +258,7 @@ HRESULT CFinaleRoad::Add_Components(wstring _strModelTag, _bool _bIsAnimModel)
 
 	// FOR ANIMTOOL
 
+	/*
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
@@ -267,7 +268,7 @@ HRESULT CFinaleRoad::Add_Components(wstring _strModelTag, _bool _bIsAnimModel)
 	CHECK_FAILED(hr);
 
 	Set_BodyCollider(COLLIDER_SPHERE, 0.f, 0.f, 1.f);
-
+	*/
 	return S_OK;
 }
 
