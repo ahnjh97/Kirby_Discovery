@@ -143,6 +143,8 @@ void CKirbyBalloon_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
+	Bbong_FX(fTimeDelta, pTransformCom);
+
 	Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
 	Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 	Turn_Z_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
@@ -341,6 +343,22 @@ void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		{
 			if (CUtils::Make_RandomInt(0, 1) > 0)
 				DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			_float4 vKirbyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vKirbyLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+
+			FXDesc.vInitPos = { vKirbyPos.x, vKirbyPos.y + .4f, vKirbyPos.z };
+			FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y + 20.f, 0.f };
+			FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
+
+			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Smoke Fast"), &FXDesc)))
+				return;
+
+			FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y - 20.f, 0.f };
+			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Smoke Fast"), &FXDesc)))
+				return;
+
 
 			pKirby->Change_State(CKirby::STATE_EATLANDING, 50.f, false, false, CKirby::BODY_BALLOON);
 			return;
