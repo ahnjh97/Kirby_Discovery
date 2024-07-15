@@ -486,6 +486,14 @@ void CRenderer::Color_Initialize()
 		0.218674f, 0.00985707f, 0.499961f, 0.912908f, 0.99115f, 0.00992393f, 0.190238f, 0.350267f
 		});
 
+	Save_ColorSet("Beach",
+		COLOR_DATA{
+		1.0198f, 1.f, 0.95f, 1.3f, 0.85f, 1.03727f, 1.05996f, 0.680332f,
+		0.6f, 0.6f, 1.16004f, 0.96f, 1.04f, 0.243137f, 0.00784314f, 0.00784314f,
+		0.12f, 0.917647f, 0.513726f, 0.145098f, 0.16f, 1.f, 0.847059f, 0.254902f,
+		0.34f, 0.13f, 0.55f
+		});
+
 	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
 	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
 	m_pGameInstance->Emplace_TriggerFunc(1, TriggerFunc);
@@ -697,6 +705,11 @@ void CRenderer::Set_ColorSet(string strColorName)
 	m_DestColorData = Find_ColorSet(strColorName);
 }
 
+void CRenderer::Set_ColorSet(COLORSET eColorSet)
+{
+	Set_ColorSet_ByIndex((_uint)eColorSet);
+}
+
 void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 {
 	switch (iSetIdx)
@@ -845,6 +858,28 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 		m_fRimLightRatio.second = .0f;
 
 		m_fDOFIntensity = 0.f;
+	}
+	break;
+	case 10:
+	{
+		m_DestColorData = Find_ColorSet("Beach");
+
+		m_vFogYColor = { 0.f, 0.88f, 0.7f };
+		m_fFogYBottom = { 0.f };
+		m_fFogYTopY = 18.2f;
+		m_fFogYIntensity = 10.f;
+
+		m_vFogViewColor = { 0.f, 0.88f, 0.7f };
+		m_fFogViewStart = { 1.f };
+		m_fFogViewEnd = 370.f;
+		m_fFogViewIntensity = .5f;
+
+		m_fRimLightRatio.second = 1.f;
+		m_fRimLightRadius.second = 1.f;
+		m_vRimColor.second = _float3(.84f, 1.f, .5f);
+
+		m_fDOFIntensity = 1.f;
+		m_vDOFColor = _float3{ .03f, .07f, 0.f };
 	}
 	break;
 	default:

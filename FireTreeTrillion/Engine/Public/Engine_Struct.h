@@ -258,6 +258,11 @@ namespace Engine
 		_float fShadowThreshold = { -1.f };
 		_float fHighlightThreshold = { -1.f };
 
+		_float m_fRimLightRatio;
+		_float m_fRimLightRadius;
+		_float3 m_vRimColor;
+
+
 	}COLOR_DATA;
 
 	typedef struct ENGINE_DLL

@@ -31,6 +31,23 @@ public:
 		RENDER_END
 	};
 
+	enum COLORSET
+	{
+		COLORSET_TUTORIAL,
+		COLORSET_FOREST,
+		COLORSET_NIGHT,
+		COLORSET_STAGE1,
+		COLORSET_TOWN,
+		COLORSET_FINALE,
+		COLORSET_HORROR,
+		COLORSET_FINAL,
+		COLORSET_LAB,
+		COLORSET_PARK,
+		COLORSET_BEACH,
+
+		COLORSET_END
+	};
+
 private:
 	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CRenderer() = default;
@@ -75,6 +92,7 @@ public:
 
 	void Set_ColorSet(COLOR_DATA destColorData);
 	void Set_ColorSet(string strColorName);
+	void Set_ColorSet(COLORSET eColorSet);
 	void Set_ColorSet_ByIndex(_int iSetIdx);
 	void Save_ColorSet(string strTag, COLOR_DATA destColorData);
 	COLOR_DATA& Find_ColorSet(string strTag);
