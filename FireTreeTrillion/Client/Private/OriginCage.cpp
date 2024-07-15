@@ -15,7 +15,8 @@ COriginCage::COriginCage(const COriginCage& rhs)
 
 void COriginCage::Activate(CGameObject* pObj)
 {
-	m_pModelCom->Set_Animation(CAGE_BREAK, 40.f, false, false);
+	m_bActivacted = true;
+	m_eState = CAGE_STATE_CRACK;
 }
 
 HRESULT COriginCage::Initialize_Prototype()
@@ -60,8 +61,17 @@ _int COriginCage::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
-	if (true == m_pModelCom->IsFinished())
-		m_pModelCom->Set_Animation(CAGE_BREAKAFTER, 1.f, false);
+	if (true == m_bActivacted && CAGE_STATE_CRACK == m_eState)
+		m_fTime += m_pGameInstance->Get_SecondTimer();
+
+	if (m_fTime > 2.f && CAGE_STATE_CRACK == m_eState)
+	{
+		m_eState = CAGE_STATE_AFTER;
+		m_pModelCom->Set_Animation(CAGE_BREAK, 40.f, false);
+	}
+
+	if (true == m_pModelCom->IsFinished() && CAGE_BREAK == m_pModelCom->Get_CurAnimIndex())
+		m_pModelCom->Set_Animation(CAGE_BREAKAFTER, 1.f, true, false);
 
 	return OBJ_NOEVENT;
 }
@@ -90,7 +100,11 @@ HRESULT COriginCage::Render()
 		RenderMeshes(m_vecBeforeMeshes);
 		RenderMesh(m_iGlassCrackMesh);
 	}
-	else if(CAGE_STATE_AFTER == m_eState)
+	else if (CAGE_STATE_AFTER == m_eState) {
+		RenderMeshes(m_vecAfterMeshes);
+		RenderMesh(m_iGlassBreakMesh);
+	}
+	else if(CAGE_STATE_AFTER_END == m_eState)
 		RenderMeshes(m_vecAfterMeshes);
 
 	return S_OK;
@@ -144,10 +158,11 @@ void COriginCage::SetUpMeshIndices()
 		string strMeshName = m_pModelCom->Get_MeshName(i);
 		if ("GlassBreakCrackM__GlassCrackC" == strMeshName)
 			m_iGlassCrackMesh = i;
-		else if ("GlassBack1M__GlassFrontC" == strMeshName || "GlassFront1M__GlassFrontC" == strMeshName
-			|| "GlassFront2M__GlassBreakFrontC" == strMeshName || "GlassInside1M__GlassInsideC" == strMeshName)
+		else if ("GlassBreak__GlassBreakFrontC" == strMeshName)
+			m_iGlassBreakMesh = i;
+		else if ("GlassBack1M__GlassFrontC" == strMeshName || "GlassFront1M__GlassFrontC" == strMeshName || "GlassInside1M__GlassInsideC" == strMeshName)
 			m_vecBeforeMeshes.emplace_back(i);
-		else if ("GlassBreak__GlassBreakFrontC" == strMeshName || "GlassBack2M__GlassBreakBackC" == strMeshName)
+		else if ("GlassBack2M__GlassBreakBackC" == strMeshName || "GlassFront2M__GlassBreakFrontC" == strMeshName)
 			m_vecAfterMeshes.emplace_back(i);
 		else
 			m_vecDefaultMeshes.emplace_back(i);

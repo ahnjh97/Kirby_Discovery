@@ -454,6 +454,8 @@ private:
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
 
+	_bool m_bCageNotified = { false };
+
 public:
 	static	CSimba_Death* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
 		{ return new CSimba_Death(pController, pTransform, pKirby, pKirbyTransform); }
