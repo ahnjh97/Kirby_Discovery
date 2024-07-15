@@ -46,6 +46,7 @@ namespace Client
         KEVENT_SIMBA_WAVE2DEAD,
         KEVENT_SIMBA_THRONEBREAK,
         KEVENT_SIMBA_GLASSBREAK,
+        KEVENT_SIMBA_CAGEBREAK,
         KEVENT_END
     };
     
