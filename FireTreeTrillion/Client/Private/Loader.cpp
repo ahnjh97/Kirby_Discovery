@@ -2605,8 +2605,8 @@ void CLoader::Load_ItemModels()
 	// For AbilityItemModels
 	m_vecModelInfo.emplace_back("Item_Sword", TYPE_NONANIM, 1.f, 0.f);
 	m_vecModelInfo.emplace_back("Item_Bomb", TYPE_NONANIM, 1.f, 0.f);
-	m_vecModelInfo.emplace_back("Item_Hammer", TYPE_NONANIM, 1.f, 0.f);
-	m_vecModelInfo.emplace_back("Item_Crash", TYPE_NONANIM, 1.f, 0.f);
+	m_vecModelInfo.emplace_back("Item_Hammer", TYPE_NONANIM, 0.8f, 0.f);
+	m_vecModelInfo.emplace_back("Item_Crash", TYPE_NONANIM, 0.9f, 0.f);
 	m_vecModelInfo.emplace_back("Item_Star", TYPE_NONANIM, 0.5f, 0.f);
 }
 
