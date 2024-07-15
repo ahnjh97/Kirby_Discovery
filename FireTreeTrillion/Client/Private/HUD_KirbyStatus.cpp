@@ -29,7 +29,7 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
-	
+
 	m_UIObjDesc = HUDKirby_Desc;
 	m_UIObjDesc.eUIType = HUDKirby_Desc.eUIType;
 	m_UIObjDesc.vColorRGB = HUDKirby_Desc.vColorRGB;
@@ -44,8 +44,8 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 		XMVectorSet(m_UIObjDesc.vPos.x,
-					m_UIObjDesc.vPos.y,
-					m_UIObjDesc.vPos.z, 1.f));
+			m_UIObjDesc.vPos.y,
+			m_UIObjDesc.vPos.z, 1.f));
 
 #pragma region SET_PROJ
 	if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
@@ -83,10 +83,17 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 
 	m_eCurState = KIRBYHP_HIDE;
 	if (LEVEL_FINALE != *m_pCurrentLevelID)
+	{
 		m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
-	
+		Safe_AddRef(m_pKirby);
+
+	}
+
 	if (LEVEL_FINALE == *m_pCurrentLevelID)
+	{
 		m_pKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+		Safe_AddRef(m_pKirby);
+	}
 
 	return S_OK;
 }

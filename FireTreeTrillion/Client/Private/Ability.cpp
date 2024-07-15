@@ -89,10 +89,10 @@ HRESULT CAbility::Initialize(void* pArg)
 		m_fPower = 2.f;
 
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
-		FXDesc.vInitPos = { 0.f, .3f, 0.f };
+		FXDesc.vInitPos = { 0.f, .2f, 0.f };
 		FXDesc.pSocketMatrix = &m_EffectSocket;
-		FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
+		FXDesc.vInitScale = { 1.7f, 1.7f, 1.7f };
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemAbility1"), &FXDesc)))
 			return E_FAIL;
 		Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 	}

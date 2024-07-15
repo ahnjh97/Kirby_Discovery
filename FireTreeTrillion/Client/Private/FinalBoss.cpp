@@ -395,7 +395,7 @@ HRESULT CFinalBoss::Make_TargetToCams()
 	CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 	CHECK_NULLPTR(pCameraMain);
 
-	pCameraMain->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_BOTH);
+	pCameraMain->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_SECOND);
 
 	return S_OK;
 }

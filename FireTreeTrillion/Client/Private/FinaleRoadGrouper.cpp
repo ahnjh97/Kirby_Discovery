@@ -367,6 +367,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 		break;
 	}
 
+	for(auto& road : m_pRoads)
+		Safe_AddRef(road);
+
 	switch (RoadGroupDesc.eMoveCommand)
 	{
 	case MOVECMD_ROTATE:

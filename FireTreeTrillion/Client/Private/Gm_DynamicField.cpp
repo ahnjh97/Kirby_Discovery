@@ -26,6 +26,9 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 
 	if (pArg != nullptr)
 		DynamicFieldDesc = *(GAMEOBJECT_DESC*)pArg;
+	
+	DynamicFieldDesc.fSpeedPerSec = 10.f;
+	DynamicFieldDesc.fRotationPerSec = 90.f;
 
 	if (FAILED(__super::Initialize(&DynamicFieldDesc)))
 		return E_FAIL;
@@ -57,18 +60,20 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 
 #pragma region CREATE_SOLARPANEL
 
+	/*
 	//상호작용할 태양전지판 생성
 	CGameObject::GAMEOBJECT_DESC tDesc{};
 	_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
 
 	_float3 vWorldPos = GET_POS;
 	_float3 vOffset = { 5.542f, 38.970f, -12.082f }; //5.542, 38.970, -12.082
-	matWorld.Translation(/*vWorldPos + */vOffset);
+	matWorld.Translation(vOffset);
 
 	tDesc.matWorld = matWorld;
 	m_pSolarPanel = dynamic_cast<CGm_ParkSolarPanelOnce*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc));
 	if (nullptr == m_pSolarPanel)
 		return E_FAIL;
+	*/
 
 #pragma endregion
 
@@ -82,14 +87,33 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 {
 	//if (TRUE == m_bDead)
 	//	return OBJ_DEAD;
-	if (nullptr != m_pSolarPanel)
-		m_pSolarPanel->Tick(fTimeDelta);
 
-	switch (m_eDFieldType) //동적필드 타입 별 움직임 세분화
+	if (nullptr == m_pSolarPanel)
+		return OBJ_NOEVENT;
+
+	CGm_ParkSolarPanelOnce::ANIM_STATE eGimmickState = m_pSolarPanel->Get_AnimState();
+
+	switch (m_eDFieldType)
 	{
-	case DFMOVE_UPDOWN: break;
-	case DFMOVE_LEFTRIGHT: break;
-	case DFMOVE_FRONTBACK: break;
+	case DFMOVE_UPDOWN: 
+		if (CGm_ParkSolarPanelOnce::ANIM_STATE::STATE_ONWAIT == eGimmickState)
+		{
+			_float3 vCurWorldPos = GET_POS;
+			if (100.f <= vCurWorldPos.y) //특정 위치 도착할 경우
+			{
+				vCurWorldPos.y = 100.f;
+				return OBJ_NOEVENT;
+			}
+			
+			m_pTransformCom->Go_Up(fTimeDelta);
+		}
+		break;
+
+	case DFMOVE_LEFTRIGHT: //Surprice 기믹
+		break;
+
+	case DFMOVE_FRONTBACK: 
+		break;
 	case DFMOVE_NONE: break;
 	}
 
@@ -98,10 +122,6 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 
 void CGm_DynamicField::Late_Tick(_float fTimeDelta)
 {
-	//m_pModelCom->Play_Animation(m_pGameInstance->Get_SecondTimer());
-	if (nullptr != m_pSolarPanel)
-		m_pSolarPanel->Late_Tick(fTimeDelta);
-
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 
 	//애니메이션 재생종료 시 Set_Dead
@@ -162,9 +182,6 @@ HRESULT CGm_DynamicField::Render_LightDepth()
 #ifdef _DEBUG
 void CGm_DynamicField::Render_IMGUI()
 {
-	if (nullptr != m_pSolarPanel)
-		m_pSolarPanel->Render_IMGUI();
-
 	switch (m_eDFieldType)
 	{
 	case DFMOVE_UPDOWN:			ImGui::Text(u8"DFMOVE_UPDOWN"); break;
