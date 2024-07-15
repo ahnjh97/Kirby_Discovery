@@ -697,7 +697,9 @@ void CSimba_Death::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			pSimba->Change_State(CSimba::Simba_DemoDeadCut1, 50.f, false, true);
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_THRONEBREAK);
 		}
-		else if (CSimba::Simba_DemoDeadCut1 == iState)
+		else if (CSimba::Simba_DemoDeadCut1 == iState) {
 			pSimba->Change_State(CSimba::Simba_DemoDeadCut2, 60.f, false, false);
+			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_CAGEBREAK);
+		}
 	}
 }

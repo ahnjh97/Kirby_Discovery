@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "RoomGlass.h"
 #include "EventCenter.h"
+#include "Bone.h"
 
 CRoomGlass::CRoomGlass(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -55,6 +56,8 @@ HRESULT CRoomGlass::Initialize(void* pArg)
 	CEventCenter::Get_Instance()->Subscribe(KEVENT_SIMBA_GLASSBREAK, this, func);
 
 	m_bHide = true;
+	
+	m_pBone = m_pModelCom->Get_BonePtr("BreakGlass02MAllL");
 
 	return S_OK;
 }
@@ -74,7 +77,7 @@ void CRoomGlass::Late_Tick(_float fTimeDelta)
 {
 	if (false == m_bHide) 
 	{
-		Compute_ViewZ();
+		Compute_BoneViewZ(m_pBone);
 		m_pModelCom->Play_Animation(fTimeDelta);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
 	}
@@ -181,6 +184,7 @@ void CRoomGlass::Free()
 
 	__super::Free();
 
+	Safe_Release(m_pBone);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }

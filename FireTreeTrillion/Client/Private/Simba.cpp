@@ -179,6 +179,7 @@ _int CSimba::Tick(_float fTimeDelta)
 	if (m_fHp <= 0.f && false == m_bDeathAnimPlayed)
 	{
 		m_bDeathAnimPlayed = true;
+		Turn_RotationBoneMatrix(0.f);
 		TransformToDefault(0.f);
 		Change_State(Simba_Death, 2.f, false, true);
 	}
