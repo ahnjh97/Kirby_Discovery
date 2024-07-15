@@ -93,7 +93,7 @@ HRESULT CFinaleRoad::Initialize(void* pArg)
 
 
 	m_bMotionBlur = false;
-	m_bStencil = true;
+	m_bStencil = false;
 	m_bRimLight = true;
 	m_fRimWidth = .08f;
 	m_wstrModelName = RoadDesc.wstrModelName;

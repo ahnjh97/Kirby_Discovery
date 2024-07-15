@@ -233,8 +233,6 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
-	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
-
 	m_fParticalDelay += fTimeDelta;
 
 	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f || (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN)))
@@ -317,6 +315,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
 	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 
+	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), 1.5f);
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 	{
@@ -522,7 +521,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		m_fFallTime += fTimeDelta;
 
 		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
-		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta, 1.5f);
 
 		if (pController->Is_Terrain())
 		{
@@ -547,7 +546,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPSTATE_LANDING)
 	{
-		pController->FreeFall(pTransformCom, fTimeDelta);
+		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), 1.5f);
 
 		if (pKirby->isAnimFinish())
 		{
