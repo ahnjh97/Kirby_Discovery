@@ -443,7 +443,7 @@ void CCamera_Main::Fill_ActionDir(CAMACTION& Action, CAMDIR eCamDir, _float3 vDi
 	Action.vDir = vDir;
 }
 
-// 임시입니다. 효선아 여기야
+// 임시입니다.
 void CCamera_Main::Change_LevelTrigger()
 {
 	static _bool bOnceFade = false;

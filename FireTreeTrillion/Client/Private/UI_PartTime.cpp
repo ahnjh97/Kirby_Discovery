@@ -124,8 +124,6 @@ _int CUI_PartTime::Tick(_float fTimeDelta)
 		Compute_TimeScore(fTimeDelta);
 	}
 
-
-
 	return OBJ_NOEVENT;
 }
 
@@ -453,13 +451,11 @@ void CUI_PartTime::Setup_PosSizeColor(_int iTextureNum)
 		m_arrPosition[iTextureNum] = _float2(1507.f, 82.f);
 		break;
 	case 12: // 점수판 digits 000
-		m_arrPosition[iTextureNum] = _float2(135.f, 817.f);
-		break;
 	case 13: // 점수판 digits 00
-		m_arrPosition[iTextureNum] = _float2(180.f, 817.f);
-		break;
 	case 14: // 점수판 digits 0
-		m_arrPosition[iTextureNum] = _float2(225.f, 817.f);
+	{
+		Repose_ScoreTextures();
+	}
 		break;
 	case 18: // go!
 		m_arrPosition[iTextureNum] = _float2(830.f, 200.f);
@@ -490,18 +486,11 @@ _bool CUI_PartTime::Setup_DeeFace(_int iTextureNum)
 // 타임바와 관계없습니다.
 void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 {
-
-
-	if (m_pGameInstance->Get_SecondTimer() == 0.f)
-	{
-		//if(CPartTimeHelper::Get_Instance()->Handle_LunchTime())
-	}
-
 	_float fLunchTime(20.9f), fGameoverTime(0.5f);
 	m_fStandardTime += fTimeDelta;
 	if (m_fStandardTime - m_fBeforeTime >= 1.f)
 	{
-		//m_fCurTime = 5.f - m_fStandardTime;
+		//m_fCurTime = 50.f - m_fStandardTime;
 		m_fCurTime = 30.f - m_fStandardTime;
 		if (m_fCurTime <= 0.f) m_fCurTime = 0.f;
 		Change_TimeTexures(m_fCurTime);
@@ -512,11 +501,6 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 		}
 		else if (m_fCurTime <= fLunchTime && m_bLunchTimeTrigger) // 타임이 20일 때, 점심시간 시작.
 		{
-			// 모두 다 멈 춰!
-			//m_pGameInstance->Set_FirstTimerRatio(0.f);
-			//m_pGameInstance->Set_SecondTimerRatio(0.f);
-
-			// 점심시간 슈우우웅 이동되는거 // 효선아 여기야
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 			CHECK_NULLPTR(pCamera);
 			pCamera->Make_Sequence(CCamera_Main::SEQ_LUNCHTIME);
@@ -532,7 +516,6 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 
 			m_bLunchTimeTrigger = false;
 		}
-
 
 		m_fBeforeTime = m_fStandardTime;
 	}
@@ -585,6 +568,32 @@ void CUI_PartTime::Change_TimeTexures(_float _fTime)
 	// 두번째 텍스쳐 iRest와 대응되는 숫자 텍스쳐로 변경
 	m_arrTimerDigits[1] = iRest;
 }
+
+// 0일때, 십의자리일때, 백의자리일때 숫자텍스쳐 위치 보정
+void CUI_PartTime::Repose_ScoreTextures()
+{
+	// 리셋
+	m_arrPosition[12] = _float2(-100.f, -100.f);
+	m_arrPosition[13] = _float2(-100.f, -100.f);
+	m_arrPosition[14] = _float2(-100.f, -100.f);
+
+	_float fScore = m_arrScoreDigits[0] * 100 + m_arrScoreDigits[1] * 10 + m_arrScoreDigits[2];
+	if (fScore <= 0.f)// 0일 때
+	{
+		m_arrPosition[14] = _float2(180.f, 817.f);
+	}
+	else if (fScore < 100.f)// 십의 자리 일때
+	{
+		m_arrPosition[13] = _float2(157.5f, 817.f);
+		m_arrPosition[14] = _float2(202.5f, 817.f);
+	}
+	else // 백의 자리 일때
+	{
+		m_arrPosition[12] = _float2(135.f, 817.f);
+		m_arrPosition[13] = _float2(180.f, 817.f);
+		m_arrPosition[14] = _float2(225.f, 817.f);
+	}
+}	
 
 // 맞추면 먼저가는 옅은 타임바를 올려줍니다. 파라미터 수치만큼 올립니다.
 void CUI_PartTime::Add_TimeBar(_float _fTimeBar)
