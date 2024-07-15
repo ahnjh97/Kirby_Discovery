@@ -258,10 +258,27 @@ namespace Engine
 		_float fShadowThreshold = { -1.f };
 		_float fHighlightThreshold = { -1.f };
 
-		_float m_fRimLightRatio;
-		_float m_fRimLightRadius;
-		_float3 m_vRimColor;
+		_float fRimLightRatio = { -1.f };
+		_float fRimLightRadius = { -1.f };
+		_float3 vRimColor;
 
+		_float fDOFIntensity = { -1.f };
+		_float3 vDOFColor = { -1.f,  -1.f,  -1.f };
+
+		_float fSSAOScale = { -1.f };
+		_float fSSAOBias = { -1.f };
+		_float fSSAOSampleRadius = { -1.f };
+		_float fSSAOIntensity = { -1.f };
+
+		_float3 vFogYColor = { -1.f,  -1.f,  -1.f };
+		_float fFogYBottom = { -1.f };
+		_float fFogYTopY = { -1.f };
+		_float fFogYIntensity = { -1.f };
+
+		_float3 vFogViewColor = { -1.f,  -1.f,  -1.f };
+		_float fFogViewStart = { -1.f };
+		_float fFogViewEnd = { -1.f };
+		_float fFogViewIntensity = { -1.f };
 
 	}COLOR_DATA;
 

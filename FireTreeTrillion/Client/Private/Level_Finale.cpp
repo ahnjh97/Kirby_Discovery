@@ -83,9 +83,11 @@ HRESULT CLevel_Finale::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Objects();
 	CHECK_FAILED(hr);
+
+	
 	hr = Ready_FinaleRoad();
 	CHECK_FAILED(hr);
-
+	
 	
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
@@ -233,10 +235,6 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 {
 
 #pragma region Ã³À½ ºôµùµé
-
-
-	//_float3 vDestPos{ 139.f, -26.f, 4.8f };
-	//_float3 vStartPos{ 139.f, -26.f, 4.8f };
 
 	Make_FinaleRoad(RTYPE_BUILDINGA, MOVECMD_STOP,
 		{ 137.f, -28.f, 4.8f },	{ .98f, .21f, .07f },
