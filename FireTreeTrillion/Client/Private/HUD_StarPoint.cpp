@@ -91,6 +91,8 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 	//m_iPreCoin = pKirby->Get_Coin();
 
 #pragma endregion
+	
+	m_eCurState = STARPOINT_HIDE;
 
 	return S_OK;
 }
@@ -131,12 +133,9 @@ void CHUD_StarPoint::Late_Tick(_float fTimeDelta)
 
 HRESULT CHUD_StarPoint::Render()
 {
-	//해당 상태의 경우에는 렌더x
-//	if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
-//		return S_OK;
-
-	if (m_bRender == false)
-		return E_FAIL;
+	//07.15) Render OFF 처리 추가
+	if (STARPOINT_HIDE == m_eCurState && 0 == m_fAlpha)
+		return S_OK;
 
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 		Render_BindSet(m_pShaderCom, m_pTransformCom);
@@ -518,13 +517,13 @@ void CHUD_StarPoint::Disappear_CoinUI(_float fTimeDelta)
 		if (m_fAlpha < 0.f)
 		{
 			m_fAlpha = 0.f;
-			m_bRender = false;
+			m_eCurState = STARPOINT_HIDE;
 		}
 
 	}
 	else if (m_fIdleTime <= 5.f)
 	{
-		m_bRender = true;
+		m_eCurState = STARPOINT_SHOW;
 		m_fAlpha = 1.f;
 		if (UI_FONT == m_UIObjDesc.eUIType)
 		{

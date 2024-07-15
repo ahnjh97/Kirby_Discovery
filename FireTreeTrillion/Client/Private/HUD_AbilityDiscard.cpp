@@ -55,6 +55,7 @@ HRESULT CHUD_AbilityDiscard::Initialize(void* _pArg)
 	}
 
 	m_eCurState = DISCARD_HIDE;
+	m_UIObjDesc.fAlpha = 0.f;
 
 	return S_OK;
 }
