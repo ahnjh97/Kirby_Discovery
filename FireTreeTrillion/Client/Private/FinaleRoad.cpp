@@ -17,7 +17,6 @@ CFinaleRoad::CFinaleRoad(const CFinaleRoad& rhs)
 //충돌한 도로가 도로 그룹들에게 
 void CFinaleRoad::Start_CollisionEvent()
 {
-
 	switch (m_eCollideType)
 	{
 	case CTYPE_NONE:
@@ -32,16 +31,15 @@ void CFinaleRoad::Start_CollisionEvent()
 	break;
 	case CTYPE_BREAK:
 	{
-		m_bCollided = true;
-
-		if (m_wstrModelName == L"RoadLongBreak")
+		if (false == m_bCollided)
 		{
-			m_pDynamicActor->userData = nullptr;
-			if (m_pDynamicActor->getScene())
-			{
-				auto pScene = m_pGameInstance->Get_Scene();
-				pScene->removeActor(*m_pDynamicActor);
-			}
+			m_pGameInstance->DisableActor(m_pDynamicActor);
+			//m_pDynamicActor->userData = nullptr;
+			//if (m_pDynamicActor->getScene())
+			//{
+			//	auto pScene = m_pGameInstance->Get_Scene();
+			//	pScene->removeActor(*m_pDynamicActor);
+			//}
 
 			CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
 			pMaker->Make_Partical(50, GET_POS, 10.f, 1.5f, 1.f, _float4(0.f, -1.f, 0.f, 0.f), 120.f, 1.f);
@@ -343,9 +341,9 @@ CGameObject* CFinaleRoad::Clone(void* pArg)
 
 void CFinaleRoad::Free()
 {
+	m_pGameInstance->ReleaseActor(m_pDynamicActor);
 	__super::Free();
 
-	m_pGameInstance->ReleaseActor(m_pDynamicActor);
 
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
