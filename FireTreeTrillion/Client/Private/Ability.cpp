@@ -6,6 +6,8 @@
 #include "MultiEffect.h"
 #include "Camera_Main.h"
 
+#include "Light.h"
+
 CAbility::CAbility(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CItemObject{ pDevice, pContext }
 {
@@ -64,6 +66,21 @@ HRESULT CAbility::Initialize(void* pArg)
 
 		Add_Effect("ItemStar", FXDesc, true);
 
+
+
+
+		LIGHT_DESC			LightDesc{};
+		LightDesc.eType = LIGHT_DESC::TYPE_POINT;
+		LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + m_pTransformCom->Get_State(CTransform::STATE_UP) * 0.5f;
+		LightDesc.fRange = 4.f;
+		LightDesc.vDiffuse = _float4(0.97f, 0.96f, 0.4f, 1.f);
+		LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
+		LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
+		if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+			return E_FAIL;
+		m_pStarLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
+		Safe_AddRef(m_pStarLight);
+
 		m_fAttack = 20.f;
 	}
 	else
@@ -109,9 +126,13 @@ _int CAbility::Tick(_float fTimeDelta)
 		CTransform* pCameraTransform = pCameraMain->Get_TransformCom();
 		_vector vCameraLook = pCameraTransform->Get_State_Vector(CTransform::STATE_LOOK);
 
+		m_pStarLight->Update_LightPos(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + m_pTransformCom->Get_State(CTransform::STATE_UP) * 0.5f);
+
 		// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
 		if (m_ePhyXState == PO_FLYAWAY)
 		{
+			m_pStarLight->Interpolate_Light(_float4(0.97f, 0.96f, 0.4f, 1.f), 7.f, 0.1f);
+
 			_float3 vDamegeDir = m_vDamegeDir;
 			_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vDamegeDir * m_fTimeDelta * 30.f);
@@ -119,15 +140,36 @@ _int CAbility::Tick(_float fTimeDelta)
 			m_fFlyTime += m_fTimeDelta;
 
 			if (RayCast_Terrain(XMVector3Normalize(vDamegeDir)) == true)
+			{
 				m_bDead = true;
-
-			if (m_fFlyTime > 2.f)
+				m_pStarLight->Set_DeadLight(true);
+				Safe_Release(m_pStarLight);
+				m_pStarLight = nullptr;
+			}
+			else if (m_fFlyTime > 2.f)
+			{
 				m_bDead = true;
+				m_pStarLight->Set_DeadLight(true);
+				Safe_Release(m_pStarLight);
+				m_pStarLight = nullptr;
+			}
 		}
 		else if (m_ePhyXState == PO_FLYDEADAWAY)
+		{
 			m_bDead = true;
+			m_pStarLight->Set_DeadLight(true);
+			Safe_Release(m_pStarLight);
+			m_pStarLight = nullptr;
+		}
 		else if (m_ePhyXState == PO_KIRBYMOUTH)
+		{
 			Delete_AllEffect();
+			m_pStarLight->Interpolate_Light(_float4(0.97f, 0.96f, 0.4f, 1.f), 0.01f, 0.1f);
+		}
+		else if (m_ePhyXState == PO_VACUUMING)
+		{
+
+		}
 		else
 		{
 			_vector		vLook = vCameraLook;
@@ -159,6 +201,8 @@ _int CAbility::Tick(_float fTimeDelta)
 				}
 				else
 				{
+					m_pStarLight->Interpolate_Light(_float4(0.97f, 0.96f, 0.4f, 1.f), 0.01f, 0.25f);
+
 					m_fLifeTime += m_fTimeDelta;
 					if (0.2f > m_fLifeTime)
 					{
@@ -166,7 +210,12 @@ _int CAbility::Tick(_float fTimeDelta)
 						m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 					}
 					else
+					{
 						m_bDead = true;
+						m_pStarLight->Set_DeadLight(true);
+						Safe_Release(m_pStarLight);
+						m_pStarLight = nullptr;
+					}
 				}
 			}
 			m_fJumpPower -= GRAVITY * m_fTimeDelta * m_fPower;
@@ -515,5 +564,6 @@ void CAbility::Free()
 	__super::Free();
 
 	Safe_Release(m_pModelCom);
+	Safe_Release(m_pStarLight);
 	Delete_Effect("ItemStar");
 }

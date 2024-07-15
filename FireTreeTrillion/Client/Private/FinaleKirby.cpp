@@ -468,6 +468,7 @@ void CFinaleKirby::Start_CutScene()
     m_bMotionBlur = false;
     m_bSlope = false;
 
+
     // 카메라의 타겟을 바꿀까요?
     CBone* pBone = m_pModelCom[BODY_DUMPCUT]->Get_BonePtr("TopL");
     _float4x4 pBoneLocalMatrix = *pBone->Get_CombinedTransformationMatrix();

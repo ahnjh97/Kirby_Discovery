@@ -33,6 +33,7 @@ private:
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
+	class CBone* m_pBone = { nullptr };
 
 	_float m_fWhiteColorDiffuse = {};
 

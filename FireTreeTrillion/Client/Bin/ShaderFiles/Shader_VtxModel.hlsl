@@ -685,10 +685,10 @@ PS_OUT PS_FOR_STAR(PS_IN In)
     
     // 밝은 부분
     if (vDot > 0.5)
-        vRimLightColor = float4(1.f, 0.9f, 0.6f, 1.f) * vDot;
+        vRimLightColor = float4(1.f, 1.f, 1.f, 1.f) * vDot;
     // 밝지 않은 부분
-    else if (vDot < 0.5)
-        vRimLightColor = clamp(vDot, float4(1.f, 0.075f, 0.075f, 1.f), float4(1.f, 0.9, 0.6f, 1.f)) * (1.f - vDot);
+    else if (vDot <= 0.5)
+        vRimLightColor = lerp(float4(1.f, 0.9f, 0.6f, 1.f), float4(1.f, 0.5, 0.5f, 1.f), vDot * 2.f);
 
     Out.vDiffuse = saturate(vMtrlDiffuse * vRimLightColor);
     return Out;

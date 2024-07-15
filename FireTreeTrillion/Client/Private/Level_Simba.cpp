@@ -74,9 +74,7 @@ HRESULT CLevel_Simba::Initialize()
 	pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
 	pTransingStar->Activate(CTransingStar::OPEN);
 
-
-
-	//m_pGameInstance->ShowAllAnimations("Simba");
+	//m_pGameInstance->ShowAllAnimations("OriginCage_Anim");
 
 	return S_OK;
 }
@@ -738,9 +736,9 @@ HRESULT CLevel_Simba::Ready_Objects()
 		}
 		else if ("OriginCage" == strModelName)
 		{
-			/*tDesc.wstrModelName += L"_Anim";
+			tDesc.wstrModelName += L"_Anim";
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_OriginCage"), &tDesc)))
-				continue;*/
+				continue;
 		}
 	}
 

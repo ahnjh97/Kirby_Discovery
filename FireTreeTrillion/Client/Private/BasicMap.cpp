@@ -95,7 +95,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
         XMStoreFloat3(&vMaxFloat3, vMax);
 
         m_pOcTree = m_pModelCom->Create_OcTree(vMinFloat3, vMaxFloat3, m_vecPassIndices, m_vecSamplingFactors, m_vecConstantNames);
-
+       
         InsertMapDecos();
     }
     else
@@ -111,7 +111,11 @@ HRESULT CBasicMap::Initialize(void* pArg)
         {
             TraverseBlendDecoInfoTxts(m_mapBlendMeshesIndices, m_mapBlendObjStaticActor);
 
-            ReadMapDecoTxts();
+            ReadDecoTxts("MapDeco", m_setMapDecoNames);
+            ReadDecoTxts("TownDeco", m_setTownDecoNames);
+            ReadDecoTxts("ParkDeco", m_setParkDecoNames);
+            ReadDecoTxts("LabDiscovera_Deco", m_setLabDecoNames);
+
             ReadDecos_ForSmallLevels();
         }
     }
@@ -468,10 +472,8 @@ void CBasicMap::InsertMapDecos()
             tBlendObjDesc.setBlendMeshIndices = mapIter->second;
             CBlendMapObject* pBlendMapObj = dynamic_cast<CBlendMapObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BlendMapObject"), &tBlendObjDesc));
 
-            if (nullptr != pBlendMapObj) {
+            if (nullptr != pBlendMapObj)
                 m_vecBlendObjects.push_back(pBlendMapObj);
-                //pModel->Set_BlendObject(pBlendMapObj);
-            }
 
             pModel->RemoveBlendMeshes(mapIter->second);
 
@@ -494,9 +496,8 @@ void CBasicMap::InsertMapDecos()
 
 
         if (CMapToolObject::MAPOBJ_NONCOL == iMapObjType)
-        {
             vecNonCols.push_back(pModel);
-        }
+  
         else if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
         {
             auto idleIter = m_ModelIdleAnimMap.find(strModelName);
@@ -635,15 +636,21 @@ void CBasicMap::ReadDecos_ForSmallLevels()
 
         TYPE eType = TYPE_NONANIM;
         string strFolder;
-        if (LEVEL_TOWN == *m_pCurrentLevelID || LEVEL_PARTTIME == *m_pCurrentLevelID || LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
-            strFolder = string("TownDeco/");
-        else if(LEVEL_PARK == *m_pCurrentLevelID)
-            strFolder = string("ParkDeco/");
-        else if (LEVEL_FINALBOSS == *m_pCurrentLevelID || LEVEL_SIMBA == *m_pCurrentLevelID || LEVEL_FINALE == *m_pCurrentLevelID)
-            strFolder = string("LabDiscovera_Deco/");
+        //if (LEVEL_TOWN == *m_pCurrentLevelID || LEVEL_PARTTIME == *m_pCurrentLevelID || LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
+        //    strFolder = string("TownDeco/");
+        //else if(LEVEL_PARK == *m_pCurrentLevelID)
+        //    strFolder = string("ParkDeco/");
+        //else if (LEVEL_FINALBOSS == *m_pCurrentLevelID || LEVEL_SIMBA == *m_pCurrentLevelID || LEVEL_FINALE == *m_pCurrentLevelID)
+        //    strFolder = string("LabDiscovera_Deco/");
 
         if (true == IsMapDeco(strModelName))
             strFolder = string("MapDeco/");
+        else if(true == IsTownDeco(strModelName))
+            strFolder = string("TownDeco/");
+        else if(true == IsParkDeco(strModelName))
+            strFolder = string("ParkDeco/");
+        else if(true == IsLabDeco(strModelName))
+            strFolder = string("LabDiscovera_Deco/");
 
         if (CMapToolObject::MAPOBJ_ANIM == iMapObjType)
             eType = TYPE_ANIM;
@@ -811,9 +818,9 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
     return S_OK;
 }
 
-void CBasicMap::ReadMapDecoTxts()
+void CBasicMap::ReadDecoTxts(const string& _strFolder, unordered_set<string>& _setDecoNames)
 {
-    string strPath = "../../../model_txt/MapDeco/NonAnim/";
+    string strPath = "../../../model_txt/" + _strFolder + "/NonAnim/";
 
     directory_iterator end_iter;  // 디렉토리 순회의 끝을 나타내는 iterator
     directory_iterator dir_iter(strPath);  // 지정된 경로의 시작 iterator
@@ -822,7 +829,7 @@ void CBasicMap::ReadMapDecoTxts()
         if (is_regular_file(*dir_iter)) {
             string strFilePath = dir_iter->path().filename().string();
             string strModelName = strFilePath.substr(0, strFilePath.length() - 4);
-            m_setMapDecoNames.insert(strModelName);
+            _setDecoNames.insert(strModelName);
         }
         ++dir_iter;
     }
@@ -832,7 +839,27 @@ _bool CBasicMap::IsMapDeco(const string& _strModelName)
 {
     if (m_setMapDecoNames.end() != m_setMapDecoNames.find(_strModelName))
         return true;
+    return _bool();
+}
 
+_bool CBasicMap::IsTownDeco(const string& _strModelName)
+{
+    if (m_setTownDecoNames.end() != m_setTownDecoNames.find(_strModelName))
+        return true;
+    return _bool();
+}
+
+_bool CBasicMap::IsParkDeco(const string& _strModelName)
+{
+    if (m_setParkDecoNames.end() != m_setParkDecoNames.find(_strModelName))
+        return true;
+    return _bool();
+}
+
+_bool CBasicMap::IsLabDeco(const string& _strModelName)
+{
+    if (m_setLabDecoNames.end() != m_setLabDecoNames.find(_strModelName))
+        return true;
     return _bool();
 }
 
@@ -923,6 +950,19 @@ _bool CBasicMap::IsOctreeMapModel(const wstring& _wstrModelName)
     return _bool();
 }
 
+void CBasicMap::ReleaseMapActors()
+{
+    for (auto& trigger : m_vecAnimDecoTriggersActors)
+        m_pGameInstance->ReleaseActor(trigger);
+    m_vecAnimDecoTriggersActors.clear();
+
+    for (auto& staticActor : m_vecDecoStaticActors)
+        m_pGameInstance->ReleaseActor(staticActor);
+    m_vecDecoStaticActors.clear();
+
+    m_pGameInstance->ReleaseActor(m_pStaticActor);
+}
+
 void CBasicMap::Save_OctreeData(const string& strLevel)
 {
     string tempFileName = "temp_" + strLevel + "_Octree.txt";
@@ -1008,16 +1048,7 @@ void CBasicMap::Free()
     __super::Free();
 
     Release_MapDecos();
-    
-    for (auto& trigger : m_vecAnimDecoTriggersActors)
-        m_pGameInstance->ReleaseActor(trigger);
-    m_vecAnimDecoTriggersActors.clear();
-
-    for (auto& staticActor : m_vecDecoStaticActors)
-        m_pGameInstance->ReleaseActor(staticActor);
-    m_vecDecoStaticActors.clear();
-
-    m_pGameInstance->ReleaseActor(m_pStaticActor);
+    ReleaseMapActors();
 
     Safe_Release(m_pOcTree);
     Safe_Release(m_pBlendMap);
