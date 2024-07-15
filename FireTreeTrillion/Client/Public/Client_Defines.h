@@ -48,8 +48,6 @@ namespace Client
         KEVENT_SIMBA_GLASSBREAK,
         KEVENT_END
     };
-
-    enum FILE_TYPE { FILE_UI, FILE_NONE };
     
     const unsigned int	g_iWinSizeX = 1600; //1280;
     const unsigned int	g_iWinSizeY = 900; //720;

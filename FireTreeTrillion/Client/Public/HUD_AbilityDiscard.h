@@ -13,7 +13,7 @@ BEGIN(Client)
 class CHUD_AbilityDiscard : public CUIObject
 {
 public:
-	//enum TEX_STATE { DISCARD_IDLE, DISCARD_HIDE, DISCARD_SHOW, DISCARD_NONE	};
+	enum ABILITYDISCARD_STATE { DISCARD_IDLE, DISCARD_HIDE, DISCARD_SHOW, DISCARD_NONE	};
 	enum TEX_DISCARD { TEXDC_BASE, TEXDC_GAUGE, TEXDC_BTN, TEXDC_NONE };
 
 private:
@@ -29,7 +29,7 @@ public:
 	virtual HRESULT				Render()									override;
 
 #ifdef _DEBUG
-	//virtual void				Render_IMGUI()								override;
+	virtual void				Render_IMGUI()								override;
 #endif
 
 	void						ChaseUI_To_Player();
@@ -50,13 +50,10 @@ private:
 	CTexture*					m_pTexCom[TEX_NONE] = { nullptr };
 	class CCharacter*			m_pKirby = { nullptr };
 	
-	//TEX_STATE					m_eTexState = { DISCARD_NONE };
-	_bool						m_IsGaugeBLINK = { FALSE };
+	ABILITYDISCARD_STATE			m_eCurState = { DISCARD_NONE };
 
 	_float						m_fGaugeRatio = { 0.f };
 	_float						m_fDumpAbilityTime = { 0.f };
-	_float						m_fHIDEAnimTime = { 0.f };
-	_float						m_fBLINKAnimTime = { 0.f };
 
 };
 
