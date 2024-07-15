@@ -351,7 +351,7 @@ void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 		vStartPos, { -.87f, 0.f, 1.f },
 		vDestPos, { .87f, .5f, .02f }, 0.f);
 
-		m_bRoadTrigger[3] = false;
+		m_bRoadTrigger[4] = false;
 
 	}
 	//else if (m_bRoadTrigger[4] == true && fKirbyX + (fKirbySpeed * 5.f) > 1619.6f)
