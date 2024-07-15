@@ -34,6 +34,7 @@ public:
 		m_eState = eState; 
 		m_fFadeOutRatio = (m_eState == FADEIN) ? 0.f : 1.f;
 	}
+	STATE					Get_State() const { return m_eState; }
 							
 	_float					Get_FadeRatio() const { return m_fFadeOutRatio; }
 
