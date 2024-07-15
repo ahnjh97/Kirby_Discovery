@@ -164,10 +164,9 @@ void CUI_PartTimeResult::Render_Digits()
 		if (fTimeAcc >= 0.2f)
 		{
 			_int iAddNum = 1;
-			// 와들디 iAddNum만큼 등장 // 효선아 여기야
-
-			// 30만큼 점수판 += 점수
-			if (m_fScore < Change_ScoreTextures(iAddNum))
+			//iAddNum만큼 와들디 등장 // 효선아 여기야
+			//_int iAddNum = CUtils::Make_RandomInt(1, 3);
+			if (m_fScore < Change_ScoreTextures(iAddNum)) // 30만큼 점수판 += 점수
 			{
 				m_bRenderTotalScore = true;
 				if (fTimeAcc >= 2.f)
@@ -207,6 +206,7 @@ void CUI_PartTimeResult::Render_Digits()
 		}
 	}
 
+	Repose_ScoreTextures();
 	for (_int i = 5; i <= 7; ++i)
 	{
 		_float fPosRatio = sin(m_fMoveRatio * 3.14159f);
@@ -250,6 +250,7 @@ void CUI_PartTimeResult::Render_TotalScore()
 		}
 	}
 
+	Repose_TotalScoreTextures();
 	for (_int i = 1; i <= 3; ++i)
 	{
 		_float fSizeRatio = sin(m_fSizeRatio * 3.14159f);
@@ -398,6 +399,53 @@ HRESULT CUI_PartTimeResult::Bind_ShaderResources()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+// 123 : 토탈 숫자
+// 567 : 올라가는 점수 숫자
+// 0일때, 십의자리일때, 백의자리일때 숫자텍스쳐 위치 보정
+void CUI_PartTimeResult::Repose_TotalScoreTextures()
+{
+	// 리셋
+	m_arrPosition[1] = _float2(-100.f, -100.f);
+	m_arrPosition[2] = _float2(-100.f, -100.f);
+	m_arrPosition[3] = _float2(-100.f, -100.f);
+
+	if (m_fScore <= 0.f)			// 0일 때
+		m_arrPosition[3] = _float2(800.f, 220.f);
+	else if (m_fScore < 100.f)		// 십의 자리 일때
+	{
+		m_arrPosition[2] = _float2(780.f, 220.f);
+		m_arrPosition[3] = _float2(820.f, 220.f);
+	}
+	else							// 백의 자리 일때
+	{
+		m_arrPosition[1] = _float2(760.f, 220.f);
+		m_arrPosition[2] = _float2(800.f, 220.f);
+		m_arrPosition[3] = _float2(840.f, 220.f);
+	}
+}
+
+void CUI_PartTimeResult::Repose_ScoreTextures()
+{
+	// 리셋
+	m_arrPosition[5] = _float2(-100.f, -100.f);
+	m_arrPosition[6] = _float2(-100.f, -100.f);
+	m_arrPosition[7] = _float2(-100.f, -100.f);
+	
+	if (m_fScore <= 0.f)			// 0일 때
+		m_arrPosition[7] = _float2(1035.f, 490.f);
+	else if (m_fScore < 100.f)		// 십의 자리 일때
+	{
+		m_arrPosition[6] = _float2(1017.5f, 490.f);
+		m_arrPosition[7] = _float2(1052.5f, 490.f);
+	}
+	else							// 백의 자리 일때
+	{
+		m_arrPosition[5] = _float2(1000.f, 490.f);
+		m_arrPosition[6] = _float2(1035.f, 490.f);
+		m_arrPosition[7] = _float2(1070.f, 490.f);
+	}
 }
 
 CUI_PartTimeResult* CUI_PartTimeResult::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
