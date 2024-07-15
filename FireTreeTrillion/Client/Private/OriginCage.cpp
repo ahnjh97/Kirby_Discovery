@@ -70,9 +70,11 @@ _int COriginCage::Tick(_float fTimeDelta)
 		m_pModelCom->Set_Animation(CAGE_BREAK, 40.f, false);
 	}
 
-	if (true == m_pModelCom->IsFinished() && CAGE_BREAK == m_pModelCom->Get_CurAnimIndex())
+	if (true == m_pModelCom->IsFinished() && CAGE_BREAK == m_pModelCom->Get_CurAnimIndex()) {
+		m_eState = CAGE_STATE_AFTER_END;
 		m_pModelCom->Set_Animation(CAGE_BREAKAFTER, 1.f, true, false);
-
+	}
+		
 	return OBJ_NOEVENT;
 }
 
