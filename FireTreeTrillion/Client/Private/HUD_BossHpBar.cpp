@@ -28,6 +28,7 @@ HRESULT CHUD_BossHpBar::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pMyMonster = (CMonster*)pArg;
+	Safe_AddRef(m_pMyMonster);
 
 	m_fSizeX = g_iWinSizeX;
 	m_fSizeY = g_iWinSizeY;

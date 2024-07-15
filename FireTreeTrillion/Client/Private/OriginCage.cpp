@@ -52,6 +52,7 @@ HRESULT COriginCage::Initialize(void* pArg)
 	CEventCenter::Get_Instance()->Subscribe(KEVENT_SIMBA_CAGEBREAK, this, func);
 
 	m_pBone = m_pModelCom->Get_BonePtr("Glass1L");
+	Safe_AddRef(m_pBone);
 
 	return S_OK;
 }
@@ -70,9 +71,11 @@ _int COriginCage::Tick(_float fTimeDelta)
 		m_pModelCom->Set_Animation(CAGE_BREAK, 40.f, false);
 	}
 
-	if (true == m_pModelCom->IsFinished() && CAGE_BREAK == m_pModelCom->Get_CurAnimIndex())
+	if (true == m_pModelCom->IsFinished() && CAGE_BREAK == m_pModelCom->Get_CurAnimIndex()) {
+		m_eState = CAGE_STATE_AFTER_END;
 		m_pModelCom->Set_Animation(CAGE_BREAKAFTER, 1.f, true, false);
-
+	}
+		
 	return OBJ_NOEVENT;
 }
 
@@ -93,6 +96,7 @@ HRESULT COriginCage::Render()
 		return E_FAIL;
 
 	RenderMeshes(m_vecDefaultMeshes);
+
 	if(CAGE_STATE_BEFORE == m_eState)
 		RenderMeshes(m_vecBeforeMeshes);
 	if (CAGE_STATE_CRACK == m_eState)

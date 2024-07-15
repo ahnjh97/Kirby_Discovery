@@ -55,10 +55,8 @@ HRESULT CSimba::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_fMaxHp = 500.f;
-	m_fHp = 500.f;
-	m_fMaxHp = 50.f;
-	m_fHp = 50.f;
+	m_fMaxHp = 250.f;
+	m_fHp = 250.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eEyeState = SIMBAEYE_LONG;

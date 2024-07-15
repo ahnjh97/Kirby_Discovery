@@ -436,8 +436,10 @@ HRESULT COriginalDee::Add_Components()
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
+#ifdef _DEBUG
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom;
+#endif
 
 	//´« ÅØ½ºÃÄ
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Dee_Eye"),
@@ -529,6 +531,8 @@ HRESULT COriginalDee::Add_PartObjects(DEE_CHARACTER eCharacter)
 		m_PartObjects.emplace(TEXT("Part_Instrument"), pPartObj);
 
 	}
+
+
 	/*if (*m_pCurrentLevelID != LEVEL_TOWN && *m_pCurrentLevelID != LEVEL_PARTTIME)
 		return S_OK;
 
@@ -770,12 +774,6 @@ CGameObject* COriginalDee::Clone(void* pArg)
 
 void COriginalDee::Free()
 {
-	Safe_Release(m_pEyeTextureCom);
-
-	for (auto& Pair : m_PartObjects)
-		Safe_Release(Pair.second);
-
-	m_PartObjects.clear();
 
 	__super::Free();
 }

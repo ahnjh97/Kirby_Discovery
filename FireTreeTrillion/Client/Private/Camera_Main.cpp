@@ -1169,6 +1169,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ -0.73f, .2f, .67f };
+
+		newAction.fZAngle = 10.f;
 		m_CamSeq.push_back(newAction);
 
 		newAction = {};
@@ -1180,6 +1182,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.vPos = _float3{ 30.f, 6.f, 0.f };
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ 0.f, -.2f, 1.f };
+		newAction.fZAngle = 0.f;
 		m_CamSeq.push_back(newAction);
 	}
 	break;
