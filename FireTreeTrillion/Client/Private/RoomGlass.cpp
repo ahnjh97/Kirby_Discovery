@@ -58,6 +58,7 @@ HRESULT CRoomGlass::Initialize(void* pArg)
 	m_bHide = true;
 	
 	m_pBone = m_pModelCom->Get_BonePtr("BreakGlass02MAllL");
+	Safe_AddRef(m_pBone);
 
 	return S_OK;
 }

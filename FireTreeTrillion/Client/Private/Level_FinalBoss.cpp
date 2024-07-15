@@ -57,6 +57,7 @@ HRESULT CLevel_FinalBoss::Initialize()
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
 	
+	m_pGameInstance->Set_ColorSet_ByIndex(7);
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
 
@@ -98,14 +99,14 @@ HRESULT CLevel_FinalBoss::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
 
-	LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
+	LightDesc.vDiffuse = _float4(0.6f, 0.21f, 0.15f, 1.f);
 	LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
 	LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 300.f, 1200.f, 1.f});
+	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 30000.f, 1200.f, 1.f});
 
 	return S_OK;
 }

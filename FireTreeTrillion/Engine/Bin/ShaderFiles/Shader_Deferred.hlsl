@@ -163,10 +163,42 @@ float g_fBlackBackGround;
 float4 g_vCamPosition;
 float4 g_vCamLook;
 
-//////////////////////////////////// For PBR 
-
 bool g_bDeepShadow = false;
 
+// For Fog
+float3 g_vFogYColor = { 1.f, 1.f, 1.f };
+float g_fFogYBottom;
+float g_fFogYTopY;
+float g_fFogYIntensity = { 0.f };
+
+float3 g_vFogViewColor = { 1.f, 1.f, 1.f };
+float g_fFogViewStart;
+float g_fFogViewEnd;
+float g_fFogViewIntensity = { 0.f };
+
+
+float3 FOGY(float fWorldY, float4 vColor, float3 vFogColor, float fFogBottomY, float fFogTopY, float fintensity)
+{
+    float fogFactor = saturate((fWorldY - fFogBottomY) / (fFogTopY - fFogBottomY));
+
+    vColor.rgb = lerp(vColor.rgb, vFogColor, (1.f - fogFactor) * fintensity);
+    
+
+    return vColor.rgb;
+}
+
+float3 FOGViewZ(float fViewZ, float4 vColor, float3 vFogColor, float fFogStart, float fFogEnd, float fintensity)
+{
+    
+    float fogFactor = saturate((fViewZ - fFogStart) / (fFogEnd - fFogStart));
+    float fRatio = min(fogFactor < 0.5 ? 16 * pow(fogFactor, 5.f) : 1 - pow(-2 * fogFactor + 2, 5) / 2,  0.5f);
+    vColor.rgb = lerp(vColor.rgb, vFogColor, fRatio * fintensity);
+
+    return vColor.rgb;
+}
+
+
+//////////////////////////////////// For PBR 
 
 float ndfGGX(float cosLh, float roughness)
 {
@@ -1155,7 +1187,11 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
         Out.vColor *= g_fBlackBackGround;
     }
     
-    Out.vColor = saturate(Out.vColor);
+    float4 vFogBeforeColor = saturate(Out.vColor);
+    
+    float3 vFogY = FOGY(vWorldPos.y, vFogBeforeColor, g_vFogYColor, g_fFogYBottom, g_fFogYTopY, g_fFogYIntensity);
+    float3 vFogView = FOGViewZ(fViewZ, vFogBeforeColor, g_vFogViewColor, g_fFogViewStart, g_fFogViewEnd, g_fFogViewIntensity);
+    Out.vColor.rgb = saturate((vFogY + vFogView) / 2);
     return Out;
 }
 

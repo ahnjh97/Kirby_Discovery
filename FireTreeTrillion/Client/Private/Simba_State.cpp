@@ -3,6 +3,7 @@
 #include "Simba.h"
 #include "Kirby.h"
 #include "EventCenter.h"
+#include "Camera_Main.h"
 
 #define	AttackJump -2.f
 #define BiteRush -9.f
@@ -89,8 +90,15 @@ void CSimba_Appear2::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			if (true == pSimba->Get_RenderMant())
 				pSimba->Set_RenderMant(false);
 			m_fTime += fTimeDelta;
+
 			if (m_fTime > 1.5f) {
 				pSimba->Change_State(CSimba::Simba_Walk, 66.66f, true, false);
+				
+				//카메라에게 2번째 타겟으로 등록
+				CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+				if(pCamera!= nullptr)
+					pCamera->Set_Target(pSimba->Get_TransformCom(), CCamera::TARGET_SECOND, CCamera::FOCUS_BOTH);
+
 
 				_vector vPos = m_pTransform->Get_State(CTransform::STATE_POSITION);
 				_vector vLook = XMVector3Normalize(m_pTransform->Get_State(CTransform::STATE_LOOK));
@@ -697,8 +705,10 @@ void CSimba_Death::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			pSimba->Change_State(CSimba::Simba_DemoDeadCut1, 50.f, false, true);
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_THRONEBREAK);
 		}
-		else if (CSimba::Simba_DemoDeadCut1 == iState) {
+		else if (CSimba::Simba_DemoDeadCut1 == iState)
 			pSimba->Change_State(CSimba::Simba_DemoDeadCut2, 60.f, false, false);
+		else if (CSimba::Simba_DemoDeadCut2 == iState && false == m_bCageNotified) {
+			m_bCageNotified = true;
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_CAGEBREAK);
 		}
 	}

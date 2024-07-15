@@ -50,8 +50,10 @@ HRESULT CLevel_Town::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Triggers();
 	CHECK_FAILED(hr);
+	
 	hr = Ready_Dees();
 	CHECK_FAILED(hr);
+	
 	hr = Ready_Items();
 	CHECK_FAILED(hr);
 	hr = Ready_Objects();

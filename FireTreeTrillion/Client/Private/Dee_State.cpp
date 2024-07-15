@@ -406,15 +406,18 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 			}
 		}
 
-		if (pHungryDee->Get_WaitingTime() < 20.f)
-		{
-			baseInfo.pDee->Set_DeeEyeState(DEEEYE_SADNESS);
-		}
-
-		if (pHungryDee->Get_WaitingTime() < 15.f)
+		if (pHungryDee->Get_WaitingTime() < .2f)
 		{
 			baseInfo.pDee->Set_DeeEyeState(DEEEYE_ANGER);
 			pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_GUESTANGER, 60.f, true, true);
+		}
+		else if (pHungryDee->Get_WaitingTime() < .8f)
+		{
+			baseInfo.pDee->Set_DeeEyeState(DEEEYE_SADNESS);
+		}
+		else
+		{
+			baseInfo.pDee->Set_DeeEyeState(DEEEYE_IDLE);
 		}
 	}
 	break;
@@ -433,7 +436,7 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 			}
 		}
 
-		if (15.f < pHungryDee->Get_WaitingTime())
+		if (.2f < pHungryDee->Get_WaitingTime())
 		{
 			baseInfo.pDee->Set_DeeEyeState(DEEEYE_SADNESS);
 			pHungryDee->Change_State((DEE_ANIM)DEESHOPANIM_GUESTNORMAL, 60.f, true, true);
@@ -445,12 +448,12 @@ void CDee_Hungry_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	{
 		baseInfo.pTransformCom->Look_At_Interpolate(baseInfo.pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, 0.f, 1.f, 0.f }, fTimeDelta * 4.f);
 
-		if (pHungryDee->Get_WaitingTime() < 20.f)
+		if (pHungryDee->Get_WaitingTime() < .8f)
 		{
 			baseInfo.pDee->Set_DeeEyeState(DEEEYE_SADNESS);
 		}
 
-		if (pHungryDee->Get_WaitingTime() < 15.f)
+		if (pHungryDee->Get_WaitingTime() < .2f)
 		{
 			baseInfo.pDee->Set_DeeEyeState(DEEEYE_ANGER);
 		}
@@ -780,7 +783,7 @@ void CDee_NPC_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 
 	//참 가까이 접근했고, 버튼 누르면 대화 시작
 	//이것도 용건 있을 때 웃는 걸로 변경해야해
-	if (baseInfo.pDee->IsCloseToKirby() && m_pGameInstance->Get_KeyState(DIK_C, KEY_DOWN))
+	if (baseInfo.pDee->IsCloseToKirby() && m_pGameInstance->Get_KeyState(DIK_A, KEY_DOWN))
 	{
 		baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE);
 		baseInfo.pDee->Change_State(DEEANIM_CLERKTALK, 60.f, false, true);

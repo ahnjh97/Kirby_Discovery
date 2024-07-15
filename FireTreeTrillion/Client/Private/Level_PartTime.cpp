@@ -479,7 +479,7 @@ HRESULT CLevel_PartTime::Ready_Dees()
 
 	for (_int i = 0; i < 10; ++i)
 	{
-		HungryDeeDesc.iIdx = i;
+		//HungryDeeDesc.iIdx = i;
 
 		if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc)))
 			return E_FAIL;

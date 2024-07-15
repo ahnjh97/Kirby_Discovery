@@ -448,6 +448,14 @@ void CRenderer::Color_Initialize()
 		0.99115f, 0.00976099f, 0.199837f, 0.350306f
 		});
 
+	Save_ColorSet("Final",
+		COLOR_DATA{
+		2.5f, 1.f, 1.08023f, 0.809684f, 0.990206f, 1.03727f, 1.20983f,
+		0.74032f, 0.6f, 0.6f, 1.03f, 0.96f, 1.04f, 0.243137f, 0.00784314f,
+		0.00784314f, 0.00971069f, 0.917647f, 0.513726f, 0.145098f, 0.00992562f,
+		1.f, 0.847059f, 0.254902f, 0.00999975f, 0.13f, 0.55f
+		});
+
 	Save_ColorSet("Finale",
 		COLOR_DATA{
 		1.3f, 1.f, 0.999745f, 1.27947f, 1.28048f, 1.3f, 1.1f, 0.880135f, 0.742923f,
@@ -458,9 +466,16 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Horror",
 		COLOR_DATA{
-1.50967f, 1.f, 1.00975f, 1.00983f, 0.990212f, 1.20989f, 1.20994f, 0.709838f, 0.699999f, 0.700001f,
-0.99009f, 0.999997f, 1.f, 0.0848762f, 0.0345318f, 0.177767f, 0.00976206f, 0.466084f, 0.676991f,
-0.218674f, 0.00988089f, 0.499961f, 0.912908f, 0.99115f, 0.00997962f, 0.189991f, 0.360167f
+		1.50967f, 1.f, 1.00975f, 1.00983f, 0.990212f, 1.20989f, 1.20994f, 0.709838f, 0.699999f, 0.700001f,
+		0.99009f, 0.999997f, 1.f, 0.0848762f, 0.0345318f, 0.177767f, 0.00976206f, 0.466084f, 0.676991f,
+		0.218674f, 0.00988089f, 0.499961f, 0.912908f, 0.99115f, 0.00997962f, 0.189991f, 0.360167f
+		});
+
+	Save_ColorSet("Lab",
+		COLOR_DATA{
+		0.809755f, 1.f, 0.990072f, 1.43971f, 0.99014f, 1.10986f, 1.09033f, 0.799844f, 0.6f, 0.6f,
+		1.1401f, 1.06f, 1.18f, 0.0382485f, 0.225391f, 0.671426f, 0.1099f, 0.466084f, 0.676991f,
+		0.218674f, 0.00985707f, 0.499961f, 0.912908f, 0.99115f, 0.00992393f, 0.190238f, 0.350267f
 		});
 
 	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
@@ -680,26 +695,27 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	{
 	case 0:
 		m_DestColorData = Find_ColorSet("Tutorial");
-		Update_Option(OPTION_DOF, true);
 
 		m_fRimLightRatio.second = .7f;
+		m_fRimLightRadius.second = 1.f;
+		m_vRimColor.second = _float3(1.f, .7f, 4.f);
+
 		break;
 	case 1:
 		m_DestColorData = Find_ColorSet("Forest");
-		Update_Option(OPTION_DOF, true);
-
-		m_fRimLightRatio.second = .3f;
+		m_fRimLightRatio.second = .1f;
+		m_fRimLightRadius.second = 1.f;
 		break;
 	case 2:
 		m_DestColorData = Find_ColorSet("Night");
-		Update_Option(OPTION_DOF, true);
 		break;
 	case 3:
 	{
 		m_DestColorData = Find_ColorSet("Stage1");
+
 		m_fRimLightRatio.second = 1.f;
+		m_fRimLightRadius.second = 1.f;
 		m_vRimColor.second = _float3(1.f, .5f, .3f);
-		Update_Option(OPTION_DOF, true);
 
 		if (m_iCurColorIdx != iSetIdx)
 		{
@@ -769,8 +785,10 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	break;
 	case 4:
 		m_DestColorData = Find_ColorSet("Town");
-		Update_Option(OPTION_DOF, true);
 		m_fRimLightRatio.second = .7f;
+		m_fRimLightRadius.second = 1.f;
+		m_vRimColor.second = _float3(1.f, .5f, .3f);
+
 		break;
 	case 5:
 	{
@@ -778,16 +796,38 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 
 		m_fRimLightRatio.second = 1.f;
 		m_vRimColor.second = _float3(1.f, .45f, 0.f);
+
 		m_fDOFIntensity = .1f;
 		m_vDOFColor = _float3{ .07f, .05f, .09f };
-		Update_Option(OPTION_DOF, true);
 	}
 	break;
 	case 6:
 	{
 		m_DestColorData = Find_ColorSet("Horror");
 		m_fRimLightRatio.second = 0.f;
-		Update_Option(OPTION_DOF, true);
+	}
+	break;
+	case 7:
+	{
+		m_DestColorData = Find_ColorSet("Final");
+
+		m_fRimLightRatio.second = 0.f;
+		m_vRimColor.second = _float3(.83f, .07f, .1f);
+
+		m_fDOFIntensity = .4f;
+		m_vDOFColor = _float3{ .08f, .07f, .10f };
+	}
+	break;
+	case 8:
+	{
+		m_DestColorData = Find_ColorSet("Lab");
+
+		m_fRimLightRatio.second = .5f;
+		m_fRimLightRadius.second = 3.f;
+		m_vRimColor.second = _float3(.4f, .8f, 1.f);
+
+		m_fDOFIntensity = 1.f;
+		m_vDOFColor = _float3{ .7f, .65f, .92f };
 	}
 	break;
 	default:
@@ -1319,7 +1359,6 @@ HRESULT CRenderer::Render_Result()
 			return E_FAIL;
 	}
 
-
 	// 섞을 이펙트들 (빛 상관 없는 애들)
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Blur_Y"), "g_BlurTexture")))
 		return E_FAIL;
@@ -1327,7 +1366,6 @@ HRESULT CRenderer::Render_Result()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_NonLight"), "g_NonLightTexture")))
 		return E_FAIL;
-
 	//// SSAO 연산
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SSAO_Y"), "g_SSAOTexture")))
 		return E_FAIL;
@@ -1342,27 +1380,43 @@ HRESULT CRenderer::Render_Result()
 	// 림 라이트 배율
 	if (FAILED(m_pShader->Bind_RawValue("g_fRimLightRatio", &m_fRimLightRatio.first, sizeof(_float))))
 		return E_FAIL;
-
 	// 림 라이트 범위
 	if (FAILED(m_pShader->Bind_RawValue("g_fRimLightRadius", &m_fRimLightRadius.first, sizeof(_float))))
 		return E_FAIL;
-
 	// 림 라이트 컬러
 	if (FAILED(m_pShader->Bind_RawValue("g_vRimColor", &m_vRimColor.first, sizeof(_float3))))
 		return E_FAIL;
 
+
 	// DOF 강도
 	if (FAILED(m_pShader->Bind_RawValue("g_fDOFIntensity", &m_fDOFIntensity, sizeof(_float))))
 		return E_FAIL;
-
 	// DOF 컬러
 	if (FAILED(m_pShader->Bind_RawValue("g_vDOFColor", &m_vDOFColor, sizeof(_float3))))
 		return E_FAIL;
 
+	// FOG 데이터
+	if (FAILED(m_pShader->Bind_RawValue("g_vFogYColor", &m_vFogYColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogYBottom", &m_fFogYBottom, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogYTopY", &m_fFogYTopY, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogYIntensity", &m_fFogYIntensity, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_vFogViewColor", &m_vFogViewColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogViewStart", &m_fFogViewStart, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogViewEnd", &m_fFogViewEnd, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogViewIntensity", &m_fFogViewIntensity, sizeof(_float))))
+		return E_FAIL;
+
+
 	// 섞을 스카이 박스
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Sky"), "g_SkyTexture")))
 		return E_FAIL;
-
 	// 각종 디퍼드 자원
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_DeferredInfo"), "g_DeferredInfoTexture")))
 		return E_FAIL;

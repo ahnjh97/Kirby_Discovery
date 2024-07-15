@@ -14,12 +14,9 @@ class CGm_DynamicField final : public CPhysXObject
 {
 public: 
 	enum DYNAMICFILED_TYPE { DFMOVE_UPDOWN, DFMOVE_LEFTRIGHT, DFMOVE_FRONTBACK, DFMOVE_NONE };
-	/*
-	typedef struct : public CGameObject::GAMEOBJECT_DESC
-	{
-		
-	}DYNAMICFILED_DESC;
-	*/
+
+public:
+	void Set_SolarPanel(CGm_ParkSolarPanelOnce* _pSolarPanel) { m_pSolarPanel = _pSolarPanel; Safe_AddRef(m_pSolarPanel); }
 
 private:
 	CGm_DynamicField(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

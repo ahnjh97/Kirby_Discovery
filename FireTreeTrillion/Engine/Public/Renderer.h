@@ -239,6 +239,15 @@ private:
 	_float m_fSSAOSampleRadius = { 2.85f };
 	_float m_fSSAOIntensity = { 2.5f };
 
+	_float3 m_vFogYColor = { 0.f, 0.f, 0.f };
+	_float m_fFogYBottom = { 0.f };
+	_float m_fFogYTopY = { 0.f };
+	_float m_fFogYIntensity = { 0.f };
+		   
+	_float3 m_vFogViewColor = { 1.f, 1.f, 1.f };
+	_float m_fFogViewStart = { 0.f };
+	_float m_fFogViewEnd = { 0.f };
+	_float m_fFogViewIntensity = { 0.f };
 
 	_bool  m_bMaptool = { false };
 
