@@ -23,24 +23,24 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 	HRESULT hr = __super::Initialize(_pArg);
 	CHECK_FAILED(hr);
 
-	UIOBJ_DESC* HUDStarPoint_Desc{};
+	UIOBJ_DESC HUDStarPoint_Desc{};
 	if (nullptr != _pArg)
-		HUDStarPoint_Desc = (UIOBJ_DESC*)_pArg;
+		HUDStarPoint_Desc = *(UIOBJ_DESC*)_pArg;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 	
-	m_UIObjDesc = (*HUDStarPoint_Desc);
-	m_UIObjDesc.eUIType = (*HUDStarPoint_Desc).eUIType;
-	m_UIObjDesc.vColorRGB = (*HUDStarPoint_Desc).vColorRGB;
-	m_UIObjDesc.fAlpha = (*HUDStarPoint_Desc).fAlpha;
+	m_UIObjDesc = HUDStarPoint_Desc;
+	m_UIObjDesc.eUIType = HUDStarPoint_Desc.eUIType;
+	m_UIObjDesc.vColorRGB = HUDStarPoint_Desc.vColorRGB;
+	m_UIObjDesc.fAlpha = HUDStarPoint_Desc.fAlpha;
 	//.vDegree = (*HUDStarPoint_Desc).vDegree;
 
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
-		m_iTexIndex = (*HUDStarPoint_Desc).iTexIndex;
+		m_iTexIndex = HUDStarPoint_Desc.iTexIndex;
 
 	if (UI_FONT == m_UIObjDesc.eUIType)
-		m_UIObjDesc.wstrText = (*HUDStarPoint_Desc).wstrText;
+		m_UIObjDesc.wstrText = HUDStarPoint_Desc.wstrText;
 
 
 	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, m_UIObjDesc.vSize.z);
@@ -53,14 +53,14 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 
 	if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
 	{
-		m_UIObjDesc.vDegree.z = (*HUDStarPoint_Desc).vDegree.z;
+		m_UIObjDesc.vDegree.z = HUDStarPoint_Desc.vDegree.z;
 		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 		XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	}
 
 	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
 	{
-		m_UIObjDesc.vDegree = (*HUDStarPoint_Desc).vDegree;
+		m_UIObjDesc.vDegree = HUDStarPoint_Desc.vDegree;
 
 		_float fRadianX = XMConvertToRadians(m_UIObjDesc.vDegree.x);
 		_float fRadianY = XMConvertToRadians(m_UIObjDesc.vDegree.y);
@@ -91,6 +91,8 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 	//m_iPreCoin = pKirby->Get_Coin();
 
 #pragma endregion
+	
+	m_eCurState = STARPOINT_HIDE;
 
 	return S_OK;
 }
@@ -131,12 +133,9 @@ void CHUD_StarPoint::Late_Tick(_float fTimeDelta)
 
 HRESULT CHUD_StarPoint::Render()
 {
-	//해당 상태의 경우에는 렌더x
-//	if (STARPOINT_WAIT == m_eCurState && STARPOINT_HIDE == m_ePreState)
-//		return S_OK;
-
-	if (m_bRender == false)
-		return E_FAIL;
+	//07.15) Render OFF 처리 추가
+	if (STARPOINT_HIDE == m_eCurState && 0 == m_fAlpha)
+		return S_OK;
 
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
 		Render_BindSet(m_pShaderCom, m_pTransformCom);
@@ -518,13 +517,13 @@ void CHUD_StarPoint::Disappear_CoinUI(_float fTimeDelta)
 		if (m_fAlpha < 0.f)
 		{
 			m_fAlpha = 0.f;
-			m_bRender = false;
+			m_eCurState = STARPOINT_HIDE;
 		}
 
 	}
 	else if (m_fIdleTime <= 5.f)
 	{
-		m_bRender = true;
+		m_eCurState = STARPOINT_SHOW;
 		m_fAlpha = 1.f;
 		if (UI_FONT == m_UIObjDesc.eUIType)
 		{

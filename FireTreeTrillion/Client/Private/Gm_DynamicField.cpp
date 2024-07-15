@@ -85,7 +85,7 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 	if (nullptr != m_pSolarPanel)
 		m_pSolarPanel->Tick(fTimeDelta);
 
-	switch (m_eDFieldType) //동적필드 타입에 별 움직임 세분화
+	switch (m_eDFieldType) //동적필드 타입 별 움직임 세분화
 	{
 	case DFMOVE_UPDOWN: break;
 	case DFMOVE_LEFTRIGHT: break;

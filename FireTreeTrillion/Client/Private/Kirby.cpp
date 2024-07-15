@@ -798,51 +798,6 @@ void CKirby::Setting_KirbyBalance()
 void CKirby::Key_Input(_float fTimeDelta)
 {
 #pragma region 커비 연구소 (애니메이션 제어)
-
-	//Test
-	if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
-	{
-		m_iTestAnim++;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
-
-	}
-	else if (m_pGameInstance->Get_DIKeyState(DIK_O, KEY_DOWN))
-	{
-		m_iTestAnim--;
-		if (m_iTestAnim < 0)
-			m_iTestAnim = 0;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
-
-	}
-
-	if (m_pGameInstance->Get_DIKeyState(DIK_0, KEY_DOWN))
-	{
-		INFO(m_eBodyState) = BODY_DEFAULT;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
-
-	}
-	else if (m_pGameInstance->Get_DIKeyState(DIK_9, KEY_DOWN))
-	{
-		INFO(m_eBodyState) = BODY_BALLOON;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
-
-	}
-	else if (m_pGameInstance->Get_DIKeyState(DIK_8, KEY_DOWN))
-	{
-		INFO(m_eBodyState) = BODY_VACUUM;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
-	}
-	else if (m_pGameInstance->Get_DIKeyState(DIK_7, KEY_DOWN))
-	{
-		INFO(m_eBodyState) = BODY_CARDEFAULT;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
-	}
-	else if (m_pGameInstance->Get_DIKeyState(DIK_6, KEY_DOWN))
-	{
-		INFO(m_eBodyState) = BODY_CARVACUUM;
-		m_pModelCom[INFO(m_eBodyState)]->Set_Animation(m_iTestAnim, 60.f, true, true);
-	}
-
 	if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
 	{
 		Change_State(BULBVACUUMSTATE_DEFORM, 60.f, false, false, BODY_BULBVACUUM, OFFSET_BULBVACUUM);
@@ -1696,6 +1651,8 @@ void CKirby::Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool 
 
 	if ( INFO(m_eBodyState) == BODY_CARDEFAULT )
 		Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 2.f);
+	else if (INFO(m_eBodyState) == BODY_BULBDEFAULT )
+		Set_BodyCollider(COLLIDER_CYLINDER, 1.5f, 3.f, 1.f);
 	else
 		Set_BodyCollider(COLLIDER_SPHERE, 0.7f, 0.f, 0.6f);
 
@@ -1919,12 +1876,12 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	// 커비가 레벨별로 시작할 때, 바라보는 방향을 정해준다.
 	Kirby_LookInitialize();
 
+	m_fMaxHp = 100.f;
 
 	// 임시로 능력 디폴트 화
 	if (*m_pCurrentLevelID == LEVEL_INTRO)
 	{
 		m_fHp = 100.f; // 기존 사용하던 HP입니다.
-		m_fMaxHp = 100.f;
 		m_eAbilityType = ABILITY_DEFAULT;
 	}
 	else
