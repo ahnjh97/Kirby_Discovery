@@ -1,9 +1,12 @@
 #include "stdafx.h"
 #include "Camera_Main.h"
+
 #include "Kirby.h"
 #include "PartTimerKirby.h"
 #include "FinaleKirby.h"
 #include "FinaleBoss.h"
+
+#include "Simba.h"
 
 #include "EventCenter.h"
 #include "PartTimeHelper.h"
@@ -1333,6 +1336,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 	}
 	break;
+
 	case SEQ_PARTTIMESTART:
 	{
 		//이벤트 호출
@@ -1363,6 +1367,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 	}
 	break;
+
 	case SEQ_LUNCHTIME:
 	{
 		//이벤트 호출
@@ -1385,6 +1390,169 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 	}
 	break;
+
+#pragma region 사자
+	//통 보여주고 줌아웃
+	case SEQ_SIMBA_START:
+	{
+		CAMACTION newAction{};
+		Fill_HardCutSet(newAction, 0.f);
+
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 1.f, 20.4f, -41.f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.1f, .1f, 1.f });
+		newAction.fFOVY = 40.f;
+		m_CamSeq.push_back(newAction);
+
+
+		//
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_LINEAR, 2.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { -1.f, 20.4f, -41.f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { .1f, .1f, 1.f });
+
+		m_CamSeq.push_back(newAction);
+
+		//
+		Fill_InterpolateCutSet(newAction, 2.f, EASE_INOUT_FAST, 1.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, {.3f, 4.6f, -99.4f});
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .05f, 1.f });
+		m_CamSeq.push_back(newAction);
+
+		Fill_InterpolateCutSet(newAction, 3.f, EASE_INOUT, 15.f);
+		m_CamSeq.push_back(newAction);
+
+	}
+	break;
+	//심바 배틀 start
+	case SEQ_SIMBA_BATTLESTART:
+	{
+		CAMACTION newAction{};
+		Fill_HardCutSet(newAction, 0.f);
+
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 11.25f, 6.4f, -41.6f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.64f, .07f, .76f });
+		m_CamSeq.push_back(newAction);
+
+
+		//
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_LINEAR, 2.f);
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.64f, .07f, .76f });
+		newAction.vDir.Normalize();
+
+		newAction.vPos -= newAction.vDir * 2.f;
+		m_CamSeq.push_back(newAction);
+
+		// 망토 잡기
+		Fill_HardCutSet(newAction, 2.f);
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .12f, 1.f });
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { .7f, 9.5f, -53.f });
+		newAction.fFOVY = 30.f;
+		m_CamSeq.push_back(newAction);
+
+		Fill_InterpolateCutSet(newAction, 2.f, EASE_OUT_FAST, .7f);
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .12f, 1.f });
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { .7f, 9.5f, -49.f });
+		m_CamSeq.push_back(newAction);
+
+		// 망토 던지기
+		Fill_InterpolateCutSet(newAction, 2.7f, EASE_INOUT_FAST, .5f);
+
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .12f, 1.f });
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { .7f, 8.3f, -54.3f });
+		newAction.fFOVY = 40.f;
+		m_CamSeq.push_back(newAction);
+
+		Fill_InterpolateCutSet(newAction, 3.2f, EASE_INOUT, 3.f);
+		m_CamSeq.push_back(newAction);
+
+	}
+
+	break;
+	//어깨 뷰
+	case SEQ_SIMBA_SHOULDER:
+	{
+		CAMACTION newAction{};
+		Fill_HardCutSet(newAction, 0.f);
+
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 11.25f, 6.4f, -41.6f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.64f, .07f, .76f });
+		newAction.fFOVY = 30.f;
+		m_CamSeq.push_back(newAction);
+
+		//
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 3.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 12.f, 7.5f, -41.8f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, {-.68f, .14f, .72f });
+		m_CamSeq.push_back(newAction);
+
+		Fill_InterpolateCutSet(newAction, 3.f, EASE_INOUT, 20.f);
+		m_CamSeq.push_back(newAction);
+
+	}
+	break;
+	//어깨 - 통
+	case SEQ_SIMBA_TONG:
+	{
+		CAMACTION newAction{};
+		Fill_HardCutSet(newAction, 0.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 12.f, 7.5f, -41.8f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.68f, .14f, .72f });
+		m_CamSeq.push_back(newAction);
+		newAction.fFOVY = 30.f;
+
+		//
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 3.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 10.21f, 8.9f, -42.f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.41f, .13f, .9f});
+		m_CamSeq.push_back(newAction);
+	}
+	break;
+	//얼굴뷰
+	case SEQ_SIMBA_FRONTVIEW:
+	{
+		CAMACTION newAction{};
+		Fill_HardCutSet(newAction, 0.f);
+
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 0.f, 5.8f, -46.f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .13f, 1.f });
+		newAction.fFOVY = 30.f;
+		m_CamSeq.push_back(newAction);
+
+		//
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 3.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 0.f, 8.6f, -46.f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .13f, 1.f });
+		m_CamSeq.push_back(newAction);
+
+		Fill_InterpolateCutSet(newAction, 3.f, EASE_INOUT, 20.f);
+		m_CamSeq.push_back(newAction);
+	}
+	break;
+	//로우 앵글
+	case SEQ_SIMBA_LOW:
+		{
+			CAMACTION newAction{};
+			Fill_HardCutSet(newAction, 0.f);
+
+			Fill_ActionPos(newAction, POS_ABSOLUTE, { 9.52f, 2.77f, -50.38f });
+			Fill_ActionDir(newAction, DIR_ABSOLUTE, {-.42f, .37f, .83f });
+			newAction.vDir.Normalize();
+			newAction.fFOVY = 30.f;
+			m_CamSeq.push_back(newAction);
+
+			//
+			Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 2.f);
+			newAction.vPos -= newAction.vDir;
+			m_CamSeq.push_back(newAction);
+
+			Fill_InterpolateCutSet(newAction, 2.f, EASE_INOUT, 20.f);
+			m_CamSeq.push_back(newAction);
+		}
+		break;
+
+#pragma endregion
+
+#pragma region 피날레
+
 	case SEQ_FINALESTART:
 	{
 		//이벤트 호출
@@ -1756,8 +1924,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 	}
 	break;
-	//QTE
-	//커비를 왼쪽에서 본다. 원경
+
 	case SEQ_FINALECUT7:
 	{
 		_float fDuration = m_FinaleSeqBTime.front();
@@ -1957,8 +2124,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 	}
 	break;
-	//13 : 맞짱
-	//QTE 끝. 보스가 밀어냄
+
 	case SEQ_FINALECUT14:
 	{
 
@@ -2070,6 +2236,9 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 	}
 	break;
+
+#pragma endregion
+
 	default:
 		break;
 	}
@@ -2098,8 +2267,33 @@ void CCamera_Main::Ready_Cam_DeeDeeDee(CGameObject* pNotifier)
 	Set_Target(pNotifier->Get_TransformCom(), TARGET_SECOND, FOCUS_BOTH);
 }
 
-void CCamera_Main::Ready_Cam_Leongar(CGameObject* pNotifier)
+void CCamera_Main::Ready_Monsters_Leongar(CGameObject* pNotifier)
 {
+	//위에서 보기
+	CAMACTION newAction{};
+	Fill_HardCutSet(newAction, 0.f);
+
+	Fill_ActionPos(newAction, POS_ABSOLUTE, { 1.2f, 14.f, -102.f });
+	Fill_ActionDir(newAction, DIR_ABSOLUTE, {0.f, -.35f, 1.f });
+	Make_One_Sequence(newAction);
+	Set_TargetAnchor({ 0.f, 4.f, 5.f });
+
+	//Make_Sequence(SEQ_SIMBA_BATTLESTART);
+}
+
+void CCamera_Main::Ready_Dialog1_Leongar(CGameObject* pNotifier)
+{
+	Make_Sequence(SEQ_SIMBA_SHOULDER);
+}
+
+void CCamera_Main::Ready_Dialog2_Leongar(CGameObject* pNotifier)
+{
+	Make_Sequence(SEQ_SIMBA_FRONTVIEW);
+}
+
+void CCamera_Main::Ready_Dialog3_Leongar(CGameObject* pNotifier)
+{
+	Make_Sequence(SEQ_SIMBA_LOW);
 }
 
 void CCamera_Main::Ready_Cam_FinalBoss(CGameObject* pNotifier)
@@ -2387,9 +2581,21 @@ void CCamera_Main::Subscribe_Events()
 	func = bind(&CCamera_Main::Ready_Cam_DeeDeeDee, this, placeholders::_1);
 	CEventCenter::Get_Instance()->Subscribe(KEVENT_DDD_BATTLESTART, this, func);
 
-	//디디디 산송장
-	//func = bind(&CCamera_Main::EventFunc, this, placeholders::_1);
-	//CEventCenter::Get_Instance()->Subscribe(KEVENT_DDD_DEAD, this, func, 0);
+
+
+	//사자 컷
+
+	func = bind(&CCamera_Main::Ready_Dialog1_Leongar, this, placeholders::_1);
+	CEventCenter::Get_Instance()->Subscribe(KEVENT_SIMBA_NEXT_DIALOG1, this, func);
+
+	func = bind(&CCamera_Main::Ready_Dialog2_Leongar, this, placeholders::_1);
+	CEventCenter::Get_Instance()->Subscribe(KEVENT_SIMBA_NEXT_DIALOG2, this, func);
+
+	func = bind(&CCamera_Main::Ready_Dialog3_Leongar, this, placeholders::_1);
+	CEventCenter::Get_Instance()->Subscribe(KEVENT_SIMBA_LAST_DIALOG, this, func);
+
+	func = bind(&CCamera_Main::Ready_Monsters_Leongar, this, placeholders::_1);
+	CEventCenter::Get_Instance()->Subscribe(KEVENT_SIMBA_APPEAR_END, this, func);
 
 }
 
