@@ -696,6 +696,64 @@ PS_OUT PS_FOR_STAR(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_FOR_COIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+
+    vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+    float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
+    float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+    float3 vWorldNormal = mul(vNormal, WorldMatrix);
+    
+    float4 vWorldPos = In.vWorldPos;
+    
+    Out.vDiffuse = float4(0.2f, 0.2f, 0.0f, 1.f);
+    Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
+    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
+
+    float4 vLook = float4(g_vCamPosition.xyz, 1.f) - float4(vWorldPos.xyz, 1.f);
+    float vDot = dot(normalize(vLook), normalize(float4(vWorldNormal, 0.f)));
+    
+    vDot = 1.0f - saturate(vDot);
+    
+    vDot = vDot < 0.5 ?
+    2 * vDot * vDot :
+    1 - pow(-2 * vDot + 2, 2) / 3;
+
+    vector vRimLightColor = 0;
+    
+    if (vDot > 0.4)
+        vRimLightColor = float4(0.9f, .9f, 0.6f, 1.f) * vDot;
+    // 밝지 않은 부분
+    else if (vDot <= 0.6)
+        vRimLightColor = lerp(float4(0.6f, 0.2f, 0.15f, 1.f), float4(.9f, .9f, 0.5f, 1.f), pow(vDot, 0.5f));
+        // 밝은 부분
+    //if (vDot > 0.5)
+    //    vRimLightColor = float4(1.f, 0.9f, 0.6f, 1.f) * vDot;
+    //// 밝지 않은 부분
+    //else if (vDot < 0.5)
+    //    vRimLightColor = clamp(vDot, float4(1.f, 0.075f, 0.075f, 1.f), float4(1.f, 0.9, 0.6f, 1.f)) * (1.f - vDot);
+
+
+    Out.vEmissive = saturate(/*vMtrlDiffuse * */vRimLightColor);
+    
+    if (g_bStencil == true)
+        Out.vStencil = vector(1.f, 0.f, 0.0f, 1.f);
+    
+    if (g_bRimLight == true)
+        Out.vRimLight = vector(0.f, m_fRimWidth, 1.f, 1.f);
+
+    if (g_bMotionBlur == true)
+        Out.vMotionBlur = g_vMotionVelocity;
+
+    return Out;
+}
+
 
 technique11 DefaultTechnique
 {
@@ -930,7 +988,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX_CLAMPDIFFUSE();
     }
 
-    // Emissive, Normal O  (16)
+    // Emissive, Normal O  ( 17 )
     pass Emissive_Normal_O
     {
         SetRasterizerState(RS_Default);
@@ -944,7 +1002,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_EMISSIVE_NORMAL_O();
     }
 
-    // Emissive, Normal X  (17)
+    // Emissive, Normal X  ( 18 )
     pass Emissive_Normal_X
     {
         SetRasterizerState(RS_Default);
@@ -957,7 +1015,7 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_EMISSIVE_NORMAL_X();
     }
-    // Star ( 18 )
+    // Star ( 19 )
     pass STAR
     {
         SetRasterizerState(RS_Default);
@@ -969,6 +1027,19 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_FOR_STAR();
+    }
+    // Coin ( 20 )
+    pass COIN
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_FOR_COIN();
     }
 
 }

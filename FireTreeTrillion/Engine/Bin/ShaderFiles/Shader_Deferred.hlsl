@@ -1155,11 +1155,13 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     // 기존 디퓨즈와 가산되어 그려진다.
     Out.vColor += vEffect + vBlur;
     
+    Out.vColor = saturate(Out.vColor);
+    
     //맵툴이 아닐 때.
     if (g_bMapTool == false)
         Out.vColor += g_EmissiveTexture.Sample(ClampSampler, In.vTexcoord);
 
-    
+    Out.vColor = saturate(Out.vColor);
     
     if (g_DeferredInfoTexture.Sample(LinearSampler, In.vTexcoord).g == 1.f && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).r != 1.f)
     {
