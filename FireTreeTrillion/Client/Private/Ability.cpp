@@ -53,6 +53,16 @@ HRESULT CAbility::Initialize(void* pArg)
 		m_fPower = 2.f;
 		m_fSpeed = 3.f;
 		m_fScale = 1.f;
+		m_fRimWidth = 5.f;
+
+		CEffect::FX_DESC FXDesc{};
+
+		FXDesc.vInitPos = { 0.f, 0.f, 0.f };
+		//FXDesc.vInitRot = { 0.f, 0.f, 0.f };
+		FXDesc.vInitScale = { 1.7f, 1.7f, 1.7f };
+		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+		Add_Effect("ItemStar", FXDesc, true);
 
 		m_fAttack = 20.f;
 	}
@@ -60,6 +70,14 @@ HRESULT CAbility::Initialize(void* pArg)
 	{
 		m_fJumpPower = 7.f;
 		m_fPower = 2.f;
+
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = { 0.f, .3f, 0.f };
+		FXDesc.pSocketMatrix = &m_EffectSocket;
+		FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
+			return E_FAIL;
+		Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 	}
 
 	AbilityType(m_eAbilityType);
@@ -73,15 +91,6 @@ HRESULT CAbility::Initialize(void* pArg)
 	CTransform* pTransform = pKirby->Get_TransformCom();
 	m_vLookDir = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
 
-	/*
-	CMultiEffect::MULTI_FX_DESC FXDesc{};
-	FXDesc.vInitPos = { 0.f, .3f, 0.f };
-	FXDesc.pSocketMatrix = &m_EffectSocket;
-	FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
-	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
-		return E_FAIL;
-	Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
-	*/
 	return S_OK;
 }
 
@@ -99,7 +108,6 @@ _int CAbility::Tick(_float fTimeDelta)
 
 		CTransform* pCameraTransform = pCameraMain->Get_TransformCom();
 		_vector vCameraLook = pCameraTransform->Get_State_Vector(CTransform::STATE_LOOK);
-		vCameraLook.m128_f32[1] = 0.f;
 
 		// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
 		if (m_ePhyXState == PO_FLYAWAY)
@@ -239,7 +247,13 @@ void CAbility::Late_Tick(_float fTimeDelta)
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+
+		if (ABILITY_DEFAULT == m_eAbilityType)
+		{
+			Compute_ViewZ();
+			m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+			m_iRenderCount = 1;
+		}
 	}
 }
 
@@ -253,25 +267,53 @@ HRESULT CAbility::Render()
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-	for (size_t i = 0; i < iNumMeshes; i++)
+	if (0 == m_iRenderCount && ABILITY_DEFAULT == m_eAbilityType)
 	{
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
-			return E_FAIL;
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+				return E_FAIL;
 
-		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
-		if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
-			return E_FAIL;
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+			/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+			if (FAILED(m_pShaderCom->Begin(MODEL_STAR)))
+				return E_FAIL;
+			m_pModelCom->Render(i);
+		}
+		m_iRenderCount = 0;
+	}
+	else
+	{
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+				return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_O)))
-			return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+				return E_FAIL;
+			_float fWhiteColorDiffuse = 0.f;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColorDiffuse, sizeof(_float))))
+				return E_FAIL;
 
-		m_pModelCom->Render(i);
+			/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+			if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_O)))
+				return E_FAIL;
+			m_pModelCom->Render(i);
+		}
+		m_iRenderCount = 0;
 	}
 
 	return S_OK;
@@ -473,4 +515,5 @@ void CAbility::Free()
 	__super::Free();
 
 	Safe_Release(m_pModelCom);
+	Delete_Effect("ItemStar");
 }

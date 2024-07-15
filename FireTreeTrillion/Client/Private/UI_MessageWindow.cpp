@@ -281,7 +281,6 @@ void CUI_MessageWindow::Render_IMGUI()
 	case WINDOW_NONE:	default: ImGui::Text(u8"MWINDOW_NONE"); break;
 	}
 }
-
 #endif // DEBUG
 
 void CUI_MessageWindow::Show_DialogMessage()
@@ -497,13 +496,13 @@ HRESULT CUI_MessageWindow::Render_Message()
 		_float2 vTitleScale = m_tMessageDesc.vTitleScale;
 
 		//타이틀 그림자
-		_float2 vOffset[] = { {-2.f, 0.f},
-							{2.f, 0.f},
-							{0.f, -2.f} ,
-							{0.f, 2.f} };
+		_float2 vOffset[] = { {-3.f, 0.f},
+							{3.f, 0.f},
+							{0.f, -3.f} ,
+							{0.f, 3.f} };
 
 		_float4 vTitleShadowRGBA = m_tMessageDesc.vTitleRGBA;
-		_float2 vTitleShadowScale = { 1.01f, 1.01f };
+		_float2 vTitleShadowScale = { 1.0f, 1.0f };
 		for (_uint i = 0; i < 4; ++i)
 		{
 			_float2 vTitleShadowPos = { vTitlePos.x + vOffset[i].x, vTitlePos.y + vOffset[i].y };
