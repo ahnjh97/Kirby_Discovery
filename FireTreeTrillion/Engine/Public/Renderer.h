@@ -267,6 +267,14 @@ private:
 	_float m_fFogViewEnd = { 0.f };
 	_float m_fFogViewIntensity = { 0.f };
 
+	_float3 m_vOceanTopColor = { 0.f, 0.f, 0.f };
+	_float3 m_vOceanBottomColor = { 0.f, 0.f, 0.f };
+	_float m_fOceanTopY = { 0.f };
+	_float m_fOceanBottomY = { 0.f };
+	_float m_fOceanIntensity = { 0.f };
+
+
+
 	_bool  m_bMaptool = { false };
 
 

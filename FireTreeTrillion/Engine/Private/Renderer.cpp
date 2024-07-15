@@ -1822,6 +1822,19 @@ HRESULT CRenderer::Render_FinalResult()
 	if (FAILED(m_pShader->Bind_RawValue("g_fHighlightIntensity", &m_fHighlightIntensity, sizeof(_float))))
 		return E_FAIL;
 
+
+	if (FAILED(m_pShader->Bind_RawValue("g_vOceanTopColor", &m_vOceanTopColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_vOceanBottomColor", &m_vOceanBottomColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fOceanTopY", &m_fOceanTopY, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fOceanBottomY", &m_fOceanBottomY, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fOceanIntensity", &m_fOceanIntensity, sizeof(_float))))
+		return E_FAIL;
+
+
 #pragma endregion
 
 	// 최종 작업물 던지기
