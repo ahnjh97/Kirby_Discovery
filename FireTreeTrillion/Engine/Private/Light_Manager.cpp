@@ -87,21 +87,21 @@ void CLight_Manager::IMGUI_Tick()
 		{
 			// POSITION
 			string strLightPos = "POSITION_" + to_string(iIDX);
-			ImGui::DragFloat3(strLightPos.c_str(), &pLightDesc->vPosition.x, -200.f, 500.f);
+			ImGui::DragFloat3(strLightPos.c_str(), &pLightDesc->vPosition.x, .05f, -200.f, 500.f, "%.2f");
 			// RANGE
 			string strLightRange = "RANGE_" + to_string(iIDX);
-			ImGui::DragFloat(strLightRange.c_str(), &pLightDesc->fRange, 0.f, 200.f);
+			ImGui::DragFloat(strLightRange.c_str(), &pLightDesc->fRange, .05f, 0.f, 200.f, "%.2f");
 		}
 
 		// DIFFUSE
 		string strLightDiffuse = "DIFFUSE_" + to_string(iIDX);
-		ImGui::DragFloat3(strLightDiffuse.c_str(), &pLightDesc->vDiffuse.x, 0.f, 1.f);
+		ImGui::DragFloat3(strLightDiffuse.c_str(), &pLightDesc->vDiffuse.x, .01f, 0.f, 1.f, "%.2f");
 		// AMBIENT
 		string strLightAmbient = "AMBIENT_" + to_string(iIDX);
-		ImGui::DragFloat3(strLightAmbient.c_str(), &pLightDesc->vAmbient.x, 0.f, 1.f);
+		ImGui::DragFloat3(strLightAmbient.c_str(), &pLightDesc->vAmbient.x, .01f, 0.f, 1.f, "%.2f");
 		// SPECULAR
 		string strLightSpecular = "SPECULAR_" + to_string(iIDX);
-		ImGui::DragFloat3(strLightSpecular.c_str(), &pLightDesc->vSpecular.x, 0.f, 1.f);
+		ImGui::DragFloat3(strLightSpecular.c_str(), &pLightDesc->vSpecular.x, .01f, 0.f, 1.f, "%.2f");
 		ImGui::NewLine(); ImGui::Separator();
 
 		++iIDX;

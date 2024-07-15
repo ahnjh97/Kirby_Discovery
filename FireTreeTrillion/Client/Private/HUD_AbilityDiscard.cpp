@@ -43,10 +43,16 @@ HRESULT CHUD_AbilityDiscard::Initialize(void* _pArg)
 	LEVEL eLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
 
 	if (LEVEL_FINALE != *m_pCurrentLevelID)
+	{
 		m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(eLevel, TEXT("Layer_Player")));
+		Safe_AddRef(m_pKirby);
+	}
 	
 	if (LEVEL_FINALE == *m_pCurrentLevelID) //피날레 레벨에 대한 처리. 다만 현재 피날레 레벨은 어빌 덤프타임 정보가 없는 상태
+	{
 		m_pKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(eLevel, TEXT("Layer_Player")));
+		Safe_AddRef(m_pKirby);
+	}
 	
 	m_eCurState = DISCARD_HIDE;
 	m_UIObjDesc.fAlpha = 0.f;
