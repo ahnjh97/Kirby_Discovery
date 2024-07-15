@@ -336,6 +336,11 @@ void CCamera_Main::Check_FinaleTime(_float fTimeDelta)
 
 	if (m_iPreSceneIdx == QTE3 + 1 && m_iCurSceneIdx == QTE3 + 2)
 	{
+		CEffect::FX_DESC FxDesc{};
+		FxDesc.vInitPos = BATTLE_POS + _float3{ 0.f, 0.f, -100.f };
+
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale rect"), &FxDesc)))
+			return;
 
 		Make_Sequence(SEQ_FINALECUT20);
 		return;
@@ -1868,19 +1873,6 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		Fill_InterpolateCutSet(newAction, 2.5f, EASE_INOUT, fDuration - 2.5f);
 		m_CamSeq.push_back(newAction);
 
-
-		/*	newAction.fFOVY = 55.f;
-			Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 2.5f);
-
-			Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - newAction.vDir * 20.f);
-
-			m_CamSeq.push_back(newAction);*/
-
-			/*newAction.eCamPos = POS_ABSOLUTE;
-			newAction.vPos = BOSS_POS + _float3{ -15.f, -4.f, 20.f };
-			m_CamSeq.push_back(newAction);*/
-
-			//
 	}
 	break;
 	//운석 던지기
