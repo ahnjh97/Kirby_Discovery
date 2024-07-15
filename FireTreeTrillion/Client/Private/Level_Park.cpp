@@ -844,7 +844,6 @@ HRESULT CLevel_Park::Ready_Objects()
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 
-#pragma region GIMMICK_OBJECT
 
 		//원더리아 입구
 		if ("FhEntranceAlien_NonAnim" == strModelName)
@@ -856,19 +855,46 @@ HRESULT CLevel_Park::Ready_Objects()
 		//태양광 패널 기믹
 		if ("SolarPanelCharge_NonAnim" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkSolarPanelCharge"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"), TEXT("Prototype_GameObject_Gm_ParkSolarPanelCharge"), &tDesc)))
 				continue;
 		}
 
 		if ("SolarPanelOnce_NonAnim" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"), TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc)))
 				continue;
 		}
 
-#pragma endregion
 	}
 	fileInput.close();
+
+#pragma region SET_GIMMICK_SOLARPANEL
+
+	//기믹 오브젝트를 기준으로, 가장 가까운 거리를 검사하여 다이나믹 필드를 세팅
+	list<CGameObject*>* GimmickList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"));
+	for (auto& Gimmick : *GimmickList)
+	{
+		_float fDistance = { FLT_MAX };
+		CGameObject* pDField = { nullptr };
+
+		list<CGameObject*>* DFieldList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField_Updown"));
+		for (auto& DField : *DFieldList)
+		{
+			//기믹 & 필드 거리 검사
+			_float fNewDistance = m_pGameInstance->Compute_Distance(Gimmick, DField);
+			if (fDistance >= fNewDistance)
+			{
+				fDistance = fNewDistance;
+				pDField = DField;
+			}
+		}
+		CGm_ParkSolarPanelOnce* pGimmickSP = dynamic_cast<CGm_ParkSolarPanelOnce*>(Gimmick);
+		dynamic_cast<CGm_DynamicField*>(pDField)->Set_SolarPanel(pGimmickSP);
+		if (nullptr == pGimmickSP)
+			continue;
+	}
+
+#pragma endregion
 
 	return S_OK;
 }
