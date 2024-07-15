@@ -658,6 +658,9 @@
     <Filter Include="02.GameObjects\UI\QTE">
       <UniqueIdentifier>{1a199e21-3f4e-423d-9db6-532a22d4ecb1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\QTE\Effect">
+      <UniqueIdentifier>{3bff22bc-6326-4ee4-b987-adccf7f44990}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1327,7 +1330,9 @@
     <ClInclude Include="..\public\QTE.h">
       <Filter>02.GameObjects\UI\QTE</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\QTE_Effect.h" />
+    <ClInclude Include="..\Public\QTE_Effect.h">
+      <Filter>02.GameObjects\UI\QTE\Effect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1978,7 +1983,9 @@
     <ClCompile Include="..\private\QTE.cpp">
       <Filter>02.GameObjects\UI\QTE</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\QTE_Effect.cpp" />
+    <ClCompile Include="..\Private\QTE_Effect.cpp">
+      <Filter>02.GameObjects\UI\QTE\Effect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

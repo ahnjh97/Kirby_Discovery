@@ -34,9 +34,6 @@ private:
 	HRESULT						Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex);
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
 
-	void						Update_UIState(_float _fTimeDelta);
-	void						Play_Animation(_float _fAccTime, KIRBYHP_STATE _eCurState);
-
 	void						Compute_Player_Hp(_float fTimeDelta, _float _fKirbyHpMax, _float _fKirbyHp);
 	void						Disappear_HpBar(_float fTimeDelta);
 
@@ -44,7 +41,7 @@ private:
 	_bool							m_IsMovingUP = { TRUE };
 	_bool							m_IsKirbyExistence = { FALSE };
 
-	KIRBYHP_STATE					m_ePreState = { KIRBYHP_NONE };
+	class CCharacter*				m_pKirby = { nullptr };
 	KIRBYHP_STATE					m_eCurState = { KIRBYHP_NONE };
 
 	// 마스킹을 위한 텍스쳐

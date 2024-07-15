@@ -194,13 +194,12 @@ void CUI_MessageWindow::Late_Tick(_float fTimeDelta)
 
 HRESULT CUI_MessageWindow::Render()
 {
-	HRESULT hr;
-
-#pragma region RENDER_BINDSET
-
 	if (WINDOW_HIDE == m_eCurState && 0.f == m_UIObjDesc.fAlpha)
 		return S_OK;
 
+#pragma region RENDER_BINDSET
+
+	HRESULT hr;
 	for (_uint iTEXIx = 0; iTEXIx < TEXMW_NONE; ++iTEXIx)
 	{
 		TEX_MWTYPE eTexType = { TYPE_DEFAULT };
@@ -260,7 +259,6 @@ HRESULT CUI_MessageWindow::Render()
 	}
 
 #pragma endregion
-
 	
 	//버튼 렌더링
 	m_pUIBtn->Render();
@@ -433,8 +431,8 @@ HRESULT CUI_MessageWindow::Render_Message()
 							{0.f, -3.f} ,
 							{0.f, 3.f} };
 
-		_float4 vMessageShadowRGBA = { 0.05f, 0.05f, 0.05f, 0.05f };
-		_float2 vMessageShadowScale = { 1.01f, 1.01f };
+		_float4 vMessageShadowRGBA = { 0.1f, 0.1f, 0.1f, 0.1f };
+		_float2 vMessageShadowScale = { 1.0f, 1.0f };
 
 		// 스크립트 그림자
 		wstring& wstrSubstrMessage = wstrMsg.substr(0, m_iCurCharIndex);

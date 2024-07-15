@@ -498,8 +498,8 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 		else if (m_fCurTime <= fLunchTime && m_bLunchTimeTrigger) // 타임이 20일 때, 점심시간 시작.
 		{
 			// 모두 다 멈 춰!
-			m_pGameInstance->Set_FirstTimerRatio(0.f);
-			m_pGameInstance->Set_SecondTimerRatio(0.f);
+			//m_pGameInstance->Set_FirstTimerRatio(0.f);
+			//m_pGameInstance->Set_SecondTimerRatio(0.f);
 
 			// 점심시간 슈우우웅 이동되는거 // 효선아 여기야
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
