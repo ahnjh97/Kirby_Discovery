@@ -40,7 +40,6 @@ HRESULT CHUD_AbilityDiscard::Initialize(void* _pArg)
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
-	//m_eTexState = DISCARD_IDLE;
 	LEVEL eLevel = (LEVEL)*m_pGameInstance->Get_CurrentLevelID();
 
 	if (LEVEL_FINALE != *m_pCurrentLevelID)
@@ -54,6 +53,8 @@ HRESULT CHUD_AbilityDiscard::Initialize(void* _pArg)
 		m_pKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(eLevel, TEXT("Layer_Player")));
 		Safe_AddRef(m_pKirby);
 	}
+
+	m_eCurState = DISCARD_HIDE;
 
 	return S_OK;
 }
@@ -88,6 +89,9 @@ void CHUD_AbilityDiscard::Late_Tick(_float fTimeDelta)
 
 HRESULT CHUD_AbilityDiscard::Render()
 {
+	if (DISCARD_HIDE == m_eCurState && 0.f == m_UIObjDesc.fAlpha)
+		return S_OK;
+
 	HRESULT hr;
 
 	//For.Mask
@@ -122,6 +126,20 @@ HRESULT CHUD_AbilityDiscard::Render()
 
 	return S_OK;
 }
+
+#ifdef DEBUG
+void CHUD_AbilityDiscard::Render_IMGUI()
+{
+	switch (m_eCurState)
+	{
+	case DISCARD_IDLE:			ImGui::Text(u8"DISCARD_IDLE"); break;
+	case DISCARD_HIDE:		ImGui::Text(u8"DISCARD_HIDE"); break;
+	case DISCARD_SHOW:		ImGui::Text(u8"DISCARD_SHOW"); break;
+	case DISCARD_NONE:	default: ImGui::Text(u8"DISCARD_NONE"); break;
+	}
+}
+
+#endif // DEBUG
 
 void CHUD_AbilityDiscard::ChaseUI_To_Player()
 {
@@ -163,6 +181,7 @@ _bool CHUD_AbilityDiscard::Key_InputSystem(_float fTimeDelta)
 	//이는 덤프시간 MAX치 오버될 경우 (value >= 1.f)와 이어지며, 값이 1로 넘어가자마자 0으로 변경됨
 	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS) && m_fDumpAbilityTime > 0.f)
 	{
+		m_eCurState = DISCARD_SHOW;
 		m_UIObjDesc.fAlpha += fTimeDelta * 5.f;
 
 		if (m_UIObjDesc.fAlpha > 1.f)
@@ -170,6 +189,7 @@ _bool CHUD_AbilityDiscard::Key_InputSystem(_float fTimeDelta)
 	}
 	else if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS) == false || m_fDumpAbilityTime <= 0.f)
 	{
+		m_eCurState = DISCARD_HIDE;
 		m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;
 
 		if (m_UIObjDesc.fAlpha < 0.f) //시간 경과할 경우 idle 상태로 변경

@@ -59,6 +59,7 @@ HRESULT CLevel_Park::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Objects();
 	CHECK_FAILED(hr);
+
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
 
@@ -78,11 +79,11 @@ HRESULT CLevel_Park::Initialize()
 	m_pGameInstance->Set_ColorSet_ByIndex(6);
 
 	// PARK 도착했으면 오픈해주세요
-	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
-	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
-	pTransingStar->Set_LargeColor(_float3(95.f / 255.f, 28.f / 255.f, 128.f / 255.f));
-	pTransingStar->Set_SmallColor(_float3(167.f / 255.f, 42.f / 255.f, 168.f / 255.f));
-	pTransingStar->Activate(CTransingStar::OPEN);
+	//CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
+	//CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
+	//pTransingStar->Set_LargeColor(_float3(95.f / 255.f, 28.f / 255.f, 128.f / 255.f));
+	//pTransingStar->Set_SmallColor(_float3(167.f / 255.f, 42.f / 255.f, 168.f / 255.f));
+	//pTransingStar->Activate(CTransingStar::OPEN);
 
 	// 플레이어 이동 트리거
 	function<void(_int)> func = bind(&CLevel_Park::Teleport_Player, this);
@@ -156,7 +157,8 @@ HRESULT CLevel_Park::Ready_Layer_Camera(const wstring& strLayerTag)
 {
 
 	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
-	MainCamDesc.fFovy = XMConvertToRadians(38.0f);
+	//MainCamDesc.fFovy = XMConvertToRadians(38.0f);
+	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
 	MainCamDesc.fNear = 0.1f;
 	MainCamDesc.fFar = 1000.0f;
@@ -853,8 +855,6 @@ HRESULT CLevel_Park::Ready_Objects()
 				continue;
 		}
 
-
-
 #pragma endregion
 	}
 	fileInput.close();
@@ -864,6 +864,101 @@ HRESULT CLevel_Park::Ready_Objects()
 
 HRESULT CLevel_Park::Ready_UI()
 {
+
+#pragma region PARSING HUD_KIRBYHP, STARPOINT
+	
+	vector<string> vecUITag = { "HUD_KirbyStatus", "HUD_StarPoint" };
+
+	string strFileBase = { "../../../UI_txt/" };
+	string strFileExt = { "_Orig.txt" };
+
+	for (const auto& strUITag : vecUITag)
+	{
+		string strFilePath = strFileBase + strUITag.c_str() + strFileExt;
+		std::ifstream InputFile(strFilePath, ios::in | std::ios::binary);
+
+		if (!InputFile.is_open()) //==FALSE 
+		{
+			MSG_BOX(TEXT("Failed to Open : FileData"));
+			ALARM_FAIL(TEXT("Failed to Open : FileData"));
+			return E_FAIL;
+		}
+
+		size_t size = 0;
+		InputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+
+		for (size_t i = 0; i < size; ++i)
+		{
+			string strProtoTag = {};
+			_uint iProtoTagLen = {};
+			InputFile.read(reinterpret_cast<char*>(&iProtoTagLen), sizeof(iProtoTagLen));
+			strProtoTag.resize(iProtoTagLen);
+			InputFile.read(&strProtoTag[0], iProtoTagLen);
+
+			if (0 == strProtoTag.size())
+				return E_FAIL;
+
+			CUIObject::UIOBJ_DESC LayerUIDesc{};
+			string strUITag = {};
+			_uint iUITagLen = {};
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.eUIType), sizeof(LayerUIDesc.eUIType));
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.eUIProj), sizeof(LayerUIDesc.eUIProj));
+
+			InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
+			strUITag.resize(iUITagLen);
+			InputFile.read(&strUITag[0], iUITagLen);
+			LayerUIDesc.wstrUITag = CUtils::StrToWstr(strUITag);
+
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vCenter), sizeof(LayerUIDesc.vCenter));
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vSize), sizeof(LayerUIDesc.vSize));
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vPos), sizeof(LayerUIDesc.vPos));
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vDegree), sizeof(LayerUIDesc.vDegree));
+
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.iTexIndex), sizeof(LayerUIDesc.iTexIndex));
+
+			string strText = {};
+			_uint iUIextLen = {};
+			InputFile.read(reinterpret_cast<char*>(&iUIextLen), sizeof(iUIextLen));
+			strText.resize(iUIextLen);
+			InputFile.read(&strText[0], iUIextLen);
+			LayerUIDesc.wstrText = CUtils::StrToWstr(strText);
+
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vColorRGB), sizeof(LayerUIDesc.vColorRGB));
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.fAlpha), sizeof(LayerUIDesc.fAlpha));
+
+			//파일 경로명으로 prototag를 받아 생성하는 방식
+			size_t strFileFrontPos = strFilePath.find("txt/");
+			if (strFileFrontPos != string::npos)
+				strUITag = strFilePath.substr(strFileFrontPos + 4);
+
+			//Prototype_GameObject_
+			size_t strFileBackPos = strUITag.find("_Orig");
+			if (strFileBackPos != string::npos)
+				strUITag = strUITag.substr(0, strFileBackPos);
+
+			size_t strProtoPos = strProtoTag.find("t_"); //찾을 문자열 위치
+			if (strProtoPos != string::npos)
+			{
+				strProtoTag = strProtoTag.substr(0, strProtoPos + 2); //해당 문자열 이후만 남김
+				strProtoTag += strUITag;
+			}
+
+			wstring wstrLayerTag = {};
+			if ("HUD_KirbyStatus" == strUITag)
+				wstrLayerTag = TEXT("Layer_UI_HUD_KirbyHP");
+
+			if ("HUD_StarPoint" == strUITag)
+				wstrLayerTag = TEXT("Layer_UI_HUD_StarPoint");
+
+			HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
+			CHECK_FAILED(hr);
+		}
+
+		continue;
+	}
+
+#pragma endregion
+
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
