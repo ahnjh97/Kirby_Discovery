@@ -273,7 +273,7 @@ private:
 	_float m_fOceanBottomY = { 0.f };
 	_float m_fOceanIntensity = { 0.f };
 
-
+	_float m_fObjectBlack = { 1.f };
 
 	_bool  m_bMaptool = { false };
 

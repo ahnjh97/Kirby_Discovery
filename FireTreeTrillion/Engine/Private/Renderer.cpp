@@ -650,6 +650,8 @@ void CRenderer::Key_Input()
 	if (m_pGameInstance->Get_DIKeyState(DIK_F2, KEY_DOWN))
 		m_IsRenderHitBox = !m_IsRenderHitBox;
 #endif
+	if (m_pGameInstance->Get_DIKeyState(DIK_F3, KEY_DOWN))
+		m_fObjectBlack = m_fObjectBlack == 1.f ? 0.f : 1.f;
 
 	if (m_pGameInstance->Get_KeyState(DIK_F5, KEY_DOWN))
 	{
@@ -1465,6 +1467,8 @@ HRESULT CRenderer::Render_Result()
 	if (FAILED(m_pShader->Bind_RawValue("g_fFogViewIntensity", &m_fFogViewIntensity, sizeof(_float))))
 		return E_FAIL;
 
+	if (FAILED(m_pShader->Bind_RawValue("g_fObjectBlack", &m_fObjectBlack, sizeof(_float))))
+		return E_FAIL;
 
 	// 섞을 스카이 박스
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Sky"), "g_SkyTexture")))

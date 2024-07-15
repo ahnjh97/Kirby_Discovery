@@ -182,6 +182,9 @@ float g_fOceanTopY = { 0.f };
 float g_fOceanBottomY;
 float g_fOceanIntensity = { 0.f };
 
+// Dark
+float g_fObjectBlack = { 1.f };
+
 
 float3 FOGY(float fWorldY, float4 vColor, float3 vFogColor, float fFogBottomY, float fFogTopY, float fintensity)
 {
@@ -1154,6 +1157,8 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     }
     
     
+    
+    Out.vColor *= g_fObjectBlack;
     /////////
     
         
@@ -1213,15 +1218,13 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
         Out.vColor *= g_fBlackBackGround;
     }
     
+    // For Fog
+    //float4 vFogBeforeColor = saturate(Out.vColor);
+    //vFogBeforeColor.rgb = Ocean(vWorldPos.y, vFogBeforeColor.rgb, g_vOceanTopColor, g_vOceanBottomColor, g_fOceanTopY, g_fOceanBottomY, g_fOceanIntensity);
+    //float3 vFogY = FOGY(vWorldPos.y, vFogBeforeColor, g_vFogYColor, g_fFogYBottom, g_fFogYTopY, g_fFogYIntensity);
+    //float3 vFogView = FOGViewZ(fViewZ, vFogBeforeColor, g_vFogViewColor, g_fFogViewStart, g_fFogViewEnd, g_fFogViewIntensity);
+    //Out.vColor.rgb = saturate((vFogY + vFogView) / 2);
     
-    float4 vFogBeforeColor = saturate(Out.vColor);
-    
-    vFogBeforeColor.rgb = Ocean(vWorldPos.y, vFogBeforeColor.rgb, g_vOceanTopColor, g_vOceanBottomColor, g_fOceanTopY, g_fOceanBottomY, g_fOceanIntensity);
-    //vFogBeforeColor.rgb = Ocean(vWorldPos.y, vFogBeforeColor.rgb, float3(0.f, 0.8, 0.7), float3(0.f, 0.3f, 0.4f), 16.2, 0, 1.f);
-
-    float3 vFogY = FOGY(vWorldPos.y, vFogBeforeColor, g_vFogYColor, g_fFogYBottom, g_fFogYTopY, g_fFogYIntensity);
-    float3 vFogView = FOGViewZ(fViewZ, vFogBeforeColor, g_vFogViewColor, g_fFogViewStart, g_fFogViewEnd, g_fFogViewIntensity);
-    Out.vColor.rgb = saturate((vFogY + vFogView) / 2);
     return Out;
 }
 
