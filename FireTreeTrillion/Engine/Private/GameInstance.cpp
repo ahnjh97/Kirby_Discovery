@@ -153,16 +153,17 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 
 #endif	
 
+}
+
+void CGameInstance::LateTick_Engine(_float fTimeDelta)
+{
 	if (m_pNewLevel)
 	{
 		HRESULT hr = Open_Level(m_NewLevelID, m_pNewLevel);
 		CHECK_FAILED(hr);
 		m_pNewLevel = nullptr;
 	}
-}
 
-void CGameInstance::LateTick_Engine(_float fTimeDelta)
-{
 	m_pObject_Manager->Late_Tick(fTimeDelta);
 }
 

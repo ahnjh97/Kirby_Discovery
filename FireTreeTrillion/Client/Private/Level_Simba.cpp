@@ -749,6 +749,8 @@ HRESULT CLevel_Simba::Ready_Objects()
 
 HRESULT CLevel_Simba::Ready_UI()
 {
+	HRESULT hr = S_OK;
+
 #pragma region PARSING HUD_KIRBYHP, STARPOINT
 
 	vector<string> vecUITag = { "HUD_KirbyStatus", "HUD_StarPoint" };
@@ -834,7 +836,7 @@ HRESULT CLevel_Simba::Ready_UI()
 			if ("HUD_StarPoint" == strUITag)
 				wstrLayerTag = TEXT("Layer_UI_HUD_StarPoint");
 
-			HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
+			hr = m_pGameInstance->Add_Clone(m_iLevel, wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
 			CHECK_FAILED(hr);
 		}
 
@@ -849,7 +851,7 @@ HRESULT CLevel_Simba::Ready_UI()
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
 	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
 
-	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
 	
 	//다이얼로그 
 	CDialog::DIALOG_DESC tDialogDesc{};

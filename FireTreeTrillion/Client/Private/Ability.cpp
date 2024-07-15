@@ -6,6 +6,8 @@
 #include "MultiEffect.h"
 #include "Camera_Main.h"
 
+#include "Light.h"
+
 CAbility::CAbility(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CItemObject{ pDevice, pContext }
 {
@@ -53,11 +55,46 @@ HRESULT CAbility::Initialize(void* pArg)
 		m_fPower = 2.f;
 		m_fSpeed = 3.f;
 		m_fScale = 1.f;
+		m_fRimWidth = 5.f;
+
+		CEffect::FX_DESC FXDesc{};
+
+		FXDesc.vInitPos = { 0.f, 0.f, 0.f };
+		//FXDesc.vInitRot = { 0.f, 0.f, 0.f };
+		FXDesc.vInitScale = { 1.7f, 1.7f, 1.7f };
+		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+		Add_Effect("ItemStar", FXDesc, true);
+
+
+
+
+		LIGHT_DESC			LightDesc{};
+		LightDesc.eType = LIGHT_DESC::TYPE_POINT;
+		LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + m_pTransformCom->Get_State(CTransform::STATE_UP) * 0.5f;
+		LightDesc.fRange = 4.f;
+		LightDesc.vDiffuse = _float4(0.97f, 0.96f, 0.4f, 1.f);
+		LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
+		LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
+		if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+			return E_FAIL;
+		m_pStarLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
+		Safe_AddRef(m_pStarLight);
+
+		m_fAttack = 20.f;
 	}
 	else
 	{
 		m_fJumpPower = 7.f;
 		m_fPower = 2.f;
+
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = { 0.f, .3f, 0.f };
+		FXDesc.pSocketMatrix = &m_EffectSocket;
+		FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
+			return E_FAIL;
+		Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 	}
 
 	AbilityType(m_eAbilityType);
@@ -71,15 +108,6 @@ HRESULT CAbility::Initialize(void* pArg)
 	CTransform* pTransform = pKirby->Get_TransformCom();
 	m_vLookDir = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
 
-	/*
-	CMultiEffect::MULTI_FX_DESC FXDesc{};
-	FXDesc.vInitPos = { 0.f, .3f, 0.f };
-	FXDesc.pSocketMatrix = &m_EffectSocket;
-	FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
-	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
-		return E_FAIL;
-	Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
-	*/
 	return S_OK;
 }
 
@@ -97,11 +125,14 @@ _int CAbility::Tick(_float fTimeDelta)
 
 		CTransform* pCameraTransform = pCameraMain->Get_TransformCom();
 		_vector vCameraLook = pCameraTransform->Get_State_Vector(CTransform::STATE_LOOK);
-		vCameraLook.m128_f32[1] = 0.f;
+
+		m_pStarLight->Update_LightPos(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + m_pTransformCom->Get_State(CTransform::STATE_UP) * 0.5f);
 
 		// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
 		if (m_ePhyXState == PO_FLYAWAY)
 		{
+			m_pStarLight->Interpolate_Light(_float4(0.97f, 0.96f, 0.4f, 1.f), 7.f, 0.1f);
+
 			_float3 vDamegeDir = m_vDamegeDir;
 			_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vDamegeDir * m_fTimeDelta * 30.f);
@@ -109,15 +140,36 @@ _int CAbility::Tick(_float fTimeDelta)
 			m_fFlyTime += m_fTimeDelta;
 
 			if (RayCast_Terrain(XMVector3Normalize(vDamegeDir)) == true)
+			{
 				m_bDead = true;
-
-			if (m_fFlyTime > 2.f)
+				m_pStarLight->Set_DeadLight(true);
+				Safe_Release(m_pStarLight);
+				m_pStarLight = nullptr;
+			}
+			else if (m_fFlyTime > 2.f)
+			{
 				m_bDead = true;
+				m_pStarLight->Set_DeadLight(true);
+				Safe_Release(m_pStarLight);
+				m_pStarLight = nullptr;
+			}
 		}
 		else if (m_ePhyXState == PO_FLYDEADAWAY)
+		{
 			m_bDead = true;
+			m_pStarLight->Set_DeadLight(true);
+			Safe_Release(m_pStarLight);
+			m_pStarLight = nullptr;
+		}
 		else if (m_ePhyXState == PO_KIRBYMOUTH)
+		{
 			Delete_AllEffect();
+			m_pStarLight->Interpolate_Light(_float4(0.97f, 0.96f, 0.4f, 1.f), 0.01f, 0.1f);
+		}
+		else if (m_ePhyXState == PO_VACUUMING)
+		{
+
+		}
 		else
 		{
 			_vector		vLook = vCameraLook;
@@ -149,6 +201,8 @@ _int CAbility::Tick(_float fTimeDelta)
 				}
 				else
 				{
+					m_pStarLight->Interpolate_Light(_float4(0.97f, 0.96f, 0.4f, 1.f), 0.01f, 0.25f);
+
 					m_fLifeTime += m_fTimeDelta;
 					if (0.2f > m_fLifeTime)
 					{
@@ -156,7 +210,12 @@ _int CAbility::Tick(_float fTimeDelta)
 						m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 					}
 					else
+					{
 						m_bDead = true;
+						m_pStarLight->Set_DeadLight(true);
+						Safe_Release(m_pStarLight);
+						m_pStarLight = nullptr;
+					}
 				}
 			}
 			m_fJumpPower -= GRAVITY * m_fTimeDelta * m_fPower;
@@ -237,7 +296,13 @@ void CAbility::Late_Tick(_float fTimeDelta)
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+
+		if (ABILITY_DEFAULT == m_eAbilityType)
+		{
+			Compute_ViewZ();
+			m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+			m_iRenderCount = 1;
+		}
 	}
 }
 
@@ -251,25 +316,53 @@ HRESULT CAbility::Render()
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-	for (size_t i = 0; i < iNumMeshes; i++)
+	if (0 == m_iRenderCount && ABILITY_DEFAULT == m_eAbilityType)
 	{
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
-			return E_FAIL;
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+				return E_FAIL;
 
-		m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool));
-		m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool));
-		if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
-			return E_FAIL;
-		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool));
+			/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+			if (FAILED(m_pShaderCom->Begin(MODEL_STAR)))
+				return E_FAIL;
+			m_pModelCom->Render(i);
+		}
+		m_iRenderCount = 0;
+	}
+	else
+	{
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+				return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_O)))
-			return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+				return E_FAIL;
+			_float fWhiteColorDiffuse = 0.f;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColorDiffuse, sizeof(_float))))
+				return E_FAIL;
 
-		m_pModelCom->Render(i);
+			/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+			if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_O)))
+				return E_FAIL;
+			m_pModelCom->Render(i);
+		}
+		m_iRenderCount = 0;
 	}
 
 	return S_OK;
@@ -327,7 +420,7 @@ HRESULT CAbility::Add_Components()
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
 	if(ABILITY_DEFAULT == m_eAbilityType)
-		HitBox.pCollisionType = BATTLEDEE;
+		HitBox.pCollisionType = OBJECT;
 	else
 		HitBox.pCollisionType = ABILITYITEM;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
@@ -471,4 +564,6 @@ void CAbility::Free()
 	__super::Free();
 
 	Safe_Release(m_pModelCom);
+	Safe_Release(m_pStarLight);
+	Delete_Effect("ItemStar");
 }

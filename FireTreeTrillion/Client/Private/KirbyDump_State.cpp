@@ -204,7 +204,7 @@ void ToCut_Reset_Kirby(CTransform* pTransformCom, CCharacterController* pControl
 }
 void QTE_End()
 {
-	if ( nullptr == GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_QTE")))
+	if (nullptr == GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_QTE")))
 		return;
 
 	for (auto& pQTE : *GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_QTE")))
@@ -233,11 +233,9 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
-	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
-
 	m_fParticalDelay += fTimeDelta;
 
-	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f || (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN)))
+	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1570.f || (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN)))
 	{
 		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
 		ToCut_Reset_Kirby(pTransformCom, pController);
@@ -317,6 +315,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
 	pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 
+	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), 1.5f);
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 	{
@@ -375,15 +374,16 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 			_float fScale = CUtils::Make_RandomFloat(1.5f, 3.f);
 			fxDesc.vInitScale = { fScale, fScale, fScale };
-			pKirby->Add_Effect("dump dash smoke", fxDesc);
-
+			//pKirby->Add_Effect("dump dash smoke", fxDesc);
+			pKirby->Add_Effect("real dump smoke test", fxDesc);
 			fxDesc.vInitPos = vCenterPos;
 			fxDesc.vInitPos -= (_float3)pTransformCom->Get_State(CTransform::STATE_RIGHT) * (2.3f + CUtils::Make_RandomFloat(-.2f, .2f));
 			fxDesc.vInitPos += (_float3)pTransformCom->Get_State(CTransform::STATE_UP) * 7.2f;
 
 			fScale = CUtils::Make_RandomFloat(1.5f, 3.f);
 			fxDesc.vInitScale = { fScale, fScale, fScale };
-			pKirby->Add_Effect("dump dash smoke", fxDesc);
+			//pKirby->Add_Effect("dump dash smoke", fxDesc);
+			pKirby->Add_Effect("real dump smoke test", fxDesc);
 			fBoostTime = 0.f;
 		}
 	}
@@ -428,7 +428,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
 
-	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1550.f || (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN)))
+	if (pTransformCom->Get_State(CTransform::STATE_POSITION).x > 1570.f || (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN)))
 	{
 		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
 		ToCut_Reset_Kirby(pTransformCom, pController);
@@ -522,7 +522,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		m_fFallTime += fTimeDelta;
 
 		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
-		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta);
+		pController->Jump(pTransformCom, DESC(m_fJumpVelocity), fTimeDelta, 1.5f);
 
 		if (pController->Is_Terrain())
 		{
@@ -547,7 +547,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPSTATE_LANDING)
 	{
-		pController->FreeFall(pTransformCom, fTimeDelta);
+		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), 1.5f);
 
 		if (pKirby->isAnimFinish())
 		{
@@ -713,8 +713,10 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 			MultiFXDesc.vInitPos = vMyPos;
 			MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_dump smoke"), &MultiFXDesc)))
-				return;
+			pKirby->Add_Effect("real dump smoke test", MultiFXDesc);
+
+			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_dump smoke"), &MultiFXDesc)))
+			//	return;
 		}
 
 		if (m_fRunTime > 1.7f && m_fRunTime < 1.8f)
@@ -780,14 +782,20 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	_int iAnimIndex = pCenter->Get_CutScene();
 
 
+
 	if (iAnimIndex == 1)
 	{
 		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT1, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
-		
-		//CEffect::FX_DESC FXDesc{};
-		//FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 
-		//pKirby->Add_Effect("Come On Dash", FXDesc, true);
+		if (m_bShakeTrigger1)
+		{
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+			pKirby->Add_Effect("Come On Dash", FXDesc, true);
+			m_bShakeTrigger1 = false;
+		}
+
 	}
 	else if (iAnimIndex == 2)
 		pKirby->Change_State(CFinaleKirby::DUMPCUTSTATE_CUT2, 50.f, false, false, CFinaleKirby::BODY_DUMPCUT, CFinaleKirby::OFFSET_DUMPCUT);
@@ -945,14 +953,14 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if (2170.f < pKirby->m_vBonePos.x)
 			{
-				m_pGameInstance->Set_FirstTimerRatio(.06f);
-				m_pGameInstance->Set_SecondTimerRatio(.06f);
+				m_pGameInstance->Set_FirstTimerRatio(.04f);
+				m_pGameInstance->Set_SecondTimerRatio(.04f);
 
 				m_iQTECnt++;
 				CCamera_Main* pCameraMain = static_cast<CCamera_Main*>
 					(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 				CHECK_NULLPTR(pCameraMain);
-				pCameraMain->Set_FOVY(45.f);	
+				pCameraMain->Set_FOVY(45.f);
 				CQTE::QTEDESC QTEdesc = {};
 				QTEdesc.eType = CQTE::QTE_B;
 				QTEdesc.vOffSet = _float3(0.f, 7.f, 0.f);
@@ -1000,8 +1008,8 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if (2333.f < pKirby->m_vBonePos.x)
 			{
-				m_pGameInstance->Set_FirstTimerRatio(.06f);
-				m_pGameInstance->Set_SecondTimerRatio(.06f);
+				m_pGameInstance->Set_FirstTimerRatio(.04f);
+				m_pGameInstance->Set_SecondTimerRatio(.04f);
 
 				CCamera_Main* pCameraMain = static_cast<CCamera_Main*>
 					(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
@@ -1154,12 +1162,12 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 
 
-		m_fQTERatio -= fTimeDelta * 16.f;
+		m_fQTERatio -= fTimeDelta * 10.f;
 
 		if (m_fQTERatio < 0.f)
 			m_fQTERatio = 0.f;
 
-		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) == true || 
+		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) == true ||
 			m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_DOWN) == true ||
 			m_pGameInstance->Get_DIKeyState(DIK_DOWN, KEY_DOWN) == true ||
 			m_pGameInstance->Get_DIKeyState(DIK_RIGHT, KEY_DOWN) == true ||
@@ -1254,7 +1262,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		}
 
 
-		m_fQTERatio -= fTimeDelta * 16.f;
+		m_fQTERatio -= fTimeDelta * 13.f;
 
 		if (m_fQTERatio < 0.f)
 			m_fQTERatio = 0.f;

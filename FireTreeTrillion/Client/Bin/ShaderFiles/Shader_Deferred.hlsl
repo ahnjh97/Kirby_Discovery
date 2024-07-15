@@ -1068,7 +1068,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
             if (g_bDeepShadow == false)
                 Out.vColor *= 0.5f + clamp((vPosition.w - (vLightDepthDesc.x * 2000.f)) * 0.05f, 0.f, 0.5f);
             else
-                Out.vColor *= 0.3f + clamp((vPosition.w - (vLightDepthDesc.x * 2000.f)) * 0.1f, 0.f, 0.5f);
+                Out.vColor *= 0.1f + clamp((vPosition.w - (vLightDepthDesc.x * 2000.f)) * 0.1f, 0.f, 0.5f);
         }
     }
 

@@ -207,7 +207,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		vPos.m128_f32[1] -= 0.5f;
 		m_vecMagneticDebris[0]->Set_ParticleEffect(XMVectorSetW(vPos, 1.f), 2.5f);
 
-		for (_uint i = 0; i < 2; ++i)
+		for (_uint i = 0; i < 3; ++i)
 		{
 			// 파편 파티클 튀는거 
 			if (m_vecDebris.size() > m_iDebrsiMaxCnt)
@@ -220,7 +220,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 
 			// 파편 파티클 살리기
 			for (m_iDebrisCnt; m_iDebrisCnt < m_iDebrsiMaxCnt; ++m_iDebrisCnt)
-				m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vPos, 1.f, _float2(5.f, 10.f));
+				m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vPos, 1.f, _float2(5.f, 15.f), _float2(3.f, 5.f));
 		}
 	}
 

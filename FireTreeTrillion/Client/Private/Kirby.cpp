@@ -1902,7 +1902,7 @@ HRESULT CKirby::Kirby_SystemInitialize()
 		else if (LEVEL_TOWN == eLEVEL && LEVEL_TOWN == *m_pCurrentLevelID)
 		{
 			_float3 vNewPos = tLevelData.vLastPos;
-			m_pControllerCom->Set_Position(m_pTransformCom, _float4{ vNewPos.x, vNewPos.y, vNewPos.z, 1.f });
+			//m_pControllerCom->Set_Position(m_pTransformCom, _float4{ vNewPos.x, vNewPos.y, vNewPos.z, 1.f });
 		}
 		else
 		{

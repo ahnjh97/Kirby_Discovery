@@ -153,6 +153,11 @@ _int CMeteor::Tick(_float fTimeDelta)
 
 	_float fRatio = m_fRunTime / m_fDelayTime * 0.7f;
 
+	if(true == m_bBig)
+	{
+		if (1.f < fRatio)
+			fRatio = 1.f;
+	}
 	m_pTransformCom->Set_Scaled(1.f * fRatio, 1.f * fRatio, 1.f * fRatio);
 
 	if (m_fDelayTime < m_fRunTime)

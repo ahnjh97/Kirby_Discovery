@@ -64,6 +64,7 @@ private:
 	_bool					m_bTurn = { false };
 
 	_uint					m_iDeathCount = { 0 };
+	_uint					m_iRenderCount = { 0 };
 
 	_float					m_fJumpPower = { 0.f };
 	_float					m_fJumpPowerTemp = { 0.f };
@@ -81,6 +82,7 @@ private:
 
 	wstring					m_strComponentTag = { L"" };
 
+	class CLight*			m_pStarLight = { nullptr };
 public:
 	static CAbility* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

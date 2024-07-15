@@ -246,7 +246,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_CamTriggerUpOffsets.reserve(LEVEL_END);
 	m_CamTriggerUpOffsets.resize(LEVEL_END);
 	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f };
-	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, .4f , .4f , .5f , 0.2f , 0.2f, 0.f };
+	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f , .4f , .5f , 0.2f , 0.2f, 0.f };
 
 
 	//º° ÀÌÆåÆ® Å×½ºÆ®¿ë
@@ -270,10 +270,10 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_FinaleSeqBTime =
 	{
 		0.f,
-		120.f / 50.f, //cut7 - cut8. 2¹è ´À¸²
+		110.f / 50.f, //cut7 - cut8. 2¹è ´À¸²
 		142.f / 50.f, //cut8 - cut9
-		135.f / 50.f, //cut9 - cut10
-		319.f / 50.f, //cut10 - cut11
+		130.f / 50.f, //cut9 - cut10
+		310.f / 50.f, //cut10 - cut11
 		110.f / 50.f, //cut11 - cut12
 		80.f / 50.f, /*70.f*/
 	};
@@ -281,8 +281,8 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_FinaleSeqCTime =
 	{
 		0.f,
-		113.f / 50.f, //ÄÆ½Å 14
-		65.f / 50.f, //ÄÆ½Å 15
+		105.f / 50.f, //ÄÆ½Å 14
+		55.f / 50.f, //ÄÆ½Å 15
 		499.f / 50.f, //ÄÆ½Å 16
 	};
 
@@ -961,14 +961,22 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 	if (m_iMatrixIndex < 0 || m_iMatrixIndex >= m_vecFrontDirRadius.size())
 		return;
 
-	m_fTriggerRatio = Compute_TriggerPosRatio(m_iMatrixIndex);
+	_float vRatio = Compute_TriggerPosRatio(m_iMatrixIndex);
 
-	if (m_fTriggerRatio < 0.f || 1.f < m_fTriggerRatio)
+	if (vRatio < 0.f || 1.f < m_fTriggerRatio)
+	{
+		m_fTriggerRatio = -1.f;
 		return;
+	}
 
-	m_fTriggerRatio = SATURATE(m_fTriggerRatio);
+	m_fTriggerRatio = SATURATE(vRatio);
 
-
+	//QZR  >> Y°ª »ìÂ¦ ¿Ã¸®´Â°Å
+	if (*m_pCurrentLevelID == LEVEL_PARK && 3 == m_iMatrixIndex)
+	{
+		//_float4 vPos = GET_POS;
+		//SET_POS(_float4(vPos.x, vPos.y + 0.2f, vPos.z, 1.f));
+	}
 	//CGameObject* pKirby = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0);
 	//if (nullptr == pKirby)
 	//	return;
@@ -1873,9 +1881,9 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		//
 		newAction = {};
-		Fill_InterpolateCutSet(newAction, 1.f, EASE_OUT, fDuration - 1.f);
+		Fill_InterpolateCutSet(newAction, 1.f, EASE_INOUT_FAST, fDuration - 1.f);
 
-		Fill_ActionPos(newAction, POS_ABSOLUTE, BOSS_POS + _float3{ -60.f, 10.f, 0.f });
+		Fill_ActionPos(newAction, POS_ABSOLUTE, BOSS_POS + _float3{ -70.f, 15.f, 0.f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 1.f, 0.f, 0.f });
 
 		newAction.fFOVY = 50.f;
@@ -2094,6 +2102,10 @@ void CCamera_Main::Ready_Cam_DeeDeeDee(CGameObject* pNotifier)
 	Set_Target(pNotifier->Get_TransformCom(), TARGET_SECOND, FOCUS_BOTH);
 }
 
+void CCamera_Main::Ready_Cam_Leongar(CGameObject* pNotifier)
+{
+}
+
 void CCamera_Main::Start_ShutterSeq(CGameObject* pNotifier)
 {
 	Make_Sequence(SEQ_BREAKCARSHOP);
@@ -2136,7 +2148,7 @@ void CCamera_Main::Reset_DeferredCamSet()
 
 			m_pGameInstance->Update_DofFocus(FINALEKIRBY->m_vBonePos);
 		}
-		if (m_iCurSceneIdx == 2)
+		else if (m_iCurSceneIdx == 2)
 		{
 			(0.f < m_fSeqEventTime) ?
 				m_pGameInstance->Update_DofFocus(FINALEKIRBY->m_vBonePos) :
@@ -2636,7 +2648,6 @@ void CCamera_Main::Render_IMGUI()
 	ImGui::DragFloat(u8"¸ñÇ¥ ÁÜ ¿ÀÇÁ¼Â", &m_fDestZoomOffset, .05f, -20.f, 20.f, "%.1f");
 
 	ImGui::End();
-
 }
 void CCamera_Main::Render_GraphicIMGUI(_float4x4 _worldMat)
 {
