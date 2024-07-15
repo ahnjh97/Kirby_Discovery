@@ -74,7 +74,7 @@ HRESULT CLevel_Simba::Initialize()
 	pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
 	pTransingStar->Activate(CTransingStar::OPEN);
 
-	m_pGameInstance->ShowAllAnimations("OriginCage_Anim");
+	//m_pGameInstance->ShowAllAnimations("OriginCage_Anim");
 
 	return S_OK;
 }
