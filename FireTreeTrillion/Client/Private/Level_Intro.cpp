@@ -177,28 +177,6 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ -60.f, 5.f, -6.5f });
-	ObjDesc.matWorld = InitMat;
-
-	// Car Test
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Deform"), TEXT("Prototype_GameObject_Bulb"), &ObjDesc)))
-		return E_FAIL;
-
-
-	ObjDesc.fSpeedPerSec = 5.f;
-	ObjDesc.fRotationPerSec = ToRadian(90.f);
-	InitMat = _float4x4::Identity;
-	InitMat.Translation({ -50.f, 5.f, -6.5f });
-	ObjDesc.matWorld = InitMat;
-	ObjDesc.wstrModelName = TEXT("RockA");
-	// Car Test
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Breakable"), TEXT("Prototype_GameObject_BreakableRock"), &ObjDesc)))
-		return E_FAIL;
-
-
-	ObjDesc.fSpeedPerSec = 5.f;
-	ObjDesc.fRotationPerSec = ToRadian(90.f);
-	InitMat = _float4x4::Identity;
 	InitMat.Translation({ 53.38f, 22.19f, 348.12f });
 	ObjDesc.matWorld = InitMat;
 	// Car Test

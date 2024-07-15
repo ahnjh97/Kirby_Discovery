@@ -206,7 +206,7 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 
 		m_fGravity += fTimeDelta;
 		_float fOffset = -DESC(m_fCrashChargeTime) + 2.5f;
-		DESC(m_fCrashChargeTime) += fTimeDelta * 20.f - (0.35f * m_fGravity);
+		DESC(m_fCrashChargeTime) += fTimeDelta * 20.f - (0.35f * m_fGravity * fTimeDelta * 50.f);
 
 
 
