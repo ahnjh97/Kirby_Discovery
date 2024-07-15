@@ -57,6 +57,8 @@ void CMainApp::Tick(_float fTimeDelta)
 {
 	m_pGameInstance->Tick_Engine(fTimeDelta);
 
+	CCollisionCenter::Get_Instance()->Collision_Tick(fTimeDelta);
+
 	if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_LALT, KEY_PRESS))
 	{
 		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_GRAVE, KEY_DOWN))
@@ -131,8 +133,6 @@ void CMainApp::Tick(_float fTimeDelta)
 				return;
 		}
 	}
-
-	CCollisionCenter::Get_Instance()->Collision_Tick(fTimeDelta);
 
 	m_pGameInstance->LateTick_Engine(fTimeDelta);
 }
