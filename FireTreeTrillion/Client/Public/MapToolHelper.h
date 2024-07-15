@@ -54,6 +54,7 @@ private:
 	void	Menu_MonsterInfo();
 	void	Menu_RallyPointInfo();
 	void	Menu_BlendDecoInfo();
+	void	Menu_LightInfo();
 	void	Edit_Object();
 
 	// On Key/Mouse Input 

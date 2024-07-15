@@ -64,6 +64,9 @@ static _bool s_bWasTownDecosOpen = false;
 static _bool s_bWasLabDecosOpen = false;
 static _bool s_bWasParkDecosOpen = false;
 
+static _float s_fLightRange = {};
+static vector<std::array<_float, 4>> s_vecLightInfo;
+
 static void HelpMarker(const char* desc)
 {
 	ImGui::TextDisabled("(?)");
@@ -283,6 +286,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
+	s_vecLightInfo.resize(CMapToolObject::LIGHT_END);
 
 	ReadMapDecoTxts();
 	ReadMapObjTxts();
@@ -328,6 +332,7 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 		Menu_MonsterInfo();
 		Menu_RallyPointInfo();
 		Menu_BlendDecoInfo();
+		Menu_LightInfo();
 	}
 
 	// 스타일 복원
@@ -1019,6 +1024,47 @@ void CMapToolHelper::Menu_BlendDecoInfo()
 	ImGui::End();
 }
 
+void CMapToolHelper::Menu_LightInfo()
+{
+	if ("LightBulb" != m_strCurModel)
+		return;
+
+	CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+
+	s_fLightRange = pMapToolObject->Get_Radius();
+	vector<_float4> vecLightInfo = pMapToolObject->Get_LightInfo();
+	for (_uint i = 0; i < CMapToolObject::LIGHT_END; i++)
+	{
+		s_vecLightInfo[i][0] = vecLightInfo[i].x;
+		s_vecLightInfo[i][1] = vecLightInfo[i].y;
+		s_vecLightInfo[i][2] = vecLightInfo[i].z;
+		s_vecLightInfo[i][3] = vecLightInfo[i].w;
+	}
+
+	ImGui::Begin("LightInfo");
+	ImGui::Text("Range"); ImGui::SameLine();
+	ImGui::SetCursorPosX(60);
+	if (ImGui::InputFloat("##LightRange", &s_fLightRange, 0.2f, 1.0f, "%.3f"))
+		pMapToolObject->Set_Radius(s_fLightRange);
+
+	for (_uint i = 0; i < CMapToolObject::LIGHT_END; i++)
+	{
+		if (0 == i)
+			ImGui::Text("Diffuse"); 
+		else if (1 == i) 
+			ImGui::Text("Ambient");
+		else if (2 == i) 
+			ImGui::Text("Specular");
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(60);
+		string strLabel = "LightInfo" + to_string(i);
+		if (ImGui::InputFloat4(strLabel.c_str(), s_vecLightInfo[i].data(), "%.3f"))
+			pMapToolObject->Set_LightInfo(i,_float4(s_vecLightInfo[i][0], s_vecLightInfo[i][1], s_vecLightInfo[i][2], s_vecLightInfo[i][3]));
+	}
+
+	ImGui::End();
+}
+
 void CMapToolHelper::Edit_Object()
 {
 	if (nullptr == m_pPickedObject)
@@ -1308,6 +1354,14 @@ void CMapToolHelper::Save_Level()
 		_uint iStrLength = strModelName.length();
 		_uint iShaderVars = object->Get_ShaderVars();
 		_float fRimWidth = object->Get_RimWidth();
+
+		if ("LightBulb" == strModelName)
+		{
+			CMapToolObject* pMapToolObj = dynamic_cast<CMapToolObject*>(object);
+			fRimWidth = pMapToolObj->Get_Radius();
+			vector<_float4> vecLightInfo = pMapToolObj->Get_LightInfo();
+			//matWorld._11 = 
+		}
 
 		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
 		outputFile.write(strModelName.c_str(), iStrLength);

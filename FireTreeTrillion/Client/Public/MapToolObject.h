@@ -15,6 +15,7 @@ class CMapToolObject : public CGameObject
 {
 public:
 	enum TYPE_MAPOBJ { MAPOBJ_NONCOL, MAPOBJ_ANIM, MAPOBJ_ACTOR, MAPOBJ_END };
+	enum LIGHT_INFO { LIGHT_DIFFUSE, LIGHT_AMBIENT, LIGHT_SPECULAR, LIGHT_END };
 
 public:
 	struct MAPTOOLOBJECT_DESC : public GAMEOBJECT_DESC
@@ -28,6 +29,10 @@ public:
 		string strConnectedMonster;
 		unordered_set<_uint> setBlendMeshIndices;
 		TYPE_MAPOBJ eMapObjType = { MAPOBJ_END };
+
+		_float4 vDiffuse = _float4(0.f, 0.f, 0.f, 1.f);
+		_float4 vAmbient = _float4(0.5f, 0.5f, 0.5f, 1.f);
+		_float4 vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
 	};
 
 public:
@@ -39,6 +44,7 @@ public:
 	map<_uint, _float3>& Get_RallyPoints() { return m_RallyPoints; }
 	TYPE_MAPOBJ Get_MapObjType() { return m_eMapObjType; }
 	_int Get_PassIndex() { return m_iPassIndex; }
+	vector<_float4> Get_LightInfo() { return m_vecLightInfo; }
 
 	virtual void Set_Hide(_bool bHide) { m_bHide = bHide; if (nullptr != m_pOrbitingCamera) m_pOrbitingCamera->Set_Hide(bHide); }
 
@@ -51,6 +57,7 @@ public:
 	void Set_PassIndex(_int iPassIndex) { m_iPassIndex = iPassIndex; }
 	void Set_PassIndices(unordered_set<_uint>& _setBlendMeshIndices);
 	void Reset_Time(_uint iIndex) { m_iMeshIndex = iIndex; m_fTime = 0; }
+	void Set_LightInfo(_uint iLightInfoType, _float4 vInfo) { m_vecLightInfo[iLightInfoType] = vInfo; }
 
 private:
 	CMapToolObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -86,6 +93,7 @@ private:
 	TYPE_MAPOBJ m_eMapObjType = { MAPOBJ_ACTOR };
 
 	vector<_uint> m_vecPassIndices;
+	vector<_float4> m_vecLightInfo;
 
 private:
 	CModel* m_pModelCom = { nullptr };
