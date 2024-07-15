@@ -153,6 +153,11 @@ Quaternion CUtils::Make_Quat_FromDir(const _float3& _dir)
 	return Quaternion::FromToRotation(vStartDir, vDestDir);
 }
 
+_float3 CUtils::Degree_ToRadian(_float3 vDegree)
+{
+	return  _float3(ToRadian(vDegree.x), ToRadian(vDegree.y), ToRadian(vDegree.z));
+}
+
 _float3 CUtils::Make_Degree_FromDir(const _float4& _dir)
 {
 	Quaternion vQuat = Make_Quat_FromDir(_dir);
@@ -173,12 +178,20 @@ _float3 CUtils::SlerpDirVec(_float3 vStart, _float3 vEnd, _float fRatio)
 {
 	_float fDot = vStart.Dot(vEnd);
 	fDot = clamp(fDot, -1.f, 1.f);
-	_float fTheta = acos(fDot) * fRatio;
+	_float fTheta = acosf(fDot) * fRatio;
+	_float3 vRelative = XMVector3Normalize(vEnd - vStart * fRatio);
 
-	_float3 vRelative = vEnd - vStart * fDot;
-	vRelative.Normalize();
+	return XMVector3Normalize( vStart * cosf(fTheta) + vRelative * sinf(fTheta) );
+}
 
-	_float3 vResult = XMVector3Normalize(vStart * cos(fTheta) + vRelative * sin(fTheta));
+_vector CUtils::TurnDirectionVector(_fvector vDirVec, _float3 vAxis, _float fAngle)
+{
+	_float fRadian = XMConvertToRadians(fAngle);
+	_vector vRotationAxis = XMVectorSet(vAxis.x, vAxis.y, vAxis.z, 0.0f);
+	_matrix matRotation = XMMatrixRotationAxis(vRotationAxis, fRadian);
+
+	_vector vResult = XMVector3TransformNormal(vDirVec, matRotation);
+
 	return vResult;
 }
 

@@ -33,7 +33,9 @@ public:
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_LightDepth() override;
 
-
+private:
+	void			Ready_FadeIn();
+	void			Ready_FadeOut();
 
 private:
 	CModel* m_pModelCom = { nullptr };
@@ -50,6 +52,7 @@ private:
 
 	_bool	m_bItemTrigger = { true };
 	_bool	m_bShowDialog = { FALSE };
+	_bool	m_bFadeOutEnd = false;
 
 private:
 	HRESULT Add_Components();

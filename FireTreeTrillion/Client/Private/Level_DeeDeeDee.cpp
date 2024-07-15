@@ -86,7 +86,16 @@ void CLevel_DeeDeeDee::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
 
+	static _float fTimeAcc = 0.f;
+	fTimeAcc += fTimeDelta;
+	if (fTimeAcc > 2.f) // 2초뒤 페이드인
+		Ready_FadeIn();
+}
+
+void CLevel_DeeDeeDee::Ready_FadeIn()
+{
 	static _bool bOnceFade = false;
+	static _bool bOnceChanger = false;
 
 	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
 	CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
@@ -98,11 +107,13 @@ void CLevel_DeeDeeDee::Tick(_float fTimeDelta)
 		bOnceFade = true;
 	}
 	else if (pFadingUI->Get_FadeRatio() >= 1.f)
-		pFadingUI->Set_IsRender(false);
-}
-
-void CLevel_DeeDeeDee::Ready_FadeIn()
-{
+	{
+		if (bOnceChanger == false)
+		{
+			pFadingUI->Set_IsRender(false);
+			bOnceChanger = true;
+		}
+	}
 }
 
 HRESULT CLevel_DeeDeeDee::Render()

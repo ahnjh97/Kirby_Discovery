@@ -16,10 +16,12 @@
 #include "BG.h"
 #include "HUD.h"
 #include "SkySphere.h"
+
 #include "Dialog.h"
-//#include "Kirby.h"
 #include "EventCenter.h"
+#include "TransingStar.h"
 #include "GameObject.h"
+#include "Simba.h"
 
 CLevel_Simba::CLevel_Simba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -65,6 +67,16 @@ HRESULT CLevel_Simba::Initialize()
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
+	// SIMBA 도착했으면 오픈해주세요
+	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
+	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
+	pTransingStar->Set_LargeColor(_float3(85.f / 255.f, 93.f / 255.f, 183.f / 255.f));
+	pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
+	pTransingStar->Activate(CTransingStar::OPEN);
+
+
+
+	//m_pGameInstance->ShowAllAnimations("Simba");
 
 	return S_OK;
 }
@@ -74,24 +86,11 @@ void CLevel_Simba::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
 
-	if (false == bWave1DeadNotified)
-	{
-		list<CGameObject*>* objListPtr = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Wave1"));
-		if (nullptr != objListPtr)
-		{
-			if (objListPtr->empty()) // Wave1 의 몬스터들이 모두 죽은 경우
-			{
-				bWave1DeadNotified = true;
-				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_WAVE1DEAD);
-			}
-		}
-	}
-
 	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_APPEAR_START);
-		else if(m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
+		else if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_APPEAR_END);
 		else if (m_pGameInstance->Get_KeyState(DIK_3, KEY_DOWN))
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_WAVE1DEAD);
@@ -99,6 +98,32 @@ void CLevel_Simba::Tick(_float fTimeDelta)
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_WAVE2DEAD);
 		else if (m_pGameInstance->Get_KeyState(DIK_C, KEY_DOWN))
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_THRONEBREAK);
+	}
+
+	if (false == m_bWave1DeadNotified)
+	{
+		list<CGameObject*>* objListPtr = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Wave1"));
+		if (nullptr != objListPtr)
+		{
+			if (objListPtr->empty()) // Wave1 의 몬스터들이 모두 죽은 경우
+			{
+				m_bWave1DeadNotified = true;
+				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_WAVE1DEAD);
+			}
+		}
+	}
+
+	if (false == m_bWave2DeadNotified)
+	{
+		list<CGameObject*>* objListPtr = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Wave2"));
+		if (nullptr != objListPtr)
+		{
+			if (objListPtr->empty()) // Wave2 의 몬스터들이 모두 죽은 경우
+			{
+				m_bWave2DeadNotified = true;
+				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_WAVE2DEAD);
+			}
+		}
 	}
 }
 		
@@ -389,7 +414,6 @@ HRESULT CLevel_Simba::Ready_Triggers()
 
 HRESULT CLevel_Simba::Ready_Monsters()
 {
-
 	string strFileName = "../../../objects_txt/Simba_Monsters.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -411,6 +435,8 @@ HRESULT CLevel_Simba::Ready_Monsters()
 	_uint iNumRallyPoints{};
 	vector<_float4> vecRallyPoints;
 	wstring wstrGameObjectTag;
+
+	vector<CMonster::MONSTER_DESC> vecMonsterDescs;
 
 	for (_uint i = 0; i < iNumObjects; i++)
 	{
@@ -437,9 +463,17 @@ HRESULT CLevel_Simba::Ready_Monsters()
 		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 		tempDesc.iShaderVars = iShaderVars;
 		tempDesc.fRimWidth = fRimWidth;
+
 		if (strModelName.size() >= 8) { // NonAnim_ 부분 지우기
 			if ("NonAnim" == strModelName.substr(0, 7))
 				tempDesc.wstrModelName.erase(0, 8);
+		}
+
+		CMonster::MONSTER_DESC tMonsterDesc = *static_cast<CMonster::MONSTER_DESC*>(&tempDesc);
+		tMonsterDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
+		if (iTriggerIndex > 10) {
+			vecMonsterDescs.push_back(tMonsterDesc);
+			continue;
 		}
 
 		if (L"Awoofy" == tempDesc.wstrModelName)
@@ -527,13 +561,15 @@ HRESULT CLevel_Simba::Ready_Monsters()
 		}
 		else if ("NonAnim_Simba" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Simba"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Simba"), TEXT("Prototype_GameObject_Simba"), &tempDesc)))
 				return E_FAIL;
 		}
 	}
 
 	fileInput.close();
 
+	CSimba* pSimba = dynamic_cast<CSimba*>(m_pGameInstance->Get_GameObject(m_iLevel, TEXT("Layer_Simba")));
+	pSimba->RegisterMonstersToSimba(vecMonsterDescs);
 
 	return S_OK;
 }

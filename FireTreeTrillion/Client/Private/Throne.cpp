@@ -49,7 +49,7 @@ HRESULT CThrone::Initialize(void* pArg)
 
 	*pEditMatrix = matTemp;
 
-	m_pModelCom->Set_Animation(0, 40.f, false, false);
+	m_pModelCom->Set_Animation(0, 50.f, false, false);
 	m_pModelCom->Play_Animation(m_pGameInstance->Get_FirstTimer());
 
 	function<void(CGameObject*)> func = bind(&CThrone::Break, this, placeholders::_1);
@@ -87,16 +87,6 @@ _int CThrone::Tick(_float fTimeDelta)
 		m_bGlassBreak = true;
 		CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_GLASSBREAK);
 	}
-
-	//if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_SPACE, KEY_DOWN))
-	//{
-	//	_uint iCurAnimIndex = m_pModelCom->Get_CurAnimIndex();
-	//	_uint iNewAnimIndex = iCurAnimIndex + 1;
-	//	_uint iNumAnimations = m_pModelCom->Get_AnimCnt();
-	//	if (iNumAnimations == iNewAnimIndex)
-	//		iNewAnimIndex = 0;
-	//	m_pModelCom->Set_Animation(iNewAnimIndex, 40.f, true, false);
-	//}
 
 	if (m_pModelCom->Get_CurAnimIndex() == 0 && true == m_pModelCom->IsFinished())
 		m_bPlayAnimation = false;

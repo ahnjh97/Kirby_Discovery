@@ -30,6 +30,10 @@ float   g_fFadeRatio = { 1.f };
 float3  g_vSmallStarColor = { 1.f, 1.f, 1.f };
 float3  g_vLargeStarColor = { 1.f, 1.f, 1.f };
 
+// For QTE
+float g_fRedRatio = { 0.f };
+bool g_bInitializeQTE;
+
 // 회전된 UV를 계산
 float2 RotateUV(float2 vCoord, float fAngle)
 {
@@ -549,6 +553,68 @@ PS_OUT PS_CLAW(PS_IN_ALPHABLEND In)
     return Out;
 }
 
+PS_OUT PS_QTEBASE(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+	
+	//알파 테스트
+    if (Out.vColor.a < .1f)
+        discard;
+    
+    // 흰 부분일 것이다.
+    if (Out.vColor.g > 0.7f && Out.vColor.b > 0.7f)
+    {
+        float fgbColor = 1.f - g_fRedRatio;
+        Out.vColor.gb = float2(fgbColor, fgbColor);
+    }
+    
+    Out.vColor.a *= g_fAlpha;
+    
+    return Out;
+}
+
+PS_OUT PS_QTEPLATE(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+	
+	//알파 테스트
+    if (Out.vColor.a < .1f)
+        discard;
+    
+    float fHeight = In.vTexcoord.y;
+    if (Out.vColor.a < 0.7f)
+    {
+        float3 vTopColor = { 226.f / 255.f, 226.f / 255.f, 155.f / 255.f };
+        float3 vBottomColor = { 155.f / 255.f, 231.f / 255.f, 231.f / 255.f };
+        Out.vColor.rgb = saturate(lerp(vTopColor, vBottomColor, fHeight) + float3(g_fRedRatio, g_fRedRatio, g_fRedRatio));
+        Out.vColor.a = 0.9f;
+    }
+    
+    Out.vColor.a *= g_fAlpha;
+    
+    return Out;
+}
+
+PS_OUT PS_QTEEFFECT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+	
+	//알파 테스트
+//    if (Out.vColor.a < .1f)
+ //       discard;
+    
+    Out.vColor.rgb *= g_vRColor;
+    Out.vColor.a *= g_fAlpha;
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	// 기본 패스. 알파 테스팅 ( 0 )
@@ -828,5 +894,45 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_CLAW();
     }
+    // UI QTEBASE ( 20 )
+    pass QTEBASE
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_QTEBASE();
+    }
+    // UI QTEPLATE ( 21 )
+    pass QTEPLATE
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_QTEPLATE();
+    }
+    // UI QTEEFFECT ( 22 )
+    pass QTEEFFECT
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_QTEEFFECT();
+    }
+
 
 }

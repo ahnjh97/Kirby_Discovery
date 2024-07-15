@@ -39,6 +39,8 @@ float g_fOverPowerColor;
 bool g_bEmissive = { false };
 float g_fEmissivePower;
 
+float4 g_vCamPosition;
+
 
 // 회전된 UV를 계산
 float2 RotateUV(float2 vCoord, float fAngle)
@@ -412,7 +414,27 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN In)
     return Out;
 }
 
-PS_OUT_EFFECT PS_MAIN_BLEND_FX(PS_IN In)
+PS_OUT_EFFECT PS_MAIN_BLEND_FX_LINEARDIFFUSE(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
+    MaskTest(vMask);
+    
+
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    AlphaTest(vDiffuse);
+
+    Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
+    Out.vColor.a = vDiffuse.a * vMask.r * g_fAlpha;
+
+    //소프트 이펙트 보정
+    Out.vColor.a = SoftEffect(Out.vColor.a, In.vProjPos);
+    Out.vNonBlur = vector(0, 1, 0, 1);
+    return Out;
+}
+
+PS_OUT_EFFECT PS_MAIN_BLEND_FX_CLAMPDIFFUSE(PS_IN In)
 {
     PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
 
@@ -478,6 +500,8 @@ PS_OUT_EFFECT PS_MAIN_WHITE_FX_CLAMPDIFFUSE(PS_IN In)
     
     return Out;
 }
+
+
 
 PS_OUT_LIGHTDEPTH PS_MAIN_DEFERREDINFO(PS_IN In)
 {
@@ -628,6 +652,48 @@ PS_OUT PS_EMISSIVE_NORMAL_X(PS_IN In)
     
     return Out;
 }
+
+PS_OUT PS_FOR_STAR(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+
+    vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+    float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
+    float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+    float3 vWorldNormal = mul(vNormal, WorldMatrix);
+    
+    float4 vWorldPos = In.vWorldPos;
+    
+    Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
+    
+    float4 vLook = float4(g_vCamPosition.xyz, 1.f) - float4(vWorldPos.xyz, 1.f);
+    float vDot = dot(normalize(vLook), normalize(float4(vWorldNormal, 0.f)));
+    
+    vDot = 1.0f - saturate(vDot); // 내적 값이 0에 가까울수록 vDot이 1에 가까워지도록 변환
+    //vDot = vDot < 0.5 ? pow(2, 20 * vDot - 10) : (2 - pow(2, -20 * vDot + 10)) * 100;
+    vDot = vDot < 0.5 ?
+    2 * vDot * vDot :
+    1 - pow(-2 * vDot + 2, 2) / 3;
+    
+    
+    vector vRimLightColor = 0;
+    
+    // 밝은 부분
+    if (vDot > 0.5)
+        vRimLightColor = float4(1.f, 0.9f, 0.6f, 1.f) * vDot;
+    // 밝지 않은 부분
+    else if (vDot < 0.5)
+        vRimLightColor = clamp(vDot, float4(1.f, 0.075f, 0.075f, 1.f), float4(1.f, 0.9, 0.6f, 1.f)) * (1.f - vDot);
+
+    Out.vDiffuse = saturate(vMtrlDiffuse * vRimLightColor);
+    return Out;
+}
+
 
 technique11 DefaultTechnique
 {
@@ -805,8 +871,8 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_FX();
     }
 
-    //블렌드되는 이펙트. 알파 블렌딩 + 마스크 + 소프트 이펙트 ( 8 -> 13 )
-    pass BlendFX
+    //블렌드되는 이펙트. 알파 블렌딩 + 마스크 + 소프트 이펙트 ( 13 )
+    pass BlendFX_LinearDiffuse
     {
         SetRasterizerState(RS_NonCull);
         SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
@@ -816,11 +882,25 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX();
+        PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX_LINEARDIFFUSE();
+    }
+
+    //블렌드되는 이펙트. 알파 블렌딩 + 마스크 + 소프트 이펙트 ( 14 )
+    pass BlendFX_ClampDiffuse
+    {
+        SetRasterizerState(RS_NonCull);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX_CLAMPDIFFUSE();
     }
 
 
-    //화이트 이펙트. 알파 블렌딩 + 마스크 + 디퓨즈 리니어샘플( 10 -> 14 )
+    //화이트 이펙트. 알파 블렌딩 + 마스크 + 디퓨즈 리니어샘플( 10 -> 15 )
     pass WhiteFX_LinearDiffuse
     {
         SetRasterizerState(RS_NonCull);
@@ -834,7 +914,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX_LINEARDIFFUSE();
     }
 
-    ////화이트 이펙트. 알파 블렌딩 + 마스크 + 디퓨즈 클램프샘플 ( 10 -> 15 )
+    ////화이트 이펙트. 알파 블렌딩 + 마스크 + 디퓨즈 클램프샘플 ( 10 -> 16 )
     pass WhiteFX_ClampDiffuse
     {
         SetRasterizerState(RS_NonCull);
@@ -875,4 +955,18 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_EMISSIVE_NORMAL_X();
     }
+    // Star ( 18 )
+    pass STAR
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_FOR_STAR();
+    }
+
 }

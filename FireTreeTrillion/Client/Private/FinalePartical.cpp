@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "FinalePartical.h"
+#include "FinaleCut_ControlCenter.h"
+
 
 CFinalePartical::CFinalePartical(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
@@ -31,6 +33,7 @@ HRESULT CFinalePartical::Initialize(void* pArg)
 
     m_bMotionBlur = true;
     m_bRimLight = true;
+    m_fRimWidth = 0.1f;
     m_bStencil = true;
 
 
@@ -50,7 +53,14 @@ _int CFinalePartical::Tick(_float fTimeDelta)
 
     _float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
     m_fGravity += 1.5f * m_fTimeDelta;
-    _float4 vDelta = (m_vDir * m_fTimeDelta * m_fSpeed);
+
+
+    _int iAnimIndex = { 0 };
+    CFinaleCut_ControlCenter* pCenter = static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
+    if (pCenter != nullptr)
+        iAnimIndex = pCenter->Get_CutScene();
+
+    _float4 vDelta = (iAnimIndex == 13 || iAnimIndex == 18) == true ? ((m_vDir + _float4(2.f, 0.f, 0.f, 0.f)) * m_fTimeDelta * m_fSpeed) : (m_vDir * m_fTimeDelta * m_fSpeed);
     _float4 vGravity = m_bNoGravity == false ? _float4(0.f, m_fGravity, 0.f, 0.f) : _float4(0.f, 0.f, 0.f, 0.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vDelta - vGravity);
     m_pTransformCom->Turn(m_fTurnAxis, m_fTimeDelta, m_fTurn);

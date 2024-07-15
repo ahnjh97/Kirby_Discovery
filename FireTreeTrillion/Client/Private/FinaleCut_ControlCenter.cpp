@@ -37,7 +37,7 @@ _int CFinaleCut_ControlCenter::Tick(_float fTimeDelta)
 	if (m_bDead == true)
 		return OBJ_DEAD;
 
-
+	/*
 	if (m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 
@@ -98,7 +98,7 @@ _int CFinaleCut_ControlCenter::Tick(_float fTimeDelta)
 		if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
 			Set_CutScene(20);
 	}
-
+	*/
 	return OBJ_NOEVENT;
 }
 
@@ -114,6 +114,22 @@ HRESULT CFinaleCut_ControlCenter::Render()
 void CFinaleCut_ControlCenter::Set_CutScene(_uint iScene)
 {
 	m_iCutScene = iScene;
+
+	if (iScene == 7)
+	{
+		m_pGameInstance->Set_FirstTimerRatio(.5f);
+		m_pGameInstance->Set_SecondTimerRatio(.5f);
+	}
+	else if (iScene == 8)
+	{
+		m_pGameInstance->Restore_FirstTimer(.2f);
+		m_pGameInstance->Restore_SecondTimer(.2f);
+	}
+
+	if (iScene == 14)
+	{
+		int a = 0;
+	}
 }
 
 CFinaleCut_ControlCenter* CFinaleCut_ControlCenter::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

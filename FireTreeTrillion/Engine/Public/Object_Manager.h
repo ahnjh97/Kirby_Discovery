@@ -19,7 +19,7 @@ public:
 	const class CComponent* Get_Component(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strComTag, _uint iIndex);
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& strLayerTag, _uint iIndex);
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& wstrLayerTag);
-	class CGameObject*		Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, wstring _tag);
+	class CGameObject*		Get_GameObject_ByTag(_uint iLevelIndex, const wstring& strLayerTag, const wstring& _tag);
 	class CGameObject*		Get_LastGameObject(_uint iLevelIndex, const wstring& wstrLayerTag);
 	list<CGameObject*>*		Get_List(_uint iLevelIndex, const wstring& strLayerTag);
 
@@ -35,7 +35,6 @@ public:
 	CGameObject*			Add_CloneReturn(_uint iLevelIndex, const wstring& strLayerTag, const wstring& strPrototypeTag, void* pArg);
 	class CGameObject*		Clone_GameObject(const wstring& strPrototypeTag, void* pArg);
 	void					Tick(_float fTimeDelta);
-	void					Event_Tick(_float fTimeDelta);
 	void					Late_Tick(_float fTimeDelta);
 	void					Clear(_uint iLevelIndex);
 	void					Clear_Layer(_uint iLevelIndex, const wstring& strLayerTag);

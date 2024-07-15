@@ -89,6 +89,11 @@ HRESULT CLevel_Park::Initialize()
 	function<void(_int)> func = bind(&CLevel_Park::Teleport_Player, this);
 	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_STAR, func);
 
+	// 레벨전환 트리거
+	function<void(_int)> funcChanger = bind(&CLevel_Park::Change_Levels, this);
+	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_LEVELCHANGER, funcChanger);
+
+
 	return S_OK;
 }
 
@@ -102,9 +107,16 @@ void CLevel_Park::Teleport_Player()
 	pTransingStar->Set_SmallColor(_float3(167.f / 255.f, 42.f / 255.f, 168.f / 255.f));
 }
 
-//심바로 가는 맵
-//pTransingStar->Set_LargeColor(_float3(85.f / 255.f, 93.f / 255.f, 183.f / 255.f));
-//pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
+
+void CLevel_Park::Change_Levels()
+{
+	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
+	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
+	pTransingStar->Set_NextLevel(LEVEL_SIMBA);
+	pTransingStar->Set_LargeColor(_float3(85.f / 255.f, 93.f / 255.f, 183.f / 255.f));
+	pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
+	pTransingStar->Activate(CTransingStar::CLOSE);
+}
 
 void CLevel_Park::Tick(_float fTimeDelta)
 {

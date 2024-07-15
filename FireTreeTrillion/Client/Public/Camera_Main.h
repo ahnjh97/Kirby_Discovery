@@ -199,8 +199,8 @@ private:
 	//for Finale
 	_int				m_iPreSceneIdx =	{ 0 };
 	_int				m_iCurSceneIdx =	{ 0 };
+	_bool				m_bChangedScene = { false };
 
-	//_bool				m_bChangedScene = { false };
 	_int				m_iSceneCnt =		{ -1 };
 
 
@@ -213,6 +213,7 @@ private:
 	list<_float>		m_FinaleSeqBTime;
 	list<_float>		m_FinaleSeqCTime;
 	list<_float>		m_FinaleSeqDTime;
+
 
 	_float3 m_vCurKirbyTriggerLocalPos = { 0.f, 0.f, 0.f };
 	vector<pair<_vector, _float>>	m_vecFrontDirRadius;
@@ -366,6 +367,7 @@ private:
 
 	void System_Tick(_float fTimeDelta);
 	void Check_FinaleScene(_float fTimeDelta);
+	void Check_FinaleTime(_float fTimeDelta);
 
 	void Fill_HardCutSet(CAMACTION& Action, _float fTime);
 	void Fill_InterpolateCutSet(CAMACTION& Action, _float fTime, EASING eEase, _float fInterpolateSpeed);

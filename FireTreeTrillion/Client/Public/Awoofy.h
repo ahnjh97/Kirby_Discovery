@@ -64,8 +64,10 @@ private:
 	_bool				m_bRenderBody = { true };
 	_bool				m_bEffect = { false };
 
+	_uint				m_iEyeMeshIdx = {};
+
 private:
-	HRESULT			Add_Components();
+	HRESULT			Add_Components(const wstring& wstrModelName);
 	HRESULT			Bind_ShaderResources();
 
 	// FSM

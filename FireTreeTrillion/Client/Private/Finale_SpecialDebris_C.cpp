@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Finale_SpecialDebris_C.h"
+#include "FinaleCut_ControlCenter.h"
+
 
 CFinale_SpecialDebris_C::CFinale_SpecialDebris_C(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -34,6 +36,16 @@ HRESULT CFinale_SpecialDebris_C::Initialize(void* pArg)
 	m_bRimLight = true;
 	m_bStencil = true;
 
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(2550.f, 239.f, -136.f, 1.f));
+	_float4 NewLook = _float4(1.f, 0.f, 0.f, 0.f);
+	_float4 NewUp = _float4(0.f, 1.f, 0.f, 0.f);
+	_float4 NewRight = XMVector3Cross(NewUp, NewLook);
+
+	m_pTransformCom->Set_State(CTransform::STATE_LOOK, NewLook);
+	m_pTransformCom->Set_State(CTransform::STATE_UP, NewUp);
+	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, NewRight);
+
+
 	return S_OK;
 }
 
@@ -44,13 +56,84 @@ _int CFinale_SpecialDebris_C::Tick(_float fTimeDelta)
 
 	m_fAccTime = m_pGameInstance->Get_SecondTimer();
 
+	CFinaleCut_ControlCenter* pCenter =
+		static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
+	if (nullptr == pCenter)
+		return OBJ_NOEVENT;
+
+	_int iCutIndex = pCenter->Get_CutScene();
+
+	if (iCutIndex == 10)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT10;
+	}
+	else if (iCutIndex == 11)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT11;
+	}
+	else if (iCutIndex == 12)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT12;
+	}
+	else if (iCutIndex == 13)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT13;
+	}
+	else if (iCutIndex == 14)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT14;
+	}
+	else if (iCutIndex == 15)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT15;
+	}
+	else if (iCutIndex == 16)
+	{
+		m_bRender = false;
+		//m_eCurCut = CUT16;
+	}
+	else if (iCutIndex == 17)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT17;
+	}
+	else if (iCutIndex == 18)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT18;
+	}
+	else if (iCutIndex == 19)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT19;
+	}
+	else if (iCutIndex == 20)
+	{
+		m_bRender = true;
+		m_eCurCut = CUT20;
+	}
+	else
+		m_bRender = false;
+
+	Set_Animation();
+
 
 	return OBJ_NOEVENT;
 }
 
 void CFinale_SpecialDebris_C::Late_Tick(_float fTimeDelta)
 {
+	if (m_bRender == false)
+		return;
+
 	m_pModelCom->Play_Animation(m_fAccTime);
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 
@@ -110,7 +193,7 @@ HRESULT CFinale_SpecialDebris_C::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_PopStar"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_CutDebrisC"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
@@ -139,6 +222,54 @@ _int CFinale_SpecialDebris_C::Make_Partical()
 
 
 	return 0;
+}
+
+void CFinale_SpecialDebris_C::Set_Animation()
+{
+	if (m_eCurCut == m_ePreCut)
+		return;
+
+	switch (m_eCurCut)
+	{
+	case CUT10:
+		m_pModelCom->Set_Animation(CUT10, 35.f, false, false);
+		break;
+	case CUT11:
+		m_pModelCom->Set_Animation(CUT11, 40.f, false, false);
+		break;
+	case CUT12:
+		m_pModelCom->Set_Animation(CUT12, 40.f, false, false);
+		break;
+	case CUT13:
+		m_pModelCom->Set_Animation(CUT13, 40.f, false, false);
+		break;
+	case CUT14:
+		m_pModelCom->Set_Animation(CUT14, 40.f, false, false);
+		break;
+	case CUT15:
+		m_pModelCom->Set_Animation(CUT15, 40.f, false, false);
+		break;
+	case CUT16:
+		m_pModelCom->Set_Animation(CUT16, 40.f, false, false);
+		break;
+	case CUT17:
+		m_pModelCom->Set_Animation(CUT17, 40.f, false, false);
+		break;
+	case CUT18:
+		m_pModelCom->Set_Animation(CUT18, 40.f, false, false);
+		break;
+	case CUT19:
+		m_pModelCom->Set_Animation(CUT19, 40.f, false, false);
+		break;
+	case CUT20:
+		m_pModelCom->Set_Animation(CUT20, 40.f, false, false);
+		break;
+	default:
+		break;
+	}
+
+	m_ePreCut = m_eCurCut;
+
 }
 
 CFinale_SpecialDebris_C* CFinale_SpecialDebris_C::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

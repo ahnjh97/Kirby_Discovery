@@ -899,6 +899,20 @@ string CModel::ExtractDigitsAfterUnderScore(_uint iMeshIndex)
 	return strMeshName.substr(numStartPos, numEndPos - numStartPos);
 }
 
+void CModel::ShowAllAnims()
+{
+	wstring wstrMsg;
+	_uint iCount{};
+
+	for (_uint i = 0; i < m_iNumAnimations; i++) {
+		wstrMsg += to_wstring(i) + TEXT(". ") + CUtils::StrToWstr(m_Animations[i]->Get_AnimationName()) + TEXT("\t");
+		if (i % 3 == 2)
+			wstrMsg += TEXT("\n");
+	}
+		
+	MB(wstrMsg.c_str(), TEXT("Animations"));
+}
+
 HRESULT CModel::Ready_Meshes(_bool bOctree)
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));

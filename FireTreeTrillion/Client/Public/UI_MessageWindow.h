@@ -66,6 +66,7 @@ private:
 #pragma region GETTER/SETTER
 public:
 	MESSAGEWINDOW_STATE Get_MWindowState() { return m_eCurState; }
+	void Reset_MessageIndex(CGameObject* pObj) { m_iCurMessageIndex = 0; } 
 #pragma endregion
 
 public:
@@ -90,8 +91,12 @@ private:
 	HRESULT						Render_Message();
 	void						Split_Message();
 	_float2						Repose_Fonts(_float2 fontPos, wstring wstrHighlightMsg);
+
+	// MessageWindow와 관련있는 이벤트를 처리하기 위한 함수들입니다.
 	void						OnEvent();
 	void						Start_Message(CGameObject* pObj = nullptr);
+	void						Event_Tick(_float fTimeDelta);
+	void						Ready_FadeOut();
 
 public:
 	static CUI_MessageWindow*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -125,5 +130,10 @@ private:
 	_bool						m_bSignalHightlight = false;
 	_bool						m_bSignalPostHightlight = false;
 
+	_bool						m_bEventCall = false;
+
+	_bool						m_bNextDialog1Notified = { false };
+	_bool						m_bNextDialog2Notified = { false };
+	_bool						m_bLastDialogNotified = { false };
 };
 END

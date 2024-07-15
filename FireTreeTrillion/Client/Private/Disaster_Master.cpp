@@ -6,6 +6,7 @@
 #include "Particle.h"
 
 #include "FinalePartical_Maker.h"
+#include "FinaleCut_ControlCenter.h"
 
 CDisaster_Master::CDisaster_Master(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -37,7 +38,7 @@ HRESULT CDisaster_Master::Initialize(void* pArg)
 	LIGHT_DESC			LightDesc{};
 	LightDesc.eType = LIGHT_DESC::TYPE_POINT;
 	LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
-	LightDesc.fRange = 90.f;
+	LightDesc.fRange = 70.f;
 	LightDesc.vDiffuse = _float4(.8f, .3f, .06f, 1.f);
 	LightDesc.vAmbient = _float4(0.3f, .3f, .3f, 1.f);
 	LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
@@ -117,17 +118,23 @@ _int CDisaster_Master::Tick(_float fTimeDelta)
 	}
 	else if (m_bKirbyCutSceneStart == true)
 	{
+
 		if (m_pLight != nullptr)
 		{
-			_float4 vLightPos = vKirbyPos;
-			vLightPos.x += 50.f;
-			vLightPos.y += 40.f;
+			_float4 vLightPos = m_pKirby->Compute_RootPos();
+			_float4 vLightKirbyPos = vLightPos;
+			vLightPos.x += 30.f;
+			vLightPos.y += 30.f;
 			m_pLight->Update_LightPos(vLightPos);
-			m_pGameInstance->Update_LightShadow(vLightPos, vKirbyPos);
+			m_pGameInstance->Update_LightShadow(vLightPos, vLightKirbyPos);
 		}
 
-		
 
+		m_fAirParticleDelay += fTimeDelta;
+		//m_fBuildingParticleDelay += fTimeDelta;
+
+		// 공기 중에 날아댕기는 파티클을 구현하였다.
+		Make_CutAirParticle();
 	}
 
 	return OBJ_NOEVENT;
@@ -205,6 +212,43 @@ void CDisaster_Master::Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_FinaleRoadGrouper"),
 		TEXT("Prototype_GameObject_FinaleRoadGrouper"), &roadGrouperDesc)))
 		return;
+}
+
+void CDisaster_Master::Make_CutAirParticle()
+{
+	_float4 vKirbyPos = m_pKirby->Compute_RootPos();
+
+	if (m_bCutInitializeParticle == true)
+	{
+		for (_int i = 0; i < 100; i++)
+		{
+			_float4 vNewMyPos = _float4(
+				vKirbyPos.x + CUtils::Make_RandomFloat(100.f, 500.f),
+				vKirbyPos.y + CUtils::Make_RandomFloat(-300.f, 300.f),
+				vKirbyPos.z + CUtils::Make_RandomFloat(-300.f, 300.f),
+				1.f);
+			m_pMaker->Make_Partical(1, vNewMyPos, 0.f, 2.f, 1.f, _float4(0.f, 1.f, 0.f, 0.f), 10.f, CUtils::Make_RandomFloat(15.f, 30.f), true);
+		}
+
+		m_bCutInitializeParticle = false;
+	}
+
+	if (m_fAirParticleDelay > 0.1f)
+	{
+		_float fZOffSet = { 0.f };
+		fZOffSet = CUtils::Make_RandomInt(0, 1) == 0 ? CUtils::Make_RandomFloat(-200.f, -50.f) : CUtils::Make_RandomFloat(50.f, 200.f);
+		_float fXOffSet = { 0.f };
+		fXOffSet = CUtils::Make_RandomFloat(20.f, 500.f);
+		_float fYOffSet = { 0.f };
+		fYOffSet = CUtils::Make_RandomFloat(-200.f, 10.f);
+
+		vKirbyPos.x += fXOffSet;
+		vKirbyPos.y += fYOffSet;
+		vKirbyPos.z += fZOffSet;
+		m_pMaker->Make_Partical(1, vKirbyPos, 0.f, 2.f, 1.f, _float4(0.f, 1.f, 0.f, 0.f), 10.f, CUtils::Make_RandomFloat(15.f, 30.f), true);
+		m_fAirParticleDelay = 0.f;
+	}
+
 }
 
 void CDisaster_Master::Make_AirParticle()

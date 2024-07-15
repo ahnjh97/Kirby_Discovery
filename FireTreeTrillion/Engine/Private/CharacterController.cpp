@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "GameInstance.h"
 #include "PhysX.h"
+#include "QueryFilterCallback.h"
 
 CCharacterController::CCharacterController(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent(pDevice, pContext)
@@ -397,7 +398,7 @@ _float CCharacterController::Compute_Height(_fvector vAxis)
 	PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
 	_float fMaxDistance = 10.f;
 
-	_float fHeight = { 0.f };
+	_float fHeight = { FLT_MAX };
 	PxRaycastHit hit;
 	PxRaycastBuffer hitBuffer;
 	PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
@@ -410,10 +411,13 @@ _float CCharacterController::Compute_Height(_fvector vAxis)
 		hit = hitBuffer.block;
 		fHeight = rayOrigin.y - hit.position.y;
 	}
-	else
-		fHeight = RayCastToDynamicActor(XMVectorSet(0, -1, 0, 0));
 
-	return fHeight;
+	_float fHeight2 = RayCastToDynamicActor(XMVectorSet(0, -1, 0, 0)/*, _float3(0, 0.5f, 0)*/);
+
+	if (fHeight == FLT_MAX && fHeight2 == FLT_MAX)
+		return 20.f;
+	else
+		return min(fHeight, fHeight2);
 }
 
 _float CCharacterController::Compute_Wall(_fvector vLook, _float fOffSet)
@@ -476,6 +480,34 @@ _float CCharacterController::Compute_Wall(_fvector vLook, _float3 vOffset)
 	return fDistance;
 }
 
+_float CCharacterController::RayCastToStaticActor(_fvector vDir, _float fRayDistance, _float3 vOffset)
+{
+	PxExtendedVec3 position = m_pController->getPosition();
+	PxVec3 rayOrigin = PxVec3((_float)position.x + vOffset.x, (_float)position.y + vOffset.y, (_float)position.z + vOffset.z);
+
+	PxVec3 rayDirection = CUtils::To_PxVec3(vDir);
+	_float fMaxDistance = fRayDistance;
+
+	_float fDistance = { 0.f };
+	PxRaycastHit hit;
+	PxRaycastBuffer hitBuffer;
+	PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
+
+	_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+
+	if (isRayCast)
+	{
+		// 첫 번째 히트 결과
+		hit = hitBuffer.block;
+
+		m_pMostRecentActor = hit.actor;
+
+		fDistance = (rayOrigin - hit.position).magnitude();
+	}
+	else
+		return FLT_MAX;
+}
+
 _float CCharacterController::RayCastToDynamicActor(_fvector vLook, _float3 vOffset)
 {
 	PxExtendedVec3 position = m_pController->getPosition();
@@ -484,20 +516,25 @@ _float CCharacterController::RayCastToDynamicActor(_fvector vLook, _float3 vOffs
 	PxVec3 rayDirection = CUtils::To_PxVec3(vLook);
 	_float fMaxDistance = 10.f;
 
-	_float fDistance = { 0.f };
+	_float fDistance = { FLT_MAX };
 	PxRaycastHit hit;
 	PxRaycastBuffer hitBuffer;
-	PxQueryFilterData filterData(PxQueryFlag::eDYNAMIC);
-
-	_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eDEFAULT, filterData);
+	PxQueryFilterData filterData(PxQueryFlag::eDYNAMIC | PxQueryFlag::ePREFILTER);
+	PxRigidActor* pMyActor = m_pController->getActor();
+	if (nullptr == pMyActor)
+		MB(TEXT("컨트롤러 액터 nullptr임"), TEXT("오류"));
+	CQueryFilterCallback filterCallback(pMyActor);
+	_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eDEFAULT, filterData, &filterCallback);
 
 	if (isRayCast)
 	{
 		// 첫 번째 히트 결과
 		hit = hitBuffer.block;
 
-		if(m_pController->getActor() != hit.actor)
+		if (m_pController->getActor() != hit.actor)
 			m_pMostRecentActor = hit.actor;
+		else
+			MSG_BOX(TEXT("Self Hit."));
 
 		fDistance = (rayOrigin - hit.position).magnitude();
 	}

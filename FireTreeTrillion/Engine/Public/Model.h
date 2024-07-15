@@ -137,6 +137,8 @@ public:
 	_bool Get_LerpPartialAnim() { return m_bLerpPartialAnim; }
 	void Set_LerpPartialAnim(_bool bLerpPartialAnim) { m_bLerpPartialAnim = bLerpPartialAnim; }
 
+	void ShowAllAnims();
+
 private:
 	_uint						m_iNumMeshes = { 0 };
 	vector<class CMesh*>		m_Meshes;

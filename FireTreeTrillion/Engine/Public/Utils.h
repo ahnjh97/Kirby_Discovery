@@ -36,10 +36,15 @@ public:
 	static Quaternion Make_Quat_FromDir(const _float4& _dir);
 	static Quaternion Make_Quat_FromDir(const _float3& _dir);
 
+	//degree to radian
+	static _float3 Degree_ToRadian(_float3 vDegree);
+
 	// Dir 던져 오일러 각도를 받는다.
 	static _float3 Make_Degree_FromDir(const _float4& _dir);
 	static _float3 Make_Degree_FromDir(const _float3& _dir);
 	static _float3 SlerpDirVec(_float3 vStart, _float3 vEnd, _float fRatio);
+
+	static _vector TurnDirectionVector(_fvector vDirVec, _float3 vAxis, _float fAngle);
 
 	//static _float2 
 

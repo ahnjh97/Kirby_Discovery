@@ -40,6 +40,24 @@ HRESULT CLevel_Finale::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_ControlCenter"), TEXT("Prototype_GameObject_FinaleCut_ControlCenter"))))
 		return E_FAIL;
 
+	// ºôµù ÄÆ¾À A, B
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_BuildingCluster"), TEXT("Prototype_GameObject_BuildingCluster_A"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_BuildingCluster"), TEXT("Prototype_GameObject_BuildingCluster_B"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_BuildingCluster"), TEXT("Prototype_GameObject_BuildingCluster_C"))))
+		return E_FAIL;
+
+
+	// µ¥ºê¸®½º ÄÆ¾À A, B, C
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_Debris"), TEXT("Prototype_GameObject_Finale_SpecialDebris_A"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_Debris"), TEXT("Prototype_GameObject_Finale_SpecialDebris_B"))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_Debris"), TEXT("Prototype_GameObject_Finale_SpecialDebris_C"))))
+		return E_FAIL;
+
+
 	// È¯°æ¸ÊÀ» Ãß°¡ÇÑ´Ù.
 	hr = Add_EnvMap();
 	CHECK_FAILED(hr);
@@ -143,8 +161,8 @@ HRESULT CLevel_Finale::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.f, -1.f, -.3f, 0.f);
 
-	LightDesc.vDiffuse = _float4(.095f, .024f, .365f, 1.f);
-	LightDesc.vAmbient = _float4(.23f, .27f, .47f, 1.f);
+	LightDesc.vDiffuse = _float4(.05f, .03f, .136f, 1.f);
+	LightDesc.vAmbient = _float4(.44f, .3f, .14f, 1.f);
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
@@ -253,7 +271,7 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 		-10.f);
 
 
-
+	/*
 	//cut scene start building
 	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_STOP,
 		{ 1619.6f, -84.37f, -152.71f }, { .87f, .5f, .02f },
@@ -276,8 +294,7 @@ HRESULT CLevel_Finale::Ready_FinaleRoad()
 	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_ROTATE,
 		{ 1842.2f, 7.f, -211.8f }, { .92f, .18f, .36f },
 		{ 1842.2f, 7.f, -211.8f }, { .92f, .18f, .36f }, -120.f);
-
-	/*
+		
 	//(¾Æ·¡) µµ·Î B
 	roadGrouperDesc = {};
 	roadGrouperDesc.eRoadType = RTYPE_ROADB;
@@ -981,6 +998,10 @@ HRESULT CLevel_Finale::Add_EnvMap()
 
 	//Normal ´øÁø´Ù.
 	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_NORMAL], "g_RandomNormalTexture")))
+		return E_FAIL;
+
+	_bool	bDeepShadow = true;
+	if (FAILED(m_pGameInstance->Bind_DeferredRawValue("g_bDeepShadow", &bDeepShadow, sizeof(_bool))))
 		return E_FAIL;
 
 	return S_OK;

@@ -22,22 +22,41 @@ HRESULT CRabbit::Initialize_Prototype()
 
 HRESULT CRabbit::Initialize(void* pArg)
 {
-	RABBIT_DESC* pRabbitDesc = nullptr;
-
-	if (nullptr != pArg)
+	wstring wstrModelName;
+	if (LEVEL_SIMBA == *m_pGameInstance->Get_CurrentLevelID())
 	{
-		pRabbitDesc = (RABBIT_DESC*)pArg;
+		MONSTER_DESC tDesc{};
+		if(nullptr != pArg)
+			tDesc = *(MONSTER_DESC*)pArg;
+		tDesc.fSpeedPerSec = 7.f;
+		tDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+		m_eRabbitState = RS_TARGET;
+		wstrModelName = tDesc.wstrModelName;
+		if (FAILED(__super::Initialize(&tDesc)))
+			return E_FAIL;
+	}
+	if (LEVEL_TOOL_ANIM == *m_pGameInstance->Get_CurrentLevelID())
+		wstrModelName = TEXT("Rabbit");
+	else
+	{
+		RABBIT_DESC* pRabbitDesc = nullptr;
 
-		pRabbitDesc->fSpeedPerSec = 7.f;
-		pRabbitDesc->fRotationPerSec = XMConvertToRadians(90.0f);
-		m_eRabbitState = pRabbitDesc->eRabbitState;
+		if (nullptr != pArg)
+		{
+			pRabbitDesc = (RABBIT_DESC*)pArg;
+
+			pRabbitDesc->fSpeedPerSec = 7.f;
+			pRabbitDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+			m_eRabbitState = pRabbitDesc->eRabbitState;
+			wstrModelName = pRabbitDesc->wstrModelName;
+		}
+
+		if (FAILED(__super::Initialize(pRabbitDesc)))
+			return E_FAIL;
 	}
 
-	if (FAILED(__super::Initialize(pRabbitDesc)))
-		return E_FAIL;
-
 	m_eCollisionGroup = MONSTER;
-	if (FAILED(Add_Components()))
+	if (FAILED(Add_Components(wstrModelName)))
 		return E_FAIL;
 
 	//Change_State(RABBIT_WAIT, 45.f, false, true);
@@ -53,6 +72,13 @@ HRESULT CRabbit::Initialize(void* pArg)
 	m_eAbilityType = ABILITY_DEFAULT;
 	m_eEyeState = RABBITEYE_IDLE;
 
+	m_iEyeMeshIdx = m_pModelCom->Find_MeshIndex(string("Eye"));
+
+	if (LEVEL_SIMBA == *m_pCurrentLevelID) {
+		m_bFind = true;
+		Set_Slope(false);
+	}
+		
 	return S_OK;
 }
 
@@ -117,37 +143,17 @@ HRESULT CRabbit::Render()
 
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
-
-		//몸통이라면 나머지 텍스쳐까지 바인딩 함
-		if (i == 1)
-		{
-			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
-				return E_FAIL;
-			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
-				return E_FAIL;
-		}
-
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
-
-		//몸통(1)은 normal O, 눈까리(0)는 normal x 패스
-		if (i == 1 && bRenderBody)
-		{
-			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
-				return E_FAIL;
-			if (FAILED(m_pModelCom->Render(i)))
-				return E_FAIL;
-		}
-		else if( i == 0 && bRenderEye)
-		{
-			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
-				return E_FAIL;
-			if (FAILED(m_pModelCom->Render(i)))
-				return E_FAIL;
-		}
-
-		
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render(i)))
+			return E_FAIL;
 	}
 
 	return S_OK;
@@ -265,7 +271,7 @@ _vector CRabbit::JumpAttak(_float fTimeDelta)
 	return m_vGoPos;
 }
 
-HRESULT CRabbit::Add_Components()
+HRESULT CRabbit::Add_Components(const wstring& _wstrModelName)
 {
 	HRESULT hr;
 	/* For.Com_Shader */
@@ -274,8 +280,8 @@ HRESULT CRabbit::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_Model */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Rabbit"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	wstring wstrModelTag = TEXT("Prototype_Component_Model_") + _wstrModelName;
+	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
 	/* For.Com_Texture */
@@ -288,6 +294,7 @@ HRESULT CRabbit::Add_Components()
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	desc.fOffset = 1.f;
+		
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 	//m_pControllerCom->Set_Object(this);
@@ -315,7 +322,6 @@ HRESULT CRabbit::Bind_ShaderResources()
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
@@ -333,8 +339,6 @@ HRESULT CRabbit::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
 		return E_FAIL;
-
-
 
 	return S_OK;
 }
@@ -371,7 +375,7 @@ void CRabbit::SetUp_FSM()
 
 _bool CRabbit::Custom_Face(_uint iMeshIndex)
 {
-	if (iMeshIndex == 0)
+	if (iMeshIndex == m_iEyeMeshIdx)
 	{
 		HRESULT hr;
 

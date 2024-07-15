@@ -161,6 +161,16 @@
 #include "FinalePartical_Maker.h"
 #include "FinaleCut_ControlCenter.h"
 
+#include "Finale_SpecialDebris_A.h"
+#include "Finale_SpecialDebris_B.h"
+#include "Finale_SpecialDebris_C.h"
+#include "BuildingCluster_A.h"
+#include "BuildingCluster_B.h"
+#include "BuildingCluster_C.h"
+
+#include "QTE.h"
+#include "QTE_Effect.h"
+
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA)
 //BOSS
 #include "BossChimera.h"
@@ -263,8 +273,8 @@ HRESULT CLoader::Start()
 
 		SetUp_ModelScaleRotation(LEVEL_STATIC);
 		hr = Loading_StaticComponentAll();
-
 		CHECK_FAILED(hr);
+
 		hr = Loading_For_Logo();
 	}
 	break;
@@ -272,7 +282,7 @@ HRESULT CLoader::Start()
 	case LEVEL_GAMEPLAY:
 		hr = Loading_For_GamePlay();
 		break;
-	// 05.20) UI Tool 레벨 추가
+
 	case LEVEL_TOOL_UI:
 		hr = Loading_For_Tool_UI();
 		break;
@@ -322,9 +332,7 @@ HRESULT CLoader::Start()
 	}
 
 	LeaveCriticalSection(&m_Critical_Section);
-
-	if (FAILED(hr))
-		return E_FAIL;
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -453,6 +461,16 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalePartical"), CFinalePartical);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleBuildingPartical"), CFinaleBuildingPartical);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleCut_ControlCenter"), CFinaleCut_ControlCenter);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Finale_SpecialDebris_A"), CFinale_SpecialDebris_A);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Finale_SpecialDebris_B"), CFinale_SpecialDebris_B);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Finale_SpecialDebris_C"), CFinale_SpecialDebris_C);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_A"), CBuildingCluster_A);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_B"), CBuildingCluster_B);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_C"), CBuildingCluster_C);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("QTE"), CQTE);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("QTE_Effect"), CQTE_Effect);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -796,6 +814,7 @@ HRESULT CLoader::Loading_For_DeeDeeDee()
 
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
+	hr = Add_Texture(eLevel, "HUD_BossName_DeeDeeDee", "UI/HUD/Boss/BossName_Dedede.png");
 
 	// 얼굴, 눈 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
@@ -1024,9 +1043,6 @@ HRESULT CLoader::Loading_For_Park()
 	
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 
-	//HUD_BOSSHPBAR
-	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
-
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
 
@@ -1085,6 +1101,8 @@ HRESULT CLoader::Loading_For_Simba()
 
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
+	hr = Add_Texture(eLevel, "HUD_BossName_Leongar", "UI/HUD/Boss/BossName_Leongar.png");
+
 
 	if (FAILED(Add_Texture(eLevel, "SimbaEye_Diffuse", "SimbaEye/Eye_BaseColor%d.dds", 3)))
 		return E_FAIL;
@@ -1156,6 +1174,8 @@ HRESULT CLoader::Loading_For_FinalBoss()
 
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
+	hr = Add_Texture(eLevel, "HUD_BossName_Elfilis", "UI/HUD/Boss/BossName_Elfilis.png");
+
 
 #pragma region SKYSPHERE::LEVEL_FINALBOSS
 
@@ -1220,11 +1240,21 @@ HRESULT CLoader::Loading_For_Finale()
 	if (FAILED(Add_Texture(eLevel, "FinalePartical", "FinalePartical/Finale_%d.dds", 9)))
 		return E_FAIL;
 
+	if (FAILED(Add_Texture(eLevel, "QTE_A", "UI/QTE/QTE_A.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "QTE_B", "UI/QTE/QTE_B.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "QTE_JoyOn", "UI/QTE/QTE_JoyOn.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "QTE_JoyOff", "UI/QTE/QTE_JoyOff.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "QTE_Plate", "UI/QTE/QTE_Plate.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "QTE_Effect", "UI/QTE/QTE_Effect.png")))
+		return E_FAIL;
+
 
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
-
-	//HUD_BOSSHPBAR
-	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
 
 #pragma region SKYSPHERE::LEVEL_FINALE
 
@@ -1307,7 +1337,6 @@ HRESULT CLoader::Loading_For_Tool_Anim()
 	//if (FAILED(Add_Texture(eLevel, "Logo", "Logo/Logo.png")))
 	//	return E_FAIL;
 	Add_KirbyFaceTexture(eLevel);
-
 	#pragma region 와들디 주문 말풍선
 	hr = Add_Texture(eLevel, "OrderCloud", "UI/MGameFood/OrderCloud.png");
 	CHECK_FAILED(hr);
@@ -1532,7 +1561,7 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.png", 4);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Grad", "Effects/Basic/common_gradation.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Hit", "Effects/Basic/common_ring_0.dds");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Smoke", "Effects/Basic/common_smoke.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Smoke", "Effects/Basic/common_smoke_%d.png", 2);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Line", "Effects/Basic/common_line_0.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Jump", "Effects/Basic/common_jump.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Sparkle", "Effects/Basic/common_sparkle.png");	CHECK_FAILED(hr);
@@ -1577,6 +1606,8 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_PopstarFallWind", "Effects/Popstar/PopStarFallEffectWind.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_PopstarSkyCloud", "Effects/Popstar/PopStarSkyCloud.dds");	CHECK_FAILED(hr);
 
+	//안개
+	hr = Add_Texture(LEVEL_STATIC, "FX_Fog", "Map/Fog/Sand_%d.png", 4);	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -2019,6 +2050,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Kirby Armour
 		Load_KirbyArmourModels();
 
+		// For Monsters
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.2f, 180.f);
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("AwoofyWild", TYPE_ANIM, 1.35f, 180.f);
+		m_vecModelInfo.emplace_back("RabbitBig", TYPE_ANIM, 1.35f, 180.f);
+
 		// For Boss 
 		m_vecModelInfo.emplace_back("Simba", TYPE_ANIM, 1.f, 180.f);
 
@@ -2105,10 +2142,21 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BuildingPiece", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("StarPiece", TYPE_NONANIM, 1.f, 0.f, 0);
 
-		m_vecModelInfo.emplace_back("MovableBuildingA", TYPE_NONANIM, 1.f, 0.f, 0);
-		m_vecModelInfo.emplace_back("MovableBuildingB", TYPE_NONANIM, 1.f, 0.f, 0);
-		m_vecModelInfo.emplace_back("MovableBuildingC", TYPE_NONANIM, 1.f, 0.f, 0);
-		m_vecModelInfo.emplace_back("MovableBuildingD", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingA", TYPE_NONANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingB", TYPE_NONANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingC", TYPE_NONANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("MovableBuildingD", TYPE_NONANIM, 0.8f, 0.f, 0);
+
+		m_vecModelInfo.emplace_back("BigMovableBuildingA", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BigMovableBuildingB", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BigMovableBuildingC", TYPE_NONANIM, 1.f, 0.f, 0);
+		m_vecModelInfo.emplace_back("BigMovableBuildingD", TYPE_NONANIM, 1.f, 0.f, 0);
+
+		m_vecModelInfo.emplace_back("CutDebrisA", TYPE_ANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("CutDebrisB", TYPE_ANIM, 0.8f, 0.f, 0);
+		m_vecModelInfo.emplace_back("CutDebrisC", TYPE_ANIM, 0.8f, 0.f, 0);
+
+
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
 		m_vecModelInfo.emplace_back("LbBrokenBuildingAC", TYPE_NONANIM, 1.f, 0.f, 0, string("LabDiscovera_Deco/"));
@@ -2116,8 +2164,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("LbBrokenBuildingCL", TYPE_NONANIM, 1.f, 0.f, 0, string("LabDiscovera_Deco/"));
 		m_vecModelInfo.emplace_back("LbBrokenBuildingDL", TYPE_NONANIM, 1.f, 0.f, 0, string("LabDiscovera_Deco/"));
 
+		m_vecModelInfo.emplace_back("BuildingCluster01", TYPE_ANIM, 0.8f);
+		m_vecModelInfo.emplace_back("BuildingCluster02", TYPE_ANIM, 0.8f);
+		m_vecModelInfo.emplace_back("BuildingSub", TYPE_ANIM, 0.8f);
 
-
+		 
 		m_vecModelInfo.emplace_back("Road", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadEnd", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 0.2f, 0.f, 0);
@@ -2209,14 +2260,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("StarBlockPiece", TYPE_NONANIM, 0.5f, 180.f);
 		m_vecModelInfo.emplace_back("StarBlockPieceStar", TYPE_NONANIM, 0.5f, 180.f);
 
-
 		// For Item
 		Load_ItemModels();
 		Load_KickableModels();
 
 		// 와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
-
 	}
 	else if (eLevel == LEVEL_TOOL_MAP)
 	{
@@ -2261,8 +2310,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("SpookStep", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("GhostGordo", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("Bomber", TYPE_ANIM, 1.f, 180.f);
-
 		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f);
+		
 		// Boss
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
