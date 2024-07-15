@@ -23,23 +23,23 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 	HRESULT hr = __super::Initialize(_pArg);
 	CHECK_FAILED(hr);
 
-	UIOBJ_DESC* HUDKirby_Desc{};
+	UIOBJ_DESC HUDKirby_Desc{};
 	if (nullptr != _pArg)
-		HUDKirby_Desc = (UIOBJ_DESC*)_pArg;
+		HUDKirby_Desc = *(UIOBJ_DESC*)_pArg;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 	
-	m_UIObjDesc = (*HUDKirby_Desc);
-	m_UIObjDesc.eUIType = (*HUDKirby_Desc).eUIType;
-	m_UIObjDesc.vColorRGB = (*HUDKirby_Desc).vColorRGB;
-	m_UIObjDesc.fAlpha = (*HUDKirby_Desc).fAlpha;
+	m_UIObjDesc = HUDKirby_Desc;
+	m_UIObjDesc.eUIType = HUDKirby_Desc.eUIType;
+	m_UIObjDesc.vColorRGB = HUDKirby_Desc.vColorRGB;
+	m_UIObjDesc.fAlpha = HUDKirby_Desc.fAlpha;
 
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
-		m_iTexIndex = (*HUDKirby_Desc).iTexIndex;
+		m_iTexIndex = HUDKirby_Desc.iTexIndex;
 
 	if (UI_FONT == m_UIObjDesc.eUIType)
-		m_UIObjDesc.wstrText = (*HUDKirby_Desc).wstrText;
+		m_UIObjDesc.wstrText = HUDKirby_Desc.wstrText;
 
 	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
@@ -50,13 +50,13 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 #pragma region SET_PROJ
 	if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
 	{
-		m_UIObjDesc.vDegree.z = (*HUDKirby_Desc).vDegree.z;
+		m_UIObjDesc.vDegree.z = HUDKirby_Desc.vDegree.z;
 		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 		XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	}
 	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
 	{
-		m_UIObjDesc.vDegree = (*HUDKirby_Desc).vDegree;
+		m_UIObjDesc.vDegree = HUDKirby_Desc.vDegree;
 
 		_float fRadianX = XMConvertToRadians(m_UIObjDesc.vDegree.x);
 		_float fRadianY = XMConvertToRadians(m_UIObjDesc.vDegree.y);
@@ -80,7 +80,13 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 
 		m_fFontSavePosX = m_vFontPos.x;
 	}
+
 	m_eCurState = KIRBYHP_HIDE;
+	if (LEVEL_FINALE != *m_pCurrentLevelID)
+		m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+	
+	if (LEVEL_FINALE == *m_pCurrentLevelID)
+		m_pKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 
 	return S_OK;
 }
@@ -88,12 +94,18 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 {	
 	__super::Tick(fTimeDelta);
+	if (nullptr == m_pKirby)
+		return OBJ_NOEVENT;
 
 	m_fTimeDelta = fTimeDelta;
 
 	_float fHpMax = { 0.f };
 	_float fHp = { 0.f };
 
+	fHp = m_pKirby->Get_Hp();
+	fHpMax = m_pKirby->Get_MaxHp();
+
+	/*
 	if (*m_pCurrentLevelID == LEVEL_FINALE)
 	{
 		CFinaleKirby* pKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
@@ -103,7 +115,7 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 		fHp = pKirby->Get_Hp();
 		fHpMax = pKirby->Get_MaxHp();
 	}
-	else
+	else if (*m_pCurrentLevelID != LEVEL_FINALE)
 	{
 		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 		if (pKirby == nullptr)
@@ -112,6 +124,7 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 		fHp = pKirby->Get_Hp();
 		fHpMax = pKirby->Get_MaxHp();
 	}
+	*/
 
 	// 피를 닳게 하는 기능을 가진 함수
 	Compute_Player_Hp(fTimeDelta, fHpMax, fHp);
@@ -518,8 +531,10 @@ CGameObject* CHUD_KirbyStatus::Clone(void* pArg)
 
 void CHUD_KirbyStatus::Free()
 {
-	Safe_Release(m_pTexMask);
 	__super::Free();
+	Safe_Release(m_pTexMask);
+
+	Safe_Release(m_pKirby);
 }
 
 

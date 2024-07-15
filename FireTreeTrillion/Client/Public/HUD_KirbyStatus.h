@@ -41,6 +41,7 @@ private:
 	_bool							m_IsMovingUP = { TRUE };
 	_bool							m_IsKirbyExistence = { FALSE };
 
+	class CCharacter*				m_pKirby = { nullptr };
 	KIRBYHP_STATE					m_eCurState = { KIRBYHP_NONE };
 
 	// 마스킹을 위한 텍스쳐

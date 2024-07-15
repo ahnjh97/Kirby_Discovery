@@ -23,24 +23,24 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 	HRESULT hr = __super::Initialize(_pArg);
 	CHECK_FAILED(hr);
 
-	UIOBJ_DESC* HUDStarPoint_Desc{};
+	UIOBJ_DESC HUDStarPoint_Desc{};
 	if (nullptr != _pArg)
-		HUDStarPoint_Desc = (UIOBJ_DESC*)_pArg;
+		HUDStarPoint_Desc = *(UIOBJ_DESC*)_pArg;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 	
-	m_UIObjDesc = (*HUDStarPoint_Desc);
-	m_UIObjDesc.eUIType = (*HUDStarPoint_Desc).eUIType;
-	m_UIObjDesc.vColorRGB = (*HUDStarPoint_Desc).vColorRGB;
-	m_UIObjDesc.fAlpha = (*HUDStarPoint_Desc).fAlpha;
+	m_UIObjDesc = HUDStarPoint_Desc;
+	m_UIObjDesc.eUIType = HUDStarPoint_Desc.eUIType;
+	m_UIObjDesc.vColorRGB = HUDStarPoint_Desc.vColorRGB;
+	m_UIObjDesc.fAlpha = HUDStarPoint_Desc.fAlpha;
 	//.vDegree = (*HUDStarPoint_Desc).vDegree;
 
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
-		m_iTexIndex = (*HUDStarPoint_Desc).iTexIndex;
+		m_iTexIndex = HUDStarPoint_Desc.iTexIndex;
 
 	if (UI_FONT == m_UIObjDesc.eUIType)
-		m_UIObjDesc.wstrText = (*HUDStarPoint_Desc).wstrText;
+		m_UIObjDesc.wstrText = HUDStarPoint_Desc.wstrText;
 
 
 	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, m_UIObjDesc.vSize.z);
@@ -53,14 +53,14 @@ HRESULT CHUD_StarPoint::Initialize(void* _pArg)
 
 	if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
 	{
-		m_UIObjDesc.vDegree.z = (*HUDStarPoint_Desc).vDegree.z;
+		m_UIObjDesc.vDegree.z = HUDStarPoint_Desc.vDegree.z;
 		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 		XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	}
 
 	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
 	{
-		m_UIObjDesc.vDegree = (*HUDStarPoint_Desc).vDegree;
+		m_UIObjDesc.vDegree = HUDStarPoint_Desc.vDegree;
 
 		_float fRadianX = XMConvertToRadians(m_UIObjDesc.vDegree.x);
 		_float fRadianY = XMConvertToRadians(m_UIObjDesc.vDegree.y);
