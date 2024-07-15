@@ -665,13 +665,13 @@ CGameObject* CHungryDee::Clone(void* pArg)
 
 void CHungryDee::Free()
 {
-	Safe_Release(m_pEyeTextureCom);
+	//Safe_Release(m_pEyeTextureCom);
 	Safe_Release(m_pDialogUI);
 
-	for (auto& Pair : m_PartObjects)
-		Safe_Release(Pair.second);
+	//for (auto& Pair : m_PartObjects)
+	//	Safe_Release(Pair.second);
 
-	m_PartObjects.clear();
+	//m_PartObjects.clear();
 
 	__super::Free();
 }

@@ -356,12 +356,6 @@ CGameObject* CFoodShopDee::Clone(void* pArg)
 
 void CFoodShopDee::Free()
 {
-	Safe_Release(m_pEyeTextureCom);
-
-	for (auto& Pair : m_PartObjects)
-		Safe_Release(Pair.second);
-
-	m_PartObjects.clear();
 
 	__super::Free();
 }
