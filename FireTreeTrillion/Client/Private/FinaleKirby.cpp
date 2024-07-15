@@ -665,7 +665,9 @@ _bool CFinaleKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
     else if ((_eBodyState == BODY_DEFAULT && _iMeshIndex == 3) ||
         (_eBodyState == BODY_VACUUM && _iMeshIndex == 2 ||
             /*_eBodyState == BODY_DUMPVACUUM && _iMeshIndex == 6 ||*/
-            _eBodyState == BODY_DUMPDEFAULT && _iMeshIndex == 7))
+            _eBodyState == BODY_DUMPDEFAULT && _iMeshIndex == 7 ||
+            _eBodyState == BODY_DUMPCUT && _iMeshIndex == 7)
+        )
     {
         m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
         m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
