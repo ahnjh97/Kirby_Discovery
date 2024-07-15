@@ -210,6 +210,8 @@ HRESULT CLevel_Town::Ready_Layer_BackGround(const wstring& strLayerTag)
 
 HRESULT CLevel_Town::Ready_UI()
 {
+	HRESULT hr = S_OK;
+
 #pragma region PARSING HUD_KIRBYHP, STARPOINT
 
 	vector<string> vecUITag = { "HUD_KirbyStatus", "HUD_StarPoint" };
@@ -295,7 +297,7 @@ HRESULT CLevel_Town::Ready_UI()
 			if ("HUD_StarPoint" == strUITag)
 				wstrLayerTag = TEXT("Layer_UI_HUD_StarPoint");
 
-			HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
+			hr = m_pGameInstance->Add_Clone(m_iLevel, wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
 			CHECK_FAILED(hr);
 		}
 
