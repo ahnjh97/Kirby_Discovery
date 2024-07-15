@@ -1154,7 +1154,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 
 
-		m_fQTERatio -= fTimeDelta * 16.f;
+		m_fQTERatio -= fTimeDelta * 10.f;
 
 		if (m_fQTERatio < 0.f)
 			m_fQTERatio = 0.f;
@@ -1254,7 +1254,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		}
 
 
-		m_fQTERatio -= fTimeDelta * 16.f;
+		m_fQTERatio -= fTimeDelta * 13.f;
 
 		if (m_fQTERatio < 0.f)
 			m_fQTERatio = 0.f;

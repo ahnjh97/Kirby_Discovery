@@ -344,12 +344,12 @@ void CDisaster_Master::Moving_FinaleRoad(_float fKirbyX)
 	}
 	else if (m_bRoadTrigger[4] == true && fKirbyX + (fKirbySpeed * 5.f) > 1619.6f)
 	{
-		_float3 vDestPos = { 1619.6f, -80.37f, -152.71f };
+		_float3 vDestPos = { 1619.6f, -86.37f, -152.71f };
 		_float3 vStartPos = vDestPos + _float3(100.f, 300.f, -200.f);
 	
 	Make_FinaleRoad(RTYPE_BUILDINGC, MOVECMD_FLY,
 		vStartPos, { -.87f, 0.f, 1.f },
-		vDestPos, { .87f, .5f, .02f }, 0.f);
+		vDestPos, { .87f, .5f, .0f }, 0.f);
 
 		m_bRoadTrigger[4] = false;
 
