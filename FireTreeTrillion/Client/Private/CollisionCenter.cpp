@@ -8,6 +8,8 @@
 #include "Monster.h"
 #include "AnimDeco.h"
 #include "DeeDeeDee.h"
+#include "Simba.h"
+#include "FinalBoss.h"
 #include "HUD_StarPoint.h"
 #include "Kirby_State_Function.h"
 #include "HitBox.h"
@@ -507,6 +509,30 @@ void CCollisionCenter::DeeDeeDee_Battle()
 			Dst->Set_Dead();
 		});
 
+	// 플레이어 공격에 대한 처리
+	Collision_Collider(m_GameObjects[OBJECT], m_GameObjects[BOSS_DEEDEEDEE], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pObject = static_cast<CPhysXObject*>(Dst);
+			CMonster* pMonster = static_cast<CMonster*>(Src);
+
+			if (pObject->Get_PhyXState() != PO_FLYAWAY)
+				return;
+
+			_float fAttack = pObject->Get_Attack();
+			pMonster->Minus_Hp(fAttack);
+			pthis->Camera_Shaking(1.2f);
+			DstHit->Set_Alive(false);
+			SrcHit->Set_Alive(false);
+			pObject->Set_PhyXState(PO_FLYDEADAWAY);
+		});
+
+
 	// 플레이어가 공격당하는 로직
 	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[HITBOX_DEEDEEDEE], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
@@ -594,6 +620,34 @@ void CCollisionCenter::DeeDeeDee_Battle()
 			pMonster->Minus_Hp(10.f);
 		});
 
+		Collision_Collider(m_GameObjects[BATTLEDEE], m_GameObjects[HITBOX_DEEDEEDEE], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pNpc = static_cast<CPhysXObject*>(Dst);
+			CDeeDeeDee* pMonster = static_cast<CDeeDeeDee*>(Src);
+
+			if (pNpc->Get_PhyXState() != PO_NORMAL)
+				return;
+
+			_float4 vNpcPos = pNpc->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+			_float4 vDeeDeeDeePos = pMonster->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+
+			_float3 vKnockDir = XMVector3Normalize(vNpcPos - vDeeDeeDeePos);
+
+			pthis->Knock_back(pNpc, vKnockDir * 5.f, CUtils::Make_RandomFloat(15.f, 28.f));
+			DstHit->Set_Alive(false);
+			SrcHit->Set_Alive(false);
+
+			pNpc->Collision(CONTENT_ATTACK, pMonster);
+
+		});
+
+
 }
 
 void CCollisionCenter::Simba_Battle()
@@ -615,6 +669,30 @@ void CCollisionCenter::Simba_Battle()
 			pMonster->Collision(CONTENT_DAMAGE, nullptr);
 			DstHit->Set_Alive(false);
 		});
+
+	// 플레이어 공격에 대한 처리
+	Collision_Collider(m_GameObjects[OBJECT], m_GameObjects[BOSS_SIMBA], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pObject = static_cast<CPhysXObject*>(Dst);
+			CMonster* pMonster = static_cast<CMonster*>(Src);
+
+			if (pObject->Get_AbilityType() != PO_FLYAWAY)
+				return;
+
+			_float fAttack = pObject->Get_Attack();
+			pMonster->Minus_Hp(fAttack);
+			pthis->Camera_Shaking(1.2f);
+			DstHit->Set_Alive(false);
+			SrcHit->Set_Alive(false);
+			pObject->Set_PhyXState(PO_FLYDEADAWAY);
+		});
+
 }
 
 void CCollisionCenter::FinalStage_Battle()
@@ -635,6 +713,31 @@ void CCollisionCenter::FinalStage_Battle()
 			pthis->Damage_And_Effect_For_Monster(pKirby, pMonster, 1.2f);
 			DstHit->Set_Alive(false);
 		});
+
+
+	// 플레이어 공격에 대한 처리
+	Collision_Collider(m_GameObjects[OBJECT], m_GameObjects[BOSS_FINALBOSS], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pObject = static_cast<CPhysXObject*>(Dst);
+			CMonster* pMonster = static_cast<CMonster*>(Src);
+
+			if (pObject->Get_AbilityType() != PO_FLYAWAY)
+				return;
+
+			_float fAttack = pObject->Get_Attack();
+			pMonster->Minus_Hp(fAttack);
+			pthis->Camera_Shaking(1.2f);
+			DstHit->Set_Alive(false);
+			SrcHit->Set_Alive(false);
+			pObject->Set_PhyXState(PO_FLYDEADAWAY);
+		});
+
 
 }
 
@@ -674,6 +777,8 @@ void CCollisionCenter::RealFinaleStage_Battle()
 			pBreakable->Collision(CONTENT_BODY, pKirby);
 
 		});
+
+
 }
 
 void CCollisionCenter::Body_To_Body_Collision()
