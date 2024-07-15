@@ -301,14 +301,14 @@ HRESULT CLevel_Park::Ready_Map()
 			if ("Gimmick_PkFunHouseDarkness02" == strModelName ||
 				"Gimmick_PkFunHouseDarkness03" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_LeftRight"),
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_Updown"),
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
 
 			if ("Gimmick_PkFunHouse06" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_FrontBack"),
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_Updown"),
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
@@ -871,12 +871,13 @@ HRESULT CLevel_Park::Ready_Objects()
 
 	//기믹 오브젝트를 기준으로, 가장 가까운 거리를 검사하여 다이나믹 필드를 세팅
 	list<CGameObject*>* GimmickList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"));
+	list<CGameObject*>* DFieldList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField_Updown"));
+
 	for (auto& Gimmick : *GimmickList)
 	{
 		_float fDistance = { FLT_MAX };
 		CGameObject* pDField = { nullptr };
 
-		list<CGameObject*>* DFieldList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField_Updown"));
 		for (auto& DField : *DFieldList)
 		{
 			//기믹 & 필드 거리 검사
@@ -887,10 +888,13 @@ HRESULT CLevel_Park::Ready_Objects()
 				pDField = DField;
 			}
 		}
-		CGm_ParkSolarPanelOnce* pGimmickSP = dynamic_cast<CGm_ParkSolarPanelOnce*>(Gimmick);
-		dynamic_cast<CGm_DynamicField*>(pDField)->Set_SolarPanel(pGimmickSP);
-		if (nullptr == pGimmickSP)
+
+		if ("SolarPanelOnce_NonAnim" == strModelName)
+		{
+			CGm_ParkSolarPanelOnce* pGimmickSP = dynamic_cast<CGm_ParkSolarPanelOnce*>(Gimmick);
+			dynamic_cast<CGm_DynamicField*>(pDField)->Set_SolarPanel(pGimmickSP);
 			continue;
+		}		
 	}
 
 #pragma endregion
