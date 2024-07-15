@@ -15,6 +15,7 @@ private:
 public:
 	_uint Get_NumMeshes() const { return m_iNumMeshes; }
 	class CBone* Get_BonePtr(const _char* pBoneName) const;
+	class CBone* Get_BonePtrByIndex(_uint iIndex) const;
 
 	MODEL Get_ModelInfo() const { return m_tModel; }
 	string Get_ModelName() const { return m_tModel.strModelName; }

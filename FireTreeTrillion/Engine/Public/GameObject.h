@@ -84,7 +84,7 @@ protected:
 	HRESULT				Add_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut, void* pArg = nullptr);
 	void				Delete_Component(const wstring& strPrototypeTag, const wstring& strComponentTag, class CComponent** ppOut);
 	HRESULT				Compute_ViewZ();
-
+	HRESULT				Compute_BoneViewZ(class CBone* pBone, _float3 vOffset = _float3());
 
 protected:
 	ID3D11Device*							m_pDevice = { nullptr };

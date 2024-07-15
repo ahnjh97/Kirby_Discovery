@@ -60,6 +60,14 @@ CBone * CModel::Get_BonePtr(const _char * pBoneName) const
 	return *iter;
 }
 
+CBone* CModel::Get_BonePtrByIndex(_uint iIndex) const
+{
+	if (iIndex >= m_Bones.size())
+		return nullptr;
+
+	return m_Bones[iIndex];
+}
+
 string CModel::Get_MeshName(_uint iMeshIndex)
 {
 	string str = m_Meshes[iMeshIndex]->Get_Name();

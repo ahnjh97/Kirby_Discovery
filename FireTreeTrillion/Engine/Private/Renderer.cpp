@@ -779,7 +779,7 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 		m_fRimLightRatio.second = 1.f;
 		m_vRimColor.second = _float3(1.f, .45f, 0.f);
 		m_fDOFIntensity = .1f;
-		m_vDOFColor = _float3{ .08f, .05f, .13f };
+		m_vDOFColor = _float3{ .07f, .05f, .09f };
 		Update_Option(OPTION_DOF, true);
 	}
 	break;

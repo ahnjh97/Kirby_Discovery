@@ -82,6 +82,9 @@ private:
 	vector<CGameObject*> m_vecAnimDecoGameObjs;
 
 	unordered_set<string> m_setMapDecoNames;
+	unordered_set<string> m_setTownDecoNames;
+	unordered_set<string> m_setParkDecoNames;
+	unordered_set<string> m_setLabDecoNames;
 
 	unordered_map<string, unordered_set<_uint>> m_mapBlendMeshesIndices;
 	unordered_map<string, _bool> m_mapBlendObjStaticActor;
@@ -108,8 +111,11 @@ private:
 	void Release_MapDecos();
 	HRESULT Render_NonOctreeMapDecos();
 
-	void	ReadMapDecoTxts();
+	void	ReadDecoTxts(const string& _strFolder, unordered_set<string>& _setDecoNames);
 	_bool	IsMapDeco(const string& _strModelName);
+	_bool	IsTownDeco(const string& _strModelName);
+	_bool	IsParkDeco(const string& _strModelName);
+	_bool	IsLabDeco(const string& _strModelName);
 
 	_bool	IsBlendDeco(const string& _strModelName);
 	void	TraverseBlendDecoInfoTxts(unordered_map<string, unordered_set<_uint>>& _mapBlendMeshIndices
@@ -120,6 +126,8 @@ private:
 	_bool	IsShadowDeco(const string& _strModelName);
 	
 	_bool	IsOctreeMapModel(const wstring& _wstrModelName);
+
+	void	ReleaseMapActors();
 		
 public:
 	static CBasicMap* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
