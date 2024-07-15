@@ -12,6 +12,11 @@ END
 BEGIN(Client)
 class CHUD_StarPoint : public CHUD
 {
+public:
+	enum STARPOINT_STATE {
+		STARPOINT_IDLE, STARPOINT_WAIT,
+		STARPOINT_HIDE, STARPOINT_SHOW, STARPOINT_LOOT, STARPOINT_DROP, STARPOINT_NONE
+	};
 
 private:
 	CHUD_StarPoint(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -51,7 +56,7 @@ private:
 	//_bool						m_IsKirbyExist = { FALSE };
 
 	//STARPOINT_STATE				m_ePreState = { STARPOINT_NONE };
-	//STARPOINT_STATE				m_eCurState = { STARPOINT_NONE };
+	STARPOINT_STATE				m_eCurState = { STARPOINT_NONE };
 	//
 	//_uint						m_iPreCoin = { 0 };
 

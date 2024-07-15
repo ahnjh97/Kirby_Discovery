@@ -44,6 +44,8 @@ public:
 	static _float3 Make_Degree_FromDir(const _float3& _dir);
 	static _float3 SlerpDirVec(_float3 vStart, _float3 vEnd, _float fRatio);
 
+	static _vector TurnDirectionVector(_fvector vDirVec, _float3 vAxis, _float fAngle);
+
 	//static _float2 
 
 	// Matrix °è»ê±â

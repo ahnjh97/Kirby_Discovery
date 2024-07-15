@@ -94,8 +94,8 @@ HRESULT CFinaleRoad::Initialize(void* pArg)
 
 	m_bMotionBlur = false;
 	m_bStencil = true;
-	m_bRimLight = false;
-
+	m_bRimLight = true;
+	m_fRimWidth = .08f;
 	m_wstrModelName = RoadDesc.wstrModelName;
 	m_pSocketMatrix = RoadDesc.pSocketMat;
 	m_bIsAnimModel = RoadDesc.bIsAnimModel;

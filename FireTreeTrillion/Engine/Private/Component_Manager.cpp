@@ -47,6 +47,17 @@ void CComponent_Manager::Clear(_uint iLevelIndex)
 	m_pPrototypes[iLevelIndex].clear();
 }
 
+void CComponent_Manager::ShowAllAnimations(_uint iLevelIndex, const wstring& wstrPrototypeTag)
+{
+	CModel* pModel = dynamic_cast<CModel*>(Find_Prototype(iLevelIndex, wstrPrototypeTag));
+	if (nullptr == pModel) {
+		MSG_BOX(TEXT("¸ðµ¨ ¾Æ´Ô"));
+		return;
+	}
+		
+	pModel->ShowAllAnims();
+}
+
 CComponent_Manager::PROTOTYPES* CComponent_Manager::Get_ComMap(_uint iLevelIdx)
 {
 	if (iLevelIdx >= m_iNumLevels)

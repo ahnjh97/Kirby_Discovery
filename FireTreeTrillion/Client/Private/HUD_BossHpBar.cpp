@@ -37,13 +37,16 @@ HRESULT CHUD_BossHpBar::Initialize(void* pArg)
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(m_fSizeX, m_fSizeY, 0.f, 1.f));
 
-	for (_int i = UI_BARPLATE; i < UI_END; ++i)
+	for (_int i = UI_BARPLATE; i <= UI_BARHIGH; ++i)
 	{
 		XMStoreFloat4x4(&m_BarMatrix[i], XMMatrixIdentity());
 		CUtils::Set_Scaled_Matrix(m_BarMatrix[i], 900.f, 55.f, 1.f);
 		CUtils::Turn_OtherMatrix(m_BarMatrix[i], _float4(0.f, 0.f, 1.f, 0.f), 1.f, 3.5f);
-
 	}
+	XMStoreFloat4x4(&m_NameMatrix, XMMatrixIdentity());
+	CUtils::Set_Scaled_Matrix(m_NameMatrix, 240.f, 40.f, 1.f);
+	CUtils::Turn_OtherMatrix(m_NameMatrix, _float4(0.f, 0.f, 1.f, 0.f), 1.f, 3.5f);
+
 
 	CUtils::Set_State_Matrix(m_BarMatrix[UI_BARPLATE], CUtils::STATE_POSITION,
 		_float4(m_fX - (m_fSizeX * 0.3f),
@@ -73,10 +76,22 @@ HRESULT CHUD_BossHpBar::Initialize(void* pArg)
 			1.f));
 	m_fOriginY[UI_BARHIGH] = m_BarMatrix[UI_BARHIGH]._42;
 
+
+	CUtils::Set_State_Matrix(m_NameMatrix, CUtils::STATE_POSITION,
+		_float4(m_fX - (m_fSizeX * 0.1f),
+			-m_fY + (m_fSizeY * 0.175f),
+			1.f,
+			1.f));
+	m_fNameOriginY = m_NameMatrix._42;
+
+
+
+
 	m_vColor[UI_BARPLATE] = { 1.f, 1.f, 1.f };
 	m_vColor[UI_BARLOW] = { 0.f, 0.f, 0.f };
 	m_vColor[UI_BARMIDDLE] = { 255.f / 255.f, 128.f / 255.f, 64.f / 255.f };
 	m_vColor[UI_BARHIGH] = { 138.f / 255.f, 20.f / 255.f, 174.f / 255.f };
+	m_vNameColor = { 1.f, 1.f, 1.f };
 
 	m_fAmplitude = 5.f;
 
@@ -138,34 +153,60 @@ HRESULT CHUD_BossHpBar::Render()
 			const _float BlackRatio = 1.f;
 			if (FAILED(m_pShaderCom->Bind_RawValue("g_fMaskRatio", &BlackRatio, sizeof(_float))))
 				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vRColor", &m_vColor[i], sizeof(_float3))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Begin(POSTEX_BOSS_BARPASS_DEFAULT)))
+				return E_FAIL;
+
 		}
 		else if (i == UI_BARLOW)
 		{
 			const _float BlackRatio = 1.f;
 			if (FAILED(m_pShaderCom->Bind_RawValue("g_fMaskRatio", &BlackRatio, sizeof(_float))))
 				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vRColor", &m_vColor[i], sizeof(_float3))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Begin(POSTEX_BOSS_BARPASS_DEFAULT)))
+				return E_FAIL;
+
 		}
 		else if (i == UI_BARMIDDLE)
 		{
 			if (FAILED(m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fBossSlowHpBar, sizeof(_float))))
 				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vRColor", &m_vColor[i], sizeof(_float3))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Begin(POSTEX_BOSS_BARPASS_DEFAULT)))
+				return E_FAIL;
+
 		}
 		else if (i == UI_BARHIGH)
 		{
 			if (FAILED(m_pShaderCom->Bind_RawValue("g_fMaskRatio", &m_fBossHpBar, sizeof(_float))))
 				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vRColor", &m_vColor[i], sizeof(_float3))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Begin(POSTEX_BOSS_BARPASS_DEFAULT)))
+				return E_FAIL;
 		}
-
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_vRColor", &m_vColor[i], sizeof(_float3))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Begin(POSTEX_BOSS_BARPASS_DEFAULT)))
-			return E_FAIL;
-	
 		if (FAILED(m_pVIBufferCom->Bind_Buffers()))
 			return E_FAIL;
 		if (FAILED(m_pVIBufferCom->Render()))
 			return E_FAIL;
 	}
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_NameMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vRColor", &m_vNameColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pTextureNameCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture")))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Begin(POSTEX_QTEEFFECT)))
+		return E_FAIL;
+	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
+		return E_FAIL;
+	if (FAILED(m_pVIBufferCom->Render()))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -182,9 +223,17 @@ HRESULT CHUD_BossHpBar::Add_Components()
 		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
 
-
 	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_BossBar"),
 		TEXT("Com_Texture"), (CComponent**)&m_pTextureCom)))
+		return E_FAIL;
+
+	wstring wstrTextureTag;
+	if (*m_pCurrentLevelID == LEVEL_DEEDEEDEE) wstrTextureTag = TEXT("DeeDeeDee");
+	else if (*m_pCurrentLevelID == LEVEL_SIMBA) wstrTextureTag = TEXT("Leongar");
+	else if (*m_pCurrentLevelID == LEVEL_FINALBOSS) wstrTextureTag = TEXT("Elfilis");
+
+	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_BossName_") + wstrTextureTag,
+		TEXT("Com_NameTexture"), (CComponent**)&m_pTextureNameCom)))
 		return E_FAIL;
 
 	return S_OK;
@@ -286,6 +335,11 @@ void CHUD_BossHpBar::Compute_MyBossHp(_float fTimeDelta)
 			CUtils::Set_State_Matrix(m_BarMatrix[i], CUtils::STATE_POSITION, vUIPos);
 		}
 
+		_float4 vNameUIPos = CUtils::Get_State_Vector_Matrix(m_NameMatrix, CUtils::STATE_POSITION);
+		vNameUIPos.y = m_fNameOriginY + m_fMoveY;
+		CUtils::Set_State_Matrix(m_NameMatrix, CUtils::STATE_POSITION, vNameUIPos);
+
+
 		m_fAmplitude -= fTimeDelta * 20.f;
 
 		if (m_fShakingTime > 0.25f)
@@ -300,12 +354,14 @@ void CHUD_BossHpBar::Compute_MyBossHp(_float fTimeDelta)
 				vUIPos.y = m_fOriginY[i];
 				CUtils::Set_State_Matrix(m_BarMatrix[i], CUtils::STATE_POSITION, vUIPos);
 			}
+
+			vNameUIPos = CUtils::Get_State_Vector_Matrix(m_NameMatrix, CUtils::STATE_POSITION);
+			vNameUIPos.y = m_fNameOriginY;
+			CUtils::Set_State_Matrix(m_NameMatrix, CUtils::STATE_POSITION, vNameUIPos);
 		}
 	}
 
 	m_fPreBossHpRatio = m_fCurBossHpRatio;
-
-
 
 	// 미리 자리 잡아두고 흔들어 보자.
 	// 구조 조금 바꿔볼 것.
@@ -357,4 +413,5 @@ void CHUD_BossHpBar::Free()
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pMyMonster);
+	Safe_Release(m_pTextureNameCom);
 }

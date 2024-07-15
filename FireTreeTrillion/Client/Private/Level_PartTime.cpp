@@ -20,6 +20,7 @@
 #include "BG.h"
 #include "HUD.h"
 #include "PartTimeHelper.h"
+#include "Dialog.h"
 
 
 CLevel_PartTime::CLevel_PartTime(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -59,7 +60,7 @@ HRESULT CLevel_PartTime::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
-	hr = Ready_Layer_UI(TEXT("Layer_UI"));
+	hr = Ready_UI();
 	CHECK_FAILED(hr);
 
 	Ready_Layer_Player(TEXT("Layer_Player"));
@@ -245,12 +246,21 @@ void CLevel_PartTime::Ready_Layer_Food(const wstring& strLayerTag)
 	CHECK_FAILED(hr);
 }
 
-HRESULT CLevel_PartTime::Ready_Layer_UI(const wstring& _wstrLayerTag)
+HRESULT CLevel_PartTime::Ready_UI()
 {
-	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, _wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTime"));
+	wstring wstrLayerTag = TEXT("Layer_UI_PartTime");
+	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTime"));
 	CHECK_FAILED(hr);
-	hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, _wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTimeResult"));
+
+	hr = m_pGameInstance->Add_Clone(LEVEL_PARTTIME, wstrLayerTag, TEXT("Prototype_GameObject_UI_PartTimeResult"));
 	CHECK_FAILED(hr);
+
+	// 다이얼로그 1 : 파트타임
+	CDialog::DIALOG_DESC tDialogDesc{};
+	tDialogDesc.strPath = "../Bin/Resources/Data/Dialog_Parttime.json";
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_Dialog"), &tDialogDesc);
+	CHECK_FAILED(hr);
+
 	return S_OK;
 }
 
@@ -654,84 +664,6 @@ HRESULT CLevel_PartTime::Ready_Kickables()
 	}
 
 	fileInput.close();
-
-	return S_OK;
-}
-
-HRESULT CLevel_PartTime::Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _wstrLayerTag)
-{
-	std::ifstream InputFile(_strFilePath, ios::in | std::ios::binary);
-
-	if (!InputFile.is_open()) //==FALSE 
-	{
-		MSG_BOX(TEXT("Failed to Open : FileData"));
-		ALARM_FAIL(TEXT("Failed to Open : FileData"));
-		return E_FAIL;
-	}
-
-	size_t size = 0;
-	InputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
-	//m_LayerUIs.reserve(size);
-
-	for (size_t i = 0; i < size; ++i)
-	{
-		string strProtoTag = {};
-		_uint iProtoTagLen = {};
-		InputFile.read(reinterpret_cast<char*>(&iProtoTagLen), sizeof(iProtoTagLen));
-		strProtoTag.resize(iProtoTagLen);
-		InputFile.read(&strProtoTag[0], iProtoTagLen);
-
-		if (0 == strProtoTag.size())
-			return E_FAIL;
-
-		CUIObject::UIOBJ_DESC LayerUIDesc{};
-		string strUITag = {};
-		_uint iUITagLen = {};
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.eUIType), sizeof(LayerUIDesc.eUIType));
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.eUIProj), sizeof(LayerUIDesc.eUIProj));
-
-		InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
-		strUITag.resize(iUITagLen);
-		InputFile.read(&strUITag[0], iUITagLen);
-		LayerUIDesc.wstrUITag = CUtils::StrToWstr(strUITag);
-
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vCenter), sizeof(LayerUIDesc.vCenter));
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vSize), sizeof(LayerUIDesc.vSize));
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vPos), sizeof(LayerUIDesc.vPos));
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vDegree), sizeof(LayerUIDesc.vDegree));
-
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.iTexIndex), sizeof(LayerUIDesc.iTexIndex));
-
-		string strText = {};
-		_uint iUIextLen = {};
-		InputFile.read(reinterpret_cast<char*>(&iUIextLen), sizeof(iUIextLen));
-		strText.resize(iUIextLen);
-		InputFile.read(&strText[0], iUIextLen);
-		LayerUIDesc.wstrText = CUtils::StrToWstr(strText);
-
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vColorRGB), sizeof(LayerUIDesc.vColorRGB));
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.fAlpha), sizeof(LayerUIDesc.fAlpha));
-
-		//파일 경로명으로 prototag를 받아 생성하는 방식
-		size_t strFileFrontPos = _strFilePath.find("txt/");
-		if (strFileFrontPos != string::npos)
-			strUITag = _strFilePath.substr(strFileFrontPos + 4);
-
-		//Prototype_GameObject_
-		size_t strFileBackPos = strUITag.find("_Orig");
-		if (strFileBackPos != string::npos)
-			strUITag = strUITag.substr(0, strFileBackPos);
-
-		size_t strProtoPos = strProtoTag.find("t_"); //찾을 문자열 위치
-		if (strProtoPos != string::npos)
-		{
-			strProtoTag = strProtoTag.substr(0, strProtoPos + 2); //해당 문자열 이후만 남김
-			strProtoTag += strUITag;
-		}
-
-		HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, _wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
-		CHECK_FAILED(hr);
-	}
 
 	return S_OK;
 }

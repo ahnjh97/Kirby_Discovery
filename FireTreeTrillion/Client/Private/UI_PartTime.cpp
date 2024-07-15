@@ -3,6 +3,7 @@
 
 #include "Camera_Main.h"
 #include "PartTimeHelper.h"
+#include "HungryDee.h"
 
 const _float g_fTimeSpeed = 0.06f;
 const _int	 g_iTextTextureCnt = 4;
@@ -62,10 +63,10 @@ HRESULT CUI_PartTime::Initialize_Prototype()
 	fill(m_arrColor.begin(), m_arrColor.end(), temp3D);
 	_int iZero(0);
 	fill(m_arrScoreDigits.begin(), m_arrScoreDigits.end(), iZero);
-	
+
 	m_arrRenderState[START] = false;
 	m_arrRenderState[BASIC] = false;
-	m_arrRenderState[FADE]  = false;
+	m_arrRenderState[FADE] = false;
 
 	m_arrTimerDigits[0] = 5;
 	m_arrTimerDigits[1] = 0;
@@ -109,7 +110,7 @@ _int CUI_PartTime::Tick(_float fTimeDelta)
 		// 점수를 받음으로써 변화되는 time-bar와 관련된 것을 관리합니다.
 		Compute_TimeScore(fTimeDelta);
 	}
-	
+
 	return OBJ_NOEVENT;
 }
 
@@ -200,44 +201,30 @@ HRESULT CUI_PartTime::Render()
 #ifdef _DEBUG
 void CUI_PartTime::Render_IMGUI()
 {
-	char ratio[16];
-	ImGui::DragFloat(ratio, (_float*)&m_fRatioTimeBar, 0.01f, 0.01f, 1.f);
+	//char ratio[16];
+	//ImGui::DragFloat(ratio, (_float*)&m_fRatioTimeBar, 0.01f, 0.01f, 1.f);
 	ImGui::Separator(); ImGui::NewLine();
 
-	//for (_int i = 10; i < m_arrPosition.size(); ++i)
-	//{
-	//	_int i = 15;
-	//	char name[16], size[16], color[16];
-	//	sprintf_s(name, "pos%d", i);
-	//	sprintf_s(size, "size%d", i);
-	//	sprintf_s(color, "color%d", i);
+	for (_int i = 10; i < 15; ++i)
+	{
+		char name[16];
+		sprintf_s(name, "pos%d", i);
+		ImGui::DragFloat2(name, (_float*)&m_arrPosition[i]);
 
-	//	ImGui::DragFloat(size,   (_float*)&m_arrSizeRatio[i], 0.05f, 0.1f, 2.f);
-	//	ImGui::DragFloat2(name,  (_float*)&m_arrPosition[i]);
-	//	ImGui::DragFloat3(color, (_float*)&m_arrColor[i], 0.01f, 0.f, 1.f);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+			XMVectorSet(m_arrPosition[i].x - g_iWinSizeX * 0.5f,
+				-m_arrPosition[i].y + g_iWinSizeY * 0.5f,
+				0.f,
+				1.f));
 
-	//	m_arrSize[i].x = m_arrOriginalSize[i].x * m_arrSizeRatio[i];
-	//	m_arrSize[i].y = m_arrOriginalSize[i].y * m_arrSizeRatio[i];
-
-	//	m_pTransformCom->Set_Scaled(m_arrSize[i].x, m_arrSize[i].y, 1.f);
-	//	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-	//		XMVectorSet(m_arrPosition[i].x - g_iWinSizeX * 0.5f,
-	//					- m_arrPosition[i].y + g_iWinSizeY * 0.5f,
-	//					0.f,
-	//					1.f));
-
-	//	ImGui::NewLine();
-	//}
-
-	//char test[16], test2[16];
-	//ImGui::DragFloat3(test, (_float*)&m_vTESTCOLOR, 0.01f, 0.f, 1.f);
-	//ImGui::DragFloat3(test2, (_float*)&m_vTESTCOLOR2, 0.01f, 0.f, 1.f);
+		ImGui::NewLine();
+	}
 }
 #endif
 
 void CUI_PartTime::Set_RenderState(STATE _eState, _bool _bState)
 {
-	 m_arrRenderState[_eState] = _bState;
+	m_arrRenderState[_eState] = _bState;
 }
 
 HRESULT CUI_PartTime::Add_Components()
@@ -248,7 +235,7 @@ HRESULT CUI_PartTime::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	#pragma region 텍스쳐 컴포넌트
+#pragma region 텍스쳐 컴포넌트
 	// 배경
 	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameFoodUI_BaseBar"),
 		TEXT("Com_Texture_BaseBar"), (CComponent**)&m_arrTexures[0])))
@@ -278,8 +265,8 @@ HRESULT CUI_PartTime::Add_Components()
 	// 왼쪽 아래 스코어 판
 	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameFoodUI_ScoreBar"),
 		TEXT("Com_Texture_ScoreBar"), (CComponent**)&m_arrTexures[6])))
-		return E_FAIL;	
-	
+		return E_FAIL;
+
 	// 와들디 얼굴 for test
 	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_GameFoodUI_AngryDee"),
 		TEXT("Com_Texture_DeeFaceAngry"), (CComponent**)&m_arrTexures[7])))
@@ -328,7 +315,7 @@ HRESULT CUI_PartTime::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Parttime_Ready"),
 		TEXT("Com_Texture_Ready"), (CComponent**)&m_arrTexures[17]);
 	CHECK_FAILED(hr);
-	
+
 	// GO 텍스쳐
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Parttime_Go"),
 		TEXT("Com_Texture_Go"), (CComponent**)&m_arrTexures[18]);
@@ -337,7 +324,7 @@ HRESULT CUI_PartTime::Add_Components()
 	if (FAILED(__super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby_Mask"),
 		TEXT("Com_Texture_Mask"), (CComponent**)&m_pTexMask)))
 		return E_FAIL;
-	#pragma endregion
+#pragma endregion
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
 		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
@@ -434,32 +421,30 @@ void CUI_PartTime::Setup_PosSizeColor(_int iTextureNum)
 		m_arrPosition[iTextureNum] = _float2(180.f, 817.f);
 	}
 	break;
-	case 7: // 와들디 얼굴
-	case 8: // 와들디 얼굴
-	case 9: // 와들디 얼굴
+	//////////////////////// ↓ 와들디 얼굴 ↓ /////////////////////////
+	case 7:
+	case 8:
+	case 9:
 	{
 		m_arrSize[iTextureNum] = m_SizeDeeFace2D * 0.9f;
 		m_arrPosition[iTextureNum] = _float2(213.f, 61.f);
 	}
 	break;
-	////////////////////// ↓ ↓ Digits ↓ ↓ /////////////////////////
+	//////////////////////// ↓ ↓ Digits ↓ ↓ /////////////////////////
 	case 10: // 타임판 digits 00
-		m_arrPosition[iTextureNum] = _float2(1467.f, 74.f);
-	break;
+		m_arrPosition[iTextureNum] = _float2(1463.f, 82.f);
+		break;
 	case 11: // 타임판 digits 0
-		m_arrPosition[iTextureNum] = _float2(1510.f, 74.f);
-	break;
+		m_arrPosition[iTextureNum] = _float2(1507.f, 82.f);
+		break;
 	case 12: // 점수판 digits 000
-		m_arrPosition[iTextureNum] = _float2(140.f, 810.f);
-	break;
+		m_arrPosition[iTextureNum] = _float2(135.f, 817.f);
+		break;
 	case 13: // 점수판 digits 00
-		m_arrPosition[iTextureNum] = _float2(185.f, 810.f);
-	break;
+		m_arrPosition[iTextureNum] = _float2(180.f, 817.f);
+		break;
 	case 14: // 점수판 digits 0
-		m_arrPosition[iTextureNum] = _float2(230.f, 810.f);
-	break;
-	case 15: // GAME OVER
-		//m_arrPosition[iTextureNum] = _float2(830.f, 200.f);
+		m_arrPosition[iTextureNum] = _float2(225.f, 817.f);
 		break;
 	case 18: // go!
 		m_arrPosition[iTextureNum] = _float2(830.f, 200.f);
@@ -468,10 +453,10 @@ void CUI_PartTime::Setup_PosSizeColor(_int iTextureNum)
 
 	m_pTransformCom->Set_Scaled(m_arrSize[iTextureNum].x, m_arrSize[iTextureNum].y, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-							XMVectorSet(m_arrPosition[iTextureNum].x - g_iWinSizeX * 0.5f,
-										- m_arrPosition[iTextureNum].y + g_iWinSizeY * 0.5f,
-										0.f,
-										1.f));
+		XMVectorSet(m_arrPosition[iTextureNum].x - g_iWinSizeX * 0.5f,
+			-m_arrPosition[iTextureNum].y + g_iWinSizeY * 0.5f,
+			0.f,
+			1.f));
 }
 
 // 현재 남아있는 Ratio에 따른 와들디 표정 변화. - 7 : angry, 8 : idle, 9 : sad
@@ -490,37 +475,57 @@ _bool CUI_PartTime::Setup_DeeFace(_int iTextureNum)
 // 타임바와 관계없습니다.
 void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 {
+
+
 	if (m_pGameInstance->Get_SecondTimer() == 0.f)
 	{
-		if(CPartTimeHelper::Get_Instance()->Handle_LunchTime())
-			m_pGameInstance->Set_SecondTimerRatio(1.f);
+		//if(CPartTimeHelper::Get_Instance()->Handle_LunchTime())
 	}
 
 	_float fLunchTime(20.9f), fGameoverTime(0.5f);
 	m_fStandardTime += fTimeDelta;
 	if (m_fStandardTime - m_fBeforeTime >= 1.f)
 	{
-		m_fCurTime = 5.f - m_fStandardTime;
-		//m_fCurTime = 50.f - m_fStandardTime;
+		//m_fCurTime = 5.f - m_fStandardTime;
+		m_fCurTime = 21.f - m_fStandardTime;
 		if (m_fCurTime <= 0.f) m_fCurTime = 0.f;
 		Change_TimeTexures(m_fCurTime);
-		
+
 		if (m_fCurTime <= fGameoverTime) // GAME OVER 텍스쳐 띄우기
 		{
 			CPartTimeHelper::Get_Instance()->Handle_UI(CPartTimeHelper::GAMEOVER);
 		}
-		else if (m_fCurTime <= fLunchTime) // 타임이 20일 때, 점심시간 시작.
+		else if (m_fCurTime <= fLunchTime && m_bLunchTimeTrigger) // 타임이 20일 때, 점심시간 시작.
 		{
 			// 모두 다 멈 춰!
-			m_pGameInstance->Set_SecondTimerRatio(0.f);
-			
+			//m_pGameInstance->Set_FirstTimerRatio(0.f);
+			//m_pGameInstance->Set_SecondTimerRatio(0.f);
+
 			// 점심시간 슈우우웅 이동되는거 // 효선아 여기야
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 			CHECK_NULLPTR(pCamera);
-			//pCamera->
+			pCamera->Make_Sequence(CCamera_Main::SEQ_LUNCHTIME);
+			pCamera->Unlock();
+
+			//유아이 숨기기
+			m_arrRenderState[BASIC] = false;
+			m_fLunchTimeStartTime = 5.f;
 
 			// 커비랑 와들디에게 점심시간 알리기
+
 			CPartTimeHelper::Get_Instance()->NotifyObserver();
+
+			m_bLunchTimeTrigger = false;
+		}
+
+		if (0.f < m_fLunchTimeStartTime)
+		{
+			m_fLunchTimeStartTime -= fTimeDelta;
+			if (m_fLunchTimeStartTime < 0.f)
+			{
+				m_arrRenderState[BASIC] = true;
+				m_fLunchTimeStartTime = 0.f;
+			}
 		}
 		m_fBeforeTime = m_fStandardTime;
 	}
@@ -531,13 +536,13 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 void CUI_PartTime::Compute_TimerBar(_float fTimeDelta)
 {
 	_float fSpeed(0.f);
-	if(m_fCurTime < 20.f)
+	if (m_fCurTime < 20.f)
 		fSpeed = g_fTimeSpeed * 10.f;
 	else
 		fSpeed = g_fTimeSpeed * 5.f;
-	
+
 	m_fRatioBarSub += fTimeDelta * fSpeed;
-	if(m_fRatioBarSub >= m_fGoalTimeBar)
+	if (m_fRatioBarSub >= m_fGoalTimeBar)
 	{
 		if (m_fGoalTimeBar >= 1.f) m_fRatioBarSub = 1.f;
 		m_fRatioTimeBar = m_fRatioBarSub;
@@ -549,7 +554,7 @@ void CUI_PartTime::Compute_TimerBar(_float fTimeDelta)
 // 리얼 타임바는 시간에 따라서 계속 줄어듭니다.
 void CUI_PartTime::Compute_TimeScore(_float fTimeDelta)
 {
-	if(m_fCurTime <= 20.f)
+	if (m_fCurTime <= 20.f)
 		m_fRatioTimeBar -= fTimeDelta * g_fTimeSpeed * 1.4f;
 	else
 		m_fRatioTimeBar -= fTimeDelta * g_fTimeSpeed;
@@ -620,10 +625,10 @@ void CUI_PartTime::Render_READY()
 	m_fMovePosition2D = _float2(standardPos2D.x * fPosRatio, standardPos2D.y);
 	m_pTransformCom->Set_Scaled(m_arrSize[iNum].x * 2.f, m_arrSize[iNum].y * 1.75f, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-								XMVectorSet(m_fMovePosition2D.x - g_iWinSizeX * 0.5f,
-											- m_fMovePosition2D.y + g_iWinSizeY * 0.5f,
-											0.f,
-											1.f));
+		XMVectorSet(m_fMovePosition2D.x - g_iWinSizeX * 0.5f,
+			-m_fMovePosition2D.y + g_iWinSizeY * 0.5f,
+			0.f,
+			1.f));
 
 	// UI별 포지션, 사이즈, 컬러 조정
 	HRESULT hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
@@ -648,7 +653,7 @@ void CUI_PartTime::Render_GO()
 	_int iNum = 18;
 	static _float fTimeAcc = 0.f;
 	static _float2 standardSize2D = m_arrSize[iNum];
-	
+
 	m_fSizeRatio += m_fTimeDelta * 2.f;
 	if (m_fSizeRatio >= 1.f)
 	{
@@ -665,13 +670,13 @@ void CUI_PartTime::Render_GO()
 
 	_float fSizeRatio = 1.f - EaseOutBounce(m_fSizeRatio);
 	_float2 ChangedSize2D = _float2(standardSize2D.x * fSizeRatio + m_arrSize[iNum].x * 2.f
-								  , standardSize2D.y * fSizeRatio + m_arrSize[iNum].y * 2.f);
+		, standardSize2D.y * fSizeRatio + m_arrSize[iNum].y * 2.f);
 	m_pTransformCom->Set_Scaled(ChangedSize2D.x, ChangedSize2D.y, 1.f);
 	m_arrPosition[iNum] = _float2(830.f, 200.f);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 		XMVectorSet(m_arrPosition[iNum].x - g_iWinSizeX * 0.5f,
-					- m_arrPosition[iNum].y + g_iWinSizeY * 0.5f, 0.f, 1.f));
+			-m_arrPosition[iNum].y + g_iWinSizeY * 0.5f, 0.f, 1.f));
 
 	// UI별 포지션, 사이즈, 컬러 조정
 	HRESULT hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
@@ -712,15 +717,15 @@ void CUI_PartTime::Render_Finish()
 	_float fSizeRatio = 1.f - EaseOutBounce(m_fSizeRatio);
 
 	_float2 ChangedSize2D = _float2(standardFSize2D.x * fSizeRatio + m_arrSize[iNum].x * 2.f
-									, standardFSize2D.y * fSizeRatio + m_arrSize[iNum].y * 2.f);
+		, standardFSize2D.y * fSizeRatio + m_arrSize[iNum].y * 2.f);
 	m_pTransformCom->Set_Scaled(ChangedSize2D.x, ChangedSize2D.y, 1.f);
 	m_arrPosition[iNum] = _float2(830.f, 200.f);
-	
+
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-							   XMVectorSet(m_arrPosition[iNum].x - g_iWinSizeX * 0.5f,
-							   	-m_arrPosition[iNum].y + g_iWinSizeY * 0.5f,
-							   	0.f,
-							   	1.f));
+		XMVectorSet(m_arrPosition[iNum].x - g_iWinSizeX * 0.5f,
+			-m_arrPosition[iNum].y + g_iWinSizeY * 0.5f,
+			0.f,
+			1.f));
 
 	// UI별 포지션, 사이즈, 컬러 조정
 	HRESULT hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
@@ -749,7 +754,7 @@ void CUI_PartTime::Render_Fade()
 
 	_int iFade = 1;
 	m_pShaderCom->Bind_RawValue("g_iFade", &iFade, sizeof(_int));
-	
+
 	fFadeOutRatio -= m_fTimeDelta * 0.9f;
 	_float fRatio = EASE_IN_SINE(fFadeOutRatio);
 	m_pShaderCom->Bind_RawValue("g_fFadeRatio", &fRatio, sizeof(_float));
@@ -768,9 +773,9 @@ void CUI_PartTime::Render_Fade()
 	m_arrPosition[iNum] = _float2(800.f, 400.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 		XMVectorSet(m_arrPosition[iNum].x - g_iWinSizeX * 0.5f,
-					-m_arrPosition[iNum].y + g_iWinSizeY * 0.5f,
-					0.f,
-					1.f));
+			-m_arrPosition[iNum].y + g_iWinSizeY * 0.5f,
+			0.f,
+			1.f));
 
 	// UI별 포지션, 사이즈, 컬러 조정
 	HRESULT hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");

@@ -23,23 +23,23 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 	HRESULT hr = __super::Initialize(_pArg);
 	CHECK_FAILED(hr);
 
-	UIOBJ_DESC* HUDKirby_Desc{};
+	UIOBJ_DESC HUDKirby_Desc{};
 	if (nullptr != _pArg)
-		HUDKirby_Desc = (UIOBJ_DESC*)_pArg;
+		HUDKirby_Desc = *(UIOBJ_DESC*)_pArg;
 
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 	
-	m_UIObjDesc = (*HUDKirby_Desc);
-	m_UIObjDesc.eUIType = (*HUDKirby_Desc).eUIType;
-	m_UIObjDesc.vColorRGB = (*HUDKirby_Desc).vColorRGB;
-	m_UIObjDesc.fAlpha = (*HUDKirby_Desc).fAlpha;
+	m_UIObjDesc = HUDKirby_Desc;
+	m_UIObjDesc.eUIType = HUDKirby_Desc.eUIType;
+	m_UIObjDesc.vColorRGB = HUDKirby_Desc.vColorRGB;
+	m_UIObjDesc.fAlpha = HUDKirby_Desc.fAlpha;
 
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
-		m_iTexIndex = (*HUDKirby_Desc).iTexIndex;
+		m_iTexIndex = HUDKirby_Desc.iTexIndex;
 
 	if (UI_FONT == m_UIObjDesc.eUIType)
-		m_UIObjDesc.wstrText = (*HUDKirby_Desc).wstrText;
+		m_UIObjDesc.wstrText = HUDKirby_Desc.wstrText;
 
 	m_pTransformCom->Set_Scaled(m_UIObjDesc.vSize.x, m_UIObjDesc.vSize.y, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
@@ -50,13 +50,13 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 #pragma region SET_PROJ
 	if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
 	{
-		m_UIObjDesc.vDegree.z = (*HUDKirby_Desc).vDegree.z;
+		m_UIObjDesc.vDegree.z = HUDKirby_Desc.vDegree.z;
 		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 		XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	}
 	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
 	{
-		m_UIObjDesc.vDegree = (*HUDKirby_Desc).vDegree;
+		m_UIObjDesc.vDegree = HUDKirby_Desc.vDegree;
 
 		_float fRadianX = XMConvertToRadians(m_UIObjDesc.vDegree.x);
 		_float fRadianY = XMConvertToRadians(m_UIObjDesc.vDegree.y);
@@ -81,8 +81,12 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 		m_fFontSavePosX = m_vFontPos.x;
 	}
 
-	m_eCurState = KIRBYHP_WAIT;
-	m_ePreState = KIRBYHP_HIDE;
+	m_eCurState = KIRBYHP_HIDE;
+	if (LEVEL_FINALE != *m_pCurrentLevelID)
+		m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+	
+	if (LEVEL_FINALE == *m_pCurrentLevelID)
+		m_pKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 
 	return S_OK;
 }
@@ -90,12 +94,18 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 {	
 	__super::Tick(fTimeDelta);
+	if (nullptr == m_pKirby)
+		return OBJ_NOEVENT;
 
 	m_fTimeDelta = fTimeDelta;
 
 	_float fHpMax = { 0.f };
 	_float fHp = { 0.f };
 
+	fHp = m_pKirby->Get_Hp();
+	fHpMax = m_pKirby->Get_MaxHp();
+
+	/*
 	if (*m_pCurrentLevelID == LEVEL_FINALE)
 	{
 		CFinaleKirby* pKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
@@ -105,7 +115,7 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 		fHp = pKirby->Get_Hp();
 		fHpMax = pKirby->Get_MaxHp();
 	}
-	else
+	else if (*m_pCurrentLevelID != LEVEL_FINALE)
 	{
 		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 		if (pKirby == nullptr)
@@ -114,6 +124,7 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 		fHp = pKirby->Get_Hp();
 		fHpMax = pKirby->Get_MaxHp();
 	}
+	*/
 
 	// 피를 닳게 하는 기능을 가진 함수
 	Compute_Player_Hp(fTimeDelta, fHpMax, fHp);
@@ -131,12 +142,13 @@ void CHUD_KirbyStatus::Late_Tick(_float fTimeDelta)
 
 HRESULT CHUD_KirbyStatus::Render()
 {
-	//if (KIRBYHP_WAIT == m_eCurState && KIRBYHP_HIDE == m_ePreState)
-	//	return S_OK;
+	//07.15) Render OFF 처리 추가
+	if (KIRBYHP_HIDE == m_eCurState && 0 == m_fAlpha)
+		return S_OK;
 
 	// 만약, 클래스 내부에서 랜더되지 않아도 되는 상황으로 판단한다면, 랜더를 하지 않는다.
-	if (m_bRenderHpbar == false)
-		return S_OK;
+	//if (m_bRenderHpbar == false)
+	//	return S_OK;
 
 	// 알파값이 1보다 낮아지려고 하는 것은 사라지려고 하는 것이다.
 	if (m_fAlpha < 1.f)
@@ -151,6 +163,7 @@ HRESULT CHUD_KirbyStatus::Render()
 		Render_BindSet(m_pShaderCom, m_pTransformCom);
 	}
 
+	//추후 폰트가 아닌 이미지폰트로 렌더할 예정
 	if (UI_FONT == m_UIObjDesc.eUIType)
 	{
 		_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha * m_fAlpha };
@@ -221,7 +234,6 @@ HRESULT CHUD_KirbyStatus::Render_BindSet(CShader* _pShaderCom, CTransform* _pTra
 HRESULT CHUD_KirbyStatus::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex)
 {
 
-
 	if (TEXT("Gauge") == m_UIObjDesc.wstrUITag)
 	{
 		m_pTexMask->Bind_ShaderResource(_pShaderCom, "g_MaskTexture", 0);
@@ -275,120 +287,6 @@ HRESULT CHUD_KirbyStatus::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 		return E_FAIL;
 
 	return S_OK;
-}
-
-void CHUD_KirbyStatus::Update_UIState(_float _fTimeDelta)
-{
-	switch (m_eCurState)
-	{
-	case KIRBYHP_IDLE: // 1) 렌더x 기본 상태
-		if (KIRBYHP_HIDE == m_ePreState)	//이전 상태가 HIDE인 경우, 기본값으로 세팅
-			m_eCurState = KIRBYHP_WAIT;
-		break;
-
-	case KIRBYHP_WAIT: // 3) 특정 이벤트 이후 대기 상태
-		if (KIRBYHP_DAMAGE == m_ePreState)	//이전 피격받았을 경우,
-		{
-			m_fAccTime += _fTimeDelta;
-			if (m_fAccTime > 5.f)
-			{
-				m_eCurState = KIRBYHP_HIDE; //3-A) 이후 숨김 상태로 변경
-				m_fAccTime = 0.f;
-			}
-		}
-		else
-			Play_Animation(m_fAccTime, KIRBYHP_WAIT);
-		break;
-
-	case KIRBYHP_HIDE: // 4) 숨김 상태
-		m_fAccTime += _fTimeDelta;
-		if (m_fAccTime > 0.16f)
-		{
- 			m_fAccTime = 0.f;
-			m_eCurState = KIRBYHP_IDLE;	//4-A) 시간 경과 후 대기 상태로 변경 (렌더X)
-			m_ePreState = KIRBYHP_HIDE;
-		}
-		else
-			Play_Animation(m_fAccTime, KIRBYHP_HIDE);
-		break;
-
-	//Frame 52 > 77
-	case KIRBYHP_DAMAGE: // 2) 피격 상태
-		m_fAccTime += _fTimeDelta;
-		if (m_fAccTime >= 25.f / 144.f)
-		{
-			m_fAccTime = 0.f;
-			m_eCurState = KIRBYHP_WAIT;
-			m_ePreState = KIRBYHP_DAMAGE;
-		}
-		else
-			Play_Animation(m_fAccTime, KIRBYHP_DAMAGE);
-		break;
-
-	case KIRBYHP_HEAL: 
-		break;
-
-	case KIRBYHP_NONE:
-	default:	break;
-	}
-}
-
-void CHUD_KirbyStatus::Play_Animation(_float _fAccTime, KIRBYHP_STATE _eCurState)
-{
-	_float4 vWAITPos = {};
-
-	switch (m_eCurState)
-	{
-	case CHUD::KIRBYHP_IDLE: //기본 상태에서 위치 값을 저장
-		break;
-
-	case CHUD::KIRBYHP_WAIT:
-		//if (TEXT("Name") == m_UIObjDesc.wstrUITag)
-		//	m_UIObjDesc.vPos = { -750.f, 413.f, 0.f };
-
-		//if (TEXT("Base") == m_UIObjDesc.wstrUITag || TEXT("Shadow") == m_UIObjDesc.wstrUITag || (TEXT("Blur") == m_UIObjDesc.wstrUITag))
-		//	m_UIObjDesc.vPos = { -0.39f, 0.21f, 1.f };
-
-		//if (TEXT("Gauge_Base") == m_UIObjDesc.wstrUITag || (TEXT("Gauge_Damage") == m_UIObjDesc.wstrUITag || TEXT("Gauge") == m_UIObjDesc.wstrUITag))
-		//	m_UIObjDesc.vPos = { -0.39f, 0.21f, 1.f };
-
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-			XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
-				m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
-				m_UIObjDesc.vPos.z, 1.f));
-
-		break;
-
-	case CHUD::KIRBYHP_HIDE: //X값 좌측 이동, 알파 값 죽이기
-		if (m_UIObjDesc.wstrUITag == TEXT("Name"))
-		{
-			m_UIObjDesc.vPos.x -= 40.f;
-			//m_UIObjDesc.vPos.x = m_vOriginalPos - (내가 이동하고 싶은 값) (50.f * _fAccTime * (1.f / 0.16f))
-		}
-
-		m_UIObjDesc.vPos.x -= 0.05f;
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-			XMVectorSet(m_UIObjDesc.vPos.x - m_UIObjDesc.vCenter.x + m_UIObjDesc.vCenter.x,
-				m_UIObjDesc.vPos.y - m_UIObjDesc.vCenter.y + m_UIObjDesc.vCenter.y,
-				m_UIObjDesc.vPos.z, 1.f));
-
-		// 1 ~ 0  -> 0.16초
-		m_UIObjDesc.fAlpha = 1.f - (_fAccTime * (1.f / 0.16f));
-
-		if (m_UIObjDesc.fAlpha < 1.f / 255.f)
-			m_UIObjDesc.fAlpha = 1.f / 255.f;
-		break;
-
-	case CHUD::KIRBYHP_DAMAGE:
-		//m_pTransformCom->Set_State(CTransform::STATE_POSITION, vStateWAITPos);
-		break;
-
-	case CHUD::KIRBYHP_HEAL:
-		break;
-
-	case CHUD::KIRBYHP_NONE:
-	default:	break;
-	}
 }
 
 void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta, _float _fKirbyHpMax, _float _fKirbyHp)
@@ -585,14 +483,15 @@ void CHUD_KirbyStatus::Disappear_HpBar(_float fTimeDelta)
 		if (m_fAlpha < 0.f)
 		{
 			m_fAlpha = 0.f;
-			m_bRenderHpbar = false;
+			m_eCurState = KIRBYHP_HIDE;
+
 		}
 	}
 	// 반대로, 7초 이하이거나 (피격 또는 회복이 되었다는 뜻임) 
 	// 또는 우리가 밖에서 RenderHpbar 라는 불 변수를 true로 만들어주면 강제적으로 Render한다.
 	else if (m_fIdleTime <= 5.f || m_bCustomRenderHpbar == true)
 	{
-		m_bRenderHpbar = true;
+		m_eCurState = KIRBYHP_SHOW;
 		m_fAlpha = 1.f;
 		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		vPos.x = m_fSaveMyX;
@@ -632,8 +531,10 @@ CGameObject* CHUD_KirbyStatus::Clone(void* pArg)
 
 void CHUD_KirbyStatus::Free()
 {
-	Safe_Release(m_pTexMask);
 	__super::Free();
+	Safe_Release(m_pTexMask);
+
+	Safe_Release(m_pKirby);
 }
 
 

@@ -168,6 +168,9 @@
 #include "BuildingCluster_B.h"
 #include "BuildingCluster_C.h"
 
+#include "QTE.h"
+#include "QTE_Effect.h"
+
 #pragma region LEVEL_FINALBOSS (LAB_DISCOVERA)
 //BOSS
 #include "BossChimera.h"
@@ -466,6 +469,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_B"), CBuildingCluster_B);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BuildingCluster_C"), CBuildingCluster_C);
 
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("QTE"), CQTE);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("QTE_Effect"), CQTE_Effect);
 
 	//Dee
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
@@ -809,6 +814,7 @@ HRESULT CLoader::Loading_For_DeeDeeDee()
 
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
+	hr = Add_Texture(eLevel, "HUD_BossName_DeeDeeDee", "UI/HUD/Boss/BossName_Dedede.png");
 
 	// 얼굴, 눈 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
@@ -942,9 +948,9 @@ HRESULT CLoader::Loading_For_Parttime()
 	CHECK_FAILED(hr);
 
 	// 게임 DIGITS
-	hr = Add_Texture(eLevel, "TimeDigits", "UI/Parttime/TimeDigits/%d.png", 10);
+	hr = Add_Texture(eLevel, "TimeDigits", "UI/Parttime/TimeDigits/%d.dds", 10);
 	CHECK_FAILED(hr);
-	hr = Add_Texture(eLevel, "ScoreDigits", "UI/Parttime/ScoreDigits/%d.png", 10);
+	hr = Add_Texture(eLevel, "ScoreDigits", "UI/Parttime/ScoreDigits/%d.dds", 10);
 	CHECK_FAILED(hr);
 
 #pragma endregion
@@ -1037,9 +1043,6 @@ HRESULT CLoader::Loading_For_Park()
 	
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 
-	//HUD_BOSSHPBAR
-	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
-
 	// 커비 얼굴 텍스쳐 로드
 	Add_KirbyFaceTexture(eLevel);
 
@@ -1098,6 +1101,8 @@ HRESULT CLoader::Loading_For_Simba()
 
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
+	hr = Add_Texture(eLevel, "HUD_BossName_Leongar", "UI/HUD/Boss/BossName_Leongar.png");
+
 
 	if (FAILED(Add_Texture(eLevel, "SimbaEye_Diffuse", "SimbaEye/Eye_BaseColor%d.dds", 3)))
 		return E_FAIL;
@@ -1169,6 +1174,8 @@ HRESULT CLoader::Loading_For_FinalBoss()
 
 	//HUD_BOSSHPBAR
 	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
+	hr = Add_Texture(eLevel, "HUD_BossName_Elfilis", "UI/HUD/Boss/BossName_Elfilis.png");
+
 
 #pragma region SKYSPHERE::LEVEL_FINALBOSS
 
@@ -1233,11 +1240,21 @@ HRESULT CLoader::Loading_For_Finale()
 	if (FAILED(Add_Texture(eLevel, "FinalePartical", "FinalePartical/Finale_%d.dds", 9)))
 		return E_FAIL;
 
+	if (FAILED(Add_Texture(eLevel, "QTE_A", "UI/QTE/QTE_A.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "QTE_B", "UI/QTE/QTE_B.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "QTE_JoyOn", "UI/QTE/QTE_JoyOn.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "QTE_JoyOff", "UI/QTE/QTE_JoyOff.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "QTE_Plate", "UI/QTE/QTE_Plate.png")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "QTE_Effect", "UI/QTE/QTE_Effect.png")))
+		return E_FAIL;
+
 
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
-
-	//HUD_BOSSHPBAR
-	hr = Add_Texture(eLevel, "HUD_BossBar", "UI/HUD/Boss/BossBar_%d.png", 5);
 
 #pragma region SKYSPHERE::LEVEL_FINALE
 
@@ -1544,7 +1561,7 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.png", 4);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Grad", "Effects/Basic/common_gradation.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Hit", "Effects/Basic/common_ring_0.dds");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Smoke", "Effects/Basic/common_smoke.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Smoke", "Effects/Basic/common_smoke_%d.png", 2);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Line", "Effects/Basic/common_line_0.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Jump", "Effects/Basic/common_jump.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Sparkle", "Effects/Basic/common_sparkle.png");	CHECK_FAILED(hr);
@@ -1589,6 +1606,8 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_PopstarFallWind", "Effects/Popstar/PopStarFallEffectWind.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_PopstarSkyCloud", "Effects/Popstar/PopStarSkyCloud.dds");	CHECK_FAILED(hr);
 
+	//안개
+	hr = Add_Texture(LEVEL_STATIC, "FX_Fog", "Map/Fog/Sand_%d.png", 4);	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -2030,6 +2049,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		Load_KirbyWeaponModels();
 		// For Kirby Armour
 		Load_KirbyArmourModels();
+
+		// For Monsters
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.2f, 180.f);
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("AwoofyWild", TYPE_ANIM, 1.35f, 180.f);
+		m_vecModelInfo.emplace_back("RabbitBig", TYPE_ANIM, 1.35f, 180.f);
 
 		// For Boss 
 		m_vecModelInfo.emplace_back("Simba", TYPE_ANIM, 1.f, 180.f);

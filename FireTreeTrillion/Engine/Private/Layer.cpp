@@ -60,7 +60,7 @@ CGameObject* CLayer::Get_GameObject()
 	return nullptr;
 }
 
-CGameObject* CLayer::Get_GameObject_ByTag(wstring _tag)
+CGameObject* CLayer::Get_GameObject_ByTag(const wstring& _tag)
 {
 	for (auto& obj : m_GameObjects)
 	{
@@ -90,15 +90,6 @@ void CLayer::Tick(_float fTimeDelta)
 		}
 		else
 			iter++;
-	}
-}
-
-void CLayer::Event_Tick(_float fTimeDelta)
-{
-	for (auto& pGameObject : m_GameObjects)
-	{
-		if (nullptr != pGameObject)
-			pGameObject->Event_Tick(fTimeDelta);
 	}
 }
 

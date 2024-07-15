@@ -111,7 +111,7 @@ HRESULT CHungryDee::Initialize(void* pArg)
 		m_pDialogUI = static_cast<CUI_PartTimeDee*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_UI_PartTimeDee")));
 		m_pDialogUI->Set_IsRender(false);
 	}
-	
+
 	m_pModelCom->Set_Animation(DEESHOPANIM_RUN, CUtils::Make_RandomFloat(45.f, 60.f), true, true);
 
 	return S_OK;
@@ -122,7 +122,7 @@ _int CHungryDee::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return Ready_Dead();
 
-	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
 
 	//디버깅용
 	if (m_iMyIdx == FRONT_WAITPOS)
@@ -148,7 +148,7 @@ _int CHungryDee::Tick(_float fTimeDelta)
 			m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc);
 		}
 	}
-	
+
 
 	//나머지 슈퍼틱, 파트 틱 처리
 	__super::Tick(m_fTimeDelta);
@@ -162,7 +162,7 @@ _int CHungryDee::Tick(_float fTimeDelta)
 			m_pDialogUI->Tick(m_fTimeDelta);
 	}
 	//내가 앞자리 직전이고, 주문하는 애니메이션일 때
-	else if ( m_iMyIdx == FRONT_WAITPOS + 1 && (m_pFSM->Get_State() == DEESHOPANIM_GUESTNORMAL || m_pFSM->Get_State() == DEESHOPANIM_GUESTANGER))
+	else if (m_iMyIdx == FRONT_WAITPOS + 1 && (m_pFSM->Get_State() == DEESHOPANIM_GUESTNORMAL || m_pFSM->Get_State() == DEESHOPANIM_GUESTANGER))
 	{
 		if (m_pDialogUI != nullptr)
 		{
@@ -330,11 +330,13 @@ void CHungryDee::OnNotify()
 	HungryDeeDesc.matWorld = InitMat;
 
 	_int iStartIdx = m_iWatingNum;
+
 	for (_int i = 0; i < 10; ++i)
 	{
 		HungryDeeDesc.iIdx = iStartIdx + i;
-		//m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc);
+		m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc);
 	}
+
 }
 
 //맨 앞자리 디
@@ -452,7 +454,7 @@ void CHungryDee::Bring_Food(PARTTIME_ITEM eITEM)
 HRESULT CHungryDee::Add_Components()
 {
 	HRESULT hr;
-	
+
 	//쉐이더
 	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxAnimModel"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);

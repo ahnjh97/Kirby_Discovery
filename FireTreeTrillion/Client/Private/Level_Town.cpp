@@ -59,7 +59,7 @@ HRESULT CLevel_Town::Initialize()
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
 
-	hr = Ready_Layer_UI(TEXT("Layer_UI"));
+	hr = Ready_UI();
 	CHECK_FAILED(hr);
 
 	// Part-timer Kirby Test
@@ -208,30 +208,103 @@ HRESULT CLevel_Town::Ready_Layer_BackGround(const wstring& strLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_Town::Ready_Layer_UI(const wstring& _wstrLayerTag)
+HRESULT CLevel_Town::Ready_UI()
 {
-	HRESULT hr;
+	HRESULT hr = S_OK;
 
-	//모든 HUD를 준비
-	string strUITag = { "LayerUI" };
-	CHUD::UI_TAG eHUDType = CHUD::TAG_NONE;
+#pragma region PARSING HUD_KIRBYHP, STARPOINT
 
-	map<CHUD::UI_TAG, string> HUDmap =
+	vector<string> vecUITag = { "HUD_KirbyStatus", "HUD_StarPoint" };
+
+	string strFileBase = { "../../../UI_txt/" };
+	string strFileExt = { "_Orig.txt" };
+
+	for (const auto& strUITag : vecUITag)
 	{
-		{CHUD::HUD_KIRBYHP, "HUD_KirbyStatus"},
-		{CHUD::HUD_STARPOINT, "HUD_StarPoint"},
-		//{CHUD::HUD_ABILITYDISCARD, "HUD_AbilityDiscard"},
-	};
+		string strFilePath = strFileBase + strUITag.c_str() + strFileExt;
+		std::ifstream InputFile(strFilePath, ios::in | std::ios::binary);
 
-	for (const auto& [eHUDType, strUITag] : HUDmap)
-	{
-		string strFilePath = { "../../../UI_txt/" };
-		string strFileExt = { "_Orig.txt" };
+		if (!InputFile.is_open()) //==FALSE 
+		{
+			MSG_BOX(TEXT("Failed to Open : FileData"));
+			ALARM_FAIL(TEXT("Failed to Open : FileData"));
+			return E_FAIL;
+		}
 
-		strFilePath += strUITag.c_str() + strFileExt;
-		hr = Load_FileData(strFilePath, FILE_UI, _wstrLayerTag);
-		CHECK_FAILED(hr);
+		size_t size = 0;
+		InputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+
+		for (size_t i = 0; i < size; ++i)
+		{
+			string strProtoTag = {};
+			_uint iProtoTagLen = {};
+			InputFile.read(reinterpret_cast<char*>(&iProtoTagLen), sizeof(iProtoTagLen));
+			strProtoTag.resize(iProtoTagLen);
+			InputFile.read(&strProtoTag[0], iProtoTagLen);
+
+			if (0 == strProtoTag.size())
+				return E_FAIL;
+
+			CUIObject::UIOBJ_DESC LayerUIDesc{};
+			string strUITag = {};
+			_uint iUITagLen = {};
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.eUIType), sizeof(LayerUIDesc.eUIType));
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.eUIProj), sizeof(LayerUIDesc.eUIProj));
+
+			InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
+			strUITag.resize(iUITagLen);
+			InputFile.read(&strUITag[0], iUITagLen);
+			LayerUIDesc.wstrUITag = CUtils::StrToWstr(strUITag);
+
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vCenter), sizeof(LayerUIDesc.vCenter));
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vSize), sizeof(LayerUIDesc.vSize));
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vPos), sizeof(LayerUIDesc.vPos));
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vDegree), sizeof(LayerUIDesc.vDegree));
+
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.iTexIndex), sizeof(LayerUIDesc.iTexIndex));
+
+			string strText = {};
+			_uint iUIextLen = {};
+			InputFile.read(reinterpret_cast<char*>(&iUIextLen), sizeof(iUIextLen));
+			strText.resize(iUIextLen);
+			InputFile.read(&strText[0], iUIextLen);
+			LayerUIDesc.wstrText = CUtils::StrToWstr(strText);
+
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vColorRGB), sizeof(LayerUIDesc.vColorRGB));
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.fAlpha), sizeof(LayerUIDesc.fAlpha));
+
+			//파일 경로명으로 prototag를 받아 생성하는 방식
+			size_t strFileFrontPos = strFilePath.find("txt/");
+			if (strFileFrontPos != string::npos)
+				strUITag = strFilePath.substr(strFileFrontPos + 4);
+
+			//Prototype_GameObject_
+			size_t strFileBackPos = strUITag.find("_Orig");
+			if (strFileBackPos != string::npos)
+				strUITag = strUITag.substr(0, strFileBackPos);
+
+			size_t strProtoPos = strProtoTag.find("t_"); //찾을 문자열 위치
+			if (strProtoPos != string::npos)
+			{
+				strProtoTag = strProtoTag.substr(0, strProtoPos + 2); //해당 문자열 이후만 남김
+				strProtoTag += strUITag;
+			}
+
+			wstring wstrLayerTag = {};
+			if ("HUD_KirbyStatus" == strUITag)
+				wstrLayerTag = TEXT("Layer_UI_HUD_KirbyHP");
+
+			if ("HUD_StarPoint" == strUITag)
+				wstrLayerTag = TEXT("Layer_UI_HUD_StarPoint");
+
+			hr = m_pGameInstance->Add_Clone(m_iLevel, wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
+			CHECK_FAILED(hr);
+		}
+
+		continue;
 	}
+
+#pragma endregion
 
 	//능력버리기
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
@@ -240,25 +313,25 @@ HRESULT CLevel_Town::Ready_Layer_UI(const wstring& _wstrLayerTag)
 	DiscardUIDesc.vSize = { 260.f * 0.8f, 120.f * 0.8f, 1.f };
 
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_AbilityDiscard"), &DiscardUIDesc);
+	CHECK_FAILED(hr);
 
 	// 다이얼로그 1 : 파트타임
 	CDialog::DIALOG_DESC tDialogDesc{};
 	tDialogDesc.strPath = "../Bin/Resources/Data/Dialog_Town.json";
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_Dialog"), &tDialogDesc);
-	
+	CHECK_FAILED(hr);
+
 	// 다이얼로그 2 : 파크데려가는 디디디
 	CDialog::DIALOG_DESC tDialogDDD_Desc{};
 	tDialogDDD_Desc.strPath = "../Bin/Resources/Data/Dialog_TownToPark.json";
 	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_Dialog"), TEXT("Prototype_GameObject_Dialog"), &tDialogDDD_Desc);
-
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
 
 HRESULT CLevel_Town::Ready_Map()
 {
-
-
 	string strFileName = "../../../objects_txt/Town_Map.txt";
 	ifstream fileInput(strFileName, ios::binary);
 	if (fileInput.is_open() == false)
@@ -315,7 +388,6 @@ HRESULT CLevel_Town::Ready_Map()
 
 HRESULT CLevel_Town::Ready_Triggers()
 {
-
 	string strFileName = "../../../objects_txt/Town_Triggers.txt";
 	ifstream fileInput(strFileName, ios::binary);
 	if (fileInput.is_open() == false)
@@ -447,9 +519,6 @@ HRESULT CLevel_Town::Ready_Triggers()
 
 HRESULT CLevel_Town::Ready_Dees()
 {
-
-
-
 	CWaddleDee::DEE_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
@@ -821,84 +890,6 @@ HRESULT CLevel_Town::Ready_Objects()
 	}
 
 	fileInput.close();
-
-	return S_OK;
-}
-
-HRESULT CLevel_Town::Load_FileData(const string& _strFilePath, FILE_TYPE _eFileType, const wstring& _wstrLayerTag)
-{
-	std::ifstream InputFile(_strFilePath, ios::in | std::ios::binary);
-
-	if (!InputFile.is_open()) //==FALSE 
-	{
-		MSG_BOX(TEXT("Failed to Open : FileData"));
-		ALARM_FAIL(TEXT("Failed to Open : FileData"));
-		return E_FAIL;
-	}
-
-	size_t size = 0;
-	InputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
-	//m_LayerUIs.reserve(size);
-
-	for (size_t i = 0; i < size; ++i)
-	{
-		string strProtoTag = {};
-		_uint iProtoTagLen = {};
-		InputFile.read(reinterpret_cast<char*>(&iProtoTagLen), sizeof(iProtoTagLen));
-		strProtoTag.resize(iProtoTagLen);
-		InputFile.read(&strProtoTag[0], iProtoTagLen);
-
-		if (0 == strProtoTag.size())
-			return E_FAIL;
-
-		CUIObject::UIOBJ_DESC LayerUIDesc{};
-		string strUITag = {};
-		_uint iUITagLen = {};
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.eUIType), sizeof(LayerUIDesc.eUIType));
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.eUIProj), sizeof(LayerUIDesc.eUIProj));
-
-		InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
-		strUITag.resize(iUITagLen);
-		InputFile.read(&strUITag[0], iUITagLen);
-		LayerUIDesc.wstrUITag = CUtils::StrToWstr(strUITag);
-
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vCenter), sizeof(LayerUIDesc.vCenter));
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vSize), sizeof(LayerUIDesc.vSize));
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vPos), sizeof(LayerUIDesc.vPos));
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vDegree), sizeof(LayerUIDesc.vDegree));
-
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.iTexIndex), sizeof(LayerUIDesc.iTexIndex));
-
-		string strText = {};
-		_uint iUIextLen = {};
-		InputFile.read(reinterpret_cast<char*>(&iUIextLen), sizeof(iUIextLen));
-		strText.resize(iUIextLen);
-		InputFile.read(&strText[0], iUIextLen);
-		LayerUIDesc.wstrText = CUtils::StrToWstr(strText);
-
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vColorRGB), sizeof(LayerUIDesc.vColorRGB));
-		InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.fAlpha), sizeof(LayerUIDesc.fAlpha));
-
-		//파일 경로명으로 prototag를 받아 생성하는 방식
-		size_t strFileFrontPos = _strFilePath.find("txt/");
-		if (strFileFrontPos != string::npos)
-			strUITag = _strFilePath.substr(strFileFrontPos + 4);
-
-		//Prototype_GameObject_
-		size_t strFileBackPos = strUITag.find("_Orig");
-		if (strFileBackPos != string::npos)
-			strUITag = strUITag.substr(0, strFileBackPos);
-
-		size_t strProtoPos = strProtoTag.find("t_"); //찾을 문자열 위치
-		if (strProtoPos != string::npos)
-		{
-			strProtoTag = strProtoTag.substr(0, strProtoPos + 2); //해당 문자열 이후만 남김
-			strProtoTag += strUITag;
-		}
-
-		HRESULT hr = m_pGameInstance->Add_Clone(LEVEL_GAMEPLAY, _wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
-		CHECK_FAILED(hr);
-	}
 
 	return S_OK;
 }

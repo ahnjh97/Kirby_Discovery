@@ -232,7 +232,7 @@ void CFinale_SpecialDebris_C::Set_Animation()
 	switch (m_eCurCut)
 	{
 	case CUT10:
-		m_pModelCom->Set_Animation(CUT10, 40.f, false, false);
+		m_pModelCom->Set_Animation(CUT10, 35.f, false, false);
 		break;
 	case CUT11:
 		m_pModelCom->Set_Animation(CUT11, 40.f, false, false);

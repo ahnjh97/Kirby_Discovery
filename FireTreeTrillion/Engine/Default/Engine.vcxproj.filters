@@ -193,6 +193,12 @@
     <Filter Include="01.Utility\12.TimeController">
       <UniqueIdentifier>{bcf5e0f1-895c-4733-bd87-8aca7e79dfb9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.PhysX\EventCallBack">
+      <UniqueIdentifier>{e4b81b7e-5528-4df1-8580-b5d9a790c8c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.PhysX\QueryFilterCallback">
+      <UniqueIdentifier>{358e1726-73f9-41b3-b8b8-c5cf9f5161ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp">
@@ -387,9 +393,6 @@
     <ClCompile Include="..\Private\Picking.cpp">
       <Filter>01.Utility\11.Picking</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\EventCallBack.cpp">
-      <Filter>02.PhysX</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Model.cpp">
       <Filter>01.Utility\02.Components\Model</Filter>
     </ClCompile>
@@ -401,6 +404,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\TimeController.cpp">
       <Filter>01.Utility\12.TimeController</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EventCallBack.cpp">
+      <Filter>02.PhysX\EventCallBack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\QueryFilterCallback.cpp">
+      <Filter>02.PhysX\QueryFilterCallback</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -623,9 +632,6 @@
     <ClInclude Include="..\Public\Picking.h">
       <Filter>01.Utility\11.Picking</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\EventCallBack.h">
-      <Filter>02.PhysX</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Model.h">
       <Filter>01.Utility\02.Components\Model</Filter>
     </ClInclude>
@@ -637,6 +643,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\TimeController.h">
       <Filter>01.Utility\12.TimeController</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EventCallBack.h">
+      <Filter>02.PhysX\EventCallBack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\QueryFilterCallback.h">
+      <Filter>02.PhysX\QueryFilterCallback</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

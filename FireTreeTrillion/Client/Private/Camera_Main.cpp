@@ -153,7 +153,6 @@ void CCamera_Main::Lock_All(_float3 vPos, _float3 vLook, _bool bInterpolate)
 
 void CCamera_Main::Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS eFocus, _float3 vAnchorOffset, _float fInterpolateSpeed)
 {
-
 	if (nullptr == pTarget)
 		return;
 
@@ -271,9 +270,9 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_FinaleSeqBTime =
 	{
 		0.f,
-		134.f / 50.f, //cut7 - cut8. 2배 느림
+		120.f / 50.f, //cut7 - cut8. 2배 느림
 		142.f / 50.f, //cut8 - cut9
-		139.f / 50.f, //cut9 - cut10
+		135.f / 50.f, //cut9 - cut10
 		319.f / 50.f, //cut10 - cut11
 		110.f / 50.f, //cut11 - cut12
 		80.f / 50.f, /*70.f*/
@@ -304,7 +303,6 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 	m_EffectSocket = _float4x4::Identity;
 	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
-	Check_FinaleScene(fTimeDelta);
 }
 
 void CCamera_Main::Check_FinaleScene(_float fTimeDelta)
@@ -316,24 +314,60 @@ void CCamera_Main::Check_FinaleScene(_float fTimeDelta)
 		return;
 
 
-	//이전 인덱스 갱신하는데
+	if (m_bChangedScene
+		&& (m_iCurSceneIdx != QTE1 && m_iCurSceneIdx != QTE2 && m_iCurSceneIdx != QTE3))
+	{
+		Make_Sequence(CAMSEQ((_uint)SEQ_FINALECUT1 + m_iCurSceneIdx - 1));
+	}
+
+}
+
+
+void CCamera_Main::Check_FinaleTime(_float fTimeDelta)
+{
+	CFinaleCut_ControlCenter* pCenter =
+		static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
+	if (nullptr == pCenter)
+		return;
+
+	m_bChangedScene = false;
+
+	////이전 인덱스 갱신
 	m_iPreSceneIdx = m_iCurSceneIdx;
 
-	//지금 신 변화 안 했고, 현재 인덱스와 동일하다면 아무런 변화 없음.
+	//현재 인덱스 확인
 	m_iCurSceneIdx = pCenter->Get_CutScene();
+
+	if (m_iPreSceneIdx == QTE3 + 1 && m_iCurSceneIdx == QTE3 + 2)
+	{
+
+		Make_Sequence(SEQ_FINALECUT20);
+		return;
+	}
 
 	//시퀀스 a 시간 체크
 	if (1 <= m_iCurSceneIdx && !m_FinaleSeqATime.empty())
 	{
 		m_FinaleSeqATime.front() -= fTimeDelta;
 
-		m_fSeqPlayedTime = m_FinaleSeqATime.front();
+		//m_fSeqPlayedTime = m_FinaleSeqATime.front();
 
 		if (m_FinaleSeqATime.front() <= 0.f)
 		{
 			m_FinaleSeqATime.pop_front();
-			if (!m_FinaleSeqATime.empty())
-				Make_Sequence(CAMSEQ((_uint)SEQ_FINALECUT1 + 5 - m_FinaleSeqATime.size()));
+
+			//처음 세팅은 패스
+			if (m_iPreSceneIdx == 0 && m_iCurSceneIdx == 1)
+			{
+				Make_Sequence(SEQ_FINALECUT1);
+			}
+			else/* if (!m_FinaleSeqATime.empty())*/
+			{
+				m_iCurSceneIdx++;
+				pCenter->Set_CutScene(m_iCurSceneIdx);
+				m_bChangedScene = true;
+			}
+
 		}
 
 	}
@@ -341,14 +375,25 @@ void CCamera_Main::Check_FinaleScene(_float fTimeDelta)
 	if (7 <= m_iCurSceneIdx && !m_FinaleSeqBTime.empty())
 	{
 		m_FinaleSeqBTime.front() -= fTimeDelta;
-		m_fSeqPlayedTime = m_FinaleSeqBTime.front();
+		//m_fSeqPlayedTime = m_FinaleSeqBTime.front();
 
 		if (m_FinaleSeqBTime.front() <= 0.f)
 		{
 			m_FinaleSeqBTime.pop_front();
 
-			if (!m_FinaleSeqBTime.empty())
-				Make_Sequence(CAMSEQ((_uint)SEQ_FINALECUT7 + 6 - m_FinaleSeqBTime.size()));
+			//처음 세팅은 패스
+			if (m_iPreSceneIdx == QTE1 && m_iCurSceneIdx == QTE1+1)
+			{
+				Make_Sequence(SEQ_FINALECUT7);
+			}
+			else if(m_iCurSceneIdx != QTE2)
+			{
+				m_iCurSceneIdx++;
+				pCenter->Set_CutScene(m_iCurSceneIdx);
+				m_bChangedScene = true;
+
+			}
+
 		}
 
 	}
@@ -356,103 +401,27 @@ void CCamera_Main::Check_FinaleScene(_float fTimeDelta)
 	if (14 <= m_iCurSceneIdx && !m_FinaleSeqCTime.empty())
 	{
 		m_FinaleSeqCTime.front() -= fTimeDelta;
-		m_fSeqPlayedTime = m_FinaleSeqCTime.front();
+		//m_fSeqPlayedTime = m_FinaleSeqCTime.front();
 
 		if (m_FinaleSeqCTime.front() <= 0.f)
 		{
 			m_FinaleSeqCTime.pop_front();
 
-			if (!m_FinaleSeqCTime.empty())
-				Make_Sequence(CAMSEQ((_uint)SEQ_FINALECUT14 + 3 - m_FinaleSeqCTime.size()));
+			//처음 세팅은 패스
+			if (m_iPreSceneIdx == QTE2 && m_iCurSceneIdx == QTE2+1)
+			{
+				Make_Sequence(SEQ_FINALECUT14);
+			}
+			else if (m_iCurSceneIdx != QTE3)
+			{
+				m_iCurSceneIdx++;
+				pCenter->Set_CutScene(m_iCurSceneIdx);
+				m_bChangedScene = true;
+
+			}
+
 		}
-
 	}
-
-	if (QTE2 == m_iCurSceneIdx && m_iPreSceneIdx != m_iCurSceneIdx)
-	{
-		CAMACTION newAction{};
-		_float3 vPos = BATTLE_POS;
-		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, .5f);
-
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, 0.f, -1.f });
-		Fill_ActionPos(newAction, POS_ABSOLUTE, vPos - newAction.vDir * 30.f);
-
-		Make_One_Sequence(newAction);
-	}
-
-	if (QTE3 == m_iCurSceneIdx && m_iPreSceneIdx != m_iCurSceneIdx)
-	{
-		CAMACTION newAction{};
-		_float3 vPos = BATTLE_POS;
-		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, .5f);
-
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, 0.f, -1.f });
-		Fill_ActionPos(newAction, POS_ABSOLUTE, vPos - newAction.vDir * 30.f);
-
-		Make_One_Sequence(newAction);
-	}
-
-	if (20 == m_iCurSceneIdx && m_iPreSceneIdx != m_iCurSceneIdx)
-	{
-		/*m_FinaleSeqDTime.front() -= fTimeDelta;
-		m_fSeqPlayedTime = m_FinaleSeqDTime.front();
-
-		if (m_FinaleSeqDTime.front() <= 0.f)
-		{
-			m_FinaleSeqDTime.pop_front();
-
-			if (!m_FinaleSeqDTime.empty())*/
-		Make_Sequence(SEQ_FINALECUT20);
-		//}
-
-	}
-
-	/*
-	if (ISDEFAULTCNT(m_iSceneCnt) && m_iPreSceneIdx == m_iCurSceneIdx)
-		return;
-
-
-	//만약에 받았는데 다르다면, 카운트 값 초기화한다.
-	if (m_iPreSceneIdx != m_iCurSceneIdx)
-		m_iSceneCnt = 2;
-
-	if (ISDEFAULTCNT(m_iSceneCnt))
-		return;
-
-
-
-	//지금 신 변화 하는 중이면 카운트 깎는다.
-	//다 깎였으면(2틱 돌았으면 여기서 시퀀스 세팅한다.)
-	if (0 < m_iSceneCnt)
-		m_iSceneCnt--;
-	else
-	{
-		//여기에서 make seq 한다.
-		//if (m_iCurSceneIdx == QTE1)
-		//{
-		//	CAMACTION newAction = {};
-		//	Fill_HardCutSet(newAction, 0.f);
-
-		//	Fill_ActionDir(newAction, DIR_ABSOLUTE,
-		//		FINALEKIRBY->m_vBonePos + _float3{ .5f, .15f, -.3f });
-		//	newAction.vDir.Normalize();
-
-		//	Fill_ActionPos(newAction, POS_ABSOLUTE,
-		//		FINALEKIRBY->m_vBonePos + newAction.vDir * 20.f);
-
-
-
-		//	newAction.fFOVY = 50.f;
-		//	Make_One_Sequence(newAction);
-
-		//}
-
-
-		//값 초기화
-		m_iSceneCnt = -1;
-	}
-	*/
-
 }
 
 void CCamera_Main::Fill_HardCutSet(CAMACTION& Action, _float fTime)
@@ -518,6 +487,8 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 
 	System_Tick(fTimeDelta);
 
+	Check_FinaleScene(fTimeDelta);
+
 	Control(fRealTimeDelta);
 
 	//후보정 카메라 설정 값을 초기화한다.
@@ -541,14 +512,14 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 
 
 	// 임시입니다.
-	if(*m_pCurrentLevelID == LEVEL_RACING)
+	if (*m_pCurrentLevelID == LEVEL_RACING)
 		Change_LevelTrigger();
 	return OBJ_NOEVENT;
 }
 
 void CCamera_Main::Late_Tick(_float fTimeDelta)
 {
-
+	Check_FinaleTime(fTimeDelta);
 }
 
 //타겟 위치로부터 카메라 위치를 갱신, 보간한다.
@@ -601,6 +572,33 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	{
 		m_fSeqEventTime -= fTimeDelta;
 
+
+
+#pragma region
+
+		if (m_eSpecialSeq == SEQ_LUNCHTIME)
+		{
+			//4초 남았을 시
+			if (abs(m_fSeqEventTime - 4.f) < fTimeDelta * 2.f)
+			{
+				m_pGameInstance->Restore_FirstTimer(.1f);
+
+				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_lunch time logo test"))))
+					return;
+
+				//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Lunch Time Icon"))))
+				//	return;
+			}
+
+			if (abs(m_fSeqEventTime - .5f) < fTimeDelta * 2.f)
+			{
+
+			}
+		}
+
+#pragma endregion
+
+
 		//시퀀스 시간 다 깠았다~~
 		if (m_fSeqEventTime < 0.f)
 		{
@@ -620,11 +618,24 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 				Set_FOVY(38.f);
 			}
 
+			//점심 시간이다~~
+			if (m_eSpecialSeq == SEQ_LUNCHTIME)
+			{
+				Lock_All({ 16.4f, 25.7f, 35.75f }, { .16f, -.08f, -1.f });
+				m_pGameInstance->Restore_SecondTimer(.1f);
+
+			}
+
 			if (m_eSpecialSeq == SEQ_FINALESTART)
 			{
 				m_fCurShakeTime = m_fInitialShakeTime = 0.f;
 			}
 
+			if (m_eSpecialSeq == SEQ_FINALECUT5)
+			{
+				Lock_All({ 2057.f, 24.5f, -136.f }, { 1.f, .08f, -.12f });
+				Unlock();
+			}
 		}
 	}
 
@@ -908,24 +919,12 @@ void CCamera_Main::Compute_Set_BattleFocus(_float fTimeDelta)
 	_float fRatio{ .5f };
 
 
-	_float3 vAxis = {-.3f, 1.f, 0.f};
+	_float3 vAxis = { -.3f, 1.f, 0.f };
 	vAxis.Normalize();
 
 	Quaternion vQuat = Quaternion::CreateFromAxisAngle(vAxis, ToRadian((m_fBothFocusRatio - .5f) * 140.f));
 	_float3 vResultVector = _float3::Transform(vCenterDir, vQuat);
 
-	/*
-	//_float3 interpolatedVector = CustomLerp(vKirbyToBoss, vBossToKirby, vCenterDir, m_fBothFocusRatio);
-
-	if (abs(m_fBothFocusRatio - .5f) < .4f)
-	{
-		fRatio = (m_fBothFocusRatio - .1f) * .5f + .2f;
-	}
-	else if (m_fBothFocusRatio < .1f)
-		fRatio = EASE_IN(m_fBothFocusRatio) * .3f;
-	else if (.9f < m_fBothFocusRatio)
-		fRatio = .9f + (EASE_OUT(m_fBothFocusRatio) - .9f) * .3f;
-	*/
 
 	m_vDestCamDir = vResultVector;
 	m_vDestCamDir.Normalize();
@@ -1345,7 +1344,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction.eCamDir = DIR_ABSOLUTE;
 		newAction.vDir = _float3{ -.15f, 0.f, 1.f };
 		m_CamSeq.push_back(newAction);
-		  
+
 		newAction = {};
 		newAction.fTime = 0.f;
 		newAction.eCamCut = CUT_INTERPOLATE;
@@ -1363,31 +1362,22 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	case SEQ_LUNCHTIME:
 	{
 		//이벤트 호출
-		//m_fSeqEventTime = 7.f;
+		m_fSeqEventTime = 5.f;
 
 		CAMACTION newAction = {};
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 1.f);
 
-		newAction.fTime = 0.f;
-		newAction.eCamCut = CUT_INTERPOLATE;
-		newAction.eEase = EASE_INOUT_FAST;
-		newAction.fInterpolateSpeed = 1.f;
-
-		newAction.eCamPos = POS_ABSOLUTE;
-		newAction.vPos = _float3{ 19.6f, 26.f, 15.2f };
-		newAction.eCamDir = DIR_ABSOLUTE;
-		newAction.vDir = _float3{ -.15f, 0.f, 1.f };
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 16.4f, 25.7f, 25.75f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { .16f, -.08f, -1.f });
 		m_CamSeq.push_back(newAction);
 
-		newAction.fTime = 2.f;
-		newAction.eCamCut = CUT_INTERPOLATE;
-		newAction.eEase = EASE_INOUT_FAST;
-		newAction.fInterpolateSpeed = 1.f;
+		Fill_InterpolateCutSet(newAction, 4.f, EASE_INOUT, 1.f);
 
-		newAction.eCamPos = POS_ABSOLUTE;
-		newAction.vPos = _float3{ 19.6f, 26.f, 12.2f };
-		newAction.eCamDir = DIR_ABSOLUTE;
-		newAction.vDir = _float3{ -.15f, 0.f, 1.f };
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 16.4f, 25.7f, 35.75f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { .16f, -.08f, -1.f });
 		m_CamSeq.push_back(newAction);
+
+		Fill_InterpolateCutSet(newAction, 5.f, EASE_INOUT, .5f);
 
 	}
 	break;
@@ -1633,7 +1623,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	{
 		CAMACTION newAction = {};
 		_float fDuration = m_FinaleSeqATime.front();
-		_float3 vStartPos = BOSS_POS + _float3{0.f, 2.f, 0.f};
+		_float3 vStartPos = BOSS_POS + _float3{ 0.f, 2.f, 0.f };
 
 		newAction.fFOVY = 45.f;
 		Fill_HardCutSet(newAction, 0.f);
@@ -1706,23 +1696,24 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 
 
-	/*	newAction.fFOVY = 55.f;
-		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 2.5f);
+		/*	newAction.fFOVY = 55.f;
+			Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 2.5f);
 
-		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - newAction.vDir * 20.f);
+			Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - newAction.vDir * 20.f);
 
-		m_CamSeq.push_back(newAction);*/
+			m_CamSeq.push_back(newAction);*/
 
-		/*newAction.eCamPos = POS_ABSOLUTE;
-		newAction.vPos = BOSS_POS + _float3{ -15.f, -4.f, 20.f };
-		m_CamSeq.push_back(newAction);*/
+			/*newAction.eCamPos = POS_ABSOLUTE;
+			newAction.vPos = BOSS_POS + _float3{ -15.f, -4.f, 20.f };
+			m_CamSeq.push_back(newAction);*/
 
-		//
+			//
 	}
 	break;
 	//운석 던지기
 	case SEQ_FINALECUT5:
 	{
+		m_fSeqEventTime = m_FinaleSeqATime.front();
 		_float fDuration = m_FinaleSeqATime.front();
 
 		CAMACTION newAction = {};
@@ -1754,14 +1745,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 
 
-		newAction = {};
-		Fill_HardCutSet(newAction, fDuration);
 
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 1.f, .08f, -.12f });
-		newAction.vDir.Normalize();
-
-		Fill_ActionPos(newAction, POS_ABSOLUTE, _float3{ 2062.f, 24.5f, -136.f } - newAction.vDir * 20.f);
-		m_CamSeq.push_back(newAction);
 
 		//Fill_InterpolateCutSet(newAction, fDuration - .2f, EASE_INOUT, .2f);
 		//m_CamSeq.push_back(newAction);
@@ -1783,10 +1767,10 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		//_float3 vActionDir = XMVector3Normalize(_float3{ .24f, .37f, -.9f });
 
-		Fill_ActionDir(newAction, DIR_ABSOLUTE,	{ .24f, .37f, -.9f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { .24f, .37f, -.9f });
 		newAction.vDir.Normalize();
 
-		Fill_ActionPos(newAction, POS_ABSOLUTE,	{2371.f, 127.5f, -22.f});
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 2371.f, 127.5f, -22.f });
 
 		newAction.fFOVY = 45.f;
 		m_CamSeq.push_back(newAction);
@@ -1889,7 +1873,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		//
 		newAction = {};
-		Fill_InterpolateCutSet(newAction, 1.f, EASE_INOUT_FAST, fDuration - 1.f);
+		Fill_InterpolateCutSet(newAction, 1.f, EASE_OUT, fDuration - 1.f);
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE, BOSS_POS + _float3{ -60.f, 10.f, 0.f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 1.f, 0.f, 0.f });
@@ -1947,7 +1931,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -.57f, -.27f, -.77f });
 		newAction.vDir.Normalize();
 		//Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - (newAction.vDir * 60.f));
-		Fill_ActionPos(newAction, POS_ABSOLUTE, {2566.4f, 247.5f, -25.6f} );
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 2566.4f, 247.5f, -25.6f });
 
 		m_CamSeq.push_back(newAction);
 
@@ -2144,6 +2128,7 @@ void CCamera_Main::Reset_DeferredCamSet()
 			|| m_iCurSceneIdx == 8
 			|| m_iCurSceneIdx == 11
 			|| m_iCurSceneIdx == 12
+			|| m_iCurSceneIdx == 14
 			|| m_iCurSceneIdx == 15
 			|| m_iCurSceneIdx == 16
 			|| m_iCurSceneIdx == 17)
@@ -2253,7 +2238,7 @@ void CCamera_Main::Move_ForTrigger(_float fTimeDelta, _float3 vPos, _float3 vDir
 	if (LEVEL_TOWN == *m_pCurrentLevelID)
 	{
 		vPos = { 109.9f, 25.2f, 108.5f };
-		vDir = { 1.f, -.15f, -.12f };
+		vDir = { 1.f, .15f, -.12f };
 		CAMACTION newAct = {};
 		newAct.fTime = 0.f;
 		newAct.eCamCut = CUT_HARD;
@@ -2265,6 +2250,8 @@ void CCamera_Main::Move_ForTrigger(_float fTimeDelta, _float3 vPos, _float3 vDir
 		newAct.vDir = vDir;
 
 		Make_One_Sequence(newAct);
+		Set_TargetAnchor({0.f, 5.f, 0.f});
+
 	}
 	//else if()
 }
@@ -2343,7 +2330,7 @@ _float3 CCamera_Main::Make_TargetPos()
 		_float3 vBossPos = (_float3)pBoss->Get_RootPos();
 
 		//vTargetPos = vKirbyPos * (1.f - m_fBothFocusRatio) + vBossPos * (m_fBothFocusRatio);
-		vTargetPos = vKirbyPos * .5f + vBossPos * .5f + _float3{0.f, -10.f, 0.f};
+		vTargetPos = vKirbyPos * .5f + vBossPos * .5f + _float3{ 0.f, -10.f, 0.f };
 	}
 
 	return vTargetPos;
@@ -2492,7 +2479,7 @@ void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
 
 	//보간하여 바라보기
 	m_pTransformCom->Look_At_Interpolate(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + Dir(m_vCurCamDir) + _float4{ 0.f, m_fCurUpOffset, 0.f, 0.f },
-		fTimeDelta* fInterpolateSpeed);
+		fTimeDelta * fInterpolateSpeed);
 
 	//m_pTransformCom->Move(Dir(Make_ShakeDir(fTimeDelta)));
 }
@@ -2543,12 +2530,14 @@ void CCamera_Main::Orbit_Target(_float fTimeDelta)
 #ifdef _DEBUG
 void CCamera_Main::Render_IMGUI()
 {
+	ImGui::Begin(u8"메인 카메라");
+
 	if (ImGui::TreeNode("Revise Offset"))
 	{
 		string strPos = "pos";
 		_float4 vCurPos = GET_POS;
 		ImGui::DragFloat3(strPos.c_str(), (_float*)&vCurPos, -10.f, 50);
-		
+
 		string strLook = "look";
 		_float4 vLook = m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK);
 		ImGui::DragFloat3(strLook.c_str(), (_float*)&vLook, 0.f, 10);
@@ -2644,7 +2633,7 @@ void CCamera_Main::Render_IMGUI()
 	ImGui::Dummy(ImVec2(0, 10));
 	ImGui::SeparatorText(u8"줌 오프셋");
 	ImGui::DragFloat(u8"현재 줌 오프셋", &m_fCurZoomOffset, .05f, -20.f, 20.f, "%.1f", ImGuiSliderFlags_NoInput);
-	ImGui::DragFloat(u8"현재 줌 오프셋", &m_fDestZoomOffset, .05f, -20.f, 20.f, "%.1f");
+	ImGui::DragFloat(u8"목표 줌 오프셋", &m_fDestZoomOffset, .05f, -20.f, 20.f, "%.1f");
 
 	ImGui::End();
 
@@ -2695,10 +2684,10 @@ void CCamera_Main::Render_GraphicIMGUI(_float4x4 _worldMat)
 		v2 = _float3::Transform(v2, _worldMat);
 		v3 = _float3::Transform(v3, _worldMat);
 
-		if (	_float3::Transform(v0, viewMat).z < 0.f
-			||	_float3::Transform(v1, viewMat).z < 0.f
-			||	_float3::Transform(v2, viewMat).z < 0.f
-			||	_float3::Transform(v3, viewMat).z < 0.f)
+		if (_float3::Transform(v0, viewMat).z < 0.f
+			|| _float3::Transform(v1, viewMat).z < 0.f
+			|| _float3::Transform(v2, viewMat).z < 0.f
+			|| _float3::Transform(v3, viewMat).z < 0.f)
 			continue;
 
 		ImVec2 screenPos0 = CUtils::WorldPosTo_ImguiProjPos(v0);

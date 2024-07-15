@@ -655,6 +655,9 @@
     <Filter Include="02.GameObjects\UI\Fading">
       <UniqueIdentifier>{b3aa3c4e-817c-484b-8310-7e41a0bf044b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\QTE">
+      <UniqueIdentifier>{1a199e21-3f4e-423d-9db6-532a22d4ecb1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1321,6 +1324,10 @@
     <ClInclude Include="..\Public\BuildingCluster_C.h">
       <Filter>02.GameObjects\Map\Finale_SpeicalBuilding</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\QTE.h">
+      <Filter>02.GameObjects\UI\QTE</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\QTE_Effect.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1968,6 +1975,10 @@
     <ClCompile Include="..\Private\BuildingCluster_C.cpp">
       <Filter>02.GameObjects\Map\Finale_SpeicalBuilding</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\QTE.cpp">
+      <Filter>02.GameObjects\UI\QTE</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\QTE_Effect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

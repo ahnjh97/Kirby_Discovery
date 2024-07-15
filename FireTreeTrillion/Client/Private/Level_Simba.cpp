@@ -16,10 +16,12 @@
 #include "BG.h"
 #include "HUD.h"
 #include "SkySphere.h"
+
 #include "Dialog.h"
-//#include "Kirby.h"
 #include "EventCenter.h"
+#include "TransingStar.h"
 #include "GameObject.h"
+#include "Simba.h"
 
 CLevel_Simba::CLevel_Simba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -65,6 +67,16 @@ HRESULT CLevel_Simba::Initialize()
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
+	// SIMBA 도착했으면 오픈해주세요
+	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
+	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
+	pTransingStar->Set_LargeColor(_float3(85.f / 255.f, 93.f / 255.f, 183.f / 255.f));
+	pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
+	pTransingStar->Activate(CTransingStar::OPEN);
+
+
+
+	//m_pGameInstance->ShowAllAnimations("Simba");
 
 	return S_OK;
 }
@@ -74,24 +86,11 @@ void CLevel_Simba::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
 
-	if (false == bWave1DeadNotified)
-	{
-		list<CGameObject*>* objListPtr = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Wave1"));
-		if (nullptr != objListPtr)
-		{
-			if (objListPtr->empty()) // Wave1 의 몬스터들이 모두 죽은 경우
-			{
-				bWave1DeadNotified = true;
-				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_WAVE1DEAD);
-			}
-		}
-	}
-
 	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_APPEAR_START);
-		else if(m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
+		else if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_APPEAR_END);
 		else if (m_pGameInstance->Get_KeyState(DIK_3, KEY_DOWN))
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_WAVE1DEAD);
@@ -99,6 +98,32 @@ void CLevel_Simba::Tick(_float fTimeDelta)
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_WAVE2DEAD);
 		else if (m_pGameInstance->Get_KeyState(DIK_C, KEY_DOWN))
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_THRONEBREAK);
+	}
+
+	if (false == m_bWave1DeadNotified)
+	{
+		list<CGameObject*>* objListPtr = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Wave1"));
+		if (nullptr != objListPtr)
+		{
+			if (objListPtr->empty()) // Wave1 의 몬스터들이 모두 죽은 경우
+			{
+				m_bWave1DeadNotified = true;
+				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_WAVE1DEAD);
+			}
+		}
+	}
+
+	if (false == m_bWave2DeadNotified)
+	{
+		list<CGameObject*>* objListPtr = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Wave2"));
+		if (nullptr != objListPtr)
+		{
+			if (objListPtr->empty()) // Wave2 의 몬스터들이 모두 죽은 경우
+			{
+				m_bWave2DeadNotified = true;
+				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_WAVE2DEAD);
+			}
+		}
 	}
 }
 		
@@ -389,7 +414,6 @@ HRESULT CLevel_Simba::Ready_Triggers()
 
 HRESULT CLevel_Simba::Ready_Monsters()
 {
-
 	string strFileName = "../../../objects_txt/Simba_Monsters.txt";
 
 	ifstream fileInput(strFileName, ios::binary);
@@ -411,6 +435,8 @@ HRESULT CLevel_Simba::Ready_Monsters()
 	_uint iNumRallyPoints{};
 	vector<_float4> vecRallyPoints;
 	wstring wstrGameObjectTag;
+
+	vector<CMonster::MONSTER_DESC> vecMonsterDescs;
 
 	for (_uint i = 0; i < iNumObjects; i++)
 	{
@@ -437,9 +463,17 @@ HRESULT CLevel_Simba::Ready_Monsters()
 		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 		tempDesc.iShaderVars = iShaderVars;
 		tempDesc.fRimWidth = fRimWidth;
+
 		if (strModelName.size() >= 8) { // NonAnim_ 부분 지우기
 			if ("NonAnim" == strModelName.substr(0, 7))
 				tempDesc.wstrModelName.erase(0, 8);
+		}
+
+		CMonster::MONSTER_DESC tMonsterDesc = *static_cast<CMonster::MONSTER_DESC*>(&tempDesc);
+		tMonsterDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
+		if (iTriggerIndex > 10) {
+			vecMonsterDescs.push_back(tMonsterDesc);
+			continue;
 		}
 
 		if (L"Awoofy" == tempDesc.wstrModelName)
@@ -527,13 +561,15 @@ HRESULT CLevel_Simba::Ready_Monsters()
 		}
 		else if ("NonAnim_Simba" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Simba"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Simba"), TEXT("Prototype_GameObject_Simba"), &tempDesc)))
 				return E_FAIL;
 		}
 	}
 
 	fileInput.close();
 
+	CSimba* pSimba = dynamic_cast<CSimba*>(m_pGameInstance->Get_GameObject(m_iLevel, TEXT("Layer_Simba")));
+	pSimba->RegisterMonstersToSimba(vecMonsterDescs);
 
 	return S_OK;
 }
@@ -715,6 +751,100 @@ HRESULT CLevel_Simba::Ready_Objects()
 
 HRESULT CLevel_Simba::Ready_UI()
 {
+#pragma region PARSING HUD_KIRBYHP, STARPOINT
+
+	vector<string> vecUITag = { "HUD_KirbyStatus", "HUD_StarPoint" };
+
+	string strFileBase = { "../../../UI_txt/" };
+	string strFileExt = { "_Orig.txt" };
+
+	for (const auto& strUITag : vecUITag)
+	{
+		string strFilePath = strFileBase + strUITag.c_str() + strFileExt;
+		std::ifstream InputFile(strFilePath, ios::in | std::ios::binary);
+
+		if (!InputFile.is_open()) //==FALSE 
+		{
+			MSG_BOX(TEXT("Failed to Open : FileData"));
+			ALARM_FAIL(TEXT("Failed to Open : FileData"));
+			return E_FAIL;
+		}
+
+		size_t size = 0;
+		InputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+
+		for (size_t i = 0; i < size; ++i)
+		{
+			string strProtoTag = {};
+			_uint iProtoTagLen = {};
+			InputFile.read(reinterpret_cast<char*>(&iProtoTagLen), sizeof(iProtoTagLen));
+			strProtoTag.resize(iProtoTagLen);
+			InputFile.read(&strProtoTag[0], iProtoTagLen);
+
+			if (0 == strProtoTag.size())
+				return E_FAIL;
+
+			CUIObject::UIOBJ_DESC LayerUIDesc{};
+			string strUITag = {};
+			_uint iUITagLen = {};
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.eUIType), sizeof(LayerUIDesc.eUIType));
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.eUIProj), sizeof(LayerUIDesc.eUIProj));
+
+			InputFile.read(reinterpret_cast<char*>(&iUITagLen), sizeof(iUITagLen));
+			strUITag.resize(iUITagLen);
+			InputFile.read(&strUITag[0], iUITagLen);
+			LayerUIDesc.wstrUITag = CUtils::StrToWstr(strUITag);
+
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vCenter), sizeof(LayerUIDesc.vCenter));
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vSize), sizeof(LayerUIDesc.vSize));
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vPos), sizeof(LayerUIDesc.vPos));
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vDegree), sizeof(LayerUIDesc.vDegree));
+
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.iTexIndex), sizeof(LayerUIDesc.iTexIndex));
+
+			string strText = {};
+			_uint iUIextLen = {};
+			InputFile.read(reinterpret_cast<char*>(&iUIextLen), sizeof(iUIextLen));
+			strText.resize(iUIextLen);
+			InputFile.read(&strText[0], iUIextLen);
+			LayerUIDesc.wstrText = CUtils::StrToWstr(strText);
+
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.vColorRGB), sizeof(LayerUIDesc.vColorRGB));
+			InputFile.read(reinterpret_cast<char*>(&LayerUIDesc.fAlpha), sizeof(LayerUIDesc.fAlpha));
+
+			//파일 경로명으로 prototag를 받아 생성하는 방식
+			size_t strFileFrontPos = strFilePath.find("txt/");
+			if (strFileFrontPos != string::npos)
+				strUITag = strFilePath.substr(strFileFrontPos + 4);
+
+			//Prototype_GameObject_
+			size_t strFileBackPos = strUITag.find("_Orig");
+			if (strFileBackPos != string::npos)
+				strUITag = strUITag.substr(0, strFileBackPos);
+
+			size_t strProtoPos = strProtoTag.find("t_"); //찾을 문자열 위치
+			if (strProtoPos != string::npos)
+			{
+				strProtoTag = strProtoTag.substr(0, strProtoPos + 2); //해당 문자열 이후만 남김
+				strProtoTag += strUITag;
+			}
+
+			wstring wstrLayerTag = {};
+			if ("HUD_KirbyStatus" == strUITag)
+				wstrLayerTag = TEXT("Layer_UI_HUD_KirbyHP");
+
+			if ("HUD_StarPoint" == strUITag)
+				wstrLayerTag = TEXT("Layer_UI_HUD_StarPoint");
+
+			HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, wstrLayerTag, CUtils::StrToWstr(strProtoTag), &LayerUIDesc);
+			CHECK_FAILED(hr);
+		}
+
+		continue;
+	}
+
+#pragma endregion
+
 	//능력버리기
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };

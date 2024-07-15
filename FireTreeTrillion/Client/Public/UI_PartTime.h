@@ -83,7 +83,7 @@ private:
 	_float2						m_SizeScoreBar2D = _float2(438.f, 156.f);
 	_float2						m_SizeCategory2D = _float2(256.f, 256.f);
 	_float2						m_SizeDeeFace2D = _float2(200.f, 116.f);
-	_float2						m_SizeDigits2D = _float2(50.f, 60.f);
+	_float2						m_SizeDigits2D = _float2(72.f, 72.f);
 
 	// TimeBar Ratio
 	_float						m_fRatioTimeBar = 1.f;
@@ -102,7 +102,11 @@ private:
 	array<_int, 3>				m_arrScoreDigits;
 
 	_float						m_fTimeDelta = 0.f;
-	
+
+	//점심시간용
+	_bool						m_bLunchTimeTrigger = { true };
+	_float						m_fLunchTimeStartTime = { 0.f };
+
 	// GAME-OVER 텍스트
 	_float						m_fSizeRatio = 0.f;
 	_float2						m_fStandardSize2D = _float2();

@@ -324,7 +324,6 @@ void CPartTimerKirby_Win_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex,
 void CPartTimerKirby_Win_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CPartTimerKirby* pAlbaKirby = static_cast<CPartTimerKirby*>(pGameObject);
-
 	if (pAlbaKirby->Get_State() == CPartTimerKirby::FOODSHOP_RESULTWINSTART)
 	{
 		if (pAlbaKirby->IsAnimFinished())
@@ -335,9 +334,8 @@ void CPartTimerKirby_Win_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	}
 	else
 	{
-		if (pAlbaKirby->IsAnimFinished())
-			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_SELECT, 50.f, true, true);
-
+		/*if (pAlbaKirby->IsAnimFinished())
+			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_SELECT, 50.f, true, true);*/
 		pAlbaKirby->Set_EyeState(CPartTimerKirby::EYE_IDLE);
 		pAlbaKirby->Set_MouthState(CPartTimerKirby::MOUTH_HAPPY);
 	}

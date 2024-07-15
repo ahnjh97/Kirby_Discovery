@@ -31,6 +31,7 @@ public:
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& strPrototypeTag, class CComponent* pPrototype);
 	class CComponent* Clone_Component(_uint iLevelIndex, const wstring& strPrototypeTag, void* pArg);
 	void Clear(_uint iLevelIndex);
+	void ShowAllAnimations(_uint iLevelIndex, const wstring& wstrPrototypeTag);
 
 private:
 	map<const wstring, class CComponent*>*			m_pPrototypes = { nullptr };
