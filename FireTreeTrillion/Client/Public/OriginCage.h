@@ -13,7 +13,7 @@ class COriginCage final : public CGameObject
 {
 public:
 	enum CAGE_STATE { CAGE_STATE_BEFORE, CAGE_STATE_CRACK, CAGE_STATE_AFTER, CAGE_STATE_END };
-	enum CAGE_ANIM { CAGE_BREAK, CAGE_BREAKAFTER, CAGE_WAIT, CAGE_END };
+	enum CAGE_ANIM { CAGE_BREAK, CAGE_BREAKAFTER, CAGE_BROKENWAIT, CAGE_WAIT, CAGE_END };
 
 private:
 	COriginCage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
