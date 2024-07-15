@@ -1025,10 +1025,10 @@ CLevel_Finale* CLevel_Finale::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 void CLevel_Finale::Free()
 {
+	m_pGameInstance->Clear_EventCallBack();
 	__super::Free();
 	for (auto& tex : m_pEnvTexture)
 		Safe_Release(tex);
-
 }
 
 

@@ -95,6 +95,8 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 		Safe_AddRef(m_pKirby);
 	}
 
+	Safe_AddRef(m_pKirby);
+
 	return S_OK;
 }
 

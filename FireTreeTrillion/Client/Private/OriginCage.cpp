@@ -52,6 +52,7 @@ HRESULT COriginCage::Initialize(void* pArg)
 	CEventCenter::Get_Instance()->Subscribe(KEVENT_SIMBA_CAGEBREAK, this, func);
 
 	m_pBone = m_pModelCom->Get_BonePtr("Glass1L");
+	Safe_AddRef(m_pBone);
 
 	return S_OK;
 }
@@ -95,6 +96,7 @@ HRESULT COriginCage::Render()
 		return E_FAIL;
 
 	RenderMeshes(m_vecDefaultMeshes);
+
 	if(CAGE_STATE_BEFORE == m_eState)
 		RenderMeshes(m_vecBeforeMeshes);
 	if (CAGE_STATE_CRACK == m_eState)
