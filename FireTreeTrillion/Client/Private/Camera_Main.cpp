@@ -266,7 +266,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 		210.f / 50.f, /*210.f*/ //cut2 - cut3
 		200.f / 50.f, /*200.f*/ //cut3 - cut4
 		151.f / 50.f, /*150.f*/ //cut4 - cut5//운석 던지기 시작
-		180.f / 50.f,
+		190.f / 50.f,
 	};
 
 	//7부터
@@ -1476,6 +1476,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 
 		Fill_InterpolateCutSet(newAction, 5.f, EASE_INOUT, .5f);
+		m_CamSeq.push_back(newAction);
 
 	}
 	break;

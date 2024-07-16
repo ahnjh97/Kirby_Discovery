@@ -148,7 +148,6 @@ _bool CKirbyDefault_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelt
 			pKirby->Change_State(CKirby::STATE_INHALESTART, 60.f, false, false, CKirby::BODY_VACUUM);
 			return true;
 		}
-
 	}
 
 	return false;

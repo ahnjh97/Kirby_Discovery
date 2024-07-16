@@ -36,9 +36,10 @@ void CFinalBoss_Appear_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_BossUI"), TEXT("Prototype_GameObject_HUD_BossHpBar"), pFinalBoss);
 		CHECK_FAILED(hr);
 
-		CCamera_Main* pCameraMain = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
-		if (nullptr != pCameraMain)
-			pCameraMain->Set_CamFocus(CCamera::FOCUS_BOTH);
+		//효선아 여기야
+		//CCamera_Main* pCameraMain = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+		//if (nullptr != pCameraMain)
+		//	pCameraMain->Set_CamFocus(CCamera::FOCUS_BOTH);
 
 
 		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAITAIR, 50.f, false, true);

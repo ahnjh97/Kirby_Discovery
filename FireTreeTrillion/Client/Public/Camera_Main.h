@@ -119,7 +119,10 @@ public:
 
 	void Set_TargetAnchor(_float3 vAnchorOffset) { m_vAnchorOffset = vAnchorOffset; }
 
-	void Set_CamFocus(CAMFOCUS eFocus) { m_eCamFocus = eFocus; }
+	void Set_CamFocus(CAMFOCUS eFocus)
+	{
+		m_eCamFocus = eFocus;
+	}
 
 	//FOV를 세팅한다.
 	void Set_FOVY(_float fFOVYDegree) { m_fDestFovy = XMConvertToRadians(fFOVYDegree); }

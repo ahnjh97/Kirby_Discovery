@@ -61,7 +61,8 @@ HRESULT CLevel_FinalBoss::Initialize()
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
 	
-	m_pGameInstance->Set_ColorSet_ByIndex(7);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_FINAL);
+
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
 
@@ -653,6 +654,12 @@ HRESULT CLevel_FinalBoss::Ready_Objects()
 		if ("LbBossRoomDoor_NonAnim" == strModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_LabBossRoomDoor"), &tDesc)))
+				continue;
+		}
+
+		if ("NonRenderWall" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_NonRenderWall"), TEXT("Prototype_GameObject_NonRenderWall"), &tDesc)))
 				continue;
 		}
 
