@@ -1704,7 +1704,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("PopStar_StarSmall", TYPE_NONANIM);
 
 		//º¸½º ÀÌÆåÆ® ¸ðµ¨
-		m_vecModelInfo.emplace_back("FXRayArrow", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("RayArrow", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("MoundPiece", TYPE_NONANIM, 0.2f, 180.f);
 		m_vecModelInfo.emplace_back("3DRockA", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("3DRockB", TYPE_NONANIM);
