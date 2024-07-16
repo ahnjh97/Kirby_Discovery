@@ -188,6 +188,12 @@ HRESULT CFinale_SpecialDebris_B::Bind_ShaderResources()
 
 void CFinale_SpecialDebris_B::Make_Particle()
 {
+	if (m_eCurCut == CUT6 && m_pModelCom->Get_CurTrackPosition() >= 325.f && m_BlackTrigger == true)
+	{
+		m_pGameInstance->Set_ObjectBlack(0.2f, 0.5f);
+		m_BlackTrigger = false;
+	}
+
 
 	if (m_eCurCut == CUT6 && m_pModelCom->Get_CurTrackPosition() >= 375.f)
 	{
@@ -223,7 +229,7 @@ void CFinale_SpecialDebris_B::Make_Particle()
 			pCamera->Make_Shake(8.f, 0.7f);
 			m_pGameInstance->Setting_RadialBlur(50.f, 60.f);
 
-
+			m_pGameInstance->Set_ObjectBlack(0.6f, 0.3f);
 			m_bParticleTrigger = false;
 		}
 	}

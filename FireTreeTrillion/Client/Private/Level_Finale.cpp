@@ -124,7 +124,7 @@ HRESULT CLevel_Finale::Initialize()
 	m_pGameInstance->Setting_GodRay(_float4(5500.f, 850.f, 0.f, 1.f), 0.05f, 0.96815f, 0.9f, 0.9f, 0.5f);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet_ByIndex(5);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_FINALE);
 
 	return S_OK;
 }
@@ -963,6 +963,11 @@ CLevel_Finale* CLevel_Finale::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 void CLevel_Finale::Free()
 {
 	m_pGameInstance->Clear_EventCallBack();
+
+	_bool	bDeepShadow = false;
+	if (FAILED(m_pGameInstance->Bind_DeferredRawValue("g_bDeepShadow", &bDeepShadow, sizeof(_bool))))
+		return;
+
 	__super::Free();
 	for (auto& tex : m_pEnvTexture)
 		Safe_Release(tex);

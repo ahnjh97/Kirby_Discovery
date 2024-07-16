@@ -193,6 +193,34 @@ CKirbyHammer_Attack_State::CKirbyHammer_Attack_State()
 void CKirbyHammer_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+	CGameObject* pObject = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"));
+	CTransform* pTransformCom = pObject->Get_TransformCom();
+	_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+	if (_iAnimIndex == CKirby::HAMMERSTATE_HAMMERATTACKTOY)
+	{
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.vInitPos = { 0.f, -.5f, -1.f };
+		FXDesc.vInitRot = { 0.f, 0.f, 0.f };
+		FXDesc.fStartDelay = 0.1f;
+		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail"), &FXDesc)))
+			return;
+		static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+	}
+	else if (_iAnimIndex == CKirby::HAMMERSTATE_HAMMERATTACKFINALTOY)
+	{
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.vInitPos = { 0.f, -.5f, -1.f };
+		FXDesc.vInitRot = { 0.f, 0.f, 0.f };
+		FXDesc.fStartDelay = 0.5f;
+		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail"), &FXDesc)))
+			return;
+		static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+	}
 }
 
 void CKirbyHammer_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -276,6 +304,40 @@ void CKirbyHammer_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKHITTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake();
+
+			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			_float4 vUp = pTransformCom->Get_State(CTransform::STATE_UP);
+			_float4 vHammerHitPos = vPos + (vLook * 1.8f) + (vUp * 0.5f);
+			PxVec3 rayOrigin = PxVec3((_float)vHammerHitPos.x, (_float)vHammerHitPos.y, (_float)vHammerHitPos.z);
+			PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
+			_float fMaxDistance = 5.f;
+			PxRaycastHit hit;
+			PxRaycastBuffer hitBuffer;
+			PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
+			_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+			hit = hitBuffer.block;
+			vHammerHitPos = XMVectorSetW(CUtils::To_Vector(hit.position), 1.f);
+			vHammerHitPos.y += 0.1f;
+			_float4 vTerrainNormal = XMVectorSetW(CUtils::To_Vector(hit.normal), 0.f);
+			_float3 vRot = CUtils::Make_Degree_FromDir(-1.f * vTerrainNormal);
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.vInitPos = (_float3)vHammerHitPos;
+			FXDesc.vInitRot = vRot;
+			FXDesc.vInitScale = { 1.8f, 1.8f, 1.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerHit"), &FXDesc)))
+				return;
+			FXDesc.vInitRot = vRot;
+			FXDesc.vInitScale = { 3.f, 3.f, 1.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerHit2"), &FXDesc)))
+				return;
+			CParticle::PARTICLE_DESC ParticleDesc{};
+			ParticleDesc.vInitPos = (_float3)vHammerHitPos;
+			ParticleDesc.vInitRot = vRot;
+			ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_start particle test A"), &ParticleDesc)))
+				return;
+
 			pKirby->Set_WeaponAnim(6);
 			return;
 		}
@@ -349,12 +411,46 @@ void CKirbyHammer_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		else
 			Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 
-		if (m_fAttackJumpTime > 0.4f && m_bAttackJumpTrigger == true)
+		if (m_fAttackJumpTime > 0.45f && m_bAttackJumpTrigger == true)
 		{
 			if (m_bCountTrigger == true)
 			{
 				CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 				pCamera->Make_Shake();
+
+				_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+				_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+				_float4 vUp = pTransformCom->Get_State(CTransform::STATE_UP);
+				_float4 vHammerHitPos = vPos + (vLook * 1.8f) + (vUp * 0.5f);
+				PxVec3 rayOrigin = PxVec3((_float)vHammerHitPos.x, (_float)vHammerHitPos.y, (_float)vHammerHitPos.z);
+				PxVec3 rayDirection = PxVec3(0.f, -1.f, 0.f);
+				_float fMaxDistance = 5.f;
+				PxRaycastHit hit;
+				PxRaycastBuffer hitBuffer;
+				PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
+				_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eNORMAL, filterData);
+				hit = hitBuffer.block;
+				vHammerHitPos = XMVectorSetW(CUtils::To_Vector(hit.position), 1.f);
+				vHammerHitPos.y += 0.1f;
+				_float4 vTerrainNormal = XMVectorSetW(CUtils::To_Vector(hit.normal), 0.f);
+				_float3 vRot = CUtils::Make_Degree_FromDir(-1.f * vTerrainNormal);
+				CEffect::FX_DESC FXDesc{};
+				FXDesc.vInitPos = (_float3)vHammerHitPos;
+				FXDesc.vInitRot = vRot;
+				FXDesc.vInitScale = { 3.f, 3.f, 1.f };
+				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerHit"), &FXDesc)))
+					return;
+				FXDesc.vInitRot = vRot;
+				FXDesc.vInitScale = { 6.f, 6.f, 1.f };
+				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerHit2"), &FXDesc)))
+					return;
+				CParticle::PARTICLE_DESC ParticleDesc{};
+				ParticleDesc.vInitPos = (_float3)vHammerHitPos;
+				ParticleDesc.vInitRot = vRot;
+				ParticleDesc.vInitScale = { 3.f, 3.f, 2.f };
+				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_start particle test A"), &ParticleDesc)))
+					return;
+
 				m_bCountTrigger = false;
 			}
 			DESC(m_fJumpVelocity) = 30.f;
@@ -614,6 +710,25 @@ CKirbyHammer_JumpAttack_State::CKirbyHammer_JumpAttack_State()
 void CKirbyHammer_JumpAttack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+	CGameObject* pObject = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"));
+	CTransform* pTransformCom = pObject->Get_TransformCom();
+	_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	if (_iAnimIndex == CKirby::HAMMERSTATE_WHEELHAMMER)
+	{
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.vInitPos = { 0.f, 0.f, 0.f };
+		FXDesc.vInitRot = { 0.f, 0.f, 0.f };
+		FXDesc.fStartDelay = 0.05f;
+		FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
+		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerWheel"), &FXDesc)))
+			return;
+		static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+		
+	}
 }
 
 void CKirbyHammer_JumpAttack_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)

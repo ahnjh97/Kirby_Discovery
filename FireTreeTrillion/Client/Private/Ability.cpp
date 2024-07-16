@@ -5,6 +5,7 @@
 #include "Kirby.h"
 #include "MultiEffect.h"
 #include "Camera_Main.h"
+#include "Particle.h"
 
 #include "Light.h"
 
@@ -58,16 +59,11 @@ HRESULT CAbility::Initialize(void* pArg)
 		m_fRimWidth = 5.f;
 
 		CEffect::FX_DESC FXDesc{};
-
 		FXDesc.vInitPos = { 0.f, 0.f, 0.f };
-		//FXDesc.vInitRot = { 0.f, 0.f, 0.f };
 		FXDesc.vInitScale = { 1.7f, 1.7f, 1.7f };
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
 		Add_Effect("ItemStar", FXDesc, true);
-
-
-
 
 		LIGHT_DESC			LightDesc{};
 		LightDesc.eType = LIGHT_DESC::TYPE_POINT;
@@ -94,7 +90,8 @@ HRESULT CAbility::Initialize(void* pArg)
 		FXDesc.vInitScale = { 1.7f, 1.7f, 1.7f };
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemAbility1"), &FXDesc)))
 			return E_FAIL;
-		Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+		Add_Effect("ItemAbility1", FXDesc, true);
 	}
 
 	AbilityType(m_eAbilityType);

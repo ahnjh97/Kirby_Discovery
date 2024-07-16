@@ -155,6 +155,9 @@ private:
 	_bool				m_bThrust = { false };
 	_bool				m_bSpike = { false };
 
+	//ÄÆ½Å Æ®¸®°Å
+	_bool				m_bStartOpeningTrigger = { true };
+
 	_float				m_fGlideTime = { 0.f };
 	//_float				m_fGullyTime = { 0.f };
 	_float				m_fTimeDelay = { 0.f };

@@ -44,6 +44,7 @@ public:
 		COLORSET_LAB,
 		COLORSET_PARK,
 		COLORSET_BEACH,
+		COLORSET_PARTTIME,
 
 		COLORSET_END
 	};
@@ -95,6 +96,8 @@ public:
 	void Set_ColorSet(COLORSET eColorSet);
 	void Set_ColorSet_ByIndex(_int iSetIdx);
 	void Save_ColorSet(string strTag, COLOR_DATA destColorData);
+
+
 	COLOR_DATA& Find_ColorSet(string strTag);
 
 	// 잠깐의 레디얼 블러를 세팅한다.
@@ -126,8 +129,9 @@ public:
 	void Update_Option(OPTION Option, _bool bOn);
 	void Bind_RendererFunc(_int iTriggerType);
 
-	void Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime) {
+	void Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime, _bool RealBlack) {
 		m_bObjectBlack = true;
+		m_bRealBlack = RealBlack;
 		_float fBlackdiff = fObjectBlackTarget - m_fObjectBlack;
 		m_fObjectBlackRatioTime = fBlackdiff / fBlackTime;
 		m_fObjectBlackTarget = fObjectBlackTarget;
@@ -290,8 +294,11 @@ private:
 	_float m_fObjectBlackMaxTime = { 0.f };
 	_float m_fOBjectBlackTime = { 0.f };
 	_float m_fObjectBlackTarget = { 0.f };
+	_bool  m_bRealBlack = { false };
+	_float m_fRealObjectBlack = { 1.f };
 
 	_bool  m_bMaptool = { false };
+	//_bool  m_bBloomSky = { false };
 
 
 #ifdef _DEBUG

@@ -56,9 +56,9 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 	m_fTimeDelay = 1.f;
 	m_iDebrsiMaxCnt = 0;
 
-	m_pModelCom->Set_Animation(FINALBOSS_DEMOAPPEARCUT5, 70.f, false, true);
+	m_pModelCom->Set_Animation(FINALBOSS_RECOVERYWAIT, 70.f, true, true);
 
-	Make_TargetToCams();
+	//Make_TargetToCams();
 	Add_AnimEvent();
 
 	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
@@ -125,6 +125,8 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	{
 		Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
 	}
+	else if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
+		Change_State(FINALBOSS_DEMOAPPEARCUT5, 50.f, false, true);
 
 	if (true == m_bGlide)
 	{
@@ -605,7 +607,7 @@ void CFinalBoss::SetUp_FSM()
 
 	//ป๓ลย Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
-	FSM_Desc.iState = FINALBOSS_DEMOAPPEARCUT5;
+	FSM_Desc.iState = FINALBOSS_RECOVERYWAIT;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
 }

@@ -320,7 +320,7 @@ HRESULT CSingleEffect::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 	else
 	{
 		_float4x4 ViewMatrix = _float4x4::Identity;
-		_float4x4 ProjMatrix = XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 10.f); 
+		_float4x4 ProjMatrix = XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1000.f); 
 
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
 			return E_FAIL;

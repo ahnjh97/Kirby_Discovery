@@ -92,7 +92,8 @@ void CSimba_Appear2::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 				pSimba->Set_RenderMant(false);
 			m_fTime += fTimeDelta;
 
-			if (m_fTime > 1.5f) {
+			if (m_fTime > 1.5f)
+			{
 				pSimba->Change_State(CSimba::Simba_Walk, 66.66f, true, false);
 				
 				//카메라에게 2번째 타겟으로 등록
