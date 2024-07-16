@@ -63,7 +63,7 @@ _int CFinalePartical::Tick(_float fTimeDelta)
     _float4 vDelta = { 0.f, 0.f, 0.f, 0.f };
     if (iAnimIndex == 20)
     {
-        vDelta = (m_vDir + _float4(10.f, 0.f, 0.f, 0.f)) * m_fTimeDelta * m_fSpeed;
+        vDelta = (m_vDir + _float4(10.f, 3.f, 0.f, 0.f)) * m_fTimeDelta * m_fSpeed;
     }
     else if ((iAnimIndex >= 12) == true)
         vDelta = (m_vDir + _float4(5.f, 0.f, 0.f, 0.f)) * m_fTimeDelta * m_fSpeed;
