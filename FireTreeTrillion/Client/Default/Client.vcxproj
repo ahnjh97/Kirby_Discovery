@@ -180,6 +180,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\Awoofy.h" />
     <ClInclude Include="..\Public\Awoofy_State.h" />
+    <ClInclude Include="..\Public\BabyDuck.h" />
+    <ClInclude Include="..\Public\BabyDuck_State.h" />
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\BasicMap.h" />
     <ClInclude Include="..\public\BattleDee.h" />
@@ -402,6 +404,7 @@
     <ClInclude Include="..\Public\TunnelRock.h" />
     <ClInclude Include="..\Public\Turbine.h" />
     <ClInclude Include="..\Public\UI_BtnIcon.h" />
+    <ClInclude Include="..\Public\UI_EffectParttime.h" />
     <ClInclude Include="..\Public\UI_MessageWindow.h" />
     <ClInclude Include="..\Public\UI_Fading.h" />
     <ClInclude Include="..\Public\UI_PartTime.h" />
@@ -427,6 +430,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\Awoofy.cpp" />
     <ClCompile Include="..\Private\Awoofy_State.cpp" />
+    <ClCompile Include="..\Private\BabyDuck.cpp" />
+    <ClCompile Include="..\Private\BabyDuck_State.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\Private\BasicMap.cpp" />
     <ClCompile Include="..\private\BattleDee.cpp" />
@@ -647,6 +652,7 @@
     <ClCompile Include="..\Private\TunnelRock.cpp" />
     <ClCompile Include="..\Private\Turbine.cpp" />
     <ClCompile Include="..\Private\UI_BtnIcon.cpp" />
+    <ClCompile Include="..\Private\UI_EffectParttime.cpp" />
     <ClCompile Include="..\Private\UI_MessageWindow.cpp" />
     <ClCompile Include="..\Private\UI_Fading.cpp" />
     <ClCompile Include="..\Private\UI_PartTime.cpp" />
