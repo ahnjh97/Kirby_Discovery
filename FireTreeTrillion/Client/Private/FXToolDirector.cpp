@@ -24,7 +24,8 @@ static const vector<char*> s_ModelPasses = { "0 | NORMAL_0", "1 | NORMAL_X", "2 
 	"15 | WHITEFX_LINEARDIFFUSE", "16 | WHITEFX_CLAMPDIFFUSE" };
 
 static const vector<char*> s_PosTexPasses = { "0 | DEFAULT", "1 | SOLIDBLEND", "2 | BLENDFX", "3 | BLOOM", "4 | DEFAULTFX",
-	"5 | BLEND_NOZTEST" ,"6 | WHITEFX", "7 | UI_MASK", "8 | UI_MASK2", "9 | SOFTFX", "10 | SOFTALPHAFX" };
+	"5 | BLEND_NOZTEST" ,"6 | WHITEFX", "7 | UI_MASK", "8 | UI_MASK2", "9 | SOFTFX", "10 | SOFTALPHAFX"
+	, "11 | POSTEX_UIWHITEALPHA" , "12 | POSTEX_ALPHABLEND_NOTEST" , "13 | POSTEX_ALPHATEST_COLOR" };
 
 CFXToolDirector::CFXToolDirector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CGameObject{ pDevice, pContext }

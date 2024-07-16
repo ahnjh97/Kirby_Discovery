@@ -124,6 +124,15 @@ public:
 	//FOV를 세팅한다.
 	void Set_FOVY(_float fFOVYDegree) { m_fDestFovy = XMConvertToRadians(fFOVYDegree); }
 
+	//카메라에 마지막으로 보정할 쌩 오프셋.
+	void Set_FinalOffset(_float3 vOffset, _float fInterpolateSpeed = -1.f)
+	{
+		m_fZAngleInterpolateSpeed = (fInterpolateSpeed != -1.f) ?
+			3.f : fInterpolateSpeed;
+
+		m_vDestFinalOffset = vOffset;
+	}
+
 	//z 각도와, z 각도 보간 속도를 설정한다.
 	void Set_ZAngle(_float fZAngle, _float fInterpolateSpeed = -1.f)
 	{
@@ -295,6 +304,16 @@ private:
 	_float3 m_vStartCamDir = { 0.f, 0.f, 0.f };
 
 
+#pragma region 후보정
+
+/*마지막 쌩 이동값 보정*/
+	_float3	m_vPreFinalOffset = { 0.f, 0.f, 0.f };
+	_float3	m_vCurFinalOffset = { 0.f, 0.f, 0.f };
+	_float3	m_vDestFinalOffset = { 0.f, 0.f, 0.f };
+
+	_float m_fFinalOffsetInterpolateSpeed = { 3.f };
+
+
 /*Z 앵글*/
 	//이전 프레임의 z 값을 저장.
 	_float m_fPreZAngle = { 0.f };
@@ -336,6 +355,7 @@ private:
 	_float m_fInitialShakeTime = { 0.f };
 	_float m_fCurShakeTime = { 0.f };
 
+#pragma endregion
 
 /*카메라 시퀀스*/
 

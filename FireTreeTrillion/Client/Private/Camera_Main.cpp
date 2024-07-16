@@ -296,8 +296,8 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 void CCamera_Main::System_Tick(_float fTimeDelta)
 {
 	//이펙트 소켓 업데이트
-	m_EffectSocket = _float4x4::Identity;
-	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	//m_EffectSocket = _float4x4::Identity;
+	//CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
 }
 
@@ -336,10 +336,10 @@ void CCamera_Main::Check_FinaleTime(_float fTimeDelta)
 
 	if (m_iPreSceneIdx == QTE3 + 1 && m_iCurSceneIdx == QTE3 + 2)
 	{
-		CEffect::FX_DESC FxDesc{};
-		FxDesc.vInitPos = BATTLE_POS + _float3{ 0.f, 0.f, -50.f };
-
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale rect"), &FxDesc)))
+		CMultiEffect::MULTI_FX_DESC FxDesc{};
+		//FxDesc.vInitPos = (_float3)GET_POS + (_float3)(m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 150.f);
+		FxDesc.pSocketMatrix = &m_EffectSocket;
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale"), &FxDesc)))
 			return;
 
 		Make_Sequence(SEQ_FINALECUT20);
@@ -2179,7 +2179,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		newAction = {};
 		Fill_InterpolateCutSet(newAction, 3.f, EASE_INOUT, 3.f);
 
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -.42f, -.17f, -.9f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, _float3{ -.42f, -.17f, -.6f });
 		newAction.vDir.Normalize();
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos - newAction.vDir * 20.f);
@@ -2310,6 +2310,9 @@ HRESULT CCamera_Main::Render()
 
 void CCamera_Main::Reset_DeferredCamSet()
 {
+	//마지막 보정 앵글을 초기화한다.
+	m_pTransformCom->Move(Dir(-m_vPreFinalOffset));
+
 	//z 앵글을 초기화한다.
 	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), 1.f, -m_fPreZAngle);
 
@@ -2357,6 +2360,25 @@ void CCamera_Main::Reset_DeferredCamSet()
 
 void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
 {
+
+	//마지막 보정 값 보간
+	if (.01f < _float3::Distance(m_vCurFinalOffset, m_vDestFinalOffset))
+	{
+		m_vCurFinalOffset += (m_vDestFinalOffset - m_vCurFinalOffset) * fTimeDelta * m_fFinalOffsetInterpolateSpeed;
+
+		if (_float3::Distance(m_vCurFinalOffset, m_vDestFinalOffset) <= .01f)
+			m_vCurFinalOffset = m_vDestFinalOffset;
+	}
+
+	//z angle 보간
+	if (.001f < abs(m_fCurZAngle - m_fDestZAngle))
+		m_fCurZAngle += (m_fDestZAngle - m_fCurZAngle) * fTimeDelta * m_fZAngleInterpolateSpeed;
+
+
+	//이동
+	m_pTransformCom->Move(Dir(m_vCurFinalOffset));
+	m_vPreFinalOffset = m_vCurFinalOffset;
+
 	//Z 앵글
 	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), 1.f, m_fCurZAngle);
 	m_fPreZAngle = m_fCurZAngle;
@@ -2369,21 +2391,29 @@ void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
 
 void CCamera_Main::Control(_float fTimeDelta)
 {
-	static _bool bStopTimer{ false };
+	static _bool bStopTimerToggle{ false };
+	static _bool bFinaleOffsetToggle{ false };
 
 	if (m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) &&
 		m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
-
+		//timer 일시 정지!!
 		if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
 		{
-			bStopTimer = !bStopTimer;
+			bStopTimerToggle = !bStopTimerToggle;
 
-			m_pGameInstance->Set_FirstTimerRatio((bStopTimer) ? 0.f : 1.f);
-			m_pGameInstance->Set_SecondTimerRatio((bStopTimer) ? 0.f : 1.f);
+			m_pGameInstance->Set_FirstTimerRatio((bStopTimerToggle) ? 0.f : 1.f);
+			m_pGameInstance->Set_SecondTimerRatio((bStopTimerToggle) ? 0.f : 1.f);
 		}
 
+		if (m_pGameInstance->Get_DIKeyState(DIK_N, KEY_DOWN))
+		{
+			bFinaleOffsetToggle = !bFinaleOffsetToggle;
 
+			Set_FinalOffset( (bFinaleOffsetToggle) ? _float3{0.f, -5.f, 0.f} : _float3{0.f, 0.f, 0.f});
+		}
+
+		//시퀀스 테스트
 		if (m_pGameInstance->Get_KeyState(DIK_L, KEY_DOWN))
 		{
 			//Lock_All({ 109.9f, 25.2f, 108.5f }, { 1.f, .15f, -.12f });
@@ -2408,7 +2438,15 @@ void CCamera_Main::Control(_float fTimeDelta)
 		{
 			//SEQ_HARDCUT_TEST
 			//Make_Sequence(SEQ_SOFTCUT_TEST);
+
+			//CEffect::FX_DESC FxDesc{};
+			////FxDesc.vInitPos = (_float3)GET_POS + (_float3)(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			//FxDesc.pSocketMatrix = &m_EffectSocket;
+			//FxDesc.vInitRot = CUtils::Make_Degree_FromDir( m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale rect"), &FxDesc)))
+			//	return;
 		}
+
 
 		if (m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN))
 		{
@@ -2546,9 +2584,6 @@ void CCamera_Main::Interpolate_CamSet(_float fTimeDelta)
 		fSlerpSpeed = 10.f;
 	m_vCurCamDir = CUtils::SlerpDirVec(m_vCurCamDir, m_vDestCamDir, clamp(fTimeDelta * fSlerpSpeed, 0.f, 1.f));
 
-	//z angle 보간
-	if (.001f < abs(m_fCurZAngle - m_fDestZAngle))
-		m_fCurZAngle += (m_fDestZAngle - m_fCurZAngle) * fTimeDelta * m_fZAngleInterpolateSpeed;
 
 }
 
@@ -2765,7 +2800,14 @@ void CCamera_Main::Render_IMGUI()
 
 
 	ImGui::Dummy(ImVec2(0, 10));
+	static _float3 vEffectSocketOffset{};
+	ImGui::DragFloat3(u8"이펙트 소켓 이동", &(vEffectSocketOffset.x), .01f, -1000.f, 1000.f, "%.2f");
+	m_EffectSocket = _float4x4::Identity;
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION,
+		m_pTransformCom->Get_State(CTransform::STATE_POSITION) + vEffectSocketOffset);
 
+
+	ImGui::Dummy(ImVec2(0, 10));
 	ImGui::DragFloat(u8"배틀 포커스 비율", &m_fBothFocusRatio, .01f, 0.f, 1.f, "%.2f");
 
 
