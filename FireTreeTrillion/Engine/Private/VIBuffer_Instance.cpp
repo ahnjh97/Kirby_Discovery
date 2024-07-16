@@ -330,7 +330,6 @@ void CVIBuffer_Instance::Decelerate(_float fTimeDelta, VTXMATRIX* pVertices)
 		if (m_pSpeeds[i] < 0.f)
 			m_pSpeeds[i] = 0.f;
 
-
 	}
 }
 
@@ -459,6 +458,16 @@ void CVIBuffer_Instance::Gravity(_float fTimeDelta)
 		//m_pDirections[i].y -= GRAVITY * fTimeDelta;
 		m_pVelocities[i].y -= GRAVITY * 2.5f * fTimeDelta;
 	}
+}
+
+void CVIBuffer_Instance::Orbit(_float fTimeDelta, VTXMATRIX* pVertices)
+{
+
+}
+
+void CVIBuffer_Instance::Assemble(_float fTimeDelta, VTXMATRIX* pVertices)
+{
+
 }
 
 

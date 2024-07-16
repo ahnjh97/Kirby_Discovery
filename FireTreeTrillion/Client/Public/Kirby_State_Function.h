@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Kirby.h"
 #include "Utils.h"
 #include "SingleEffect.h"
@@ -780,7 +781,7 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 				_float fDot = XMVectorGetX(XMVector3Dot(XMVector3Normalize(vObjectDir), vLook));
 				_float fDegrees = XMConvertToDegrees(acosf(fDot));
 
-				// 각도가 내가 보는 기준 90도 이상이면 스킵한다.
+				// 각도가 내가 보는 기준 45도면 스킵한다.
 				if (fDegrees > 45.f)
 					continue;
 

@@ -644,7 +644,7 @@ void CRenderer::Key_Input()
 	//}
 
 	//리얼 초저사양모드
-	if (m_pGameInstance->Get_DIKeyState(DIK_LSHIFT, KEY_PRESS))
+	if (m_pGameInstance->Get_DIKeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_DIKeyState(DIK_RSHIFT, KEY_PRESS))
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
 		{

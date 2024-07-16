@@ -17,6 +17,7 @@ public:
         CONTENT_BODY,		    // 캐릭터와 몬스터가 몸끼리 박음
 
         CONTENT_ATTACK,         // 플레이어의 히트박스 X 몬스터
+        CONTENT_ATTACKBULLET,
         CONTENT_DAMAGE,         // 몬스터와의 히트박스 X 플레이어
         CONTENT_DEFORM,
 
@@ -69,6 +70,8 @@ private:
     void HitStop_Rogic(class CKirby* pKirby, _float fStopTime = 0.12f);
 
     void Damage_And_Effect_For_Monster(class CKirby* pKirby, class CPhysXObject* pMonster, _float fEffectOffSet = 0.5f);
+    void Effect(class CKirby* pKirby, class CPhysXObject* pObject);
+
 #pragma endregion
 
 

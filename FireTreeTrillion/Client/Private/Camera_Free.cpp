@@ -55,7 +55,7 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 _int CCamera_Free::Tick(_float fTimeDelta)
 {
-	if ( m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_L, KEY_DOWN))
+	if (m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_L, KEY_DOWN))
 	{
 		LockToggle();
 	}

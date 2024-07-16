@@ -54,6 +54,36 @@ float2 RotateUV(float2 vCoord, float fAngle)
 }
 
 
+void MaskTest(vector vMaskValue)
+{
+     //마스크 자르기
+    if (vMaskValue.a < g_fMaskThreshold)
+        discard;
+    else if (vMaskValue.r < g_fMaskThreshold)
+        discard;
+}
+
+void AlphaTest(vector vDiffuseValue, float fDiscardValue = .01)
+{
+    if (vDiffuseValue.a < fDiscardValue ||
+        (vDiffuseValue.r < fDiscardValue && vDiffuseValue.g < fDiscardValue && vDiffuseValue.b < fDiscardValue))
+        discard;
+}
+
+float SoftEffect(float fAlpha, vector vProjPos)
+{
+    //소프트 이펙트 보정
+    float2 vTexcoord = (float2) 0.f;
+
+    vTexcoord.x = (vProjPos.x / vProjPos.w) * 0.5f + 0.5f;
+    vTexcoord.y = (vProjPos.y / vProjPos.w) * -0.5f + 0.5f;
+
+    float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
+    float fOldViewZ = vDepthDesc.y * g_fFar;
+
+    return fAlpha * saturate(fOldViewZ - vProjPos.w);
+}
+
 struct VS_IN
 {
 	float3		vPosition : POSITION;
@@ -222,6 +252,25 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN_ALPHABLEND In)
     if ( 0.01f <= Out.vColor.a )
         Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
 	
+    return Out;
+}
+
+
+PS_OUT PS_MAIN_BLEND_FX_NOSOFTFX(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+	
+    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
+    MaskTest(vMask);
+    
+
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    AlphaTest(vDiffuse);
+    
+    
+    Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
+    Out.vColor.a = vDiffuse.a * g_fAlpha;
+
     return Out;
 }
 
@@ -977,5 +1026,21 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_SPAWNEFFECT();
+        PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX_NOSOFTFX();
+    }
+
+    // BlendFX_SoftEffect_X ( 24 )
+    pass BlendFX_SoftEffect_X
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_SPAWNEFFECT();
+        PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX_NOSOFTFX();
     }
 }

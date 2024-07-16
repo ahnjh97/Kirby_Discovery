@@ -54,7 +54,7 @@ _int CAnimToolObject::Tick(_float fTimeDelta)
 	if (m_bDead == true)
 		return OBJ_DEAD;
 	
-	SetOn_Slope(fTimeDelta);
+	//SetOn_Slope(fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -132,11 +132,13 @@ HRESULT CAnimToolObject::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
+	/*
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
+	*/
 
 	// for animTool
 	m_ppModelForAnimTool = &m_pModelCom;
