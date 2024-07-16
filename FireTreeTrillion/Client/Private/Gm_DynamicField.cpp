@@ -46,39 +46,20 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 		|| TEXT("Gimmick_PkFunHouseDarkness05") == wstrModelTag)
 		m_eDFieldType = DFMOVE_UPDOWN;
 
-	if (TEXT("Gimmick_PkFunHouseDarkness02") == wstrModelTag || TEXT("Gimmick_PkFunHouseDarkness03") == wstrModelTag)
+	else if (TEXT("Gimmick_PkFunHouseDarkness02") == wstrModelTag || TEXT("Gimmick_PkFunHouseDarkness03") == wstrModelTag)
 		m_eDFieldType = DFMOVE_LEFTRIGHT;
 
-	if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
+	else if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
 		m_eDFieldType = DFMOVE_FRONTBACK;
+
+	else if (TEXT("Gimmick_PkFunHouse07") == wstrModelTag)
+		m_eDFieldType = DFMOVE_NONE;
 
 	m_IsInteraction = FALSE;
 
 	//피직스 추가
 	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
 	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-
-#pragma region CREATE_SOLARPANEL
-
-	/*
-	//상호작용할 태양전지판 생성
-	CGameObject::GAMEOBJECT_DESC tDesc{};
-	_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
-
-	_float3 vWorldPos = GET_POS;
-	_float3 vOffset = { 5.542f, 38.970f, -12.082f }; //5.542, 38.970, -12.082
-	matWorld.Translation(vOffset);
-
-	tDesc.matWorld = matWorld;
-	m_pSolarPanel = dynamic_cast<CGm_ParkSolarPanelOnce*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc));
-	if (nullptr == m_pSolarPanel)
-		return E_FAIL;
-	*/
-
-#pragma endregion
-
-	//림라이트 OFF
-	//m_bRimLight = FALSE;
 
 	return S_OK;
 }

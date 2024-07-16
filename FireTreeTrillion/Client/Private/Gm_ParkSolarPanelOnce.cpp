@@ -58,7 +58,7 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 	case STATE_CHARGE: //충전 중
 		if (TRUE == m_pModelCom->IsFinished()) //충전 중 애님 종료 시 충전 완료 상태 변경
 		{
-			m_pModelCom->Set_Animation(STATE_ONWAITSTART, 30.f, FALSE, TRUE);
+			m_pModelCom->Set_Animation(STATE_ONWAITSTART, 60.f, FALSE, TRUE);
 			m_eCurState = STATE_ONWAITSTART;
 		}
 		break;
@@ -66,7 +66,7 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 	case STATE_ONWAITSTART: //충전 시작
 		if (TRUE == m_pModelCom->IsFinished())
 		{
-			m_pModelCom->Set_Animation(STATE_ONWAIT, 30.f, FALSE, TRUE);
+			m_pModelCom->Set_Animation(STATE_ONWAIT, 60.f, FALSE, TRUE);
 			m_eCurState = STATE_ONWAIT;
 		}
 		break;
