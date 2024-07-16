@@ -366,6 +366,30 @@ void CGameInstance::Set_ColorSet_ByIndex(_int iSetIdx)
 	m_pRenderer->Set_ColorSet_ByIndex(iSetIdx);
 }
 
+void CGameInstance::Set_ColorSet(COLOR_DATA destColorData)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Set_ColorSet(destColorData);
+}
+
+void CGameInstance::Set_ColorSet(string strColorName)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Set_ColorSet(strColorName);
+}
+
+void CGameInstance::Set_ColorSet(CRenderer::COLORSET eColorSet)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Set_ColorSet(eColorSet);
+}
+
 void CGameInstance::Set_BlackBackGround(_bool bSet)
 {
 	if (nullptr == m_pRenderer)
@@ -419,6 +443,14 @@ void CGameInstance::Setting_LensFlare(_bool bOnOff)
 		return;
 
 	m_pRenderer->Setting_LensFlare(bOnOff);
+}
+
+
+void CGameInstance::Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime, _bool RealBlack )
+{
+	if (nullptr == m_pRenderer)
+		return;
+	m_pRenderer->Set_ObjectBlack(fObjectBlackTarget, fBlackTime, RealBlack);
 }
 
 #ifdef _DEBUG

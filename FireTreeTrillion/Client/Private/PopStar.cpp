@@ -176,6 +176,7 @@ _int CPopStar::Tick(_float fTimeDelta)
 	}
 	else if (iCutIndex == 20)
 	{
+		m_bRender = false;
 		m_eCurCut = CUT20;
 	}
 
@@ -186,6 +187,9 @@ _int CPopStar::Tick(_float fTimeDelta)
 
 void CPopStar::Late_Tick(_float fTimeDelta)
 {
+	if (m_bRender == false)
+		return;
+
 	Compute_ViewZ();
 	m_pModelCom->Play_Animation(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);

@@ -11,7 +11,7 @@
 
 #define FRONT_WAITPOS 2
 #define SECOND_WAITPOS 3
-#define LAST_WAITPOS (m_iWatingNum - 1)
+#define LAST_WAITPOS (CPartTimeHelper::Get_Instance()->Get_CurDeeWaitingNum() - 1)
 
 const _float fOffsetInteract = 2.f;
 
@@ -47,9 +47,6 @@ pair<_float3, vector<WAITING_INFO>> CHungryDee::m_WaitingList =
 		WAITING_INFO{ {2.4f, 1.5f, -31.f}, 0.1f},
 	}
 };
-
-_int CHungryDee::m_iWatingNum = { 0 };
-_float CHungryDee::m_fWaitingTime = { 30.f };
 
 CHungryDee::CHungryDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CWaddleDee{ pDevice, pContext }
@@ -87,11 +84,13 @@ HRESULT CHungryDee::Initialize(void* pArg)
 	{
 		m_WaitingList.first = pDeeDesc.matWorld.Translation();
 
-		m_iMyIdx = pDeeDesc.iIdx;
+		m_iMyIdx = CPartTimeHelper::Get_Instance()->Get_CurDeeWaitingNum();
+
 		_float4 vDir = Dir(m_WaitingList.second[m_iMyIdx].vPos);
-		vDir += _float4{ 18.f, 0.f, -6.f, 0.f };
+		vDir += (m_iMyIdx < 10) ? _float4 { 18.f, 0.f, -6.f, 0.f } : _float4{ 18.f, 0.f, -3.f, 0.f };
+
 		m_pTransformCom->Move(vDir);
-		++m_iWatingNum;
+		CPartTimeHelper::Get_Instance()->Add_WaitingNum();
 
 		if (m_iMyIdx == WAITPOS_FRONT)
 			CPartTimeHelper::Get_Instance()->Register_FirstDee(this);
@@ -126,10 +125,7 @@ _int CHungryDee::Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
 
 
-	//타임 ratio를 받아 확인한다.
-	CUI_PartTime* pUI = dynamic_cast<CUI_PartTime*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_UI_PartTime"), TEXT("Prototype_GameObject_UI_PartTime")));
-	if (nullptr != pUI)
-		m_fWaitingTime = pUI->Get_TimeRatioBar();
+
 
 	/*
 	//지영아 여기야
@@ -180,6 +176,17 @@ _int CHungryDee::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
+_float CHungryDee::Get_WaitingTime()
+{
+	//타임 ratio를 받아 확인한다.
+	CUI_PartTime* pUI = dynamic_cast<CUI_PartTime*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_UI_PartTime"), TEXT("Prototype_GameObject_UI_PartTime")));
+	if (nullptr != pUI)
+		return pUI->Get_TimeRatioBar();
+	else
+		return 1.f;
+
+}
+
 void CHungryDee::Set_RenderDialog(_bool bRender)
 {
 	m_pDialogUI->Set_IsRender(bRender);
@@ -187,7 +194,7 @@ void CHungryDee::Set_RenderDialog(_bool bRender)
 
 void CHungryDee::Swap_WatingPosition()
 {
-	m_iMyIdx = (m_iMyIdx + LAST_WAITPOS) % m_iWatingNum;
+	m_iMyIdx = (m_iMyIdx + LAST_WAITPOS) % CPartTimeHelper::Get_Instance()->Get_CurDeeWaitingNum();
 
 	//바뀐 자리가 앞자리라면, 나를 등록
 	if (m_iMyIdx == FRONT_WAITPOS)
@@ -332,11 +339,11 @@ void CHungryDee::OnNotify()
 	InitMat.Translation(m_WaitingList.first);
 	HungryDeeDesc.matWorld = InitMat;
 
-	_int iStartIdx = m_iWatingNum;
+	//_int iStartIdx = m_iWatingNum;
 
 	for (_int i = 0; i < 10; ++i)
 	{
-		HungryDeeDesc.iIdx = iStartIdx + i;
+		//HungryDeeDesc.iIdx = iStartIdx + i;
 		m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc);
 	}
 
@@ -469,9 +476,10 @@ HRESULT CHungryDee::Add_Components()
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
+#ifdef _DEBUG
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom;
-
+#endif
 	//눈 텍스쳐
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Dee_Eye"),
 		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
@@ -487,15 +495,6 @@ HRESULT CHungryDee::Add_Components()
 		TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &ControllerDesc);
 	CHECK_FAILED(hr);
 
-
-	//CHitBox::HITBOX_DESC HitBox{};
-	//HitBox.pOwner = this;
-	//HitBox.pDesc = &m_tColliderDesc[BODY];
-	//HitBox.pCollisionType = NPC;
-	//hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox);
-	//CHECK_FAILED(hr);
-
-	//Set_BodyCollider(COLLIDER_CYLINDER, 0.6f, 1.2f, 1.2f);
 
 	SetUp_FSM();
 
@@ -665,13 +664,6 @@ CGameObject* CHungryDee::Clone(void* pArg)
 
 void CHungryDee::Free()
 {
-	Safe_Release(m_pEyeTextureCom);
 	Safe_Release(m_pDialogUI);
-
-	for (auto& Pair : m_PartObjects)
-		Safe_Release(Pair.second);
-
-	m_PartObjects.clear();
-
 	__super::Free();
 }

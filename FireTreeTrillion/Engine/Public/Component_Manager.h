@@ -5,6 +5,7 @@
 #include "Texture.h"
 #include "Transform.h"
 #include "VIBuffer_Rect.h"
+#include "VIBuffer_UpperRect.h"
 #include "VIBuffer_Cube.h"
 #include "VIBuffer_Terrain.h"
 #include "VIBuffer_Instance_Rect.h"

@@ -67,7 +67,8 @@ HRESULT CLevel_PartTime::Initialize()
 	Ready_Layer_Food(TEXT("Layer_Food"));
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet_ByIndex(4);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_PARTTIME);
+
 	return S_OK;
 }
 
@@ -150,8 +151,6 @@ HRESULT CLevel_PartTime::Ready_Layer_Camera(const wstring& strLayerTag)
 
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
 		return E_FAIL;
-
-
 
 	return S_OK;
 }
@@ -479,7 +478,7 @@ HRESULT CLevel_PartTime::Ready_Dees()
 
 	for (_int i = 0; i < 10; ++i)
 	{
-		HungryDeeDesc.iIdx = i;
+		//HungryDeeDesc.iIdx = i;
 
 		if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc)))
 			return E_FAIL;

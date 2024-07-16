@@ -3,7 +3,9 @@
 
 #include "HitBox.h"
 #include "Kirby.h"
-//#include "BreakableRockParticle.h"
+#include "Gm_ParkSolarPanelOnce.h"
+#include "Gm_ParkSolarPanelCharge.h"
+#include "SurprisedBoard.h"
 
 CGm_DynamicField::CGm_DynamicField(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -26,9 +28,11 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 
 	if (pArg != nullptr)
 		DynamicFieldDesc = *(GAMEOBJECT_DESC*)pArg;
-	
+
 	DynamicFieldDesc.fSpeedPerSec = 10.f;
 	DynamicFieldDesc.fRotationPerSec = 90.f;
+	m_iGimmickIndex = DynamicFieldDesc.iShaderVars;
+	DynamicFieldDesc.iShaderVars = 6;
 
 	if (FAILED(__super::Initialize(&DynamicFieldDesc)))
 		return E_FAIL;
@@ -41,44 +45,25 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 		return E_FAIL;
 
 	//모델 별 타입 지정
-	if (TEXT("Gimmick_PkFunHouseDarkness01") == wstrModelTag 
+	if (TEXT("Gimmick_PkFunHouseDarkness01") == wstrModelTag
 		|| TEXT("Gimmick_PkFunHouseDarkness04") == wstrModelTag
 		|| TEXT("Gimmick_PkFunHouseDarkness05") == wstrModelTag)
 		m_eDFieldType = DFMOVE_UPDOWN;
 
-	if (TEXT("Gimmick_PkFunHouseDarkness02") == wstrModelTag || TEXT("Gimmick_PkFunHouseDarkness03") == wstrModelTag)
+	else if (TEXT("Gimmick_PkFunHouseDarkness02") == wstrModelTag || TEXT("Gimmick_PkFunHouseDarkness03") == wstrModelTag)
 		m_eDFieldType = DFMOVE_LEFTRIGHT;
 
-	if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
+	else if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
 		m_eDFieldType = DFMOVE_FRONTBACK;
+
+	else if (TEXT("Gimmick_PkFunHouse07") == wstrModelTag)
+		m_eDFieldType = DFMOVE_NONE;
 
 	m_IsInteraction = FALSE;
 
 	//피직스 추가
 	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
 	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-
-#pragma region CREATE_SOLARPANEL
-
-	/*
-	//상호작용할 태양전지판 생성
-	CGameObject::GAMEOBJECT_DESC tDesc{};
-	_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
-
-	_float3 vWorldPos = GET_POS;
-	_float3 vOffset = { 5.542f, 38.970f, -12.082f }; //5.542, 38.970, -12.082
-	matWorld.Translation(vOffset);
-
-	tDesc.matWorld = matWorld;
-	m_pSolarPanel = dynamic_cast<CGm_ParkSolarPanelOnce*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc));
-	if (nullptr == m_pSolarPanel)
-		return E_FAIL;
-	*/
-
-#pragma endregion
-
-	//림라이트 OFF
-	//m_bRimLight = FALSE;
 
 	return S_OK;
 }
@@ -88,15 +73,21 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 	//if (TRUE == m_bDead)
 	//	return OBJ_DEAD;
 
-	if (nullptr == m_pSolarPanel)
+	if (nullptr == m_pSolarPanelOnce && nullptr == m_pSolarPanelCharge && nullptr == m_pSurpriseBoard)
 		return OBJ_NOEVENT;
 
-	CGm_ParkSolarPanelOnce::ANIM_STATE eGimmickState = m_pSolarPanel->Get_AnimState();
+	if (nullptr == m_pSolarPanelOnce)
+		return OBJ_NOEVENT;
 
-	switch (m_eDFieldType)
+	CGm_ParkSolarPanelOnce::PANELONCE_STATE eGimmickState = m_pSolarPanelOnce->Get_AnimState();
+
+	if (CGm_ParkSolarPanelOnce::STATE_ONWAIT == eGimmickState)
 	{
-	case DFMOVE_UPDOWN: 
-		if (CGm_ParkSolarPanelOnce::ANIM_STATE::STATE_ONWAIT == eGimmickState)
+		_int a = 0;
+
+		switch (m_eDFieldType)
+		{
+		case DFMOVE_UPDOWN:
 		{
 			_float3 vCurWorldPos = GET_POS;
 			if (100.f <= vCurWorldPos.y) //특정 위치 도착할 경우
@@ -104,18 +95,23 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 				vCurWorldPos.y = 100.f;
 				return OBJ_NOEVENT;
 			}
-			
+
 			m_pTransformCom->Go_Up(fTimeDelta);
+
 		}
 		break;
 
-	case DFMOVE_LEFTRIGHT: //Surprice 기믹
-		break;
+		case DFMOVE_LEFTRIGHT: //SurprisedBoard 기믹
+			break;
 
-	case DFMOVE_FRONTBACK: 
-		break;
-	case DFMOVE_NONE: break;
+		case DFMOVE_FRONTBACK:
+			break;
+		case DFMOVE_NONE: break;
+		}
 	}
+
+	if (nullptr != m_pDynamicActor) // 트랜스폼 월드 행렬에 맞춰서 다이나믹 액터도 같이 움직이도록 
+		m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));
 
 	return OBJ_NOEVENT;
 }
@@ -131,10 +127,6 @@ void CGm_DynamicField::Late_Tick(_float fTimeDelta)
 
 HRESULT CGm_DynamicField::Render()
 {
-	if (nullptr != m_pSolarPanel)
-		m_pSolarPanel->Render();
-
-
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -189,9 +181,12 @@ void CGm_DynamicField::Render_IMGUI()
 	case DFMOVE_FRONTBACK:		ImGui::Text(u8"DFMOVE_FRONTBACK"); break;
 	case DFMOVE_NONE:	default: ImGui::Text(u8"DFMOVE_NONE"); break;
 	}
-	
+
 	if (m_IsInteraction) ImGui::Text(u8"Gm_DynamicFiled :: IsInteraction : TRUE");
 	else ImGui::Text(u8"Gm_DynamicFiled :: IsInteraction : FALSE");
+
+	string strGimmickIndex = "Index :" + to_string(m_iGimmickIndex);
+	ImGui::Text(strGimmickIndex.c_str());
 
 #pragma region IMGUI GIZMO
 
@@ -213,8 +208,8 @@ void CGm_DynamicField::Render_IMGUI()
 
 void CGm_DynamicField::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	if (nullptr != m_pSolarPanel)
-		m_pSolarPanel->Collision(eContent, pObject);
+	if (nullptr != m_pSolarPanelOnce)
+		m_pSolarPanelOnce->Collision(eContent, pObject);
 
 	m_IsInteraction = TRUE;
 }
@@ -321,5 +316,7 @@ void CGm_DynamicField::Free()
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 
-	Safe_Release(m_pSolarPanel);
+	Safe_Release(m_pSolarPanelOnce);
+	Safe_Release(m_pSolarPanelCharge);
+	Safe_Release(m_pSurpriseBoard);
 }

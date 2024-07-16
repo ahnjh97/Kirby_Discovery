@@ -19,7 +19,7 @@ static _int s_iParkDecoIdx = -1;
 static _int s_iLevelIndex = 0;
 static _int s_iTempLevelIdx = -1;
 
-static const _char* s_triggerTypes[] = {"Camera", "Shader", "Star", "LevelChanger"};
+static const _char* s_triggerTypes[] = {"Camera", "Shader", "Star", "LevelChanger", "Monster"};
 static _int s_iTriggerType = -1;
 static const _char* s_triggerIndices[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
 									"11", "12", "13", "14", "15", "16", "17", "18", "19", "20" };
@@ -63,6 +63,9 @@ static _bool s_bWasMapDecosOpen = false;
 static _bool s_bWasTownDecosOpen = false;
 static _bool s_bWasLabDecosOpen = false;
 static _bool s_bWasParkDecosOpen = false;
+
+static _float s_fLightRange = {};
+static vector<std::array<_float, 4>> s_vecLightInfo;
 
 static void HelpMarker(const char* desc)
 {
@@ -281,8 +284,13 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	// Emissive가 입혀져 있지만, Emissive용 Pass로 하고 싶지 않은 모델들
 	m_setNonEmissiveModels = {};
 
+	// ParkGimmick
+	m_setParkGimmicks = { "SolarPanelOnce_NonAnim", "SolarPanelCharge_NonAnim", "Gimmick_PkFunHouseDarkness01", "Gimmick_PkFunHouseDarkness02",
+		"Gimmick_PkFunHouseDarkness03", "Gimmick_PkFunHouseDarkness04", "Gimmick_PkFunHouseDarkness05", "Gimmick_PkFunHouse06" };
+
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
+	s_vecLightInfo.resize(CMapToolObject::LIGHT_END);
 
 	ReadMapDecoTxts();
 	ReadMapObjTxts();
@@ -328,6 +336,8 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 		Menu_MonsterInfo();
 		Menu_RallyPointInfo();
 		Menu_BlendDecoInfo();
+		Menu_LightInfo();
+		Menu_GimmickInfo();
 	}
 
 	// 스타일 복원
@@ -1019,6 +1029,82 @@ void CMapToolHelper::Menu_BlendDecoInfo()
 	ImGui::End();
 }
 
+void CMapToolHelper::Menu_LightInfo()
+{
+	if ("LightBulb" != m_strCurModel)
+		return;
+
+	CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+
+	s_fLightRange = pMapToolObject->Get_Radius();
+	vector<_float4> vecLightInfo = pMapToolObject->Get_LightInfo();
+	for (_uint i = 0; i < CMapToolObject::LIGHT_END; i++)
+	{
+		s_vecLightInfo[i][0] = vecLightInfo[i].x;
+		s_vecLightInfo[i][1] = vecLightInfo[i].y;
+		s_vecLightInfo[i][2] = vecLightInfo[i].z;
+		s_vecLightInfo[i][3] = vecLightInfo[i].w;
+	}
+
+	ImGui::Begin("LightInfo");
+	ImGui::Text("Range"); ImGui::SameLine();
+	ImGui::SetCursorPosX(60);
+	if (ImGui::InputFloat("##LightRange", &s_fLightRange, 0.5f, 1.0f, "%.3f"))
+		pMapToolObject->Set_Radius(s_fLightRange);
+
+	for (_uint i = 0; i < CMapToolObject::LIGHT_END; i++)
+	{
+		if (0 == i)
+			ImGui::Text("Diffuse"); 
+		else if (1 == i) 
+			ImGui::Text("Ambient");
+		else if (2 == i) 
+			ImGui::Text("Specular");
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(60);
+		string strLabel = "LightInfo" + to_string(i);
+		if (ImGui::InputFloat4(strLabel.c_str(), s_vecLightInfo[i].data(), "%.3f"))
+			pMapToolObject->Set_LightInfo(i, _float4(s_vecLightInfo[i][0], s_vecLightInfo[i][1], s_vecLightInfo[i][2], s_vecLightInfo[i][3]));
+	}
+
+	ImGui::End();
+}
+
+void CMapToolHelper::Menu_GimmickInfo()
+{
+	if (false == IsParkGimmick(m_strCurModel))
+		return;
+
+	ImGui::Begin("ParkGimmick");
+
+	if (m_pPickedObject->Get_PrototypeTag() == TEXT("Prototype_GameObject_MapToolObject"))
+	{
+		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+		s_iTriggerIdx = pMapToolObject->Get_TriggerIndex();
+
+		ImGui::SetCursorPosX(33);
+		ImGui::Text("INDEX");
+		ImGui::SetNextItemWidth(80);
+
+		if (ImGui::Combo("##Index", &s_iTriggerIdx, s_triggerIndices, IM_ARRAYSIZE(s_triggerIndices)))
+			pMapToolObject->Set_TriggerIndex(s_iTriggerIdx);
+	}
+	else
+	{
+		CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(m_pPickedObject);
+		s_iTriggerIdx = round(pBasicMap->Get_MinX());
+
+		ImGui::SetCursorPosX(33);
+		ImGui::Text("INDEX");
+		ImGui::SetNextItemWidth(80);
+
+		if (ImGui::Combo("##Index", &s_iTriggerIdx, s_triggerIndices, IM_ARRAYSIZE(s_triggerIndices)))
+			pBasicMap->Set_MinX(s_iTriggerIdx);
+	}
+
+	ImGui::End();
+}
+
 void CMapToolHelper::Edit_Object()
 {
 	if (nullptr == m_pPickedObject)
@@ -1260,6 +1346,7 @@ void CMapToolHelper::Save_Level()
 	vector<CGameObject*> vecDecos;
 	vector<CGameObject*> vecItems;
 	vector<CGameObject*> vecKickables;
+	vector<CGameObject*> vecLights;
 
 	for (auto& object : *pObjectsList)
 	{
@@ -1304,10 +1391,21 @@ void CMapToolHelper::Save_Level()
 			vecRallyPoints.push_back(object);
 			continue;
 		}
+		if ("LightBulb" == strModelName)
+		{
+			vecLights.push_back(object);
+			continue;
+		}
 		_float4x4 matWorld = pTransform->Get_WorldMatrix();
 		_uint iStrLength = strModelName.length();
 		_uint iShaderVars = object->Get_ShaderVars();
 		_float fRimWidth = object->Get_RimWidth();
+
+		if (true == IsParkGimmick(strModelName))
+		{
+			CMapToolObject* pMapToolObj = dynamic_cast<CMapToolObject*>(object);
+			iShaderVars = pMapToolObj->Get_TriggerIndex();
+		}
 
 		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
 		outputFile.write(strModelName.c_str(), iStrLength);
@@ -1363,6 +1461,14 @@ void CMapToolHelper::Save_Level()
 		wstrSave += L"BlendDecoInfos O\n";
 	else
 		wstrSave += L"BlendDecoInfos X\n";
+
+	if ("Park" == strLevel)
+	{
+		if (true == Save_Lights(strLevel, vecLights))
+			wstrSave += L"Lights O\n";
+		else
+			wstrSave += L"Lights X\n";
+	}
 
 	if (false == m_vecBaseEmissiveRequiredModels.empty())
 	{
@@ -1430,6 +1536,12 @@ void CMapToolHelper::Load_Level()
 		tDesc.fRimWidth = fRimWidth;
 		wstring wstrGameObjectTag = TEXT("MapToolObject");
 
+		if (true == IsParkGimmick(strModelName))
+		{
+			tDesc.iTriggerIndex = iShaderVars;
+			tDesc.iShaderVars = 6;
+		}
+
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{
 			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
@@ -1448,6 +1560,8 @@ void CMapToolHelper::Load_Level()
 	//Load_RallyPoints(strLevel);
 	Load_Items(strLevel);
 	Load_Kickables(strLevel);
+	if (CheckIfFileExists(strLevel, string("Lights")))
+		Load_Lights(strLevel);
 
 	MoveToCam();
 }
@@ -1717,6 +1831,13 @@ _bool CMapToolHelper::IsBlendDeco(const string& _strModelName)
 	return false;
 }
 
+_bool CMapToolHelper::IsParkGimmick(const string& _strModelName)
+{
+	if (m_setParkGimmicks.end() != m_setParkGimmicks.find(_strModelName))
+		return true;
+	return _bool();
+}
+
 _bool CMapToolHelper::RenameFile(const string& _strLevel, const string& _tempFileName, const string& _strCustom)
 {
 	// 현재시간 받아오기
@@ -1733,6 +1854,17 @@ _bool CMapToolHelper::RenameFile(const string& _strLevel, const string& _tempFil
 	string fileName_Time = "../../../objects_txt/" + string(buffer) + "_" + _strLevel + _strCustom + ".txt";
 	string fileName = "../../../objects_txt/" + _strLevel + _strCustom + ".txt";
 	
+	if (true == AreFilesIdentical(_tempFileName, fileName)) {
+		remove(_tempFileName);
+		return true;
+	}
+
+	if (false == exists(fileName)) // 기존 파일이없을경우 생성.
+	{ 
+		ofstream newFile(fileName);
+		newFile.close();
+	}
+
 	if (rename(fileName.c_str(), fileName_Time.c_str()) != 0)
 	{
 		string strFile = _strLevel + _strCustom + ".txt";
@@ -1750,6 +1882,30 @@ _bool CMapToolHelper::RenameFile(const string& _strLevel, const string& _tempFil
 	}
 
 	return true;
+}
+
+_bool CMapToolHelper::AreFilesIdentical(const string& file1, const string& file2)
+{
+	ifstream ifs1(file1, ifstream::binary | ifstream::ate);
+	ifstream ifs2(file2, ifstream::binary | ifstream::ate);
+
+	if (!ifs1.is_open() || !ifs2.is_open())
+		return false;
+
+	// 파일 크기 비교
+	if (ifs1.tellg() != ifs2.tellg())
+		return false;
+
+	// 파일 포인터를 파일의 시작 위치로 되돌림
+	ifs1.seekg(0, ifstream::beg);
+	ifs2.seekg(0, ifstream::beg);
+
+	// 파일 내용을 바이트 단위로 비교
+	return equal(
+		istreambuf_iterator<char>(ifs1.rdbuf()),
+		istreambuf_iterator<char>(),
+		istreambuf_iterator<char>(ifs2.rdbuf())
+	);
 }
 
 void CMapToolHelper::HideTriggers(_bool bHideTriggers)
@@ -2045,6 +2201,15 @@ _bool CMapToolHelper::IsNonEmissive(const string& _strModelName)
 	return _bool();
 }
 
+_bool CMapToolHelper::CheckIfFileExists(const string& _strLevel, const string& _strFileName)
+{
+	path filePath("../../../objects_txt/" + _strLevel + "_" + _strFileName + ".txt");
+	if (filesystem::exists(filePath))
+		return true;
+
+	return _bool();
+}
+
 void CMapToolHelper::Reset_MapShaderInfo()
 {
 	if (nullptr == m_pPickedObject)
@@ -2094,6 +2259,12 @@ _bool CMapToolHelper::Save_Map(const string& _strLevel, vector<CGameObject*>& _v
 
 		_float3 vMin{ FLT_MAX, FLT_MAX, FLT_MAX }, vMax{ -FLT_MAX, -FLT_MAX , -FLT_MAX };
 		pModel->Find_MinMax(vMin, vMax);
+
+		if (true == IsParkGimmick(strModelName))
+		{
+			CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(map);
+			vMin.x = pBasicMap->Get_MinX();
+		}
 
 		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
 		outputFile.write(strModelName.c_str(), iStrLength);
@@ -2399,6 +2570,60 @@ _bool CMapToolHelper::Save_Kickables(const string& _strLevel, vector<CGameObject
 		_uint iStrLength = strModelName.length();
 		_uint iShaderVars = item->Get_ShaderVars();
 		_float fRimWidth = item->Get_RimWidth();
+
+		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
+		outputFile.write(strModelName.c_str(), iStrLength);
+		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
+		outputFile.write(reinterpret_cast<const char*>(&iShaderVars), sizeof(iShaderVars));
+		outputFile.write(reinterpret_cast<const char*>(&fRimWidth), sizeof(fRimWidth));
+	}
+
+	outputFile.close();
+
+	if (!outputFile)
+	{
+		wstring wstrError = TEXT("Failed to write data to ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrError.c_str());
+		remove(tempFileName.c_str()); // 임시파일 삭제
+		return false;
+	}
+
+	if (false == RenameFile(_strLevel, tempFileName, strCustom))
+		return false;
+
+	return true;
+}
+
+_bool CMapToolHelper::Save_Lights(const string& _strLevel, vector<CGameObject*>& _vecLights)
+{
+	string strCustom = "_Lights";
+	string tempFileName = "temp_" + _strLevel + strCustom + ".txt";
+
+	ofstream outputFile(tempFileName, ios::out | ios::binary);
+	if (!outputFile.is_open()) // 임시파일 열렸는지 확인
+	{
+		wstring wstrErrorMsg = TEXT("Failed to Open: ") + CUtils::StrToWstr(tempFileName);
+		MSG_BOX(wstrErrorMsg.c_str());
+		return false;
+	}
+
+	_uint iNumObjects = _vecLights.size();
+	outputFile.write(reinterpret_cast<const char*>(&iNumObjects), sizeof(iNumObjects));
+
+	for (auto& item : _vecLights)
+	{
+		CMapToolObject* pMapToolObj = dynamic_cast<CMapToolObject*>(item);
+		CModel* pModel = dynamic_cast<CModel*>(item->Get_Component(TEXT("Com_Model")));
+		CTransform* pTransform = dynamic_cast<CTransform*>(item->Get_Component(g_strTransformTag));
+
+		string strModelName = pModel->Get_ModelInfo().strModelName;
+		_float4x4 matWorld = pTransform->Get_WorldMatrix();
+		_uint iStrLength = strModelName.length();
+		_uint iShaderVars = item->Get_ShaderVars();
+		_float fRimWidth = pMapToolObj->Get_Radius();
+		vector<_float4> vecLightInfo = pMapToolObj->Get_LightInfo();
+		for(_uint i = 0; i < CMapToolObject::LIGHT_END; i++)
+			memcpy(&matWorld.m[i][0], &vecLightInfo[i], sizeof(_float4));
 
 		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
 		outputFile.write(strModelName.c_str(), iStrLength);
@@ -2772,6 +2997,60 @@ void CMapToolHelper::Load_Kickables(const string& _strLevel)
 		tDesc.matWorld = matWorld;
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
+
+		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
+		{
+			wstring wstrErrorMsg = TEXT("Failed to Clone: ") + wstrGameObjectTag;
+			MSG_BOX(wstrErrorMsg.c_str());
+			fileInput.close();
+			return;
+		}
+	}
+
+	fileInput.close();
+}
+
+void CMapToolHelper::Load_Lights(const string& _strLevel)
+{
+	string strFileName = "../../../objects_txt/" + _strLevel + "_Lights.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		wstring wstrError = TEXT("Failed to open : ") + CUtils::StrToWstr(_strLevel) + TEXT("_Lights.txt");
+		MSG_BOX(wstrError.c_str());
+		return;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iStrLength{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+	wstring wstrGameObjectTag = TEXT("MapToolObject");
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(matWorld));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		CMapToolObject::MAPTOOLOBJECT_DESC tDesc{};
+		tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+		tDesc.vDiffuse = _float4(matWorld._11, matWorld._12, matWorld._13, matWorld._14);
+		tDesc.vAmbient = _float4(matWorld._21, matWorld._22, matWorld._23, matWorld._24);
+		tDesc.vSpecular = _float4(matWorld._31, matWorld._32, matWorld._33, matWorld._34);
+		tDesc.matWorld._41 = matWorld._41;
+		tDesc.matWorld._42 = matWorld._42;
+		tDesc.matWorld._43 = matWorld._43;
+		tDesc.matWorld._44 = 1;
+		tDesc.fRadius = fRimWidth;
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{

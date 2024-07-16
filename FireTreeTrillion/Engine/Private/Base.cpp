@@ -24,7 +24,6 @@ unsigned int CBase::Release()
 	}
 	else
 	{
-		
 		return this->m_iRefCnt--;
 	}
 }

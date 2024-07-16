@@ -313,7 +313,7 @@ void CQTE::QTE_Animation(_float fTimeDelta)
 			m_fPlateScale = 1.5f;
 			m_fJoyStickControlTime = 0.f;
 
-			CUtils::Rotation(m_UIMatrix[TEXTURE_BASE2], CUtils::Get_State_Vector_Matrix(m_UIMatrix[TEXTURE_BASE2], CUtils::STATE_LOOK), ToRadian(90.f));
+			CUtils::Rotation(m_UIMatrix[TEXTURE_BASE2], CUtils::Get_State_Vector_Matrix(m_UIMatrix[TEXTURE_BASE2], CUtils::STATE_LOOK), ToRadian(270.f));
 
 		}
 		
@@ -334,7 +334,7 @@ void CQTE::QTE_Animation(_float fTimeDelta)
 			m_fPlateScale = 1.5f;
 			m_fJoyStickControlTime = 0.f;
 
-			CUtils::Rotation(m_UIMatrix[TEXTURE_BASE2], CUtils::Get_State_Vector_Matrix(m_UIMatrix[TEXTURE_BASE2], CUtils::STATE_LOOK), ToRadian(270.f));
+			CUtils::Rotation(m_UIMatrix[TEXTURE_BASE2], CUtils::Get_State_Vector_Matrix(m_UIMatrix[TEXTURE_BASE2], CUtils::STATE_LOOK), ToRadian(90.f));
 		}
 
 		if (m_fJoyStickControlTime > 0.15f)

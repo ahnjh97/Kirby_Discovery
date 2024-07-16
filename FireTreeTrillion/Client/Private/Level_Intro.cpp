@@ -64,6 +64,8 @@ HRESULT CLevel_Intro::Initialize()
 
 	// 셰이더 트리거
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_BEACH);
+
 	// 레벨전환 트리거
 	function<void(_int)> func = bind(&CLevel_Intro::Change_Levels, this);
 	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_LEVELCHANGER, func);
@@ -177,28 +179,6 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ -60.f, 5.f, -6.5f });
-	ObjDesc.matWorld = InitMat;
-
-	// Car Test
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Deform"), TEXT("Prototype_GameObject_Bulb"), &ObjDesc)))
-		return E_FAIL;
-
-
-	ObjDesc.fSpeedPerSec = 5.f;
-	ObjDesc.fRotationPerSec = ToRadian(90.f);
-	InitMat = _float4x4::Identity;
-	InitMat.Translation({ -50.f, 5.f, -6.5f });
-	ObjDesc.matWorld = InitMat;
-	ObjDesc.wstrModelName = TEXT("RockA");
-	// Car Test
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Breakable"), TEXT("Prototype_GameObject_BreakableRock"), &ObjDesc)))
-		return E_FAIL;
-
-
-	ObjDesc.fSpeedPerSec = 5.f;
-	ObjDesc.fRotationPerSec = ToRadian(90.f);
-	InitMat = _float4x4::Identity;
 	InitMat.Translation({ 53.38f, 22.19f, 348.12f });
 	ObjDesc.matWorld = InitMat;
 	// Car Test
@@ -472,10 +452,10 @@ HRESULT CLevel_Intro::Ready_Triggers()
 			tFogInstanceDesc.matWorld = matWorld;
 			tFogInstanceDesc.iRows = iTriggerIndex;
 			tFogInstanceDesc.iNumInstances = static_cast<_uint>(fRadius);*/
-			CGameObject::GAMEOBJECT_DESC tDesc{};
-			tDesc.matWorld = matWorld;
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &tDesc)))
-				return E_FAIL;
+			//CGameObject::GAMEOBJECT_DESC tDesc{};
+			//tDesc.matWorld = matWorld;
+			//if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_TerrainFog"), TEXT("Prototype_GameObject_TerrainFog"), &tDesc)))
+			//	return E_FAIL;
 		}
 	}
 

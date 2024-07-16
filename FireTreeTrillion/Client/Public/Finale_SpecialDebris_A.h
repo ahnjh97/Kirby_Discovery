@@ -37,6 +37,8 @@ private:
 	_bool			m_bRender = { false };
 	void			Set_Animation();
 
+	_bool			m_BlackTrigger = { true };
+
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };

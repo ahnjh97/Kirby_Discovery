@@ -105,7 +105,7 @@ static void Hammer_Slash(_float fTimeDelta, CTransform* pTransformCom, _bool bIs
 		CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 		MultiFXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
 
-		MultiFXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
+		MultiFXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir( pTransformCom->Get_State(CTransform::STATE_LOOK) ).y, 0.f };
 		MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
 
 		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_multi hammer hit A"), &MultiFXDesc)))

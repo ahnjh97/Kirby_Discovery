@@ -5,6 +5,7 @@
 #include "MultiEffect.h"
 #include "KirbyBomb.h"
 #include "Camera_Main.h"
+#include "Particle.h"
 
 #define DESC(state) Kirbydesc->state
 #define GAMEINSTANCE CGameInstance::Get_Instance()->

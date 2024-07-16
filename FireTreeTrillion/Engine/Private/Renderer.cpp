@@ -471,11 +471,35 @@ void CRenderer::Color_Initialize()
 		0.218674f, 0.00988089f, 0.499961f, 0.912908f, 0.99115f, 0.00997962f, 0.189991f, 0.360167f
 		});
 
+	Save_ColorSet("Park",
+		COLOR_DATA{
+		0.590069f, 1.f, 0.979981f, 1.20988f, 2.0299f, 1.20026f, 1.10964f,
+		0.720317f, 0.699998f, 0.7f, 0.949932f, 0.999996f, 1.f, 0.0945045f,
+		0.0329081f, 0.167429f, 0.00977626f, 0.466084f, 0.676991f, 0.218674f,
+		0.00982029f, 0.499961f, 0.912908f, 0.99115f, 0.00960964f, 0.180212f, 0.369867f
+		});
+
 	Save_ColorSet("Lab",
 		COLOR_DATA{
 		0.809755f, 1.f, 0.990072f, 1.43971f, 0.99014f, 1.10986f, 1.09033f, 0.799844f, 0.6f, 0.6f,
 		1.1401f, 1.06f, 1.18f, 0.0382485f, 0.225391f, 0.671426f, 0.1099f, 0.466084f, 0.676991f,
 		0.218674f, 0.00985707f, 0.499961f, 0.912908f, 0.99115f, 0.00992393f, 0.190238f, 0.350267f
+		});
+
+	Save_ColorSet("Beach",
+		COLOR_DATA{
+		1.0198f, 1.f, 0.95f, 1.3f, 0.85f, 1.03727f, 1.05996f, 0.680332f,
+		0.6f, 0.6f, 1.16004f, 0.96f, 1.04f, 0.243137f, 0.00784314f, 0.00784314f,
+		0.12f, 0.917647f, 0.513726f, 0.145098f, 0.16f, 1.f, 0.847059f, 0.254902f,
+		0.34f, 0.13f, 0.55f
+		});
+
+	Save_ColorSet("PartTime",
+		COLOR_DATA{
+		0.729446f, 1.f, 1.03022f, 1.42964f, 1.79006f, 1.49008f, 1.00988f, 0.720329f, 0.6f,
+		0.6f, 1.32023f, 1.07612f, 1.09806f, 0.0846788f, 0.0345651f, 0.177979f, 0.019863f,
+		0.466084f, 0.676991f, 0.218674f, 0.019726f, 0.499961f, 0.912908f, 0.99115f,
+		0.0197512f, 0.189896f, 0.360017f
 		});
 
 	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
@@ -597,8 +621,11 @@ void CRenderer::Render_SystemTick(_float fTimeDelta)
 	// 컬러를 보간해준다.
 	Interpolate_ColorData(fTimeDelta);
 
-	// 컨텐츠 색상변화 기능
+	// 컨텐츠 색상변화 기능 (디퍼드 자원 빼고 약하게 어두워지게 됨)
 	Interpolate_BlackBackground(fTimeDelta);
+
+	// 컨텐츠 색상변화 기능 (객체들 전부 어두워짐)
+	ObjectBlack(fTimeDelta);
 
 	Key_Input();
 }
@@ -687,6 +714,11 @@ void CRenderer::Set_ColorSet(string strColorName)
 	//일단 -1로 초기화
 	m_DestColorData = {};
 	m_DestColorData = Find_ColorSet(strColorName);
+}
+
+void CRenderer::Set_ColorSet(COLORSET eColorSet)
+{
+	Set_ColorSet_ByIndex((_uint)eColorSet);
 }
 
 void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
@@ -828,6 +860,43 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 
 		m_fDOFIntensity = 1.f;
 		m_vDOFColor = _float3{ .7f, .65f, .92f };
+	}
+	break;
+	case 9:
+	{
+		m_DestColorData = Find_ColorSet("Park");
+
+		m_fRimLightRatio.second = .0f;
+
+		m_fDOFIntensity = 0.f;
+	}
+	break;
+	case 10:
+	{
+		m_DestColorData = Find_ColorSet("Beach");
+
+		m_vFogYColor = { 0.f, 0.88f, 0.7f };
+		m_fFogYBottom = { 0.f };
+		m_fFogYTopY = 18.2f;
+		m_fFogYIntensity = 10.f;
+
+		m_vFogViewColor = { 0.f, 0.88f, 0.7f };
+		m_fFogViewStart = { 1.f };
+		m_fFogViewEnd = 370.f;
+		m_fFogViewIntensity = .5f;
+
+		m_fRimLightRatio.second = 1.f;
+		m_fRimLightRadius.second = 1.f;
+		m_vRimColor.second = _float3(.84f, 1.f, .5f);
+
+		m_fDOFIntensity = 1.f;
+		m_vDOFColor = _float3{ .03f, .07f, 0.f };
+	}
+	break;
+	case 11:
+	{
+		m_DestColorData = Find_ColorSet("PartTime");
+		Update_Option(OPTION_DOF, false);
 	}
 	break;
 	default:
@@ -1267,6 +1336,9 @@ HRESULT CRenderer::Render_EffectResult()
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SSAO"), "g_SSAOTexture")))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Sky"), "g_SkyTexture")))
+		return E_FAIL;
+
 	if (FAILED(m_pShader->Bind_RawValue("g_bMapTool", &m_bMaptool, sizeof(_bool))))
 		return E_FAIL;
 
@@ -1359,7 +1431,6 @@ HRESULT CRenderer::Render_Result()
 			return E_FAIL;
 	}
 
-
 	// 섞을 이펙트들 (빛 상관 없는 애들)
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Blur_Y"), "g_BlurTexture")))
 		return E_FAIL;
@@ -1367,7 +1438,6 @@ HRESULT CRenderer::Render_Result()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_NonLight"), "g_NonLightTexture")))
 		return E_FAIL;
-
 	//// SSAO 연산
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SSAO_Y"), "g_SSAOTexture")))
 		return E_FAIL;
@@ -1382,27 +1452,47 @@ HRESULT CRenderer::Render_Result()
 	// 림 라이트 배율
 	if (FAILED(m_pShader->Bind_RawValue("g_fRimLightRatio", &m_fRimLightRatio.first, sizeof(_float))))
 		return E_FAIL;
-
 	// 림 라이트 범위
 	if (FAILED(m_pShader->Bind_RawValue("g_fRimLightRadius", &m_fRimLightRadius.first, sizeof(_float))))
 		return E_FAIL;
-
 	// 림 라이트 컬러
 	if (FAILED(m_pShader->Bind_RawValue("g_vRimColor", &m_vRimColor.first, sizeof(_float3))))
 		return E_FAIL;
 
+
 	// DOF 강도
 	if (FAILED(m_pShader->Bind_RawValue("g_fDOFIntensity", &m_fDOFIntensity, sizeof(_float))))
 		return E_FAIL;
-
 	// DOF 컬러
 	if (FAILED(m_pShader->Bind_RawValue("g_vDOFColor", &m_vDOFColor, sizeof(_float3))))
+		return E_FAIL;
+
+	// FOG 데이터
+	if (FAILED(m_pShader->Bind_RawValue("g_vFogYColor", &m_vFogYColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogYBottom", &m_fFogYBottom, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogYTopY", &m_fFogYTopY, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogYIntensity", &m_fFogYIntensity, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_vFogViewColor", &m_vFogViewColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogViewStart", &m_fFogViewStart, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogViewEnd", &m_fFogViewEnd, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fFogViewIntensity", &m_fFogViewIntensity, sizeof(_float))))
+		return E_FAIL;
+
+	if (FAILED(m_pShader->Bind_RawValue("g_fObjectBlack", &m_fObjectBlack, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fRealObjectBlack", &m_fRealObjectBlack, sizeof(_float))))
 		return E_FAIL;
 
 	// 섞을 스카이 박스
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Sky"), "g_SkyTexture")))
 		return E_FAIL;
-
 	// 각종 디퍼드 자원
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_DeferredInfo"), "g_DeferredInfoTexture")))
 		return E_FAIL;
@@ -1756,6 +1846,19 @@ HRESULT CRenderer::Render_FinalResult()
 	if (FAILED(m_pShader->Bind_RawValue("g_fHighlightIntensity", &m_fHighlightIntensity, sizeof(_float))))
 		return E_FAIL;
 
+
+	if (FAILED(m_pShader->Bind_RawValue("g_vOceanTopColor", &m_vOceanTopColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_vOceanBottomColor", &m_vOceanBottomColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fOceanTopY", &m_fOceanTopY, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fOceanBottomY", &m_fOceanBottomY, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fOceanIntensity", &m_fOceanIntensity, sizeof(_float))))
+		return E_FAIL;
+
+
 #pragma endregion
 
 	// 최종 작업물 던지기
@@ -1827,6 +1930,22 @@ void CRenderer::Render_IMGUI()
 		Update_Option(OPTION_DOF, m_bRenderOption[OPTION_DOF]);
 	if (ImGui::Checkbox(u8"모샨블라", &m_bRenderOption[OPTION_MOTIONBLUR]))
 		Update_Option(OPTION_MOTIONBLUR, m_bRenderOption[OPTION_MOTIONBLUR]);
+
+
+
+	ImGui::SeparatorText(u8"포그");
+
+	ImGui::DragFloat3(u8"가로 포그", &(m_vFogYColor.x), .01f, 0.f, 1.f, "%.2f");
+	ImGui::DragFloat(u8"가로 포그 밑", &m_fFogYBottom, .1f, -1000.f, 1000.f, "%.2f");
+	ImGui::DragFloat(u8"가로 포그 위", &m_fFogYTopY, .1f, -1000.f, 1000.f, "%.2f");
+	ImGui::DragFloat(u8"가로 포그 강도", &m_fFogYIntensity, .01f, 0.f, 1.f, "%.2f");
+
+	ImGui::Dummy({ 0.f, 10.f });
+	ImGui::DragFloat3(u8"뷰 포그", &(m_vFogViewColor.x), .01f, 0.f, 1.f, "%.2f");
+	ImGui::DragFloat(u8"뷰 포그 앞", &m_fFogViewStart, .1f, -1000.f, 1000.f, "%.2f");
+	ImGui::DragFloat(u8"뷰 포그 뒤", &m_fFogViewEnd, .1f, -1000.f, 1000.f, "%.2f");
+	ImGui::DragFloat(u8"뷰 포그 강도", &m_fFogViewIntensity, .01f, 0.f, 1.f, "%.2f");
+
 
 
 	ImGui::SeparatorText(u8"SSAO");
@@ -2174,6 +2293,48 @@ void CRenderer::Update_Option(OPTION Option, _bool bOn)
 }
 
 #ifdef _DEBUG
+
+void CRenderer::ObjectBlack(_float fTimeDelta)
+{
+	if (m_bObjectBlack == true)
+	{
+		if (m_fObjectBlackMaxTime == 0.f)
+		{
+			m_fObjectBlack = m_fObjectBlackTarget;
+			m_fOBjectBlackTime = 0.f;
+
+			if (m_bRealBlack == true)
+			{
+				m_fRealObjectBlack = m_fObjectBlackTarget;
+				m_bRealBlack = false;
+			}
+
+			m_bObjectBlack = false;
+			return;
+		}
+
+		m_fOBjectBlackTime += fTimeDelta;
+		m_fObjectBlack += fTimeDelta * m_fObjectBlackRatioTime;
+
+		if (m_bRealBlack == true)
+			m_fRealObjectBlack += fTimeDelta * m_fObjectBlackRatioTime;
+
+
+		if (m_fOBjectBlackTime > m_fObjectBlackMaxTime)
+		{
+			m_fObjectBlack = m_fObjectBlackTarget;
+			m_fOBjectBlackTime = 0.f;
+
+			if (m_bRealBlack == true)
+			{
+				m_fRealObjectBlack = m_fObjectBlackTarget;
+				m_bRealBlack = false;
+			}
+
+			m_bObjectBlack = false;
+		}
+	}
+}
 
 HRESULT CRenderer::Render_Debug()
 {

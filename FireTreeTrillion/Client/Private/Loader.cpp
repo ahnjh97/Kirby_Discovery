@@ -266,6 +266,8 @@ HRESULT CLoader::Start()
 
 	HRESULT		hr = { 0 };
 	SetUp_ModelScaleRotation(m_eNextLevelID);
+
+
 	switch (m_eNextLevelID)
 	{
 	case LEVEL_LOGO:
@@ -385,7 +387,6 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_StarPoint"), CHUD_StarPoint);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_AbilityDiscard"), CHUD_AbilityDiscard);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_BossHpBar"), CHUD_BossHpBar);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Mission"), CHUD_Mission);
 	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTime"), CUI_PartTime);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTimeDee"), CUI_PartTimeDee);
@@ -593,6 +594,10 @@ HRESULT CLoader::Loading_StaticComponentAll()
 
 	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("Rect"),
 		CVIBuffer_Rect::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+
+	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("UpperRect"),
+		CVIBuffer_UpperRect::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
 
 	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("Instance_Point"),
@@ -1036,7 +1041,7 @@ HRESULT CLoader::Loading_For_Park()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+	if (FAILED(Add_Texture(eLevel, "Level_Park_Env", "Map/Level_Park_Env.dds")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
 		return E_FAIL;
@@ -1562,7 +1567,7 @@ HRESULT CLoader::Add_FXTexture()
 	// 주로 사용되는 텍스쳐들
 	hr = Add_Texture(LEVEL_STATIC, "FX_Star", "Effects/Basic/common_star.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Bubble", "Effects/Basic/common_bubble.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.png", 4);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.png", 5);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Grad", "Effects/Basic/common_gradation.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Hit", "Effects/Basic/common_ring_0.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Smoke", "Effects/Basic/common_smoke_%d.png", 2);	CHECK_FAILED(hr);
@@ -1609,6 +1614,7 @@ HRESULT CLoader::Add_FXTexture()
 	//팝스타
 	hr = Add_Texture(LEVEL_STATIC, "FX_PopstarFallWind", "Effects/Popstar/PopStarFallEffectWind.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_PopstarSkyCloud", "Effects/Popstar/PopStarSkyCloud.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_PopstarBG", "Effects/UI/end bg.png");	CHECK_FAILED(hr);
 
 	//안개
 	hr = Add_Texture(LEVEL_STATIC, "FX_Fog", "Map/Fog/Sand_%d.png", 4);	CHECK_FAILED(hr);
@@ -1616,6 +1622,9 @@ HRESULT CLoader::Add_FXTexture()
 	// 파크 몬스터용
 	hr = Add_Texture(LEVEL_STATIC, "FX_ParkSmoke", "Effects/common_smoke08.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SmokeNormal", "Effects/indirect3_normal.png");	CHECK_FAILED(hr);
+
+	//스카이스피어
+	hr = Add_Texture(LEVEL_STATIC, "FX_FinalBoss_SkySphere", "SkySphere/SkySphere_Lab_Diffuse_%d.dds", 3);	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -1774,6 +1783,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Town", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("NonRenderWall", TYPE_NONANIM, 0.01f, 1.f, 0, string("MapObjs/"));
 
 
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
@@ -2091,6 +2101,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("Trigger", TYPE_NONANIM, 0.01f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("BG1", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("NonRenderWall", TYPE_NONANIM, 0.01f, 1.f, 0, string("MapObjs/"));
 
 		m_vecModelInfo.emplace_back("Kirby", TYPE_ANIM, 1.f, 180.f);
 

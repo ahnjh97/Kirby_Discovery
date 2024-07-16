@@ -107,10 +107,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+		
 
 	}
 	break;
@@ -126,10 +125,10 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+			/*Safe_AddRef(pRoad);*/
+		
 	}
 	break;
 	case RTYPE_BUILDINGC:
@@ -144,10 +143,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+		
 			
 	}
 	break;
@@ -163,10 +161,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+		
 	}
 	break;
 	case RTYPE_ROADA:
@@ -183,10 +180,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+		
 
 
 		//기본 도로
@@ -201,10 +197,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+		
 
 
 		//부서지는 도로
@@ -222,10 +217,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+		
 
 		//기본 도로
 		roadDesc = {};
@@ -242,10 +236,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+		
 
 		roadDesc = {};
 		roadDesc.wstrModelName = TEXT("RoadEnd");
@@ -258,10 +251,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+		
 	}
 	break;
 	case RTYPE_ROADB:
@@ -278,10 +270,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+		
 
 
 		//기본 도로
@@ -296,10 +287,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+		
 
 
 		//부서지는 도로
@@ -317,10 +307,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+		
 	}
 	break;
 	case RTYPE_ROADC:
@@ -337,10 +326,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		CFinaleRoad* pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+		
 
 		//부서지는 도로
 		roadDesc = {};
@@ -357,10 +345,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+		
 
 		//기본 도로
 		roadDesc = {};
@@ -374,10 +361,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+		
 
 		roadDesc = {};
 		roadDesc.wstrModelName = TEXT("RoadEnd");
@@ -390,10 +376,9 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 			return E_FAIL;
 
 		pRoad = dynamic_cast<CFinaleRoad*>(m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_FinaleRoad"))->back());
-		if (pRoad != nullptr) {
+		if (pRoad != nullptr)
 			m_pRoads.emplace_back(pRoad);
-			Safe_AddRef(pRoad);
-		}
+		
 	}
 	break;
 	default:

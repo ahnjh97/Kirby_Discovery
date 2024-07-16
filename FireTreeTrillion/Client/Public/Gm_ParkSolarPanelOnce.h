@@ -12,7 +12,7 @@ BEGIN(Client)
 class CGm_ParkSolarPanelOnce final : public CPhysXObject
 {
 public: //괄호의 숫자는 실제 인게임의 기믹 애님 순서. index는 아님
-	enum ANIM_STATE {	STATE_ONWAITSTART, //충전 시작 (3)
+	enum PANELONCE_STATE {	STATE_ONWAITSTART, //충전 시작 (3)
 						STATE_CHARGE, //충전 중 (2)
 						STATE_ONWAIT, //충전 완료 (4)
 						STATE_OFFWAIT, //충전 전 대기 (1)
@@ -21,7 +21,8 @@ public: //괄호의 숫자는 실제 인게임의 기믹 애님 순서. index는 아님
 	enum LAMP_TYPE { LAMP_GREEN, LAMP_RED, LAMP_YELLOW, LAMP_NONE };
 
 public:
-	ANIM_STATE Get_AnimState() { return m_eCurState; }
+	PANELONCE_STATE Get_AnimState() { return m_eCurState; }
+	_uint Get_GimmickIndex() { return m_iGimmickIndex; }
 
 private:
 	CGm_ParkSolarPanelOnce(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -55,7 +56,7 @@ private:
 
 	PxRigidStatic*			m_pStaticActor = { nullptr };
 
-	ANIM_STATE				m_eCurState = { STATE_NONE };
+	PANELONCE_STATE			m_eCurState = { STATE_NONE };
 
 	_float					m_fDecreasesTime = { 0.f };
 	_float					m_fWhiteColorDiffuse = { 0.f };
@@ -64,6 +65,10 @@ private:
 	
 	_bool					m_IsInteraction = { FALSE };
 	_bool					m_bStartCharge = { FALSE };
+
+	vector<_uint>			m_vecPassIndices;
+
+	_uint					m_iGimmickIndex = {};
 
 public:
 	static CGm_ParkSolarPanelOnce* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

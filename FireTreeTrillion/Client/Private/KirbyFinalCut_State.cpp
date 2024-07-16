@@ -1,0 +1,66 @@
+#include "stdafx.h"
+#include "KirbyFinalCut_State.h"
+#include "Kirby_State_Function.h"
+
+#pragma region CUT STATE
+
+CKirbyFinalCut_State::CKirbyFinalCut_State()
+{
+}
+
+void CKirbyFinalCut_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+}
+
+void CKirbyFinalCut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	// 뱉는 로직이다.
+	CKirby* pKirby = static_cast<CKirby*>(pGameObject);
+	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
+	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+	pController->FreeFall(pTransformCom, fTimeDelta);
+
+	if (pKirby->Get_State() == CKirby::FINALCUTSTATE_CUT1)
+	{
+
+
+
+
+
+		if (pKirby->isAnimFinish())
+		{
+			pKirby->Change_State(CKirby::FINALCUTSTATE_CUT2, 60.f, true, true, CKirby::BODY_FINALCUT, CKirby::OFFSET_FINALCUT);
+			return;
+		}
+
+	}
+	else if (pKirby->Get_State() == CKirby::FINALCUTSTATE_CUT2)
+	{
+
+
+
+
+
+	}
+}
+
+void CKirbyFinalCut_State::OnStateExit()
+{
+}
+
+CKirbyFinalCut_State* CKirbyFinalCut_State::Create()
+{
+	CKirbyFinalCut_State* pInstance = new CKirbyFinalCut_State();
+	return pInstance;
+}
+
+void CKirbyFinalCut_State::Free()
+{
+	__super::Free();
+}
+
+#pragma endregion

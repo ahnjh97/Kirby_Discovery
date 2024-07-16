@@ -20,7 +20,7 @@ public:
 	enum TYPE { GAMEOVER, OVER, START, TYPE_END };
 private:
 	CPartTimeHelper();
-	virtual ~ CPartTimeHelper() = default;
+	virtual ~CPartTimeHelper() = default;
 
 public: 
 	void				Register_FirstDee(class CHungryDee* pDee);
@@ -30,6 +30,10 @@ public:
 	void				Register_Camera(class CCamera_Main* pCamera);
 	void				NotifyObserver();
 
+	//헝그리 디의 총 줄선 수를 체크, 관리
+	_int				Get_CurDeeWaitingNum() { return m_iDeeWaitingNum; }
+	void				Add_WaitingNum() { m_iDeeWaitingNum++; }
+
 	// 문제 냅니다.
 	void				Make_RandomItem();
 	// 문제 잘 풀었는지 검사합니다.
@@ -38,9 +42,7 @@ public:
 	PARTTIME_ITEM		Get_PartTimeItem() const { return m_eFood; }
 
 	// 게임 흐름에 따른 이벤트들을 관할합니다.
-	void				Initialize_GameStart();
 	_bool				Handle_GameStart();
-	_bool				Handle_LunchTime();
 	_bool				Handle_GameOver();
 	void				Handle_UI(TYPE eContent);
 
@@ -53,6 +55,7 @@ private:
 
 	PARTTIME_ITEM				m_eFood	= PARTTIME_ITEM::CAKE;
 	_float						m_fScore = 0.f;
+	_int						m_iDeeWaitingNum = { 0 };
 
 public:
 	virtual void Free() override;

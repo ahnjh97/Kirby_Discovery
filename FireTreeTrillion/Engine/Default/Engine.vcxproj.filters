@@ -411,6 +411,9 @@
     <ClCompile Include="..\Private\QueryFilterCallback.cpp">
       <Filter>02.PhysX\QueryFilterCallback</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_UpperRect.cpp">
+      <Filter>01.Utility\02.Components\VIBuffer\Rect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Base.h">
@@ -649,6 +652,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\QueryFilterCallback.h">
       <Filter>02.PhysX\QueryFilterCallback</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_UpperRect.h">
+      <Filter>01.Utility\02.Components\VIBuffer\Rect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

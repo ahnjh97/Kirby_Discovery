@@ -19,6 +19,10 @@
 #include "SkySphere.h"
 #include "TransingStar.h"
 #include "Gm_DynamicField.h"
+#include "Gm_ParkSolarPanelOnce.h"
+#include "Gm_ParkSolarPanelCharge.h"
+
+#define MONSTER_TRIGGER(index) (index - 11)
 
 CLevel_Park::CLevel_Park(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -76,7 +80,7 @@ HRESULT CLevel_Park::Initialize()
 		return E_FAIL;
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet_ByIndex(6);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_PARK);
 
 	// PARK 도착했으면 오픈해주세요
 	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
@@ -93,6 +97,9 @@ HRESULT CLevel_Park::Initialize()
 	function<void(_int)> funcChanger = bind(&CLevel_Park::Change_Levels, this);
 	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_LEVELCHANGER, funcChanger);
 
+	// 몬스터 트리거
+	function<void(_int)> funcMonster = bind(&CLevel_Park::SummonMonsters, this, placeholders::_1);
+	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_MONSTER, funcMonster);
 
 	return S_OK;
 }
@@ -115,6 +122,30 @@ void CLevel_Park::Change_Levels()
 	pTransingStar->Set_LargeColor(_float3(85.f / 255.f, 93.f / 255.f, 183.f / 255.f));
 	pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
 	pTransingStar->Activate(CTransingStar::CLOSE);
+}
+
+void CLevel_Park::SummonMonsters(_uint iTriggerIndex)
+{
+	if (m_setActivatedMonsterTriggers.end() != m_setActivatedMonsterTriggers.find(iTriggerIndex))
+		return;
+
+	m_setActivatedMonsterTriggers.insert(iTriggerIndex); // 여러번 호출되는거 방지
+
+	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
+	wstring wstrTag;
+
+	for (auto& monsterDesc : m_vecMonsterDescs[MONSTER_TRIGGER(iTriggerIndex)])
+	{
+		wstring wstrModelName = monsterDesc.wstrModelName;
+		size_t underscorePos = wstrModelName.find(L'_');
+		if (underscorePos != wstring::npos)
+			wstrModelName = wstrModelName.substr(underscorePos + 1);
+	
+		wstrTag = wstrPrototypeTag + wstrModelName;
+
+		if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), wstrTag, &monsterDesc)))
+			return;
+	}
 }
 
 void CLevel_Park::Tick(_float fTimeDelta)
@@ -160,6 +191,48 @@ HRESULT CLevel_Park::Ready_Lights()
 		return E_FAIL;
 
 	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 5000.f, 1200.f, 1.f});
+
+	string strFileName = "../../../objects_txt/Park_Lights.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : Park_Lights.txt"));
+		return E_FAIL;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	LIGHT_DESC			tPointLightDesc{};
+	tPointLightDesc.eType = LIGHT_DESC::TYPE_POINT;
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		tPointLightDesc.fRange = fRimWidth;
+		tPointLightDesc.vDiffuse = _float4(matWorld._11, matWorld._12, matWorld._13, 1.f);
+		tPointLightDesc.vAmbient = _float4(matWorld._21, matWorld._22, matWorld._23, 1.f);
+		tPointLightDesc.vSpecular = _float4(matWorld._31, matWorld._32, matWorld._33, 1.f);
+		tPointLightDesc.vPosition = _float4(matWorld._41, matWorld._42, matWorld._43, 1.f);
+
+		if (FAILED(CGameInstance::Get_Instance()->Add_Light(tPointLightDesc)))
+			return E_FAIL;
+	}
+
+	fileInput.close();
 
 	return S_OK;
 }
@@ -287,28 +360,27 @@ HRESULT CLevel_Park::Ready_Map()
 			CGameObject::GAMEOBJECT_DESC tDesc{};
 			tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			tDesc.matWorld = matWorld;
+			tDesc.iShaderVars = _uint(round(vMin.x));
 
 			//동적 필드
-			if ("Gimmick_PkFunHouseDarkness01" == strModelName
-				|| "Gimmick_PkFunHouseDarkness04" == strModelName
-				|| "Gimmick_PkFunHouseDarkness05" == strModelName)
+			if ("Gimmick_PkFunHouseDarkness01" == strModelName || "Gimmick_PkFunHouseDarkness04" == strModelName
+				|| "Gimmick_PkFunHouseDarkness05" == strModelName || "Gimmick_PkFunHouse06" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_Updown"), 
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField"), 
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
 
-			if ("Gimmick_PkFunHouseDarkness02" == strModelName ||
-				"Gimmick_PkFunHouseDarkness03" == strModelName)
+			if ("Gimmick_PkFunHouseDarkness02" == strModelName || "Gimmick_PkFunHouseDarkness03" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_LeftRight"),
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_SurpriseBoard"),
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
 
-			if ("Gimmick_PkFunHouse06" == strModelName)
+			if ("Gimmick_PkFunHouse07" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_FrontBack"),
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_StaticField"),
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
@@ -386,8 +458,12 @@ HRESULT CLevel_Park::Ready_Triggers()
 			tTriggerDesc.matWorld = matWorld;
 			tTriggerDesc.iTriggerIndex = iTriggerIndex;
 			tTriggerDesc.iTriggerType = triggerType;
+			
+			wstring wstrLayerTag = TEXT("Layer_Trigger");
+			if(10 < iTriggerIndex)
+				wstrLayerTag = TEXT("Layer_MonsterTrigger");
 
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Trigger"), TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, wstrLayerTag, TEXT("Prototype_GameObject_Trigger"), &tTriggerDesc)))
 				return E_FAIL;
 			continue;
 		}
@@ -505,6 +581,15 @@ HRESULT CLevel_Park::Ready_Monsters()
 		if (strModelName.size() >= 8) { // NonAnim_ 부분 지우기
 			if ("NonAnim" == strModelName.substr(0, 7))
 				tempDesc.wstrModelName.erase(0, 8);
+		}
+
+		if (10 < iTriggerIndex)
+		{
+			CMonster::MONSTER_DESC tMonsterDesc = *static_cast<CMonster::MONSTER_DESC*>(&tempDesc);
+			tMonsterDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
+
+			m_vecMonsterDescs[MONSTER_TRIGGER(iTriggerIndex)].push_back(tMonsterDesc);
+			continue;
 		}
 
 		if (L"Awoofy" == tempDesc.wstrModelName)
@@ -871,27 +956,37 @@ HRESULT CLevel_Park::Ready_Objects()
 
 	//기믹 오브젝트를 기준으로, 가장 가까운 거리를 검사하여 다이나믹 필드를 세팅
 	list<CGameObject*>* GimmickList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"));
-	for (auto& Gimmick : *GimmickList)
-	{
-		_float fDistance = { FLT_MAX };
-		CGameObject* pDField = { nullptr };
+	list<CGameObject*>* DFieldList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField"));
 
-		list<CGameObject*>* DFieldList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField_Updown"));
-		for (auto& DField : *DFieldList)
+	for (auto& field : *DFieldList)
+	{
+		CGm_DynamicField* pField = dynamic_cast<CGm_DynamicField*>(field);
+		_uint iFieldIndex = pField->Get_GimmickIndex();
+
+		for (auto& gimmick : *GimmickList)
 		{
-			//기믹 & 필드 거리 검사
-			_float fNewDistance = m_pGameInstance->Compute_Distance(Gimmick, DField);
-			if (fDistance >= fNewDistance)
+			if (TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce") == gimmick->Get_PrototypeTag())
 			{
-				fDistance = fNewDistance;
-				pDField = DField;
+				CGm_ParkSolarPanelOnce* pGimmick = dynamic_cast<CGm_ParkSolarPanelOnce*>(gimmick);
+				_uint iGimmickIndex = pGimmick->Get_GimmickIndex();
+				if (iFieldIndex == iGimmickIndex) {
+					pField->Set_SolarPanelOnce(pGimmick);
+					break;
+				}
+			}
+			else if (TEXT("Prototype_GameObject_Gm_ParkSolarPanelCharge") == gimmick->Get_PrototypeTag())
+			{
+				CGm_ParkSolarPanelCharge* pGimmick = dynamic_cast<CGm_ParkSolarPanelCharge*>(gimmick);
+				_uint iGimmickIndex = pGimmick->Get_GimmickIndex();
+				if (iFieldIndex == iGimmickIndex) {
+					pField->Set_SolarPanelCharge(pGimmick);
+					break;
+				}
 			}
 		}
-		CGm_ParkSolarPanelOnce* pGimmickSP = dynamic_cast<CGm_ParkSolarPanelOnce*>(Gimmick);
-		dynamic_cast<CGm_DynamicField*>(pDField)->Set_SolarPanel(pGimmickSP);
-		if (nullptr == pGimmickSP)
-			continue;
 	}
+
+	// m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT(""), 1); -> 내가 원하는 서프라이즈보드
 
 #pragma endregion
 
@@ -1008,6 +1103,33 @@ HRESULT CLevel_Park::Ready_UI()
 
 HRESULT CLevel_Park::Add_EnvMap()
 {
+	HRESULT hr(S_OK);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Level_Park_Env"),
+		TEXT("Com_Texture1"), (CComponent**)&m_pEnvTexture[TYPE_ENV]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_BRDF_LUT"),
+		TEXT("Com_Texture2"), (CComponent**)&m_pEnvTexture[TYPE_LUT]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_RandomNormal"),
+		TEXT("Com_Texture3"), (CComponent**)&m_pEnvTexture[TYPE_NORMAL]);
+	CHECK_FAILED(hr);
+
+
+	// 환경맵을 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_ENV], "g_EnvTexture")))
+		return E_FAIL;
+
+	//LUT 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_LUT], "g_LUTTexture")))
+		return E_FAIL;
+
+	//Normal 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_NORMAL], "g_RandomNormalTexture")))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -1028,6 +1150,8 @@ void CLevel_Park::Free()
 {
 	m_pGameInstance->Clear_EventCallBack();
 	__super::Free();
+
+	m_setActivatedMonsterTriggers.clear();
 
 	for (auto& tex : m_pEnvTexture)
 		Safe_Release(tex);

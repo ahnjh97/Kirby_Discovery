@@ -83,6 +83,7 @@ public:
 	_float	m_fTime = { 0.f };
 	_bool	m_bShakeTrigger1 = { true };
 	_bool	m_bShakeTrigger2 = { true };
+	_bool	m_bShakeTrigger3 = { true };
 	_float	m_fEffectTime = { 0.f };
 
 	_int	m_iQTECnt = { 0 };

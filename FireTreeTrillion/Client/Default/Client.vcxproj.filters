@@ -664,6 +664,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Phanta\SpawnEffect">
       <UniqueIdentifier>{4b97fb20-26cc-4d63-a220-15d7ce0851f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyFinalCut_State">
+      <UniqueIdentifier>{78aed1de-cad4-49c4-85c4-7c2eb6bfdb4d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1339,6 +1342,9 @@
     <ClInclude Include="..\Public\SpawnEffect.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta\SpawnEffect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\KirbyFinalCut_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyFinalCut_State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1994,6 +2000,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\SpawnEffect.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta\SpawnEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyFinalCut_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyFinalCut_State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

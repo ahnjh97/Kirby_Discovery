@@ -7,6 +7,7 @@
 #include "Bone.h"
 #include "EventCenter.h"
 #include "Bone.h"
+#include "Camera_Main.h"
 
 CSimba::CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -25,6 +26,13 @@ void CSimba::InsertHitboxActivationTiming(SIMBA_ANIM eAnimIdx, vector<tuple<_flo
 		});
 
 	m_mapHitBoxTiming.insert_or_assign(eAnimIdx, _vecTimings);
+}
+
+void CSimba::SetCamSequence(_uint iCamSeq)
+{
+	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+	if (pCamera != nullptr)
+		pCamera->Make_Sequence(CCamera_Main::CAMSEQ(iCamSeq));
 }
 
 HRESULT CSimba::Initialize_Prototype()
@@ -59,7 +67,7 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_fHp = 250.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
-	m_eEyeState = SIMBAEYE_LONG;
+	m_eEyeState = SIMBAEYE_BIG;
 
 	m_iEyeMesh = m_pModelCom->Find_MeshIndex(string("BodyM__EyeC"));
 	m_iEyeLidMesh = m_pModelCom->Find_MeshIndex(string("EyelidM__EyelidC"));
@@ -120,10 +128,17 @@ HRESULT CSimba::Initialize(void* pArg)
 	Safe_AddRef(m_pRotationBone);
 	m_pRotationBoneMatrix = m_pRotationBone->Get_EditMatrixPtr();
 
+	m_pLeftHandBone = m_pModelCom->Get_BonePtr("L_HaveL");
+	Safe_AddRef(m_pLeftHandBone);
+	m_pRightHandBone = m_pModelCom->Get_BonePtr("R_HaveL");
+	Safe_AddRef(m_pRightHandBone);
+
 	m_setAppear1Anims = { Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait, Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait, 
 		Simba_DemoAppear1Cut4, Simba_DemoAppear1Cut4Wait };
 
 	m_setUndamagableAnims = { Simba_Death, Simba_DemoDeadCut1, Simba_DemoDeadCut2 };
+
+	SetCamSequence(CCamera_Main::SEQ_SIMBA_START);
 
 	return S_OK;
 }
@@ -373,6 +388,18 @@ void CSimba::Turn_RotationBoneMatrix(_float fAngle)
 
 	CUtils::Turn_OtherMatrix(RotationMatrix, _float4(1, 0, 0, 0), 1.f, fAngle);
 	*m_pRotationBoneMatrix = RotationMatrix;
+}
+
+void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
+{
+	_float4x4 matBoneWorld{};
+
+	if (Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx)
+		matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone);
+	else if (Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
+		matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone);
+
+	// 별 생성좀 하하하
 }
 
 HRESULT CSimba::Add_Components()
@@ -634,12 +661,14 @@ void CSimba::OnNextDialog1(CGameObject* pObj)
 {
 	Change_State(Simba_DemoAppear1Cut4, 66.66f, false, true);
 	TransformToDefault(0);
+	SetCamSequence(CCamera_Main::SEQ_SIMBA_SHOULDER);
 }
 
 void CSimba::OnNextDialog2(CGameObject* pObj)
 {
 	Change_State(Simba_DemoAppear1Cut3, 66.66f, false, true);
 	TransformToDefault(0);
+	SetCamSequence(CCamera_Main::SEQ_SIMBA_FRONTVIEW);
 }
 
 void CSimba::OnLastDialog(CGameObject* pObj)
@@ -665,6 +694,11 @@ void CSimba::OnWave2Dead(CGameObject* pObj)
 	m_bRenderMant = true;
 	m_bRenderEyeLid = false;
 	Change_State(Simba_DemoAppear2Cut1, 66.66f, false, false);
+
+	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+	if (pCamera != nullptr)
+		pCamera->Make_Sequence(CCamera_Main::SEQ_SIMBA_BATTLESTART);
+
 	TransformToDefault(-0.3f);
 }
 
@@ -730,6 +764,8 @@ void CSimba::Free()
 	CEventCenter::Get_Instance()->Unsubscribe(this);
 	Safe_Release(m_pLipBone);
 	Safe_Release(m_pRotationBone);
+	Safe_Release(m_pLeftHandBone);
+	Safe_Release(m_pRightHandBone);
 	Safe_Release(m_pKirby);
 
 	__super::Free();
