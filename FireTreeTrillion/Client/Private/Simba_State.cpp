@@ -588,7 +588,7 @@ void CSimba_Damage::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** Roar *********************** // 커비기준 왼쪽 오른쪽 판단 로직 필요
+// *********************** Roar *********************** // 완료
 void CSimba_Roar::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -604,10 +604,10 @@ void CSimba_Roar::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	{
 		pSimba->Set_PreState(CSimba::Simba_Roar2);
 		pSimba->Turn_RotationBoneMatrix(BiteRushJump);
-		// 커비기준 왼쪽에 있을때
-		pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);
-		// 커비기준 오른쪽에 있을때
-		//pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 50.f, false, true);
+		if (true == pSimba->IsKirbyOnMyLeft())
+			pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);
+		else
+			pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 50.f, false, true);
 	}
 }
 
@@ -653,7 +653,7 @@ void CSimba_BiteRushJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	}
 }
 
-// *********************** DimensionClaw *********************** // 커비기준 왼쪽 오른쪽 판단 로직 필요
+// *********************** DimensionClaw *********************** // 이펙트, 충돌 필요
 void CSimba_DimensionClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -694,10 +694,10 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			pSimba->Set_PreState(iState);
 			pSimba->Turn_RotationBoneMatrix(BiteRushJump);
-			// 커비기준 왼쪽에 있을때
-			pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);
-			// 커비기준 오른쪽에 있을때
-			//pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 50.f, false, true);
+			if (true == pSimba->IsKirbyOnMyLeft())
+				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);
+			else
+				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 50.f, false, true);
 		}	
 	}
 }
@@ -741,7 +741,7 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** DimensionLaser *********************** // 커비기준 좌우판단 로직 필요
+// *********************** DimensionLaser *********************** // 이펙트, 충돌 필요
 void CSimba_DimensionLaser::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -763,10 +763,10 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			pSimba->Set_PreState(iState);
 			pSimba->Turn_RotationBoneMatrix(BiteRushJump);
-			// 커비기준 왼쪽에 있을때
-			pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 60.f, false, true);
-			// 커비기준 오른쪽에 있을때
-			//pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 60.f, false, true);
+			if (true == pSimba->IsKirbyOnMyLeft())
+				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);
+			else
+				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 50.f, false, true);
 		}
 	}
 }

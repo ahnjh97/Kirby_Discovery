@@ -35,6 +35,27 @@ void CSimba::SetCamSequence(_uint iCamSeq)
 		pCamera->Make_Sequence(CCamera_Main::CAMSEQ(iCamSeq));
 }
 
+_bool CSimba::IsKirbyOnMyLeft()
+{
+	if (nullptr == m_pKirby)
+		return false;
+
+	_vector vWorldLook = XMVector3TransformNormal(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_pTransformCom->Get_WorldMatrix());
+
+	CTransform* pKirbyTransform =  m_pKirby->Get_TransformCom();
+	if (nullptr == pKirbyTransform)
+		return false;
+	_vector vKirbyPos = pKirbyTransform->Get_State(CTransform::STATE_POSITION);
+
+	_vector crossProduct = XMVector3Cross(vWorldLook, vKirbyPos);
+	_float fCrossResultY = XMVectorGetY(crossProduct);
+
+	if (fCrossResultY > 0.f)
+		return true;
+	else
+		return false;
+}
+
 HRESULT CSimba::Initialize_Prototype()
 {
 	m_eCollisionGroup = MONSTER;

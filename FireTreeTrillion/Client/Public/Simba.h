@@ -85,6 +85,8 @@ public:
 
 	void SetCamSequence(_uint iCamSeq);
 
+	_bool IsKirbyOnMyLeft();
+
 public:
 	virtual HRESULT Initialize_Prototype()			override;
 	virtual HRESULT Initialize(void* pArg)			override;
