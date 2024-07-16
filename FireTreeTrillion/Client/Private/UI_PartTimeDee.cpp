@@ -70,6 +70,9 @@ _int CUI_PartTimeDee::Tick(_float fTimeDelta)
 	if (1.f < m_fMask) m_fMask = 1.f;
 	m_fTimeDelta = fTimeDelta;
 
+	if (m_eDialogTheme == ORDER)
+		CPartTimeHelper::Get_Instance()->Set_EffectPos(_float3{ (m_vFinPos.x * g_iWinSizeX) * 0.5f, (m_vFinPos.y * g_iWinSizeY) * 0.5f, 0.f });
+
 	return OBJ_NOEVENT;
 }
 
@@ -298,6 +301,7 @@ void CUI_PartTimeDee::Setup_PosSizeColor(_int iTextureNum)
 				(m_vFinPos.y * g_iWinSizeY) * 0.5f,
 				0.f,
 				1.f));
+
 	}
 	break;
 	case 1: // 고민하는 말풍선
@@ -351,6 +355,7 @@ void CUI_PartTimeDee::Make_RandomImg()
 	m_fMask = 0.f;
 }
 
+// UI의 직교 위치를 리턴한다.
 void CUI_PartTimeDee::Update_Pos(_float3 _vPosition)
 {
 	_float4 vNewPosition = _float4{ _vPosition.x, _vPosition.y, _vPosition.z, 1.f };
@@ -368,6 +373,7 @@ void CUI_PartTimeDee::Update_Pos(_float3 _vPosition)
 					(m_vFinPos.y * g_iWinSizeY) * 0.5f,
 					0.f,
 					1.f));
+
 }
 
 CUI_PartTimeDee* CUI_PartTimeDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

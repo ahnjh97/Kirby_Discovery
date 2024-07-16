@@ -68,6 +68,7 @@ HRESULT CPartTimerKirby::Initialize(void* pArg)
 	m_eMouthState = MOUTH_HAPPY;
 	m_eEyeState = EYE_IDLE;
 
+
 	return S_OK;
 }
 
@@ -381,6 +382,8 @@ void CPartTimerKirby::Render_Food(_bool _bRender, PARTTIME_ITEM _eItem)
 		m_pPartTimeFood->Set_Item(_eItem);
 
 	m_pPartTimeFood->Set_Render(_bRender);
+	_float4 vPos = m_pPartTimeFood->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+
 }
 
 _float4 CPartTimerKirby::Compute_BoneWorldMatrix()
@@ -427,6 +430,12 @@ void CPartTimerKirby::OnNotify()
 {
 	// 여기서 특정 시간이 되면 처리해야하는 사항을 넣기.
 	// 특정 시간이면 땀 뻘뻘
+#pragma region 이펙트WI QZR 
+	CEffect::FX_DESC FXDesc{};
+	FXDesc.vInitPos = _float3(0.f, 0.f, 0.f);
+	FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+	Add_Effect("FoodGame_Remain20seconds", FXDesc, true);
+#pragma endregion
 }
 
 void CPartTimerKirby::SetUp_FSM()

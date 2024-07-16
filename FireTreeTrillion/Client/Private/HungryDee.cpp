@@ -123,13 +123,7 @@ _int CHungryDee::Tick(_float fTimeDelta)
 		return Ready_Dead();
 
 	m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
-
-
-
-
-	/*
-	//지영아 여기야
-
+	/* 	//지영아 여기야
 	if (m_pGameInstance->Get_KeyState(DIK_S, KEY_DOWN) && m_iMyIdx == 0)
 	{
 		CHungryDee::HUNGRYDEE_DESC HungryDeeDesc{};
@@ -146,8 +140,7 @@ _int CHungryDee::Tick(_float fTimeDelta)
 			HungryDeeDesc.iIdx = iStartIdx + i;
 			m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc);
 		}
-	}
-	*/
+	}*/
 
 	//나머지 슈퍼틱, 파트 틱 처리
 	__super::Tick(m_fTimeDelta);

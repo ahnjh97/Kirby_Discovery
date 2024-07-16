@@ -420,9 +420,9 @@ void CUI_PartTimeResult::Repose_TotalScoreTextures()
 	}
 	else							// 백의 자리 일때
 	{
-		m_arrPosition[1] = _float2(760.f, 220.f);
+		m_arrPosition[1] = _float2(755.f, 220.f);
 		m_arrPosition[2] = _float2(800.f, 220.f);
-		m_arrPosition[3] = _float2(840.f, 220.f);
+		m_arrPosition[3] = _float2(845.f, 220.f);
 	}
 }
 
@@ -437,14 +437,14 @@ void CUI_PartTimeResult::Repose_ScoreTextures()
 		m_arrPosition[7] = _float2(1035.f, 490.f);
 	else if (m_fScore < 100.f)		// 십의 자리 일때
 	{
-		m_arrPosition[6] = _float2(1017.5f, 490.f);
-		m_arrPosition[7] = _float2(1052.5f, 490.f);
+		m_arrPosition[6] = _float2(1025.f, 490.f);
+		m_arrPosition[7] = _float2(1050.5f, 490.f);
 	}
 	else							// 백의 자리 일때
 	{
-		m_arrPosition[5] = _float2(1000.f, 490.f);
+		m_arrPosition[5] = _float2(1005.f, 490.f);
 		m_arrPosition[6] = _float2(1035.f, 490.f);
-		m_arrPosition[7] = _float2(1070.f, 490.f);
+		m_arrPosition[7] = _float2(1065.f, 490.f);
 	}
 }
 

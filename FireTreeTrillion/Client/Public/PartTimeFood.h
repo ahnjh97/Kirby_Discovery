@@ -41,7 +41,7 @@ public:
 	PARTTIME_ITEM		Get_Item() const { return m_eItem; }
 	void				Set_Item(PARTTIME_ITEM _eItem) { m_eItem = _eItem; }
 	void				Set_Render(_bool _bRender) { m_bRender = _bRender; }
-
+	_bool				Get_Render() const { return m_bRender; }
 	_float4				Get_OriginPosition() const { return m_vOriginPos; }
 
 private:
