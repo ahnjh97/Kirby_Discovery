@@ -698,7 +698,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 			{
 				CPartTimeHelper::Get_Instance()->Handle_GameStart();
 				Lock_All({ 16.4f, 25.7f, 35.75f }, { .16f, -.08f, -1.f });
-				Set_FOVY(38.f);
+				Set_FOVY(43.f);
 			}
 
 			//점심 시간이다~~

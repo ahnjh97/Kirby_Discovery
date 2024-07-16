@@ -1703,6 +1703,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("PopStar_StarRiver", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("PopStar_StarSmall", TYPE_NONANIM);
 
+		//보스 이펙트 모델
+		m_vecModelInfo.emplace_back("RayArrow", TYPE_NONANIM, 1.f);
+		//m_vecModelInfo.emplace_back("DimensionLaser", TYPE_NONANIM, 1.f, 180.f);
+		//m_vecModelInfo.emplace_back("DimensionGateL", TYPE_NONANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("MoundPiece", TYPE_NONANIM, 0.2f, 180.f);
+
 		//워프 스타
 		//m_vecModelInfo.emplace_back("WarpStar_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		//m_vecModelInfo.emplace_back("WarpStar_Anim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));

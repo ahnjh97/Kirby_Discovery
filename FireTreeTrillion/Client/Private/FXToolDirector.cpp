@@ -2200,9 +2200,9 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 		{
 			if (m_eSelectedProperty == KF_SCALE)
 			{
-				m_vKFPopupValue[0] = m_vKFPopupValue[0] < 0.f ? .001f : m_vKFPopupValue[0];
-				m_vKFPopupValue[1] = m_vKFPopupValue[1] < 0.f ? .001f : m_vKFPopupValue[1];
-				m_vKFPopupValue[2] = m_vKFPopupValue[2] < 0.f ? .001f : m_vKFPopupValue[2];
+				m_vKFPopupValue[0] = m_vKFPopupValue[0] <= 0.f ? .001f : m_vKFPopupValue[0];
+				m_vKFPopupValue[1] = m_vKFPopupValue[1] <= 0.f ? .001f : m_vKFPopupValue[1];
+				m_vKFPopupValue[2] = m_vKFPopupValue[2] <= 0.f ? .001f : m_vKFPopupValue[2];
 			}
 
 			m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].vValue = _float3{ m_vKFPopupValue[0], m_vKFPopupValue[1], m_vKFPopupValue[2] };
