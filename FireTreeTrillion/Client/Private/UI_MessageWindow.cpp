@@ -618,7 +618,6 @@ void CUI_MessageWindow::OnEvent()
 void CUI_MessageWindow::Start_Message(CGameObject* pObj)
 {
 	Reset_MessageIndex(nullptr);
-	m_bCam_SeqSimbaTongNotified = false;
 	m_eCurState = WINDOW_SHOW;
 	Show_DialogMessage();
 }
