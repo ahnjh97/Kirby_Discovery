@@ -376,9 +376,7 @@ void CEffect::Billboard_Effect()
 {
     // ºôº¸µå
     _float3   vScale = m_pTransformCom->Get_Scaled();
-    //_float4x4      CamMatrix;
 
-    //const CTransform* pCamTransform = m_pGameInstance->get;
     _matrix CamMatrix = m_pGameInstance->Get_Transform_Inv(CPipeLine::D3DTS_VIEW);
 
     _vector vRight, vUp, vLook;

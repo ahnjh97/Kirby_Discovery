@@ -183,9 +183,8 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 	Quaternion vResultQuat = vContinuousQuat * vCurQuat * vInitQuat;
 
 	m_pTransformCom->Turn_Absolute(vResultQuat);
-
-
-	m_pTransformCom->Set_Scaled(m_vInitScale * m_vCurScale);
+	
+	 m_pTransformCom->Set_Scaled(m_vInitScale * m_vCurScale);
 
 	if (m_pSoketMatrix != nullptr)
 	{
@@ -261,7 +260,8 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 
 	m_iMaxMaskTexIdx = m_pTextureCom[TEX_MASK]->Get_TextureNum() - 1;
 
-	if (FXDesc.strBufferTag == "Prototype_Component_VIBuffer_Rect")
+	if (FXDesc.strBufferTag == "Prototype_Component_VIBuffer_Rect"
+		|| FXDesc.strBufferTag == "Prototype_Component_VIBuffer_UpperRect")
 	{
 		hr = __super::Add_Component(LEVEL_STATIC, CUtils::StrToWstr(FXDesc.strBufferTag),
 			TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom);

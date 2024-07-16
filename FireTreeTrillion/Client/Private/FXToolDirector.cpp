@@ -2165,15 +2165,17 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 		//어떤 속성을 편집하느냐에 따라 최소, 최대 범위 정한다.
 		_float2 vValueRange{ 0.f, 1.f };
 		if (m_eSelectedProperty == KF_POS)
-			vValueRange = { -50.f, 50.f };
+			vValueRange = { -5000.f, 5000.f };
 		else if (m_eSelectedProperty == KF_ROT)
-			vValueRange = { -180.f, 180.f };
+			vValueRange = { -360.f, 360.f };
 		else if (m_eSelectedProperty == KF_SCALE)
-			vValueRange = { .001f, 50.f };
+			vValueRange = { .001f, 10000.f };
 		else if (m_eSelectedProperty == KF_UVOFFSET)
-			vValueRange = { -10.f, 10.f };
+			vValueRange = { -100.f, 100.f };
+		else if (m_eSelectedProperty == KF_MASKUVOFFSET)
+			vValueRange = { -100.f, 100.f };
 		else if (m_eSelectedProperty == KF_MASKUVANGLE)
-			vValueRange = { -10.f, 10.f };
+			vValueRange = { -360.f, 360.f };
 
 		if (DragFloat3("Value", m_vKFPopupValue, .01f, vValueRange.x, vValueRange.y, "%.3f"))
 		{
@@ -2449,6 +2451,7 @@ HRESULT CFXToolDirector::Ready_FXPrototypeVector()
 
 
 	Ready_Ingredient(TEXT("VIBuffer_Rect"), &m_FXBufferList, pStaticProtoMap);
+	Ready_Ingredient(TEXT("VIBuffer_UpperRect"), &m_FXBufferList, pStaticProtoMap);
 
 	wstring strModelTag = TEXT("Model_");
 

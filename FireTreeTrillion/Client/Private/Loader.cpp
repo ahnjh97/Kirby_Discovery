@@ -594,6 +594,10 @@ HRESULT CLoader::Loading_StaticComponentAll()
 		CVIBuffer_Rect::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
 
+	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("UpperRect"),
+		CVIBuffer_UpperRect::Create(m_pDevice, m_pContext));
+	CHECK_FAILED(hr);
+
 	hr = m_pGameInstance->Add_Prototype(LEVEL_STATIC, wstrPrototypeTag + TEXT("Instance_Point"),
 		CVIBuffer_Instance_Point::Create(m_pDevice, m_pContext));
 	CHECK_FAILED(hr);
