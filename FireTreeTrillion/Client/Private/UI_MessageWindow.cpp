@@ -6,6 +6,7 @@
 #include "TransingStar.h"
 #include "EventCenter.h"
 #include "UI_Fading.h"
+#include "Camera_Main.h"
 
 CUI_MessageWindow::CUI_MessageWindow(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CUIObject { _pDevice, _pContext }
@@ -134,9 +135,15 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 
 		if(LEVEL_SIMBA == *m_pCurrentLevelID)
 		{ 
-			if (3 == m_iCurMessageIndex)
+			if (1 == m_iCurMessageIndex)
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_NEXT_DIALOG1);
-			if (7 == m_iCurMessageIndex)
+			if (4 == m_iCurMessageIndex)
+			{
+				CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+				if (pCamera != nullptr)
+					pCamera->Make_Sequence(CCamera_Main::SEQ_SIMBA_TONG);
+			}
+			if (8 == m_iCurMessageIndex)
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_NEXT_DIALOG2);
 			if (m_iCurMessageIndex == m_tMessageDesc.vecMsg.size() - 1)
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_LAST_DIALOG);
@@ -611,9 +618,7 @@ void CUI_MessageWindow::OnEvent()
 void CUI_MessageWindow::Start_Message(CGameObject* pObj)
 {
 	Reset_MessageIndex(nullptr);
-	m_bNextDialog1Notified = false;
-	m_bNextDialog2Notified = false;
-	m_bLastDialogNotified = false;
+	m_bCam_SeqSimbaTongNotified = false;
 	m_eCurState = WINDOW_SHOW;
 	Show_DialogMessage();
 }
