@@ -1634,6 +1634,7 @@ void CFXToolDirector::Render_FXProperty()
 		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_WIGGLE] = bWiggle;
 		bEdited = true;
 	}
+
 	SameLine();
 
 	_bool bTail = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TAIL];
@@ -1643,14 +1644,32 @@ void CFXToolDirector::Render_FXProperty()
 		bEdited = true;
 	}
 
+	Spacing();
+
 	_bool bGravity = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY];
 	if (Checkbox(u8"Gravity", &bGravity))
 	{
 		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY] = bGravity;
 		bEdited = true;
 	}
+
 	SameLine();
 
+	_bool bEdit = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT];
+	if (Checkbox(u8"Orbit", &bEdit))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT] = bEdit;
+		bEdited = true;
+	}
+
+	SameLine();
+
+	bEdit = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ASSEMBLE];
+	if (Checkbox(u8"Assemble", &bEdit))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ASSEMBLE] = bEdit;
+		bEdited = true;
+	}
 	Separator();
 
 	if (DragFloat(u8"½ÃÀÛ µô·¹ÀÌ", &pCurParticle->m_InstanceDesc.fStartDelay, .1f, 0.f, 100.f, "%.2f"))
