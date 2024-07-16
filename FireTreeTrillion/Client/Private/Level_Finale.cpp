@@ -963,6 +963,11 @@ CLevel_Finale* CLevel_Finale::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 void CLevel_Finale::Free()
 {
 	m_pGameInstance->Clear_EventCallBack();
+
+	_bool	bDeepShadow = false;
+	if (FAILED(m_pGameInstance->Bind_DeferredRawValue("g_bDeepShadow", &bDeepShadow, sizeof(_bool))))
+		return;
+
 	__super::Free();
 	for (auto& tex : m_pEnvTexture)
 		Safe_Release(tex);

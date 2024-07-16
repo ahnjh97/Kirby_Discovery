@@ -243,6 +243,7 @@
     <ClInclude Include="..\Public\KirbyBulb_State.h" />
     <ClInclude Include="..\Public\KirbyCrash_State.h" />
     <ClInclude Include="..\Public\KirbyDump_State.h" />
+    <ClInclude Include="..\Public\KirbyFinalCut_State.h" />
     <ClInclude Include="..\Public\Level_Park.h" />
     <ClInclude Include="..\Public\Disaster_Master.h" />
     <ClInclude Include="..\Public\Phanta.h" />
@@ -490,6 +491,7 @@
     <ClCompile Include="..\Private\KirbyBulb_State.cpp" />
     <ClCompile Include="..\Private\KirbyCrash_State.cpp" />
     <ClCompile Include="..\Private\KirbyDump_State.cpp" />
+    <ClCompile Include="..\Private\KirbyFinalCut_State.cpp" />
     <ClCompile Include="..\Private\Level_Park.cpp" />
     <ClCompile Include="..\Private\Disaster_Master.cpp" />
     <ClCompile Include="..\Private\Phanta.cpp" />

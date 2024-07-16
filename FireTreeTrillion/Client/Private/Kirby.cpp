@@ -71,8 +71,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// µð¹ö±ë ¿ë
-	m_eAbilityType = ABILITY_BOMB;
-
+	m_eAbilityType = ABILITY_HAMMER;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 		m_eAbilityType = ABILITY_HAMMER;
 
@@ -1864,6 +1863,17 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 			m_pGameInstance->Restore_FirstTimer();
 			m_pGameInstance->Restore_SecondTimer();
 			m_fCrashRestoreTime = 0.f;
+		}
+	}
+
+
+	if (INFO(m_bFinalBossDead) == true)
+	{
+		if (m_bFinalCutTrigger == true)
+		{
+			m_pControllerCom->Set_Position(m_pTransformCom, _float4(0.f, 0.f, 0.f, 1.f));
+			m_bFinalCutTrigger = false;
+			Change_State(FINALCUTSTATE_CUT1, 60.f, false, false, BODY_FINALCUT, OFFSET_FINALCUT);
 		}
 	}
 }

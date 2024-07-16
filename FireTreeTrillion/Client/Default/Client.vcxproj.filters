@@ -661,6 +661,9 @@
     <Filter Include="02.GameObjects\UI\QTE\Effect">
       <UniqueIdentifier>{3bff22bc-6326-4ee4-b987-adccf7f44990}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyFinalCut_State">
+      <UniqueIdentifier>{78aed1de-cad4-49c4-85c4-7c2eb6bfdb4d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1333,6 +1336,9 @@
     <ClInclude Include="..\Public\QTE_Effect.h">
       <Filter>02.GameObjects\UI\QTE\Effect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\KirbyFinalCut_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyFinalCut_State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1985,6 +1991,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\QTE_Effect.cpp">
       <Filter>02.GameObjects\UI\QTE\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyFinalCut_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyFinalCut_State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
