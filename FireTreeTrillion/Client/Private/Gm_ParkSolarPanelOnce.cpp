@@ -41,6 +41,14 @@ HRESULT CGm_ParkSolarPanelOnce::Initialize(void* pArg)
 	//피직스 추가
 	m_pStaticActor = m_pNonAnimModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
 
+	for (_uint i = 0; i < m_pModelCom->Get_NumMeshes(); i++)
+	{
+		if (true == m_pModelCom->DoesTextureExist(TextureType_EMISSIVE, i))
+			m_vecPassIndices.push_back(ANIMMODEL_EMISSIVE);
+		else
+			m_vecPassIndices.push_back(ANIMMODEL_LINEAR_NORMAL_O);
+	}
+
 	//림라이트 OFF
 	//m_bRimLight = FALSE;
 
@@ -123,7 +131,7 @@ HRESULT CGm_ParkSolarPanelOnce::Render()
 		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
 		CHECK_FAILED(hr);
 
-		hr = m_pShaderCom->Begin(ANIMMODEL_LINEAR_NORMAL_O);
+		hr = m_pShaderCom->Begin(m_vecPassIndices[i]);
 		CHECK_FAILED(hr);
 
 		LAMP_TYPE eLampType = { LAMP_RED };

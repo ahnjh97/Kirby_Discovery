@@ -69,6 +69,8 @@ HRESULT CMapToolObject::Initialize(void* pArg)
 
 		m_pOrbitingCamera->Set_OrbitingCameraPos(XMVectorSet(0, 0, -m_fRadius, 0));
 	}
+	else if (GameObjectDesc.wstrModelName == TEXT("LightBulb") && 0 == m_fRadius)
+		m_fRadius = 10.f;
 
 	m_pMapToolHelper = dynamic_cast<CMapToolHelper*>(m_pGameInstance->Get_GameObject(LEVEL_TOOL_MAP, TEXT("Layer_MapToolHelper")));
 	Safe_AddRef(m_pMapToolHelper);

@@ -77,6 +77,7 @@ private:
 	_bool	Save_Decos(const string& _strLevel, vector<CGameObject*>& _vecDecos);
 	_bool	Save_Items(const string& _strLevel, vector<CGameObject*>& _vecItems);
 	_bool	Save_Kickables(const string& _strLevel, vector<CGameObject*>& _vecItems);
+	_bool	Save_Lights(const string& _strLevel, vector<CGameObject*>& _vecLights);
 	
 	void	Load_Map(const string& _strLevel);
 	void	Load_Triggers(const string& _strLevel);
@@ -84,6 +85,7 @@ private:
 	void	Load_Decos(const string& _strLevel);
 	void	Load_Items(const string& _strLevel);
 	void	Load_Kickables(const string& _strLevel);
+	void	Load_Lights(const string& _strLevel);
 	
 	void	RegisterRallyPoints(list<CGameObject*>* _pObjList);
 	void	WriteLocalizedAnimMapDecos(vector<pair<string, _float4x4>>& _vecAnimDecos);
@@ -109,6 +111,7 @@ private:
 	_bool IsBlendDeco(const string& _strModelName);
 
 	_bool RenameFile(const string& _strLevel, const string& _tempFileName, const string& _strCustom);
+	_bool AreFilesIdentical(const string& file1, const string& file2);
 
 	// Options
 	void HideTriggers(_bool bHideTriggers);
@@ -130,6 +133,7 @@ private:
 	_uint Get_EmissivePassIndex(const string& _strModelName);
 	_uint DeterminePassIndex_ForEmissive(CModel* pModel);
 	_bool IsNonEmissive(const string& _strModelName);
+	_bool CheckIfFileExists(const string& _strLevel, const string& _strFileName);
 
 private:
 	vector<string>	m_vecLevelName; 
