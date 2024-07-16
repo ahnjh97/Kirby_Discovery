@@ -11,6 +11,7 @@
 
 static _float s_fOffsetY = {};
 static _uint s_iAttackCount = {};
+static _float s_fJumpPower = {};
 
 // *********************** Appear1 ***********************  // 완료
 void CSimba_Appear1::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
@@ -138,7 +139,7 @@ void CSimba_Walk::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** QuickClaw *********************** // 공격하면서 대쉬 기능 구현필요
+// *********************** QuickClaw *********************** // 완료
 void CSimba_QuickClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -153,6 +154,7 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	CSimba* pSimba = static_cast<CSimba*>(pGameObject);
 	_uint iState = pSimba->Get_State();
 	_float fAnimRatio = pSimba->Get_AnimRatio();
+	_vector vLook = m_pTransform->Get_State(CTransform::STATE_LOOK);
 
 	if ((CSimba::Simba_QuickClawStartL == iState || CSimba::Simba_QuickClawStartR == iState) && fAnimRatio < 0.35f)
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 15.f);
@@ -160,14 +162,13 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	else if ((CSimba::Simba_QuickClawL == iState || CSimba::Simba_QuickClawR == iState))
 	{
 		_float fStart = 0.42f;
-		_float fEnd = 0.65f;
-		_float fSpeed = 100.f;
+		_float fEnd = 0.64f;
+		_float fSpeed = 6.2f;
 
 		if (fStart < fAnimRatio && fEnd > fAnimRatio)
 		{
-			_vector vLook = m_pTransform->Get_State(CTransform::STATE_LOOK);
 			_float fRatio = RATIO(fAnimRatio, fStart, fEnd);
-			_vector vDir = vLook * (1 - EASE_IN(fRatio)) * fSpeed * fTimeDelta;
+			_vector vDir = vLook * (1 - EASE_IN_FAST(fRatio)) * fSpeed * fTimeDelta * m_pGameInstance->Compute_Distance(pSimba, m_pKirby);
 			m_pController->Move_Dir(m_pTransform, vDir, fTimeDelta, s_fOffsetY);
 		}
 
@@ -185,6 +186,16 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 		{
 			m_bStarSpawned = true;
 			pSimba->SpawnStar(iState);
+		}
+
+		_float fStart = 0.27f;
+		_float fEnd = 0.3958f;
+		_float fSpeed = 6.8f;
+		if (fStart < fAnimRatio && fEnd > fAnimRatio)
+		{
+			_float fRatio = RATIO(fAnimRatio, fStart, fEnd);
+			_vector vDir = vLook * (1 - EASE_IN_FAST(fRatio)) * fSpeed * fTimeDelta * m_pGameInstance->Compute_Distance(pSimba, m_pKirby);
+			m_pController->Move_Dir(m_pTransform, vDir, fTimeDelta, s_fOffsetY);
 		}
 	}
 		
@@ -217,22 +228,22 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 			break;
 
 		case CSimba::Simba_QuickClaw2L:
-			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 15.f)
+			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 18.f)
 				pSimba->Change_State(CSimba::Simba_QuickClawEndL, 66.66f, false, false);
 			else
 				pSimba->Change_State(CSimba::Simba_QuickClawLFromStart, 66.66f, false, false);
 			break;
 		case CSimba::Simba_QuickClaw2R:
-			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 15.f)
+			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 18.f)
 				pSimba->Change_State(CSimba::Simba_QuickClawEndR, 66.66f, false, false);
 			else
 				pSimba->Change_State(CSimba::Simba_QuickClawRFromStart, 66.66f, false, false);
 			break;
 
 		case CSimba::Simba_QuickClawEndL: case CSimba::Simba_QuickClawEndR:
-			//pSimba->Set_PreState(iState);
-			//pSimba->Change_State(CSimba::Simba_JumpStart, 50.f, false, true);
-			pSimba->Change_State(CSimba::Simba_QuickClawStartL, 50.f, false, true);
+			pSimba->Set_PreState(iState);
+			pSimba->Change_State(CSimba::Simba_Wait2, 40.f, false, true);
+			//pSimba->Change_State(CSimba::Simba_QuickClawStartL, 50.f, false, true);
 			break;
 
 		case CSimba::Simba_QuickClawLFromStart: case CSimba::Simba_QuickClawRFromStart:
@@ -272,7 +283,7 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		case CSimba::Simba_FinalCrusherEnd:
 			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 15.f) {
 				pSimba->Set_PreState(iState);
-				pSimba->Change_State(CSimba::Simba_JumpStart, 50.f, false, true);
+				pSimba->Change_State(CSimba::Simba_Wait2, 40.f, false, true);
 			}
 			else
 				pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 50.f, false, true);
@@ -350,39 +361,71 @@ void CSimba_Jump::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnim
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	s_fOffsetY = -0.7f;
-	m_fJumpPower = 72.f;
+	if(CSimba::Simba_JumpStart == _iAnimIndex)
+		s_fJumpPower = 54.f;
 }
 
 void CSimba_Jump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CSimba* pSimba = static_cast<CSimba*>(pGameObject);
 	_uint iState = pSimba->Get_State();
-	if (CSimba::Simba_JumpStart == iState)
+	_float fAnimRatio = pSimba->Get_AnimRatio();
+
+	if (CSimba::Simba_Wait2 == iState)
 	{
 		m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
+		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 5.f);
+		if (0.3f < fAnimRatio)
+			pSimba->Change_State(CSimba::Simba_JumpStart, 40.f, false, true);
+			
+	}
+	else if (CSimba::Simba_JumpStart == iState)
+	{
+		m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
+	
 		if (true == pSimba->IsAnimFinished())
-			pSimba->Change_State(CSimba::Simba_Jump, 50.f, false, false);
+			pSimba->Change_State(CSimba::Simba_Jump, 40.f, false, false);
 	}
 	else if (CSimba::Simba_Jump == iState)
 	{
-		m_pController->Jump(m_pTransform, m_fJumpPower, fTimeDelta);
-		m_fJumpPower -= GRAVITY * fTimeDelta * 33.3f;
+		_float fRatio = RATIO(s_fJumpPower, 0, 54.f);
+		_float fFallVelocity = (1 - EASE_IN_FAST(fRatio)) * s_fJumpPower;
+;		m_pController->Jump(m_pTransform, s_fJumpPower, fTimeDelta);
+		s_fJumpPower -= GRAVITY * fTimeDelta * 16.5f;
 	
+		_float fDis = m_pGameInstance->Compute_Distance(m_pKirby, pSimba);
+		_vector vLook = m_pTransform->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * fDis * 1.7f;
+		m_pController->Move_Dir(m_pTransform, vLook, fTimeDelta, s_fOffsetY);
+
+		if (0.5f > fAnimRatio)
+			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 5.8f);
+
+		if (true == pSimba->IsAnimFinished())
+			pSimba->Change_State(CSimba::Simba_Fall, 40.f, true, false);
+	}
+	else if (CSimba::Simba_Fall == iState)
+	{
+		_float fRatio = RATIO(s_fJumpPower, 0, 54.f);
+		_float fFallVelocity = (1 - EASE_IN_FAST(fRatio)) * s_fJumpPower;
+		m_pController->Jump(m_pTransform, s_fJumpPower, fTimeDelta);
+		s_fJumpPower -= GRAVITY * fTimeDelta * 20.f;
+
 		_float fDis = m_pGameInstance->Compute_Distance(m_pKirby, pSimba);
 		_vector vLook = m_pTransform->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * fDis * 1.81f;
 		m_pController->Move_Dir(m_pTransform, vLook, fTimeDelta, s_fOffsetY);
 
-		if (pSimba->Get_AnimRatio() < 0.4f)
-			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 8.f);
-
-		if (true == pSimba->IsAnimFinished())
-			pSimba->Change_State(CSimba::Simba_Landing, 50.f, false, false);
+		_float fChangeDis = 1.3f;
+		if(fChangeDis > m_pController->RayCastToStaticActor(XMVectorSet(0, -1, 0, 0)))
+			pSimba->Change_State(CSimba::Simba_Landing, 40.f, false, false);
 	}
 	else if (CSimba::Simba_Landing == iState)
 	{
 		m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
+		
 		if (true == pSimba->IsAnimFinished())
 		{
+			//pSimba->Change_State(CSimba::Simba_JumpStart, 40.f, false, true); // 디버깅용
+
 			_uint iPreState = pSimba->Get_PreState();
 
 			if (CSimba::Simba_DoubleClawEnd == iPreState)
@@ -399,7 +442,7 @@ void CSimba_Jump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 				if (m_pGameInstance->Compute_Distance(m_pKirby, pGameObject) > 15.f)
 				{
 					if(0 == iRandNum)
-						pSimba->Change_State(CSimba::Simba_JumpStart, 50.f, false, true);
+						pSimba->Change_State(CSimba::Simba_Wait2, 40.f, false, true);
 					else
 					{
 						pSimba->Turn_RotationBoneMatrix(AttackJump);
@@ -462,7 +505,7 @@ void CSimba_BackStep::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** AttackJump *********************** // 점프 및 이동로직 필요
+// *********************** AttackJump *********************** // HitBox, 이동로직
 void CSimba_AttackJump::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -509,7 +552,7 @@ void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 				pSimba->Set_PreState(iState);
 				if (0 == iRandNum) {
 					pSimba->Turn_RotationBoneMatrix(0.f);
-					pSimba->Change_State(CSimba::Simba_JumpStart, 50.f, false, true);
+					pSimba->Change_State(CSimba::Simba_Wait2, 40.f, false, true);
 				}
 				else
 					pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, false);
@@ -567,7 +610,7 @@ void CSimba_Roar::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** BiteRushJump *********************** // 이동로직 필요, 각도에 따라 BiteRushStart / BiteRushStartStraight 판단로직 필요
+// *********************** BiteRushJump *********************** // 이동로직 필요
 void CSimba_BiteRushJump::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -658,7 +701,7 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	}
 }
 
-// *********************** BiteRush *********************** // 이동로직, 종료조건 필요
+// *********************** BiteRush *********************** // HiBox, 이동로직
 void CSimba_BiteRush::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);

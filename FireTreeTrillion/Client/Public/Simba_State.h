@@ -197,8 +197,6 @@ private:
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
 
-	_float m_fJumpPower = {};
-
 public:
 	static	CSimba_Jump* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform) 
 		{ return new CSimba_Jump(pController, pTransform, pKirby, pKirbyTransform); }
