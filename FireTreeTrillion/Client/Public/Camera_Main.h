@@ -402,6 +402,7 @@ private:
 	_float3 Make_ShakeDir(_float fTimeDelta);
 	void MoveTo_CurCamPos_Interpolate(_float fTimeDelta);
 	void MoveTo_CurCamPos_Absolute(_float fTimeDelta);
+	void Snap_CamSet(_float fTimeDelta);
 
 	void System_Tick(_float fTimeDelta);
 	void Check_FinaleScene(_float fTimeDelta);
