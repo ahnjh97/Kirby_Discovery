@@ -132,8 +132,5 @@ private:
 
 	_bool						m_bEventCall = false;
 
-	_bool						m_bNextDialog1Notified = { false };
-	_bool						m_bNextDialog2Notified = { false };
-	_bool						m_bLastDialogNotified = { false };
 };
 END
