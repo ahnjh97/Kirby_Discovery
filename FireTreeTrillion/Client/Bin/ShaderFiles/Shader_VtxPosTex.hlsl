@@ -34,6 +34,8 @@ float3  g_vLargeStarColor = { 1.f, 1.f, 1.f };
 float g_fRedRatio = { 0.f };
 bool g_bInitializeQTE;
 
+float g_fTimeDelta = { 0.f };
+
 // 회전된 UV를 계산
 float2 RotateUV(float2 vCoord, float fAngle)
 {
@@ -664,6 +666,35 @@ PS_OUT PS_QTEEFFECT(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_SPAWNEFFECT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vSourDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord)/* + vector(0.f, 0.f, 0.9f, 1.f)*/;
+
+    vSourDiffuse  = saturate(vSourDiffuse);
+    
+    //if ((0.5f < vSourDiffuse.r) && (0.5f < vSourDiffuse.g) && (0.5f < vSourDiffuse.b) && (0.9f < vSourDiffuse.a))
+        vSourDiffuse = lerp(vSourDiffuse, vector(0.f, 0.f, 0.9f, 1.f), 0.7f);
+    
+    float2 modifiedTexcoord = float2(In.vTexcoord.x, In.vTexcoord.y);
+
+    modifiedTexcoord.y += sin(modifiedTexcoord.x * 10.f + g_fTimeDelta * 2.f) * 0.04f;
+
+    vector vMask = g_MaskTexture.Sample(LinearSampler, modifiedTexcoord);
+    //vector vMask = g_MaskTexture.Sample(LinearSampler, In.vTexcoord) /*+ vector(1.f, 0.f, 1.f, 0.f)*/;
+
+    vector vDiffuse = vSourDiffuse * vMask;
+    vDiffuse.a *= 0.5f;
+    
+    Out.vColor = vDiffuse;
+
+    if (0.05f >= Out.vColor.a)
+        discard;
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	// 기본 패스. 알파 테스팅 ( 0 )
@@ -983,7 +1014,22 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_QTEEFFECT();
     }
 
-    // BlendFX_SoftEffect_X ( 23 )
+    // SPAWN EEFFECT ( 23 )
+    pass SPAWNEFFECT
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_SPAWNEFFECT();
+        PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX_NOSOFTFX();
+    }
+
+    // BlendFX_SoftEffect_X ( 24 )
     pass BlendFX_SoftEffect_X
     {
         SetRasterizerState(RS_Default);
@@ -994,6 +1040,7 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_SPAWNEFFECT();
         PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX_NOSOFTFX();
     }
 }

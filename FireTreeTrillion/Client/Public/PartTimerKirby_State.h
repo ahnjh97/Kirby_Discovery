@@ -78,6 +78,7 @@ public:
 private:
 	class CPartTimeFood*	m_pFood = nullptr;
 	_float					m_fSpeed = _float();
+	_bool					m_bEffect = { false };
 
 public:
 	static	CPartTimerKirby_Grab_State* Create();

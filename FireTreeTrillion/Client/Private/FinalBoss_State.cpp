@@ -1827,3 +1827,60 @@ void CFinalBoss_Recovery_State::Free()
 	__super::Free();
 }
 #pragma endregion
+
+
+#pragma region LASTDAMAGE STATE
+//*********************************
+//			 LASTDAMAGE STATE
+//*********************************
+CFinalBoss_LastDamage_State::CFinalBoss_LastDamage_State()
+{
+}
+
+void CFinalBoss_LastDamage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
+{
+	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+}
+
+void CFinalBoss_LastDamage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
+{
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	if (true == pFinalBoss->IsAnimFinished())
+	{
+		CBossClone::BOSSCLONE_DESC BossCloneDesc = {};
+
+		switch (pFinalBoss->Get_State())
+		{
+		case CFinalBoss::FINALBOSS_LASTDAMAGESTART:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_LASTDAMAGEWAIT, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_LASTDAMAGEWAIT:
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMODISAPPEARCUT2, 50.f, false, true);
+			break;
+		case CFinalBoss::FINALBOSS_DEMODISAPPEARCUT2:
+			CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
+			pKirby->Get_KirbyInfo()->m_bFinalBossDead = true;
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMODISAPPEARCUT3, 50.f, false, true);
+			break;
+		}
+	}
+}
+
+void CFinalBoss_LastDamage_State::OnStateExit()
+{
+}
+
+CFinalBoss_LastDamage_State* CFinalBoss_LastDamage_State::Create()
+{
+	CFinalBoss_LastDamage_State* pInstance = new CFinalBoss_LastDamage_State();
+	return pInstance;
+}
+
+void CFinalBoss_LastDamage_State::Free()
+{
+	__super::Free();
+}
+#pragma endregion
