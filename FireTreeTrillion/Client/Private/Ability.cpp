@@ -195,6 +195,10 @@ _int CAbility::Tick(_float fTimeDelta)
 				{
 					--m_fJumpPowerTemp;
 					m_fJumpPower = m_fJumpPowerTemp;
+
+					m_fDeadTime += m_fTimeDelta;
+					if (10.f < m_fDeadTime)
+						m_bDead = true;
 				}
 				else
 				{

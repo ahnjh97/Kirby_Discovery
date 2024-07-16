@@ -128,6 +128,11 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	}
 	else if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
 		Change_State(FINALBOSS_DEMOAPPEARCUT5, 50.f, false, true);
+	else if (m_pGameInstance->Get_KeyState(DIK_O, KEY_DOWN))
+	{
+		Change_State(FINALBOSS_LASTDAMAGESTART, 50.f, false, true);
+		m_pControllerCom->Set_Position(m_pTransformCom, XMVectorSet(0.f, 0.f, 0.f, 1.f));
+	}
 
 	if (true == m_bGlide)
 	{
@@ -605,6 +610,12 @@ void CFinalBoss::SetUp_FSM()
 	m_pFSM->Add_State(FINALBOSS_RECOVERYSTART, CFinalBoss_Recovery_State::Create());
 	m_pFSM->Add_State(FINALBOSS_RECOVERYWAIT, CFinalBoss_Recovery_State::Create());
 	m_pFSM->Add_State(FINALBOSS_RECOVERYEND, CFinalBoss_Recovery_State::Create());
+
+	// 라스트데미지 패턴
+	m_pFSM->Add_State(FINALBOSS_LASTDAMAGESTART, CFinalBoss_LastDamage_State::Create());
+	m_pFSM->Add_State(FINALBOSS_LASTDAMAGEWAIT, CFinalBoss_LastDamage_State::Create());
+	m_pFSM->Add_State(FINALBOSS_DEMODISAPPEARCUT2, CFinalBoss_LastDamage_State::Create());
+	m_pFSM->Add_State(FINALBOSS_DEMODISAPPEARCUT3, CFinalBoss_LastDamage_State::Create());
 
 	//상태 Initialize
 	CFSM::FSM_INFO		FSM_Desc = {};
