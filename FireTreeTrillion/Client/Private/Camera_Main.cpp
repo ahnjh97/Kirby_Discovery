@@ -575,7 +575,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 
 
 
-#pragma region
+#pragma region 점심시간이다~
 
 		if (m_eSpecialSeq == SEQ_LUNCHTIME)
 		{
@@ -647,18 +647,31 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	//예약 동작이 모두 끝나면 다시 기본 상태로 만든다.
 	if (m_CamSeq.empty() && abs(m_fSeqInterpolateTime.first - m_fSeqInterpolateTime.second) < .01f)
 	{
+		CAMSEQ eSeq = m_eSpecialSeq;
+
 		m_eSpecialSeq = SEQ_END;
 		m_eCurSeqEase = EASE_END;
 		m_fSeqInterpolateTime = { 0.f, 0.f };
 		m_fSeqTotalTime = m_fSeqCheckTime;
 
-		//m_vDestCamPos = m_vCurCamPos;
 		m_vDestCamDir = m_vCurCamDir;
 		m_fDestFovy = m_fFovy;
 		m_fDestZAngle = m_fCurZAngle;
 		m_fDestZoomOffset = m_fCurZoomOffset;
 
 		m_fDestDistance = m_fCurDistance = _float3::Distance(F4toF3(m_pFirstTarget->Get_State(CTransform::STATE_POSITION)), GET_POS);
+
+		//끝나고 목표 위치로 딱 맞춰주기
+		if (eSeq == SEQ_SIMBA_BATTLESTART
+			|| eSeq == SEQ_FINALECUT5)
+		{
+			//카메라 세팅 스냅
+			Snap_CamSet(fTimeDelta);
+			//카메라가 갈 포지션 업데이트
+			Update_CurCamPos(fTimeDelta);
+			//바로 이동
+			MoveTo_CurCamPos_Absolute(fTimeDelta);
+		}
 
 		return;
 	}
@@ -1411,7 +1424,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 
 		//
-		Fill_InterpolateCutSet(newAction, 0.f, EASE_LINEAR, 2.f);
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 2.f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { -1.f, 20.4f, -41.f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { .1f, .1f, 1.f });
 
@@ -1419,11 +1432,11 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		//
 		Fill_InterpolateCutSet(newAction, 2.f, EASE_INOUT_FAST, 1.f);
-		Fill_ActionPos(newAction, POS_ABSOLUTE, {.3f, 4.6f, -99.4f});
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { .3f, 4.6f, -99.4f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .05f, 1.f });
 		m_CamSeq.push_back(newAction);
 
-		Fill_InterpolateCutSet(newAction, 3.f, EASE_INOUT, 15.f);
+		Fill_InterpolateCutSet(newAction, 3.f, EASE_INOUT, 30.f);
 		m_CamSeq.push_back(newAction);
 
 	}
@@ -1448,26 +1461,26 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 
 		// 망토 잡기
-		Fill_HardCutSet(newAction, 2.f);
+		Fill_HardCutSet(newAction, 4.5f);
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .12f, 1.f });
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { .7f, 9.5f, -53.f });
 		newAction.fFOVY = 30.f;
 		m_CamSeq.push_back(newAction);
 
-		Fill_InterpolateCutSet(newAction, 2.f, EASE_OUT_FAST, .7f);
+		Fill_InterpolateCutSet(newAction, 4.5f, EASE_OUT_FAST, .7f);
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .12f, 1.f });
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { .7f, 9.5f, -49.f });
 		m_CamSeq.push_back(newAction);
 
 		// 망토 던지기
-		Fill_InterpolateCutSet(newAction, 2.7f, EASE_INOUT_FAST, .5f);
+		Fill_InterpolateCutSet(newAction, 5.2f, EASE_INOUT_FAST, .5f);
 
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .12f, 1.f });
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { .7f, 8.3f, -54.3f });
 		newAction.fFOVY = 40.f;
 		m_CamSeq.push_back(newAction);
 
-		Fill_InterpolateCutSet(newAction, 3.2f, EASE_INOUT, 3.f);
+		Fill_InterpolateCutSet(newAction, 5.7f, EASE_INOUT, 3.f);
 		m_CamSeq.push_back(newAction);
 
 	}
@@ -1487,7 +1500,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		//
 		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 3.f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { 12.f, 7.5f, -41.8f });
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, {-.68f, .14f, .72f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.68f, .14f, .72f });
 		m_CamSeq.push_back(newAction);
 
 		Fill_InterpolateCutSet(newAction, 3.f, EASE_INOUT, 20.f);
@@ -1508,7 +1521,10 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		//
 		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 3.f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { 10.21f, 8.9f, -42.f });
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.41f, .13f, .9f});
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.41f, .13f, .9f });
+		m_CamSeq.push_back(newAction);
+
+		Fill_InterpolateCutSet(newAction, 3.f, EASE_INOUT, 20.f);
 		m_CamSeq.push_back(newAction);
 	}
 	break;
@@ -1535,25 +1551,25 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	break;
 	//로우 앵글
 	case SEQ_SIMBA_LOW:
-		{
-			CAMACTION newAction{};
-			Fill_HardCutSet(newAction, 0.f);
+	{
+		CAMACTION newAction{};
+		Fill_HardCutSet(newAction, 0.f);
 
-			Fill_ActionPos(newAction, POS_ABSOLUTE, { 9.52f, 2.77f, -50.38f });
-			Fill_ActionDir(newAction, DIR_ABSOLUTE, {-.42f, .37f, .83f });
-			newAction.vDir.Normalize();
-			newAction.fFOVY = 30.f;
-			m_CamSeq.push_back(newAction);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 9.52f, 2.77f, -50.38f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.42f, .37f, .83f });
+		newAction.vDir.Normalize();
+		newAction.fFOVY = 30.f;
+		m_CamSeq.push_back(newAction);
 
-			//
-			Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 2.f);
-			newAction.vPos -= newAction.vDir;
-			m_CamSeq.push_back(newAction);
+		//
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 2.f);
+		newAction.vPos -= newAction.vDir;
+		m_CamSeq.push_back(newAction);
 
-			Fill_InterpolateCutSet(newAction, 2.f, EASE_INOUT, 20.f);
-			m_CamSeq.push_back(newAction);
-		}
-		break;
+		Fill_InterpolateCutSet(newAction, 2.f, EASE_INOUT, 20.f);
+		m_CamSeq.push_back(newAction);
+	}
+	break;
 
 #pragma endregion
 
@@ -2267,7 +2283,7 @@ void CCamera_Main::Ready_Monsters_Leongar(CGameObject* pNotifier)
 	Fill_HardCutSet(newAction, 0.f);
 
 	Fill_ActionPos(newAction, POS_ABSOLUTE, { 1.2f, 14.f, -102.f });
-	Fill_ActionDir(newAction, DIR_ABSOLUTE, {0.f, -.35f, 1.f });
+	Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, -.35f, 1.f });
 	Make_One_Sequence(newAction);
 	Set_TargetAnchor({ 0.f, 4.f, 5.f });
 
@@ -2319,8 +2335,44 @@ void CCamera_Main::Reset_DeferredCamSet()
 	//후보정 값을 초기화한다.
 	m_pTransformCom->Move(static_cast<_float4>(-m_vPreShakeDir));
 
-	//dof 위치 갱신
-	//CAMSEQ eStartCamSeq = 
+
+
+
+}
+
+void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
+{
+
+	//마지막 보정 값 보간
+	if (.01f < _float3::Distance(m_vCurFinalOffset, m_vDestFinalOffset))
+	{
+		m_vCurFinalOffset += (m_vDestFinalOffset - m_vCurFinalOffset) * fTimeDelta * m_fFinalOffsetInterpolateSpeed;
+
+		if (_float3::Distance(m_vCurFinalOffset, m_vDestFinalOffset) <= .01f)
+			m_vCurFinalOffset = m_vDestFinalOffset;
+	}
+
+	//z angle 보간
+	if (.001f < abs(m_fCurZAngle - m_fDestZAngle))
+		m_fCurZAngle += (m_fDestZAngle - m_fCurZAngle) * fTimeDelta * m_fZAngleInterpolateSpeed;
+
+
+	//이동
+	m_pTransformCom->Move(Dir(m_vCurFinalOffset));
+	m_vPreFinalOffset = m_vCurFinalOffset;
+
+	//Z 앵글
+	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), 1.f, m_fCurZAngle);
+	m_fPreZAngle = m_fCurZAngle;
+
+	//카메라 쉐이크
+	_float4 vDir = Make_ShakeDir(fTimeDelta);
+	m_pTransformCom->Move(vDir);
+
+
+//컷신용 dof 위치 갱신
+
+	//피날레
 	if (0 < m_iCurSceneIdx)
 	{
 		//커비
@@ -2356,37 +2408,18 @@ void CCamera_Main::Reset_DeferredCamSet()
 			m_pGameInstance->Update_DofFocus(FINALEBOSS->Get_RootPos());
 		}
 	}
-}
 
-void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
-{
-
-	//마지막 보정 값 보간
-	if (.01f < _float3::Distance(m_vCurFinalOffset, m_vDestFinalOffset))
+	if (SEQ_SIMBA_START <= m_eSpecialSeq && m_eSpecialSeq <= SEQ_SIMBA_LOW)
 	{
-		m_vCurFinalOffset += (m_vDestFinalOffset - m_vCurFinalOffset) * fTimeDelta * m_fFinalOffsetInterpolateSpeed;
+		//사자 포커스
+		if (m_eSpecialSeq != SEQ_SIMBA_START)
+		{
+			CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
 
-		if (_float3::Distance(m_vCurFinalOffset, m_vDestFinalOffset) <= .01f)
-			m_vCurFinalOffset = m_vDestFinalOffset;
+			m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+		}
+
 	}
-
-	//z angle 보간
-	if (.001f < abs(m_fCurZAngle - m_fDestZAngle))
-		m_fCurZAngle += (m_fDestZAngle - m_fCurZAngle) * fTimeDelta * m_fZAngleInterpolateSpeed;
-
-
-	//이동
-	m_pTransformCom->Move(Dir(m_vCurFinalOffset));
-	m_vPreFinalOffset = m_vCurFinalOffset;
-
-	//Z 앵글
-	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), 1.f, m_fCurZAngle);
-	m_fPreZAngle = m_fCurZAngle;
-
-	//카메라 쉐이크
-	_float4 vDir = Make_ShakeDir(fTimeDelta);
-	m_pTransformCom->Move(vDir);
-
 }
 
 void CCamera_Main::Control(_float fTimeDelta)
@@ -2410,7 +2443,7 @@ void CCamera_Main::Control(_float fTimeDelta)
 		{
 			bFinaleOffsetToggle = !bFinaleOffsetToggle;
 
-			Set_FinalOffset( (bFinaleOffsetToggle) ? _float3{0.f, -5.f, 0.f} : _float3{0.f, 0.f, 0.f});
+			Set_FinalOffset((bFinaleOffsetToggle) ? _float3{ 0.f, -5.f, 0.f } : _float3{ 0.f, 0.f, 0.f });
 		}
 
 		//시퀀스 테스트
@@ -2658,8 +2691,6 @@ void CCamera_Main::MoveTo_CurCamPos_Absolute(_float fTimeDelta)
 {
 	SET_POS(Pos(m_vCurCamPos));
 	m_pTransformCom->Look_At_Axis(Dir(m_vCurCamDir));
-
-	//m_pTransformCom->Move(Dir(Make_ShakeDir(fTimeDelta)));
 }
 
 void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
@@ -2719,48 +2750,17 @@ void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
 	//m_pTransformCom->Move(Dir(Make_ShakeDir(fTimeDelta)));
 }
 
-
-
-/*
-void CCamera_Main::Orbit_Target(_float fTimeDelta)
+void CCamera_Main::Snap_CamSet(_float fTimeDelta)
 {
-	if (nullptr == m_pFirstTarget)
-		return;
+	m_fCurDistance = m_fDestDistance;
 
-	//Transform 다른 부분 건드려야 되서 일단 대기 용으로 주석 처리해 둡니다
-/*
-	_float fLen = XMVector2Length(XMLoadFloat2(&m_fCamOrbitDelta)).m128_f32[0];
+	m_fCurUpOffset = m_fDestUpOffset;
 
-	if (0.f <= fLen)
-	{
-		m_pTransformCom->Orbit(F3ToVec(m_vAnchor), XMVectorSet(0.f, 1.f, 0.f, 1.f), fTimeDelta * (m_fCamOrbitDelta.x * .15f) * m_fMouseSensor);
+	m_fFovy = m_fDestFovy;
 
+	m_vCurCamDir = m_vDestCamDir;
 
-		if (5.f <= m_fCurAngle.second && m_fCurAngle.second < 80.f)
-			m_pTransformCom->Orbit(F3ToVec(m_vAnchor), m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), fTimeDelta * (m_fCamOrbitDelta.y * .15f) * m_fMouseSensor);
-		else
-		{
-			if (5.f <= m_fCurAngle.second)
-				m_fCamOrbitDelta.y = -5.f;
-
-			else
-				m_fCamOrbitDelta.y = 5.f;
-
-			m_pTransformCom->Orbit(F3ToVec(m_vAnchor), m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), fTimeDelta * (m_fCamOrbitDelta.y * .15f) * m_fMouseSensor);
-		}
-	}
-
-
-	//}
-
-	fLen = XMVector2Length(XMLoadFloat2(&m_fCamOrbitDelta)).m128_f32[0];
-	m_fCamOrbitDelta.x -= (m_fCamOrbitDelta.x * .15f);
-	m_fCamOrbitDelta.y -= (m_fCamOrbitDelta.y * .15f);
-
-	if (fLen <= 5.f)
-		m_fCamOrbitDelta = { 0.f, 0.f };
 }
-*/
 
 #ifdef _DEBUG
 void CCamera_Main::Render_IMGUI()
