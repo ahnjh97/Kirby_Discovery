@@ -337,7 +337,7 @@ void CCamera_Main::Check_FinaleTime(_float fTimeDelta)
 	if (m_iPreSceneIdx == QTE3 + 1 && m_iCurSceneIdx == QTE3 + 2)
 	{
 		CEffect::FX_DESC FxDesc{};
-		FxDesc.vInitPos = BATTLE_POS + _float3{ 0.f, 0.f, -100.f };
+		FxDesc.vInitPos = BATTLE_POS + _float3{ 0.f, 0.f, -50.f };
 
 		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale rect"), &FxDesc)))
 			return;
