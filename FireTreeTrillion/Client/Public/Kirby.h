@@ -130,6 +130,8 @@ public:
 		// ÇØ¸Ó Æû
 		_int			m_iHammerHit = { 0 };
 		_float			m_fHammerChargeTime = { 0.f };
+		_bool			m_bFirstChargeEffectTrigger = { true };
+		_bool			m_bSecondChargeEffectTrigger = { true };
 
 		// Àü±¸ Æû
 		_bool			m_bLightOn = { false };
