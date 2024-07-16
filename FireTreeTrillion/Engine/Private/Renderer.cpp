@@ -1470,6 +1470,8 @@ HRESULT CRenderer::Render_Result()
 
 	if (FAILED(m_pShader->Bind_RawValue("g_fObjectBlack", &m_fObjectBlack, sizeof(_float))))
 		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fRealObjectBlack", &m_fRealObjectBlack, sizeof(_float))))
+		return E_FAIL;
 
 	// 섞을 스카이 박스
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Sky"), "g_SkyTexture")))
@@ -2283,6 +2285,13 @@ void CRenderer::ObjectBlack(_float fTimeDelta)
 		{
 			m_fObjectBlack = m_fObjectBlackTarget;
 			m_fOBjectBlackTime = 0.f;
+
+			if (m_bRealBlack == true)
+			{
+				m_fRealObjectBlack = m_fObjectBlackTarget;
+				m_bRealBlack = false;
+			}
+
 			m_bObjectBlack = false;
 			return;
 		}
@@ -2290,10 +2299,21 @@ void CRenderer::ObjectBlack(_float fTimeDelta)
 		m_fOBjectBlackTime += fTimeDelta;
 		m_fObjectBlack += fTimeDelta * m_fObjectBlackRatioTime;
 
+		if (m_bRealBlack == true)
+			m_fRealObjectBlack += fTimeDelta * m_fObjectBlackRatioTime;
+
+
 		if (m_fOBjectBlackTime > m_fObjectBlackMaxTime)
 		{
 			m_fObjectBlack = m_fObjectBlackTarget;
 			m_fOBjectBlackTime = 0.f;
+
+			if (m_bRealBlack == true)
+			{
+				m_fRealObjectBlack = m_fObjectBlackTarget;
+				m_bRealBlack = false;
+			}
+
 			m_bObjectBlack = false;
 		}
 	}

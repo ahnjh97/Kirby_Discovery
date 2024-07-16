@@ -126,8 +126,9 @@ public:
 	void Update_Option(OPTION Option, _bool bOn);
 	void Bind_RendererFunc(_int iTriggerType);
 
-	void Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime) {
+	void Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime, _bool RealBlack) {
 		m_bObjectBlack = true;
+		m_bRealBlack = RealBlack;
 		_float fBlackdiff = fObjectBlackTarget - m_fObjectBlack;
 		m_fObjectBlackRatioTime = fBlackdiff / fBlackTime;
 		m_fObjectBlackTarget = fObjectBlackTarget;
@@ -290,6 +291,8 @@ private:
 	_float m_fObjectBlackMaxTime = { 0.f };
 	_float m_fOBjectBlackTime = { 0.f };
 	_float m_fObjectBlackTarget = { 0.f };
+	_bool  m_bRealBlack = { false };
+	_float m_fRealObjectBlack = { 1.f };
 
 	_bool  m_bMaptool = { false };
 

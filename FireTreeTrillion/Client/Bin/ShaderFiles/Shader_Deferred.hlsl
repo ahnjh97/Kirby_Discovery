@@ -184,6 +184,7 @@ float g_fOceanIntensity = { 0.f };
 
 // Dark
 float g_fObjectBlack = { 1.f };
+float g_fRealObjectBlack = { 1.f };
 
 
 float3 FOGY(float fWorldY, float4 vColor, float3 vFogColor, float fFogBottomY, float fFogTopY, float fintensity)
@@ -1138,6 +1139,9 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
     
     
+    Out.vColor *= g_fObjectBlack;
+
+    
     if (vRimLightDesc.g > 0.01f && vRimLightDesc.b == 1.f)
     {
         
@@ -1156,9 +1160,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 
     }
     
-    
-    
-    Out.vColor *= g_fObjectBlack;
+    Out.vColor *= g_fRealObjectBlack;
     /////////
     
         

@@ -422,11 +422,11 @@ void CGameInstance::Setting_LensFlare(_bool bOnOff)
 }
 
 
-void CGameInstance::Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime)
+void CGameInstance::Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime, _bool RealBlack )
 {
 	if (nullptr == m_pRenderer)
 		return;
-	m_pRenderer->Set_ObjectBlack(fObjectBlackTarget, fBlackTime);
+	m_pRenderer->Set_ObjectBlack(fObjectBlackTarget, fBlackTime, RealBlack);
 }
 
 #ifdef _DEBUG

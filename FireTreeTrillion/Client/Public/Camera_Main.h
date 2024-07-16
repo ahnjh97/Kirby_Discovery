@@ -406,6 +406,7 @@ private:
 	void System_Tick(_float fTimeDelta);
 	void Check_FinaleScene(_float fTimeDelta);
 	void Check_FinaleTime(_float fTimeDelta);
+	void Deferred_Blackoperation(CAMSEQ eSEQ);
 
 	void Fill_HardCutSet(CAMACTION& Action, _float fTime);
 	void Fill_InterpolateCutSet(CAMACTION& Action, _float fTime, EASING eEase, _float fInterpolateSpeed);

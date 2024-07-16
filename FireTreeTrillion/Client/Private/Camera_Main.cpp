@@ -314,10 +314,67 @@ void CCamera_Main::Check_FinaleScene(_float fTimeDelta)
 		&& (m_iCurSceneIdx != QTE1 && m_iCurSceneIdx != QTE2 && m_iCurSceneIdx != QTE3))
 	{
 		Make_Sequence(CAMSEQ((_uint)SEQ_FINALECUT1 + m_iCurSceneIdx - 1));
+		Deferred_Blackoperation(CAMSEQ((_uint)SEQ_FINALECUT1 + m_iCurSceneIdx - 1));
 	}
 
 }
 
+void CCamera_Main::Deferred_Blackoperation(CAMSEQ eSEQ)
+{
+	if (eSEQ == SEQ_FINALECUT2) {
+		m_pGameInstance->Set_ObjectBlack(1.f);
+	}
+	else if (eSEQ == SEQ_FINALECUT3) {
+		m_pGameInstance->Set_ObjectBlack(0.5f);
+	}
+	else if (eSEQ == SEQ_FINALECUT4) {
+		m_pGameInstance->Set_ObjectBlack(0.4f);
+	}
+	else if (eSEQ == SEQ_FINALECUT5) {
+		m_pGameInstance->Set_ObjectBlack(0.6f);
+	}
+	else if (eSEQ == SEQ_FINALECUT6) {
+		m_pGameInstance->Set_ObjectBlack(0.6f);
+	}
+	else if (eSEQ == SEQ_FINALECUT7) {
+		m_pGameInstance->Set_ObjectBlack(1.f);
+	}
+	else if (eSEQ == SEQ_FINALECUT8) {
+		m_pGameInstance->Set_ObjectBlack(0.3f);
+	}
+	else if (eSEQ == SEQ_FINALECUT9) {
+		m_pGameInstance->Set_ObjectBlack(0.3f);
+	}
+	else if (eSEQ == SEQ_FINALECUT10) {
+		m_pGameInstance->Set_ObjectBlack(1.f, 0.f);
+	}
+	else if (eSEQ == SEQ_FINALECUT11) {
+		m_pGameInstance->Set_ObjectBlack(0.5f, 0.f);
+	}
+	else if (eSEQ == SEQ_FINALECUT12) {
+		m_pGameInstance->Set_ObjectBlack(1.f);
+	}
+	else if (eSEQ == SEQ_FINALECUT13) {
+		m_pGameInstance->Set_ObjectBlack(1.f);
+	}
+	else if (eSEQ == SEQ_FINALECUT14) {
+	}
+	else if (eSEQ == SEQ_FINALECUT15) {
+		m_pGameInstance->Set_ObjectBlack(1.f);
+	}
+	else if (eSEQ == SEQ_FINALECUT16) {
+		m_pGameInstance->Set_ObjectBlack(1.f);
+	}
+	else if (eSEQ == SEQ_FINALECUT17) {
+		m_pGameInstance->Set_ObjectBlack(1.f);
+	}
+	else if (eSEQ == SEQ_FINALECUT18) {
+		m_pGameInstance->Set_ObjectBlack(1.f);
+	}
+	else if (eSEQ == SEQ_FINALECUT19) {
+		m_pGameInstance->Set_ObjectBlack(0.3f);
+	}
+}
 
 void CCamera_Main::Check_FinaleTime(_float fTimeDelta)
 {
@@ -424,6 +481,7 @@ void CCamera_Main::Check_FinaleTime(_float fTimeDelta)
 		}
 	}
 }
+
 
 void CCamera_Main::Fill_HardCutSet(CAMACTION& Action, _float fTime)
 {
