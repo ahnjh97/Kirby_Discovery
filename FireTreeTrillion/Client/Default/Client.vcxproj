@@ -377,6 +377,7 @@
     <ClInclude Include="..\Public\Simba_State.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
     <ClInclude Include="..\public\SkySphere.h" />
+    <ClInclude Include="..\Public\SpawnEffect.h" />
     <ClInclude Include="..\Public\SpikeSpear.h" />
     <ClInclude Include="..\Public\SkySphereSub.h" />
     <ClInclude Include="..\Public\SpookStep.h" />
@@ -622,6 +623,7 @@
     <ClCompile Include="..\Private\Simba_State.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
     <ClCompile Include="..\private\SkySphere.cpp" />
+    <ClCompile Include="..\Private\SpawnEffect.cpp" />
     <ClCompile Include="..\Private\SpikeSpear.cpp" />
     <ClCompile Include="..\Private\SkySphereSub.cpp" />
     <ClCompile Include="..\Private\SpookStep.cpp" />

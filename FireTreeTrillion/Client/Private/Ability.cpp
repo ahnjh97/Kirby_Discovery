@@ -66,9 +66,6 @@ HRESULT CAbility::Initialize(void* pArg)
 
 		Add_Effect("ItemStar", FXDesc, true);
 
-
-
-
 		LIGHT_DESC			LightDesc{};
 		LightDesc.eType = LIGHT_DESC::TYPE_POINT;
 		LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION) + m_pTransformCom->Get_State(CTransform::STATE_UP) * 0.5f;

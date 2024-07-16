@@ -3,6 +3,7 @@
 #include "PartTimerKirby.h"
 #include "PartTimeHelper.h"
 #include "PartTimeFood.h"
+#include "Effect.h"
 
 #pragma region IDLE STATE
 //*********************************
@@ -43,6 +44,23 @@ void CPartTimerKirby_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			CTransform* pTransform = pAlbaKirby->Get_TransformCom();
 			pAlbaKirby->Set_PrePosition(pTransform->Get_State(CTransform::STATE_POSITION));
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_INCORRECTSTART, 50.f, false, true);
+
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.vInitPos = pTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			FXDesc.vInitScale = { 1.1f, 1.1f, 1.1f };
+
+			//_float3 vDir = vPos - vRotatePos;
+			//vDir.Normalize();
+			//_float3 vLook = { 0.f, 0.f, 1.f };
+
+			//_float fAngleLook = atan2f(vLook.z, vLook.x);
+			//_float fAngleDiff = fAngleLook - atan2f(vDir.z, vDir.x);
+			//fAngleDiff = ToDegree(fAngleDiff);
+
+			//_float3 vAngle = { 10.f, fAngleDiff, 0.f };
+			//FXDesc.vInitRot = vAngle;
+
+			pAlbaKirby->Add_Effect("FoodGame_IncorrectBbong", FXDesc);
 		}
 
 	}
