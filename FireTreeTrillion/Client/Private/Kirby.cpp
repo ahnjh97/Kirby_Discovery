@@ -419,6 +419,11 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if (m_bOverPower == true)
 				return;
 
+			// 초기화해줄놈들
+			INFO(m_bFirstChargeEffectTrigger) = true;
+			INFO(m_bSecondChargeEffectTrigger) = true;
+
+
 			if (pObject->Get_Attack() > 10.f && m_eAbilityType != ABILITY_DEFAULT)
 			{
 				HRESULT hr = S_OK;
@@ -524,6 +529,11 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		{
 			if (m_bOverPower == true)
 				return;
+
+			// 초기화해줄놈들
+			INFO(m_bFirstChargeEffectTrigger) = true;
+			INFO(m_bSecondChargeEffectTrigger) = true;
+
 
 			if (pObject->Get_Attack() > 10.f && m_eAbilityType != ABILITY_DEFAULT)
 			{
