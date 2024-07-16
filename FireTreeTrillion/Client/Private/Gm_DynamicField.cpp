@@ -90,7 +90,7 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 		}
 		break;
 
-	case DFMOVE_LEFTRIGHT: //Surprice ±â¹Í
+	case DFMOVE_LEFTRIGHT: //SurprisedBoard ±â¹Í
 		break;
 
 	case DFMOVE_FRONTBACK: 

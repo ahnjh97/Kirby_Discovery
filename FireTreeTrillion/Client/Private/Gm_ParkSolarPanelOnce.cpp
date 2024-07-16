@@ -59,7 +59,7 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 {
 	//if (TRUE == m_bDead)
 	//	return OBJ_DEAD;
-
+	_float fAnimRatio = { 0.f };
 	switch (m_eCurState)
 	{
 	case STATE_OFFWAIT: break;//충전 전 대기
@@ -72,10 +72,13 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 		break;
 
 	case STATE_ONWAITSTART: //충전 시작
+		fAnimRatio = m_pModelCom->Get_AnimRatio();
+		if (0.5f >= fAnimRatio)
+			m_eCurState = STATE_ONWAIT;
+
 		if (TRUE == m_pModelCom->IsFinished())
 		{
 			m_pModelCom->Set_Animation(STATE_ONWAIT, 60.f, FALSE, TRUE);
-			m_eCurState = STATE_ONWAIT;
 		}
 		break;
 		
