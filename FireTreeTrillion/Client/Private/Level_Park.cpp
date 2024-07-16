@@ -322,7 +322,7 @@ HRESULT CLevel_Park::Ready_Map()
 				|| "Gimmick_PkFunHouseDarkness04" == strModelName
 				|| "Gimmick_PkFunHouseDarkness05" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_Updown"), 
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField"), 
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
@@ -330,14 +330,15 @@ HRESULT CLevel_Park::Ready_Map()
 			if ("Gimmick_PkFunHouseDarkness02" == strModelName ||
 				"Gimmick_PkFunHouseDarkness03" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_LeftRight"),
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField"),
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
 
-			if ("Gimmick_PkFunHouse06" == strModelName)
+			if ("Gimmick_PkFunHouse06" == strModelName ||
+				"Gimmick_PkFunHouse07" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_FrontBack"),
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField"),
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
@@ -913,12 +914,12 @@ HRESULT CLevel_Park::Ready_Objects()
 
 	//기믹 오브젝트를 기준으로, 가장 가까운 거리를 검사하여 다이나믹 필드를 세팅
 	list<CGameObject*>* GimmickList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"));
+	list<CGameObject*>* DFieldList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField"));
+
 	for (auto& Gimmick : *GimmickList)
 	{
 		_float fDistance = { FLT_MAX };
 		CGameObject* pDField = { nullptr };
-
-		list<CGameObject*>* DFieldList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField_Updown"));
 		for (auto& DField : *DFieldList)
 		{
 			//기믹 & 필드 거리 검사
@@ -929,10 +930,13 @@ HRESULT CLevel_Park::Ready_Objects()
 				pDField = DField;
 			}
 		}
-		CGm_ParkSolarPanelOnce* pGimmickSP = dynamic_cast<CGm_ParkSolarPanelOnce*>(Gimmick);
-		dynamic_cast<CGm_DynamicField*>(pDField)->Set_SolarPanel(pGimmickSP);
-		if (nullptr == pGimmickSP)
+
+		if ("SolarPanelOnce_NonAnim" == strModelName)
+		{
+			CGm_ParkSolarPanelOnce* pGimmickSP = dynamic_cast<CGm_ParkSolarPanelOnce*>(Gimmick);
+			dynamic_cast<CGm_DynamicField*>(pDField)->Set_SolarPanel(pGimmickSP);
 			continue;
+		}		
 	}
 
 #pragma endregion
@@ -1050,6 +1054,33 @@ HRESULT CLevel_Park::Ready_UI()
 
 HRESULT CLevel_Park::Add_EnvMap()
 {
+	HRESULT hr(S_OK);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Level_Park_Env"),
+		TEXT("Com_Texture1"), (CComponent**)&m_pEnvTexture[TYPE_ENV]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_BRDF_LUT"),
+		TEXT("Com_Texture2"), (CComponent**)&m_pEnvTexture[TYPE_LUT]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_RandomNormal"),
+		TEXT("Com_Texture3"), (CComponent**)&m_pEnvTexture[TYPE_NORMAL]);
+	CHECK_FAILED(hr);
+
+
+	// 환경맵을 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_ENV], "g_EnvTexture")))
+		return E_FAIL;
+
+	//LUT 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_LUT], "g_LUTTexture")))
+		return E_FAIL;
+
+	//Normal 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_NORMAL], "g_RandomNormalTexture")))
+		return E_FAIL;
+
 	return S_OK;
 }
 

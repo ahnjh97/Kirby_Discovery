@@ -20,7 +20,7 @@ public:
 	enum TYPE { GAMEOVER, OVER, START, TYPE_END };
 private:
 	CPartTimeHelper();
-	virtual ~ CPartTimeHelper() = default;
+	virtual ~CPartTimeHelper() = default;
 
 public: 
 	void				Register_FirstDee(class CHungryDee* pDee);
@@ -42,9 +42,7 @@ public:
 	PARTTIME_ITEM		Get_PartTimeItem() const { return m_eFood; }
 
 	// 게임 흐름에 따른 이벤트들을 관할합니다.
-	void				Initialize_GameStart();
 	_bool				Handle_GameStart();
-	_bool				Handle_LunchTime();
 	_bool				Handle_GameOver();
 	void				Handle_UI(TYPE eContent);
 

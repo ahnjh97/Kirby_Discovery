@@ -59,6 +59,9 @@ public: /* For.Renderer */
 
 	void Setting_GodRay(_fvector vWorldPos, _float fRayExposure = 0.15f, _float fRayDecay = 0.96815f, _float fRayIlluminationDecay = 0.8f, _float fRayDensity = 0.5f, _float fWeight = 0.5f);
 	void Setting_LensFlare(_bool bOnOff);
+
+	void Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime = 0.f);
+
 #ifdef _DEBUG
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderComponent);
@@ -239,6 +242,10 @@ public: // For Collision
 public: // For GameObject Distance
 	_float Compute_Distance(CGameObject* pDst, CGameObject* pSrc);
 
+public:
+	void	Set_IsReadyGameStart(_bool bReady) { m_bIsReadyGameStart = bReady; }
+	_bool	Get_IsReadyGameStart() const { return m_bIsReadyGameStart; }
+
 private:
 	class CGraphic_Device*			m_pGraphic_Device = { nullptr };
 	class CInput_Device*			m_pInput_Device = { nullptr };
@@ -267,6 +274,9 @@ private:
 
 	_uint	m_NewLevelID			= { 0 };
 	CLevel* m_pNewLevel				= nullptr;
+
+	// LEVEL_Logo 생성 확인용
+	_bool	m_bIsReadyGameStart = false;
 
 public:		
 	static void Release_Engine();

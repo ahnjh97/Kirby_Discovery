@@ -163,10 +163,69 @@ float g_fBlackBackGround;
 float4 g_vCamPosition;
 float4 g_vCamLook;
 
-//////////////////////////////////// For PBR 
-
 bool g_bDeepShadow = false;
 
+// For Fog
+float3 g_vFogYColor = { 1.f, 1.f, 1.f };
+float g_fFogYBottom;
+float g_fFogYTopY;
+float g_fFogYIntensity = { 0.f };
+
+float3 g_vFogViewColor = { 1.f, 1.f, 1.f };
+float g_fFogViewStart;
+float g_fFogViewEnd;
+float g_fFogViewIntensity = { 0.f };
+
+float3 g_vOceanTopColor = { 0.f, 0.f, 0.f };
+float3 g_vOceanBottomColor = { 0.f, 0.f, 0.f };
+float g_fOceanTopY = { 0.f };
+float g_fOceanBottomY;
+float g_fOceanIntensity = { 0.f };
+
+// Dark
+float g_fObjectBlack = { 1.f };
+
+
+float3 FOGY(float fWorldY, float4 vColor, float3 vFogColor, float fFogBottomY, float fFogTopY, float fintensity)
+{
+    float fogFactor = saturate((fWorldY - fFogBottomY) / (fFogTopY - fFogBottomY));
+
+    vColor.rgb = lerp(vColor.rgb, vFogColor, (1.f - fogFactor) * fintensity);
+    
+
+    return vColor.rgb;
+}
+
+float3 FOGViewZ(float fViewZ, float4 vColor, float3 vFogColor, float fFogStart, float fFogEnd, float fintensity)
+{
+    float fogFactor = saturate((fViewZ - fFogStart) / (fFogEnd - fFogStart));
+    float fRatio = min(fogFactor < 0.5 ? 16 * pow(fogFactor, 5.f) : 1 - pow(-2 * fogFactor + 2, 5) / 2,  0.5f);
+    vColor.rgb = lerp(vColor.rgb, vFogColor, fRatio * fintensity);
+
+    return vColor.rgb;
+}
+
+float3 Ocean(float fWorldY, float3 vColor, float3 vTopColor, float3 vBottomColor, float fOceanTopY, float fOceanBottomY, float fintensity)
+{
+    if (fWorldY > fOceanTopY)
+        return vColor;
+    
+    // 0 ~ 1까지의 값이 나올 것이다.
+    // 그러나, 0 (TopY와 거의 흡사할 경우) 바로 0.2로 보정하여 바다 느낌이 나게 한다.
+    // 수면위일수록 1에 가깝고, 수면 아래일수록 0에 가깝다.
+    float depthRatio = max(saturate( (fWorldY - fOceanBottomY) / (fOceanTopY - fOceanBottomY) ), 0.4f);
+    
+    // 위에서 구한 레이시오를 바탕으로 1에 가까울 수록 TopColor, 0에 가까울수록 BottomColor
+    float3 vInterpolatedColor = lerp(vBottomColor, vTopColor, pow(depthRatio, 7.f));
+    
+    // 위에서 구한 인터폴라이트 컬러를 가지고 다시 기존 컬러와 연산을 시작한다.
+    // 1에 가까울 수록 기존 컬러를 유지한다.
+    float3 vNewColor = lerp(vInterpolatedColor, vColor, pow(fintensity * depthRatio, 7.f));
+    
+    return vNewColor;
+}
+
+//////////////////////////////////// For PBR 
 
 float ndfGGX(float cosLh, float roughness)
 {
@@ -1098,6 +1157,8 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     }
     
     
+    
+    Out.vColor *= g_fObjectBlack;
     /////////
     
         
@@ -1123,11 +1184,13 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     // 기존 디퓨즈와 가산되어 그려진다.
     Out.vColor += vEffect + vBlur;
     
+    Out.vColor = saturate(Out.vColor);
+    
     //맵툴이 아닐 때.
     if (g_bMapTool == false)
         Out.vColor += g_EmissiveTexture.Sample(ClampSampler, In.vTexcoord);
 
-    
+    Out.vColor = saturate(Out.vColor);
     
     if (g_DeferredInfoTexture.Sample(LinearSampler, In.vTexcoord).g == 1.f && g_StencilTexture.Sample(LinearSampler, In.vTexcoord).r != 1.f)
     {
@@ -1155,7 +1218,13 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
         Out.vColor *= g_fBlackBackGround;
     }
     
-    Out.vColor = saturate(Out.vColor);
+    // For Fog
+    //float4 vFogBeforeColor = saturate(Out.vColor);
+    //vFogBeforeColor.rgb = Ocean(vWorldPos.y, vFogBeforeColor.rgb, g_vOceanTopColor, g_vOceanBottomColor, g_fOceanTopY, g_fOceanBottomY, g_fOceanIntensity);
+    //float3 vFogY = FOGY(vWorldPos.y, vFogBeforeColor, g_vFogYColor, g_fFogYBottom, g_fFogYTopY, g_fFogYIntensity);
+    //float3 vFogView = FOGViewZ(fViewZ, vFogBeforeColor, g_vFogViewColor, g_fFogViewStart, g_fFogViewEnd, g_fFogViewIntensity);
+    //Out.vColor.rgb = saturate((vFogY + vFogView) / 2);
+    
     return Out;
 }
 

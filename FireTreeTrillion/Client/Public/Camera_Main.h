@@ -41,6 +41,16 @@ public:
 		SEQ_FINALECUT19,
 		SEQ_FINALECUT20,
 
+		SEQ_SIMBA_START,
+
+		SEQ_SIMBA_SHOULDER,
+		SEQ_SIMBA_TONG,
+		SEQ_SIMBA_FRONTVIEW,
+		SEQ_SIMBA_LOW,
+
+		SEQ_SIMBA_BATTLESTART,
+
+		SEQ_FINALBOSS_BATTLESTART,
 
 		//단독으로 하나를 즉시 넣어 사용하는 시퀀스
 		SEQ_ONE,
@@ -143,8 +153,13 @@ public:
 
 	//카메라의 이벤트 함수들
 	void Ready_Cam_DeeDeeDee(CGameObject* pNotifier);
-	void Ready_Cam_Leongar(CGameObject* pNotifier);
 	void Ready_Cam_FinalBoss(CGameObject* pNotifier);
+
+	void Ready_Monsters_Leongar(CGameObject* pNotifier);
+
+	void Ready_Dialog1_Leongar(CGameObject* pNotifier);
+	void Ready_Dialog2_Leongar(CGameObject* pNotifier);
+	void Ready_Dialog3_Leongar(CGameObject* pNotifier);
 
 	void Start_ShutterSeq(CGameObject* pNotifier);
 	void Start_BridgeSeq(CGameObject* pNotifier);

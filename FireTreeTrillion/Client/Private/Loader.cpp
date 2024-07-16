@@ -265,6 +265,8 @@ HRESULT CLoader::Start()
 
 	HRESULT		hr = { 0 };
 	SetUp_ModelScaleRotation(m_eNextLevelID);
+
+
 	switch (m_eNextLevelID)
 	{
 	case LEVEL_LOGO:
@@ -384,7 +386,6 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_StarPoint"), CHUD_StarPoint);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_AbilityDiscard"), CHUD_AbilityDiscard);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_BossHpBar"), CHUD_BossHpBar);
-	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_Mission"), CHUD_Mission);
 	
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTime"), CUI_PartTime);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_PartTimeDee"), CUI_PartTimeDee);
@@ -1034,7 +1035,7 @@ HRESULT CLoader::Loading_For_Park()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+	if (FAILED(Add_Texture(eLevel, "Level_Park_Env", "Map/Level_Park_Env.dds")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
 		return E_FAIL;

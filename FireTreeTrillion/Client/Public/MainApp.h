@@ -21,11 +21,6 @@ public:
 	HRESULT Render(_float fTimeDelta);
 	HRESULT Open_Level(LEVEL eLevelID);
 
-private:
-	CGameInstance*			m_pGameInstance = { nullptr };
-	ID3D11Device*			m_pDevice = { nullptr };
-	ID3D11DeviceContext*	m_pContext = { nullptr };
-
 private:	
 	HRESULT Ready_Fonts();
 	HRESULT Ready_Object_For_Static();
@@ -34,6 +29,11 @@ private:
 #ifdef _DEBUG
 	_bool	Render_RTVFonts();
 #endif // _DEBUG
+
+private:
+	CGameInstance*			m_pGameInstance = { nullptr };
+	ID3D11Device*			m_pDevice = { nullptr };
+	ID3D11DeviceContext*	m_pContext = { nullptr };
 
 public:	
 	static CMainApp* Create();
