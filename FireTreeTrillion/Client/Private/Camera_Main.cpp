@@ -266,7 +266,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 		210.f / 50.f, /*210.f*/ //cut2 - cut3
 		200.f / 50.f, /*200.f*/ //cut3 - cut4
 		151.f / 50.f, /*150.f*/ //cut4 - cut5//운석 던지기 시작
-		160.f / 50.f,
+		180.f / 50.f,
 	};
 
 	//7부터
@@ -393,13 +393,24 @@ void CCamera_Main::Check_FinaleTime(_float fTimeDelta)
 
 	if (m_iPreSceneIdx == QTE3 + 1 && m_iCurSceneIdx == QTE3 + 2)
 	{
-		CMultiEffect::MULTI_FX_DESC FxDesc{};
-		//FxDesc.vInitPos = (_float3)GET_POS + (_float3)(m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 150.f);
-		FxDesc.pSocketMatrix = &m_EffectSocket;
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale"), &FxDesc)))
-			return;
-
 		Make_Sequence(SEQ_FINALECUT20);
+
+
+		CEffect::FX_DESC FxDesc{};
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale rect A"), &FxDesc)))
+			return;
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale rect C"), &FxDesc)))
+			return;
+		//CEffect::FX_DESC FxDesc{};
+		//FxDesc.vInitPos = (_float3)GET_POS + (_float3)(m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 150.f);
+		FxDesc.vInitPos = BATTLE_POS + _float3(0.f, 0.f, -50.f);
+		FxDesc.vInitRot = CUtils::Make_Degree_FromDir({0.f, 0.f, -1.f});
+		//FxDesc.pSocketMatrix = &m_EffectSocket;
+
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale rect B"), &FxDesc)))
+			return;
+			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale rect B"), &FxDesc)))
+
 		return;
 	}
 
@@ -641,7 +652,8 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 			if (abs(m_fSeqEventTime - 4.f) < fTimeDelta * 2.f)
 			{
 				m_pGameInstance->Restore_FirstTimer(.1f);
-
+				
+				
 				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_lunch time logo test"))))
 					return;
 
@@ -1519,26 +1531,26 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 
 		// 망토 잡기
-		Fill_HardCutSet(newAction, 4.5f);
+		Fill_HardCutSet(newAction, 5.7f);
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .12f, 1.f });
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { .7f, 9.5f, -53.f });
 		newAction.fFOVY = 30.f;
 		m_CamSeq.push_back(newAction);
 
-		Fill_InterpolateCutSet(newAction, 4.5f, EASE_OUT_FAST, .7f);
+		Fill_InterpolateCutSet(newAction, 5.7f, EASE_OUT_FAST, .7f);
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .12f, 1.f });
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { .7f, 9.5f, -49.f });
 		m_CamSeq.push_back(newAction);
 
 		// 망토 던지기
-		Fill_InterpolateCutSet(newAction, 5.2f, EASE_INOUT_FAST, .5f);
+		Fill_InterpolateCutSet(newAction, 6.9f, EASE_INOUT_FAST, .5f);
 
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .12f, 1.f });
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { .7f, 8.3f, -54.3f });
 		newAction.fFOVY = 40.f;
 		m_CamSeq.push_back(newAction);
 
-		Fill_InterpolateCutSet(newAction, 5.7f, EASE_INOUT, 3.f);
+		Fill_InterpolateCutSet(newAction, 7.4f, EASE_INOUT, 1.2f);
 		m_CamSeq.push_back(newAction);
 
 	}
@@ -1896,23 +1908,10 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		m_CamSeq.push_back(newAction);
 
-		/*newAction.eCamPos = POS_ABSOLUTE;
-		newAction.vPos = BOSS_POS + _float3{ -15.f, -4.f, 20.f };
-		m_CamSeq.push_back(newAction);*/
-
 		//
 		Fill_InterpolateCutSet(newAction, 2.5f, EASE_INOUT, fDuration - 2.5f);
 		m_CamSeq.push_back(newAction);
 
-		//newAction.fTime = 2.5f;
-		//newAction.eCamCut = CUT_INTERPOLATE;
-
-		//newAction.eEase = EASE_LINEAR;
-		//newAction.fInterpolateSpeed = fDuration - 2.5f;
-
-		//newAction.fFOVY = 55.f;
-		//newAction.eCamPos = POS_ABSOLUTE;
-		//newAction.vPos = BOSS_POS + _float3{ -15.f, -4.f, 20.f };
 
 	}
 	break;
