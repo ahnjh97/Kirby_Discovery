@@ -87,7 +87,7 @@
 #define ISDEFAULTFLOAT(floatValue) _bool(floatValue == -1.f)
 #define ISDEFAULTFLOAT3(float3Value) _bool(float3Value.x == -1.f && float3Value.y == -1.f && float3Value.z == -1.f)
 
-
+#define RATIO(curValue, minValue, maxValue) _float(((curValue) - (minValue)) / _float(((maxValue) - (minValue))))
 
 #define BEGIN(NAMESPACE)	namespace NAMESPACE {
 #define END					}

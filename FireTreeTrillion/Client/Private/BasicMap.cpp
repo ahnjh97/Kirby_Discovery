@@ -31,6 +31,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
 
     GameObjectDesc.fSpeedPerSec = 10.f;
     GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+    m_fMinX = GameObjectDesc.vMin.x;
 
     if (FAILED(__super::Initialize(&GameObjectDesc)))
         return E_FAIL;

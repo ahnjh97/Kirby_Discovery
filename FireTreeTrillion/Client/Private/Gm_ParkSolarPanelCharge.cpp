@@ -27,6 +27,9 @@ HRESULT CGm_ParkSolarPanelCharge::Initialize(void* pArg)
 	if (pArg != nullptr)
 		Desc = (GAMEOBJECT_DESC*)pArg;
 
+	m_iGimmickIndex = Desc->iShaderVars;
+	Desc->iShaderVars = 6;
+
 	if (FAILED(__super::Initialize(Desc)))
 		return E_FAIL;
 
@@ -207,6 +210,9 @@ void CGm_ParkSolarPanelCharge::Render_IMGUI()
 	
 	if (m_IsInteraction) ImGui::Text(u8"Gm_ParkSolarPanelCharge :: IsInteraction : TRUE");
 	else ImGui::Text(u8"Gm_ParkSolarPanelCharge :: IsInteraction : FALSE");
+
+	string strGimmickIndex = "Index :" + to_string(m_iGimmickIndex);
+	ImGui::Text(strGimmickIndex.c_str());
 }
 #endif
 

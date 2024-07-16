@@ -48,7 +48,6 @@ HRESULT CHUD_BossHpBar::Initialize(void* pArg)
 	CUtils::Set_Scaled_Matrix(m_NameMatrix, 240.f, 40.f, 1.f);
 	CUtils::Turn_OtherMatrix(m_NameMatrix, _float4(0.f, 0.f, 1.f, 0.f), 1.f, 3.5f);
 
-
 	CUtils::Set_State_Matrix(m_BarMatrix[UI_BARPLATE], CUtils::STATE_POSITION,
 		_float4(m_fX - (m_fSizeX * 0.3f),
 			-m_fY + (m_fSizeY * 0.1f), 
