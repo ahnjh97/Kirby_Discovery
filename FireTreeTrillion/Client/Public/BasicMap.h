@@ -25,6 +25,9 @@ public:
 	void Set_SamplingFactor(_uint iIndex, _float fSamplingFactor) { m_vecSamplingFactors[iIndex] = fSamplingFactor; }
 	void Reset_Time(_uint iIndex) { m_iMeshIndex = iIndex; m_fTime = 0; }
 
+	_uint Get_MinX() { return _uint(round(m_fMinX)); }
+	void Set_MinX(_uint iNum) { m_fMinX = _float(iNum); }
+
 private:
 	CBasicMap(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CBasicMap(const CBasicMap& rhs);
@@ -92,6 +95,8 @@ private:
 
 	unordered_set<string> m_setShadowDecos;
 	vector<CGameObject*> m_vecShadowObjects;
+
+	_float m_fMinX = {};
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);

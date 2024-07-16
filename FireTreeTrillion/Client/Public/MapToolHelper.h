@@ -55,6 +55,7 @@ private:
 	void	Menu_RallyPointInfo();
 	void	Menu_BlendDecoInfo();
 	void	Menu_LightInfo();
+	void	Menu_GimmickInfo();
 	void	Edit_Object();
 
 	// On Key/Mouse Input 
@@ -109,6 +110,7 @@ private:
 	_bool IsKickable(const string& _strModelName);
 	_bool IsTree(const string& _strModelName);
 	_bool IsBlendDeco(const string& _strModelName);
+	_bool IsParkGimmick(const string& _strModelName);
 
 	_bool RenameFile(const string& _strLevel, const string& _tempFileName, const string& _strCustom);
 	_bool AreFilesIdentical(const string& file1, const string& file2);
@@ -181,6 +183,8 @@ private:
 	vector<wstring> m_vecBaseNormalRequiredModels;
 
 	unordered_set<string> m_setNonEmissiveModels;
+
+	unordered_set<string> m_setParkGimmicks;
 
 	string m_strSelectedTxt;
 	string m_strCurModel;

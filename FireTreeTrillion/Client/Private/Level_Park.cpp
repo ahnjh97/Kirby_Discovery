@@ -19,6 +19,8 @@
 #include "SkySphere.h"
 #include "TransingStar.h"
 #include "Gm_DynamicField.h"
+#include "Gm_ParkSolarPanelOnce.h"
+#include "Gm_ParkSolarPanelCharge.h"
 
 #define MONSTER_TRIGGER(index) (index - 11)
 
@@ -358,29 +360,27 @@ HRESULT CLevel_Park::Ready_Map()
 			CGameObject::GAMEOBJECT_DESC tDesc{};
 			tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			tDesc.matWorld = matWorld;
+			tDesc.iShaderVars = _uint(round(vMin.x));
 
 			//동적 필드
-			if ("Gimmick_PkFunHouseDarkness01" == strModelName
-				|| "Gimmick_PkFunHouseDarkness04" == strModelName
-				|| "Gimmick_PkFunHouseDarkness05" == strModelName)
+			if ("Gimmick_PkFunHouseDarkness01" == strModelName || "Gimmick_PkFunHouseDarkness04" == strModelName
+				|| "Gimmick_PkFunHouseDarkness05" == strModelName || "Gimmick_PkFunHouse06" == strModelName)
 			{
 				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField"), 
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
 
-			if ("Gimmick_PkFunHouseDarkness02" == strModelName ||
-				"Gimmick_PkFunHouseDarkness03" == strModelName)
+			if ("Gimmick_PkFunHouseDarkness02" == strModelName || "Gimmick_PkFunHouseDarkness03" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField"),
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_SurpriseBoard"),
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
 
-			if ("Gimmick_PkFunHouse06" == strModelName ||
-				"Gimmick_PkFunHouse07" == strModelName)
+			if ("Gimmick_PkFunHouse07" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField"),
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_StaticField"),
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
@@ -958,28 +958,35 @@ HRESULT CLevel_Park::Ready_Objects()
 	list<CGameObject*>* GimmickList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"));
 	list<CGameObject*>* DFieldList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField"));
 
-	for (auto& Gimmick : *GimmickList)
+	for (auto& field : *DFieldList)
 	{
-		_float fDistance = { FLT_MAX };
-		CGameObject* pDField = { nullptr };
-		for (auto& DField : *DFieldList)
+		CGm_DynamicField* pField = dynamic_cast<CGm_DynamicField*>(field);
+		_uint iFieldIndex = pField->Get_GimmickIndex();
+
+		for (auto& gimmick : *GimmickList)
 		{
-			//기믹 & 필드 거리 검사
-			_float fNewDistance = m_pGameInstance->Compute_Distance(Gimmick, DField);
-			if (fDistance >= fNewDistance)
+			if (TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce") == gimmick->Get_PrototypeTag())
 			{
-				fDistance = fNewDistance;
-				pDField = DField;
+				CGm_ParkSolarPanelOnce* pGimmick = dynamic_cast<CGm_ParkSolarPanelOnce*>(gimmick);
+				_uint iGimmickIndex = pGimmick->Get_GimmickIndex();
+				if (iFieldIndex == iGimmickIndex) {
+					pField->Set_SolarPanelOnce(pGimmick);
+					break;
+				}
+			}
+			else if (TEXT("Prototype_GameObject_Gm_ParkSolarPanelCharge") == gimmick->Get_PrototypeTag())
+			{
+				CGm_ParkSolarPanelCharge* pGimmick = dynamic_cast<CGm_ParkSolarPanelCharge*>(gimmick);
+				_uint iGimmickIndex = pGimmick->Get_GimmickIndex();
+				if (iFieldIndex == iGimmickIndex) {
+					pField->Set_SolarPanelCharge(pGimmick);
+					break;
+				}
 			}
 		}
-
-		if ("SolarPanelOnce_NonAnim" == strModelName)
-		{
-			CGm_ParkSolarPanelOnce* pGimmickSP = dynamic_cast<CGm_ParkSolarPanelOnce*>(Gimmick);
-			dynamic_cast<CGm_DynamicField*>(pDField)->Set_SolarPanel(pGimmickSP);
-			continue;
-		}		
 	}
+
+	// m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT(""), 1); -> 내가 원하는 서프라이즈보드
 
 #pragma endregion
 
