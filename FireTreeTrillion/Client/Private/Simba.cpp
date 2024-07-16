@@ -67,7 +67,7 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_fHp = 250.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
-	m_eEyeState = SIMBAEYE_LONG;
+	m_eEyeState = SIMBAEYE_BIG;
 
 	m_iEyeMesh = m_pModelCom->Find_MeshIndex(string("BodyM__EyeC"));
 	m_iEyeLidMesh = m_pModelCom->Find_MeshIndex(string("EyelidM__EyelidC"));
@@ -127,6 +127,11 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_pRotationBone = m_pModelCom->Get_BonePtr("RotL");
 	Safe_AddRef(m_pRotationBone);
 	m_pRotationBoneMatrix = m_pRotationBone->Get_EditMatrixPtr();
+
+	m_pLeftHandBone = m_pModelCom->Get_BonePtr("L_HaveL");
+	Safe_AddRef(m_pLeftHandBone);
+	m_pRightHandBone = m_pModelCom->Get_BonePtr("R_HaveL");
+	Safe_AddRef(m_pRightHandBone);
 
 	m_setAppear1Anims = { Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait, Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait, 
 		Simba_DemoAppear1Cut4, Simba_DemoAppear1Cut4Wait };
@@ -383,6 +388,18 @@ void CSimba::Turn_RotationBoneMatrix(_float fAngle)
 
 	CUtils::Turn_OtherMatrix(RotationMatrix, _float4(1, 0, 0, 0), 1.f, fAngle);
 	*m_pRotationBoneMatrix = RotationMatrix;
+}
+
+void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
+{
+	_float4x4 matBoneWorld{};
+
+	if (Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx)
+		matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone);
+	else if (Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
+		matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone);
+
+	// 별 생성좀 하하하
 }
 
 HRESULT CSimba::Add_Components()
@@ -747,6 +764,8 @@ void CSimba::Free()
 	CEventCenter::Get_Instance()->Unsubscribe(this);
 	Safe_Release(m_pLipBone);
 	Safe_Release(m_pRotationBone);
+	Safe_Release(m_pLeftHandBone);
+	Safe_Release(m_pRightHandBone);
 	Safe_Release(m_pKirby);
 
 	__super::Free();

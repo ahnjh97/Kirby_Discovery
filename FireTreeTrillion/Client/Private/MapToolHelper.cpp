@@ -284,6 +284,10 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	// Emissive가 입혀져 있지만, Emissive용 Pass로 하고 싶지 않은 모델들
 	m_setNonEmissiveModels = {};
 
+	// ParkGimmick
+	m_setParkGimmicks = { "SolarPanelOnce_NonAnim", "SolarPanelCharge_NonAnim", "Gimmick_PkFunHouseDarkness01", "Gimmick_PkFunHouseDarkness02",
+		"Gimmick_PkFunHouseDarkness03", "Gimmick_PkFunHouseDarkness04", "Gimmick_PkFunHouseDarkness05", "Gimmick_PkFunHouse06" };
+
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
 	s_vecLightInfo.resize(CMapToolObject::LIGHT_END);
@@ -333,6 +337,7 @@ void CMapToolHelper::Late_Tick(_float fTimeDelta)
 		Menu_RallyPointInfo();
 		Menu_BlendDecoInfo();
 		Menu_LightInfo();
+		Menu_GimmickInfo();
 	}
 
 	// 스타일 복원
@@ -1065,6 +1070,41 @@ void CMapToolHelper::Menu_LightInfo()
 	ImGui::End();
 }
 
+void CMapToolHelper::Menu_GimmickInfo()
+{
+	if (false == IsParkGimmick(m_strCurModel))
+		return;
+
+	ImGui::Begin("ParkGimmick");
+
+	if (m_pPickedObject->Get_PrototypeTag() == TEXT("Prototype_GameObject_MapToolObject"))
+	{
+		CMapToolObject* pMapToolObject = dynamic_cast<CMapToolObject*>(m_pPickedObject);
+		s_iTriggerIdx = pMapToolObject->Get_TriggerIndex();
+
+		ImGui::SetCursorPosX(33);
+		ImGui::Text("INDEX");
+		ImGui::SetNextItemWidth(80);
+
+		if (ImGui::Combo("##Index", &s_iTriggerIdx, s_triggerIndices, IM_ARRAYSIZE(s_triggerIndices)))
+			pMapToolObject->Set_TriggerIndex(s_iTriggerIdx);
+	}
+	else
+	{
+		CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(m_pPickedObject);
+		s_iTriggerIdx = round(pBasicMap->Get_MinX());
+
+		ImGui::SetCursorPosX(33);
+		ImGui::Text("INDEX");
+		ImGui::SetNextItemWidth(80);
+
+		if (ImGui::Combo("##Index", &s_iTriggerIdx, s_triggerIndices, IM_ARRAYSIZE(s_triggerIndices)))
+			pBasicMap->Set_MinX(s_iTriggerIdx);
+	}
+
+	ImGui::End();
+}
+
 void CMapToolHelper::Edit_Object()
 {
 	if (nullptr == m_pPickedObject)
@@ -1361,6 +1401,12 @@ void CMapToolHelper::Save_Level()
 		_uint iShaderVars = object->Get_ShaderVars();
 		_float fRimWidth = object->Get_RimWidth();
 
+		if (true == IsParkGimmick(strModelName))
+		{
+			CMapToolObject* pMapToolObj = dynamic_cast<CMapToolObject*>(object);
+			iShaderVars = pMapToolObj->Get_TriggerIndex();
+		}
+
 		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
 		outputFile.write(strModelName.c_str(), iStrLength);
 		outputFile.write(reinterpret_cast<const char*>(&matWorld), sizeof(_float4x4));
@@ -1489,6 +1535,12 @@ void CMapToolHelper::Load_Level()
 		tDesc.iShaderVars = iShaderVars;
 		tDesc.fRimWidth = fRimWidth;
 		wstring wstrGameObjectTag = TEXT("MapToolObject");
+
+		if (true == IsParkGimmick(strModelName))
+		{
+			tDesc.iTriggerIndex = iShaderVars;
+			tDesc.iShaderVars = 6;
+		}
 
 		if (FAILED(m_pGameInstance->Add_Clone(LEVEL_TOOL_MAP, TEXT("Layer_Parse"), TEXT("Prototype_GameObject_") + wstrGameObjectTag, &tDesc)))
 		{
@@ -1777,6 +1829,13 @@ _bool CMapToolHelper::IsBlendDeco(const string& _strModelName)
 		return true;
 
 	return false;
+}
+
+_bool CMapToolHelper::IsParkGimmick(const string& _strModelName)
+{
+	if (m_setParkGimmicks.end() != m_setParkGimmicks.find(_strModelName))
+		return true;
+	return _bool();
 }
 
 _bool CMapToolHelper::RenameFile(const string& _strLevel, const string& _tempFileName, const string& _strCustom)
@@ -2200,6 +2259,12 @@ _bool CMapToolHelper::Save_Map(const string& _strLevel, vector<CGameObject*>& _v
 
 		_float3 vMin{ FLT_MAX, FLT_MAX, FLT_MAX }, vMax{ -FLT_MAX, -FLT_MAX , -FLT_MAX };
 		pModel->Find_MinMax(vMin, vMax);
+
+		if (true == IsParkGimmick(strModelName))
+		{
+			CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(map);
+			vMin.x = pBasicMap->Get_MinX();
+		}
 
 		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
 		outputFile.write(strModelName.c_str(), iStrLength);
