@@ -16,6 +16,7 @@ HWND g_hWnd;
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 CMainApp* pMainApp;
+CGameInstance* pGameInstance;
 
 // 이 코드 모듈에 들어 있는 함수의 정방향 선언입니다.
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -56,7 +57,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	if (nullptr == pMainApp)
 		return FALSE;
 
-	CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
+	pGameInstance = CGameInstance::Get_Instance();
 	Safe_AddRef(pGameInstance);
 
 	if (FAILED(pGameInstance->Add_Timer(TEXT("Timer_Default"))))
@@ -207,102 +208,106 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             int wmId = LOWORD(wParam);
             // 메뉴 선택을 구문 분석합니다.
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(g_hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
+            if (pGameInstance->Get_IsReadyGameStart())
+			{
+				switch (wmId)
+				{
+				case IDM_ABOUT:
+					DialogBox(g_hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+					break;
+				case IDM_EXIT:
+					DestroyWindow(hWnd);
+					break;
 
-            /* ============= LEVEL 이동 ============= */
-            case GAMEPLAY: // LEVEL_GAMEPLAY
-            {
-                hr = pMainApp->Open_Level(LEVEL_GAMEPLAY);
-                CHECK_FAILED(hr);
-            }
-            break;
-            case TOOL_FX:
-            {
-                hr = pMainApp->Open_Level(LEVEL_TOOL_FX);
-                CHECK_FAILED(hr);
-            }
-            break;
-            case TOOL_UI: // LEVEL_TOOL_UI
-            {
-                hr = pMainApp->Open_Level(LEVEL_TOOL_UI);
-                CHECK_FAILED(hr);
-            }
-            break;
-            case TOOL_ANIM: // LEVEL_TOOL_ANIM
-            {
-                hr = pMainApp->Open_Level(LEVEL_TOOL_ANIM);
-                CHECK_FAILED(hr);
-            }
-            break;
-            case TOOL_MAP:
-            {
-                hr = pMainApp->Open_Level(LEVEL_TOOL_MAP);
-                CHECK_FAILED(hr);
-            }
-            break;
-            case INTRO:
-            {
-                hr = pMainApp->Open_Level(LEVEL_INTRO);
-                CHECK_FAILED(hr);
-            }
-            break;
-            case RACING:
-            {
-                hr = pMainApp->Open_Level(LEVEL_RACING);
-                CHECK_FAILED(hr);
-            }
-            break;
-            case DEEDEEDEE:
-            {
-                hr = pMainApp->Open_Level(LEVEL_DEEDEEDEE);
-                CHECK_FAILED(hr);
-            }
-            break;
-            case TOWN:
-            {
-                hr = pMainApp->Open_Level(LEVEL_TOWN);
-                CHECK_FAILED(hr);
-            }
-            break;
-            case PARTTIME:
-            {
-                hr = pMainApp->Open_Level(LEVEL_PARTTIME);
-                CHECK_FAILED(hr);
-            }
-            break;
-            case PARK:
-            {
-                hr = pMainApp->Open_Level(LEVEL_PARK);
-                CHECK_FAILED(hr);
-            }
-            break;
-            case SIMBA:
-            {
-                hr = pMainApp->Open_Level(LEVEL_SIMBA);
-                CHECK_FAILED(hr);
-            }
-            break;
-            case FINALBOSS:
-            {
-                hr = pMainApp->Open_Level(LEVEL_FINALBOSS);
-                CHECK_FAILED(hr);
-            }
-            break;
-            case FINALE:
-            {
-                hr = pMainApp->Open_Level(LEVEL_FINALE);
-                CHECK_FAILED(hr);
-            }
-            break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
+				/* ============= LEVEL 이동 ============= */
+				case GAMEPLAY: // LEVEL_GAMEPLAY
+				{
+					hr = pMainApp->Open_Level(LEVEL_GAMEPLAY);
+					CHECK_FAILED(hr);
+				}
+				break;
+				case TOOL_FX:
+				{
+					hr = pMainApp->Open_Level(LEVEL_TOOL_FX);
+					CHECK_FAILED(hr);
+				}
+				break;
+				case TOOL_UI: // LEVEL_TOOL_UI
+				{
+					hr = pMainApp->Open_Level(LEVEL_TOOL_UI);
+					CHECK_FAILED(hr);
+				}
+				break;
+				case TOOL_ANIM: // LEVEL_TOOL_ANIM
+				{
+					hr = pMainApp->Open_Level(LEVEL_TOOL_ANIM);
+					CHECK_FAILED(hr);
+				}
+				break;
+				case TOOL_MAP:
+				{
+					hr = pMainApp->Open_Level(LEVEL_TOOL_MAP);
+					CHECK_FAILED(hr);
+				}
+				break;
+				case INTRO:
+				{
+					hr = pMainApp->Open_Level(LEVEL_INTRO);
+					CHECK_FAILED(hr);
+				}
+				break;
+				case RACING:
+				{
+					hr = pMainApp->Open_Level(LEVEL_RACING);
+					CHECK_FAILED(hr);
+				}
+				break;
+				case DEEDEEDEE:
+				{
+					hr = pMainApp->Open_Level(LEVEL_DEEDEEDEE);
+					CHECK_FAILED(hr);
+				}
+				break;
+				case TOWN:
+				{
+					hr = pMainApp->Open_Level(LEVEL_TOWN);
+					CHECK_FAILED(hr);
+				}
+				break;
+				case PARTTIME:
+				{
+					hr = pMainApp->Open_Level(LEVEL_PARTTIME);
+					CHECK_FAILED(hr);
+				}
+				break;
+				case PARK:
+				{
+					hr = pMainApp->Open_Level(LEVEL_PARK);
+					CHECK_FAILED(hr);
+				}
+				break;
+				case SIMBA:
+				{
+					hr = pMainApp->Open_Level(LEVEL_SIMBA);
+					CHECK_FAILED(hr);
+				}
+				break;
+				case FINALBOSS:
+				{
+					hr = pMainApp->Open_Level(LEVEL_FINALBOSS);
+					CHECK_FAILED(hr);
+				}
+				break;
+				case FINALE:
+				{
+					hr = pMainApp->Open_Level(LEVEL_FINALE);
+					CHECK_FAILED(hr);
+				}
+				break;
+
+				default:
+					return DefWindowProc(hWnd, message, wParam, lParam);
+				}
             }
         }
         break;

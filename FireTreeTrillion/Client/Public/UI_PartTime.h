@@ -58,7 +58,9 @@ private:
 	void						Compute_Timer(_float fTimeDelta);
 	void						Compute_TimerBar(_float fTimeDelta);
 	void						Compute_TimeScore(_float fTimeDelta);
+
 	void						Change_TimeTexures(_float _fTime);
+	void						Repose_ScoreTextures();
 
 	void						Render_READY();
 	void						Render_GO();

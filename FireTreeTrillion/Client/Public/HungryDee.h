@@ -31,13 +31,14 @@ private:
 public:
 	static pair<_float3, vector<WAITING_INFO>> m_WaitingList;
 
-	//이 두 변수는 싱글톤으로 뺄 거여요~
-	static _int		m_iWatingNum;
-	static _float	m_fWaitingTime;
+	////이 두 변수는 싱글톤으로 뺄 거여요~
+	//static _int		m_iWatingNum;
+	//static _float	m_fWaitingTime;
 
 	//현재 내가 기다려야 할 위치를 준다.
 	_float3			Get_DestWaitingPos() { return m_WaitingList.first + m_WaitingList.second[m_iMyIdx].vPos; }
-	_float			Get_WaitingTime() {return m_fWaitingTime;}
+	//_float			Get_WaitingTime() { return m_fWaitingTime; }
+	_float			Get_WaitingTime();
 	_bool			IsFrontWaiting() { return m_iMyIdx == WAITPOS_FRONT; }
 	_bool			IsSecondWaiting() { return m_iMyIdx == (WAITPOS_FRONT + 1); }
 

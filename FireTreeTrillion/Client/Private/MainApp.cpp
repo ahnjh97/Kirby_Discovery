@@ -47,9 +47,6 @@ HRESULT CMainApp::Initialize()
 	CCollisionCenter::Get_Instance()->Initialize();
 	CEventCenter::Get_Instance()->Initialize();
 
-	if (FAILED(Ready_Object_For_Static()))
-		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -59,7 +56,9 @@ void CMainApp::Tick(_float fTimeDelta)
 
 	CCollisionCenter::Get_Instance()->Collision_Tick(fTimeDelta);
 
-	if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_LALT, KEY_PRESS))
+	if (m_pGameInstance->Get_IsReadyGameStart())
+	{
+		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_LALT, KEY_PRESS))
 	{
 		if (CGameInstance::Get_Instance()->Get_DIKeyState(DIK_GRAVE, KEY_DOWN))
 		{
@@ -132,6 +131,7 @@ void CMainApp::Tick(_float fTimeDelta)
 			if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_PARK))))
 				return;
 		}
+	}
 	}
 
 	m_pGameInstance->LateTick_Engine(fTimeDelta);
@@ -219,6 +219,7 @@ HRESULT CMainApp::Ready_Fonts()
 HRESULT CMainApp::Ready_Object_For_Static()
 {
 	HRESULT hr(S_OK);
+
 
 	return S_OK;
 }

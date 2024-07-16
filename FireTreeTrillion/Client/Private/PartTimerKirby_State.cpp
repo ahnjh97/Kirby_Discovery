@@ -171,8 +171,11 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 				_float4 vPrePos = pAlbaKirby->Get_PrePosition();
 				pTransform->Set_State(CTransform::STATE_POSITION, _float4(vPrePos.x, vPrePos.y, vPrePos.z, 1.f));
 
-				_float4 vOriginPos = m_pFood->Get_OriginPosition();
-				m_pFood->Get_TransformCom()->Set_State(CTransform::STATE_POSITION, vOriginPos);
+				if (nullptr != m_pFood)
+				{
+					_float4 vOriginPos = m_pFood->Get_OriginPosition();
+					m_pFood->Get_TransformCom()->Set_State(CTransform::STATE_POSITION, vOriginPos);
+				}
 			}
 			pAlbaKirby->Render_Food(false, PARTTIME_ITEM::ITEM_END);
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_SELECT, 50.f, true, true);

@@ -78,6 +78,8 @@ HRESULT CLevel_Logo::Ready_StaticObject()
 	hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
 	CHECK_FAILED(hr);
 
+	m_pGameInstance->Set_IsReadyGameStart(true);
+
 	return S_OK;
 }
 

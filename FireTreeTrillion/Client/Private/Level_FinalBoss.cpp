@@ -32,6 +32,10 @@ HRESULT CLevel_FinalBoss::Initialize()
 	hr = __super::Initialize();
 	CHECK_FAILED(hr);
 
+	// 환경맵을 추가한다.
+	hr = Add_EnvMap();
+	CHECK_FAILED(hr);
+
 	hr = Ready_Lights();
 	CHECK_FAILED(hr);
 
@@ -768,6 +772,41 @@ HRESULT CLevel_FinalBoss::Ready_UI()
 	return S_OK;
 }
 
+HRESULT CLevel_FinalBoss::Add_EnvMap()
+{
+	HRESULT hr;
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Level_0_Env"),
+		TEXT("Com_Texture1"), (CComponent**)&m_pEnvTexture[TYPE_ENV]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_BRDF_LUT"),
+		TEXT("Com_Texture2"), (CComponent**)&m_pEnvTexture[TYPE_LUT]);
+	CHECK_FAILED(hr);
+
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_RandomNormal"),
+		TEXT("Com_Texture3"), (CComponent**)&m_pEnvTexture[TYPE_NORMAL]);
+	CHECK_FAILED(hr);
+
+	// 환경맵을 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_ENV], "g_EnvTexture")))
+		return E_FAIL;
+
+	//LUT 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_LUT], "g_LUTTexture")))
+		return E_FAIL;
+
+	//Normal 던진다.
+	if (FAILED(m_pGameInstance->Bind_DeferredTexture(m_pEnvTexture[TYPE_NORMAL], "g_RandomNormalTexture")))
+		return E_FAIL;
+
+	_bool	bDeepShadow = true;
+	if (FAILED(m_pGameInstance->Bind_DeferredRawValue("g_bDeepShadow", &bDeepShadow, sizeof(_bool))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 CLevel_FinalBoss* CLevel_FinalBoss::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CLevel_FinalBoss* pInstance = new CLevel_FinalBoss(pDevice, pContext);
@@ -786,6 +825,8 @@ void CLevel_FinalBoss::Free()
 	m_pGameInstance->Clear_EventCallBack();
 	__super::Free();
 
+	for (auto& tex : m_pEnvTexture)
+		Safe_Release(tex);
 }
 
 

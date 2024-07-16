@@ -19,28 +19,28 @@ private:
 	virtual ~CUI_PartTimeResult() = default;
 
 public:
-	virtual HRESULT					Initialize_Prototype()						override;
-	virtual HRESULT					Initialize(void* pArg)						override;
-	virtual _int					Tick(_float fTimeDelta)						override;
-	virtual void					Late_Tick(_float fTimeDelta)				override;
-	virtual HRESULT					Render()									override;
+	virtual HRESULT		Initialize_Prototype()						override;
+	virtual HRESULT		Initialize(void* pArg)						override;
+	virtual _int		Tick(_float fTimeDelta)						override;
+	virtual void		Late_Tick(_float fTimeDelta)				override;
+	virtual HRESULT		Render()									override;
 #ifdef _DEBUG
-	virtual void					Render_IMGUI()								override;
+	virtual void		Render_IMGUI()								override;
 #endif
 
-	void							Render_Digits();
-	void							Render_TotalScore();
-	void							Render_Font();
+	void				Render_Digits();
+	void				Render_TotalScore();
+	void				Render_Font();
 
-	void							Initialize_TexturePos();
-	void							Set_Score(_float _fScore) { m_fScore = _fScore; }
+	void				Initialize_TexturePos();
+	void				Set_Score(_float _fScore) { m_fScore = _fScore; }
 
-	// 10 11    타임 숫자
-	// 12 13 14 스코어 숫자
 private:
-	HRESULT							Add_Components();
-	_int							Change_ScoreTextures(_int iNum);
-	HRESULT							Bind_ShaderResources();
+	HRESULT				Add_Components();
+	_int				Change_ScoreTextures(_int iNum);
+	HRESULT				Bind_ShaderResources();
+	void				Repose_TotalScoreTextures();
+	void				Repose_ScoreTextures();
 
 private:
 	array<CTexture*, TEXTURECNT>	m_arrTexures;

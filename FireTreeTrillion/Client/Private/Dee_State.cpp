@@ -783,7 +783,7 @@ void CDee_NPC_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 
 	//참 가까이 접근했고, 버튼 누르면 대화 시작
 	//이것도 용건 있을 때 웃는 걸로 변경해야해
-	if (baseInfo.pDee->IsCloseToKirby() && m_pGameInstance->Get_KeyState(DIK_C, KEY_DOWN))
+	if (baseInfo.pDee->IsCloseToKirby() && m_pGameInstance->Get_KeyState(DIK_A, KEY_DOWN))
 	{
 		baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE);
 		baseInfo.pDee->Change_State(DEEANIM_CLERKTALK, 60.f, false, true);
