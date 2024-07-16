@@ -83,6 +83,8 @@ public:
 	_bool Get_RenderEyeLid() { return m_bRenderEyeLid; }
 	void Set_RenderEyeLid(_bool _bRenderEyeLid) { m_bRenderEyeLid = _bRenderEyeLid; }
 
+	void SetCamSequence(_uint iCamSeq);
+
 public:
 	virtual HRESULT Initialize_Prototype()			override;
 	virtual HRESULT Initialize(void* pArg)			override;
