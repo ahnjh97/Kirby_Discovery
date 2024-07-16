@@ -244,19 +244,19 @@ HRESULT CBuildingCluster_C::Add_Components()
 	CHECK_FAILED(hr);
 
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingA"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingC"),
 		TEXT("Com_ModelA1"), (CComponent**)&m_pModelCom[A1]);
 	CHECK_FAILED(hr);
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingA"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingC"),
 		TEXT("Com_ModelA2"), (CComponent**)&m_pModelCom[A2]);
 	CHECK_FAILED(hr);
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingA"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingC"),
 		TEXT("Com_ModelA3"), (CComponent**)&m_pModelCom[A3]);
 	CHECK_FAILED(hr);
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingA"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingC"),
 		TEXT("Com_ModelA4"), (CComponent**)&m_pModelCom[A4]);
 	CHECK_FAILED(hr);
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingA"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingC"),
 		TEXT("Com_ModelA5"), (CComponent**)&m_pModelCom[A5]);
 	CHECK_FAILED(hr);
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_MovableBuildingB"),

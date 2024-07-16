@@ -46,13 +46,19 @@ HRESULT CMapToolObject::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
+	m_vecLightInfo.resize(LIGHT_END);
+
 	m_iTriggerIndex = GameObjectDesc.iTriggerIndex;
 	m_iTriggerType = GameObjectDesc.iTriggerType;
 	m_iCamType = GameObjectDesc.iCamType;
 	m_fRadius = GameObjectDesc.fRadius;
 	m_RallyPoints = GameObjectDesc.RallyPoints;
 	m_strConnectedMonster = GameObjectDesc.strConnectedMonster;
-	
+
+	m_vecLightInfo[LIGHT_DIFFUSE] = GameObjectDesc.vDiffuse;
+	m_vecLightInfo[LIGHT_AMBIENT] = GameObjectDesc.vAmbient;
+	m_vecLightInfo[LIGHT_SPECULAR] = GameObjectDesc.vSpecular;
+
 	if (FAILED(Add_Components(GameObjectDesc.wstrModelName)))
 		return E_FAIL;
 	
@@ -63,6 +69,8 @@ HRESULT CMapToolObject::Initialize(void* pArg)
 
 		m_pOrbitingCamera->Set_OrbitingCameraPos(XMVectorSet(0, 0, -m_fRadius, 0));
 	}
+	else if (GameObjectDesc.wstrModelName == TEXT("LightBulb") && 0 == m_fRadius)
+		m_fRadius = 10.f;
 
 	m_pMapToolHelper = dynamic_cast<CMapToolHelper*>(m_pGameInstance->Get_GameObject(LEVEL_TOOL_MAP, TEXT("Layer_MapToolHelper")));
 	Safe_AddRef(m_pMapToolHelper);

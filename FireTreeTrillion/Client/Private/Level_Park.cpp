@@ -190,6 +190,48 @@ HRESULT CLevel_Park::Ready_Lights()
 
 	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 5000.f, 1200.f, 1.f});
 
+	string strFileName = "../../../objects_txt/Park_Lights.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : Park_Lights.txt"));
+		return E_FAIL;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	LIGHT_DESC			tPointLightDesc{};
+	tPointLightDesc.eType = LIGHT_DESC::TYPE_POINT;
+
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		tPointLightDesc.fRange = fRimWidth;
+		tPointLightDesc.vDiffuse = _float4(matWorld._11, matWorld._12, matWorld._13, 1.f);
+		tPointLightDesc.vAmbient = _float4(matWorld._21, matWorld._22, matWorld._23, 1.f);
+		tPointLightDesc.vSpecular = _float4(matWorld._31, matWorld._32, matWorld._33, 1.f);
+		tPointLightDesc.vPosition = _float4(matWorld._41, matWorld._42, matWorld._43, 1.f);
+
+		if (FAILED(CGameInstance::Get_Instance()->Add_Light(tPointLightDesc)))
+			return E_FAIL;
+	}
+
+	fileInput.close();
+
 	return S_OK;
 }
 
@@ -322,7 +364,7 @@ HRESULT CLevel_Park::Ready_Map()
 				|| "Gimmick_PkFunHouseDarkness04" == strModelName
 				|| "Gimmick_PkFunHouseDarkness05" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_Updown"), 
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField"), 
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
@@ -330,14 +372,15 @@ HRESULT CLevel_Park::Ready_Map()
 			if ("Gimmick_PkFunHouseDarkness02" == strModelName ||
 				"Gimmick_PkFunHouseDarkness03" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_LeftRight"),
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField"),
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
 
-			if ("Gimmick_PkFunHouse06" == strModelName)
+			if ("Gimmick_PkFunHouse06" == strModelName ||
+				"Gimmick_PkFunHouse07" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_FrontBack"),
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField"),
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
@@ -913,12 +956,12 @@ HRESULT CLevel_Park::Ready_Objects()
 
 	//기믹 오브젝트를 기준으로, 가장 가까운 거리를 검사하여 다이나믹 필드를 세팅
 	list<CGameObject*>* GimmickList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"));
+	list<CGameObject*>* DFieldList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField"));
+
 	for (auto& Gimmick : *GimmickList)
 	{
 		_float fDistance = { FLT_MAX };
 		CGameObject* pDField = { nullptr };
-
-		list<CGameObject*>* DFieldList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField_Updown"));
 		for (auto& DField : *DFieldList)
 		{
 			//기믹 & 필드 거리 검사
@@ -929,10 +972,13 @@ HRESULT CLevel_Park::Ready_Objects()
 				pDField = DField;
 			}
 		}
-		CGm_ParkSolarPanelOnce* pGimmickSP = dynamic_cast<CGm_ParkSolarPanelOnce*>(Gimmick);
-		dynamic_cast<CGm_DynamicField*>(pDField)->Set_SolarPanel(pGimmickSP);
-		if (nullptr == pGimmickSP)
+
+		if ("SolarPanelOnce_NonAnim" == strModelName)
+		{
+			CGm_ParkSolarPanelOnce* pGimmickSP = dynamic_cast<CGm_ParkSolarPanelOnce*>(Gimmick);
+			dynamic_cast<CGm_DynamicField*>(pDField)->Set_SolarPanel(pGimmickSP);
 			continue;
+		}		
 	}
 
 #pragma endregion

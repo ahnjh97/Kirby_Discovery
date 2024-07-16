@@ -7,6 +7,7 @@
 #include "Bone.h"
 #include "EventCenter.h"
 #include "Bone.h"
+#include "Camera_Main.h"
 
 CSimba::CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -25,6 +26,13 @@ void CSimba::InsertHitboxActivationTiming(SIMBA_ANIM eAnimIdx, vector<tuple<_flo
 		});
 
 	m_mapHitBoxTiming.insert_or_assign(eAnimIdx, _vecTimings);
+}
+
+void CSimba::SetCamSequence(_uint iCamSeq)
+{
+	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+	if (pCamera != nullptr)
+		pCamera->Make_Sequence(CCamera_Main::CAMSEQ(iCamSeq));
 }
 
 HRESULT CSimba::Initialize_Prototype()
@@ -124,6 +132,8 @@ HRESULT CSimba::Initialize(void* pArg)
 		Simba_DemoAppear1Cut4, Simba_DemoAppear1Cut4Wait };
 
 	m_setUndamagableAnims = { Simba_Death, Simba_DemoDeadCut1, Simba_DemoDeadCut2 };
+
+	SetCamSequence(CCamera_Main::SEQ_SIMBA_START);
 
 	return S_OK;
 }
@@ -634,12 +644,14 @@ void CSimba::OnNextDialog1(CGameObject* pObj)
 {
 	Change_State(Simba_DemoAppear1Cut4, 66.66f, false, true);
 	TransformToDefault(0);
+	SetCamSequence(CCamera_Main::SEQ_SIMBA_SHOULDER);
 }
 
 void CSimba::OnNextDialog2(CGameObject* pObj)
 {
 	Change_State(Simba_DemoAppear1Cut3, 66.66f, false, true);
 	TransformToDefault(0);
+	SetCamSequence(CCamera_Main::SEQ_SIMBA_FRONTVIEW);
 }
 
 void CSimba::OnLastDialog(CGameObject* pObj)
@@ -665,6 +677,11 @@ void CSimba::OnWave2Dead(CGameObject* pObj)
 	m_bRenderMant = true;
 	m_bRenderEyeLid = false;
 	Change_State(Simba_DemoAppear2Cut1, 66.66f, false, false);
+
+	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+	if (pCamera != nullptr)
+		pCamera->Make_Sequence(CCamera_Main::SEQ_SIMBA_BATTLESTART);
+
 	TransformToDefault(-0.3f);
 }
 

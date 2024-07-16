@@ -61,6 +61,8 @@ private:
 	_bool					m_IsInteraction = { FALSE };
 	_bool					m_bStartCharge = { FALSE };
 
+	vector<_uint>			m_vecPassIndices;
+
 public:
 	static CGm_ParkSolarPanelCharge* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

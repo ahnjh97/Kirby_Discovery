@@ -161,7 +161,9 @@ private:
 	_float				  m_fHitStopMaxTime = { 0.f };
 
 	_bool				  m_bMakeDisaster = { true };
-	_float3				m_vPrePos = {};
+	_float3				  m_vPrePos = {};
+
+	_bool				  m_bTest = { false };
 
 public:
 	static CFinaleKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

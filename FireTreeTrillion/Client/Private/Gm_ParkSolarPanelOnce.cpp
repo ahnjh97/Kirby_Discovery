@@ -41,6 +41,14 @@ HRESULT CGm_ParkSolarPanelOnce::Initialize(void* pArg)
 	//피직스 추가
 	m_pStaticActor = m_pNonAnimModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
 
+	for (_uint i = 0; i < m_pModelCom->Get_NumMeshes(); i++)
+	{
+		if (true == m_pModelCom->DoesTextureExist(TextureType_EMISSIVE, i))
+			m_vecPassIndices.push_back(ANIMMODEL_EMISSIVE);
+		else
+			m_vecPassIndices.push_back(ANIMMODEL_LINEAR_NORMAL_O);
+	}
+
 	//림라이트 OFF
 	//m_bRimLight = FALSE;
 
@@ -58,7 +66,7 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 	case STATE_CHARGE: //충전 중
 		if (TRUE == m_pModelCom->IsFinished()) //충전 중 애님 종료 시 충전 완료 상태 변경
 		{
-			m_pModelCom->Set_Animation(STATE_ONWAITSTART, 30.f, FALSE, TRUE);
+			m_pModelCom->Set_Animation(STATE_ONWAITSTART, 60.f, FALSE, TRUE);
 			m_eCurState = STATE_ONWAITSTART;
 		}
 		break;
@@ -66,7 +74,7 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 	case STATE_ONWAITSTART: //충전 시작
 		if (TRUE == m_pModelCom->IsFinished())
 		{
-			m_pModelCom->Set_Animation(STATE_ONWAIT, 30.f, FALSE, TRUE);
+			m_pModelCom->Set_Animation(STATE_ONWAIT, 60.f, FALSE, TRUE);
 			m_eCurState = STATE_ONWAIT;
 		}
 		break;
@@ -123,7 +131,7 @@ HRESULT CGm_ParkSolarPanelOnce::Render()
 		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
 		CHECK_FAILED(hr);
 
-		hr = m_pShaderCom->Begin(ANIMMODEL_LINEAR_NORMAL_O);
+		hr = m_pShaderCom->Begin(m_vecPassIndices[i]);
 		CHECK_FAILED(hr);
 
 		LAMP_TYPE eLampType = { LAMP_RED };

@@ -99,7 +99,6 @@ void CSimba_Appear2::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 				if(pCamera!= nullptr)
 					pCamera->Set_Target(pSimba->Get_TransformCom(), CCamera::TARGET_SECOND, CCamera::FOCUS_BOTH);
 
-
 				_vector vPos = m_pTransform->Get_State(CTransform::STATE_POSITION);
 				_vector vLook = XMVector3Normalize(m_pTransform->Get_State(CTransform::STATE_LOOK));
 				_vector vNewPos = vPos - vLook * 16.f;
