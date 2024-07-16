@@ -74,6 +74,7 @@ HRESULT CLevel_Racing::Initialize()
 	pTransingStar->Set_LargeColor(_float3(91.f / 255.f, 121.f / 255.f, 59.f / 255.f));
 	pTransingStar->Activate(CTransingStar::OPEN);
 
+	m_pGameInstance->Set_ColorSet_ByIndex(10);
 	return S_OK;
 }
 
