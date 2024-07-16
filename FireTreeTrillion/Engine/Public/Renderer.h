@@ -96,6 +96,8 @@ public:
 	void Set_ColorSet(COLORSET eColorSet);
 	void Set_ColorSet_ByIndex(_int iSetIdx);
 	void Save_ColorSet(string strTag, COLOR_DATA destColorData);
+
+
 	COLOR_DATA& Find_ColorSet(string strTag);
 
 	// 잠깐의 레디얼 블러를 세팅한다.
@@ -296,6 +298,7 @@ private:
 	_float m_fRealObjectBlack = { 1.f };
 
 	_bool  m_bMaptool = { false };
+	//_bool  m_bBloomSky = { false };
 
 
 #ifdef _DEBUG

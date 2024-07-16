@@ -12,6 +12,8 @@ matrix g_GodViewMatrix, g_GodProjMatrix;
 //색 보정 글로별 번수
 bool g_bApplyCorrection = true;
 
+bool g_bBloomSky = false;
+
 // 디퍼드 옵션 설정
 bool g_bRenderShadow = { true };
 bool g_bRenderSSAO = { true };
@@ -316,7 +318,13 @@ float4 Blur_X(float2 vTexCoord)
         //if (1.f == g_BlendTexture.Sample(ClampSampler, vUV).g)
         //    continue;
         
-        vOut += fWeight[6 + i] * (g_EffectTexture.Sample(ClampSampler, vUV) + g_SpecularTexture.Sample(ClampSampler, vUV));
+        vector vColor = g_EffectTexture.Sample(ClampSampler, vUV) + g_SpecularTexture.Sample(ClampSampler, vUV);
+        
+        //if(g_bBloomSky)
+        //    vColor += g_SkyTexture.Sample(ClampSampler, vUV);
+        
+        vOut += fWeight[6 + i] * vColor;
+        
         fTotal += fWeight[6 + i];
     }
 

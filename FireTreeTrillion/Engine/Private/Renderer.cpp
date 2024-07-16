@@ -1336,6 +1336,9 @@ HRESULT CRenderer::Render_EffectResult()
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SSAO"), "g_SSAOTexture")))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Sky"), "g_SkyTexture")))
+		return E_FAIL;
+
 	if (FAILED(m_pShader->Bind_RawValue("g_bMapTool", &m_bMaptool, sizeof(_bool))))
 		return E_FAIL;
 

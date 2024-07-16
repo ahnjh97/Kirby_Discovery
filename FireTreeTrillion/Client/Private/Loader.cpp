@@ -1613,6 +1613,9 @@ HRESULT CLoader::Add_FXTexture()
 	//안개
 	hr = Add_Texture(LEVEL_STATIC, "FX_Fog", "Map/Fog/Sand_%d.png", 4);	CHECK_FAILED(hr);
 
+	//스카이스피어
+	hr = Add_Texture(LEVEL_STATIC, "FX_FinalBoss_SkySphere", "SkySphere/SkySphere_Lab_Diffuse_%d.dds", 3);	CHECK_FAILED(hr);
+
 	return S_OK;
 }
 

@@ -62,9 +62,10 @@ HRESULT CLevel_FinalBoss::Initialize()
 	CHECK_FAILED(hr);
 	
 	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_FINAL);
-
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
+	_bool bBloomSky{ true };
+	m_pGameInstance->Bind_DeferredRawValue("g_bBloomSky", &bBloomSky, sizeof(_bool));
 
 	return S_OK;
 }
@@ -829,6 +830,9 @@ CLevel_FinalBoss* CLevel_FinalBoss::Create(ID3D11Device* pDevice, ID3D11DeviceCo
 
 void CLevel_FinalBoss::Free()
 {
+	_bool bBloomSky{ false };
+	m_pGameInstance->Bind_DeferredRawValue("g_bBloomSky", &bBloomSky, sizeof(_bool));
+
 	m_pGameInstance->Clear_EventCallBack();
 	__super::Free();
 

@@ -50,7 +50,7 @@ public:
 
 		SEQ_SIMBA_BATTLESTART,
 
-		SEQ_FINALBOSS_BATTLESTART,
+		SEQ_FINALBOSS_APPEAR,
 
 		//단독으로 하나를 즉시 넣어 사용하는 시퀀스
 		SEQ_ONE,

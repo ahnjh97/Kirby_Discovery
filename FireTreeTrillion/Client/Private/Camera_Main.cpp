@@ -249,16 +249,27 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_CamTriggerUpOffsets.reserve(LEVEL_END);
 	m_CamTriggerUpOffsets.resize(LEVEL_END);
 	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f };
-	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .4f };
+	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .1f };
 	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f , .4f , .5f , 0.2f , 0.2f, 0.f };
 
 
 	//별 이펙트 테스트용
-	CParticle::PARTICLE_DESC FXDesc{};
-	FXDesc.pSocketMatrix = &m_EffectSocket;
+	if (*m_pCurrentLevelID == LEVEL_FINALBOSS)
+	{
+		CEffect::FX_DESC FxDesc{};
+		FxDesc.pSocketMatrix = &m_EffectSocket;
 
-	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_night star test 2"), &FXDesc)))
-		return E_FAIL;
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_final sky"), &FxDesc)))
+			return E_FAIL;
+	}
+	if (*m_pCurrentLevelID == LEVEL_FINALE)
+	{
+		CParticle::PARTICLE_DESC FxDesc{};
+		FxDesc.pSocketMatrix = &m_EffectSocket;
+
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_night star test 2"), &FxDesc)))
+			return E_FAIL;
+	}
 
 	m_FinaleSeqATime =
 	{
@@ -405,12 +416,12 @@ void CCamera_Main::Check_FinaleTime(_float fTimeDelta)
 		//CEffect::FX_DESC FxDesc{};
 		//FxDesc.vInitPos = (_float3)GET_POS + (_float3)(m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 150.f);
 		FxDesc.vInitPos = BATTLE_POS + _float3(0.f, 0.f, -50.f);
-		FxDesc.vInitRot = CUtils::Make_Degree_FromDir({0.f, 0.f, -1.f});
+		FxDesc.vInitRot = CUtils::Make_Degree_FromDir({ 0.f, 0.f, -1.f });
 		//FxDesc.pSocketMatrix = &m_EffectSocket;
 
 		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale rect B"), &FxDesc)))
 			return;
-			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale rect B"), &FxDesc)))
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale rect B"), &FxDesc)))
 
 		return;
 	}
@@ -653,8 +664,8 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 			if (abs(m_fSeqEventTime - 4.f) < fTimeDelta * 2.f)
 			{
 				m_pGameInstance->Restore_FirstTimer(.1f);
-				
-				
+
+
 				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_lunch time logo test"))))
 					return;
 
@@ -1079,7 +1090,7 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 
 	//카메라 보는 기준점 위로 올려주는 놈
 	if (*m_pCurrentLevelID == LEVEL_PARTTIME
-		|| *m_pCurrentLevelID == LEVEL_FINALE
+		|| *m_pCurrentLevelID == LEVEL_FINALBOSS
 		|| *m_pCurrentLevelID == LEVEL_FINALE
 		)
 	{
@@ -1646,6 +1657,24 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	}
 	break;
 
+#pragma endregion
+
+#pragma region 에피리스
+	case SEQ_FINALBOSS_APPEAR:
+	{
+		//이벤트 호출
+		m_fSeqEventTime = 5.f;
+
+		CAMACTION newAction = {};
+		Fill_HardCutSet(newAction, 0.f);
+
+		//Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 1.f);
+
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 16.4f, 25.7f, 25.75f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { .16f, -.08f, -1.f });
+		m_CamSeq.push_back(newAction);
+	}
+	break;
 #pragma endregion
 
 #pragma region 피날레
@@ -2369,6 +2398,7 @@ void CCamera_Main::Ready_Dialog3_Leongar(CGameObject* pNotifier)
 
 void CCamera_Main::Ready_Cam_FinalBoss(CGameObject* pNotifier)
 {
+	Make_Sequence(SEQ_FINALBOSS_APPEAR);
 }
 
 void CCamera_Main::Start_ShutterSeq(CGameObject* pNotifier)
@@ -2432,9 +2462,9 @@ void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
 	m_pTransformCom->Move(vDir);
 
 
-//컷신용 dof 위치 갱신
+	//컷신용 dof 위치 갱신
 
-	//피날레
+		//피날레
 	if (0 < m_iCurSceneIdx)
 	{
 		//커비
@@ -2719,6 +2749,11 @@ void CCamera_Main::Subscribe_Events()
 
 	func = bind(&CCamera_Main::Ready_Monsters_Leongar, this, placeholders::_1);
 	CEventCenter::Get_Instance()->Subscribe(KEVENT_SIMBA_APPEAR_END, this, func);
+
+
+	//최종보스 컷
+	func = bind(&CCamera_Main::Ready_Cam_FinalBoss, this, placeholders::_1);
+	CEventCenter::Get_Instance()->Subscribe(KEVENT_FINALBOSS_APPEAR, this, func);
 
 }
 

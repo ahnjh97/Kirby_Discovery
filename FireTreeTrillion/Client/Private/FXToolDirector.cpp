@@ -2175,8 +2175,15 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 		else if (m_eSelectedProperty == KF_MASKUVANGLE)
 			vValueRange = { -10.f, 10.f };
 
-		if (DragFloat3("Value", m_vKFPopupValue, .01f, vValueRange.x, vValueRange.y, "%.2f"))
+		if (DragFloat3("Value", m_vKFPopupValue, .01f, vValueRange.x, vValueRange.y, "%.3f"))
 		{
+			if (m_eSelectedProperty == KF_SCALE)
+			{
+				m_vKFPopupValue[0] = m_vKFPopupValue[0] < 0.f ? .001f : m_vKFPopupValue[0];
+				m_vKFPopupValue[1] = m_vKFPopupValue[1] < 0.f ? .001f : m_vKFPopupValue[1];
+				m_vKFPopupValue[2] = m_vKFPopupValue[2] < 0.f ? .001f : m_vKFPopupValue[2];
+			}
+
 			m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].vValue = _float3{ m_vKFPopupValue[0], m_vKFPopupValue[1], m_vKFPopupValue[2] };
 			m_FXs[m_iSelectedFXIdx]->Late_Tick(_fTimeDelta);
 			m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
@@ -2463,6 +2470,8 @@ HRESULT CFXToolDirector::Ready_FXPrototypeVector()
 	Ready_Ingredient(strModelTag + L"FX", &m_FXBufferList, pStaticProtoMap);
 
 	Ready_Ingredient(strModelTag + L"PopStar", &m_FXBufferList, pStaticProtoMap);
+
+	Ready_Ingredient(strModelTag + L"SkySphere", &m_FXBufferList, pStaticProtoMap);
 
 	return S_OK;
 }
