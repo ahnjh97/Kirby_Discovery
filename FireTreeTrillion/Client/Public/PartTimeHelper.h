@@ -34,6 +34,10 @@ public:
 	_int				Get_CurDeeWaitingNum() { return m_iDeeWaitingNum; }
 	void				Add_WaitingNum() { m_iDeeWaitingNum++; }
 
+	// 이펙트
+	void				Set_EffectPos(_float3 vPos) { m_vEffectPos = vPos; }
+	_float3				Get_EffectPos() const { return m_vEffectPos; }
+
 	// 문제 냅니다.
 	void				Make_RandomItem();
 	// 문제 잘 풀었는지 검사합니다.
@@ -56,6 +60,7 @@ private:
 	PARTTIME_ITEM				m_eFood	= PARTTIME_ITEM::CAKE;
 	_float						m_fScore = 0.f;
 	_int						m_iDeeWaitingNum = { 0 };
+	_float3						m_vEffectPos = _float3();
 
 public:
 	virtual void Free() override;

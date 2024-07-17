@@ -77,6 +77,7 @@ private:
 	_bool			m_bRenderDialog = { false };
 
 	class CUI_PartTimeDee* m_pDialogUI = { nullptr };
+	_float3			m_vPosUI = _float3();
 
 private:
 	HRESULT Add_Components();

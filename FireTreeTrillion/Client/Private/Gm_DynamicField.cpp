@@ -72,71 +72,84 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 	if (FAILED(SetUp_ShaderInfo(wstrModelTag))) //셰이더 정보 로드 및 세팅
 		return E_FAIL;
 
+#pragma region SET DYNAMICFIELD_TYPE
+
 	//모델 별 타입 지정
 	if (TEXT("Gimmick_PkFunHouseDarkness01") == wstrModelTag
 		|| TEXT("Gimmick_PkFunHouseDarkness04") == wstrModelTag
 		|| TEXT("Gimmick_PkFunHouseDarkness05") == wstrModelTag)
+	{
 		m_eDFieldType = DFMOVE_UPDOWN;
+		m_eGimmickType = GIMMICK_SPONCE;
+	}
 
-	else if (TEXT("Gimmick_PkFunHouseDarkness02") == wstrModelTag || TEXT("Gimmick_PkFunHouseDarkness03") == wstrModelTag)
-		m_eDFieldType = DFMOVE_LEFTRIGHT;
+	if (TEXT("Gimmick_PkFunHouseDarkness02") == wstrModelTag)
+	{
+		m_eDFieldType = DFMOVE_RIGHT;
+		m_eGimmickType = GIMMICK_SURPRISE;
+	}
 
-	else if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
+	if (TEXT("Gimmick_PkFunHouseDarkness03") == wstrModelTag)
+	{
+		m_eDFieldType = DFMOVE_LEFT;
+		m_eGimmickType = GIMMICK_SURPRISE;
+	}
+
+	if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
+	{
 		m_eDFieldType = DFMOVE_FRONTBACK;
+		m_eGimmickType = GIMMICK_SPCHARGE;
+	}
 
-	else if (TEXT("Gimmick_PkFunHouse07") == wstrModelTag)
+	if (TEXT("Gimmick_PkFunHouse07") == wstrModelTag)
+	{
 		m_eDFieldType = DFMOVE_NONE;
+		m_pStaticActor = m_pModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
+	}
 
-	m_IsInteraction = FALSE;
+#pragma endregion
+	
+	else
+	{
+		m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
+		m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+	}
 
-	//피직스 추가
-	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
-	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+	m_bIsInteraction = FALSE;
 
 	return S_OK;
 }
 
 _int CGm_DynamicField::Tick(_float fTimeDelta)
 {
-	//if (TRUE == m_bDead)
-	//	return OBJ_DEAD;
+	if (TRUE == m_bDead)
+		return OBJ_DEAD;
 
-	if (nullptr == m_pSolarPanelOnce && nullptr == m_pSolarPanelCharge && nullptr == m_pSurpriseBoard)
-		return OBJ_NOEVENT;
-
-	if (nullptr == m_pSolarPanelOnce)
-		return OBJ_NOEVENT;
-
-	CGm_ParkSolarPanelOnce::PANELONCE_STATE eGimmickState = m_pSolarPanelOnce->Get_AnimState();
-
-	if (CGm_ParkSolarPanelOnce::STATE_ONWAIT == eGimmickState)
+	switch (m_eGimmickType)
 	{
-		_int a = 0;
+	case GIMMICK_SPONCE:
+		if (-1 == m_eSPOnceState)
+			return OBJ_NOEVENT;
 
-		switch (m_eDFieldType)
-		{
-		case DFMOVE_UPDOWN:
-		{
-			_float3 vCurWorldPos = GET_POS;
-			if (100.f <= vCurWorldPos.y) //특정 위치 도착할 경우
-			{
-				vCurWorldPos.y = 100.f;
-				return OBJ_NOEVENT;
-			}
-
-			m_pTransformCom->Go_Up(fTimeDelta);
-
-		}
+		m_eSPOnceState = m_pSolarPanelOnce->Get_CurState();
 		break;
 
-		case DFMOVE_LEFTRIGHT: //SurprisedBoard 기믹
-			break;
+	case GIMMICK_SPCHARGE:
+		if (-1 == m_eSPChargeState)
+			return OBJ_NOEVENT;
 
-		case DFMOVE_FRONTBACK:
-			break;
-		case DFMOVE_NONE: break;
-		}
+		m_eSPChargeState = m_pSolarPanelCharge->Get_CurState();
+		break;
+
+	case GIMMICK_SURPRISE:
+		break;
+
+	case GIMMICK_NONE:
+	default:
+		break;
 	}
+
+	Movement_Field(fTimeDelta);
 
 	if (nullptr != m_pDynamicActor) // 트랜스폼 월드 행렬에 맞춰서 다이나믹 액터도 같이 움직이도록 
 		m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));
@@ -205,12 +218,13 @@ void CGm_DynamicField::Render_IMGUI()
 	switch (m_eDFieldType)
 	{
 	case DFMOVE_UPDOWN:			ImGui::Text(u8"DFMOVE_UPDOWN"); break;
-	case DFMOVE_LEFTRIGHT:		ImGui::Text(u8"DFMOVE_LEFTRIGHT"); break;
+	case DFMOVE_LEFT:		ImGui::Text(u8"DFMOVE_LEFT"); break;
+	case DFMOVE_RIGHT:		ImGui::Text(u8"DFMOVE_RIGHT"); break;
 	case DFMOVE_FRONTBACK:		ImGui::Text(u8"DFMOVE_FRONTBACK"); break;
 	case DFMOVE_NONE:	default: ImGui::Text(u8"DFMOVE_NONE"); break;
 	}
 
-	if (m_IsInteraction) ImGui::Text(u8"Gm_DynamicFiled :: IsInteraction : TRUE");
+	if (m_bIsInteraction) ImGui::Text(u8"Gm_DynamicFiled :: IsInteraction : TRUE");
 	else ImGui::Text(u8"Gm_DynamicFiled :: IsInteraction : FALSE");
 
 	string strGimmickIndex = "Index :" + to_string(m_iGimmickIndex);
@@ -236,10 +250,6 @@ void CGm_DynamicField::Render_IMGUI()
 
 void CGm_DynamicField::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	if (nullptr != m_pSolarPanelOnce)
-		m_pSolarPanelOnce->Collision(eContent, pObject);
-
-	m_IsInteraction = TRUE;
 }
 
 HRESULT CGm_DynamicField::Add_Components(const wstring& _wstrModelTag)
@@ -309,6 +319,155 @@ HRESULT CGm_DynamicField::SetUp_ShaderInfo(const wstring& _wstrModelTag)
 	return S_OK;
 }
 
+void CGm_DynamicField::Apply_Quake(_float _fTimeDelta, _float _fQuakeDuration, _float _fShakeIntensity)
+{
+	m_fQuakeTime += _fTimeDelta;
+	if (m_fQuakeTime <= _fQuakeDuration) //지진 지속시간 체크
+	{
+		_float fShakeValue = _fShakeIntensity * std::sin(m_fQuakeTime * 70.0f); //지진 강도(진폭) 설정
+		if (fShakeValue > 0)
+			m_pTransformCom->Go_Up(fShakeValue * _fTimeDelta);
+
+		else
+			m_pTransformCom->Go_Down(-fShakeValue * _fTimeDelta);
+	}
+	/*
+	else
+	{
+		m_bIsQuake = FALSE;
+		m_fQuakeTime = 0.f;
+		vCurWorldPos.y = 36.963f;
+	}
+	*/
+}
+
+_int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
+{
+	_float3 vCurPos;
+	switch (m_eDFieldType)
+	{
+	case DFMOVE_UPDOWN:
+		vCurPos = GET_POS;
+
+		if (CGm_ParkSolarPanelOnce::STATE_ONWAIT == m_eSPOnceState) //충전 완료
+		{
+			if (56.963f <= vCurPos.y) //56.963 > 36.963 
+			{
+				vCurPos.y = 56.963f; //위치 보정
+				m_bIsQuake = TRUE;
+
+				if (m_bIsQuake)
+					Apply_Quake(_fTimeDelta, 1.f, 0.1f);
+
+				else
+				{
+					m_bIsQuake = FALSE;
+					m_fQuakeTime = 0.f;
+				}
+			}
+
+			else
+				m_pTransformCom->Go_Up(_fTimeDelta * 0.3f);
+		}
+		break;
+
+		//깜놀보드 충돌거리 조건에 따라 DFMOVE_LEFT, DFMOVE_RIGHT를 체크
+	case DFMOVE_LEFT:
+		vCurPos = GET_POS;
+
+		if (m_bIsInteraction) //RayCast 상호작용 검사
+		{
+			/*
+			if (34.851f <= vCurPos.x) //24.851 > 34.851
+			{
+				vCurPos.x = 34.851f;
+				m_bIsQuake = TRUE;
+
+				if (m_bIsQuake)
+					Apply_Quake(fTimeDelta, 1.f, 0.1f);
+			}
+
+			else
+				m_pTransformCom->Go_Right(fTimeDelta * 0.5f);
+			*/
+		}
+		break;
+	case DFMOVE_RIGHT:
+		vCurPos = GET_POS;
+
+		if (m_bIsInteraction) //RayCast 상호작용 검사
+		{
+			if (34.851f <= vCurPos.x) //24.851 > 34.851
+			{
+				vCurPos.x = 34.851f;
+				m_bIsQuake = TRUE;
+
+				if (m_bIsQuake)
+					Apply_Quake(_fTimeDelta, 1.f, 0.1f);
+			}
+
+			else
+				//여기에다가 해당 애님의 상태가 종료되었을 경우 (index:: 5번, 6번)
+				m_pTransformCom->Go_Right(_fTimeDelta * 0.25f); //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
+		}
+		//특정 애님 상태일 경우, 필드도 비활성 움직임 처리
+		/*
+		if ()
+		{
+			if (24.851f >= vCurPos.x)
+			{
+				vCurPos.x = 24.851f;
+				m_bIsQuake = TRUE;
+
+				if (m_bIsQuake)
+					Apply_Quake(_fTimeDelta, 1.f, 0.1f);
+			}
+
+			else
+				m_pTransformCom->Go_Left(_fTimeDelta * 0.5f);
+		}
+		*/
+
+		break;
+
+	case DFMOVE_FRONTBACK:
+		vCurPos = GET_POS;
+
+		//충전 완료 시에 빠르게 활성화
+		if (CGm_ParkSolarPanelCharge::STATE_CHARGEDWAIT == m_eSPChargeState)
+		{
+			if (-77.289f >= vCurPos.z) //-67.289 > -77.289
+			{
+				vCurPos.z = -77.289f;
+				m_bIsQuake = TRUE;
+
+				if (m_bIsQuake)
+					Apply_Quake(_fTimeDelta, 1.f, 0.1f);
+			}
+
+			else
+				m_pTransformCom->Go_Backward(_fTimeDelta * 2.f);
+		}
+		//충전 해제 상태동안은 천천히 이동 후 비활성화 처리
+		if (CGm_ParkSolarPanelCharge::STATE_DECREASES == m_eSPChargeState) //충전 해제
+		{
+			if (-67.289f <= vCurPos.z)
+			{
+				vCurPos.z = -67.289f;
+				return OBJ_NOEVENT;
+			}
+
+			else
+				m_pTransformCom->Go_Straight(_fTimeDelta * 0.2f); //난이도 너프함..
+		}
+		break;
+
+	case DFMOVE_NONE:
+	default:
+		break;
+	}
+}
+
 CGm_DynamicField* CGm_DynamicField::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CGm_DynamicField* pInstance = new CGm_DynamicField(pDevice, pContext);
@@ -340,6 +499,7 @@ void CGm_DynamicField::Free()
 	__super::Free();
 
 	m_pGameInstance->ReleaseActor(m_pDynamicActor);
+	m_pGameInstance->ReleaseActor(m_pStaticActor);
 
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);

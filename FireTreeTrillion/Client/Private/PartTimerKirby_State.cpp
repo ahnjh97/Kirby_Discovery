@@ -34,6 +34,14 @@ void CPartTimerKirby_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float 
 		PARTTIME_ITEM curItem = Get_CurrentFood(pAlbaKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION));
 		if (CPartTimeHelper::Get_Instance()->Check_Item(curItem))
 		{
+#pragma region 이펙트WI
+			CEffect::FX_DESC FXDesc{};
+			_float3 vPos = CPartTimeHelper::Get_Instance()->Get_EffectPos();
+			FXDesc.vInitPos = _float3(vPos.x, vPos.y + 10.f, vPos.z); // 고정 위치 >> UI 위치값
+			FXDesc.vInitScale = { 1.2f, 1.2f, 1.2f }; // 고정 사이즈
+			pAlbaKirby->Add_Effect("UI_FoodGame_CorrectCircle", FXDesc, true);
+#pragma endregion
+
 			_uint uItem = static_cast<_uint>(curItem);
 			RenderOff_Food(uItem);
 			pAlbaKirby->Render_Food(true, curItem);
@@ -42,10 +50,10 @@ void CPartTimerKirby_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float 
 		else
 		{
 			CTransform* pTransform = pAlbaKirby->Get_TransformCom();
-			pAlbaKirby->Set_PrePosition(pTransform->Get_State(CTransform::STATE_POSITION));
+			_float4 vPos = pTransform->Get_State(CTransform::STATE_POSITION);
+			pAlbaKirby->Set_PrePosition(vPos);
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_INCORRECTSTART, 50.f, false, true);
 		}
-
 	}
 }
 
@@ -71,12 +79,8 @@ void CPartTimerKirby_Idle_State::RenderOff_Food(_uint uFoodIdx)
 {
 	_uint uCurLevel = *CGameInstance::Get_Instance()->Get_CurrentLevelID();
 	auto food = m_pGameInstance->Get_GameObject(uCurLevel, TEXT("Layer_Food"), uFoodIdx);
-	//auto listFood = m_pGameInstance->Get_List(uCurLevel, TEXT("Layer_Food"));
-	//for (auto& food : *listFood)
-	//{
 	CPartTimeFood* pFood = static_cast<CPartTimeFood*>(food);
 	pFood->Set_Render(false);
-	//}
 }
 
 CPartTimerKirby_Idle_State* CPartTimerKirby_Idle_State::Create()
@@ -164,7 +168,7 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 		case CPartTimerKirby::HANDOVERSHORT:
 		case CPartTimerKirby::HANDOVERSHORTL:
 		{
-			RenderOn_AllFood();
+			RenderOn_AllFood(pAlbaKirby);
 		}
 		case CPartTimerKirby::FOODSHOP_INCORRECT:
 		{
@@ -264,8 +268,6 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 						vPos = pTransformFood->Get_State(CTransform::STATE_POSITION);
 						vPos += XMVector3Normalize(vLook) * 0.9f - pTransform->Get_State_Vector(CTransform::STATE_RIGHT) * 0.2f;
 						FXDesc.vInitPos = _float3(vPos.x, vPos.y + 0.3f, vPos.z);
-						vAngle = { 90.f, fAngleDiff, 0.f };
-						FXDesc.vInitRot = vAngle;
 						pAlbaKirby->Add_Effect("FoodGame_IncorrectBbong", FXDesc);
 					}
 				}
@@ -301,14 +303,24 @@ void CPartTimerKirby_Grab_State::OnStateExit()
 {
 }
 
-void CPartTimerKirby_Grab_State::RenderOn_AllFood()
+void CPartTimerKirby_Grab_State::RenderOn_AllFood(CPartTimerKirby* pKirby)
 {
 	_uint uCurLevel = *CGameInstance::Get_Instance()->Get_CurrentLevelID();
 	auto listFood = m_pGameInstance->Get_List(uCurLevel, TEXT("Layer_Food"));
 	for (auto& food : *listFood)
 	{
 		CPartTimeFood* pFood = static_cast<CPartTimeFood*>(food);
-		pFood->Set_Render(true);
+		if (false == pFood->Get_Render())
+		{
+			pFood->Set_Render(true);
+#pragma region 이펙트WI
+			_float4 vPos = pFood->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.vInitPos = _float3(vPos.x, vPos.y + 0.1f, vPos.z);
+			FXDesc.vInitScale = { 1.f, 1.f, 1.f }; // 고정 사이즈
+			pKirby->Add_Effect("FoodGame_MakeFood", FXDesc, true);
+#pragma endregion
+		}
 	}
 }
 
