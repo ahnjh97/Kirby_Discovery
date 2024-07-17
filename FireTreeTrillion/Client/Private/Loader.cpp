@@ -39,6 +39,8 @@
 #include "Particle.h"
 #include "MultiEffect.h"
 
+#include "Fire.h"
+
 //애님 툴
 #include "AnimToolHelper.h"
 #include "AnimToolObject.h"
@@ -413,6 +415,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("KirbyBomb"), CKirbyBomb);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimerKirby"), CPartTimerKirby);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BulbFlare"), CBulbFlare);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Fire"), CFire);
 
 	// Deform
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Car"), CCar);
@@ -1626,6 +1630,10 @@ HRESULT CLoader::Add_FXTexture()
 	//스카이스피어
 	hr = Add_Texture(LEVEL_STATIC, "FX_FinalBoss_SkySphere", "SkySphere/SkySphere_Lab_Diffuse_%d.dds", 3);	CHECK_FAILED(hr);
 
+	//Dissolve
+	hr = Add_Texture(LEVEL_STATIC, "FX_FireDissolve", "Dissolve/FireDissolve.png");	CHECK_FAILED(hr);
+
+
 	return S_OK;
 }
 
@@ -1720,6 +1728,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FXRecoveryRoot", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXThunderLine", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXMeteoDash", TYPE_NONANIM);
+
+		//공통이펙트 - YW
+		m_vecModelInfo.emplace_back("Cube", TYPE_NONANIM);
 
 
 		//m_vecModelInfo.emplace_back("DimensionLaser", TYPE_NONANIM, 1.f, 180.f);

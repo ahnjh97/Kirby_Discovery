@@ -230,6 +230,7 @@
     <ClInclude Include="..\public\Finale_SpecialDebris_A.h" />
     <ClInclude Include="..\Public\Finale_SpecialDebris_B.h" />
     <ClInclude Include="..\Public\Finale_SpecialDebris_C.h" />
+    <ClInclude Include="..\Public\Fire.h" />
     <ClInclude Include="..\Public\GhostGordo.h" />
     <ClInclude Include="..\Public\GhostGordo_State.h" />
     <ClInclude Include="..\Public\Deform.h" />
@@ -479,6 +480,7 @@
     <ClCompile Include="..\private\Finale_SpecialDebris_A.cpp" />
     <ClCompile Include="..\Private\Finale_SpecialDebris_B.cpp" />
     <ClCompile Include="..\Private\Finale_SpecialDebris_C.cpp" />
+    <ClCompile Include="..\Private\Fire.cpp" />
     <ClCompile Include="..\Private\GhostGordo.cpp" />
     <ClCompile Include="..\Private\GhostGordo_State.cpp" />
     <ClCompile Include="..\Private\Deform.cpp" />

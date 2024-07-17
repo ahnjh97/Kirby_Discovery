@@ -58,6 +58,7 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_float m_fBoosterTime = { 0.f };
 	static	CKirbyCar_Boost_State* Create();
 	virtual void				  Free() override;
 };
@@ -79,6 +80,7 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_float m_fBoosterTime = { 0.f };
 	static	CKirbyCar_Jump_State* Create();
 	virtual void				  Free() override;
 };

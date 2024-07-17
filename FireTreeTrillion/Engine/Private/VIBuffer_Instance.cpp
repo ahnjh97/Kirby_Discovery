@@ -463,6 +463,7 @@ void CVIBuffer_Instance::Gravity(_float fTimeDelta)
 void CVIBuffer_Instance::Orbit(_float fTimeDelta, VTXMATRIX* pVertices)
 {
 
+
 }
 
 void CVIBuffer_Instance::Assemble(_float fTimeDelta, VTXMATRIX* pVertices)
