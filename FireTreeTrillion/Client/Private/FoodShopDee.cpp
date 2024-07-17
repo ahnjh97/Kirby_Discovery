@@ -65,6 +65,14 @@ _int CFoodShopDee::Tick(_float fTimeDelta)
 	//공통된 디 관련 변수를 업데이트 - 초기화한다
 	Dee_SystemTick(m_fTimeDelta);
 
+	static _float fAccTime = 0.f;
+	fAccTime += m_fTimeDelta;
+	if (fAccTime >= 1.f)
+	{
+		bOpenEffect = false;
+		fAccTime = 0.f;
+	}
+
 	return OBJ_NOEVENT;
 }
 
@@ -148,7 +156,8 @@ void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 {
 	m_bIsKirbyInZone = true;
 	m_fResetHiTime = 5.f;
-	
+
+
 	static _bool bOnce = false;
 	//DEE NPC 상호작용 시, MessageWindow UI 출력
 	if (bOnce == false && m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
@@ -164,6 +173,29 @@ void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 		pCameraMain->Lock_All({ 12.f, 30.f, 1.9f }, { 0.09f, -0.18f, 0.98f }, true);
 
 		bOnce = true;
+	}
+
+	if (false == bOpenEffect)// && bOnce == true)
+	{
+#pragma region 이펙트WI
+		_float4 _vPosition = GET_POS;
+		_float4 vNewPosition = _float4{ _vPosition.x, _vPosition.y, _vPosition.z, 1.f };
+
+		_matrix ViewMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW);
+		_matrix ProjMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
+		_matrix ComMatrix = ViewMatrix * ProjMatrix;
+
+		_float4 vDeePos = XMVector3TransformCoord(XMLoadFloat4(&vNewPosition), ComMatrix);
+
+		_float3 vUIPos = _float3{ (vDeePos.x * g_iWinSizeX) * 0.5f, (vDeePos.y * g_iWinSizeY) * 0.5f, 0.f };
+
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.vInitPos = _float3{ vUIPos.x, vUIPos.y + 2.f, vUIPos.z };
+		FXDesc.vInitScale = { 0.6f, 0.6f, 0.6f };
+		Add_Effect("UI_NPC", FXDesc, true);
+#pragma endregion
+
+		bOpenEffect = true;
 	}
 }
 

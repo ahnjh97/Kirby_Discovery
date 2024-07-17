@@ -431,7 +431,6 @@ HRESULT CPartTimerKirby::Bind_ShaderResources()
 void CPartTimerKirby::OnNotify()
 {
 	// 여기서 특정 시간이 되면 처리해야하는 사항을 넣기.
-	// 특정 시간이면 땀 뻘뻘
 #pragma region 이펙트WI QZR 
 	//CEffect::FX_DESC FXDesc{};
 	//FXDesc.vInitPos = _float3(0.f, 0.f, 0.f);
