@@ -76,6 +76,20 @@ _int CSurprisedBoard::Tick(_float fTimeDelta)
 			m_pFSM->Update(this, fTimeDelta);
 	}
 
+	if (false == m_bNotified && nullptr != m_pDynamicField)
+	{
+		_uint iAnimIndex = Get_State();
+		if (POP_OUT_L == iAnimIndex || POP_OUT_R == iAnimIndex)
+		{
+			if (0.45f < m_arrModelCom[m_eModelColor]->Get_AnimRatio())
+			{
+				m_bNotified = true;
+				CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(m_pDynamicField);
+				pDynamicField->Set_Interaction(true);
+			}
+		}
+		
+	}
 	return OBJ_NOEVENT;
 }
 
@@ -173,24 +187,19 @@ void CSurprisedBoard::Render_IMGUI()
 
 void CSurprisedBoard::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+	if (true == m_bActivated)
+		return;
+
+	m_bActivated = true;
+
 	if (eContent == CCollisionCenter::CONTENT_TRIGGER)
 	{
 		_uint uState = __super::Get_State();
-		if (uState == WAIT_L) {
-			Change_State(CSurprisedBoard::PREPOP_OUT_L, 50.f, false, true);
-			if (nullptr != m_pDynamicField) {
-				CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(m_pDynamicField);
-				pDynamicField->Set_Interaction(true);
-			}
-		}
+		if (uState == WAIT_L)
+			Change_State(CSurprisedBoard::PREPOP_OUT_L, 60.f, false, false);
 			
-		else if (uState == WAIT_R) {
-			Change_State(CSurprisedBoard::PREPOP_OUT_R, 50.f, false, true);
-			if (nullptr != m_pDynamicField) {
-				CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(m_pDynamicField);
-				pDynamicField->Set_Interaction(true);
-			}
-		}
+		else if (uState == WAIT_R)
+			Change_State(CSurprisedBoard::PREPOP_OUT_R, 60.f, false, false);
 	}
 }
 

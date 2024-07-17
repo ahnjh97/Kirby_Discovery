@@ -77,6 +77,9 @@ private:
 	_float4x4			m_matWorld = _float4x4();
 
 	CGameObject*		m_pDynamicField = { nullptr };
+	_float				m_fTime = {};
+	_bool				m_bActivated = { false };
+	_bool				m_bNotified = { false };
 
 public:
 	static CSurprisedBoard* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
