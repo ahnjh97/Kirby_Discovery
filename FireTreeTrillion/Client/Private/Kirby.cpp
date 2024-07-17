@@ -1565,11 +1565,10 @@ void CKirby::RayCast_DynamicFields()
 	_vector vLook = XMVectorSet(0, 0, 1, 0);
 	_vector vRight = XMVectorSet(1, 0, 0, 0);
 
-	_float fLookOffset = 5.f;
-
+	_float fLookOffset = -7.5f;
 	_float fActivationDistance = 6.f;
 
-	if (20.f <= m_pControllerCom->RayCastToStaticActor(-vRight, 20.f, vLook * fLookOffset))
+	if (20.f <= m_pControllerCom->RayCastToStaticActor(-vRight, 20.f, vLook))
 	{
 		_float fLeftDis = m_pControllerCom->RayCastToDynamicActor(-vRight, vLook * fLookOffset);
 		if (fActivationDistance > fLeftDis)
@@ -1586,7 +1585,7 @@ void CKirby::RayCast_DynamicFields()
 		}
 	}
 
-	if (20.f <= m_pControllerCom->RayCastToStaticActor(vRight, 20.f, vLook * fLookOffset))
+	if (20.f <= m_pControllerCom->RayCastToStaticActor(vRight, 20.f, vLook))
 	{
 		_float fRightDis = m_pControllerCom->RayCastToDynamicActor(vRight, vLook * fLookOffset);
 		if (fActivationDistance > fRightDis)

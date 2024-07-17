@@ -62,34 +62,34 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 {
 	//if (TRUE == m_bDead)
 	//	return OBJ_DEAD;
-		_float fAnimRatio = { 0.f };
-		switch (m_eCurState)
+	_float fAnimRatio = { 0.f };
+	switch (m_eCurState)
+	{
+	case STATE_OFFWAIT: //충전 전 대기
+		break;
+	case STATE_CHARGE: //충전 중
+		if (TRUE == m_pModelCom->IsFinished()) //충전 중 애님 종료 시 충전 완료 상태 변경
 		{
-		case STATE_OFFWAIT: //충전 전 대기
-			break;
-		case STATE_CHARGE: //충전 중
-			if (TRUE == m_pModelCom->IsFinished()) //충전 중 애님 종료 시 충전 완료 상태 변경
-			{
-				m_pModelCom->Set_Animation(STATE_ONWAITSTART, 60.f, FALSE, TRUE);
-				m_eCurState = STATE_ONWAITSTART;
-			}
-			break;
-
-		case STATE_ONWAITSTART: //충전 시작
-			fAnimRatio = m_pModelCom->Get_AnimRatio();
-			if (0.15f < fAnimRatio)
-			{
-				m_eCurState = STATE_ONWAIT;
-				m_pModelCom->Set_Animation(STATE_ONWAIT, 60.f, TRUE, TRUE);
-			}
-			break;
-		
-		case STATE_ONWAIT: //충전 완료
-			break; 
-		case STATE_NONE:	
-			break;
-			default:	break;
+			m_pModelCom->Set_Animation(STATE_ONWAITSTART, 60.f, FALSE, TRUE);
+			m_eCurState = STATE_ONWAITSTART;
 		}
+		break;
+
+	case STATE_ONWAITSTART: //충전 시작
+		fAnimRatio = m_pModelCom->Get_AnimRatio();
+		if (0.15f < fAnimRatio)
+		{
+			m_eCurState = STATE_ONWAIT;
+			m_pModelCom->Set_Animation(STATE_ONWAIT, 60.f, TRUE, TRUE);
+		}
+		break;
+		
+	case STATE_ONWAIT: //충전 완료
+		break; 
+	case STATE_NONE:	
+		break;
+		default:	break;
+	}
 
 	return OBJ_NOEVENT;
 }

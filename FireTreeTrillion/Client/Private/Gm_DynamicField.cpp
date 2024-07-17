@@ -116,21 +116,18 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 	}
 
 	m_IsInteraction = FALSE;
-	
 
 	return S_OK;
 }
 
 _int CGm_DynamicField::Tick(_float fTimeDelta)
 {
-	//if (TRUE == m_bDead)
-	//	return OBJ_DEAD;
+	if (TRUE == m_bDead)
+		return OBJ_DEAD;
 
-	if (nullptr == m_pSolarPanelOnce && nullptr == m_pSolarPanelCharge && nullptr == m_pSurpriseBoard)
-		return OBJ_NOEVENT;
+	CGm_ParkSolarPanelOnce::PANELONCE_STATE eSPOnceState;
+	CGm_ParkSolarPanelCharge::PANELCHARGE_STATE eSPChargeState;
 
-	CGm_ParkSolarPanelOnce::PANELONCE_STATE eSPOnceState = {};
-	CGm_ParkSolarPanelCharge::PANELCHARGE_STATE eSPChargeState = {};
 	switch (m_eGimmickType)
 	{
 	case GIMMICK_SPONCE:
@@ -149,15 +146,18 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 		break;
 	}
 
-	_float3 vCurWorldPos = GET_POS;
+	_float3 vCurPos;
+	_float fMaxPosX;
 	switch (m_eDFieldType)
 	{
 	case DFMOVE_UPDOWN:
+		vCurPos = GET_POS;
+
 		if (CGm_ParkSolarPanelOnce::STATE_ONWAIT == eSPOnceState) //충전 완료
 		{
-			if (56.963f <= vCurWorldPos.y) //56.963 > 36.963 
+			if (56.963f <= vCurPos.y) //56.963 > 36.963 
 			{
-				vCurWorldPos.y = 56.963f; //위치 보정
+				vCurPos.y = 56.963f; //위치 보정
 				m_IsQuake = TRUE;
 
 				if (m_IsQuake)
@@ -175,24 +175,56 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 		}
 		break;
 
-	//SurprisedBoard 기믹 :: Left & Right 분리 필요
+	//깜놀보드 충돌거리 조건에 따라 DFMOVE_LEFT, DFMOVE_RIGHT를 체크
 	case DFMOVE_LEFT: 
-		if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
+		vCurPos = GET_POS;
+
+		if (m_IsInteraction) //RayCast 상호작용 검사
 		{
-			m_pTransformCom->Go_Left(fTimeDelta * 0.75f);
+			/*
+			if (34.851f <= vCurPos.x) //24.851 > 34.851
+			{
+				vCurPos.x = 34.851f;
+				m_IsQuake = TRUE;
+
+				if (m_IsQuake)
+					Apply_Quake(fTimeDelta, 1.f, 0.1f);
+			}
+
+			else
+				m_pTransformCom->Go_Right(fTimeDelta * 0.5f);
+			*/
+		}
+		break;
+	case DFMOVE_RIGHT:
+		vCurPos = GET_POS;
+
+		if (m_IsInteraction) //RayCast 상호작용 검사
+		{
+			if (34.851f <= vCurPos.x) //24.851 > 34.851
+			{
+				vCurPos.x = 34.851f;
+				m_IsQuake = TRUE;
+
+				if (m_IsQuake)
+					Apply_Quake(fTimeDelta, 1.f, 0.1f);
+			}
+
+			else
+				//여기에다가 해당 애님의 상태가 종료되었을 경우 (index:: 5번, 6번)
+				m_pTransformCom->Go_Right(fTimeDelta * 0.25f); //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
 		}
 		break;
 
-	case DFMOVE_RIGHT:
-		break;
-
 	case DFMOVE_FRONTBACK:
+		vCurPos = GET_POS;
+
 		//충전 완료 시에 빠르게 활성화
 		if (CGm_ParkSolarPanelCharge::STATE_CHARGEDWAIT == eSPChargeState)
 		{
-			if (-77.289f >= vCurWorldPos.z) //-67.289 > -77.289
+			if (-77.289f >= vCurPos.z) //-67.289 > -77.289
 			{
-				vCurWorldPos.z = -77.289f;
+				vCurPos.z = -77.289f;
 				m_IsQuake = TRUE;
 
 				if (m_IsQuake)
@@ -205,9 +237,9 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 		//충전 해제 상태동안은 천천히 이동 후 비활성화 처리
 		if (CGm_ParkSolarPanelCharge::STATE_DECREASES == eSPChargeState) //충전 해제
 		{
-			if (-67.289f <= vCurWorldPos.z)
+			if (-67.289f <= vCurPos.z)
 			{
-				vCurWorldPos.z = -67.289f;
+				vCurPos.z = -67.289f;
 				return OBJ_NOEVENT;
 			}
 
@@ -320,7 +352,6 @@ void CGm_DynamicField::Render_IMGUI()
 
 void CGm_DynamicField::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	m_IsInteraction = TRUE;
 }
 
 HRESULT CGm_DynamicField::Add_Components(const wstring& _wstrModelTag)
