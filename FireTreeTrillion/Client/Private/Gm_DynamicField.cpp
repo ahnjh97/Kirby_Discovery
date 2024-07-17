@@ -76,13 +76,22 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 	if (TEXT("Gimmick_PkFunHouseDarkness01") == wstrModelTag
 		|| TEXT("Gimmick_PkFunHouseDarkness04") == wstrModelTag
 		|| TEXT("Gimmick_PkFunHouseDarkness05") == wstrModelTag)
+	{
 		m_eDFieldType = DFMOVE_UPDOWN;
+		m_eGimmickType = GIMMICK_SPONCE;
+	}
 
 	if (TEXT("Gimmick_PkFunHouseDarkness02") == wstrModelTag || TEXT("Gimmick_PkFunHouseDarkness03") == wstrModelTag)
-		m_eDFieldType = DFMOVE_LEFTRIGHT;
+	{
+		m_eDFieldType = DFMOVE_LEFT;
+		m_eGimmickType = GIMMICK_SURPRISE;
+	}
 
 	if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
+	{
 		m_eDFieldType = DFMOVE_FRONTBACK;
+		m_eGimmickType = GIMMICK_SPCHARGE;
+	}
 
 	if (TEXT("Gimmick_PkFunHouse07") == wstrModelTag)
 	{
@@ -97,6 +106,8 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 	}
 
 	m_IsInteraction = FALSE;
+	
+
 	return S_OK;
 }
 
@@ -107,40 +118,64 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 
 	if (nullptr == m_pSolarPanelOnce && nullptr == m_pSolarPanelCharge && nullptr == m_pSurpriseBoard)
 		return OBJ_NOEVENT;
+	CGm_ParkSolarPanelOnce::PANELONCE_STATE eSPOnceState = {};
+	CGm_ParkSolarPanelCharge::PANELCHARGE_STATE eSPChargeState = {};
 
-	if (nullptr == m_pSolarPanelOnce)
-		return OBJ_NOEVENT;
-
-	CGm_ParkSolarPanelOnce::PANELONCE_STATE eGimmickState = m_pSolarPanelOnce->Get_AnimState();
-
-	if (CGm_ParkSolarPanelOnce::STATE_ONWAIT == eGimmickState)
+	switch (m_eGimmickType)
 	{
-		_int a = 0;
+	case GIMMICK_SPONCE:
+		eSPOnceState = m_pSolarPanelOnce->Get_CurState();
+		break;
 
-		switch (m_eDFieldType)
-		{
-		case DFMOVE_UPDOWN:
+	case GIMMICK_SPCHARGE:
+		eSPChargeState = m_pSolarPanelCharge->Get_CurState();
+		break;
+
+	case GIMMICK_SURPRISE:
+		break;
+
+	case GIMMICK_NONE:
+	default:
+		break;
+	}
+
+	switch (m_eDFieldType)
+	{
+	case DFMOVE_UPDOWN:
+		if (CGm_ParkSolarPanelOnce::STATE_ONWAIT == eSPOnceState) //충전 완료
 		{
 			_float3 vCurWorldPos = GET_POS;
-			if (56.963f <= vCurWorldPos.y) //36.963 
+			if (56.963f <= vCurWorldPos.y) //56.963 > 36.963 
 			{
-				vCurWorldPos.y = 56.963;
+				vCurWorldPos.y = 56.963f;
 				return OBJ_NOEVENT;
 			}
 
 			m_pTransformCom->Go_Up(fTimeDelta);
-
 		}
 		break;
 
-		case DFMOVE_LEFTRIGHT: //SurprisedBoard 기믹
-			break;
+	case DFMOVE_LEFTRIGHT: //SurprisedBoard 기믹 :: Left & Right 분리 필요
+		break;
 
-		case DFMOVE_FRONTBACK:
-
-			break;
-		case DFMOVE_NONE: break;
+	case DFMOVE_FRONTBACK:
+		if (CGm_ParkSolarPanelCharge::STATE_DECREASES == eSPChargeState) //충전 완료 대기
+		{
+			_float3 vCurWorldPos = GET_POS;
+			if (-77.289f >= vCurWorldPos.z) //-67.289 > -77.289
+			{
+				//vCurWorldPos.z = 77.289f;
+				m_pTransformCom->Go_Straight(fTimeDelta);
+				
+				//return OBJ_NOEVENT;
+			}
+			m_pTransformCom->Go_Backward(fTimeDelta);
 		}
+		break;
+
+	case DFMOVE_NONE: 
+	default: 
+		break;
 	}
 
 	if (nullptr != m_pDynamicActor) // 트랜스폼 월드 행렬에 맞춰서 다이나믹 액터도 같이 움직이도록 
@@ -241,10 +276,7 @@ void CGm_DynamicField::Render_IMGUI()
 
 void CGm_DynamicField::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	if (nullptr != m_pSolarPanelOnce)
-		m_pSolarPanelOnce->Collision(eContent, pObject);
-
-	m_IsInteraction = TRUE;
+	m_bIsInteraction = TRUE;
 }
 
 HRESULT CGm_DynamicField::Add_Components(const wstring& _wstrModelTag)

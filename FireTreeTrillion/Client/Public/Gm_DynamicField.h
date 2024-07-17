@@ -13,6 +13,7 @@ class CGm_DynamicField final : public CPhysXObject
 {
 public: 
 	enum DYNAMICFILED_TYPE { DFMOVE_UPDOWN, DFMOVE_LEFTRIGHT, DFMOVE_FRONTBACK, DFMOVE_NONE };
+	enum GIMMICK_TYPE { GIMMICK_SPONCE, GIMMICK_SPCHARGE, GIMMICK_SURPRISE, GIMMICK_NONE };
 
 public:
 	void Set_SolarPanelOnce(class CGm_ParkSolarPanelOnce* _pSolarPanel);
@@ -56,17 +57,19 @@ private:
 	CShader*				m_pShaderCom = { nullptr };
 	CTexture*				m_pTextureCom = { nullptr };
 
-	PxRigidStatic*			m_pStaticActor = { nullptr };
-	PxRigidDynamic*			m_pDynamicActor = { nullptr };
-	CGm_ParkSolarPanelOnce* m_pSolarPanelOnce = { nullptr };
-	CGm_ParkSolarPanelCharge* m_pSolarPanelCharge = { nullptr };
-	CSurprisedBoard*		m_pSurpriseBoard = { nullptr };
+	PxRigidStatic*				m_pStaticActor = { nullptr };
+	PxRigidDynamic*				m_pDynamicActor = { nullptr };
+	CGm_ParkSolarPanelOnce*		m_pSolarPanelOnce = { nullptr };
+	CGm_ParkSolarPanelCharge*	m_pSolarPanelCharge = { nullptr };
+	CSurprisedBoard*			m_pSurpriseBoard = { nullptr };
 
 	DYNAMICFILED_TYPE		m_eDFieldType = { DFMOVE_NONE };
+	GIMMICK_TYPE			m_eGimmickType = { GIMMICK_NONE };
 
 	_float					m_fTime = { 0.f };
 	
-	_bool					m_IsInteraction = { FALSE };
+	_bool					m_bIsInteraction = { FALSE };
+	//_bool					m_bIs
 	_uint					m_iGimmickIndex = {};
 
 public:

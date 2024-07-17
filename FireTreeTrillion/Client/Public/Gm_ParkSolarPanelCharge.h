@@ -12,7 +12,7 @@ BEGIN(Client)
 class CGm_ParkSolarPanelCharge final : public CPhysXObject
 {
 public: //괄호의 숫자는 실제 인게임의 기믹 애님 순서. index는 아님
-	enum ANIM_STATE {	STATE_CHARGE, STATE_CHARGEDSTART, STATE_CHARGEDWAIT, //충전 중(3), 충전 완료(4), 충전 완료 대기(5)
+	enum PANELCHARGE_STATE {	STATE_CHARGE, STATE_CHARGEDSTART, STATE_CHARGEDWAIT, //충전 중(3), 충전 완료(4), 충전 완료 대기(5)
 						STATE_DECREASES, //충전 해제 (6)
 						STATE_OFFWAIT, STATE_OFFWAITSTART, //충전 전 대기(2), 대기 시작(1)
 						STATE_NONE };
@@ -20,6 +20,7 @@ public: //괄호의 숫자는 실제 인게임의 기믹 애님 순서. index는 아님
 	enum LAMP_TYPE { LAMP_GREEN, LAMP_RED, LAMP_YELLOW, LAMP_NONE };
 
 public:
+	PANELCHARGE_STATE Get_CurState() { return m_eCurState; }
 	_uint Get_GimmickIndex() { return m_iGimmickIndex; }
 
 private:
@@ -54,7 +55,7 @@ private:
 
 	PxRigidStatic*			m_pStaticActor = { nullptr };
 
-	ANIM_STATE				m_eCurState = { STATE_NONE };
+	PANELCHARGE_STATE		m_eCurState = { STATE_NONE };
 
 	_float					m_fDecreasesTime = { 0.f };
 	_float					m_fWhiteColorDiffuse = { 0.f };
