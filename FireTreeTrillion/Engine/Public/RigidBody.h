@@ -7,7 +7,7 @@ class ENGINE_DLL CRigidBody : public CComponent
 {
 public:
 	PxActor* Get_Actor() { if (m_bDynamic) return m_pActor; else return m_pStaticActor; };
-
+	PxRigidDynamic* Get_RigidDynamic() { return m_pActor; }
 public:
 	struct RIGIDBODY_DESC
 	{

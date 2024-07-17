@@ -124,7 +124,7 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_pLipBone = m_pModelCom->Get_BonePtr("T_LLip0J");
 	Safe_AddRef(m_pLipBone);
 
-	m_pRotationBone = m_pModelCom->Get_BonePtr("RotL");
+	m_pRotationBone = m_pModelCom->Get_BonePtr("TopL");
 	Safe_AddRef(m_pRotationBone);
 	m_pRotationBoneMatrix = m_pRotationBone->Get_EditMatrixPtr();
 
@@ -419,9 +419,9 @@ _bool CSimba::IsKirbyOnMyLeft()
 	vDir = XMVector3Normalize(XMVectorSetY(vDir, 0));
 
 	_vector crossProduct = XMVector3Cross(vLook, vDir);
-	_float fCrossResultZ = XMVectorGetZ(crossProduct);
+	_float fCrossResultY = XMVectorGetY(crossProduct);
 
-	if (fCrossResultZ > 0.f)
+	if (fCrossResultY > 0.f)
 		return true;
 	else
 		return false;
@@ -480,7 +480,7 @@ HRESULT CSimba::Add_Components()
 	CHitBox::HITBOX_DESC tAttack{};
 	tAttack.pOwner = this;
 	tAttack.pDesc = &m_tColliderDesc[ATTACK]; // Left Hand
-	tAttack.pCollisionType = HITBOX_MONSTER;
+	tAttack.pCollisionType = HITBOX_SIMBA;
 	tAttack.pSocket = m_pModelCom->Get_BonePtr("L_HaveL");
 	//tAttack.vBoneOffset = _float3(0, 0, -3);
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
@@ -571,7 +571,7 @@ void CSimba::SetUp_FSM()
 
 	m_pFSM->Add_State(Simba_Roar2, CSimba_Roar::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
-	for(_uint i = Simba_BiteRushJumpL; i<= Simba_BiteRushLandingR; i++)
+	for(_uint i = Simba_BiteRushFallL; i<= Simba_BiteRushLandingR; i++)
 		m_pFSM->Add_State(i, CSimba_BiteRushJump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
 	for(_uint i = Simba_DimensionClaw; i<= Simba_DimensionClawWait; i++)
@@ -625,6 +625,21 @@ void CSimba::SetUpHitBoxTimings()
 		vecTiming.emplace_back(tuple<_float, _bool, COLLISION_VALUE>(i * 0.1f, false, ATTACK3));
 	}
 	InsertHitboxActivationTiming(Simba_FinalCrusher, vecTiming);
+	vecTiming.clear();
+
+	for (_uint i = 0; i < 10; i++)
+	{
+		vecTiming.emplace_back(tuple<_float, _bool, COLLISION_VALUE>(i * 0.007f, false, ATTACK));
+		vecTiming.emplace_back(tuple<_float, _bool, COLLISION_VALUE>(i * 0.006f, false, ATTACK2));
+		vecTiming.emplace_back(tuple<_float, _bool, COLLISION_VALUE>(i * 0.007f, false, ATTACK3));
+	}
+	InsertHitboxActivationTiming(Simba_AttackJumpHit, vecTiming);
+	vecTiming.clear();
+
+	vecTiming.emplace_back(tuple<_float, _bool, COLLISION_VALUE>(0.f, false, ATTACK3));
+	vecTiming.emplace_back(tuple<_float, _bool, COLLISION_VALUE>(0.475f, false, ATTACK3));
+	vecTiming.emplace_back(tuple<_float, _bool, COLLISION_VALUE>(0.95f, false, ATTACK3));
+	InsertHitboxActivationTiming(Simba_BiteRush, vecTiming);
 	vecTiming.clear();
 }
 

@@ -33,7 +33,7 @@
 #include "Crumble.h"
 #include "BulbFlare.h"
 #include "Gm_DynamicField.h"
-
+#include "SurprisedBoard.h"
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCharacter{ pDevice, pContext }
@@ -112,7 +112,8 @@ _int CKirby::Tick(_float fTimeDelta)
 	if (*m_pCurrentLevelID == LEVEL_PARK)
 	{
 		RayCast_Crumbles();
-		RayCast_DynamicFields();
+		//RayCast_DynamicFields();
+		//RayCast_SurpriseBoards();
 	}
 		
 	return OBJ_NOEVENT;
@@ -1570,10 +1571,10 @@ void CKirby::RayCast_DynamicFields()
 
 	if (20.f <= m_pControllerCom->RayCastToStaticActor(-vRight, 20.f, vLook * fLookOffset))
 	{
-		_float fLeftDis = m_pControllerCom->RayCastToDynamicActor(-vRight, vLook * fLookOffset);
+		_float fLeftDis = m_pTransformCom->RayCast(CTransform::DYNAMIC, -vRight, 20.f, vLook * fLookOffset + XMVectorSet(0, 0.5f, 0, 0));
 		if (fActivationDistance > fLeftDis)
 		{
-			CGameObject* pObj = FindDynamicField(m_pControllerCom->Get_MostRecentActor());
+			CGameObject* pObj = FindDynamicField(m_pTransformCom->Get_MostRecentActor());
 			if (nullptr != pObj)
 			{
 				CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(pObj);
@@ -1599,6 +1600,37 @@ void CKirby::RayCast_DynamicFields()
 				return;
 			}
 
+		}
+	}
+}
+
+void CKirby::RayCast_SurpriseBoards()
+{
+	if (m_pControllerCom == nullptr)
+		return;
+	_vector vLook = XMVectorSet(0, 0, 1, 0);
+
+	_float fActivationDistance = 5.f;
+	if (fActivationDistance > m_pControllerCom->RayCastToDynamicActor(vLook))
+	{
+		CGameObject* pObj = FindSurpriseBoard(m_pControllerCom->Get_MostRecentActor());
+		if (nullptr != pObj)
+		{
+			CSurprisedBoard* pSurpriseBoard = dynamic_cast<CSurprisedBoard*>(pObj);
+			_uint iState = pSurpriseBoard->Get_State();
+
+			if (CSurprisedBoard::POP_OUT_R == iState || CSurprisedBoard::POP_OUT_L == iState)
+			{
+				CGameObject* pObj2 = FindMyDynamicField(pSurpriseBoard);
+				if (nullptr != pObj2)
+				{
+					CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(pObj2);
+					if (false == pDynamicField->IsActivated())
+						pDynamicField->Set_Interaction(true);
+					return;
+				}
+			}
+			return;
 		}
 	}
 }
@@ -2099,6 +2131,26 @@ CGameObject* CKirby::FindDynamicField(PxRigidActor* pActor)
 	return nullptr;
 }
 
+CGameObject* CKirby::FindSurpriseBoard(PxRigidActor* pActor)
+{
+	auto mapIter = m_mapSurpriseBoards.find(pActor);
+	if (mapIter != m_mapSurpriseBoards.end())
+		return mapIter->second;
+
+	return nullptr;
+}
+
+CGameObject* CKirby::FindMyDynamicField(CGameObject* pSurpriseBoard)
+{
+	for (auto& pair : m_vecSurpriseBoardsAndDynamicFields)
+	{
+		if (pSurpriseBoard == pair.first)
+			return pair.second;
+	}
+
+	return nullptr;
+}
+
 void CKirby::ReleaseAndClearMap(unordered_map<PxRigidActor*, CGameObject*> _map)
 {
 	for (auto& pair : _map)
@@ -2217,7 +2269,14 @@ void CKirby::Free()
 	ReleaseAndClearMap(m_mapStarBoxes);
 	ReleaseAndClearMap(m_mapBoxes);
 	ReleaseAndClearMap(m_mapDynamicFields);
+	ReleaseAndClearMap(m_mapSurpriseBoards);
 
+	for (auto& pair : m_vecSurpriseBoardsAndDynamicFields)
+	{
+		Safe_Release(pair.first);
+		Safe_Release(pair.second);
+	}
+	
 	for (auto& pModelCom : m_pModelCom)
 		Safe_Release(pModelCom);
 	for (auto& pEyeTexture : m_pEyeTexture)
