@@ -8,6 +8,11 @@ CPipeLine::CPipeLine()
 {
 }
 
+_float CPipeLine::Get_CurCamFOV() const
+{
+	return m_pCameras[m_iCurCameraIdx]->Get_FOVY();
+}
+
 HRESULT CPipeLine::Add_Camera(CCamera* pCamera)
 {
 	m_pCameras.emplace_back(pCamera);

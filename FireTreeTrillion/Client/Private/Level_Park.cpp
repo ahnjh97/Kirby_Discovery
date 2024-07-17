@@ -67,7 +67,6 @@ HRESULT CLevel_Park::Initialize()
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
 
-
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
@@ -159,15 +158,32 @@ HRESULT CLevel_Park::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
+
+	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_PARK, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
+	CHECK_NULLPTR(pKirby);
+	_float4 vPosKirby = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+
+	_float fPosKirbyX = round(vPosKirby.x * 1000) / 1000;
+	_float fPosKirbyY = round(vPosKirby.y * 1000) / 1000;
+	_float fPosKirbyZ = round(vPosKirby.z * 1000) / 1000;
+
+	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_PARK, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+	CHECK_NULLPTR(pCamera);
+	_float4 vPosCamera = pCamera->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+
+	_float fPosCameraX = round(vPosCamera.x * 1000) / 1000;
+	_float fPosCameraY = round(vPosCamera.y * 1000) / 1000;
+	_float fPosCameraZ = round(vPosCamera.z * 1000) / 1000;
+
 	//윈도우 바 FPS 체크
 	++m_iFPS;
-
-	_tchar szFPS[MAX_PATH] = TEXT("");
-	wsprintf(szFPS, TEXT("Level Park, %d FPS"), m_iFPS);
+	wstring wstrMsg = TEXT("Level Park : ") + to_wstring(m_iFPS) 
+					+ TEXT(". | Kirby is at ")  + to_wstring(fPosKirbyX)  + TEXT(", ") + to_wstring(fPosKirbyY)  + TEXT(", ") + to_wstring(fPosKirbyZ)
+					+ TEXT(". | Camera is at ")	+ to_wstring(fPosCameraX) + TEXT(", ") + to_wstring(fPosCameraY) + TEXT(", ") + to_wstring(fPosCameraZ);
 
 	if (m_fAccDelta >= 1.f)
 	{
-		SetWindowText(g_hWnd, szFPS);
+		SetWindowText(g_hWnd, wstrMsg.c_str());
 		m_fAccDelta = 0.f;
 		m_iFPS = 0;
 	}
@@ -213,6 +229,8 @@ HRESULT CLevel_Park::Ready_Lights()
 	LIGHT_DESC			tPointLightDesc{};
 	tPointLightDesc.eType = LIGHT_DESC::TYPE_POINT;
 
+	// 지역 vector에 임시로 넣어두기
+	vector<LIGHT_DESC> vecLight;
 	for (_uint i = 0; i < iNumObjects; i++)
 	{
 		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
@@ -228,8 +246,19 @@ HRESULT CLevel_Park::Ready_Lights()
 		tPointLightDesc.vSpecular = _float4(matWorld._31, matWorld._32, matWorld._33, 1.f);
 		tPointLightDesc.vPosition = _float4(matWorld._41, matWorld._42, matWorld._43, 1.f);
 
-		if (FAILED(CGameInstance::Get_Instance()->Add_Light(tPointLightDesc)))
-			return E_FAIL;
+		vecLight.push_back(tPointLightDesc);
+	}
+
+	// z값으로 정렬
+	sort(vecLight.begin(), vecLight.end(), [](const LIGHT_DESC& a, const LIGHT_DESC& b) {
+		return a.vPosition.z <= b.vPosition.z;
+		});
+
+	// 정렬된 vector에서 light를 하나씩 꺼내어, 진짜 Light_Manager에게 보내기
+	for (auto& tLight : vecLight)
+	{
+		HRESULT hr = CGameInstance::Get_Instance()->Add_Light(tLight);
+		CHECK_FAILED(hr);
 	}
 
 	fileInput.close();
@@ -699,9 +728,10 @@ HRESULT CLevel_Park::Ready_Monsters()
 	}
 	fileInput.close();
 
-	#pragma region SurprisedBoard 여섯마리 레전드 추가
+#pragma region SurprisedBoard 일곱마리
 
-		// ------------------ 맨 앞 SurprisedBoard ------------------
+	#pragma region 맨 앞 빨강
+
 		// 위치 행렬을 만든다. 
 		_float4x4 translationMatrix = XMMatrixTranslation(19.6f, 5.f, -143.f);
 
@@ -724,8 +754,10 @@ HRESULT CLevel_Park::Ready_Monsters()
 		HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 
+#pragma endregion
+	
+	#pragma region 두번째 연두색
 
-		// ------------------ 두 번째 SurprisedBoard ------------------
 		// 위치 수정
 		translationMatrix = XMMatrixTranslation(44.54f, 4.97f, -113.189f);
 		// 회전값은 그대로 사용
@@ -739,8 +771,10 @@ HRESULT CLevel_Park::Ready_Monsters()
 		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 
+	#pragma endregion
+	
+	#pragma region 세번째 주황색
 
-		// ------------------ 세 번째 SurprisedBoard ------------------
 		// 위치 수정
 		translationMatrix = XMMatrixTranslation(21.39f, 5.08f, -89.f);
 		// 회전 행렬을 만든다.
@@ -756,8 +790,10 @@ HRESULT CLevel_Park::Ready_Monsters()
 		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 
+    #pragma endregion
+	
+	#pragma region 네번째(1) 피랑색 오른쪽
 
-		// ------------------ 네 번째(1) 오른쪽 SurprisedBoard ------------------
 		// 위치 수정
 		translationMatrix = XMMatrixTranslation(12.f, 4.5f, -68.5f);
 		// 회전값은 그대로 사용
@@ -771,8 +807,10 @@ HRESULT CLevel_Park::Ready_Monsters()
 		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 
+    #pragma endregion
+	
+	#pragma region 네번째(2) 피랑색 왼쪽
 
-		// ------------------ 네 번째(2) 왼쪽 SurprisedBoard ------------------
 		// 위치 수정
 		translationMatrix = XMMatrixTranslation(-1.62f, 4.5f, -69.5f);
 		// 회전값은 그대로 사용
@@ -787,6 +825,42 @@ HRESULT CLevel_Park::Ready_Monsters()
 		CHECK_FAILED(hr);
 
 	#pragma endregion
+	
+	#pragma region 다섯번째 Land2에서의 앞쪽 연두색
+
+		// 위치 수정
+		translationMatrix = XMMatrixTranslation(-27.02f, 57.97f, 33.42f);
+		// 회전값은 그대로 사용
+		transformationMatrix = rotationMatrix * translationMatrix;
+
+		// 해당 위치의 행렬을 넘긴다.
+		surprisedDesc.matWorld = transformationMatrix;
+		surprisedDesc.eColor = CSurprisedBoard::GREEN;
+		surprisedDesc.eStartState = CSurprisedBoard::WAIT_R; 
+		surprisedDesc.vPosition = _float3(-24.27f, 59.f, 16.f);
+		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
+		CHECK_FAILED(hr);
+
+	#pragma endregion
+	
+	#pragma region 여섯번째 Land2에서의 중간쯤 빨강색
+
+		// 위치 수정
+		translationMatrix = XMMatrixTranslation(39.5f, 57.97f, 81.5f);
+		// 회전값은 그대로 사용
+		transformationMatrix = rotationMatrix * translationMatrix;
+
+		// 해당 위치의 행렬을 넘긴다.
+		surprisedDesc.matWorld = transformationMatrix;
+		surprisedDesc.eColor = CSurprisedBoard::RED;
+		surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
+		surprisedDesc.vPosition = _float3(35.5f, 58.5f, 65.f);
+		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
+		CHECK_FAILED(hr);
+
+	#pragma endregion
+
+#pragma endregion
 
 	return S_OK;
 }

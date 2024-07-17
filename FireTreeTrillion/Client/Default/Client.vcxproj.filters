@@ -661,6 +661,36 @@
     <Filter Include="02.GameObjects\UI\QTE\Effect">
       <UniqueIdentifier>{3bff22bc-6326-4ee4-b987-adccf7f44990}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\Effect">
+      <UniqueIdentifier>{1211df29-7ccb-4244-822e-fbbc3a69f5da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Animal">
+      <UniqueIdentifier>{39a8635e-b411-4647-91f6-ad849bd64668}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Animal\BabyDuck">
+      <UniqueIdentifier>{d2c73e91-5a04-4fd7-ad6b-da0bdef67b0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Animal\BabyDuck\State">
+      <UniqueIdentifier>{2f1704aa-9758-44d3-b36b-60291ea7699b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Animal\Lizard">
+      <UniqueIdentifier>{fcecda55-c58a-4cba-9a85-cb3100df9a3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Animal\Lizard\State">
+      <UniqueIdentifier>{dc2093c9-0197-4511-980d-1d2f3f8b9a29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Animal\Duck">
+      <UniqueIdentifier>{a9ef7156-11bd-4391-beb3-b988896fed76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Animal\Duck\State">
+      <UniqueIdentifier>{d16642f6-9088-44da-ab41-0a1529d838ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Animal\Butterfly%28characterX%29">
+      <UniqueIdentifier>{0ec43322-fbf0-4a09-86ca-af960d6d31ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Animal\SeaGull%28characterX%29">
+      <UniqueIdentifier>{4bd7629d-3a53-42e9-847f-51ec1eac6310}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Phanta\SpawnEffect">
       <UniqueIdentifier>{4b97fb20-26cc-4d63-a220-15d7ce0851f4}</UniqueIdentifier>
     </Filter>
@@ -1342,6 +1372,15 @@
     <ClInclude Include="..\Public\QTE_Effect.h">
       <Filter>02.GameObjects\UI\QTE\Effect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\UI_EffectParttime.h">
+      <Filter>02.GameObjects\UI\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BabyDuck.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Animal\BabyDuck</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BabyDuck_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Animal\BabyDuck\State</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\SpawnEffect.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta\SpawnEffect</Filter>
     </ClInclude>
@@ -2003,6 +2042,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\QTE_Effect.cpp">
       <Filter>02.GameObjects\UI\QTE\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_EffectParttime.cpp">
+      <Filter>02.GameObjects\UI\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BabyDuck.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Animal\BabyDuck</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BabyDuck_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Animal\BabyDuck\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SpawnEffect.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta\SpawnEffect</Filter>

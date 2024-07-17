@@ -402,7 +402,6 @@ void CEffect::Billboard_Effect()
 
 void CEffect::Free()
 {
-    __super::Free();
-
     Safe_Delete_Array(m_iCurKeyframeIdxs);
+    __super::Free();
 }

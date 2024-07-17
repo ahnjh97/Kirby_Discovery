@@ -1026,7 +1026,6 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_SPAWNEFFECT();
-        PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX_NOSOFTFX();
     }
 
     // BlendFX_SoftEffect_X ( 24 )
@@ -1040,7 +1039,6 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 PS_SPAWNEFFECT();
         PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX_NOSOFTFX();
     }
 }

@@ -200,7 +200,7 @@ void CLevel_PartTime::Ready_Layer_Food(const wstring& strLayerTag)
 	CHECK_FAILED(hr);
 
 	// µ¼¸¶µµ
-	position = _float3(17.56f, 23.9f, 31.2f);
+	position = _float3(17.62f, 23.9f, 31.2f);
 	matPos = Matrix::CreateTranslation(position);
 	rotationY = XMConvertToRadians(-7.0f);
 	matRot = Matrix::CreateRotationY(rotationY);

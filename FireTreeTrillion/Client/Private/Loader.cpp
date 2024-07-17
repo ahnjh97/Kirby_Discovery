@@ -1571,7 +1571,7 @@ HRESULT CLoader::Add_FXTexture()
 	// 주로 사용되는 텍스쳐들
 	hr = Add_Texture(LEVEL_STATIC, "FX_Star", "Effects/Basic/common_star.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Bubble", "Effects/Basic/common_bubble.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.png", 5);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.png", 6);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Grad", "Effects/Basic/common_gradation.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Hit", "Effects/Basic/common_ring_0.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Smoke", "Effects/Basic/common_smoke_%d.png", 2);	CHECK_FAILED(hr);
@@ -1728,6 +1728,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FXRecoveryRoot", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXThunderLine", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXMeteoDash", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("FXDonut", TYPE_NONANIM);
 
 		//공통이펙트 - YW
 		m_vecModelInfo.emplace_back("Cube", TYPE_NONANIM);

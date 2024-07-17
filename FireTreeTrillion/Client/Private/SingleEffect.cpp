@@ -183,8 +183,8 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 	Quaternion vResultQuat = vContinuousQuat * vCurQuat * vInitQuat;
 
 	m_pTransformCom->Turn_Absolute(vResultQuat);
-	
-	 m_pTransformCom->Set_Scaled(m_vInitScale * m_vCurScale);
+
+	m_pTransformCom->Set_Scaled(m_vInitScale * m_vCurScale);
 
 	if (m_pSoketMatrix != nullptr)
 	{
@@ -193,6 +193,13 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 		socketMatrix.Up().Normalize();
 		socketMatrix.Backward().Normalize();
 
+		_float3 vScale = CUtils::Get_Scaled_Matrix(socketMatrix);
+		if (vScale.x < .001f)
+			CUtils::Set_Scaled_Matrix(socketMatrix, .001f, vScale.y, vScale.z);
+		if (vScale.y < .001f)
+			CUtils::Set_Scaled_Matrix(socketMatrix, vScale.x, .001f, vScale.z);
+		if (vScale.z < .001f)
+			CUtils::Set_Scaled_Matrix(socketMatrix, vScale.x, vScale.y, .001f);
 		m_pTransformCom->Set_WorldMatrix(m_pTransformCom->Get_WorldMatrix() * socketMatrix);
 	}
 
@@ -320,7 +327,7 @@ HRESULT CSingleEffect::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 	else
 	{
 		_float4x4 ViewMatrix = _float4x4::Identity;
-		_float4x4 ProjMatrix = XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1000.f); 
+		_float4x4 ProjMatrix = XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1000.f);
 
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
 			return E_FAIL;
