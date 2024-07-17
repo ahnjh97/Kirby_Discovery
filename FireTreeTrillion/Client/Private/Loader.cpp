@@ -1633,6 +1633,11 @@ HRESULT CLoader::Add_FXTexture()
 	//Dissolve
 	hr = Add_Texture(LEVEL_STATIC, "FX_FireDissolve", "Dissolve/FireDissolve.png");	CHECK_FAILED(hr);
 
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Orange", "Effects/Particle/Glow_Orange.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Green", "Effects/Particle/Glow_Green.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Blue", "Effects/Particle/Glow_Blue.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_BludParticle", "Effects/Particle/Glow_BludParticle.png");	CHECK_FAILED(hr);
+
 
 	return S_OK;
 }
@@ -2028,7 +2033,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Gimmick_PkFunHouseDarkness03", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Gimmick_PkFunHouseDarkness04", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Gimmick_PkFunHouseDarkness05", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		
+		//해당 모델 추후 삭제 필요 (아래 메쉬3개로 세분화)
 		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse06", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse06A", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse06B", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse06C", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse07", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		//기믹 오브젝트

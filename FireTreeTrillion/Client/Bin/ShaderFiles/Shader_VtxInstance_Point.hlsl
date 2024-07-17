@@ -283,9 +283,6 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN In)
     float fOldViewZ = vDepthDesc.y * g_fFar;
 
     Out.vColor.a = Out.vColor.a * saturate(fOldViewZ - In.vProjPos.w);
-    
-    if (0.01f <= Out.vColor.a)
-        Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
 	
     return Out;
 }

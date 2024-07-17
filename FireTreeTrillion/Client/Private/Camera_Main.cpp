@@ -262,14 +262,14 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_final sky"), &FxDesc)))
 			return E_FAIL;
 	}
-	if (*m_pCurrentLevelID == LEVEL_FINALE)
-	{
-		CParticle::PARTICLE_DESC FxDesc{};
-		FxDesc.pSocketMatrix = &m_EffectSocket;
+	//if (*m_pCurrentLevelID == LEVEL_FINALE)
+	//{
+	//	CParticle::PARTICLE_DESC FxDesc{};
+	//	FxDesc.pSocketMatrix = &m_EffectSocket;
 
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_night star test 2"), &FxDesc)))
-			return E_FAIL;
-	}
+	//	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_night star test 2"), &FxDesc)))
+	//		return E_FAIL;
+	//}
 
 	m_FinaleSeqATime =
 	{

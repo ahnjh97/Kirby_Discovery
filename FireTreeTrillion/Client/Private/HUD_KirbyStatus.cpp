@@ -58,6 +58,9 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 	{
 		m_UIObjDesc.vDegree = HUDKirby_Desc.vDegree;
 
+		//투영 행렬 fov 깡으로 세팅해 저장해두어야 한다.
+		XMStoreFloat4x4(&m_ProjMatrix, XMMatrixPerspectiveFovLH(ToRadian(30.f), ((_float)g_iWinSizeX / (_float)g_iWinSizeY), .1f, 1000.f));
+
 		_float fRadianX = XMConvertToRadians(m_UIObjDesc.vDegree.x);
 		_float fRadianY = XMConvertToRadians(m_UIObjDesc.vDegree.y);
 		_float fRadianZ = XMConvertToRadians(m_UIObjDesc.vDegree.z);
@@ -218,7 +221,7 @@ HRESULT CHUD_KirbyStatus::Render_BindSet(CShader* _pShaderCom, CTransform* _pTra
 	{
 		//m_ViewMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW);
 		XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
-		m_ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
+		//m_ProjMatrix = m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ);
 	}
 
 	//셰이더 파일의 매트릭스 정보를 가져와 바인딩

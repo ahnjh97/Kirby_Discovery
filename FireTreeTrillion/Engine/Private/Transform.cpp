@@ -1,6 +1,8 @@
 #include "..\Public\Transform.h"
 #include "Shader.h"
 #include "Bone.h"
+#include "Utils.h"
+#include "GameInstance.h"
 
 CTransform::CTransform(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
@@ -61,6 +63,58 @@ _float4x4 CTransform::ComputeBoneWorldMatrix(CBone* pBone, _float3 vOffset, _boo
 	}
 	Safe_Release(pBone);
 	return matResult;
+}
+
+_float CTransform::RayCast(ACTOR eActorType, _float3 vDir, _float fRayCastDistance, _float3 vOffset)
+{
+	_float4 vPos = Get_State_Float4(STATE_POSITION);
+	PxVec3 rayOrigin = PxVec3((_float)vPos.x + vOffset.x, (_float)vPos.y + vOffset.y, (_float)vPos.z + vOffset.z);
+	PxVec3 rayDirection = CUtils::To_PxVec3(vDir);
+	_float fMaxDistance = fRayCastDistance;
+
+	PxRaycastHit hit;
+	PxRaycastBuffer hitBuffer;
+	if (eActorType == STATIC)
+	{
+		PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
+		_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eDEFAULT, filterData);
+		if (isRayCast)
+		{
+			hit = hitBuffer.block;
+			m_pMostRecentActor = hit.actor;
+			return _float((rayOrigin - hit.position).magnitude());
+		}
+		else
+			return FLT_MAX;
+	}
+	else if (eActorType == DYNAMIC)
+	{
+		PxQueryFilterData filterData(PxQueryFlag::eDYNAMIC);
+		_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eDEFAULT, filterData);
+		if (isRayCast)
+		{
+			hit = hitBuffer.block;
+			m_pMostRecentActor = hit.actor;
+			return _float((rayOrigin - hit.position).magnitude());
+		}
+		else
+			return FLT_MAX;
+	}
+	else if (eActorType == BOTH)
+	{
+		PxQueryFilterData filterData;
+		_bool isRayCast = m_pGameInstance->Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eDEFAULT, filterData);
+		if (isRayCast)
+		{
+			hit = hitBuffer.block;
+			m_pMostRecentActor = hit.actor;
+			return _float((rayOrigin - hit.position).magnitude());
+		}
+		else
+			return FLT_MAX;
+	}
+	else
+		return FLT_MAX;
 }
 
 HRESULT CTransform::Initialize_Prototype()
@@ -142,8 +196,10 @@ void CTransform::Go_Up(_float fTimeDelta)
 void CTransform::Go_Down(_float fTimeDelta)
 {
 	_vector		vPosition = Get_State_Vector(STATE_POSITION);
+	_vector		vUp = Get_State_Vector(STATE_UP);
 
-	vPosition += XMVector3Normalize(m_WorldMatrix.Down()) * m_fSpeedPerSec * fTimeDelta;
+	//vPosition += XMVector3Normalize(m_WorldMatrix.Down()) * m_fSpeedPerSec * fTimeDelta;
+	vPosition -= XMVector3Normalize(vUp) * m_fSpeedPerSec * fTimeDelta;
 
 	Set_State(STATE_POSITION, vPosition);
 }

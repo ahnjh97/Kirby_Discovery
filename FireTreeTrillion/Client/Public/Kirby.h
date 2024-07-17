@@ -213,11 +213,20 @@ public:
 		m_mapDynamicFields.insert_or_assign(pActor, pGameObject);
 		Safe_AddRef(pGameObject);
 	}
+	void		RegisterActorToPlayer_ForSurpriseBoard(PxRigidActor* pActor, CGameObject* pSurpriseBoard, CGameObject* pDynamicField) {
+		m_mapSurpriseBoards.insert_or_assign(pActor, pSurpriseBoard);
+		Safe_AddRef(pSurpriseBoard);
+		m_vecSurpriseBoardsAndDynamicFields.emplace_back(pSurpriseBoard, pDynamicField);
+		Safe_AddRef(pSurpriseBoard);
+		Safe_AddRef(pDynamicField);
+	}
 
 	CGameObject*	FindToppleableBridge(PxRigidActor* pActor);
 	CGameObject*	FindStarBox(PxRigidActor* pActor);
 	CGameObject*	FindBox(PxRigidActor* pActor);
 	CGameObject*	FindDynamicField(PxRigidActor* pActor);
+	CGameObject*	FindSurpriseBoard(PxRigidActor* pActor);
+	CGameObject*	FindMyDynamicField(CGameObject* pSurpriseBoard);
 	void			Set_WeaponAnim(_uint index);
 	_float4			Get_BulbLightPos();
 	void			Large_Light(_float4 vDiffuse, _float fRange, _float fTime);
@@ -257,6 +266,7 @@ private:
 	// 파크에서의 커비 행동 감지
 	void			RayCast_Crumbles();
 	void			RayCast_DynamicFields();
+	void			RayCast_SurpriseBoards();
 
 private:
 	CModel*					m_pModelCom[BODY_END] = {nullptr};
@@ -316,6 +326,9 @@ private:
 	unordered_map<PxRigidActor*, CGameObject*> m_mapStarBoxes;
 	unordered_map<PxRigidActor*, CGameObject*> m_mapBoxes;
 	unordered_map<PxRigidActor*, CGameObject*> m_mapDynamicFields;
+	unordered_map<PxRigidActor*, CGameObject*> m_mapSurpriseBoards;
+	vector<pair<CGameObject*, CGameObject*>> m_vecSurpriseBoardsAndDynamicFields;
+
 	void ReleaseAndClearMap(unordered_map<PxRigidActor*, CGameObject*> _map);
 
 	void				  AssistLight_Control();

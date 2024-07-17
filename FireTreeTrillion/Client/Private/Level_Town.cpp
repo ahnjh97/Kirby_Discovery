@@ -81,6 +81,7 @@ HRESULT CLevel_Town::Initialize()
 	// 셰이더 트리거
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_TOWN);
+	m_pGameInstance->Set_ObjectBlack(1.f, .1f);
 
 	// 레벨전환 트리거
 	function<void(_int)> func = bind(&CLevel_Town::Change_Levels, this);
