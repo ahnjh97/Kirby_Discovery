@@ -45,6 +45,7 @@ private:
 	_float			m_fTimeDelta = { 0.f };
 	_float			m_fShaderTime = { 0.f };
 	_float			m_fScale = { 0.f };
+	_float			m_fAlpha = { 1.f };
 	_vector			m_vPosition = {};
 
 private:

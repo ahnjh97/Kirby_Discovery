@@ -65,6 +65,11 @@ _int CSpawnEffect::Tick(_float fTimeDelta)
 
 	m_fShaderTime += m_fTimeDelta;
 
+	if (1.f < m_fShaderTime)
+		m_fAlpha -= m_fTimeDelta;
+
+	if (0.f > m_fAlpha)
+		m_bDead = true;
 	Billboarding();
 
 	return OBJ_NOEVENT;
@@ -72,7 +77,7 @@ _int CSpawnEffect::Tick(_float fTimeDelta)
 
 void CSpawnEffect::Late_Tick(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
 }
 
@@ -158,6 +163,8 @@ HRESULT CSpawnEffect::Bind_ShaderResources()
 
 	hr = m_pShaderCom->Bind_RawValue("g_fTimeDelta", &m_fShaderTime, sizeof(_float));
 	CHECK_FAILED(hr);
+	hr = m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(_float));
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -179,8 +186,6 @@ void CSpawnEffect::Billboarding()
 	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScaled.x);
 	m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScaled.y);
 	m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
-=======
->>>>>>> main
 }
 
 CSpawnEffect* CSpawnEffect::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

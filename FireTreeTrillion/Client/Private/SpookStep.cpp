@@ -48,6 +48,22 @@ HRESULT CSpookStep::Initialize(void* pArg)
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;
 
+	CEffect::FX_DESC FXDesc{};
+
+	_vector vRight = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+	_vector vUp = m_pTransformCom->Get_State_Vector(CTransform::STATE_UP);
+	_vector vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+
+	for(_uint i = 0; i < 6; ++i)
+	{
+		string strName = {};
+		if (rand() % 2 == 0)
+			strName = "SpawnBbong1";
+		else
+			strName = "SpawnBbong2";
+		SpawnEffect(FXDesc, vRight, vUp, strName);
+	}
+
 	return S_OK;
 }
 
@@ -283,6 +299,19 @@ void CSpookStep::SetUp_FSM()
 	FSM_Desc.iState = SPOOKSTEP_APPEAR;
 	FSM_Desc.pModel = &m_pModelCom;
 	m_pFSM->Initialize(&FSM_Desc);
+}
+
+void CSpookStep::SpawnEffect(CEffect::FX_DESC FXDesc, _fvector vRight, _fvector vUp, string strName)
+{
+	_float fRandRight = CUtils::Make_RandomFloat(-1.f, 1.f);
+	_float fRandUp = CUtils::Make_RandomFloat(0.f, 1.5f);
+	FXDesc.vInitPos = GET_POS + vRight * fRandRight - vUp * fRandUp;
+	//FXDesc.vInitRot = { CUtils::Make_RandomFloat(0.f, 90.f), 0.f, 0.f };
+	//FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+	//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+	//Add_Effect("SpawnBbong1", FXDesc);
+	Add_Effect(strName, FXDesc);
 }
 
 CSpookStep* CSpookStep::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
