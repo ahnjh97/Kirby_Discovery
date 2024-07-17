@@ -510,6 +510,38 @@ CKirbyHammer_Onigorosi_State::CKirbyHammer_Onigorosi_State()
 void CKirbyHammer_Onigorosi_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+	CGameObject* pObject = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"));
+	CTransform* pTransformCom = pObject->Get_TransformCom();
+	_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	// ´ú Â÷Â¡
+	if (_iAnimIndex == CKirby::HAMMERSTATE_ONIGOROSIHAMMERFIRST)
+	{
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.vInitPos = { 0.f, 0.5f, -.5f };
+		FXDesc.vInitRot = { 0.f, 20.f, 0.f };
+		FXDesc.fStartDelay = 0.16f;
+		FXDesc.vInitScale = { 1.8f, 1.8f, 1.8f };
+		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail2"), &FXDesc)))
+			return;
+		static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+	}
+	// °­È­ Â÷Â¡
+	else if (_iAnimIndex == CKirby::HAMMERSTATE_ONIGOROSIHAMMEREND)
+	{
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.vInitPos = { 0.f, 0.5f, -.5f };
+		FXDesc.vInitRot = { 0.f, 0.f, 0.f };
+		FXDesc.fStartDelay = 0.44f;
+		FXDesc.vInitScale = { 2.5f, 2.5f, 2.5f };
+		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail2"), &FXDesc)))
+			return;
+		static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+	}
+
 }
 
 void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -541,6 +573,8 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKSTARTTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 			DESC(m_eEyeState) = CKirby::EYE_CLOSE;
 			DESC(m_fHammerChargeTime) = 0.f;
+			DESC(m_bFirstChargeEffectTrigger) = true;
+			DESC(m_bSecondChargeEffectTrigger) = true;
 			return;
 		}
 		if (pKirby->isAnimFinish())
@@ -554,6 +588,41 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMERCHARGE)
 	{
 		DESC(m_fHammerChargeTime) += fTimeDelta;
+
+		if (DESC(m_fHammerChargeTime) > 0.5f && DESC(m_bFirstChargeEffectTrigger) == true)
+		{
+			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			_float4 vUp = pTransformCom->Get_State(CTransform::STATE_UP);
+			_float4 vRight = pTransformCom->Get_State(CTransform::STATE_RIGHT);
+
+			CMultiEffect::MULTI_FX_DESC MulFXDesc{};
+			MulFXDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
+			MulFXDesc.vInitScale = { 2.f, 2.f, 2.f };
+			MulFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Light Cluster"), &MulFXDesc)))
+				return;
+			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+			DESC(m_bFirstChargeEffectTrigger) = false;
+		}
+		else if (DESC(m_fHammerChargeTime) > 2.f && DESC(m_bSecondChargeEffectTrigger) == true)
+		{
+			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			_float4 vUp = pTransformCom->Get_State(CTransform::STATE_UP);
+			_float4 vRight = pTransformCom->Get_State(CTransform::STATE_RIGHT);
+
+			CMultiEffect::MULTI_FX_DESC MulFXDesc{};
+			MulFXDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
+			MulFXDesc.vInitScale = { 3.f, 3.f, 3.f };
+			MulFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Light ClusterBig"), &MulFXDesc)))
+				return;
+			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+			DESC(m_bSecondChargeEffectTrigger) = false;
+		}
+
+
 
 		if (JoyStick_On() == true)
 		{
@@ -571,6 +640,8 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERFIRST, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 				DESC(m_eEyeState) = CKirby::EYE_ANGER;
 				DESC(m_fHammerChargeTime) = 0.f;
+				DESC(m_bFirstChargeEffectTrigger) = true;
+				DESC(m_bSecondChargeEffectTrigger) = true;
 				return;
 			}
 			else if (DESC(m_fHammerChargeTime) >= 2.f)
@@ -580,6 +651,8 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMEREND, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 				DESC(m_eEyeState) = CKirby::EYE_ANGER;
 				DESC(m_fHammerChargeTime) = 0.f;
+				DESC(m_bFirstChargeEffectTrigger) = true;
+				DESC(m_bSecondChargeEffectTrigger) = true;
 				pKirby->Set_WeaponAnim(10);
 				return;
 			}
@@ -587,6 +660,8 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			{
 				pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKSTARTTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 				DESC(m_eEyeState) = CKirby::EYE_CLOSE;
+				DESC(m_bFirstChargeEffectTrigger) = true;
+				DESC(m_bSecondChargeEffectTrigger) = true;
 				DESC(m_fHammerChargeTime) = 0.f;
 				return;
 			}
@@ -596,6 +671,40 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMERMOVE)
 	{
 		DESC(m_fHammerChargeTime) += fTimeDelta;
+
+		if (DESC(m_fHammerChargeTime) > 0.5f && DESC(m_bFirstChargeEffectTrigger) == true)
+		{
+			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			_float4 vUp = pTransformCom->Get_State(CTransform::STATE_UP);
+			_float4 vRight = pTransformCom->Get_State(CTransform::STATE_RIGHT);
+
+			CMultiEffect::MULTI_FX_DESC MulFXDesc{};
+			MulFXDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
+			MulFXDesc.vInitScale = { 2.f, 2.f, 2.f };
+			MulFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Light Cluster"), &MulFXDesc)))
+				return;
+			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+			DESC(m_bFirstChargeEffectTrigger) = false;
+		}
+		else if (DESC(m_fHammerChargeTime) > 2.f && DESC(m_bSecondChargeEffectTrigger) == true)
+		{
+			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			_float4 vUp = pTransformCom->Get_State(CTransform::STATE_UP);
+			_float4 vRight = pTransformCom->Get_State(CTransform::STATE_RIGHT);
+
+			CMultiEffect::MULTI_FX_DESC MulFXDesc{};
+			MulFXDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
+			MulFXDesc.vInitScale = { 3.f, 3.f, 3.f };
+			MulFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Light ClusterBig"), &MulFXDesc)))
+				return;
+			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+			DESC(m_bSecondChargeEffectTrigger) = false;
+		}
+
 
 		if (JoyStick_controller(Kirbydesc, pCamera) == true)
 		{
@@ -623,6 +732,9 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				pKirby->Change_State(CKirby::HAMMERSTATE_ONIGOROSIHAMMERFIRST, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 				DESC(m_eEyeState) = CKirby::EYE_ANGER;
 				DESC(m_fHammerChargeTime) = 0.f;
+				DESC(m_bFirstChargeEffectTrigger) = true;
+				DESC(m_bSecondChargeEffectTrigger) = true;
+
 				return;
 			}
 			else if (DESC(m_fHammerChargeTime) >= 2.f)
@@ -633,6 +745,9 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				DESC(m_eEyeState) = CKirby::EYE_ANGER;
 				pKirby->Set_WeaponAnim(10);
 				DESC(m_fHammerChargeTime) = 0.f;
+				DESC(m_bFirstChargeEffectTrigger) = true;
+				DESC(m_bSecondChargeEffectTrigger) = true;
+
 				return;
 			}
 			else
@@ -640,6 +755,9 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKSTARTTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
 				DESC(m_eEyeState) = CKirby::EYE_CLOSE;
 				DESC(m_fHammerChargeTime) = 0.f;
+				DESC(m_bFirstChargeEffectTrigger) = true;
+				DESC(m_bSecondChargeEffectTrigger) = true;
+
 				return;
 			}
 		}

@@ -1015,6 +1015,14 @@ HRESULT CLevel_Park::Ready_Objects()
 		}
 	}
 
+	// 좌우로 움직이는 DynamicField를 커비에게 등록
+	list<CGameObject*>* leftRightList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField_SurpriseBoard"));
+	for (auto& leftRight : *leftRightList)
+	{
+		CGm_DynamicField* pLeftRight = dynamic_cast<CGm_DynamicField*>(leftRight);
+		pLeftRight->RegisterToActorToKirby();
+	}
+
 	// m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT(""), 1); -> 내가 원하는 서프라이즈보드
 
 #pragma endregion

@@ -130,6 +130,8 @@ public:
 		// 해머 폼
 		_int			m_iHammerHit = { 0 };
 		_float			m_fHammerChargeTime = { 0.f };
+		_bool			m_bFirstChargeEffectTrigger = { true };
+		_bool			m_bSecondChargeEffectTrigger = { true };
 
 		// 전구 폼
 		_bool			m_bLightOn = { false };
@@ -143,6 +145,11 @@ public:
 
 		// FinalCut 폼
 		_bool			m_bFinalBossDead = { false };
+
+
+		// 어시스트 라이트
+		class CLight* m_pKirbyAssistLight1 = { nullptr };
+		class CLight* m_pKirbyAssistLight2 = { nullptr };
 	}KIRBY_INFODESC;
 
 
@@ -202,10 +209,15 @@ public:
 		m_mapBoxes.insert_or_assign(pActor, pGameObject);
 		Safe_AddRef(pGameObject);
 	}
+	void			RegisterActorToPlayer_ForDynamicField(PxRigidActor* pActor, CGameObject* pGameObject) {
+		m_mapDynamicFields.insert_or_assign(pActor, pGameObject);
+		Safe_AddRef(pGameObject);
+	}
 
 	CGameObject*	FindToppleableBridge(PxRigidActor* pActor);
 	CGameObject*	FindStarBox(PxRigidActor* pActor);
 	CGameObject*	FindBox(PxRigidActor* pActor);
+	CGameObject*	FindDynamicField(PxRigidActor* pActor);
 	void			Set_WeaponAnim(_uint index);
 	_float4			Get_BulbLightPos();
 	void			Large_Light(_float4 vDiffuse, _float fRange, _float fTime);
@@ -244,6 +256,7 @@ private:
 
 	// 파크에서의 커비 행동 감지
 	void			RayCast_Crumbles();
+	void			RayCast_DynamicFields();
 
 private:
 	CModel*					m_pModelCom[BODY_END] = {nullptr};
@@ -302,7 +315,10 @@ private:
 	unordered_map<PxRigidActor*, CGameObject*> m_mapToppleableBridges;
 	unordered_map<PxRigidActor*, CGameObject*> m_mapStarBoxes;
 	unordered_map<PxRigidActor*, CGameObject*> m_mapBoxes;
+	unordered_map<PxRigidActor*, CGameObject*> m_mapDynamicFields;
 	void ReleaseAndClearMap(unordered_map<PxRigidActor*, CGameObject*> _map);
+
+	void				  AssistLight_Control();
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

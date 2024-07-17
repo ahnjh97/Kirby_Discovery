@@ -394,6 +394,7 @@ void CEffect::Billboard_Effect()
 
     _float3 vValue = Calculate_CurValue_Lerp(0.f, KF_ROT);
     _float fAngleZ = vValue.z * 360.f;
+
     vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
     m_pTransformCom->Turn(vLook, 1.f, fAngleZ);
 
