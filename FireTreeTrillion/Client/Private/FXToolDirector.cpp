@@ -19,13 +19,16 @@
 
 static const vector<char*> s_ModelPasses = { "0 | NORMAL_0", "1 | NORMAL_X", "2 | SHADOW", "3 | SKY", "4 | BLOOM", "5 | NONBLUR"
 	,"6 | TRIGGER", "7 | ALPHABLEND", "8 | DEFERREDINFO", "9 | NEARCLIP", "10 | KIRBYPART WHITEFX", "11 | MONSTERPART",
-	"12 | DEFAULTFX",
-	"13 | BLENDFX_LINEARDIFFUSE", "14 | BLENDFX_CLAMPDIFFUSE",
-	"15 | WHITEFX_LINEARDIFFUSE", "16 | WHITEFX_CLAMPDIFFUSE" };
+	"12 | DEFAULTFX","13 | BLENDFX_LINEARDIFFUSE", "14 | BLENDFX_CLAMPDIFFUSE",	"15 | WHITEFX_LINEARDIFFUSE", "16 | WHITEFX_CLAMPDIFFUSE"
+	,"17 | MODEL_EMISSIVE_NORMAL_O", "18 | MODEL_EMISSIVE_NORMAL_X", "19 | MODEL_STAR",	"20 | MODEL_COIN"
+};
 
 static const vector<char*> s_PosTexPasses = { "0 | DEFAULT", "1 | SOLIDBLEND", "2 | BLENDFX", "3 | BLOOM", "4 | DEFAULTFX",
 	"5 | BLEND_NOZTEST" ,"6 | WHITEFX", "7 | UI_MASK", "8 | UI_MASK2", "9 | SOFTFX", "10 | SOFTALPHAFX"
-	, "11 | POSTEX_UIWHITEALPHA" , "12 | POSTEX_ALPHABLEND_NOTEST" , "13 | POSTEX_ALPHATEST_COLOR" };
+	, "11 | UIWHITEALPHA" , "12 | ALPHABLEND_NOTEST" , "13 | ALPHATEST_COLOR", "14 | ALPHATEST_COLOR_HORIZONTALCUT", "15 | BOSS_BARPASS_DEFAULT"
+, "16 | ALPHATEST_COLOR_VERTICALCUT" , "17 | FOCUSINGPOSITION" , "18 | FADEINOUT", "19 | UIMWBASE_CLAW", "20 | QTEBASE"
+, "21 | QTEPLATE" , "22 | QTEEFFECT" , "23 | BLENDFX_SOFTEFFECT_X"
+};
 
 CFXToolDirector::CFXToolDirector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CGameObject{ pDevice, pContext }
@@ -1634,6 +1637,7 @@ void CFXToolDirector::Render_FXProperty()
 		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_WIGGLE] = bWiggle;
 		bEdited = true;
 	}
+
 	SameLine();
 
 	_bool bTail = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TAIL];
@@ -1643,14 +1647,32 @@ void CFXToolDirector::Render_FXProperty()
 		bEdited = true;
 	}
 
+	Spacing();
+
 	_bool bGravity = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY];
 	if (Checkbox(u8"Gravity", &bGravity))
 	{
 		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY] = bGravity;
 		bEdited = true;
 	}
+
 	SameLine();
 
+	_bool bEdit = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT];
+	if (Checkbox(u8"Orbit", &bEdit))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT] = bEdit;
+		bEdited = true;
+	}
+
+	SameLine();
+
+	bEdit = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ASSEMBLE];
+	if (Checkbox(u8"Assemble", &bEdit))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ASSEMBLE] = bEdit;
+		bEdited = true;
+	}
 	Separator();
 
 	if (DragFloat(u8"시작 딜레이", &pCurParticle->m_InstanceDesc.fStartDelay, .1f, 0.f, 100.f, "%.2f"))
@@ -2165,23 +2187,25 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 		//어떤 속성을 편집하느냐에 따라 최소, 최대 범위 정한다.
 		_float2 vValueRange{ 0.f, 1.f };
 		if (m_eSelectedProperty == KF_POS)
-			vValueRange = { -50.f, 50.f };
+			vValueRange = { -5000.f, 5000.f };
 		else if (m_eSelectedProperty == KF_ROT)
-			vValueRange = { -180.f, 180.f };
+			vValueRange = { -360.f, 360.f };
 		else if (m_eSelectedProperty == KF_SCALE)
-			vValueRange = { .001f, 50.f };
+			vValueRange = { .001f, 10000.f };
 		else if (m_eSelectedProperty == KF_UVOFFSET)
-			vValueRange = { -10.f, 10.f };
+			vValueRange = { -100.f, 100.f };
+		else if (m_eSelectedProperty == KF_MASKUVOFFSET)
+			vValueRange = { -100.f, 100.f };
 		else if (m_eSelectedProperty == KF_MASKUVANGLE)
-			vValueRange = { -10.f, 10.f };
+			vValueRange = { -360.f, 360.f };
 
 		if (DragFloat3("Value", m_vKFPopupValue, .01f, vValueRange.x, vValueRange.y, "%.3f"))
 		{
 			if (m_eSelectedProperty == KF_SCALE)
 			{
-				m_vKFPopupValue[0] = m_vKFPopupValue[0] < 0.f ? .001f : m_vKFPopupValue[0];
-				m_vKFPopupValue[1] = m_vKFPopupValue[1] < 0.f ? .001f : m_vKFPopupValue[1];
-				m_vKFPopupValue[2] = m_vKFPopupValue[2] < 0.f ? .001f : m_vKFPopupValue[2];
+				m_vKFPopupValue[0] = m_vKFPopupValue[0] <= 0.f ? .001f : m_vKFPopupValue[0];
+				m_vKFPopupValue[1] = m_vKFPopupValue[1] <= 0.f ? .001f : m_vKFPopupValue[1];
+				m_vKFPopupValue[2] = m_vKFPopupValue[2] <= 0.f ? .001f : m_vKFPopupValue[2];
 			}
 
 			m_FXs[m_iSelectedFXIdx]->m_Keyframes[m_eSelectedProperty][m_iSelectedKFIdx].vValue = _float3{ m_vKFPopupValue[0], m_vKFPopupValue[1], m_vKFPopupValue[2] };
@@ -2449,6 +2473,7 @@ HRESULT CFXToolDirector::Ready_FXPrototypeVector()
 
 
 	Ready_Ingredient(TEXT("VIBuffer_Rect"), &m_FXBufferList, pStaticProtoMap);
+	Ready_Ingredient(TEXT("VIBuffer_UpperRect"), &m_FXBufferList, pStaticProtoMap);
 
 	wstring strModelTag = TEXT("Model_");
 
@@ -2472,6 +2497,7 @@ HRESULT CFXToolDirector::Ready_FXPrototypeVector()
 	Ready_Ingredient(strModelTag + L"PopStar", &m_FXBufferList, pStaticProtoMap);
 
 	Ready_Ingredient(strModelTag + L"SkySphere", &m_FXBufferList, pStaticProtoMap);
+	Ready_Ingredient(strModelTag + L"RayArrow", &m_FXBufferList, pStaticProtoMap);
 
 	return S_OK;
 }
