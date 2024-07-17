@@ -492,8 +492,11 @@ void CVIBuffer_Instance::Orbit(_float fTimeDelta, VTXMATRIX* pVertices)
 		_float3 vDistance = vPos - m_InstanceDesc.vCenter;
 		_float fOrbitSpeed = m_pOrbitSpeed[i];
 
-		_float4x4 RotMatrix = _float4x4::Identity;
-		CUtils::Turn_OtherMatrix(RotMatrix, m_pPreAxis[i], fTimeDelta, fOrbitSpeed);
+		_float4x4 RotMatrix = _float4x4::Identity;\
+		if (m_pPreAxis[i] != _float3(0.f, 0.f, 0.f))
+		{
+			CUtils::Turn_OtherMatrix(RotMatrix, m_pPreAxis[i], fTimeDelta, fOrbitSpeed);
+		}
 
 		//_float3 vEditDir = XMVector3Transform(vDistance, XMLoadFloat4x4(&RotMatrix));
 		_float3 vEditDir = m_InstanceDesc.vCenter + (_float3)XMVector3Transform(vDistance, XMLoadFloat4x4(&RotMatrix));
