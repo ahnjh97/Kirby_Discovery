@@ -667,6 +667,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyFinalCut_State">
       <UniqueIdentifier>{78aed1de-cad4-49c4-85c4-7c2eb6bfdb4d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\Fire">
+      <UniqueIdentifier>{75caa316-9ef6-41c7-885f-44273a100ef1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1345,6 +1348,9 @@
     <ClInclude Include="..\Public\KirbyFinalCut_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyFinalCut_State</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Fire.h">
+      <Filter>02.GameObjects\Effect\Fire</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -2003,6 +2009,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\KirbyFinalCut_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyFinalCut_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Fire.cpp">
+      <Filter>02.GameObjects\Effect\Fire</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

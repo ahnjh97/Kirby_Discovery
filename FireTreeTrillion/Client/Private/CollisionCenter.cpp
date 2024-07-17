@@ -1621,11 +1621,11 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		CGameInstance::Get_Instance()->Setting_RadialBlur(vKirbyPos, 20.f, 100.f);
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
+		FXDesc.vInitPos.y += 0.5f;
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
-		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		FXDesc.vInitScale = { 3.5f, 3.5f, 3.5f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
-
 	}
 	break;
 	// ÇØ¸Ó ´ú Â÷Â¡ °ø°Ý
