@@ -163,23 +163,23 @@ void CLevel_Park::SummonEffectForMonster(_uint iTriggerIndex)
 		_float4 vUp = _float4(monsterDesc.matWorld._21, monsterDesc.matWorld._22, monsterDesc.matWorld._23, monsterDesc.matWorld._24);
 		_float4 vLook = _float4(monsterDesc.matWorld._31, monsterDesc.matWorld._32, monsterDesc.matWorld._33, monsterDesc.matWorld._34);
 		tDesc.vPosition = vPos + vLook * 0.1f;
-		tDesc.fScale = 0.9f;
+		tDesc.fScale = 1.f;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
 		CHECK_FAILED(hr);
 		tDesc.vPosition = vPos + vUp * 0.5f;
-		tDesc.fScale = 0.9f;
+		tDesc.fScale = 1.3f;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
 		CHECK_FAILED(hr);
 		tDesc.vPosition = vPos + vRight * 0.5f;
-		tDesc.fScale = 0.9f;
+		tDesc.fScale = 1.3f;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
 		CHECK_FAILED(hr);
 		tDesc.vPosition = vPos - vRight * 0.5f;
-		tDesc.fScale = 0.9f;
+		tDesc.fScale = 1.3f;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
 		CHECK_FAILED(hr);
 		tDesc.vPosition = vPos - vUp * 0.5f;
-		tDesc.fScale = 0.9f;
+		tDesc.fScale = 1.3f;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
 		CHECK_FAILED(hr);
 	}

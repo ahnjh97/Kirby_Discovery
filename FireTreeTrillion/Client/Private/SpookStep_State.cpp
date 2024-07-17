@@ -33,7 +33,7 @@ void CSpookStep_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	// 플레이어를 향해 바라본다
 	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
 
-	if (pSpookStep->IsAnimFinished())
+	if (pSpookStep->IsAnimFinished() && pController->Is_Terrain())
 		pSpookStep->Change_State(CSpookStep::SPOOKSTEP_MOVE, 90.f, true, true);
 }
 

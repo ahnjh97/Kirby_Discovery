@@ -15,7 +15,7 @@ CBabyDuck::CBabyDuck(const CBabyDuck& rhs)
 }
 
 HRESULT CBabyDuck::Initialize_Prototype()
-{
+{ 
 	m_eCollisionGroup = TRIGGER_FOR_NOT_PHYSX;
 
 	return S_OK;

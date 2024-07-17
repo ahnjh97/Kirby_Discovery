@@ -17,6 +17,7 @@ public:
 	enum TEXTURETYPE { TYPE_DIFFUSE, TYPE_MASK, TYPE_BRUSH, TYPE_END };
 
 	struct SPAWNEFFECT_DESC : public CGameObject::GAMEOBJECT_DESC {
+		_bool	bTrail = { false };
 		_float	fScale = { 0.f };
 		_vector vPosition = {};
 	};
@@ -42,8 +43,10 @@ private:
 	CTexture*		m_pTextureCom[TYPE_END] = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 
+	_bool			m_bTrail = { false };
 	_float			m_fTimeDelta = { 0.f };
 	_float			m_fShaderTime = { 0.f };
+	_float			m_fScaleTime = { 0.f };
 	_float			m_fScale = { 0.f };
 	_float			m_fAlpha = { 1.f };
 	_vector			m_vPosition = {};

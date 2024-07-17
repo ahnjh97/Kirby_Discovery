@@ -2064,6 +2064,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
 
 		// Monster
+		// For Monster
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.2f, 180.f);
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("Phanta", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("SpookStep", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("GhostGordo", TYPE_ANIM, 1.f, 180.f);

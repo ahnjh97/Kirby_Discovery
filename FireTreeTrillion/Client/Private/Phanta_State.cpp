@@ -2,6 +2,7 @@
 #include "Phanta_State.h"
 #include "Phanta.h"
 #include "Kirby.h"
+#include "SpawnEffect.h"
 
 #pragma region IDLE STATE
 //*********************************
@@ -62,6 +63,7 @@ void CPhanta_Move_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 
 	m_fTimeDelta = 0.f;
+	m_fEffectTime = 0.f;
 	m_fSpeed = 4.f;
 }
 
@@ -85,16 +87,24 @@ void CPhanta_Move_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 
 	if (4.f > m_fTimeDelta)
 	{
+		if(0.1f < m_fEffectTime)
+		{
+			m_fEffectTime = 0.f;
+			HRESULT hr;
+			CSpawnEffect::SPAWNEFFECT_DESC tDesc{};
+			vPos.m128_f32[1] += 0.3f;
+			tDesc.bTrail = true;
+			tDesc.vPosition = vPos;
+			tDesc.fScale = 0.9f;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
+			CHECK_FAILED(hr);
+		}
+		m_fEffectTime += fTimeDelta;
+
 		// 플레이어를 향해 바라본다
 		if (3.f > m_fTimeDelta)
 			pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 2.f);
-		//else
-		//{
-		//	if (0.f < m_fSpeed)
-		//		m_fSpeed -= fTimeDelta * 2.f;
-		//	else
-		//		m_fSpeed = 0.f;
-		//}
+
 		pController->Move_Dir(pTransformCom, XMVector3Normalize(vLook) * fTimeDelta * m_fSpeed, fTimeDelta);
 	}
 	else

@@ -28,6 +28,7 @@ HRESULT CSpawnEffect::Initialize(void* pArg)
 
 		pSpawnEffectDesc->fSpeedPerSec = 7.f;
 		pSpawnEffectDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		m_bTrail = pSpawnEffectDesc->bTrail;
 		m_vPosition = pSpawnEffectDesc->vPosition;
 		m_fScale = pSpawnEffectDesc->fScale;
 	}
@@ -45,13 +46,13 @@ HRESULT CSpawnEffect::Initialize(void* pArg)
 
 	CEffect::FX_DESC FXDesc{};
 
-	FXDesc.vInitPos = _float3(0.f, 0.f, 0.f);//GET_POS;
+	FXDesc.vInitPos = GET_POS;
 	//FXDesc.vInitRot = { CUtils::Make_RandomFloat(0.f, 90.f), 0.f, 0.f };
 	//FXDesc.vInitScale = { 1.f, 1.f, 1.f };
-	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-	Add_Effect("ParkParticle1JS", FXDesc);
-	Add_Effect("ParkParticle2JS", FXDesc);
+	Add_Effect("ParkParticle3JS", FXDesc, true);
+	Add_Effect("ParkParticle4JS", FXDesc, true);
 
 	return S_OK;
 }
@@ -65,11 +66,29 @@ _int CSpawnEffect::Tick(_float fTimeDelta)
 
 	m_fShaderTime += m_fTimeDelta;
 
-	if (1.f < m_fShaderTime)
-		m_fAlpha -= m_fTimeDelta;
+	if (true == m_bTrail)
+	{
+		if (1.5f < m_fShaderTime)
+			m_bDead = true;
 
-	if (0.f > m_fAlpha)
-		m_bDead = true;
+		if (0.f < m_fAlpha)
+			m_fAlpha -= m_fTimeDelta * 0.5f;
+		else
+			m_fAlpha = 0.f;
+		m_pTransformCom->Set_Scaled(m_fScale * m_fAlpha, m_fScale * m_fAlpha, m_fScale * m_fAlpha);
+	}
+	else
+	{
+		if (2.f < m_fShaderTime)
+			m_bDead = true;
+		else if (1.f < m_fShaderTime)
+		{
+			m_pTransformCom->Set_Scaled(m_fScale * m_fAlpha, m_fScale * m_fAlpha, m_fScale * m_fAlpha);
+
+			m_fAlpha -= m_fTimeDelta * 0.5f;
+		}
+	}
+
 	Billboarding();
 
 	return OBJ_NOEVENT;
@@ -225,6 +244,6 @@ void CSpawnEffect::Free()
 		Safe_Release(m_pTextureCom[i]);
 	Safe_Release(m_pVIBufferCom);
 
-	Delete_Effect("ParkParticle1JS");
-	Delete_Effect("ParkParticle2JS");
+	Delete_Effect("ParkParticle3JS");
+	Delete_Effect("ParkParticle4JS");
 }
