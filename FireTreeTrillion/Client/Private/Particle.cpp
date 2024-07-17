@@ -110,6 +110,8 @@ void CParticle::Update_InstanceInfo(INSTANCE_DESC* _instanceDesc)
 	//loop가 두개여
 	m_InstanceDesc.bIsLoop = m_bIsLoop;
 	m_InstanceDesc.vCenter += m_vInitPos;
+	m_InstanceDesc.vInitScale = m_vInitScale;
+	m_InstanceDesc.vInitRot = m_vInitRot;
 
 	if (nullptr != m_pVIBufferCom)
 		m_pVIBufferCom->Update_InstanceDesc(m_InstanceDesc);
@@ -216,8 +218,6 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 		}
 	}
 
-	Compute_ViewZ();
-
 	m_pVIBufferCom->Compute_AllLifeTime(fMyTimeDelta);
 
 	if ( m_fDuration.second <= m_fDuration.first )
@@ -237,6 +237,8 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 		m_pTransformCom->Set_WorldMatrix(*m_pSoketMatrix);
 
 	m_pTransformCom->Set_Scaled(m_vInitScale);
+
+	Compute_ViewZ();
 
 	VTXMATRIX* pVertices = m_pVIBufferCom->Map();
 

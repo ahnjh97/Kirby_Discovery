@@ -8,6 +8,7 @@
 #include "Gully.h"
 #include "HitBox.h"
 #include "Debris.h"
+#include "EventCenter.h"
 
 CFinalBoss::CFinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -114,6 +115,24 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		return Ready_Dead();
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer() * m_fTimeDelay;
+
+	//최초 보스전 시작 트리거
+	if (m_bStartOpeningTrigger)
+	{
+		CTransform* pKirbyTransform = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"))->Get_TransformCom();
+
+		_float fKirbyZ = pKirbyTransform->Get_State(CTransform::STATE_POSITION).z;
+
+		if (-20.f < fKirbyZ)
+		{
+			//CEventCenter::Get_Instance()->Notify(KEVENT_FINALBOSS_APPEAR);
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+			if (pCamera != nullptr)
+				pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_APPEAR);
+			m_bStartOpeningTrigger = false;
+		}
+	}
+
 
 	if (m_pGameInstance->Get_KeyState(DIK_K, KEY_DOWN) || m_fHp < m_fMaxHp * 0.45f)
 	{

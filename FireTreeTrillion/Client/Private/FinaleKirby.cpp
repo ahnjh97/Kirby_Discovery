@@ -18,6 +18,7 @@
 
 #include "FinalePartical_Maker.h"
 
+
 CFinaleKirby::CFinaleKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
 {
@@ -61,7 +62,7 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
     if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Disaster_Master"), TEXT("Prototype_GameObject_Disaster_Master"), this)))
         return E_FAIL;
 
-    //BDBY
+    ////BDBY
     CParticle::PARTICLE_DESC FXDesc{};
     FXDesc.pSocketMatrix = &m_EffectSocket;
     FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
@@ -830,11 +831,15 @@ void CFinaleKirby::Free()
 {
     __super::Free();
 
+    Delete_AllEffect();
+
     for (auto& pModelCom : m_pModelCom)
         Safe_Release(pModelCom);
     for (auto& pEyeTexture : m_pEyeTexture)
         Safe_Release(pEyeTexture);
     for (auto& pMouthTexture : m_pMouthTexture)
         Safe_Release(pMouthTexture);
+
     Safe_Release(m_pCamera);
+
 }

@@ -36,11 +36,11 @@ HRESULT CFire::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vOriginPos);
 	m_fMaxRange = m_vOriginPos.y + (desc.fUpRange * CUtils::Make_RandomFloat(0.8f, 1.2f));
 	m_fMaxScale = desc.fScale * CUtils::Make_RandomFloat(0.6f, 1.f);
-	m_fScale = m_fMaxScale; //*0.1f;
+	m_fScale = m_fMaxScale * 0.1f;
 	m_vFirstColor = desc.vFirstColor;
 	m_vTargetColor = desc.vTargetColor;
 	m_vColor = m_vFirstColor;
-	m_pTransformCom->Set_Scaled(m_fMaxScale, m_fMaxScale, m_fMaxScale);
+	m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 
 	m_pTransformCom->Turn(XMVectorSet(1.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
 	m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
@@ -72,22 +72,22 @@ _int CFire::Tick(_float fTimeDelta)
 
 	if (vPos.y > m_vOriginPos.y + (m_fMaxRange * 0.01f))
 	{
-		m_fDissolve += 0.21f * (60.f * fTimeDelta);
+		m_fDissolve += 0.15f * (60.f * fTimeDelta);
 		m_fScale -= (m_fScale / 6.f) * (60.f * fTimeDelta);
 		if (m_fScale <= 0.f)
 			m_fScale = 0.00001f;
 
 		m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 	}
-	//else
-	//{
-	//	m_fScale += 0.28f * (60.f * fTimeDelta);
-	//	if (m_fScale > m_fMaxScale)
-	//	{
-	//		m_fScale = m_fMaxScale;
-	//	}
-	//	m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
-	//}
+	else
+	{
+		m_fScale += 0.1f * (60.f * fTimeDelta);
+		if (m_fScale > m_fMaxScale)
+		{
+			m_fScale = m_fMaxScale;
+		}
+		m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
+	}
 
 	m_pTransformCom->Turn(XMVectorSet(1.f, 1.f, 0.f, 0.f), fTimeDelta, 360.f);
 	m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), fTimeDelta, 270.f);
@@ -135,7 +135,7 @@ HRESULT CFire::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_Cube"),
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Model_SmokeOriginal"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
