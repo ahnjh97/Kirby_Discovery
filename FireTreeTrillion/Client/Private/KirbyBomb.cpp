@@ -370,6 +370,16 @@ _int CKirbyBomb::Ready_Dead(_float fDeadScale)
     if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BombParticle_v1"), &MultiFXDesc)))
         return OBJ_DEAD;
 
+    LIGHT_DESC         LightDesc{};
+    LightDesc.eType = LIGHT_DESC::TYPE_SUPERFLASH;
+    LightDesc.vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
+    LightDesc.fRange = 15.f;
+    LightDesc.vDiffuse = _float4(.8f, .6f, 0.f, 1.f);
+    LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
+    LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
+    if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+        return E_FAIL;
+
     return OBJ_DEAD;
 }
 

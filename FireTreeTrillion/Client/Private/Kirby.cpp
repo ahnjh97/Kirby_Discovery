@@ -1937,6 +1937,9 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 			Change_State(FINALCUTSTATE_CUT1, 60.f, false, false, BODY_FINALCUT, OFFSET_FINALCUT);
 		}
 	}
+
+	// ºû ÄÁÆ®·Ñ
+	AssistLight_Control();
 }
 
 HRESULT CKirby::Kirby_SystemInitialize()
@@ -2100,6 +2103,65 @@ void CKirby::ReleaseAndClearMap(unordered_map<PxRigidActor*, CGameObject*> _map)
 	_map.clear();
 }
 
+void CKirby::AssistLight_Control()
+{
+	if (INFO(m_pKirbyAssistLight1) == nullptr && INFO(m_eBodyState) == BODY_CARDEFAULT)
+	{
+		_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		_float4 vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float4 vUp = m_pTransformCom->Get_State(CTransform::STATE_UP);
+
+		LIGHT_DESC			LightDesc{};
+		LightDesc.eType = LIGHT_DESC::TYPE_HORONG;
+		LightDesc.vPosition = vPos + (vUp * 0.2f) - (vLook * 3.5f) + (vRight * 0.7f);
+		LightDesc.fRange = 0.1f;
+		LightDesc.vDiffuse = _float4(1.f, 0.6f, 0.2f, 1.f);
+		LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
+		LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
+		if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+			return;
+		INFO(m_pKirbyAssistLight1) = CGameInstance::Get_Instance()->Get_LightLastAddress();
+		Safe_AddRef(INFO(m_pKirbyAssistLight1));
+
+		LightDesc.vPosition = vPos + (vUp * 0.2f) - (vLook * 3.5f) - (vRight * 0.7f);
+		if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+			return;
+		INFO(m_pKirbyAssistLight2) = CGameInstance::Get_Instance()->Get_LightLastAddress();
+		Safe_AddRef(INFO(m_pKirbyAssistLight2));
+
+	}
+
+
+	if (INFO(m_pKirbyAssistLight1) != nullptr)
+	{
+		if (INFO(m_eBodyState) == BODY_CARDEFAULT)
+		{
+			if (INFO(m_bBooster) == true)
+			{
+				INFO(m_pKirbyAssistLight1)->Interpolate_Light(_float4(1.f, 0.6f, 0.2f, 1.f), 10.f, 0.3f);
+				INFO(m_pKirbyAssistLight2)->Interpolate_Light(_float4(1.f, 0.6f, 0.2f, 1.f), 10.f, 0.3f);
+			}
+			else
+			{
+				INFO(m_pKirbyAssistLight1)->Interpolate_Light(_float4(1.f, 0.6f, 0.1f, 1.f), 0.1f, 0.f);
+				INFO(m_pKirbyAssistLight2)->Interpolate_Light(_float4(1.f, 0.6f, 0.1f, 1.f), 0.1f, 0.f);
+			}
+
+			_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+			_float4 vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+			_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vUp = m_pTransformCom->Get_State(CTransform::STATE_UP);
+
+			INFO(m_pKirbyAssistLight1)->Update_LightPos(vPos + (vUp * 0.2f) - (vLook * 3.5f) + (vRight * 0.7f));
+			INFO(m_pKirbyAssistLight2)->Update_LightPos(vPos + (vUp * 0.2f) - (vLook * 3.5f) - (vRight * 0.7f));
+		}
+
+
+
+	}
+}
+
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CKirby* pInstance = new CKirby(pDevice, pContext);
@@ -2176,6 +2238,12 @@ void CKirby::Free()
 
 	if (INFO(m_pLight) != nullptr)
 		Safe_Release(INFO(m_pLight));
+
+	if (INFO(m_pKirbyAssistLight1) != nullptr)
+		Safe_Release(INFO(m_pKirbyAssistLight1));
+	if (INFO(m_pKirbyAssistLight2) != nullptr)
+		Safe_Release(INFO(m_pKirbyAssistLight2));
+
 
 	Safe_Release(m_pBulbFlare);
 }

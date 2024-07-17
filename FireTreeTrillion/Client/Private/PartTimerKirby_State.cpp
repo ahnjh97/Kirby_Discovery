@@ -233,20 +233,21 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 				{
 					m_pFood = pFood;
 					CTransform* pTransformFood = pFood->Get_TransformCom();
-					_float4		vPos = pTransformFood->Get_State(CTransform::STATE_POSITION);
+					_float4		vPosition = pTransformFood->Get_State(CTransform::STATE_POSITION);
 					_vector		vLook = pTransform->Get_State_Float4(CTransform::STATE_LOOK);
 
-					vPos += XMVector3Normalize(vLook) * 8.f * fTimeDelta;
-					pTransformFood->Set_State(CTransform::STATE_POSITION, vPos);
+					vPosition += XMVector3Normalize(vLook) * 8.f * fTimeDelta;
+					pTransformFood->Set_State(CTransform::STATE_POSITION, vPosition);
 					//pTransformFood->Set_State(CTransform::STATE_POSITION, _float4(vPos.x , vPos.y, vPos.z + fTimeDelta * 12.f, 1.f));
 
 					if(false == m_bEffect)
 					{
 						m_bEffect = true;
 						CEffect::FX_DESC FXDesc{};
-						vPos = pTransformFood->Get_State_Float4(CTransform::STATE_POSITION) + pTransform->Get_State_Float4(CTransform::STATE_RIGHT) * 0.2f;
-						FXDesc.vInitPos = _float3(vPos.x, vPos.y, vPos.z);
-						FXDesc.vInitScale = { 0.8f, 0.8f, 0.8f };
+						_float4		vPos = pTransformFood->Get_State(CTransform::STATE_POSITION);
+						vPos += XMVector3Normalize(vLook) * 0.9f + pTransform->Get_State_Vector(CTransform::STATE_RIGHT) * 0.2f;
+						FXDesc.vInitPos = _float3(vPos.x, vPos.y + 0.3f, vPos.z);
+						FXDesc.vInitScale = { 0.5f, 0.5f, 0.5f };
 
 						_float3 vDir = pTransform->Get_State(CTransform::STATE_LOOK);
 						vDir.Normalize();
@@ -260,8 +261,11 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 						FXDesc.vInitRot = vAngle;
 						pAlbaKirby->Add_Effect("FoodGame_IncorrectBbong", FXDesc);
 
-						vPos = pTransformFood->Get_State_Float4(CTransform::STATE_POSITION) - pTransform->Get_State_Float4(CTransform::STATE_RIGHT) * 0.2f;
-						FXDesc.vInitPos = _float3(vPos.x, vPos.y, vPos.z);
+						vPos = pTransformFood->Get_State(CTransform::STATE_POSITION);
+						vPos += XMVector3Normalize(vLook) * 0.9f - pTransform->Get_State_Vector(CTransform::STATE_RIGHT) * 0.2f;
+						FXDesc.vInitPos = _float3(vPos.x, vPos.y + 0.3f, vPos.z);
+						vAngle = { 90.f, fAngleDiff, 0.f };
+						FXDesc.vInitRot = vAngle;
 						pAlbaKirby->Add_Effect("FoodGame_IncorrectBbong", FXDesc);
 					}
 				}
