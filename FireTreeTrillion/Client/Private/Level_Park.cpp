@@ -177,12 +177,9 @@ HRESULT CLevel_Park::Render()
 
 	//윈도우 바 FPS 체크
 	++m_iFPS;
-
-	_tchar szFPS[MAX_PATH] = TEXT("");
-	wsprintf(szFPS, TEXT("Level Park, %d FPS. Kirby is at %"), m_iFPS);
-
-	wstring wstrMsg = TEXT("Level Park, %d FPS. | Kirby is at ") + to_wstring(fPosKirbyX)  + TEXT(", ") + to_wstring(fPosKirbyY)  + TEXT(", ") + to_wstring(fPosKirbyZ)
-					+ TEXT(". | Camera is at ")					 + to_wstring(fPosCameraX) + TEXT(", ") + to_wstring(fPosCameraY) + TEXT(", ") + to_wstring(fPosCameraZ);
+	wstring wstrMsg = TEXT("Level Park : ") + to_wstring(m_iFPS) 
+					+ TEXT(". | Kirby is at ")  + to_wstring(fPosKirbyX)  + TEXT(", ") + to_wstring(fPosKirbyY)  + TEXT(", ") + to_wstring(fPosKirbyZ)
+					+ TEXT(". | Camera is at ")	+ to_wstring(fPosCameraX) + TEXT(", ") + to_wstring(fPosCameraY) + TEXT(", ") + to_wstring(fPosCameraZ);
 
 	if (m_fAccDelta >= 1.f)
 	{
