@@ -1728,6 +1728,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FXRecoveryRoot", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXThunderLine", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXMeteoDash", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("FXDonut", TYPE_NONANIM);
 
 		//공통이펙트 - YW
 		m_vecModelInfo.emplace_back("Cube", TYPE_NONANIM);
