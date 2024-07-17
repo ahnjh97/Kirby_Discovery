@@ -244,6 +244,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_vDestCamDir.Normalize();
 	m_vCurCamDir = m_vOrigCamDir = m_vDestCamDir;
 
+	//여러 이벤트에 함수를 등록한다.
 	Subscribe_Events();
 
 	m_CamTriggerUpOffsets.reserve(LEVEL_END);
@@ -745,7 +746,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 
 		//끝나고 목표 위치로 딱 맞춰주기
 		if (eSeq == SEQ_SIMBA_BATTLESTART
-			|| eSeq == SEQ_FINALECUT5)
+			/*|| eSeq == SEQ_FINALECUT5*/)
 		{
 			//카메라 세팅 스냅
 			Snap_CamSet(fTimeDelta);
@@ -1547,13 +1548,13 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 
 		// 망토 잡기
-		Fill_HardCutSet(newAction, 5.7f);
+		Fill_HardCutSet(newAction, 5.5f);
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .12f, 1.f });
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { .7f, 9.5f, -53.f });
 		newAction.fFOVY = 30.f;
 		m_CamSeq.push_back(newAction);
 
-		Fill_InterpolateCutSet(newAction, 5.7f, EASE_OUT_FAST, .7f);
+		Fill_InterpolateCutSet(newAction, 5.5f, EASE_OUT_FAST, .7f);
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .12f, 1.f });
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { .7f, 9.5f, -49.f });
 		m_CamSeq.push_back(newAction);
@@ -1662,17 +1663,24 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 #pragma region 에피리스
 	case SEQ_FINALBOSS_APPEAR:
 	{
-		//이벤트 호출
+		//에피리스 애니메이션 교체
 		m_fSeqEventTime = 5.f;
+
 
 		CAMACTION newAction = {};
 		Fill_HardCutSet(newAction, 0.f);
 
-		//Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 1.f);
-
-		Fill_ActionPos(newAction, POS_ABSOLUTE, { 16.4f, 25.7f, 25.75f });
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, { .16f, -.08f, -1.f });
+		_float3 vStartPos = { 61.f, 7.f, -14.f };
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos);
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.95f, .12f, .29f });
 		m_CamSeq.push_back(newAction);
+
+		//
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 2.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{0.f, 0.f, 3.f});
+		m_CamSeq.push_back(newAction);
+
+
 	}
 	break;
 #pragma endregion
