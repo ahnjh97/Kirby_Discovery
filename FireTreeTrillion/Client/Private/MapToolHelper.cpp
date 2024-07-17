@@ -1462,7 +1462,8 @@ void CMapToolHelper::Save_Level()
 	else
 		wstrSave += L"BlendDecoInfos X\n";
 
-	if ("Park" == strLevel)
+	if ("Park" == strLevel
+		|| "FinalBoss" == strLevel)
 	{
 		if (true == Save_Lights(strLevel, vecLights))
 			wstrSave += L"Lights O\n";

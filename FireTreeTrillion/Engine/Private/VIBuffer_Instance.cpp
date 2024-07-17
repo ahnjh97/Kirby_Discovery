@@ -270,13 +270,12 @@ void CVIBuffer_Instance::Unmap()
 
 void CVIBuffer_Instance::Drop(_float fTimeDelta, VTXMATRIX* pVertices)
 {
-
+	
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
-		//if (!pVertices[i].bAlive || 0.f < m_pStartDelays[i])
-		//{
-		//	continue;
-		//}
+		if (!pVertices[i].bAlive/* || 0.f < m_pStartDelays[i]*/)
+			continue;
+		
 		m_pVelocities[i].y -= m_pSpeeds[i] * fTimeDelta;
 
 	}
@@ -295,7 +294,8 @@ void CVIBuffer_Instance::Spread(_float fTimeDelta, VTXMATRIX* pVertices)
 
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
-
+		if (!pVertices[i].bAlive/* || 0.f < m_pStartDelays[i]*/)
+			continue;
 		//if (!pVertices[i].bAlive || 0.f < m_pStartDelays[i])
 		//{
 		//	continue;
@@ -319,6 +319,8 @@ void CVIBuffer_Instance::Decelerate(_float fTimeDelta, VTXMATRIX* pVertices)
 {
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
+		if (!pVertices[i].bAlive)
+			continue;
 
 		if (m_pLifeTimes[i].x / m_pLifeTimes[i].y < .5f)
 			continue;
@@ -337,6 +339,8 @@ void CVIBuffer_Instance::Appear(_float fTimeDelta, VTXMATRIX* pVertices)
 {
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
+		if (!pVertices[i].bAlive)
+			continue;
 
 		_float fTimeRatio = clamp((m_pLifeTimes[i].x / m_pLifeTimes[i].y) * 5.f, .01f, 1.f);
 		fTimeRatio = SATURATE(EASE_IN(fTimeRatio));
@@ -369,6 +373,9 @@ void CVIBuffer_Instance::Disappear(_float fTimeDelta, VTXMATRIX* pVertices)
 
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
+		if (!pVertices[i].bAlive)
+			continue;
+
 		if ((m_pLifeTimes[i].x / m_pLifeTimes[i].y) < .5f)
 			continue;
 
@@ -400,6 +407,9 @@ void CVIBuffer_Instance::Wiggle(_float fTimeDelta, VTXMATRIX* pVertices)
 {
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
+		if (!pVertices[i].bAlive)
+			continue;
+
 		_matrix rotationMatrix = XMMatrixIdentity();
 		rotationMatrix = XMMatrixRotationY(XMConvertToRadians(120.f * fTimeDelta));
 		XMStoreFloat3(&m_pDirections[i], XMVector4Transform(XMLoadFloat3(&m_pDirections[i]), rotationMatrix));
@@ -417,6 +427,8 @@ void CVIBuffer_Instance::Tail(_float fTimeDelta, VTXMATRIX* pVertices)
 		//²¿¸®
 		if (i % 10 != 0)
 		{
+			if (!pVertices[i].bAlive)
+				continue;
 
 			_float4x4 PreInstanceMat = { _float4x4::Identity };
 
@@ -455,6 +467,9 @@ void CVIBuffer_Instance::Gravity(_float fTimeDelta)
 {
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
+		if (!pVertices[i].bAlive)
+			continue;
+
 		//m_pDirections[i].y -= GRAVITY * fTimeDelta;
 		m_pVelocities[i].y -= GRAVITY * 2.5f * fTimeDelta;
 	}
@@ -512,7 +527,6 @@ void CVIBuffer_Instance::Apply_Velocity(_float fTimeDelta, VTXMATRIX* pVertices)
 		pVertices[i].vLook = Dir(InstanceMat.Forward());
 		pVertices[i].vPosition = Pos(InstanceMat.Translation());
 
-		//m_pVelocities[i] = _float3();
 	}
 }
 
@@ -643,7 +657,8 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 	m_pColors[iInstanceIndex] = _float3{ vColor.x, vColor.y, vColor.z };
 	m_pAlphas[iInstanceIndex] = vColor.w;
 
-	m_pVelocities[iInstanceIndex] = m_pSpeeds[iInstanceIndex] * m_pDirections[iInstanceIndex];
+	//m_pVelocities[iInstanceIndex] = m_pSpeeds[iInstanceIndex] * m_pDirections[iInstanceIndex];
+	m_pVelocities[iInstanceIndex] = _float3();
 
 }
 void CVIBuffer_Instance::Free()

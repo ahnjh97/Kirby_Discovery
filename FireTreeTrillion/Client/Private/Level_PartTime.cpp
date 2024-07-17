@@ -68,6 +68,7 @@ HRESULT CLevel_PartTime::Initialize()
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_PARTTIME);
+	m_pGameInstance->Set_ObjectBlack(1.f);
 
 	return S_OK;
 }
