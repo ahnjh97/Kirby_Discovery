@@ -211,6 +211,13 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			}
 			break;
 			}
+
+#pragma region 이펙트WI
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.vInitPos = _float3(0.f, 0.f, 0.f);
+			FXDesc.vInitScale = { 1.f, 1.f, 1.f }; // 고정 사이즈
+			pAlbaKirby->Add_Effect("UI_FoodGame_CorrectScoreUp", FXDesc, true);
+#pragma endregion
 		}
 		break;
 		}
