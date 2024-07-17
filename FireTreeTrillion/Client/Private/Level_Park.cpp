@@ -838,8 +838,8 @@ HRESULT CLevel_Park::Ready_Monsters()
 		surprisedDesc.matWorld = transformationMatrix;
 		surprisedDesc.eColor = CSurprisedBoard::GREEN;
 		surprisedDesc.eStartState = CSurprisedBoard::WAIT_R; 
-		surprisedDesc.vPosition = _float3(-24.27f, 59.f, 16.f);
-		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
+		surprisedDesc.vPosition = _float3(-24.27f, 59.f, 31.5f);
+		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_LegendBoard"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 
 	#pragma endregion
@@ -855,8 +855,8 @@ HRESULT CLevel_Park::Ready_Monsters()
 		surprisedDesc.matWorld = transformationMatrix;
 		surprisedDesc.eColor = CSurprisedBoard::RED;
 		surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
-		surprisedDesc.vPosition = _float3(35.5f, 58.5f, 65.f);
-		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
+		surprisedDesc.vPosition = _float3(35.5f, 58.5f, 78.2f);
+		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_LegendBoard"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 
 	#pragma endregion
@@ -1063,12 +1063,32 @@ HRESULT CLevel_Park::Ready_Objects()
 		}
 	}
 
-	// 좌우로 움직이는 DynamicField를 커비에게 등록
+	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT("Layer_Player")));
+	if (nullptr == pKirby)
+		return S_OK;
+
 	list<CGameObject*>* leftRightList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField_SurpriseBoard"));
+	if(nullptr == leftRightList)
+		return S_OK;
+
 	for (auto& leftRight : *leftRightList)
 	{
 		CGm_DynamicField* pLeftRight = dynamic_cast<CGm_DynamicField*>(leftRight);
-		pLeftRight->RegisterToActorToKirby();
+		if (nullptr == pLeftRight)
+			continue;
+		_uint iGimmickIndex = pLeftRight->Get_GimmickIndex();
+
+		CSurprisedBoard* pSurpriseBoard = { nullptr };
+		if (11 == iGimmickIndex)
+		{
+			pSurpriseBoard = dynamic_cast<CSurprisedBoard*>(m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT("Layer_LegendBoard"), 0));
+			pSurpriseBoard->RegisterSurpriseBoardAndDynamicField(pLeftRight);
+		}
+		else if (12 == iGimmickIndex)
+		{
+			pSurpriseBoard = dynamic_cast<CSurprisedBoard*>(m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT("Layer_LegendBoard"), 1));
+			pSurpriseBoard->RegisterSurpriseBoardAndDynamicField(pLeftRight);
+		}
 	}
 
 	// m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT(""), 1); -> 내가 원하는 서프라이즈보드

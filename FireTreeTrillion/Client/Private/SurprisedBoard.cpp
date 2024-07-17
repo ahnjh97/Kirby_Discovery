@@ -6,6 +6,8 @@
 
 #include "MultiEffect.h"
 #include "HitBox.h"
+#include "Kirby.h"
+#include "Gm_DynamicField.h"
 
 CSurprisedBoard::CSurprisedBoard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -74,6 +76,20 @@ _int CSurprisedBoard::Tick(_float fTimeDelta)
 			m_pFSM->Update(this, fTimeDelta);
 	}
 
+	if (false == m_bNotified && nullptr != m_pDynamicField)
+	{
+		_uint iAnimIndex = Get_State();
+		if (POP_OUT_L == iAnimIndex || POP_OUT_R == iAnimIndex)
+		{
+			if (0.45f < m_arrModelCom[m_eModelColor]->Get_AnimRatio())
+			{
+				m_bNotified = true;
+				CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(m_pDynamicField);
+				pDynamicField->Set_Interaction(true);
+			}
+		}
+		
+	}
 	return OBJ_NOEVENT;
 }
 
@@ -171,13 +187,19 @@ void CSurprisedBoard::Render_IMGUI()
 
 void CSurprisedBoard::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+	if (true == m_bActivated)
+		return;
+
+	m_bActivated = true;
+
 	if (eContent == CCollisionCenter::CONTENT_TRIGGER)
 	{
 		_uint uState = __super::Get_State();
 		if (uState == WAIT_L)
-			Change_State(CSurprisedBoard::PREPOP_OUT_L, 50.f, false, true);
+			Change_State(CSurprisedBoard::PREPOP_OUT_L, 60.f, false, false);
+			
 		else if (uState == WAIT_R)
-			Change_State(CSurprisedBoard::PREPOP_OUT_R, 50.f, false, true);
+			Change_State(CSurprisedBoard::PREPOP_OUT_R, 60.f, false, false);
 	}
 }
 
@@ -216,6 +238,17 @@ void CSurprisedBoard::Go_Right_Rigid(_float fOffset)
 	vPosition += XMVector3Normalize(vRight) * fSpeed * m_fTimeDelta * fOffset;
 	
 	memcpy(&m_matWorld.m[3], &vPosition, sizeof(_float4));
+}
+
+void CSurprisedBoard::RegisterSurpriseBoardAndDynamicField(CGameObject* pDynamicField)
+{
+	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT("Layer_Player")));
+	if (nullptr == pKirby || nullptr == pDynamicField)
+		return;
+
+	pKirby->RegisterActorToPlayer_ForSurpriseBoard(m_pRigidBodyCom->Get_RigidDynamic(), this, pDynamicField);
+	m_pDynamicField = pDynamicField;
+	Safe_AddRef(m_pDynamicField);
 }
 
 HRESULT CSurprisedBoard::Add_Components()
@@ -374,6 +407,7 @@ void CSurprisedBoard::Free()
 	__super::Free();
 	//m_pGameInstance->ReleaseActor(m_pDynamicActor);
 
+	Safe_Release(m_pDynamicField);
 	Safe_Release(m_pRigidBodyCom);
 
 	for (auto& pModel : m_arrModelCom)
