@@ -232,19 +232,23 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 18.f)
 				pSimba->Change_State(CSimba::Simba_QuickClawEndL, 66.66f, false, false);
 			else
+				//pSimba->Change_State(CSimba::Simba_BackStepStart, 70.f, false, true);
 				pSimba->Change_State(CSimba::Simba_QuickClawLFromStart, 66.66f, false, false);
 			break;
 		case CSimba::Simba_QuickClaw2R:
 			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 18.f)
 				pSimba->Change_State(CSimba::Simba_QuickClawEndR, 66.66f, false, false);
 			else
+				//pSimba->Change_State(CSimba::Simba_BackStepStart, 70.f, false, true);
 				pSimba->Change_State(CSimba::Simba_QuickClawRFromStart, 66.66f, false, false);
 			break;
 
 		case CSimba::Simba_QuickClawEndL: case CSimba::Simba_QuickClawEndR:
 			pSimba->Set_PreState(iState);
 			pSimba->Change_State(CSimba::Simba_Wait2, 40.f, false, true);
-			//pSimba->Change_State(CSimba::Simba_QuickClawStartL, 50.f, false, true);
+
+			//pSimba->Change_State(CSimba::Simba_BackStepStart, 70.f, false, true);
+			//pSimba->Change_State(CSimba::Simba_QuickClawStartL, 66.f, false, true);
 			break;
 
 		case CSimba::Simba_QuickClawLFromStart: case CSimba::Simba_QuickClawRFromStart:
@@ -284,7 +288,10 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		case CSimba::Simba_FinalCrusherEnd:
 			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 15.f) {
 				pSimba->Set_PreState(iState);
-				pSimba->Change_State(CSimba::Simba_Wait2, 40.f, false, true);
+				//if(0 == CUtils::Make_RandomInt(0, 1))
+					pSimba->Change_State(CSimba::Simba_Wait2, 40.f, false, true);
+				//else
+				//	pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, true); // 점프공격
 			}
 			else
 				pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 50.f, false, true);
@@ -350,8 +357,16 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 				pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, true); // 점프공격
 			}
 			else
+			{
+				_uint iRandNum = CUtils::Make_RandomInt(0, 1);
+				if(0 == iRandNum)
+					pSimba->Change_State(CSimba::Simba_QuickClawStartL, 66.f, false, true);
+				else
+					pSimba->Change_State(CSimba::Simba_QuickClawStartR, 66.f, false, true);
+
 				//pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 50.f, false, true);
-				pSimba->Change_State(CSimba::Simba_BackStepStart, 70.f, false, true);
+				//pSimba->Change_State(CSimba::Simba_BackStepStart, 70.f, false, true);
+			}
 			break;
 		}
 	}
@@ -469,7 +484,7 @@ void CSimba_Jump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** BackStep *********************** // 이동로직 구현 필요
+// *********************** BackStep *********************** // 이동로직 구현 필요 // 후순위
 void CSimba_BackStep::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -500,8 +515,9 @@ void CSimba_BackStep::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			pSimba->Change_State(CSimba::Simba_BackStepLanding, 70.f, false, false);
 		else if (CSimba::Simba_BackStepLanding == iState)
 		{
-			pSimba->Turn_RotationBoneMatrix(AttackJump);
-			pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, true); // 점프공격
+			pSimba->Change_State(CSimba::Simba_BackStepStart, 70.f, false, true); // 점프공격
+			//pSimba->Turn_RotationBoneMatrix(AttackJump);
+			//pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, true); // 점프공격
 		}
 	}
 }

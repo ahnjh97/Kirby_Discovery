@@ -35,27 +35,6 @@ void CSimba::SetCamSequence(_uint iCamSeq)
 		pCamera->Make_Sequence(CCamera_Main::CAMSEQ(iCamSeq));
 }
 
-_bool CSimba::IsKirbyOnMyLeft()
-{
-	if (nullptr == m_pKirby)
-		return false;
-
-	_vector vWorldLook = XMVector3TransformNormal(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_pTransformCom->Get_WorldMatrix());
-
-	CTransform* pKirbyTransform =  m_pKirby->Get_TransformCom();
-	if (nullptr == pKirbyTransform)
-		return false;
-	_vector vKirbyPos = pKirbyTransform->Get_State(CTransform::STATE_POSITION);
-
-	_vector crossProduct = XMVector3Cross(vWorldLook, vKirbyPos);
-	_float fCrossResultY = XMVectorGetY(crossProduct);
-
-	if (fCrossResultY > 0.f)
-		return true;
-	else
-		return false;
-}
-
 HRESULT CSimba::Initialize_Prototype()
 {
 	m_eCollisionGroup = MONSTER;
@@ -218,7 +197,7 @@ _int CSimba::Tick(_float fTimeDelta)
 		Change_State(Simba_Death, 2.f, false, true);
 	}
 
-	if (0.45f > m_fHpRatio && 0.f < m_fHpRatio && m_bPhaseTwo == false) {
+	if (0.6f > m_fHpRatio && 0.f < m_fHpRatio && m_bPhaseTwo == false) {
 		m_bPhaseTwo = true;
 		Turn_RotationBoneMatrix(-2.5f);
 		Change_State(Simba_Damage, 50.f, false, true);
@@ -421,6 +400,31 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 		matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone);
 
 	// 별 생성좀 하하하
+}
+
+_bool CSimba::IsKirbyOnMyLeft()
+{
+	if (nullptr == m_pKirby)
+		return false;
+
+	_vector vLook = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+	_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	CTransform* pKirbyTransform = m_pKirby->Get_TransformCom();
+	if (nullptr == pKirbyTransform)
+		return false;
+	_vector vKirbyPos = pKirbyTransform->Get_State(CTransform::STATE_POSITION);
+
+	_vector vDir = vKirbyPos - vPos;
+	vDir = XMVector3Normalize(XMVectorSetY(vDir, 0));
+
+	_vector crossProduct = XMVector3Cross(vLook, vDir);
+	_float fCrossResultZ = XMVectorGetZ(crossProduct);
+
+	if (fCrossResultZ > 0.f)
+		return true;
+	else
+		return false;
 }
 
 HRESULT CSimba::Add_Components()
