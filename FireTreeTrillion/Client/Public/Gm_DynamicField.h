@@ -28,6 +28,7 @@ public:
 	_bool IsActivated() { return m_bIsInteraction; }
 	void Set_Interaction(_bool bInteraction) { m_bIsInteraction = bInteraction; }
 	void RegisterToActorToKirby();
+	void Set_ReturnMove(_bool _bReturnMove) { m_bIsReturnMove = _bReturnMove; }
 
 private:
 	CGm_DynamicField(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -79,6 +80,7 @@ private:
 	
 	_bool					m_bIsInteraction = { FALSE };
 	_bool					m_bIsQuake = { FALSE };
+	_bool					m_bIsReturnMove = { FALSE };
 
 	_uint					m_iGimmickIndex = {};
 
