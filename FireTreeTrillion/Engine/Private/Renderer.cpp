@@ -494,6 +494,14 @@ void CRenderer::Color_Initialize()
 		0.34f, 0.13f, 0.55f
 		});
 
+	Save_ColorSet("PartTime",
+		COLOR_DATA{
+		0.729446f, 1.f, 1.03022f, 1.42964f, 1.79006f, 1.49008f, 1.00988f, 0.720329f, 0.6f,
+		0.6f, 1.32023f, 1.07612f, 1.09806f, 0.0846788f, 0.0345651f, 0.177979f, 0.019863f,
+		0.466084f, 0.676991f, 0.218674f, 0.019726f, 0.499961f, 0.912908f, 0.99115f,
+		0.0197512f, 0.189896f, 0.360017f
+		});
+
 	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
 	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
 	m_pGameInstance->Emplace_TriggerFunc(1, TriggerFunc);
@@ -636,7 +644,7 @@ void CRenderer::Key_Input()
 	//}
 
 	//리얼 초저사양모드
-	if (m_pGameInstance->Get_DIKeyState(DIK_LSHIFT, KEY_PRESS))
+	if (m_pGameInstance->Get_DIKeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_DIKeyState(DIK_RSHIFT, KEY_PRESS))
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_E, KEY_DOWN))
 		{
@@ -883,6 +891,12 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 
 		m_fDOFIntensity = 1.f;
 		m_vDOFColor = _float3{ .03f, .07f, 0.f };
+	}
+	break;
+	case 11:
+	{
+		m_DestColorData = Find_ColorSet("PartTime");
+		Update_Option(OPTION_DOF, false);
 	}
 	break;
 	default:
@@ -1322,6 +1336,9 @@ HRESULT CRenderer::Render_EffectResult()
 	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_SSAO"), "g_SSAOTexture")))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Bind_RTShaderResource(m_pShader, TEXT("Target_Sky"), "g_SkyTexture")))
+		return E_FAIL;
+
 	if (FAILED(m_pShader->Bind_RawValue("g_bMapTool", &m_bMaptool, sizeof(_bool))))
 		return E_FAIL;
 
@@ -1469,6 +1486,8 @@ HRESULT CRenderer::Render_Result()
 		return E_FAIL;
 
 	if (FAILED(m_pShader->Bind_RawValue("g_fObjectBlack", &m_fObjectBlack, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fRealObjectBlack", &m_fRealObjectBlack, sizeof(_float))))
 		return E_FAIL;
 
 	// 섞을 스카이 박스
@@ -2283,6 +2302,13 @@ void CRenderer::ObjectBlack(_float fTimeDelta)
 		{
 			m_fObjectBlack = m_fObjectBlackTarget;
 			m_fOBjectBlackTime = 0.f;
+
+			if (m_bRealBlack == true)
+			{
+				m_fRealObjectBlack = m_fObjectBlackTarget;
+				m_bRealBlack = false;
+			}
+
 			m_bObjectBlack = false;
 			return;
 		}
@@ -2290,10 +2316,21 @@ void CRenderer::ObjectBlack(_float fTimeDelta)
 		m_fOBjectBlackTime += fTimeDelta;
 		m_fObjectBlack += fTimeDelta * m_fObjectBlackRatioTime;
 
+		if (m_bRealBlack == true)
+			m_fRealObjectBlack += fTimeDelta * m_fObjectBlackRatioTime;
+
+
 		if (m_fOBjectBlackTime > m_fObjectBlackMaxTime)
 		{
 			m_fObjectBlack = m_fObjectBlackTarget;
 			m_fOBjectBlackTime = 0.f;
+
+			if (m_bRealBlack == true)
+			{
+				m_fRealObjectBlack = m_fObjectBlackTarget;
+				m_bRealBlack = false;
+			}
+
 			m_bObjectBlack = false;
 		}
 	}

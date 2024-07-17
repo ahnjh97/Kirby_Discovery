@@ -189,6 +189,13 @@ HRESULT CFinale_SpecialDebris_A::Bind_ShaderResources()
 
 void CFinale_SpecialDebris_A::Make_Particle()
 {
+	if (m_eCurCut == CUT6 && m_pModelCom->Get_CurTrackPosition() >= 208.f && m_BlackTrigger == true)
+	{
+		m_pGameInstance->Set_ObjectBlack(0.2f, 0.5f);
+		m_BlackTrigger = false;
+	}
+
+
 	if (m_eCurCut == CUT6 && m_pModelCom->Get_CurTrackPosition() >= 268.f)
 	{
 		if (m_bParticleTrigger == true)

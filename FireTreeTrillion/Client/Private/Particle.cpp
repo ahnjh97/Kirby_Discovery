@@ -257,8 +257,16 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_TAIL])
 		m_pVIBufferCom->Tail(fMyTimeDelta, pVertices);
 
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT])
+		m_pVIBufferCom->Orbit(fMyTimeDelta, pVertices);
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ASSEMBLE])
+		m_pVIBufferCom->Assemble(fMyTimeDelta, pVertices);
+
+
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY])
 		m_pVIBufferCom->Gravity(fMyTimeDelta);
+
 
 	m_pVIBufferCom->Apply_Velocity(fMyTimeDelta, pVertices);
 

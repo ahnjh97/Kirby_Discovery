@@ -50,7 +50,7 @@ public:
 
 		SEQ_SIMBA_BATTLESTART,
 
-		SEQ_FINALBOSS_BATTLESTART,
+		SEQ_FINALBOSS_APPEAR,
 
 		//단독으로 하나를 즉시 넣어 사용하는 시퀀스
 		SEQ_ONE,
@@ -119,10 +119,22 @@ public:
 
 	void Set_TargetAnchor(_float3 vAnchorOffset) { m_vAnchorOffset = vAnchorOffset; }
 
-	void Set_CamFocus(CAMFOCUS eFocus) { m_eCamFocus = eFocus; }
+	void Set_CamFocus(CAMFOCUS eFocus)
+	{
+		m_eCamFocus = eFocus;
+	}
 
 	//FOV를 세팅한다.
 	void Set_FOVY(_float fFOVYDegree) { m_fDestFovy = XMConvertToRadians(fFOVYDegree); }
+
+	//카메라에 마지막으로 보정할 쌩 오프셋.
+	void Set_FinalOffset(_float3 vOffset, _float fInterpolateSpeed = -1.f)
+	{
+		m_fZAngleInterpolateSpeed = (fInterpolateSpeed != -1.f) ?
+			3.f : fInterpolateSpeed;
+
+		m_vDestFinalOffset = vOffset;
+	}
 
 	//z 각도와, z 각도 보간 속도를 설정한다.
 	void Set_ZAngle(_float fZAngle, _float fInterpolateSpeed = -1.f)
@@ -295,6 +307,16 @@ private:
 	_float3 m_vStartCamDir = { 0.f, 0.f, 0.f };
 
 
+#pragma region 후보정
+
+/*마지막 쌩 이동값 보정*/
+	_float3	m_vPreFinalOffset = { 0.f, 0.f, 0.f };
+	_float3	m_vCurFinalOffset = { 0.f, 0.f, 0.f };
+	_float3	m_vDestFinalOffset = { 0.f, 0.f, 0.f };
+
+	_float m_fFinalOffsetInterpolateSpeed = { 3.f };
+
+
 /*Z 앵글*/
 	//이전 프레임의 z 값을 저장.
 	_float m_fPreZAngle = { 0.f };
@@ -336,6 +358,7 @@ private:
 	_float m_fInitialShakeTime = { 0.f };
 	_float m_fCurShakeTime = { 0.f };
 
+#pragma endregion
 
 /*카메라 시퀀스*/
 
@@ -382,10 +405,12 @@ private:
 	_float3 Make_ShakeDir(_float fTimeDelta);
 	void MoveTo_CurCamPos_Interpolate(_float fTimeDelta);
 	void MoveTo_CurCamPos_Absolute(_float fTimeDelta);
+	void Snap_CamSet(_float fTimeDelta);
 
 	void System_Tick(_float fTimeDelta);
 	void Check_FinaleScene(_float fTimeDelta);
 	void Check_FinaleTime(_float fTimeDelta);
+	void Deferred_Blackoperation(CAMSEQ eSEQ);
 
 	void Fill_HardCutSet(CAMACTION& Action, _float fTime);
 	void Fill_InterpolateCutSet(CAMACTION& Action, _float fTime, EASING eEase, _float fInterpolateSpeed);

@@ -130,6 +130,8 @@ public:
 		// ÇØ¸Ó Æû
 		_int			m_iHammerHit = { 0 };
 		_float			m_fHammerChargeTime = { 0.f };
+		_bool			m_bFirstChargeEffectTrigger = { true };
+		_bool			m_bSecondChargeEffectTrigger = { true };
 
 		// Àü±¸ Æû
 		_bool			m_bLightOn = { false };
@@ -140,6 +142,9 @@ public:
 		_float			m_fTimeRatio = { 0.f };
 		_int			m_iCrashTimeSlow = { 0 };
 		_float			m_fCrashChargeTime = { 0.f };
+
+		// FinalCut Æû
+		_bool			m_bFinalBossDead = { false };
 	}KIRBY_INFODESC;
 
 
@@ -292,6 +297,9 @@ private:
 
 	// For Crash
 	_float				  m_fCrashRestoreTime = { 0.f };
+
+	// For FinalCut
+	_bool				  m_bFinalCutTrigger = { true };
 
 	unordered_map<PxRigidActor*, CGameObject*> m_mapToppleableBridges;
 	unordered_map<PxRigidActor*, CGameObject*> m_mapStarBoxes;

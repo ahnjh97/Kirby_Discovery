@@ -60,7 +60,17 @@ _int CFinalePartical::Tick(_float fTimeDelta)
     if (pCenter != nullptr)
         iAnimIndex = pCenter->Get_CutScene();
 
-    _float4 vDelta = (iAnimIndex >= 12) == true ? ((m_vDir + _float4(5.f, 0.f, 0.f, 0.f)) * m_fTimeDelta * m_fSpeed) : (m_vDir * m_fTimeDelta * m_fSpeed);
+    _float4 vDelta = { 0.f, 0.f, 0.f, 0.f };
+    if (iAnimIndex == 20)
+    {
+        vDelta = (m_vDir + _float4(10.f, 3.f, 0.f, 0.f)) * m_fTimeDelta * m_fSpeed;
+    }
+    else if ((iAnimIndex >= 12) == true)
+        vDelta = (m_vDir + _float4(5.f, 0.f, 0.f, 0.f)) * m_fTimeDelta * m_fSpeed;
+    else
+        vDelta = (m_vDir * m_fTimeDelta * m_fSpeed);
+
+
     _float4 vGravity = m_bNoGravity == false ? _float4(0.f, m_fGravity, 0.f, 0.f) : _float4(0.f, 0.f, 0.f, 0.f);
     m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vDelta - vGravity);
     m_pTransformCom->Turn(m_fTurnAxis, m_fTimeDelta, m_fTurn);

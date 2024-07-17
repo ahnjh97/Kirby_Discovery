@@ -64,6 +64,8 @@ HRESULT CPartTimerKirby::Initialize(void* pArg)
 		CPartTimeHelper::Get_Instance()->Register_PartTimerKirby(this);
 	}
 
+	m_pGameInstance->Update_DofFocus(GET_POS);
+
 	// 완전히 기본상태로 먼저 세팅한다.
 	m_eMouthState = MOUTH_HAPPY;
 	m_eEyeState = EYE_IDLE;

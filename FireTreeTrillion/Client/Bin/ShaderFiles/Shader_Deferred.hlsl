@@ -12,6 +12,8 @@ matrix g_GodViewMatrix, g_GodProjMatrix;
 //색 보정 글로별 번수
 bool g_bApplyCorrection = true;
 
+bool g_bBloomSky = false;
+
 // 디퍼드 옵션 설정
 bool g_bRenderShadow = { true };
 bool g_bRenderSSAO = { true };
@@ -184,6 +186,7 @@ float g_fOceanIntensity = { 0.f };
 
 // Dark
 float g_fObjectBlack = { 1.f };
+float g_fRealObjectBlack = { 1.f };
 
 
 float3 FOGY(float fWorldY, float4 vColor, float3 vFogColor, float fFogBottomY, float fFogTopY, float fintensity)
@@ -315,7 +318,13 @@ float4 Blur_X(float2 vTexCoord)
         //if (1.f == g_BlendTexture.Sample(ClampSampler, vUV).g)
         //    continue;
         
-        vOut += fWeight[6 + i] * (g_EffectTexture.Sample(ClampSampler, vUV) + g_SpecularTexture.Sample(ClampSampler, vUV));
+        vector vColor = g_EffectTexture.Sample(ClampSampler, vUV) + g_SpecularTexture.Sample(ClampSampler, vUV);
+        
+        //if(g_bBloomSky)
+        //    vColor += g_SkyTexture.Sample(ClampSampler, vUV);
+        
+        vOut += fWeight[6 + i] * vColor;
+        
         fTotal += fWeight[6 + i];
     }
 
@@ -1138,6 +1147,9 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
     
     
+    Out.vColor *= g_fObjectBlack;
+
+    
     if (vRimLightDesc.g > 0.01f && vRimLightDesc.b == 1.f)
     {
         
@@ -1156,9 +1168,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
 
     }
     
-    
-    
-    Out.vColor *= g_fObjectBlack;
+    Out.vColor *= g_fRealObjectBlack;
     /////////
     
         

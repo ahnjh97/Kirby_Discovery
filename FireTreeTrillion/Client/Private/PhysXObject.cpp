@@ -137,9 +137,9 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 		Delete_AllEffect();
 
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
-		FXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		FXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pGameInstance->Get_CamLook());
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(m_pGameInstance->Get_CamLook());
-		FXDesc.vInitScale = { 1.8f, 1.8f, 1.8f };
+		FXDesc.vInitScale = { 3.f, 3.f, 1.8f };
 
 		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;

@@ -180,7 +180,7 @@ void CStarBlock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 		_float4 vDir = vPos - vPlayerPos;
 		vDir.Normalize();
 		m_vDamegeDir = (_float3)vDir;
-		m_fHitPower = 12.f;
+		m_fHitPower = 20.f;
 		m_bDead = true;
 	}
 	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
@@ -194,6 +194,22 @@ void CStarBlock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 		m_vDamegeDir = (_float3)vDir;
 		m_fHitPower = 20.f;
 		m_bDead = true;
+	}
+	else if (eContent == CCollisionCenter::CONTENT_ATTACKBULLET)
+	{
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+		if (pCamera != nullptr)
+			pCamera->Make_Shake(0.5f);
+
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float4 vBulletPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+		_float4 vDir = vPos - vBulletPos;
+		vDir.Normalize();
+		m_vDamegeDir = (_float3)vDir;
+		m_fHitPower = 20.f;
+		m_bDead = true;
+
+
 	}
 }
 

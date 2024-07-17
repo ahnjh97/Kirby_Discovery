@@ -3,6 +3,7 @@
 #include "FSM.h"
 #include "HitBox.h"
 #include "Phanta_State.h"
+#include "SpawnEffect.h"
 
 CPhanta::CPhanta(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -54,7 +55,16 @@ HRESULT CPhanta::Initialize(void* pArg)
 _int CPhanta::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
+	{
+		HRESULT hr;
+		CSpawnEffect::SPAWNEFFECT_DESC tDesc{};
+		tDesc.vPosition = GET_POS;
+		tDesc.fScale = 2.5f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
+		CHECK_FAILED(hr);
+
 		return Ready_Dead();
+	}
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 

@@ -80,7 +80,7 @@ HRESULT CLevel_Park::Initialize()
 		return E_FAIL;
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet_ByIndex(6);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_PARK);
 
 	// PARK 도착했으면 오픈해주세요
 	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
