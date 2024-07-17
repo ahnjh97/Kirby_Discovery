@@ -728,9 +728,10 @@ HRESULT CLevel_Park::Ready_Monsters()
 	}
 	fileInput.close();
 
-	#pragma region SurprisedBoard 여섯마리 레전드 추가
+#pragma region SurprisedBoard 일곱마리
 
-		// ------------------ 맨 앞 SurprisedBoard ------------------
+	#pragma region 맨 앞 빨강
+
 		// 위치 행렬을 만든다. 
 		_float4x4 translationMatrix = XMMatrixTranslation(19.6f, 5.f, -143.f);
 
@@ -753,8 +754,10 @@ HRESULT CLevel_Park::Ready_Monsters()
 		HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 
+#pragma endregion
+	
+	#pragma region 두번째 연두색
 
-		// ------------------ 두 번째 SurprisedBoard ------------------
 		// 위치 수정
 		translationMatrix = XMMatrixTranslation(44.54f, 4.97f, -113.189f);
 		// 회전값은 그대로 사용
@@ -768,8 +771,10 @@ HRESULT CLevel_Park::Ready_Monsters()
 		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 
+	#pragma endregion
+	
+	#pragma region 세번째 주황색
 
-		// ------------------ 세 번째 SurprisedBoard ------------------
 		// 위치 수정
 		translationMatrix = XMMatrixTranslation(21.39f, 5.08f, -89.f);
 		// 회전 행렬을 만든다.
@@ -785,8 +790,10 @@ HRESULT CLevel_Park::Ready_Monsters()
 		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 
+    #pragma endregion
+	
+	#pragma region 네번째(1) 피랑색 오른쪽
 
-		// ------------------ 네 번째(1) 오른쪽 SurprisedBoard ------------------
 		// 위치 수정
 		translationMatrix = XMMatrixTranslation(12.f, 4.5f, -68.5f);
 		// 회전값은 그대로 사용
@@ -800,8 +807,10 @@ HRESULT CLevel_Park::Ready_Monsters()
 		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 
+    #pragma endregion
+	
+	#pragma region 네번째(2) 피랑색 왼쪽
 
-		// ------------------ 네 번째(2) 왼쪽 SurprisedBoard ------------------
 		// 위치 수정
 		translationMatrix = XMMatrixTranslation(-1.62f, 4.5f, -69.5f);
 		// 회전값은 그대로 사용
@@ -816,6 +825,42 @@ HRESULT CLevel_Park::Ready_Monsters()
 		CHECK_FAILED(hr);
 
 	#pragma endregion
+	
+	#pragma region 다섯번째 Land2에서의 앞쪽 연두색
+
+		// 위치 수정
+		translationMatrix = XMMatrixTranslation(-27.02f, 57.97f, 33.42f);
+		// 회전값은 그대로 사용
+		transformationMatrix = rotationMatrix * translationMatrix;
+
+		// 해당 위치의 행렬을 넘긴다.
+		surprisedDesc.matWorld = transformationMatrix;
+		surprisedDesc.eColor = CSurprisedBoard::GREEN;
+		surprisedDesc.eStartState = CSurprisedBoard::WAIT_R; 
+		surprisedDesc.vPosition = _float3(-24.27f, 59.f, 16.f);
+		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
+		CHECK_FAILED(hr);
+
+	#pragma endregion
+	
+	#pragma region 여섯번째 Land2에서의 중간쯤 빨강색
+
+		// 위치 수정
+		translationMatrix = XMMatrixTranslation(39.5f, 57.97f, 81.5f);
+		// 회전값은 그대로 사용
+		transformationMatrix = rotationMatrix * translationMatrix;
+
+		// 해당 위치의 행렬을 넘긴다.
+		surprisedDesc.matWorld = transformationMatrix;
+		surprisedDesc.eColor = CSurprisedBoard::RED;
+		surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
+		surprisedDesc.vPosition = _float3(35.5f, 58.5f, 65.f);
+		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
+		CHECK_FAILED(hr);
+
+	#pragma endregion
+
+#pragma endregion
 
 	return S_OK;
 }
