@@ -145,6 +145,11 @@ public:
 
 		// FinalCut 폼
 		_bool			m_bFinalBossDead = { false };
+
+
+		// 어시스트 라이트
+		class CLight* m_pKirbyAssistLight1 = { nullptr };
+		class CLight* m_pKirbyAssistLight2 = { nullptr };
 	}KIRBY_INFODESC;
 
 
@@ -305,6 +310,8 @@ private:
 	unordered_map<PxRigidActor*, CGameObject*> m_mapStarBoxes;
 	unordered_map<PxRigidActor*, CGameObject*> m_mapBoxes;
 	void ReleaseAndClearMap(unordered_map<PxRigidActor*, CGameObject*> _map);
+
+	void				  AssistLight_Control();
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
