@@ -1714,6 +1714,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FXRecoveryRoot", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXThunderLine", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXMeteoDash", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("FXDonut", TYPE_NONANIM);
 
 
 		//m_vecModelInfo.emplace_back("DimensionLaser", TYPE_NONANIM, 1.f, 180.f);
