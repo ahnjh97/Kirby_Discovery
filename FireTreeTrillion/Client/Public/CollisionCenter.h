@@ -17,6 +17,7 @@ public:
         CONTENT_BODY,		    // 캐릭터와 몬스터가 몸끼리 박음
 
         CONTENT_ATTACK,         // 플레이어의 히트박스 X 몬스터
+        CONTENT_ATTACKBULLET,
         CONTENT_DAMAGE,         // 몬스터와의 히트박스 X 플레이어
         CONTENT_DEFORM,
 

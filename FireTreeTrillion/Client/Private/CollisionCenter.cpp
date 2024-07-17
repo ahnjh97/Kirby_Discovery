@@ -1120,10 +1120,10 @@ void CCollisionCenter::Hitbox_Collision()
 				return;
 
 			// 폭발물
-			CPhysXObject* pDst = static_cast<CPhysXObject*>(Src);
+			CPhysXObject* pDst = static_cast<CPhysXObject*>(Dst);
 			// 오브젝트
 			CPhysXObject* pObject = static_cast<CPhysXObject*>(Src);
-			pObject->Collision(CONTENT_ATTACK, pDst);
+			pObject->Collision(CONTENT_ATTACKBULLET, pDst);
 			Dst->Set_Dead();
 		});
 
