@@ -401,6 +401,8 @@ private:
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
 
+	_float m_fTime = { false };
+
 public:
 	static	CSimba_BiteRush* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
 		{ return new CSimba_BiteRush(pController, pTransform, pKirby, pKirbyTransform); }

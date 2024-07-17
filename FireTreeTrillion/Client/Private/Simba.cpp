@@ -8,6 +8,7 @@
 #include "EventCenter.h"
 #include "Bone.h"
 #include "Camera_Main.h"
+#include "Ability.h"
 
 CSimba::CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -399,13 +400,37 @@ void CSimba::Turn_RotationBoneMatrix(_float fAngle)
 void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 {
 	_float4x4 matBoneWorld{};
-
+	HRESULT hr{};
+	CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+	AbilityItemDesc.fAngle = 0.f;
+	AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
 	if (Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx)
+	{
 		matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone);
-	else if (Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
-		matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone);
+		_float fOffsetY = 0.5f;
 
-	// 별 생성좀 하하하
+		AbilityItemDesc.fRotateDir = 1.f;
+		AbilityItemDesc.vDir = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * CUtils::Make_RandomFloat(0.2f, 0.7f);
+		AbilityItemDesc.vPosition = _float4(matBoneWorld._41, matBoneWorld._42 + fOffsetY, matBoneWorld._43, 1) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.5f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+	}
+
+	else if (Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx) {
+		matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone);
+		_float fOffsetY = 1.f;
+
+		AbilityItemDesc.fRotateDir = -1.f;
+		AbilityItemDesc.vDir = -m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * CUtils::Make_RandomFloat(0.2f, 0.7f);
+		AbilityItemDesc.vPosition = _float4(matBoneWorld._41, matBoneWorld._42 + fOffsetY, matBoneWorld._43, 1) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.5f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+	}
+
+	else if (Simba_AttackJumpHit == iAnimIdx)
+	{
+
+	}
 }
 
 _bool CSimba::IsKirbyOnMyLeft()
