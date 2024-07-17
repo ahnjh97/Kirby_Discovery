@@ -41,6 +41,8 @@ float g_fEmissivePower;
 
 float4 g_vCamPosition;
 
+float g_fDissolve;
+
 
 // 회전된 UV를 계산
 float2 RotateUV(float2 vCoord, float fAngle)
@@ -432,7 +434,10 @@ PS_OUT_EFFECT PS_MAIN_BLEND_FX_LINEARDIFFUSE(PS_IN In)
 
     //소프트 이펙트 보정
     Out.vColor.a = SoftEffect(Out.vColor.a, In.vProjPos);
-    Out.vNonBlur = vector(0, 1, 0, 1);
+    
+    if(Out.vColor.a < .1)
+        discard;
+
     return Out;
 }
 
@@ -452,7 +457,10 @@ PS_OUT_EFFECT PS_MAIN_BLEND_FX_CLAMPDIFFUSE(PS_IN In)
 
     //소프트 이펙트 보정
     Out.vColor.a = SoftEffect(Out.vColor.a, In.vProjPos);
-    Out.vNonBlur = vector(0, 1, 0, 1);
+    
+    if (Out.vColor.a < .1)
+        discard;
+    
     return Out;
 }
 
@@ -477,7 +485,8 @@ PS_OUT_EFFECT PS_MAIN_WHITE_FX_LINEARDIFFUSE(PS_IN In)
 
     //소프트 이펙트 보정
     Out.vColor.a = SoftEffect(Out.vColor.a, In.vProjPos);
-    
+    if (Out.vColor.a < .1)
+        discard;
     return Out;
 }
 
@@ -499,7 +508,8 @@ PS_OUT_EFFECT PS_MAIN_WHITE_FX_CLAMPDIFFUSE(PS_IN In)
 
     //소프트 이펙트 보정
     Out.vColor.a = SoftEffect(Out.vColor.a, In.vProjPos);
-    
+    if (Out.vColor.a < .1)
+        discard;
     return Out;
 }
 
@@ -751,6 +761,32 @@ PS_OUT PS_FOR_COIN(PS_IN In)
     if (g_bMotionBlur == true)
         Out.vMotionBlur = g_vMotionVelocity;
 
+    return Out;
+}
+
+PS_OUT_EFFECT PS_DISSOLVE(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    vector vMask =        g_MaskTexture.Sample(LinearSampler, In.vTexcoord);
+
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+    
+    if (vMask.r < g_fDissolve)
+        discard;
+
+    vMtrlDiffuse.r = g_vRColor.x;
+    vMtrlDiffuse.g = g_vRColor.y;
+    vMtrlDiffuse.b = g_vRColor.z;
+    vMtrlDiffuse.a = 1.f;
+    
+    Out.vColor = vMtrlDiffuse;
+    if (Out.vColor.a < 0.02f)
+        discard;
+    
     return Out;
 }
 
@@ -1040,6 +1076,19 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_FOR_COIN();
+    }
+    // 디졸브 효과 ( 21 )
+    pass DISSOLVE
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_DISSOLVE();
     }
 
 }

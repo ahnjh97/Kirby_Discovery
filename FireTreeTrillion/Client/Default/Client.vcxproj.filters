@@ -691,6 +691,15 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Animal\SeaGull%28characterX%29">
       <UniqueIdentifier>{4bd7629d-3a53-42e9-847f-51ec1eac6310}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Phanta\SpawnEffect">
+      <UniqueIdentifier>{4b97fb20-26cc-4d63-a220-15d7ce0851f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyFinalCut_State">
+      <UniqueIdentifier>{78aed1de-cad4-49c4-85c4-7c2eb6bfdb4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Fire">
+      <UniqueIdentifier>{75caa316-9ef6-41c7-885f-44273a100ef1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1372,6 +1381,15 @@
     <ClInclude Include="..\Public\BabyDuck_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Animal\BabyDuck\State</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SpawnEffect.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta\SpawnEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyFinalCut_State.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyFinalCut_State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Fire.h">
+      <Filter>02.GameObjects\Effect\Fire</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -2033,6 +2051,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\BabyDuck_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Animal\BabyDuck\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SpawnEffect.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta\SpawnEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyFinalCut_State.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyFinalCut_State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Fire.cpp">
+      <Filter>02.GameObjects\Effect\Fire</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

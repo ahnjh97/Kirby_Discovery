@@ -70,6 +70,7 @@ public:
 public:
 	_float	m_fMoveTime = { 0.f };
 	_float	m_fPreMoveTime = { 0.f };
+
 	static	CKirbyHammer_Onigorosi_State* Create();
 	virtual void						Free() override;
 

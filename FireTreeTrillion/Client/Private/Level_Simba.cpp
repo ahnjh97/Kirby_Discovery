@@ -66,7 +66,8 @@ HRESULT CLevel_Simba::Initialize()
 	CHECK_FAILED(hr);
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet_ByIndex(8);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_LAB);
+
 	// SIMBA 도착했으면 오픈해주세요
 	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
 	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);

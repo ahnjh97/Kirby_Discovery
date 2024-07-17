@@ -101,10 +101,12 @@ HRESULT CSurprisedBoard::Render()
 			return E_FAIL;
 		if (FAILED(m_arrModelCom[m_eModelColor]->Bind_ShaderResource(m_pShaderCom,	"g_MRATexture",		i, TextureType_METALNESS)))
 			return E_FAIL;
+		if (FAILED(m_arrModelCom[m_eModelColor]->Bind_ShaderResource(m_pShaderCom, "g_EmissiveTexture", i, TextureType_EMISSIVE)))
+			return E_FAIL;
 		if (FAILED(m_arrModelCom[m_eModelColor]->Bind_BoneMatrices(m_pShaderCom,	"g_BoneMatrices",	i)))
 			return E_FAIL;
 
-		m_pShaderCom->Begin(ANIMMODEL_NORMAL_O);
+		m_pShaderCom->Begin(ANIMMODEL_EMISSIVE);
 		m_arrModelCom[m_eModelColor]->Render(i);
 	}
 

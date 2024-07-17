@@ -64,6 +64,8 @@ HRESULT CLevel_Intro::Initialize()
 
 	// 셰이더 트리거
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_BEACH);
+
 	// 레벨전환 트리거
 	function<void(_int)> func = bind(&CLevel_Intro::Change_Levels, this);
 	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_LEVELCHANGER, func);

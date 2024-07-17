@@ -25,6 +25,8 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 
+	_bool	m_bRender = { true };
+
 	enum CUT { 
 		IDLE, IDLE2, CUT1, CUT10, CUT11, CUT12, CUT13, CUT14, CUT15, CUT17, CUT18, CUT19, 
 		CUT2, CUT20,

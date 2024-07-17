@@ -4,6 +4,66 @@
 #include "ToppleableBridge.h"
 #include "StarBlock.h"
 #include "Box.h"
+#include "Fire.h"
+
+void MakeFire(CTransform* pTransformCom)
+{
+	_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+	_float4 vRight = pTransformCom->Get_State(CTransform::STATE_RIGHT);
+	_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float4 vUp = pTransformCom->Get_State(CTransform::STATE_UP);
+
+	CFire::FIREDESC Firedesc = {};
+	Firedesc.vFirePos = (vPos + (vUp * 0.2f) - (vLook * 3.5f) + (vRight * 0.7f));
+	Firedesc.fUpRange = { 2.5f };
+	Firedesc.vFirstColor = { .8f, 0.5f, 0.5f, 1.f };
+	Firedesc.vTargetColor = { 1.f, 0.f, 0.f, 1.f };
+	Firedesc.fScale = { 0.3f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
+		return;
+
+	Firedesc.vFirePos = (vPos + (vUp * 0.2f) - (vLook * 3.5f) - (vRight * 0.7f));
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
+		return;
+
+}
+void MakeBoosterBBong(CTransform* pTransformCom, _float& fTime)
+{
+	static _float fMaxFloat = { 0.f };
+	//if (fTime > fMaxFloat)
+	{
+		_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+		_float4 vRight = pTransformCom->Get_State(CTransform::STATE_RIGHT);
+		_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float4 vUp = pTransformCom->Get_State(CTransform::STATE_UP);
+
+		_float4 vRot = CUtils::Make_Degree_FromDir(vLook);
+
+
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+		_float fScale = CUtils::Make_RandomFloat(0.3f, 1.f);
+		FXDesc.vInitScale = { fScale,fScale, fScale };
+
+		if (CUtils::Make_RandomInt(0, 1) == 0)
+		{
+			FXDesc.vInitPos = (_float3)(vPos + (vUp * 0.2f) - (vLook * 3.5f) + (vRight * 0.7f));
+			FXDesc.vInitRot = { vRot.x, vRot.y + CUtils::Make_RandomFloat(-10.f, 10.f), vRot.z };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW RacingCarSmoke"), &FXDesc)))
+				return;
+		}
+		else
+		{
+			FXDesc.vInitPos = (_float3)(vPos + (vUp * 0.2f) - (vLook * 3.5f) - (vRight * 0.7f));
+			FXDesc.vInitRot = { vRot.x, vRot.y + CUtils::Make_RandomFloat(-10.f, 10.f), vRot.z };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW RacingCarSmoke"), &FXDesc)))
+				return;
+		}
+
+		//fTime = 0.f;
+		//fMaxFloat = CUtils::Make_RandomFloat(0.02f, 0.04f);
+	}
+}
 
 #pragma region 차량 아이들 상태
 
@@ -63,6 +123,13 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 			DESC(m_bBooster) = false;
 			pKirby->Delete_Effect("Come On Dash");
+			DESC(m_pKirbyAssistLight1)->Set_DeadLight(true);
+			Safe_Release(DESC(m_pKirbyAssistLight1));
+			DESC(m_pKirbyAssistLight1) = nullptr;
+			DESC(m_pKirbyAssistLight2)->Set_DeadLight(true);
+			Safe_Release(DESC(m_pKirbyAssistLight2));
+			DESC(m_pKirbyAssistLight2) = nullptr;
+
 			return;
 		}
 	}
@@ -236,6 +303,7 @@ CKirbyCar_Jump_State::CKirbyCar_Jump_State()
 void CKirbyCar_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	m_fBoosterTime = 1.f;
 }
 
 void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -245,6 +313,8 @@ void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+	m_fBoosterTime += fTimeDelta;
 
 	if (JoyStick_controller(Kirbydesc, pCamera) == true)
 	{
@@ -293,6 +363,9 @@ void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	if (DESC(m_bBooster) == true)
 	{
+		MakeFire(pTransformCom);
+		MakeBoosterBBong(pTransformCom, m_fBoosterTime);
+
 		DESC(m_fBoosterTime) += fTimeDelta;
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 			DESC(m_fBoosterTime) = 0.f;
@@ -536,6 +609,7 @@ CKirbyCar_Boost_State::CKirbyCar_Boost_State()
 void CKirbyCar_Boost_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	m_fBoosterTime = 1.f;
 }
 
 void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -545,6 +619,8 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
+
+	m_fBoosterTime += fTimeDelta;
 
 	if (DESC(m_bCarJump) == true)
 	{
@@ -568,6 +644,9 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	if (pKirby->Get_State() == CKirby::CARSTATE_BOOST)
 	{
+		MakeFire(pTransformCom);
+		MakeBoosterBBong(pTransformCom, m_fBoosterTime);
+
 		if (JoyStick_controller(Kirbydesc, pCamera) == true)
 		{
 			Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 7.f);

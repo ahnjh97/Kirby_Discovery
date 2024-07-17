@@ -31,6 +31,24 @@ public:
 		RENDER_END
 	};
 
+	enum COLORSET
+	{
+		COLORSET_TUTORIAL,
+		COLORSET_FOREST,
+		COLORSET_NIGHT,
+		COLORSET_STAGE1,
+		COLORSET_TOWN,
+		COLORSET_FINALE,
+		COLORSET_HORROR,
+		COLORSET_FINAL,
+		COLORSET_LAB,
+		COLORSET_PARK,
+		COLORSET_BEACH,
+		COLORSET_PARTTIME,
+
+		COLORSET_END
+	};
+
 private:
 	CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CRenderer() = default;
@@ -75,8 +93,11 @@ public:
 
 	void Set_ColorSet(COLOR_DATA destColorData);
 	void Set_ColorSet(string strColorName);
+	void Set_ColorSet(COLORSET eColorSet);
 	void Set_ColorSet_ByIndex(_int iSetIdx);
 	void Save_ColorSet(string strTag, COLOR_DATA destColorData);
+
+
 	COLOR_DATA& Find_ColorSet(string strTag);
 
 	// 잠깐의 레디얼 블러를 세팅한다.
@@ -107,6 +128,16 @@ public:
 	// 환경설정 업데이트
 	void Update_Option(OPTION Option, _bool bOn);
 	void Bind_RendererFunc(_int iTriggerType);
+
+	void Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime, _bool RealBlack) {
+		m_bObjectBlack = true;
+		m_bRealBlack = RealBlack;
+		_float fBlackdiff = fObjectBlackTarget - m_fObjectBlack;
+		m_fObjectBlackRatioTime = fBlackdiff / fBlackTime;
+		m_fObjectBlackTarget = fObjectBlackTarget;
+		m_fOBjectBlackTime = 0.f;
+		m_fObjectBlackMaxTime = fBlackTime;
+	}
 
 #ifdef _DEBUG
 public:
@@ -249,7 +280,25 @@ private:
 	_float m_fFogViewEnd = { 0.f };
 	_float m_fFogViewIntensity = { 0.f };
 
+	_float3 m_vOceanTopColor = { 0.f, 0.f, 0.f };
+	_float3 m_vOceanBottomColor = { 0.f, 0.f, 0.f };
+	_float m_fOceanTopY = { 0.f };
+	_float m_fOceanBottomY = { 0.f };
+	_float m_fOceanIntensity = { 0.f };
+
+
+	void   ObjectBlack(_float fTimeDelta);
+	_float m_fObjectBlack = { 1.f };
+	_bool  m_bObjectBlack = { false };
+	_float m_fObjectBlackRatioTime = { 0.f };
+	_float m_fObjectBlackMaxTime = { 0.f };
+	_float m_fOBjectBlackTime = { 0.f };
+	_float m_fObjectBlackTarget = { 0.f };
+	_bool  m_bRealBlack = { false };
+	_float m_fRealObjectBlack = { 1.f };
+
 	_bool  m_bMaptool = { false };
+	//_bool  m_bBloomSky = { false };
 
 
 #ifdef _DEBUG

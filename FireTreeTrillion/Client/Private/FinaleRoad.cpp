@@ -31,19 +31,14 @@ void CFinaleRoad::Start_CollisionEvent()
 	break;
 	case CTYPE_BREAK:
 	{
-		if (false == m_bCollided)
+		if (m_wstrModelName == L"RoadLongBreak")
 		{
 			m_pGameInstance->DisableActor(m_pDynamicActor);
-			//m_pDynamicActor->userData = nullptr;
-			//if (m_pDynamicActor->getScene())
-			//{
-			//	auto pScene = m_pGameInstance->Get_Scene();
-			//	pScene->removeActor(*m_pDynamicActor);
-			//}
 
 			CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
 			pMaker->Make_Partical(50, GET_POS, 10.f, 1.5f, 1.f, _float4(0.f, -1.f, 0.f, 0.f), 120.f, 1.f);
 		}
+		m_bCollided = true;
 	}
 	break;
 	default:
@@ -254,18 +249,6 @@ HRESULT CFinaleRoad::Add_Components(wstring _strModelTag, _bool _bIsAnimModel)
 	CHECK_FAILED(hr);
 
 
-	// FOR ANIMTOOL
-	/*
-	CHitBox::HITBOX_DESC HitBox{};
-	HitBox.pOwner = this;
-	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = OBJECT;
-
-	hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox);
-	CHECK_FAILED(hr);
-
-	Set_BodyCollider(COLLIDER_SPHERE, 0.f, 0.f, 1.f);
-	*/
 	return S_OK;
 }
 
@@ -342,9 +325,9 @@ CGameObject* CFinaleRoad::Clone(void* pArg)
 void CFinaleRoad::Free()
 {
 	m_pGameInstance->ReleaseActor(m_pDynamicActor);
-	__super::Free();
-
 
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
+
+	__super::Free();
 }

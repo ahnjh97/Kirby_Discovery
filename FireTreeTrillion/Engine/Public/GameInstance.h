@@ -55,10 +55,17 @@ public: /* For.Renderer */
 	void Set_RenderMode(CRenderer::RENDER_MODE eMode);
 	void Update_Option(CRenderer::OPTION Option, _bool bOn);
 	void Bind_RendererFunc(_int iTriggerType);
+
 	void Set_ColorSet_ByIndex(_int iSetIdx);
+	void Set_ColorSet(COLOR_DATA destColorData);
+	void Set_ColorSet(string strColorName);
+	void Set_ColorSet(CRenderer::COLORSET eColorSet);
 
 	void Setting_GodRay(_fvector vWorldPos, _float fRayExposure = 0.15f, _float fRayDecay = 0.96815f, _float fRayIlluminationDecay = 0.8f, _float fRayDensity = 0.5f, _float fWeight = 0.5f);
 	void Setting_LensFlare(_bool bOnOff);
+
+	void Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime = 0.f, _bool RealBlack = false);
+
 #ifdef _DEBUG
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderComponent);

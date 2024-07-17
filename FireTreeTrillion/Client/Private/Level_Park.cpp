@@ -19,6 +19,8 @@
 #include "SkySphere.h"
 #include "TransingStar.h"
 #include "Gm_DynamicField.h"
+#include "Gm_ParkSolarPanelOnce.h"
+#include "Gm_ParkSolarPanelCharge.h"
 
 #define MONSTER_TRIGGER(index) (index - 11)
 
@@ -65,7 +67,6 @@ HRESULT CLevel_Park::Initialize()
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
 
-
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
@@ -78,7 +79,7 @@ HRESULT CLevel_Park::Initialize()
 		return E_FAIL;
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet_ByIndex(6);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_PARK);
 
 	// PARK 도착했으면 오픈해주세요
 	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
@@ -157,15 +158,32 @@ HRESULT CLevel_Park::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
+
+	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_PARK, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
+	CHECK_NULLPTR(pKirby);
+	_float4 vPosKirby = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+
+	_float fPosKirbyX = round(vPosKirby.x * 1000) / 1000;
+	_float fPosKirbyY = round(vPosKirby.y * 1000) / 1000;
+	_float fPosKirbyZ = round(vPosKirby.z * 1000) / 1000;
+
+	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_PARK, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+	CHECK_NULLPTR(pCamera);
+	_float4 vPosCamera = pCamera->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+
+	_float fPosCameraX = round(vPosCamera.x * 1000) / 1000;
+	_float fPosCameraY = round(vPosCamera.y * 1000) / 1000;
+	_float fPosCameraZ = round(vPosCamera.z * 1000) / 1000;
+
 	//윈도우 바 FPS 체크
 	++m_iFPS;
-
-	_tchar szFPS[MAX_PATH] = TEXT("");
-	wsprintf(szFPS, TEXT("Level Park, %d FPS"), m_iFPS);
+	wstring wstrMsg = TEXT("Level Park : ") + to_wstring(m_iFPS) 
+					+ TEXT(". | Kirby is at ")  + to_wstring(fPosKirbyX)  + TEXT(", ") + to_wstring(fPosKirbyY)  + TEXT(", ") + to_wstring(fPosKirbyZ)
+					+ TEXT(". | Camera is at ")	+ to_wstring(fPosCameraX) + TEXT(", ") + to_wstring(fPosCameraY) + TEXT(", ") + to_wstring(fPosCameraZ);
 
 	if (m_fAccDelta >= 1.f)
 	{
-		SetWindowText(g_hWnd, szFPS);
+		SetWindowText(g_hWnd, wstrMsg.c_str());
 		m_fAccDelta = 0.f;
 		m_iFPS = 0;
 	}
@@ -189,6 +207,61 @@ HRESULT CLevel_Park::Ready_Lights()
 		return E_FAIL;
 
 	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 5000.f, 1200.f, 1.f});
+
+	string strFileName = "../../../objects_txt/Park_Lights.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : Park_Lights.txt"));
+		return E_FAIL;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	LIGHT_DESC			tPointLightDesc{};
+	tPointLightDesc.eType = LIGHT_DESC::TYPE_POINT;
+
+	// 지역 vector에 임시로 넣어두기
+	vector<LIGHT_DESC> vecLight;
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		tPointLightDesc.fRange = fRimWidth;
+		tPointLightDesc.vDiffuse = _float4(matWorld._11, matWorld._12, matWorld._13, 1.f);
+		tPointLightDesc.vAmbient = _float4(matWorld._21, matWorld._22, matWorld._23, 1.f);
+		tPointLightDesc.vSpecular = _float4(matWorld._31, matWorld._32, matWorld._33, 1.f);
+		tPointLightDesc.vPosition = _float4(matWorld._41, matWorld._42, matWorld._43, 1.f);
+
+		vecLight.push_back(tPointLightDesc);
+	}
+
+	// z값으로 정렬
+	sort(vecLight.begin(), vecLight.end(), [](const LIGHT_DESC& a, const LIGHT_DESC& b) {
+		return a.vPosition.z <= b.vPosition.z;
+		});
+
+	// 정렬된 vector에서 light를 하나씩 꺼내어, 진짜 Light_Manager에게 보내기
+	for (auto& tLight : vecLight)
+	{
+		HRESULT hr = CGameInstance::Get_Instance()->Add_Light(tLight);
+		CHECK_FAILED(hr);
+	}
+
+	fileInput.close();
 
 	return S_OK;
 }
@@ -316,28 +389,27 @@ HRESULT CLevel_Park::Ready_Map()
 			CGameObject::GAMEOBJECT_DESC tDesc{};
 			tDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			tDesc.matWorld = matWorld;
+			tDesc.iShaderVars = _uint(round(vMin.x));
 
 			//동적 필드
-			if ("Gimmick_PkFunHouseDarkness01" == strModelName
-				|| "Gimmick_PkFunHouseDarkness04" == strModelName
-				|| "Gimmick_PkFunHouseDarkness05" == strModelName)
+			if ("Gimmick_PkFunHouseDarkness01" == strModelName || "Gimmick_PkFunHouseDarkness04" == strModelName
+				|| "Gimmick_PkFunHouseDarkness05" == strModelName || "Gimmick_PkFunHouse06" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_Updown"), 
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField"), 
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
 
-			if ("Gimmick_PkFunHouseDarkness02" == strModelName ||
-				"Gimmick_PkFunHouseDarkness03" == strModelName)
+			if ("Gimmick_PkFunHouseDarkness02" == strModelName || "Gimmick_PkFunHouseDarkness03" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_LeftRight"),
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_SurpriseBoard"),
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
 
-			if ("Gimmick_PkFunHouse06" == strModelName)
+			if ("Gimmick_PkFunHouse07" == strModelName)
 			{
-				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField_FrontBack"),
+				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_StaticField"),
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
 					continue;
 			}
@@ -913,27 +985,45 @@ HRESULT CLevel_Park::Ready_Objects()
 
 	//기믹 오브젝트를 기준으로, 가장 가까운 거리를 검사하여 다이나믹 필드를 세팅
 	list<CGameObject*>* GimmickList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"));
-	for (auto& Gimmick : *GimmickList)
-	{
-		_float fDistance = { FLT_MAX };
-		CGameObject* pDField = { nullptr };
+	list<CGameObject*>* DFieldList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField"));
 
-		list<CGameObject*>* DFieldList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField_Updown"));
-		for (auto& DField : *DFieldList)
+	for (auto& field : *DFieldList)
+	{
+		CGm_DynamicField* pField = dynamic_cast<CGm_DynamicField*>(field);
+		_uint iFieldIndex = pField->Get_GimmickIndex();
+
+		for (auto& gimmick : *GimmickList)
 		{
-			//기믹 & 필드 거리 검사
-			_float fNewDistance = m_pGameInstance->Compute_Distance(Gimmick, DField);
-			if (fDistance >= fNewDistance)
+			if (TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce") == gimmick->Get_PrototypeTag())
 			{
-				fDistance = fNewDistance;
-				pDField = DField;
+				CGm_ParkSolarPanelOnce* pGimmick = dynamic_cast<CGm_ParkSolarPanelOnce*>(gimmick);
+				_uint iGimmickIndex = pGimmick->Get_GimmickIndex();
+				if (iFieldIndex == iGimmickIndex) {
+					pField->Set_SolarPanelOnce(pGimmick);
+					break;
+				}
+			}
+			else if (TEXT("Prototype_GameObject_Gm_ParkSolarPanelCharge") == gimmick->Get_PrototypeTag())
+			{
+				CGm_ParkSolarPanelCharge* pGimmick = dynamic_cast<CGm_ParkSolarPanelCharge*>(gimmick);
+				_uint iGimmickIndex = pGimmick->Get_GimmickIndex();
+				if (iFieldIndex == iGimmickIndex) {
+					pField->Set_SolarPanelCharge(pGimmick);
+					break;
+				}
 			}
 		}
-		CGm_ParkSolarPanelOnce* pGimmickSP = dynamic_cast<CGm_ParkSolarPanelOnce*>(Gimmick);
-		dynamic_cast<CGm_DynamicField*>(pDField)->Set_SolarPanel(pGimmickSP);
-		if (nullptr == pGimmickSP)
-			continue;
 	}
+
+	// 좌우로 움직이는 DynamicField를 커비에게 등록
+	list<CGameObject*>* leftRightList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField_SurpriseBoard"));
+	for (auto& leftRight : *leftRightList)
+	{
+		CGm_DynamicField* pLeftRight = dynamic_cast<CGm_DynamicField*>(leftRight);
+		pLeftRight->RegisterToActorToKirby();
+	}
+
+	// m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT(""), 1); -> 내가 원하는 서프라이즈보드
 
 #pragma endregion
 

@@ -347,9 +347,9 @@ void CTransingStar::On_Event()
         {
             CGameObject* pPlayer = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
             CKirby* pKirby = dynamic_cast<CKirby*>(pPlayer);
-            pKirby->Set_ControllerPos(_float4(0.5f, 68.f, 165.f, 1.f)); //for test : 심바맵으로 이동하기 위한
-            //pKirby->Set_ControllerPos(_float4(0.5f, 68.f, , 1.f)); //for test : 엘베 탔다고 가정한
-            //pKirby->Set_ControllerPos(_float4(5.4f, 39.f, -26.36f, 1.f)); 
+           // pKirby->Set_ControllerPos(_float4(0.5f, 68.f, 165.f, 1.f)); //for test : 심바맵으로 이동하기 위한
+            pKirby->Set_ControllerPos(_float4(0.5f, 68.f, -10.f, 1.f)); //for test : 엘베 타고 이동한
+            //pKirby->Set_ControllerPos(_float4(5.4f, 39.f, -26.36f, 1.f));  // 엘베
             CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
             pCameraMain->Set_FOVY(30);
         }

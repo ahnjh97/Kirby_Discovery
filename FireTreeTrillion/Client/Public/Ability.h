@@ -76,6 +76,7 @@ private:
 	_float					m_fRotateDir = { 0.f };
 	_float					m_fLifeTime = { 0.f };
 	_float					m_fRenderTime = { 0.f };
+	_float					m_fDeadTime = { 0.f };
 
 	_float					m_fFlyTime = { 0.f };
 	_float					m_fHitPower = { 0.f };

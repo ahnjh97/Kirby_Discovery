@@ -80,7 +80,7 @@ HRESULT CLevel_Town::Initialize()
 
 	// 셰이더 트리거
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet_ByIndex(4);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_TOWN);
 
 	// 레벨전환 트리거
 	function<void(_int)> func = bind(&CLevel_Town::Change_Levels, this);
@@ -884,6 +884,12 @@ HRESULT CLevel_Town::Ready_Objects()
 		if ("FhEntranceAlien_NonAnim" == strModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkFhEntranceAlien"), &tDesc)))
+				continue;
+		}
+
+		if ("NonRenderWall" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_NonRenderWall"), TEXT("Prototype_GameObject_NonRenderWall"), &tDesc)))
 				continue;
 		}
 

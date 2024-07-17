@@ -83,6 +83,8 @@ public:
 	_bool Get_RenderEyeLid() { return m_bRenderEyeLid; }
 	void Set_RenderEyeLid(_bool _bRenderEyeLid) { m_bRenderEyeLid = _bRenderEyeLid; }
 
+	void SetCamSequence(_uint iCamSeq);
+
 public:
 	virtual HRESULT Initialize_Prototype()			override;
 	virtual HRESULT Initialize(void* pArg)			override;
@@ -102,6 +104,8 @@ public:
 	_bool			IsAnimFinished(_uint iCurrentAnimIndex) { return m_pModelCom->IsFinished(iCurrentAnimIndex); }
 	void			CreateHpBar();
 	void			Turn_RotationBoneMatrix(_float fAngle);
+	void			SpawnStar(_uint iAnimIdx);
+	_bool			IsKirbyOnMyLeft();
 
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
@@ -109,6 +113,8 @@ private:
 	class CBone*	m_pLipBone = { nullptr };
 	class CBone*	m_pRotationBone = { nullptr };
 	_float4x4*		m_pRotationBoneMatrix = { nullptr };
+	class CBone*	m_pLeftHandBone = { nullptr };
+	class CBone*	m_pRightHandBone = { nullptr };
 
 	SIMBA_ANIM		m_eCurrentState = { SIMBA_END };
 	SIMBA_ANIM		m_ePreState = { SIMBA_END };

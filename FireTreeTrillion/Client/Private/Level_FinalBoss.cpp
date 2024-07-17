@@ -61,9 +61,11 @@ HRESULT CLevel_FinalBoss::Initialize()
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
 	
-	m_pGameInstance->Set_ColorSet_ByIndex(7);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_FINAL);
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
+	_bool bBloomSky{ true };
+	m_pGameInstance->Bind_DeferredRawValue("g_bBloomSky", &bBloomSky, sizeof(_bool));
 
 	return S_OK;
 }
@@ -656,6 +658,12 @@ HRESULT CLevel_FinalBoss::Ready_Objects()
 				continue;
 		}
 
+		if ("NonRenderWall" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_NonRenderWall"), TEXT("Prototype_GameObject_NonRenderWall"), &tDesc)))
+				continue;
+		}
+
 #pragma endregion
 	}
 	fileInput.close();
@@ -822,6 +830,9 @@ CLevel_FinalBoss* CLevel_FinalBoss::Create(ID3D11Device* pDevice, ID3D11DeviceCo
 
 void CLevel_FinalBoss::Free()
 {
+	_bool bBloomSky{ false };
+	m_pGameInstance->Bind_DeferredRawValue("g_bBloomSky", &bBloomSky, sizeof(_bool));
+
 	m_pGameInstance->Clear_EventCallBack();
 	__super::Free();
 

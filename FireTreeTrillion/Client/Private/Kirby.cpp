@@ -32,6 +32,7 @@
 #include "Light.h"
 #include "Crumble.h"
 #include "BulbFlare.h"
+#include "Gm_DynamicField.h"
 
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -71,9 +72,10 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용
-	m_eAbilityType = ABILITY_CRASH;
+	m_eAbilityType = ABILITY_HAMMER;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 		m_eAbilityType = ABILITY_HAMMER;
+
 	// 커비의 상태에 따라, 애니메이션이 시작된다.
 	Kirby_StateInitialize();
 
@@ -108,8 +110,11 @@ _int CKirby::Tick(_float fTimeDelta)
 	m_pArmours->Tick(m_fTimeDelta);
 
 	if (*m_pCurrentLevelID == LEVEL_PARK)
+	{
 		RayCast_Crumbles();
-
+		RayCast_DynamicFields();
+	}
+		
 	return OBJ_NOEVENT;
 }
 
@@ -418,6 +423,11 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if (m_bOverPower == true)
 				return;
 
+			// 초기화해줄놈들
+			INFO(m_bFirstChargeEffectTrigger) = true;
+			INFO(m_bSecondChargeEffectTrigger) = true;
+
+
 			if (pObject->Get_Attack() > 10.f && m_eAbilityType != ABILITY_DEFAULT)
 			{
 				HRESULT hr = S_OK;
@@ -523,6 +533,11 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		{
 			if (m_bOverPower == true)
 				return;
+
+			// 초기화해줄놈들
+			INFO(m_bFirstChargeEffectTrigger) = true;
+			INFO(m_bSecondChargeEffectTrigger) = true;
+
 
 			if (pObject->Get_Attack() > 10.f && m_eAbilityType != ABILITY_DEFAULT)
 			{
@@ -1538,6 +1553,56 @@ void CKirby::RayCast_Crumbles()
 	}
 }
 
+void CKirby::RayCast_DynamicFields()
+{
+	if (m_pControllerCom == nullptr) 
+		return;
+
+	/*_vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), 0));
+	_vector vRight = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), 0));*/
+
+	_vector vLook = XMVectorSet(0, 0, 1, 0);
+	_vector vRight = XMVectorSet(1, 0, 0, 0);
+
+	_float fLookOffset = 5.f;
+
+	_float fActivationDistance = 6.f;
+
+	if (20.f <= m_pControllerCom->RayCastToStaticActor(-vRight, 20.f, vLook * fLookOffset))
+	{
+		_float fLeftDis = m_pControllerCom->RayCastToDynamicActor(-vRight, vLook * fLookOffset);
+		if (fActivationDistance > fLeftDis)
+		{
+			CGameObject* pObj = FindDynamicField(m_pControllerCom->Get_MostRecentActor());
+			if (nullptr != pObj)
+			{
+				CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(pObj);
+				if (false == pDynamicField->IsActivated())
+					pDynamicField->Set_Interaction(true);
+				return;
+			}
+
+		}
+	}
+
+	if (20.f <= m_pControllerCom->RayCastToStaticActor(vRight, 20.f, vLook * fLookOffset))
+	{
+		_float fRightDis = m_pControllerCom->RayCastToDynamicActor(vRight, vLook * fLookOffset);
+		if (fActivationDistance > fRightDis)
+		{
+			CGameObject* pObj = FindDynamicField(m_pControllerCom->Get_MostRecentActor());
+			if (nullptr != pObj)
+			{
+				CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(pObj);
+				if (false == pDynamicField->IsActivated())
+					pDynamicField->Set_Interaction(true);
+				return;
+			}
+
+		}
+	}
+}
+
 void CKirby::Update_PartObjectMatrix()
 {
 	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM || 
@@ -1864,6 +1929,20 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 			m_fCrashRestoreTime = 0.f;
 		}
 	}
+
+
+	if (INFO(m_bFinalBossDead) == true)
+	{
+		if (m_bFinalCutTrigger == true)
+		{
+			m_pControllerCom->Set_Position(m_pTransformCom, _float4(0.f, 0.f, 0.f, 1.f));
+			m_bFinalCutTrigger = false;
+			Change_State(FINALCUTSTATE_CUT1, 60.f, false, false, BODY_FINALCUT, OFFSET_FINALCUT);
+		}
+	}
+
+	// 빛 컨트롤
+	AssistLight_Control();
 }
 
 HRESULT CKirby::Kirby_SystemInitialize()
@@ -2011,11 +2090,79 @@ CGameObject* CKirby::FindBox(PxRigidActor* pActor)
 	return nullptr;
 }
 
+CGameObject* CKirby::FindDynamicField(PxRigidActor* pActor)
+{
+	auto mapIter = m_mapDynamicFields.find(pActor);
+	if (mapIter != m_mapDynamicFields.end())
+		return mapIter->second;
+
+	return nullptr;
+}
+
 void CKirby::ReleaseAndClearMap(unordered_map<PxRigidActor*, CGameObject*> _map)
 {
 	for (auto& pair : _map)
 		Safe_Release(pair.second);
 	_map.clear();
+}
+
+void CKirby::AssistLight_Control()
+{
+	if (INFO(m_pKirbyAssistLight1) == nullptr && INFO(m_eBodyState) == BODY_CARDEFAULT)
+	{
+		_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		_float4 vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float4 vUp = m_pTransformCom->Get_State(CTransform::STATE_UP);
+
+		LIGHT_DESC			LightDesc{};
+		LightDesc.eType = LIGHT_DESC::TYPE_HORONG;
+		LightDesc.vPosition = vPos + (vUp * 0.2f) - (vLook * 3.5f) + (vRight * 0.7f);
+		LightDesc.fRange = 0.1f;
+		LightDesc.vDiffuse = _float4(1.f, 0.6f, 0.2f, 1.f);
+		LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
+		LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
+		if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+			return;
+		INFO(m_pKirbyAssistLight1) = CGameInstance::Get_Instance()->Get_LightLastAddress();
+		Safe_AddRef(INFO(m_pKirbyAssistLight1));
+
+		LightDesc.vPosition = vPos + (vUp * 0.2f) - (vLook * 3.5f) - (vRight * 0.7f);
+		if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+			return;
+		INFO(m_pKirbyAssistLight2) = CGameInstance::Get_Instance()->Get_LightLastAddress();
+		Safe_AddRef(INFO(m_pKirbyAssistLight2));
+
+	}
+
+
+	if (INFO(m_pKirbyAssistLight1) != nullptr)
+	{
+		if (INFO(m_eBodyState) == BODY_CARDEFAULT)
+		{
+			if (INFO(m_bBooster) == true)
+			{
+				INFO(m_pKirbyAssistLight1)->Interpolate_Light(_float4(1.f, 0.6f, 0.2f, 1.f), 10.f, 0.3f);
+				INFO(m_pKirbyAssistLight2)->Interpolate_Light(_float4(1.f, 0.6f, 0.2f, 1.f), 10.f, 0.3f);
+			}
+			else
+			{
+				INFO(m_pKirbyAssistLight1)->Interpolate_Light(_float4(1.f, 0.6f, 0.1f, 1.f), 0.1f, 0.f);
+				INFO(m_pKirbyAssistLight2)->Interpolate_Light(_float4(1.f, 0.6f, 0.1f, 1.f), 0.1f, 0.f);
+			}
+
+			_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+			_float4 vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+			_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vUp = m_pTransformCom->Get_State(CTransform::STATE_UP);
+
+			INFO(m_pKirbyAssistLight1)->Update_LightPos(vPos + (vUp * 0.2f) - (vLook * 3.5f) + (vRight * 0.7f));
+			INFO(m_pKirbyAssistLight2)->Update_LightPos(vPos + (vUp * 0.2f) - (vLook * 3.5f) - (vRight * 0.7f));
+		}
+
+
+
+	}
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -2069,6 +2216,7 @@ void CKirby::Free()
 	ReleaseAndClearMap(m_mapToppleableBridges);
 	ReleaseAndClearMap(m_mapStarBoxes);
 	ReleaseAndClearMap(m_mapBoxes);
+	ReleaseAndClearMap(m_mapDynamicFields);
 
 	for (auto& pModelCom : m_pModelCom)
 		Safe_Release(pModelCom);
@@ -2093,6 +2241,12 @@ void CKirby::Free()
 
 	if (INFO(m_pLight) != nullptr)
 		Safe_Release(INFO(m_pLight));
+
+	if (INFO(m_pKirbyAssistLight1) != nullptr)
+		Safe_Release(INFO(m_pKirbyAssistLight1));
+	if (INFO(m_pKirbyAssistLight2) != nullptr)
+		Safe_Release(INFO(m_pKirbyAssistLight2));
+
 
 	Safe_Release(m_pBulbFlare);
 }

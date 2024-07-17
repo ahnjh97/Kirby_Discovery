@@ -1103,6 +1103,7 @@ void CCollisionCenter::Hitbox_Collision()
 			CKirby* pKirby = static_cast<CKirby*>(Dst);
 			CPhysXObject* pObject = static_cast<CPhysXObject*>(Src);
 
+			pthis->Effect(pKirby, pObject);
 
 			// 몬스터의 CONTENT_ATTACK타입의 Collision함수를 발동시킨다. 정말 세부적인건 이쪽에서 처리된다.
 			pObject->Collision(CONTENT_ATTACK, pKirby);
@@ -1119,10 +1120,10 @@ void CCollisionCenter::Hitbox_Collision()
 				return;
 
 			// 폭발물
-			CPhysXObject* pDst = static_cast<CPhysXObject*>(Src);
+			CPhysXObject* pDst = static_cast<CPhysXObject*>(Dst);
 			// 오브젝트
 			CPhysXObject* pObject = static_cast<CPhysXObject*>(Src);
-			pObject->Collision(CONTENT_ATTACK, pDst);
+			pObject->Collision(CONTENT_ATTACKBULLET, pDst);
 			Dst->Set_Dead();
 		});
 
@@ -1255,7 +1256,6 @@ void CCollisionCenter::Hitbox_Collision()
 			// 별도의 충돌로직이 발생할 것이다.
 			pKirby->Collision(CONTENT_ATTACK, pMonsterBullet);
 		});
-
 
 
 	// 풀 등과 플레이어
@@ -1419,6 +1419,13 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 	{
 		fAttack = 10.f;
 		HitStop_Rogic(pKirby, 0.2f);
+
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
+		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
+		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
+			return;
 	}
 	break;
 	// 해머 평타
@@ -1426,6 +1433,14 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 	{
 		fAttack = 5.f;
 		HitStop_Rogic(pKirby, 0.06f);
+
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
+		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
+		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
+			return;
+
 	}
 	break;
 	// 해머 풀 차징 공격
@@ -1435,6 +1450,14 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		Hit_TimeStop(0.01f, 0.5f);
 		Camera_Shaking(2.f);
 		CGameInstance::Get_Instance()->Setting_RadialBlur(vKirbyPos, 20.f, 100.f);
+
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
+		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
+		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
+			return;
+
 	}
 	break;
 	// 해머 덜 차징 공격
@@ -1444,6 +1467,14 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		Hit_TimeStop(0.01f, 0.3f);
 		Camera_Shaking(1.f);
 		CGameInstance::Get_Instance()->Setting_RadialBlur(vKirbyPos, 20.f, 150.f);
+
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
+		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
+		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
+			return;
+
 	}
 	break;
 	// 해머 공중 회전 공격
@@ -1452,6 +1483,13 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		fAttack = 7.f;
 		HitStop_Rogic(pKirby);
 		Camera_Shaking();
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
+		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
+		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
+			return;
+
 	}
 	break;
 	// 해머 공중 회전 공격
@@ -1477,6 +1515,166 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 	}
 
 	pCMonster->Minus_Hp(fAttack);
+}
+
+void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
+{
+	_uint uKirbyState = pKirby->Get_State();
+
+	CTransform* pObjectTransform = pObject->Get_TransformCom();
+	CTransform* pKirbyTransform = pKirby->Get_TransformCom();
+	_float4 vObjectPos = pObjectTransform->Get_State(CTransform::STATE_POSITION);
+	_float4 vKirbyPos = pKirbyTransform->Get_State(CTransform::STATE_POSITION);
+
+	_float4 vEffectLook = XMVector3Normalize(vKirbyPos - vObjectPos);
+	_float4 vEffectRandomPos = vObjectPos + (vEffectLook * 0.3f) + (_float4)CUtils::Make_Random_Vector(0.5f);
+
+	switch (uKirbyState)
+	{
+		// SWORD 연속기 1타
+	case CKirby::SWORDSTATE_SIDESLASH:
+	{
+		HitStop_Rogic(pKirby);
+		Camera_Shaking(0.7f, 0.5f);
+		SwordHit(pObjectTransform);
+	}
+	break;
+	// SWORD 연속기 2타
+	case CKirby::SWORDSTATE_MULITSWORDATTACK:
+	{
+		HitStop_Rogic(pKirby);
+		Camera_Shaking(0.7f, 0.5f);
+		SwordHit(pObjectTransform);
+	}
+	break;
+	// SWORD 연속기 3타
+	case CKirby::SWORDSTATE_DECISIVESLASH:
+	{
+		HitStop_Rogic(pKirby);
+		Camera_Shaking();
+		SwordHit_Big(pObjectTransform);
+
+	}
+	break;
+	// 덜 차징 회전베기
+	case CKirby::SWORDSTATE_GIGANTSPINSLASH:
+	{
+		HitStop_Rogic(pKirby);
+		Camera_Shaking(0.7f, 0.5f);
+		SwordHit(pObjectTransform);
+
+	}
+	break;
+	// 풀 차징 회전베기
+	case CKirby::SWORDSTATE_SUPERSPINSLASHLOOP:
+	{
+		HitStop_Rogic(pKirby);
+		Camera_Shaking(0.7f, 0.5f);
+		SwordHit(pObjectTransform);
+	}
+	break;
+	// 위로 올려베기 (대쉬기 중 점프 키)
+	case CKirby::SWORDSTATE_UPWARDSLASH:
+	{
+		HitStop_Rogic(pKirby);
+		Camera_Shaking();
+		SwordHit(pObjectTransform);
+	}
+	// 공중제비 도는 공격
+	case CKirby::SWORDSTATE_SWORDSPIN:
+	{
+		HitStop_Rogic(pKirby);
+		Camera_Shaking();
+		SwordHit(pObjectTransform);
+	}
+	break;
+	// 해머 5타 통 애님 (막타)
+	case CKirby::HAMMERSTATE_HAMMERATTACKFINALTOY:
+	{
+		HitStop_Rogic(pKirby, 0.2f);
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
+		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
+		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
+			return;
+	}
+	break;
+	// 해머 평타
+	case CKirby::HAMMERSTATE_HAMMERATTACKHITTOY:
+	{
+		HitStop_Rogic(pKirby, 0.06f);
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
+		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
+		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
+			return;
+
+	}
+	break;
+	// 해머 풀 차징 공격
+	case CKirby::HAMMERSTATE_ONIGOROSIHAMMEREND:
+	{
+		Hit_TimeStop(0.01f, 0.5f);
+		Camera_Shaking(2.f);
+		CGameInstance::Get_Instance()->Setting_RadialBlur(vKirbyPos, 20.f, 100.f);
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
+		FXDesc.vInitPos.y += 0.5f;
+		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
+		FXDesc.vInitScale = { 3.5f, 3.5f, 3.5f };
+		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
+			return;
+	}
+	break;
+	// 해머 덜 차징 공격
+	case CKirby::HAMMERSTATE_ONIGOROSIHAMMERFIRST:
+	{
+		Hit_TimeStop(0.01f, 0.3f);
+		Camera_Shaking(1.f);
+		CGameInstance::Get_Instance()->Setting_RadialBlur(vKirbyPos, 20.f, 150.f);
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
+		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
+		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
+			return;
+
+	}
+	break;
+	// 해머 공중 회전 공격
+	case CKirby::HAMMERSTATE_WHEELHAMMER:
+	{
+		HitStop_Rogic(pKirby);
+		Camera_Shaking();
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
+		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
+		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
+			return;
+
+	}
+	break;
+	// 해머 공중 회전 공격
+	case CKirby::CRASHSTATE_ATTACK:
+	{
+		//HitStop_Rogic(pKirby);
+		Camera_Shaking(0.5f);
+	}
+	break;
+	// 해머 공중 회전 공격
+	case CKirby::CRASHSTATE_BIGATTACK:
+	{
+		//HitStop_Rogic(pKirby);
+		Camera_Shaking(0.5f);
+	}
+	break;
+
+	default:
+		break;
+	}
 }
 
 void CCollisionCenter::Camera_Shaking(_float fPower, _float fTime, _float2 vDir)

@@ -330,7 +330,6 @@ void CVIBuffer_Instance::Decelerate(_float fTimeDelta, VTXMATRIX* pVertices)
 		if (m_pSpeeds[i] < 0.f)
 			m_pSpeeds[i] = 0.f;
 
-
 	}
 }
 
@@ -459,6 +458,17 @@ void CVIBuffer_Instance::Gravity(_float fTimeDelta)
 		//m_pDirections[i].y -= GRAVITY * fTimeDelta;
 		m_pVelocities[i].y -= GRAVITY * 2.5f * fTimeDelta;
 	}
+}
+
+void CVIBuffer_Instance::Orbit(_float fTimeDelta, VTXMATRIX* pVertices)
+{
+
+
+}
+
+void CVIBuffer_Instance::Assemble(_float fTimeDelta, VTXMATRIX* pVertices)
+{
+
 }
 
 
@@ -622,8 +632,7 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 
 
 
-	_float4 vDirection = 
-		m_InstanceDesc.vecMoveCommands[INSTANCE_WIGGLE] == true ? CUtils::Make_Random_Vector(1.f) : Compute_RandDirection();
+	_float4 vDirection = m_InstanceDesc.vecMoveCommands[INSTANCE_WIGGLE] == true ? CUtils::Make_Random_Vector(1.f) : Compute_RandDirection();
 	m_pDirections[iInstanceIndex] = _float3{ vDirection.x, vDirection.y, vDirection.z };
 	m_pSpeeds[iInstanceIndex] = m_InstanceDesc.vecMoveCommands[INSTANCE_WIGGLE] == true ?
 		CUtils::Make_RandomFloat(m_InstanceDesc.fSpeed - m_InstanceDesc.fSpeedRandomOffset, m_InstanceDesc.fSpeed + m_InstanceDesc.fSpeedRandomOffset) : vDirection.w;
