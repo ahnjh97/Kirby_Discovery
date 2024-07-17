@@ -105,6 +105,7 @@ public:
 	void			CreateHpBar();
 	void			Turn_RotationBoneMatrix(_float fAngle);
 	void			SpawnStar(_uint iAnimIdx);
+	_bool			IsKirbyOnMyLeft();
 
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };

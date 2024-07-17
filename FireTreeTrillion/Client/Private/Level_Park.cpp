@@ -67,7 +67,6 @@ HRESULT CLevel_Park::Initialize()
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
 
-
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
@@ -159,15 +158,32 @@ HRESULT CLevel_Park::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
+
+	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_PARK, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
+	CHECK_NULLPTR(pKirby);
+	_float4 vPosKirby = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+
+	_float fPosKirbyX = round(vPosKirby.x * 1000) / 1000;
+	_float fPosKirbyY = round(vPosKirby.y * 1000) / 1000;
+	_float fPosKirbyZ = round(vPosKirby.z * 1000) / 1000;
+
+	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_PARK, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+	CHECK_NULLPTR(pCamera);
+	_float4 vPosCamera = pCamera->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+
+	_float fPosCameraX = round(vPosCamera.x * 1000) / 1000;
+	_float fPosCameraY = round(vPosCamera.y * 1000) / 1000;
+	_float fPosCameraZ = round(vPosCamera.z * 1000) / 1000;
+
 	//윈도우 바 FPS 체크
 	++m_iFPS;
-
-	_tchar szFPS[MAX_PATH] = TEXT("");
-	wsprintf(szFPS, TEXT("Level Park, %d FPS"), m_iFPS);
+	wstring wstrMsg = TEXT("Level Park : ") + to_wstring(m_iFPS) 
+					+ TEXT(". | Kirby is at ")  + to_wstring(fPosKirbyX)  + TEXT(", ") + to_wstring(fPosKirbyY)  + TEXT(", ") + to_wstring(fPosKirbyZ)
+					+ TEXT(". | Camera is at ")	+ to_wstring(fPosCameraX) + TEXT(", ") + to_wstring(fPosCameraY) + TEXT(", ") + to_wstring(fPosCameraZ);
 
 	if (m_fAccDelta >= 1.f)
 	{
-		SetWindowText(g_hWnd, szFPS);
+		SetWindowText(g_hWnd, wstrMsg.c_str());
 		m_fAccDelta = 0.f;
 		m_iFPS = 0;
 	}
@@ -213,6 +229,8 @@ HRESULT CLevel_Park::Ready_Lights()
 	LIGHT_DESC			tPointLightDesc{};
 	tPointLightDesc.eType = LIGHT_DESC::TYPE_POINT;
 
+	// 지역 vector에 임시로 넣어두기
+	vector<LIGHT_DESC> vecLight;
 	for (_uint i = 0; i < iNumObjects; i++)
 	{
 		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
@@ -228,8 +246,19 @@ HRESULT CLevel_Park::Ready_Lights()
 		tPointLightDesc.vSpecular = _float4(matWorld._31, matWorld._32, matWorld._33, 1.f);
 		tPointLightDesc.vPosition = _float4(matWorld._41, matWorld._42, matWorld._43, 1.f);
 
-		if (FAILED(CGameInstance::Get_Instance()->Add_Light(tPointLightDesc)))
-			return E_FAIL;
+		vecLight.push_back(tPointLightDesc);
+	}
+
+	// z값으로 정렬
+	sort(vecLight.begin(), vecLight.end(), [](const LIGHT_DESC& a, const LIGHT_DESC& b) {
+		return a.vPosition.z <= b.vPosition.z;
+		});
+
+	// 정렬된 vector에서 light를 하나씩 꺼내어, 진짜 Light_Manager에게 보내기
+	for (auto& tLight : vecLight)
+	{
+		HRESULT hr = CGameInstance::Get_Instance()->Add_Light(tLight);
+		CHECK_FAILED(hr);
 	}
 
 	fileInput.close();
@@ -984,6 +1013,14 @@ HRESULT CLevel_Park::Ready_Objects()
 				}
 			}
 		}
+	}
+
+	// 좌우로 움직이는 DynamicField를 커비에게 등록
+	list<CGameObject*>* leftRightList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField_SurpriseBoard"));
+	for (auto& leftRight : *leftRightList)
+	{
+		CGm_DynamicField* pLeftRight = dynamic_cast<CGm_DynamicField*>(leftRight);
+		pLeftRight->RegisterToActorToKirby();
 	}
 
 	// m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT(""), 1); -> 내가 원하는 서프라이즈보드

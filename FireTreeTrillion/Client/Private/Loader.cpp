@@ -39,6 +39,8 @@
 #include "Particle.h"
 #include "MultiEffect.h"
 
+#include "Fire.h"
+
 //애님 툴
 #include "AnimToolHelper.h"
 #include "AnimToolObject.h"
@@ -83,6 +85,7 @@
 #include "SpookStep.h"
 #include "GhostGordo.h"
 #include "Bomber.h"
+#include "SpawnEffect.h"
 
 // 보스 몬스터
 #include "FinalBoss.h"
@@ -413,6 +416,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("PartTimerKirby"), CPartTimerKirby);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BulbFlare"), CBulbFlare);
 
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Fire"), CFire);
+
 	// Deform
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Car"), CCar);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DumpCar"), CDump);
@@ -436,6 +441,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SpookStep"), CSpookStep);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("GhostGordo"), CGhostGordo);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Bomber"), CBomber);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SpawnEffect"), CSpawnEffect);
 
 	// FinalBoss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBoss"), CFinalBoss);
@@ -1617,8 +1623,16 @@ HRESULT CLoader::Add_FXTexture()
 	//안개
 	hr = Add_Texture(LEVEL_STATIC, "FX_Fog", "Map/Fog/Sand_%d.png", 4);	CHECK_FAILED(hr);
 
+	// 파크 몬스터용
+	hr = Add_Texture(LEVEL_STATIC, "FX_ParkSmoke", "Effects/common_smoke08.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SmokeNormal", "Effects/indirect3_normal.png");	CHECK_FAILED(hr);
+
 	//스카이스피어
 	hr = Add_Texture(LEVEL_STATIC, "FX_FinalBoss_SkySphere", "SkySphere/SkySphere_Lab_Diffuse_%d.dds", 3);	CHECK_FAILED(hr);
+
+	//Dissolve
+	hr = Add_Texture(LEVEL_STATIC, "FX_FireDissolve", "Dissolve/FireDissolve.png");	CHECK_FAILED(hr);
+
 
 	return S_OK;
 }
@@ -1715,6 +1729,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FXThunderLine", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXMeteoDash", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXDonut", TYPE_NONANIM);
+
+		//공통이펙트 - YW
+		m_vecModelInfo.emplace_back("Cube", TYPE_NONANIM);
 
 
 		//m_vecModelInfo.emplace_back("DimensionLaser", TYPE_NONANIM, 1.f, 180.f);
