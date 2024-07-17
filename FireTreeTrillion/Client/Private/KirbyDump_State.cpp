@@ -6,6 +6,44 @@
 #include "FinaleCut_ControlCenter.h"
 
 #include "QTE.h"
+#include "Fire.h"
+
+void MakeBoosterBBong(_float& fTime, CFinaleKirby* pKirby)
+{
+	static _float fMaxFloatForDump = { 0.f };
+	if (fTime > fMaxFloatForDump)
+	{
+		_float4x4 KirbyEffectSocketMatrix = *pKirby->Get_EffectSocket();
+		_float4 vLook = CUtils::Get_State_Vector_Matrix(KirbyEffectSocketMatrix, CUtils::STATE_LOOK);
+		_float4 vUp = CUtils::Get_State_Vector_Matrix(KirbyEffectSocketMatrix, CUtils::STATE_UP);
+		_float4 vRight = CUtils::Get_State_Vector_Matrix(KirbyEffectSocketMatrix, CUtils::STATE_RIGHT);
+		_float4 vPos = CUtils::Get_State_Vector_Matrix(KirbyEffectSocketMatrix, CUtils::STATE_POSITION);
+		_float4 vRot = CUtils::Make_Degree_FromDir(vLook);
+
+		CEffect::FX_DESC FXDesc{};
+		_float fScale = CUtils::Make_RandomFloat(0.8f, 1.5f);
+		FXDesc.vInitScale = { fScale,fScale, fScale };
+
+		if (CUtils::Make_RandomInt(0, 1) == 0)
+		{
+			FXDesc.vInitPos = (_float3)(vPos - (vUp * 3.f) - (vLook * 11.f) + (vRight * 2.f));
+			FXDesc.vInitRot = { vRot.x, vRot.y + CUtils::Make_RandomFloat(-10.f, 10.f), vRot.z };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW RacingCarSmoke"), &FXDesc)))
+				return;
+		}
+		else
+		{
+			FXDesc.vInitPos = (_float3)(vPos - (vUp * 3.f) - (vLook * 11.f) - (vRight * 2.f));
+			FXDesc.vInitRot = { vRot.x, vRot.y + CUtils::Make_RandomFloat(-10.f, 10.f), vRot.z };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW RacingCarSmoke"), &FXDesc)))
+				return;
+		}
+
+		fTime = 0.f;
+		fMaxFloatForDump = CUtils::Make_RandomFloat(0.02f, 0.04f);
+	}
+}
+
 
 void Turn_Interpolate(CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta, _float fInterpolateSpeed = 12.f)
 {
@@ -203,6 +241,8 @@ void ToCut_Reset_Kirby(CTransform* pTransformCom, CCharacterController* pControl
 
 	CFinaleCut_ControlCenter* pCenter = static_cast<CFinaleCut_ControlCenter*>(GAMEINSTANCE Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")));
 	pCenter->Set_CutScene(1);
+
+
 }
 void QTE_End()
 {
@@ -243,7 +283,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		ToCut_Reset_Kirby(pTransformCom, pController);
 		pKirby->Start_CutScene();
 		DESC(m_bBooster) = false;
-		//pKirby->Delete_Effect("Come On Dash");
+		pKirby->Delete_AllEffect();
 		return;
 	}
 
@@ -331,10 +371,10 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		//부슽 이펙트
 
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
-		FXDesc.vInitPos = { 0.f, 3.5f, -10.f };
+		FXDesc.vInitPos = { 0.f, -.5f, -1.f };
 		FXDesc.vInitScale = { 15.f, 15.f, 30.f };
 		FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
-		pKirby->Add_Effect("YW Come On Dash Dump", FXDesc, true);
+		pKirby->Add_Effect("YW Real Dash", FXDesc, true);
 
 		DESC(m_bBooster) = true;
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
@@ -357,7 +397,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	if (DESC(m_fBoosterTime) <= 0.f)
 	{
 		DESC(m_bBooster) = false;
-		pKirby->Delete_Effect("YW Come On Dash Dump");
+		pKirby->Delete_Effect("YW Real Dash");
 	}
 	//트럭방구
 	else
@@ -388,6 +428,9 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pKirby->Add_Effect("real dump smoke test", fxDesc);
 			fBoostTime = 0.f;
 		}
+
+		m_fBBongTime += fTimeDelta;
+		MakeBoosterBBong(m_fBBongTime, pKirby);
 	}
 }
 
@@ -436,8 +479,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		ToCut_Reset_Kirby(pTransformCom, pController);
 		pKirby->Start_CutScene();
 		DESC(m_bBooster) = false;
-		//pKirby->Delete_Effect("Come On Dash");
-
+		pKirby->Delete_AllEffect();
 		return;
 	}
 
@@ -447,10 +489,10 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		//부슽 이펙트
 		//ComeOn_Dash_For_Dump(pTransformCom);
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
-		FXDesc.vInitPos = { 0.f, 3.5f, -10.f };
+		FXDesc.vInitPos = { 0.f, -.5f, -1.f };
 		FXDesc.vInitScale = { 15.f, 15.f, 30.f };
 		FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
-		pKirby->Add_Effect("YW Come On Dash Dump", FXDesc, true);
+		pKirby->Add_Effect("YW Real Dash", FXDesc, true);
 
 		//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 		DESC(m_bBooster) = true;
@@ -473,7 +515,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	if (DESC(m_fBoosterTime) <= 0.f)
 	{
 		DESC(m_bBooster) = false;
-		pKirby->Delete_Effect("YW Come On Dash Dump");
+		pKirby->Delete_Effect("YW Real Dash");
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS) == true)
@@ -792,9 +834,11 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		if (m_bShakeTrigger1)
 		{
 			CMultiEffect::MULTI_FX_DESC FXDesc{};
-			FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+			FXDesc.vInitPos = { 0.f, -.5f, -1.f };
+			FXDesc.vInitScale = { 15.f, 15.f, 30.f };
 			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
-			pKirby->Add_Effect("YW Come On Dash Dump", FXDesc, true);
+			pKirby->Add_Effect("YW Real Dash", FXDesc, true);
+
 			m_bShakeTrigger1 = false;
 		}
 
@@ -838,6 +882,9 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	// 컷씬 진입소. 점프 점프
 	if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT1)
 	{
+		m_fBBongTime += fTimeDelta;
+		MakeBoosterBBong(m_fBBongTime, pKirby);
+
 		_float4 NewLook = _float4(1.f, 0.f, 0.f, 0.f);
 		_float4 NewUp = _float4(0.f, 1.f, 0.f, 0.f);
 		_float4 NewRight = XMVector3Cross(NewUp, NewLook);
@@ -919,6 +966,8 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	// 멀리서 부릉부릉
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT2)
 	{
+		m_fBBongTime += fTimeDelta;
+		MakeBoosterBBong(m_fBBongTime, pKirby);
 
 
 
@@ -929,6 +978,8 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	// 큐티 모션 후 점프
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT6)
 	{
+		m_fBBongTime += fTimeDelta;
+		MakeBoosterBBong(m_fBBongTime, pKirby);
 
 		m_fEffectTime += fTimeDelta;
 		_float4 vEffectPos = pKirby->m_vBonePos;
@@ -1056,6 +1107,9 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	//
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT7)
 	{
+		m_fBBongTime += fTimeDelta;
+		MakeBoosterBBong(m_fBBongTime, pKirby);
+
 
 		m_fEffectTime += fTimeDelta;
 		_float4 vEffectPos = pKirby->m_vBonePos;
@@ -1087,6 +1141,8 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT8)
 	{
+		m_fBBongTime += fTimeDelta;
+		MakeBoosterBBong(m_fBBongTime, pKirby);
 
 
 
@@ -1100,6 +1156,8 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT9)
 	{
+		m_fBBongTime += fTimeDelta;
+		MakeBoosterBBong(m_fBBongTime, pKirby);
 
 
 
@@ -1107,6 +1165,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT10)
 	{
+
 		m_fTime += fTimeDelta;
 		if (m_fTime > 0.2f && m_bShakeTrigger1 == true)
 		{
@@ -1118,6 +1177,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT11)
 	{
+
 		if (pKirby->isAnimFinish())
 		{
 			//pCenter->Set_CutScene(12);
