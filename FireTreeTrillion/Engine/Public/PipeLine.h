@@ -21,6 +21,7 @@ public:
 
 	_float4x4	Get_Transform(TRANSFORMSTATE _eState) const { return m_TransformMatrices[_eState]; }
 	_float4x4	Get_Transform_Inv(TRANSFORMSTATE _eState) const { return m_TransformInverseMatrices[_eState]; }
+	_float		Get_CurCamFOV /*_Float4*/() const;
 
 	_float4		Get_CamPosition /*_Float4*/() const { return m_vCamPosition; }
 	_float4		Get_CamLook /*_Float4*/() const { return m_vCamLook; }
