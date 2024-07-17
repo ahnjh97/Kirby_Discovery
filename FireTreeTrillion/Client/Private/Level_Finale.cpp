@@ -39,7 +39,8 @@ HRESULT CLevel_Finale::Initialize()
 
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_ControlCenter"), TEXT("Prototype_GameObject_FinaleCut_ControlCenter"))))
 		return E_FAIL;
-
+	
+	
 	// ºôµù ÄÆ¾À A, B
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_BuildingCluster"), TEXT("Prototype_GameObject_BuildingCluster_A"))))
 		return E_FAIL;
@@ -56,12 +57,12 @@ HRESULT CLevel_Finale::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_FinaleCut_Debris"), TEXT("Prototype_GameObject_Finale_SpecialDebris_C"))))
 		return E_FAIL;
-
-
+	
 	// È¯°æ¸ÊÀ» Ãß°¡ÇÑ´Ù.
 	hr = Add_EnvMap();
 	CHECK_FAILED(hr);
-
+		
+	
 	hr = Ready_Lights();
 	CHECK_FAILED(hr);
 
@@ -75,22 +76,23 @@ HRESULT CLevel_Finale::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Triggers();
 	CHECK_FAILED(hr);
+	
 	hr = Ready_Monsters();
 	CHECK_FAILED(hr);
 	hr = Ready_Items();
 	CHECK_FAILED(hr);
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
+	
 	hr = Ready_Objects();
 	CHECK_FAILED(hr);
-
 	
 	hr = Ready_FinaleRoad();
 	CHECK_FAILED(hr);
 	
-	
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
+	
 	
 
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
@@ -966,12 +968,13 @@ void CLevel_Finale::Free()
 	m_pGameInstance->Clear_EventCallBack();
 
 	_bool	bDeepShadow = false;
-	if (FAILED(m_pGameInstance->Bind_DeferredRawValue("g_bDeepShadow", &bDeepShadow, sizeof(_bool))))
-		return;
+	m_pGameInstance->Bind_DeferredRawValue("g_bDeepShadow", &bDeepShadow, sizeof(_bool));
 
-	__super::Free();
 	for (auto& tex : m_pEnvTexture)
 		Safe_Release(tex);
+	
+
+	__super::Free();
 }
 
 

@@ -110,6 +110,8 @@ void CParticle::Update_InstanceInfo(INSTANCE_DESC* _instanceDesc)
 	//loop가 두개여
 	m_InstanceDesc.bIsLoop = m_bIsLoop;
 	m_InstanceDesc.vCenter += m_vInitPos;
+	m_InstanceDesc.vInitScale = m_vInitScale;
+	m_InstanceDesc.vInitRot = m_vInitRot;
 
 	if (nullptr != m_pVIBufferCom)
 		m_pVIBufferCom->Update_InstanceDesc(m_InstanceDesc);

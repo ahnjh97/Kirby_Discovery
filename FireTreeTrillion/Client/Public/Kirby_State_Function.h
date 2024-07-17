@@ -1280,12 +1280,19 @@ static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
 		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
 			return;
 
+		//CParticle::PARTICLE_DESC SingleFXDesc{};
+		//SingleFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerChargeParticle"), &SingleFXDesc)))
+		//	return;
+
+
+		/*
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		ParticleDesc.vInitScale = { .1f, .1f, .1f };
 		ParticleDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_particle center test"), &ParticleDesc)))
 			return;
-
+			*/
 		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Lunch Time Icon"), &ParticleDesc)))
 		//	return;
 

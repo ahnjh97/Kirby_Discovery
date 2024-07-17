@@ -184,9 +184,12 @@ _float CVIBuffer_Instance_Point::Compute_RandStartDelay()
 
 _float3 CVIBuffer_Instance_Point::Compute_RandScale()
 {
-	return { m_InstanceDesc.vScale.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vScaleRandomOffset.x, m_InstanceDesc.vScaleRandomOffset.x),
-			m_InstanceDesc.vScale.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vScaleRandomOffset.x, m_InstanceDesc.vScaleRandomOffset.x),
-			m_InstanceDesc.vScale.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vScaleRandomOffset.x, m_InstanceDesc.vScaleRandomOffset.x)};
+	_float3 vScale = { m_InstanceDesc.vScale.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vScaleRandomOffset.x, m_InstanceDesc.vScaleRandomOffset.x),
+					 m_InstanceDesc.vScale.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vScaleRandomOffset.y, m_InstanceDesc.vScaleRandomOffset.y),
+					 m_InstanceDesc.vScale.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vScaleRandomOffset.z, m_InstanceDesc.vScaleRandomOffset.z) };
+
+
+	return vScale * m_InstanceDesc.vInitScale;
 }
 
 _float3 CVIBuffer_Instance_Point::Compute_RandRotation()
@@ -199,17 +202,12 @@ _float3 CVIBuffer_Instance_Point::Compute_RandRotation()
 
 _float4 CVIBuffer_Instance_Point::Compute_RandPosition()
 {
-	return {	m_InstanceDesc.vCenter.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.x),
-				m_InstanceDesc.vCenter.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.y),
-				m_InstanceDesc.vCenter.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.z, m_InstanceDesc.vRange.z), 1.f };
+	_float3 vPosition = {	m_InstanceDesc.vCenter.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.x),
+							m_InstanceDesc.vCenter.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.y),
+							m_InstanceDesc.vCenter.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.z, m_InstanceDesc.vRange.z)};
 
 
-	//uniform_real_distribution<float>	RangePosX(m_InstanceDesc.vCenter.x - m_InstanceDesc.vRange.x * 0.5f, m_InstanceDesc.vCenter.x + m_InstanceDesc.vRange.x * 0.5f);
-	//uniform_real_distribution<float>	RangePosY(m_InstanceDesc.vCenter.y - m_InstanceDesc.vRange.y * 0.5f, m_InstanceDesc.vCenter.y + m_InstanceDesc.vRange.y * 0.5f);
-	//uniform_real_distribution<float>	RangePosZ(m_InstanceDesc.vCenter.z - m_InstanceDesc.vRange.z * 0.5f, m_InstanceDesc.vCenter.z + m_InstanceDesc.vRange.z * 0.5f);
-
-
-	//return _float4(RangePosX(m_RandomNumber), RangePosY(m_RandomNumber), RangePosZ(m_RandomNumber), 1.f);
+	return Pos(vPosition * m_InstanceDesc.vInitScale);
 }
 
 _float4 CVIBuffer_Instance_Point::Compute_RandDirection()
