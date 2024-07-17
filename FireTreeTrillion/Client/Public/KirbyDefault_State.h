@@ -136,6 +136,7 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_float	m_fEffectTime = { 0.f };
 	static	CKirbyDefault_Slide_State* Create();
 	virtual void						Free() override;
 };

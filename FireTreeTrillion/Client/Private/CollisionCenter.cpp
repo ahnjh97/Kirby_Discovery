@@ -1779,9 +1779,18 @@ void CCollisionCenter::Player_Monster_Knock_back(CPhysXObject* pPlayer, CPhysXOb
 		pPlayer->Set_DamageMoving(vPlayerKnockbackDir, 5.f);
 
 	if (static_cast<CCharacter*>(pPlayer)->Get_State() == CKirby::STATE_SLIDE)
-		pMonster->Set_DamageMoving(vMonsterKnockbackDir, 10.f);
+	{
+		pMonster->Set_DamageMoving(vMonsterKnockbackDir, 15.f);
+
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitPos = static_cast<_float3>(vMonsterPos);
+		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
+		FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
+			return;
+	}
 	else
-		pMonster->Set_DamageMoving(vMonsterKnockbackDir, 5.f);
+		pMonster->Set_DamageMoving(vMonsterKnockbackDir, 8.f);
 }
 
 void CCollisionCenter::Fly_DeadAway(CPhysXObject* pSrc, CPhysXObject* pDst)
@@ -1817,12 +1826,13 @@ void CCollisionCenter::Compute_Damage(CPhysXObject* pPlayer, CPhysXObject* pMons
 	// 무적이 아닐 경우
 	if (pKirby->isOverPower() == false)
 	{
-		_float fMonsterAttack = pCMonster->Get_Attack();
-		pKirby->Minus_Hp(fMonsterAttack);
-		Camera_Shaking(1.2f);
-
-		// fMonsterAttack는 몬스터의 공격력으로, 커비에게 데미지를 주는 곳. 카메라 쉐이킹 추가 완료
-		// 여기에 Damage를 입히는 함수를 작동시키면 됨 (SJ)
+		// 슬라이딩 상태가 아닐 경우
+		if (pKirby->Get_State() != CKirby::STATE_SLIDE)
+		{
+			_float fMonsterAttack = pCMonster->Get_Attack();
+			pKirby->Minus_Hp(fMonsterAttack);
+			Camera_Shaking(1.2f);
+		}
 	}
 
 	_float fPlayerAttack = pKirby->Get_Attack();
