@@ -15,11 +15,15 @@ public:
 	enum DYNAMICFILED_TYPE { DFMOVE_UPDOWN, DFMOVE_LEFTRIGHT, DFMOVE_FRONTBACK, DFMOVE_NONE };
 
 public:
-	void Set_SolarPanelOnce(class CGm_ParkSolarPanelOnce* _pSolarPanel) { m_pSolarPanelOnce = _pSolarPanel; Safe_AddRef(m_pSolarPanelOnce); }
-	void Set_SolarPanelCharge(class CGm_ParkSolarPanelCharge* _pSolarPanel) { m_pSolarPanelCharge = _pSolarPanel;  Safe_AddRef(m_pSolarPanelCharge); }
-	void Set_SurpriseBoard(class CSurprisedBoard* _pSurpriseBoard) { m_pSurpriseBoard = _pSurpriseBoard; Safe_AddRef(m_pSurpriseBoard); }
+	void Set_SolarPanelOnce(class CGm_ParkSolarPanelOnce* _pSolarPanel);
+	void Set_SolarPanelCharge(class CGm_ParkSolarPanelCharge* _pSolarPanel);
+	void Set_SurpriseBoard(class CSurprisedBoard* _pSurpriseBoard); 
 
 	_uint Get_GimmickIndex() { return  m_iGimmickIndex; }
+	
+	_bool IsActivated() { return m_IsInteraction; }
+	void Set_Interaction(_bool bInteraction) { m_IsInteraction = bInteraction; }
+	void RegisterToActorToKirby();
 
 private:
 	CGm_DynamicField(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

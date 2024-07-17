@@ -32,6 +32,7 @@
 #include "Light.h"
 #include "Crumble.h"
 #include "BulbFlare.h"
+#include "Gm_DynamicField.h"
 
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -109,8 +110,11 @@ _int CKirby::Tick(_float fTimeDelta)
 	m_pArmours->Tick(m_fTimeDelta);
 
 	if (*m_pCurrentLevelID == LEVEL_PARK)
+	{
 		RayCast_Crumbles();
-
+		RayCast_DynamicFields();
+	}
+		
 	return OBJ_NOEVENT;
 }
 
@@ -1549,6 +1553,53 @@ void CKirby::RayCast_Crumbles()
 	}
 }
 
+void CKirby::RayCast_DynamicFields()
+{
+	if (m_pControllerCom == nullptr) 
+		return;
+
+	_vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), 0));
+	_vector vRight = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), 0));
+
+	_float fLookOffset = 3.3f;
+
+	_float fActivationDistance = 6.f;
+
+	if (20.f <= m_pControllerCom->RayCastToStaticActor(-vRight, 20.f, vLook * fLookOffset))
+	{
+		_float fLeftDis = m_pControllerCom->RayCastToDynamicActor(-vRight, vLook * fLookOffset);
+		if (fActivationDistance > fLeftDis)
+		{
+			CGameObject* pObj = FindDynamicField(m_pControllerCom->Get_MostRecentActor());
+			if (nullptr != pObj)
+			{
+				CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(pObj);
+				if (false == pDynamicField->IsActivated())
+					pDynamicField->Set_Interaction(true);
+				return;
+			}
+
+		}
+	}
+
+	if (20.f <= m_pControllerCom->RayCastToStaticActor(vRight, 20.f, vLook * fLookOffset))
+	{
+		_float fRightDis = m_pControllerCom->RayCastToDynamicActor(vRight, vLook * fLookOffset);
+		if (fActivationDistance > fRightDis)
+		{
+			CGameObject* pObj = FindDynamicField(m_pControllerCom->Get_MostRecentActor());
+			if (nullptr != pObj)
+			{
+				CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(pObj);
+				if (false == pDynamicField->IsActivated())
+					pDynamicField->Set_Interaction(true);
+				return;
+			}
+
+		}
+	}
+}
+
 void CKirby::Update_PartObjectMatrix()
 {
 	if ((INFO(m_eBodyState) == BODY_CARDEFAULT || INFO(m_eBodyState) == BODY_CARVACUUM || 
@@ -2036,6 +2087,15 @@ CGameObject* CKirby::FindBox(PxRigidActor* pActor)
 	return nullptr;
 }
 
+CGameObject* CKirby::FindDynamicField(PxRigidActor* pActor)
+{
+	auto mapIter = m_mapDynamicFields.find(pActor);
+	if (mapIter != m_mapDynamicFields.end())
+		return mapIter->second;
+
+	return nullptr;
+}
+
 void CKirby::ReleaseAndClearMap(unordered_map<PxRigidActor*, CGameObject*> _map)
 {
 	for (auto& pair : _map)
@@ -2153,6 +2213,7 @@ void CKirby::Free()
 	ReleaseAndClearMap(m_mapToppleableBridges);
 	ReleaseAndClearMap(m_mapStarBoxes);
 	ReleaseAndClearMap(m_mapBoxes);
+	ReleaseAndClearMap(m_mapDynamicFields);
 
 	for (auto& pModelCom : m_pModelCom)
 		Safe_Release(pModelCom);

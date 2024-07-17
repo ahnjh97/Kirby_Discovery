@@ -6,6 +6,34 @@
 #include "Gm_ParkSolarPanelOnce.h"
 #include "Gm_ParkSolarPanelCharge.h"
 #include "SurprisedBoard.h"
+#include "Kirby.h"
+
+void CGm_DynamicField::Set_SolarPanelOnce(CGm_ParkSolarPanelOnce* _pSolarPanel)
+{
+	m_pSolarPanelOnce = _pSolarPanel; 
+	Safe_AddRef(m_pSolarPanelOnce);
+}
+
+void CGm_DynamicField::Set_SolarPanelCharge(CGm_ParkSolarPanelCharge* _pSolarPanel)
+{
+	m_pSolarPanelCharge = _pSolarPanel;  
+	Safe_AddRef(m_pSolarPanelCharge);
+}
+
+void CGm_DynamicField::Set_SurpriseBoard(CSurprisedBoard* _pSurpriseBoard)
+{
+	m_pSurpriseBoard = _pSurpriseBoard; 
+	Safe_AddRef(m_pSurpriseBoard);
+}
+
+void CGm_DynamicField::RegisterToActorToKirby()
+{
+	 CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+	 if (nullptr == pKirby || nullptr == m_pDynamicActor)
+		 return;
+
+	 pKirby->RegisterActorToPlayer_ForDynamicField(m_pDynamicActor, this);
+}
 
 CGm_DynamicField::CGm_DynamicField(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }

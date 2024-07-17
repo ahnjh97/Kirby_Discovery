@@ -197,7 +197,7 @@ _int CSimba::Tick(_float fTimeDelta)
 		Change_State(Simba_Death, 2.f, false, true);
 	}
 
-	if (0.45f > m_fHpRatio && 0.f < m_fHpRatio && m_bPhaseTwo == false) {
+	if (0.6f > m_fHpRatio && 0.f < m_fHpRatio && m_bPhaseTwo == false) {
 		m_bPhaseTwo = true;
 		Turn_RotationBoneMatrix(-2.5f);
 		Change_State(Simba_Damage, 50.f, false, true);
@@ -402,6 +402,31 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 	// 별 생성좀 하하하
 }
 
+_bool CSimba::IsKirbyOnMyLeft()
+{
+	if (nullptr == m_pKirby)
+		return false;
+
+	_vector vLook = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+	_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	CTransform* pKirbyTransform = m_pKirby->Get_TransformCom();
+	if (nullptr == pKirbyTransform)
+		return false;
+	_vector vKirbyPos = pKirbyTransform->Get_State(CTransform::STATE_POSITION);
+
+	_vector vDir = vKirbyPos - vPos;
+	vDir = XMVector3Normalize(XMVectorSetY(vDir, 0));
+
+	_vector crossProduct = XMVector3Cross(vLook, vDir);
+	_float fCrossResultZ = XMVectorGetZ(crossProduct);
+
+	if (fCrossResultZ > 0.f)
+		return true;
+	else
+		return false;
+}
+
 HRESULT CSimba::Add_Components()
 {
 	HRESULT hr;
@@ -530,6 +555,7 @@ void CSimba::SetUp_FSM()
 	for(_uint i = Simba_DoubleClaw; i <= Simba_DoubleClawEnd; i++)
 		m_pFSM->Add_State(i, CSimba_DoubleClaw::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
+	m_pFSM->Add_State(Simba_Wait2, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 	m_pFSM->Add_State(Simba_Jump, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 	m_pFSM->Add_State(Simba_JumpStart, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 	m_pFSM->Add_State(Simba_Fall, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
