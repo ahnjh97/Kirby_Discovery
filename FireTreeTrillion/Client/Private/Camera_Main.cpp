@@ -227,11 +227,13 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 		m_pGameInstance->Emplace_ExitFunc(TRIGGER_CAMERA, exitFunc);
 	}
 
+
 	//// 파트타임헬퍼에 옵저버로 카메라를 알게하고 있습니다. JYWI's ps : 카메라 클래스 하나 더 팔걸~~
 	//HYO's ps : 에이 파면 또 귀찮어~~~~~
 	if (iLevel == LEVEL_PARTTIME)
 		CPartTimeHelper::Get_Instance()->Register_Camera(this);
 
+	//distance 세팅
 	m_fDestDistance = m_fOrigDistance;
 	m_fCurDistance = m_fOrigDistance;
 
@@ -656,8 +658,6 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	{
 		m_fSeqEventTime -= fTimeDelta;
 
-
-
 #pragma region 점심시간이다~
 
 		if (m_eSpecialSeq == SEQ_LUNCHTIME)
@@ -675,14 +675,24 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 				//	return;
 			}
 
-			if (abs(m_fSeqEventTime - .5f) < fTimeDelta * 2.f)
-			{
+			//if (abs(m_fSeqEventTime - .5f) < fTimeDelta * 2.f)
+			//{
 
-			}
+			//}
 		}
 
 #pragma endregion
 
+		if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR)
+		{
+			if (abs(m_fSeqEventTime - 3.f) < fTimeDelta * 2.f)
+			{
+
+				CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
+				if (pFinalBoss != nullptr)
+					Set_Target(pFinalBoss->Get_TransformCom(), TARGET_SECOND, FOCUS_BOTH);
+			}
+		}
 
 		//시퀀스 시간 다 깠았다~~
 		if (m_fSeqEventTime < 0.f)
@@ -713,7 +723,10 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 
 			if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR)
 			{
-				//CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject)
+				CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
+				if (pFinalBoss != nullptr)
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMOAPPEARCUT5, 50.f, false, false);
+				m_pGameInstance->Update_DofFocus(pFinalBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
 			}
 
 			if (m_eSpecialSeq == SEQ_FINALESTART)
@@ -1683,51 +1696,52 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 
 		//
-		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 2.f);
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 3.f);
 		m_CamSeq.push_back(newAction);
 
 
 		//커비 뒤
 		vStartPos = { 0.f, 6.4f, -56.f };
-		Fill_HardCutSet(newAction, 2.f);
+		newAction.fFOVY = 40.f;
+		Fill_HardCutSet(newAction, 3.f);
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos);
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .15f, 1.f });
 		m_CamSeq.push_back(newAction);
 
 		//
-		Fill_InterpolateCutSet(newAction, 2.f, EASE_INOUT, 3.f);
+		Fill_InterpolateCutSet(newAction, 3.f, EASE_INOUT, 3.f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ 0.f, 0.f, -3.f });
 		m_CamSeq.push_back(newAction);
 
 
 		//사이드 앵글
 		vStartPos = { 61.f, 7.f, -14.f };
-		Fill_HardCutSet(newAction, 5.f);
+		Fill_HardCutSet(newAction, 6.f);
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos);
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.95f, .12f, .29f });
 		m_CamSeq.push_back(newAction);
 
 		//
-		Fill_InterpolateCutSet(newAction, 5.f, EASE_INOUT, 3.f);
+		Fill_InterpolateCutSet(newAction, 6.f, EASE_INOUT, 3.f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ 0.f, 0.f, 3.f });
 		m_CamSeq.push_back(newAction);
 
 
-		//에피리스 애니메이션 교체
-		m_fSeqEventTime = 7.f;
+		//에피리스 애니메이션 교체, target set
+		m_fSeqEventTime = 10.f;
 
 		//보스 정면으로
-		vStartPos = { 0.f, 28.2f, -7.9f };
-		Fill_HardCutSet(newAction, 8.f);
+		vStartPos = { 0.f, 30.f, -7.f };
+		Fill_HardCutSet(newAction, 9.f);
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos);
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .2f, 1.f });
 		m_CamSeq.push_back(newAction);
 
 		//
-		Fill_InterpolateCutSet(newAction, 8.f, EASE_INOUT, 5.f);
+		Fill_InterpolateCutSet(newAction, 9.f, EASE_INOUT, 5.f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ 0.f, 0.f, -5.f });
 		m_CamSeq.push_back(newAction);
 
@@ -2584,7 +2598,7 @@ void CCamera_Main::Control(_float fTimeDelta)
 		m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
 		//timer 일시 정지!!
-		if (m_pGameInstance->Get_DIKeyState(DIK_B, KEY_DOWN))
+		if (m_pGameInstance->Get_DIKeyState(DIK_P, KEY_DOWN))
 		{
 			bStopTimerToggle = !bStopTimerToggle;
 

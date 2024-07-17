@@ -118,7 +118,7 @@ HRESULT CLevel_FinalBoss::Ready_Lights()
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	m_pGameInstance->Setting_GodRay({ 0.f, 110.f, 2000.f, 1.f });
+	m_pGameInstance->Setting_GodRay({ 0.f, 1250.f, 2000.f, 1.f });
 	m_pGameInstance->Set_ObjectBlack(.4f);
 	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_FINAL);
 
