@@ -13,6 +13,7 @@
 #include "PoppyBrosJr.h"
 #include "SurprisedBoard.h"
 #include "Crumble.h"
+#include "SpawnEffect.h"
 
 #include "BG.h"
 #include "HUD.h"
@@ -98,7 +99,7 @@ HRESULT CLevel_Park::Initialize()
 	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_LEVELCHANGER, funcChanger);
 
 	// 몬스터 트리거
-	function<void(_int)> funcMonster = bind(&CLevel_Park::SummonMonsters, this, placeholders::_1);
+	function<void(_int)> funcMonster = bind(&CLevel_Park::SummonEffectForMonster, this, placeholders::_1);
 	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_MONSTER, funcMonster);
 
 	return S_OK;
@@ -126,11 +127,6 @@ void CLevel_Park::Change_Levels()
 
 void CLevel_Park::SummonMonsters(_uint iTriggerIndex)
 {
-	if (m_setActivatedMonsterTriggers.end() != m_setActivatedMonsterTriggers.find(iTriggerIndex))
-		return;
-
-	m_setActivatedMonsterTriggers.insert(iTriggerIndex); // 여러번 호출되는거 방지
-
 	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
 	wstring wstrTag;
 
@@ -148,10 +144,61 @@ void CLevel_Park::SummonMonsters(_uint iTriggerIndex)
 	}
 }
 
+void CLevel_Park::SummonEffectForMonster(_uint iTriggerIndex)
+{
+	if (m_setActivatedMonsterTriggers.end() != m_setActivatedMonsterTriggers.find(iTriggerIndex))
+		return;
+
+	m_setActivatedMonsterTriggers.insert(iTriggerIndex); // 여러번 호출되는거 방지
+
+	m_bTrigger = true;
+	m_iTriggerIndex = iTriggerIndex;
+
+	for (auto& monsterDesc : m_vecMonsterDescs[MONSTER_TRIGGER(iTriggerIndex)])
+	{
+		HRESULT hr;
+		CSpawnEffect::SPAWNEFFECT_DESC tDesc{};
+		_float4 vPos = _float4(monsterDesc.matWorld._41, monsterDesc.matWorld._42, monsterDesc.matWorld._43, monsterDesc.matWorld._44);
+		_float4 vRight = _float4(monsterDesc.matWorld._11, monsterDesc.matWorld._12, monsterDesc.matWorld._13, monsterDesc.matWorld._14);
+		_float4 vUp = _float4(monsterDesc.matWorld._21, monsterDesc.matWorld._22, monsterDesc.matWorld._23, monsterDesc.matWorld._24);
+		_float4 vLook = _float4(monsterDesc.matWorld._31, monsterDesc.matWorld._32, monsterDesc.matWorld._33, monsterDesc.matWorld._34);
+		tDesc.vPosition = vPos + vLook * 0.1f;
+		tDesc.fScale = 0.9f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
+		CHECK_FAILED(hr);
+		tDesc.vPosition = vPos + vUp * 0.5f;
+		tDesc.fScale = 0.9f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
+		CHECK_FAILED(hr);
+		tDesc.vPosition = vPos + vRight * 0.5f;
+		tDesc.fScale = 0.9f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
+		CHECK_FAILED(hr);
+		tDesc.vPosition = vPos - vRight * 0.5f;
+		tDesc.fScale = 0.9f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
+		CHECK_FAILED(hr);
+		tDesc.vPosition = vPos - vUp * 0.5f;
+		tDesc.fScale = 0.9f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
+		CHECK_FAILED(hr);
+	}
+}
+
 void CLevel_Park::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
+
+	if(true == m_bTrigger)
+		m_fSummonTime += fTimeDelta;
+
+	if (2.f < m_fSummonTime)
+	{
+		m_bTrigger = false;
+		m_fSummonTime = 0.f;
+		SummonMonsters(m_iTriggerIndex);
+	}
 }
 
 HRESULT CLevel_Park::Render()

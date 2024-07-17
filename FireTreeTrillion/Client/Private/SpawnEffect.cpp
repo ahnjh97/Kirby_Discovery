@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "SpawnEffect.h"
 #include "Effect.h"
+#include "Camera_Main.h"
 
 CSpawnEffect::CSpawnEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -40,6 +41,8 @@ HRESULT CSpawnEffect::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);
 	m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 
+	m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), ToRadian(CUtils::Make_RandomFloat(0.f, 90.f)));
+
 	CEffect::FX_DESC FXDesc{};
 
 	FXDesc.vInitPos = _float3(0.f, 0.f, 0.f);//GET_POS;
@@ -62,13 +65,14 @@ _int CSpawnEffect::Tick(_float fTimeDelta)
 
 	m_fShaderTime += m_fTimeDelta;
 
-
+	Billboarding();
 
 	return OBJ_NOEVENT;
 }
 
 void CSpawnEffect::Late_Tick(_float fTimeDelta)
 {
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
 }
 
@@ -156,6 +160,27 @@ HRESULT CSpawnEffect::Bind_ShaderResources()
 	CHECK_FAILED(hr);
 
 	return S_OK;
+}
+
+void CSpawnEffect::Billboarding()
+{
+	CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+	CHECK_NULLPTR(pCameraMain);
+
+	CTransform* pCameraTransform = pCameraMain->Get_TransformCom();
+	_vector vCameraLook = pCameraTransform->Get_State_Vector(CTransform::STATE_LOOK);
+
+	_vector		vLook = vCameraLook;
+	_vector		vRight = XMVector3Cross(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), vLook);
+	_vector		vUp = XMVector3Cross(vLook, vRight);
+
+	_float3		vScaled = m_pTransformCom->Get_Scaled();
+
+	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScaled.x);
+	m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScaled.y);
+	m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
+=======
+>>>>>>> main
 }
 
 CSpawnEffect* CSpawnEffect::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

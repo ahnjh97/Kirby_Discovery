@@ -675,21 +675,21 @@ PS_OUT PS_SPAWNEFFECT(PS_IN In)
     vSourDiffuse  = saturate(vSourDiffuse);
     
     //if ((0.5f < vSourDiffuse.r) && (0.5f < vSourDiffuse.g) && (0.5f < vSourDiffuse.b) && (0.9f < vSourDiffuse.a))
-        vSourDiffuse = lerp(vSourDiffuse, vector(0.f, 0.f, 0.9f, 1.f), 0.7f);
+        vSourDiffuse = lerp(vSourDiffuse, vector(0.24f, 0.42f, 0.81f, 1.f), 0.7f);
     
     float2 modifiedTexcoord = float2(In.vTexcoord.x, In.vTexcoord.y);
 
-    modifiedTexcoord.y += sin(modifiedTexcoord.x * 10.f + g_fTimeDelta * 2.f) * 0.04f;
+    modifiedTexcoord.y += sin(modifiedTexcoord.x * 20.f + g_fTimeDelta * 2.f) * 0.04f;
 
     vector vMask = g_MaskTexture.Sample(LinearSampler, modifiedTexcoord);
     //vector vMask = g_MaskTexture.Sample(LinearSampler, In.vTexcoord) /*+ vector(1.f, 0.f, 1.f, 0.f)*/;
 
     vector vDiffuse = vSourDiffuse * vMask;
-    vDiffuse.a *= 0.5f;
+    vDiffuse.a *= 0.6f;
     
     Out.vColor = vDiffuse;
 
-    if (0.05f >= Out.vColor.a)
+    if (0.35f >= Out.vColor.a)
         discard;
     
     return Out;
@@ -1018,7 +1018,7 @@ technique11 DefaultTechnique
     pass SPAWNEFFECT
     {
         SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();

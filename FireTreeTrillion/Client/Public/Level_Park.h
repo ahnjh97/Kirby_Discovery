@@ -31,6 +31,7 @@ private:
 	void	Teleport_Player();
 	void	Change_Levels();
 	void	SummonMonsters(_uint iTriggerIndex);
+	void	SummonEffectForMonster(_uint iTriggerIndex);
 
 	HRESULT Add_EnvMap();
 	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };
@@ -38,6 +39,10 @@ private:
 
 	vector<CMonster::MONSTER_DESC> m_vecMonsterDescs[10];
 	unordered_set<_uint> m_setActivatedMonsterTriggers;
+
+	_float	m_fSummonTime = { 0.f };
+	_uint	m_iTriggerIndex = { 0 };
+	_bool	m_bTrigger = { false };
 
 public:
 	static CLevel_Park* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
