@@ -4,6 +4,7 @@
 #include "Kirby.h"
 #include "PartTimerKirby.h"
 #include "FinaleKirby.h"
+#include "FinalBoss.h"
 #include "FinaleBoss.h"
 
 #include "Simba.h"
@@ -708,6 +709,11 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 				Lock_All({ 16.4f, 25.7f, 35.75f }, { .16f, -.08f, -1.f });
 				m_pGameInstance->Restore_SecondTimer(.1f);
 
+			}
+
+			if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR)
+			{
+				//CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject)
 			}
 
 			if (m_eSpecialSeq == SEQ_FINALESTART)
@@ -1663,23 +1669,70 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 #pragma region 에피리스
 	case SEQ_FINALBOSS_APPEAR:
 	{
-		//에피리스 애니메이션 교체
-		m_fSeqEventTime = 5.f;
+
 
 
 		CAMACTION newAction = {};
+
+		//탑 앵글
+		_float3 vStartPos = { 41.6f, 43.f, 18.7f };
 		Fill_HardCutSet(newAction, 0.f);
 
-		_float3 vStartPos = { 61.f, 7.f, -14.f };
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos);
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.65f, -.71f, -.28f });
+		m_CamSeq.push_back(newAction);
+
+		//
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 2.f);
+		m_CamSeq.push_back(newAction);
+
+
+		//커비 뒤
+		vStartPos = { 0.f, 6.4f, -56.f };
+		Fill_HardCutSet(newAction, 2.f);
+
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos);
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .15f, 1.f });
+		m_CamSeq.push_back(newAction);
+
+		//
+		Fill_InterpolateCutSet(newAction, 2.f, EASE_INOUT, 3.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ 0.f, 0.f, -3.f });
+		m_CamSeq.push_back(newAction);
+
+
+		//사이드 앵글
+		vStartPos = { 61.f, 7.f, -14.f };
+		Fill_HardCutSet(newAction, 5.f);
+
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos);
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.95f, .12f, .29f });
 		m_CamSeq.push_back(newAction);
 
 		//
-		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 2.f);
-		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{0.f, 0.f, 3.f});
+		Fill_InterpolateCutSet(newAction, 5.f, EASE_INOUT, 3.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ 0.f, 0.f, 3.f });
 		m_CamSeq.push_back(newAction);
 
+
+		//에피리스 애니메이션 교체
+		m_fSeqEventTime = 7.f;
+
+		//보스 정면으로
+		vStartPos = { 0.f, 28.2f, -7.9f };
+		Fill_HardCutSet(newAction, 8.f);
+
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos);
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .2f, 1.f });
+		m_CamSeq.push_back(newAction);
+
+		//
+		Fill_InterpolateCutSet(newAction, 8.f, EASE_INOUT, 5.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ 0.f, 0.f, -5.f });
+		m_CamSeq.push_back(newAction);
+
+		Fill_InterpolateCutSet(newAction, 13.f, EASE_INOUT, 5.f);
+		m_CamSeq.push_back(newAction);
 
 	}
 	break;
@@ -2953,10 +3006,16 @@ void CCamera_Main::Render_IMGUI()
 		ImGui::Text(u8" 뒤 Dir %.2f\t%.2f\t%.2f", vRearDir.x, vRearDir.y, vRearDir.z);
 	}
 
-	for (const auto& mat : m_vecTriggerInfo)
+	static _bool bRenderTriggers{ true };
+	ImGui::Checkbox(u8"트리거 렌더", &bRenderTriggers);
+
+	if (bRenderTriggers)
 	{
-		_float4x4 origMat = mat.first.Invert();
-		Render_GraphicIMGUI(origMat);
+		for (const auto& mat : m_vecTriggerInfo)
+		{
+			_float4x4 origMat = mat.first.Invert();
+			Render_GraphicIMGUI(origMat);
+		}
 	}
 
 	ImGui::Dummy(ImVec2(0, 10));
@@ -3007,16 +3066,6 @@ void CCamera_Main::Render_GraphicIMGUI(_float4x4 _worldMat)
 		20, 21, 22, 23  // Bottom face
 	};
 
-	/*
-	// 정점 변환 및 그리기
-	for (const auto& vertex : vertices) {
-
-		_float3 vWorldPos = _float3::Transform(vertex, worldMat);
-		ImVec2 screenPos = CUtils::WorldPosTo_ImguiProjPos(vWorldPos);
-
-		ImGui::GetForegroundDrawList()->AddCircleFilled(screenPos, 5.0f, IM_COL32(0, 255, 255, 255));
-	}
-	*/
 
 	// 각 면을 순회하며 사각형 그리기
 	for (int i = 0; i < 24; i += 4) {
