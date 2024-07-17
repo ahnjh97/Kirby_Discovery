@@ -115,7 +115,7 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 		m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 	}
 
-	m_IsInteraction = FALSE;
+	m_bIsInteraction = FALSE;
 
 	return S_OK;
 }
@@ -125,17 +125,20 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 	if (TRUE == m_bDead)
 		return OBJ_DEAD;
 
-	CGm_ParkSolarPanelOnce::PANELONCE_STATE eSPOnceState;
-	CGm_ParkSolarPanelCharge::PANELCHARGE_STATE eSPChargeState;
-
 	switch (m_eGimmickType)
 	{
 	case GIMMICK_SPONCE:
-		eSPOnceState = m_pSolarPanelOnce->Get_CurState();
+		if (-1 == m_eSPOnceState)
+			return OBJ_NOEVENT;
+
+		m_eSPOnceState = m_pSolarPanelOnce->Get_CurState();
 		break;
 
 	case GIMMICK_SPCHARGE:
-		eSPChargeState = m_pSolarPanelCharge->Get_CurState();
+		if (-1 == m_eSPChargeState)
+			return OBJ_NOEVENT;
+
+		m_eSPChargeState = m_pSolarPanelCharge->Get_CurState();
 		break;
 
 	case GIMMICK_SURPRISE:
@@ -146,112 +149,7 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 		break;
 	}
 
-	_float3 vCurPos;
-	_float fMaxPosX;
-	switch (m_eDFieldType)
-	{
-	case DFMOVE_UPDOWN:
-		vCurPos = GET_POS;
-
-		if (CGm_ParkSolarPanelOnce::STATE_ONWAIT == eSPOnceState) //충전 완료
-		{
-			if (56.963f <= vCurPos.y) //56.963 > 36.963 
-			{
-				vCurPos.y = 56.963f; //위치 보정
-				m_IsQuake = TRUE;
-
-				if (m_IsQuake)
-					Apply_Quake(fTimeDelta, 1.f, 0.1f);
-
-				else
-				{
-					m_IsQuake = FALSE;
-					m_fQuakeTime = 0.f;
-				}
-			}
-			
-			else
-				m_pTransformCom->Go_Up(fTimeDelta * 0.75f);
-		}
-		break;
-
-	//깜놀보드 충돌거리 조건에 따라 DFMOVE_LEFT, DFMOVE_RIGHT를 체크
-	case DFMOVE_LEFT: 
-		vCurPos = GET_POS;
-
-		if (m_IsInteraction) //RayCast 상호작용 검사
-		{
-			/*
-			if (34.851f <= vCurPos.x) //24.851 > 34.851
-			{
-				vCurPos.x = 34.851f;
-				m_IsQuake = TRUE;
-
-				if (m_IsQuake)
-					Apply_Quake(fTimeDelta, 1.f, 0.1f);
-			}
-
-			else
-				m_pTransformCom->Go_Right(fTimeDelta * 0.5f);
-			*/
-		}
-		break;
-	case DFMOVE_RIGHT:
-		vCurPos = GET_POS;
-
-		if (m_IsInteraction) //RayCast 상호작용 검사
-		{
-			if (34.851f <= vCurPos.x) //24.851 > 34.851
-			{
-				vCurPos.x = 34.851f;
-				m_IsQuake = TRUE;
-
-				if (m_IsQuake)
-					Apply_Quake(fTimeDelta, 1.f, 0.1f);
-			}
-
-			else
-				//여기에다가 해당 애님의 상태가 종료되었을 경우 (index:: 5번, 6번)
-				m_pTransformCom->Go_Right(fTimeDelta * 0.25f); //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
-		}
-		break;
-
-	case DFMOVE_FRONTBACK:
-		vCurPos = GET_POS;
-
-		//충전 완료 시에 빠르게 활성화
-		if (CGm_ParkSolarPanelCharge::STATE_CHARGEDWAIT == eSPChargeState)
-		{
-			if (-77.289f >= vCurPos.z) //-67.289 > -77.289
-			{
-				vCurPos.z = -77.289f;
-				m_IsQuake = TRUE;
-
-				if (m_IsQuake)
-					Apply_Quake(fTimeDelta, 1.f, 0.1f);
-			}
-
-			else
-				m_pTransformCom->Go_Backward(fTimeDelta * 2.f);
-		}
-		//충전 해제 상태동안은 천천히 이동 후 비활성화 처리
-		if (CGm_ParkSolarPanelCharge::STATE_DECREASES == eSPChargeState) //충전 해제
-		{
-			if (-67.289f <= vCurPos.z)
-			{
-				vCurPos.z = -67.289f;
-				return OBJ_NOEVENT;
-			}
-
-			else
-				m_pTransformCom->Go_Straight(fTimeDelta * 0.2f); //난이도 너프함..
-		}
-		break;
-
-	case DFMOVE_NONE: 
-	default: 
-		break;
-	}
+	Movement_Field(fTimeDelta);
 
 	if (nullptr != m_pDynamicActor) // 트랜스폼 월드 행렬에 맞춰서 다이나믹 액터도 같이 움직이도록 
 		m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));
@@ -326,7 +224,7 @@ void CGm_DynamicField::Render_IMGUI()
 	case DFMOVE_NONE:	default: ImGui::Text(u8"DFMOVE_NONE"); break;
 	}
 
-	if (m_IsInteraction) ImGui::Text(u8"Gm_DynamicFiled :: IsInteraction : TRUE");
+	if (m_bIsInteraction) ImGui::Text(u8"Gm_DynamicFiled :: IsInteraction : TRUE");
 	else ImGui::Text(u8"Gm_DynamicFiled :: IsInteraction : FALSE");
 
 	string strGimmickIndex = "Index :" + to_string(m_iGimmickIndex);
@@ -436,11 +334,138 @@ void CGm_DynamicField::Apply_Quake(_float _fTimeDelta, _float _fQuakeDuration, _
 	/*
 	else
 	{
-		m_IsQuake = FALSE;
+		m_bIsQuake = FALSE;
 		m_fQuakeTime = 0.f;
 		vCurWorldPos.y = 36.963f;
 	}
 	*/
+}
+
+_int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
+{
+	_float3 vCurPos;
+	switch (m_eDFieldType)
+	{
+	case DFMOVE_UPDOWN:
+		vCurPos = GET_POS;
+
+		if (CGm_ParkSolarPanelOnce::STATE_ONWAIT == m_eSPOnceState) //충전 완료
+		{
+			if (56.963f <= vCurPos.y) //56.963 > 36.963 
+			{
+				vCurPos.y = 56.963f; //위치 보정
+				m_bIsQuake = TRUE;
+
+				if (m_bIsQuake)
+					Apply_Quake(_fTimeDelta, 1.f, 0.1f);
+
+				else
+				{
+					m_bIsQuake = FALSE;
+					m_fQuakeTime = 0.f;
+				}
+			}
+
+			else
+				m_pTransformCom->Go_Up(_fTimeDelta * 0.3f);
+		}
+		break;
+
+		//깜놀보드 충돌거리 조건에 따라 DFMOVE_LEFT, DFMOVE_RIGHT를 체크
+	case DFMOVE_LEFT:
+		vCurPos = GET_POS;
+
+		if (m_bIsInteraction) //RayCast 상호작용 검사
+		{
+			/*
+			if (34.851f <= vCurPos.x) //24.851 > 34.851
+			{
+				vCurPos.x = 34.851f;
+				m_bIsQuake = TRUE;
+
+				if (m_bIsQuake)
+					Apply_Quake(fTimeDelta, 1.f, 0.1f);
+			}
+
+			else
+				m_pTransformCom->Go_Right(fTimeDelta * 0.5f);
+			*/
+		}
+		break;
+	case DFMOVE_RIGHT:
+		vCurPos = GET_POS;
+
+		if (m_bIsInteraction) //RayCast 상호작용 검사
+		{
+			if (34.851f <= vCurPos.x) //24.851 > 34.851
+			{
+				vCurPos.x = 34.851f;
+				m_bIsQuake = TRUE;
+
+				if (m_bIsQuake)
+					Apply_Quake(_fTimeDelta, 1.f, 0.1f);
+			}
+
+			else
+				//여기에다가 해당 애님의 상태가 종료되었을 경우 (index:: 5번, 6번)
+				m_pTransformCom->Go_Right(_fTimeDelta * 0.25f); //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
+		}
+		//특정 애님 상태일 경우, 필드도 비활성 움직임 처리
+		/*
+		if ()
+		{
+			if (24.851f >= vCurPos.x)
+			{
+				vCurPos.x = 24.851f;
+				m_bIsQuake = TRUE;
+
+				if (m_bIsQuake)
+					Apply_Quake(_fTimeDelta, 1.f, 0.1f);
+			}
+
+			else
+				m_pTransformCom->Go_Left(_fTimeDelta * 0.5f);
+		}
+		*/
+
+		break;
+
+	case DFMOVE_FRONTBACK:
+		vCurPos = GET_POS;
+
+		//충전 완료 시에 빠르게 활성화
+		if (CGm_ParkSolarPanelCharge::STATE_CHARGEDWAIT == m_eSPChargeState)
+		{
+			if (-77.289f >= vCurPos.z) //-67.289 > -77.289
+			{
+				vCurPos.z = -77.289f;
+				m_bIsQuake = TRUE;
+
+				if (m_bIsQuake)
+					Apply_Quake(_fTimeDelta, 1.f, 0.1f);
+			}
+
+			else
+				m_pTransformCom->Go_Backward(_fTimeDelta * 2.f);
+		}
+		//충전 해제 상태동안은 천천히 이동 후 비활성화 처리
+		if (CGm_ParkSolarPanelCharge::STATE_DECREASES == m_eSPChargeState) //충전 해제
+		{
+			if (-67.289f <= vCurPos.z)
+			{
+				vCurPos.z = -67.289f;
+				return OBJ_NOEVENT;
+			}
+
+			else
+				m_pTransformCom->Go_Straight(_fTimeDelta * 0.2f); //난이도 너프함..
+		}
+		break;
+
+	case DFMOVE_NONE:
+	default:
+		break;
+	}
 }
 
 CGm_DynamicField* CGm_DynamicField::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

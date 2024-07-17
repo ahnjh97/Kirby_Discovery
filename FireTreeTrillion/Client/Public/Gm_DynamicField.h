@@ -2,6 +2,9 @@
 #include "Client_Defines.h"
 #include "PhysXObject.h"
 
+#include "Gm_ParkSolarPanelOnce.h"
+#include "Gm_ParkSolarPanelCharge.h"
+
 BEGIN(Engine)
 class CModel;
 class CShader;
@@ -22,8 +25,8 @@ public:
 
 	_uint Get_GimmickIndex() { return  m_iGimmickIndex; }
 	
-	_bool IsActivated() { return m_IsInteraction; }
-	void Set_Interaction(_bool bInteraction) { m_IsInteraction = bInteraction; }
+	_bool IsActivated() { return m_bIsInteraction; }
+	void Set_Interaction(_bool bInteraction) { m_bIsInteraction = bInteraction; }
 	void RegisterToActorToKirby();
 
 private:
@@ -49,6 +52,7 @@ private:
 	HRESULT				Bind_ShaderResources();
 	HRESULT				SetUp_ShaderInfo(const wstring& _wstrModelTag);
 	void				Apply_Quake(_float _fTimeDelta, _float _fQuakeDuration, _float _fShakeIntensity);
+	_int				Movement_Field(_float _fTimeDelta);
 	
 
 	unordered_set<_uint>	m_setUpdateMeshs;
@@ -67,12 +71,14 @@ private:
 
 	DYNAMICFILED_TYPE		m_eDFieldType = { DFMOVE_NONE };
 	GIMMICK_TYPE			m_eGimmickType = { GIMMICK_NONE };
+	CGm_ParkSolarPanelOnce::PANELONCE_STATE m_eSPOnceState = {};
+	CGm_ParkSolarPanelCharge::PANELCHARGE_STATE m_eSPChargeState = {};
 
 	_float					m_fTime = { 0.f };
 	_float					m_fQuakeTime = { 0.f };
 	
-	_bool					m_IsInteraction = { FALSE };
-	_bool					m_IsQuake = { FALSE };
+	_bool					m_bIsInteraction = { FALSE };
+	_bool					m_bIsQuake = { FALSE };
 
 	_uint					m_iGimmickIndex = {};
 
