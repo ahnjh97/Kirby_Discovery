@@ -99,6 +99,21 @@ _int CPartTimerKirby::Tick(_float fTimeDelta)
 			m_pHat->Tick(fTimeDelta);
 	}
 
+	if (CPartTimeHelper::Get_Instance()->Get_TimeAttack())
+	{
+		static _bool bOnce = false;
+		if (false == bOnce)
+		{
+			#pragma region 이펙트WI QZR 
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.vInitPos = _float3(0.f, 0.f, 0.f);
+			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			Add_Effect("FoodGame_TimeAttack", FXDesc, true);
+			#pragma endregion
+			bOnce = true;
+		}
+	}
+
 	return OBJ_NOEVENT;
 }
 
@@ -431,12 +446,7 @@ HRESULT CPartTimerKirby::Bind_ShaderResources()
 void CPartTimerKirby::OnNotify()
 {
 	// 여기서 특정 시간이 되면 처리해야하는 사항을 넣기.
-#pragma region 이펙트WI QZR 
-	//CEffect::FX_DESC FXDesc{};
-	//FXDesc.vInitPos = _float3(0.f, 0.f, 0.f);
-	//FXDesc.vInitScale = { 1.f, 1.f, 1.f };
-	//Add_Effect("FoodGame_Remain20seconds", FXDesc, true);
-#pragma endregion
+
 }
 
 void CPartTimerKirby::SetUp_FSM()
