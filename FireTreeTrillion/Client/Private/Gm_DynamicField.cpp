@@ -95,7 +95,10 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 		m_eGimmickType = GIMMICK_SURPRISE;
 	}
 
-	if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
+	//if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
+	if (TEXT("Gimmick_PkFunHouse06A") == wstrModelTag
+		|| TEXT("Gimmick_PkFunHouse06B") == wstrModelTag
+		|| TEXT("Gimmick_PkFunHouse06C") == wstrModelTag)
 	{
 		m_eDFieldType = DFMOVE_FRONTBACK;
 		m_eGimmickType = GIMMICK_SPCHARGE;

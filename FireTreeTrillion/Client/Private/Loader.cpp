@@ -2029,6 +2029,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Gimmick_PkFunHouseDarkness04", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Gimmick_PkFunHouseDarkness05", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse06", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse06A", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse06B", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse06C", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse07", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		//기믹 오브젝트

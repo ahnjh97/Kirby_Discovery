@@ -365,7 +365,8 @@ HRESULT CLevel_Park::Ready_Map()
 		else if ("Gimmick_PkFunHouseDarkness01" == strModelName || "Gimmick_PkFunHouseDarkness02" == strModelName 
 			|| "Gimmick_PkFunHouseDarkness03" == strModelName || "Gimmick_PkFunHouseDarkness04" == strModelName 
 			|| "Gimmick_PkFunHouseDarkness05" == strModelName || "Gimmick_PkFunHouse06" == strModelName 
-			|| "Gimmick_PkFunHouse07" == strModelName)
+			|| "Gimmick_PkFunHouse06A" == strModelName || "Gimmick_PkFunHouse06B" == strModelName
+			|| "Gimmick_PkFunHouse06C" == strModelName	|| "Gimmick_PkFunHouse07" == strModelName)
 			wstrGameObjectTag = TEXT("DynamicField");
 			
 		else
@@ -393,7 +394,9 @@ HRESULT CLevel_Park::Ready_Map()
 
 			//동적 필드
 			if ("Gimmick_PkFunHouseDarkness01" == strModelName || "Gimmick_PkFunHouseDarkness04" == strModelName
-				|| "Gimmick_PkFunHouseDarkness05" == strModelName || "Gimmick_PkFunHouse06" == strModelName)
+				|| "Gimmick_PkFunHouseDarkness05" == strModelName || "Gimmick_PkFunHouse06" == strModelName
+				|| "Gimmick_PkFunHouse06A" == strModelName || "Gimmick_PkFunHouse06B" == strModelName
+				|| "Gimmick_PkFunHouse06C" == strModelName)
 			{
 				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField"), 
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
@@ -1069,8 +1072,6 @@ HRESULT CLevel_Park::Ready_Objects()
 		CGm_DynamicField* pLeftRight = dynamic_cast<CGm_DynamicField*>(leftRight);
 		pLeftRight->RegisterToActorToKirby();
 	}
-
-	// m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT(""), 1); -> 내가 원하는 서프라이즈보드
 
 #pragma endregion
 
