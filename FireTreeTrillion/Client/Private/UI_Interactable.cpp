@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "UI_Interactable.h"
 
-
 CUI_Interactable::CUI_Interactable(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CUIObject{ _pDevice, _pContext }
 {
@@ -27,10 +26,12 @@ HRESULT CUI_Interactable::Initialize(void* pArg)
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
-
-	//m_pTransformCom->Set_Scaled(2000.f, 1000.f, 1.f);
-	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.f, 0.2f, 1.f));
-
+	
+	// 사이즈, 위치 디폴트값 지정
+	m_InitialSize = _float2(116.f * 0.5f, 88.f * 0.5f);
+	m_pTransformCom->Set_Scaled(m_InitialSize.x, m_InitialSize.y, 1.f);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.f, 0.f, 1.f));
+	
 	m_bIsRender = false;
 
 	return S_OK;
@@ -39,8 +40,37 @@ HRESULT CUI_Interactable::Initialize(void* pArg)
 _int CUI_Interactable::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
+	_float fOwnTimeDelta = fTimeDelta * 0.5f;
 
-	m_fTimeDelta = fTimeDelta;
+	// 위치 UPDATE
+	CTransform* pTransform = m_pOwner->Get_TransformCom();
+	_float4 vPos = pTransform->Get_State_Float4(CTransform::STATE_POSITION);
+	Update_Pos(_float3(vPos.x, vPos.y + m_fOffset, vPos.z));
+	
+	// 사이즈 UPDATE
+	static _float fAccTime = 0.f;
+	if (m_eState == PLUS)
+	{
+		fAccTime += fOwnTimeDelta;
+		if (fAccTime >= 0.5f)
+		{
+			fAccTime = 0.5f;
+			m_eState = MINUS;
+		}
+	} 
+	else
+	{
+		fAccTime -= fOwnTimeDelta;
+		if (fAccTime < 0.f)
+		{
+			fAccTime = 0.f;
+			m_eState = PLUS;
+		}
+	}
+
+	_float fRatio = sin((fAccTime * 3.1415f) / 2);
+	m_pTransformCom->Set_Scaled(m_InitialSize.x + m_InitialSize.x * fAccTime,
+							    m_InitialSize.y + m_InitialSize.y * fAccTime, 1.f);
 
 	return OBJ_NOEVENT;
 }
@@ -64,7 +94,7 @@ HRESULT CUI_Interactable::Render()
 	hr = m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
 	CHECK_FAILED(hr);
 	
-	hr = m_pShaderCom->Begin(POSTEX_FADEINOUT);
+	hr = m_pShaderCom->Begin(POSTEX_DEFAULT); // 사이즈 변화 POSTEX_SOLIDBLEND
 	CHECK_FAILED(hr);
 
 	hr = m_pVIBufferCom->Bind_Buffers();
@@ -142,6 +172,22 @@ HRESULT CUI_Interactable::Bind_ShaderResources()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CUI_Interactable::Update_Pos(_float3 _vPosition)
+{
+	_float4 vNewPosition = _float4{ _vPosition.x, _vPosition.y, _vPosition.z, 1.f };
+
+	_matrix ViewMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW);
+	_matrix ProjMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
+	_matrix ComMatrix = ViewMatrix * ProjMatrix;
+
+	_float4 vFinPos = XMVector3TransformCoord(XMLoadFloat4(&vNewPosition), ComMatrix);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
+		XMVectorSet((vFinPos.x * g_iWinSizeX) * 0.5f,
+					(vFinPos.y * g_iWinSizeY) * 0.5f,
+					0.f,
+					1.f));
 }
 
 CUI_Interactable* CUI_Interactable::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

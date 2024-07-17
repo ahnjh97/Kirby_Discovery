@@ -207,6 +207,7 @@
 #include "UI_MessageWindow.h"
 #include "UI_BtnIcon.h"
 #include "UI_Fading.h"
+#include "UI_Interactable.h"
 
 // æ∆¿Ã≈€
 #include "Food.h"
@@ -396,6 +397,8 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_TransingStar"), CTransingStar);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Fading"), CUI_Fading);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Interactable"), CUI_Interactable);
 
 	//DIALOG
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Dialog"), CDialog);
@@ -1671,7 +1674,7 @@ HRESULT CLoader::Add_StaticUITexture()
 	hr = Add_Texture(LEVEL_STATIC, "Fade", "UI/Fade.png");	CHECK_FAILED(hr);
 
 	//UI_Interacting
-	hr = Add_Texture(LEVEL_STATIC, "UI_Interacting", "Effects/UI/TalkIconBalloon.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "UI_Interacting", "UI/Quest/TalkIconBalloon.png");	CHECK_FAILED(hr);
 
 	return S_OK;
 }

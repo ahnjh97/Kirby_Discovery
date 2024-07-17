@@ -6,6 +6,7 @@
 #include "Dee_State.h"
 #include "UI_MessageWindow.h"
 #include "Camera_Main.h"
+#include "UI_Interactable.h"
 
 CFoodShopDee::CFoodShopDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CWaddleDee{ pDevice, pContext }
@@ -46,6 +47,10 @@ HRESULT CFoodShopDee::Initialize(void* pArg)
 
 	m_pTransformCom->Rotation(_float3{ 0.f, 1.f, 0.f }, ToRadian(180.f));
 	m_pModelCom->Set_Animation(DEEANIM_WAIT, 60.f, true, true);
+
+	m_pUI_Interactable = dynamic_cast<CUI_Interactable*>(m_pGameInstance->Add_CloneReturn(*m_pCurrentLevelID, L"Layer_UI", L"Prototype_GameObject_UI_Interactable"));
+	m_pUI_Interactable->Set_Owner(this);
+	m_pUI_Interactable->Set_Offset(2.f);
 
 	return S_OK;
 }
@@ -162,6 +167,8 @@ void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	//DEE NPC 상호작용 시, MessageWindow UI 출력
 	if (bOnce == false && m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
 	{
+		m_pUI_Interactable->Set_IsRender(false);
+
 		// 07.14) 크래시 버그 수정 (Layer 명확하게 검색)
 		CUI_MessageWindow* pMWindow =  dynamic_cast<CUI_MessageWindow*>
 			(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_Parttimer_Dee")));
@@ -175,28 +182,8 @@ void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 		bOnce = true;
 	}
 
-	if (false == bOpenEffect)// && bOnce == true)
-	{
-#pragma region 이펙트WI
-		_float4 _vPosition = GET_POS;
-		_float4 vNewPosition = _float4{ _vPosition.x, _vPosition.y, _vPosition.z, 1.f };
-
-		_matrix ViewMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW);
-		_matrix ProjMatrix = m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_PROJ);
-		_matrix ComMatrix = ViewMatrix * ProjMatrix;
-
-		_float4 vDeePos = XMVector3TransformCoord(XMLoadFloat4(&vNewPosition), ComMatrix);
-
-		_float3 vUIPos = _float3{ (vDeePos.x * g_iWinSizeX) * 0.5f, (vDeePos.y * g_iWinSizeY) * 0.5f, 0.f };
-
-		CEffect::FX_DESC FXDesc{};
-		FXDesc.vInitPos = _float3{ vUIPos.x, vUIPos.y + 2.f, vUIPos.z };
-		FXDesc.vInitScale = { 0.6f, 0.6f, 0.6f };
-		Add_Effect("UI_NPC", FXDesc, true);
-#pragma endregion
-
-		bOpenEffect = true;
-	}
+	if(bOnce == false)
+		m_pUI_Interactable->Set_IsRender(true);
 }
 
 HRESULT CFoodShopDee::Add_Components()

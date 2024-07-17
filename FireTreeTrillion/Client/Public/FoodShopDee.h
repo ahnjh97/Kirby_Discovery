@@ -37,6 +37,7 @@ public:
 
 
 private:
+	class CUI_Interactable* m_pUI_Interactable = nullptr;
 	DEE_ANIM		m_eMyState = { DEEANIM_END };
 
 	HRESULT Add_Components();
