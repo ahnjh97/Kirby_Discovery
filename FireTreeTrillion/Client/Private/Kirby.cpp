@@ -1558,10 +1558,13 @@ void CKirby::RayCast_DynamicFields()
 	if (m_pControllerCom == nullptr) 
 		return;
 
-	_vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), 0));
-	_vector vRight = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), 0));
+	/*_vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), 0));
+	_vector vRight = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), 0));*/
 
-	_float fLookOffset = 3.3f;
+	_vector vLook = XMVectorSet(0, 0, 1, 0);
+	_vector vRight = XMVectorSet(1, 0, 0, 0);
+
+	_float fLookOffset = 5.f;
 
 	_float fActivationDistance = 6.f;
 
