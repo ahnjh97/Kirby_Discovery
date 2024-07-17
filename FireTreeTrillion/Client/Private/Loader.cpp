@@ -1177,7 +1177,7 @@ HRESULT CLoader::Loading_For_FinalBoss()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+	if (FAILED(Add_Texture(eLevel, "Level_Final_Env", "Map/Level_Final_Env.dds")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
 		return E_FAIL;

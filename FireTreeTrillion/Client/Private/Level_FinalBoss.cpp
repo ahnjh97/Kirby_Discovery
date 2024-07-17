@@ -851,7 +851,7 @@ HRESULT CLevel_FinalBoss::Add_EnvMap()
 {
 	HRESULT hr;
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Level_0_Env"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Level_Final_Env"),
 		TEXT("Com_Texture1"), (CComponent**)&m_pEnvTexture[TYPE_ENV]);
 	CHECK_FAILED(hr);
 
