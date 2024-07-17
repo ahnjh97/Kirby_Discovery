@@ -20,6 +20,12 @@ CFinalBoss::CFinalBoss(const CFinalBoss& rhs)
 {
 }
 
+void CFinalBoss::Appear_Event(CGameObject* pObj)
+{
+	//Change_State(CFinalBoss::FINALBOSS_DEMOAPPEARCUT5, 50.f, false, true);
+	m_pGameInstance->Set_ObjectBlack(.7f, 1.f);
+}
+
 HRESULT CFinalBoss::Initialize_Prototype()
 {
 	m_eCollisionGroup = MONSTER;
@@ -62,6 +68,9 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 
 	//Make_TargetToCams();
 	Add_AnimEvent();
+
+	function<void(CGameObject*)> func = bind(&CFinalBoss::Appear_Event, this, placeholders::_1);
+	CEventCenter::Get_Instance()->Subscribe(KEVENT_FINALBOSS_APPEAR, this, func);
 
 	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
 	{
