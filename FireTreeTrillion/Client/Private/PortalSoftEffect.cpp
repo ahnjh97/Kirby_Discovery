@@ -32,6 +32,8 @@ HRESULT CPortalSoftEffect::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pTransformCom->Set_Scaled(10.f, 10.f, 1.f);
+	if(LEVEL_TOWN == *m_pCurrentLevelID)
+		m_pTransformCom->Set_Scaled(15.f, 15.f, 1.f);
 
 	return S_OK;
 }
@@ -65,6 +67,25 @@ HRESULT CPortalSoftEffect::Render()
 
 	return S_OK;
 }
+
+#ifdef _DEBUG
+void CPortalSoftEffect::Render_IMGUI()
+{
+	if (ImGui::TreeNode("Guizmo"))
+	{
+		_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
+		m_pGameInstance->EditTransform(matWorld);
+		m_pTransformCom->Set_WorldMatrix(matWorld);
+		ImGui::Separator(); ImGui::NewLine();
+		ImGui::TreePop();
+	}
+
+	ImGui::Separator(); ImGui::NewLine();
+
+	__super::Render_IMGUI();
+}
+#endif
+
 
 HRESULT CPortalSoftEffect::Add_Components()
 {
