@@ -52,6 +52,7 @@ private:
 	CShader*				m_pShaderCom = { nullptr };
 	CTexture*				m_pTextureCom = { nullptr };
 
+	PxRigidStatic*			m_pStaticActor = { nullptr };
 	PxRigidDynamic*			m_pDynamicActor = { nullptr };
 	CGm_ParkSolarPanelOnce* m_pSolarPanelOnce = { nullptr };
 	CGm_ParkSolarPanelCharge* m_pSolarPanelCharge = { nullptr };

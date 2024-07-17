@@ -249,7 +249,7 @@ HRESULT CGm_ParkSolarPanelOnce::Add_Components()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 
-	Set_BodyCollider(COLLIDER_CYLINDER, 0.f, 5.f, 5.f);
+	Set_BodyCollider(COLLIDER_SPHERE, 0.f, 5.f, 5.f);
 
 #pragma endregion
 

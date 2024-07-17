@@ -50,21 +50,25 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 		|| TEXT("Gimmick_PkFunHouseDarkness05") == wstrModelTag)
 		m_eDFieldType = DFMOVE_UPDOWN;
 
-	else if (TEXT("Gimmick_PkFunHouseDarkness02") == wstrModelTag || TEXT("Gimmick_PkFunHouseDarkness03") == wstrModelTag)
+	if (TEXT("Gimmick_PkFunHouseDarkness02") == wstrModelTag || TEXT("Gimmick_PkFunHouseDarkness03") == wstrModelTag)
 		m_eDFieldType = DFMOVE_LEFTRIGHT;
 
-	else if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
+	if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
 		m_eDFieldType = DFMOVE_FRONTBACK;
 
-	else if (TEXT("Gimmick_PkFunHouse07") == wstrModelTag)
+	if (TEXT("Gimmick_PkFunHouse07") == wstrModelTag)
+	{
 		m_eDFieldType = DFMOVE_NONE;
+		m_pStaticActor = m_pModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
+	}
+	
+	else
+	{
+		m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
+		m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+	}
 
 	m_IsInteraction = FALSE;
-
-	//피직스 추가
-	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
-	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-
 	return S_OK;
 }
 
@@ -90,9 +94,9 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 		case DFMOVE_UPDOWN:
 		{
 			_float3 vCurWorldPos = GET_POS;
-			if (100.f <= vCurWorldPos.y) //특정 위치 도착할 경우
+			if (56.963f <= vCurWorldPos.y) //36.963 
 			{
-				vCurWorldPos.y = 100.f;
+				vCurWorldPos.y = 56.963;
 				return OBJ_NOEVENT;
 			}
 
@@ -105,6 +109,7 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 			break;
 
 		case DFMOVE_FRONTBACK:
+
 			break;
 		case DFMOVE_NONE: break;
 		}
@@ -312,6 +317,7 @@ void CGm_DynamicField::Free()
 	__super::Free();
 
 	m_pGameInstance->ReleaseActor(m_pDynamicActor);
+	m_pGameInstance->ReleaseActor(m_pStaticActor);
 
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
