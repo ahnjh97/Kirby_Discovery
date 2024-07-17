@@ -380,29 +380,9 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 
 		if (m_bIsInteraction) //RayCast 상호작용 검사
 		{
-			/*
-			if (34.851f <= vCurPos.x) //24.851 > 34.851
+			if (19.460f >= vCurPos.x) //24.460 > 14.460
 			{
-				vCurPos.x = 34.851f;
-				m_bIsQuake = TRUE;
-
-				if (m_bIsQuake)
-					Apply_Quake(fTimeDelta, 1.f, 0.1f);
-			}
-
-			else
-				m_pTransformCom->Go_Right(fTimeDelta * 0.5f);
-			*/
-		}
-		break;
-	case DFMOVE_RIGHT:
-		vCurPos = GET_POS;
-
-		if (m_bIsInteraction) //RayCast 상호작용 검사
-		{
-			if (34.851f <= vCurPos.x) //24.851 > 34.851
-			{
-				vCurPos.x = 34.851f;
+				vCurPos.x = 19.460f;
 				m_bIsQuake = TRUE;
 
 				if (m_bIsQuake)
@@ -410,8 +390,26 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			}
 
 			else
-				//여기에다가 해당 애님의 상태가 종료되었을 경우 (index:: 5번, 6번)
-				m_pTransformCom->Go_Right(_fTimeDelta * 0.25f); //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
+				m_pTransformCom->Go_Left(_fTimeDelta * 0.5f);
+		}
+		break;
+	case DFMOVE_RIGHT:
+		vCurPos = GET_POS;
+
+		if (m_bIsInteraction) //RayCast 상호작용 검사
+		{
+			if (29.851f <= vCurPos.x) //24.851 > 34.851
+			{
+				vCurPos.x = 29.851f;
+				m_bIsQuake = TRUE;
+
+				if (m_bIsQuake)
+					Apply_Quake(_fTimeDelta, 1.f, 0.1f);
+			}
+
+			//원작의 경우는 0.25f 속도인데 좀 더 빠르게 변경
+			else
+				m_pTransformCom->Go_Right(_fTimeDelta * 0.5f); //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
 		}
 		//특정 애님 상태일 경우, 필드도 비활성 움직임 처리
 		/*
