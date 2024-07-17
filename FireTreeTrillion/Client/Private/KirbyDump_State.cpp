@@ -416,16 +416,16 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 			_float fScale = CUtils::Make_RandomFloat(1.5f, 3.f);
 			fxDesc.vInitScale = { fScale, fScale, fScale };
-			//pKirby->Add_Effect("dump dash smoke", fxDesc);
-			pKirby->Add_Effect("real dump smoke test", fxDesc);
+			pKirby->Add_Effect("dump dash smoke", fxDesc);
+			//pKirby->Add_Effect("real dump smoke test", fxDesc);
 			fxDesc.vInitPos = vCenterPos;
 			fxDesc.vInitPos -= (_float3)pTransformCom->Get_State(CTransform::STATE_RIGHT) * (2.3f + CUtils::Make_RandomFloat(-.2f, .2f));
 			fxDesc.vInitPos += (_float3)pTransformCom->Get_State(CTransform::STATE_UP) * 7.2f;
 
 			fScale = CUtils::Make_RandomFloat(1.5f, 3.f);
 			fxDesc.vInitScale = { fScale, fScale, fScale };
-			//pKirby->Add_Effect("dump dash smoke", fxDesc);
-			pKirby->Add_Effect("real dump smoke test", fxDesc);
+			pKirby->Add_Effect("dump dash smoke", fxDesc);
+			//pKirby->Add_Effect("real dump smoke test", fxDesc);
 			fBoostTime = 0.f;
 		}
 
@@ -757,7 +757,8 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 			MultiFXDesc.vInitPos = vMyPos;
 			MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
-			pKirby->Add_Effect("real dump smoke test", MultiFXDesc);
+			//pKirby->Add_Effect("real dump smoke test", MultiFXDesc);
+			pKirby->Add_Effect("dump smoke", MultiFXDesc);
 
 			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_dump smoke"), &MultiFXDesc)))
 			//	return;

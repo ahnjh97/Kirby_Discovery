@@ -1201,12 +1201,6 @@ static void BombSmoke(CTransform* pTransformCom, _float3 vPos, _float3 vScale)
 
 static void ComeOn_Dash(CTransform* pTransformCom)
 {
-	//CEffect::FX_DESC FXDesc{};
-	//FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-	//FXDesc.vInitPos = { 0.f, 1.4f, -1.0f };
-	//FXDesc.vInitScale = { 8.f, 8.f, 8.f };
-	//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Come On Dash"), &FXDesc)))
-	//	return;
 
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
 	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();

@@ -37,6 +37,7 @@ public:
 
 
 private:
+	class CUI_Interactable* m_pUI_Interactable = nullptr;
 	DEE_ANIM		m_eMyState = { DEEANIM_END };
 
 	HRESULT Add_Components();
@@ -45,6 +46,8 @@ private:
 
 	void	SetUp_FSM();
 	_bool	Custom_Face(_uint iMeshIndex);
+
+	_bool	bOpenEffect = false;
 
 public:
 	static CFoodShopDee* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

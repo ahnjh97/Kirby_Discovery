@@ -498,6 +498,10 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 		{
 			CPartTimeHelper::Get_Instance()->Handle_UI(CPartTimeHelper::GAMEOVER);
 		}
+		else if (m_fCurTime <= 10.f)
+		{
+			CPartTimeHelper::Get_Instance()->Set_TimeAttack(true);
+		}
 		else if (m_fCurTime <= fLunchTime && m_bLunchTimeTrigger) // 타임이 20일 때, 점심시간 시작.
 		{
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
@@ -510,12 +514,11 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 			m_fLunchTimeStartTime = 5.f;
 
 			// 커비랑 와들디에게 점심시간 알리기
-
 			CPartTimeHelper::Get_Instance()->NotifyObserver();
 
 			m_bLunchTimeTrigger = false;
-
 		}
+		
 
 		m_fBeforeTime = m_fStandardTime;
 	}

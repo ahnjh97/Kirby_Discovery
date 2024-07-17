@@ -257,23 +257,29 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f , .4f , .5f , 0.2f , 0.2f, 0.f };
 
 
-	//별 이펙트 테스트용
-	if (*m_pCurrentLevelID == LEVEL_FINALBOSS)
-	{
-		CEffect::FX_DESC FxDesc{};
-		FxDesc.pSocketMatrix = &m_EffectSocket;
+	//시퀀스 이벤트 트리거를 초기화
+	m_SeqEventTriggers.reserve(10);
+	m_SeqEventTriggers.resize(10);
+	fill(m_SeqEventTriggers.begin(), m_SeqEventTriggers.end(), true);
 
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_final sky"), &FxDesc)))
-			return E_FAIL;
-	}
-	//if (*m_pCurrentLevelID == LEVEL_FINALE)
+	//별 이펙트 테스트용
+	//if (*m_pCurrentLevelID == LEVEL_FINALBOSS)
 	//{
-	//	CParticle::PARTICLE_DESC FxDesc{};
+	//	CEffect::FX_DESC FxDesc{};
 	//	FxDesc.pSocketMatrix = &m_EffectSocket;
 
-	//	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_night star test 2"), &FxDesc)))
+	//	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_final sky"), &FxDesc)))
 	//		return E_FAIL;
 	//}
+
+	if (*m_pCurrentLevelID == LEVEL_FINALE)
+	{
+		CParticle::PARTICLE_DESC FxDesc{};
+		FxDesc.pSocketMatrix = &m_EffectSocket;
+
+		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_night star test 2"), &FxDesc)))
+			return E_FAIL;
+	}
 
 	m_FinaleSeqATime =
 	{
@@ -658,40 +664,41 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	{
 		m_fSeqEventTime -= fTimeDelta;
 
-#pragma region 점심시간이다~
-
-		if (m_eSpecialSeq == SEQ_LUNCHTIME)
+		//이벤트 충간 체크
+		switch (m_eSpecialSeq)
+		{
+		case SEQ_LUNCHTIME:
 		{
 			//4초 남았을 시
-			if (abs(m_fSeqEventTime - 4.f) < fTimeDelta * 2.f)
+			if (m_SeqEventTriggers[0] == true && m_fSeqEventTime < 4.f)
 			{
+				m_SeqEventTriggers[0] = false;
 				m_pGameInstance->Restore_FirstTimer(.1f);
-
 
 				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_lunch time logo test"))))
 					return;
-
-				//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Lunch Time Icon"))))
-				//	return;
+			}
+		}
+		break;
+		case SEQ_FINALBOSS_APPEAR:
+			if (m_SeqEventTriggers[0] == true && m_fSeqEventTime < 3.f)
+			{
+				m_SeqEventTriggers[0] = false;
+				m_pGameInstance->Set_ObjectBlack(.3f);
 			}
 
-			//if (abs(m_fSeqEventTime - .5f) < fTimeDelta * 2.f)
-			//{
-
-			//}
-		}
-
-#pragma endregion
-
-		if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR)
-		{
-			if (abs(m_fSeqEventTime - 3.f) < fTimeDelta * 2.f)
+			if (m_SeqEventTriggers[1] == true && m_fSeqEventTime < 1.f)
 			{
+				m_SeqEventTriggers[1] = false;
 
 				CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
 				if (pFinalBoss != nullptr)
-					Set_Target(pFinalBoss->Get_TransformCom(), TARGET_SECOND, FOCUS_BOTH);
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMOAPPEARCUT5, 50.f, false, true);
+
 			}
+			break;
+		default:
+			break;
 		}
 
 		//시퀀스 시간 다 깠았다~~
@@ -699,46 +706,59 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 		{
 			m_fSeqEventTime = 0.f;
 
-			if (m_eSpecialSeq == SEQ_BREAKRACINGMAP)
+			switch (m_eSpecialSeq)
+			{
+			case SEQ_BREAKCARSHOP:
 			{
 				m_pGameInstance->StopSound(CHANNEL_BGM);
 				m_pGameInstance->PlayBGM(L"Welcome to the New World!.mp3");
 			}
+			break;
 
-
-			if (m_eSpecialSeq == SEQ_PARTTIMESTART)
+			case SEQ_PARTTIMESTART:
 			{
 				CPartTimeHelper::Get_Instance()->Handle_GameStart();
 				Lock_All({ 16.4f, 25.7f, 35.75f }, { .16f, -.08f, -1.f });
 				Set_FOVY(43.f);
 			}
 
-			//점심 시간이다~~
-			if (m_eSpecialSeq == SEQ_LUNCHTIME)
+			break;
+			case SEQ_LUNCHTIME:
 			{
 				Lock_All({ 16.4f, 25.7f, 35.75f }, { .16f, -.08f, -1.f });
 				m_pGameInstance->Restore_SecondTimer(.1f);
-
 			}
+			break;
 
-			if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR)
+			case SEQ_FINALBOSS_APPEAR:
 			{
+				CEventCenter::Get_Instance()->Notify(KEVENT_FINALBOSS_APPEAR, this);
+
+				//dof 세팅, state 변경
 				CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
 				if (pFinalBoss != nullptr)
-					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMOAPPEARCUT5, 50.f, false, false);
-				m_pGameInstance->Update_DofFocus(pFinalBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+				{
+					Set_Target(pFinalBoss->Get_TransformCom(), TARGET_SECOND, FOCUS_BOTH, {0.f, -2.f, 0.f});
+				}
 			}
-
-			if (m_eSpecialSeq == SEQ_FINALESTART)
+			break;
+			case SEQ_FINALESTART:
 			{
 				m_fCurShakeTime = m_fInitialShakeTime = 0.f;
 			}
-
-			if (m_eSpecialSeq == SEQ_FINALECUT5)
+			break;
+			case SEQ_FINALECUT5:
 			{
 				Lock_All({ 2057.f, 24.5f, -136.f }, { 1.f, .08f, -.12f });
 				Unlock();
 			}
+			break;
+			default:
+				break;
+			}
+
+			fill(m_SeqEventTriggers.begin(), m_SeqEventTriggers.end(), true);
+
 		}
 	}
 
@@ -1683,8 +1703,6 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	case SEQ_FINALBOSS_APPEAR:
 	{
 
-
-
 		CAMACTION newAction = {};
 
 		//탑 앵글
@@ -1730,7 +1748,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 
 		//에피리스 애니메이션 교체, target set
-		m_fSeqEventTime = 10.f;
+		m_fSeqEventTime = 9.f;
 
 		//보스 정면으로
 		vStartPos = { 0.f, 30.f, -7.f };
@@ -2825,10 +2843,6 @@ void CCamera_Main::Subscribe_Events()
 	func = bind(&CCamera_Main::Ready_Monsters_Leongar, this, placeholders::_1);
 	CEventCenter::Get_Instance()->Subscribe(KEVENT_SIMBA_APPEAR_END, this, func);
 
-
-	//최종보스 컷
-	func = bind(&CCamera_Main::Ready_Cam_FinalBoss, this, placeholders::_1);
-	CEventCenter::Get_Instance()->Subscribe(KEVENT_FINALBOSS_APPEAR, this, func);
 
 }
 

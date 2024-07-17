@@ -121,6 +121,7 @@ private:
 	_bool					m_bInitializeAnim = { true };
 	_float4x4				m_WeaponMatrix;
 	class CDeeDeeDeeHammer* m_pWeapons = { nullptr };
+	class CUI_Interactable* m_pUI_Interactable = nullptr;
 
 
 	_float					m_ftext = { 0.f };

@@ -105,6 +105,8 @@ public:
 	void Set_Spike(_bool bSpike) { m_bSpike = bSpike; }
 	_bool Get_Spike() { return m_bSpike; }
 
+	//이벤트 함수
+	void Appear_Event(CGameObject* pObj);
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
