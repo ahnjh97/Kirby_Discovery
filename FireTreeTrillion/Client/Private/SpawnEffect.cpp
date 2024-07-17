@@ -68,7 +68,7 @@ _int CSpawnEffect::Tick(_float fTimeDelta)
 
 	if (true == m_bTrail)
 	{
-		if (1.5f < m_fShaderTime)
+		if (2.f < m_fShaderTime)
 			m_bDead = true;
 
 		if (0.f < m_fAlpha)
