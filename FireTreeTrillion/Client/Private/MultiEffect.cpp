@@ -75,6 +75,7 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 				if (nullptr != pFX)
 					m_FXs.push_back(pFX);
 
+				Safe_AddRef(pFX);
 				m_fDuration.second = pFX->Get_BiggerDuration(m_fDuration.second);
 			}
 		}

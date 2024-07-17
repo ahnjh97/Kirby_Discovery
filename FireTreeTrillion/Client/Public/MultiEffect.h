@@ -27,6 +27,7 @@ public:
 	virtual void Add_Effect(CEffect* pEffect)
 	{
 		m_FXs.push_back(pEffect);
+		Safe_AddRef(pEffect);
 		//제일 긴 놈의 duration으로 정해진다.
 		m_fDuration.second = pEffect->Get_BiggerDuration(m_fDuration.second);
 	}

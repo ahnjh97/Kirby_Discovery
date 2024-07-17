@@ -1223,24 +1223,21 @@ void CFXToolDirector::Render_FXHierarchy()
 
 		if (MenuItem(u8"모두 복사 생성"))
 		{
-			//일단 단일 이펙트만
-			SINGLE_FX_DATA FXData{};
-			m_FXs[m_iSelectedFXIdx]->Fill_SaveData(&FXData);
-
 			//이름 정해줘
 			string strBaseName{ "New FX " };
+			string strName{};
 
 			//default 이펙트 이름 뒤에 중복 존재 시 알파벳을 붙인다.
 			char szSuffix = 'A';
 			while (true)
 			{
 				_bool bDoesExistSameName{ false };
-				FXData.strName = strBaseName + szSuffix;
+				strName = strBaseName + szSuffix;
 
 				//중복 이름 있으면 안됨
 				for (const auto& fx : m_FXs)
 				{
-					if (fx->m_strFXName == FXData.strName)
+					if (fx->m_strFXName == strName)
 					{
 						bDoesExistSameName = true;
 						break;
@@ -1253,29 +1250,46 @@ void CFXToolDirector::Render_FXHierarchy()
 				++szSuffix;
 			}
 
-			Make_Effect(FXData);
+			if (m_eSelected == SELECTED_SINGLE_FX)
+			{
+				//일단 단일 이펙트만
+				SINGLE_FX_DATA FXData{};
+				m_FXs[m_iSelectedFXIdx]->Fill_SaveData(&FXData);
+
+				FXData.strName = strName;
+
+				Make_Effect(FXData);
+
+			}
+			else if (m_eSelected == SELECTED_PARTICLE_FX)
+			{
+				PARTICLE_DATA ParticleData{};
+				m_FXs[m_iSelectedFXIdx]->Fill_SaveData(&ParticleData);
+
+				ParticleData.strName = strName;
+
+				Make_Effect(ParticleData);
+			}
+
 		}
 
 		if (MenuItem(u8"변수만 복사 생성"))
 		{
-			//일단 단일 이펙트만
-			SINGLE_FX_DATA FXData{};
-			m_FXs[m_iSelectedFXIdx]->Fill_SaveData(&FXData);
-
 			//이름 정해줘
 			string strBaseName{ "New FX " };
+			string strName{};
 
-			//default 이펙트 이름 뒤에 중복 존재 시 알파벳을 붙인다.
+
 			char szSuffix = 'A';
 			while (true)
 			{
 				_bool bDoesExistSameName{ false };
-				FXData.strName = strBaseName + szSuffix;
+				strName = strBaseName + szSuffix;
 
 				//중복 이름 있으면 안됨
 				for (const auto& fx : m_FXs)
 				{
-					if (fx->m_strFXName == FXData.strName)
+					if (fx->m_strFXName == strName)
 					{
 						bDoesExistSameName = true;
 						break;
@@ -1285,16 +1299,49 @@ void CFXToolDirector::Render_FXHierarchy()
 				//중복 이름이 없거나, 알파벳이 초과하면 반복 끝
 				if (!bDoesExistSameName || 'Z' <= szSuffix)
 					break;
+
 				++szSuffix;
 			}
 
-			//버퍼, 텍스쳐, 마스크 텍스쳐 컴포넌트 이름 떤져준다.
-			string strComponentTag = "Prototype_Component_";
-			FXData.strBufferName = strComponentTag + m_FXBufferList[m_iAddingFXBufferIdx];
-			FXData.strTexName = strComponentTag + m_FXTexList[m_iAddingFXTexIdx];
-			FXData.strMaskTexName = strComponentTag + m_FXMaskTexList[m_iAddingFXMaskTexIdx];
+			if (m_eSelected == SELECTED_SINGLE_FX)
+			{
+				//일단 단일 이펙트만
+				SINGLE_FX_DATA FXData{};
+				m_FXs[m_iSelectedFXIdx]->Fill_SaveData(&FXData);
 
-			Make_Effect(FXData);
+
+				FXData.strName = strName;
+
+				//버퍼, 텍스쳐, 마스크 텍스쳐 컴포넌트 이름 떤져준다.
+				string strComponentTag = "Prototype_Component_";
+				FXData.strBufferName = strComponentTag + m_FXBufferList[m_iAddingFXBufferIdx];
+				FXData.strTexName = strComponentTag + m_FXTexList[m_iAddingFXTexIdx];
+				FXData.strMaskTexName = strComponentTag + m_FXMaskTexList[m_iAddingFXMaskTexIdx];
+				FXData.iPassIdx = 0;
+				FXData.iMaskTexIdx = 0;
+				FXData.iTexIdx = 0;
+
+				Make_Effect(FXData);
+
+			}
+			else if (m_eSelected == SELECTED_PARTICLE_FX)
+			{
+
+				PARTICLE_DATA ParticleData{};
+				m_FXs[m_iSelectedFXIdx]->Fill_SaveData(&ParticleData);
+
+				ParticleData.strName = strName;
+
+				ParticleData.iPassIdx = 0;
+				ParticleData.iMaskTexIdx = 0;
+				ParticleData.iTexIdx = 0;
+
+				string strComponentTag = "Prototype_Component_";
+				ParticleData.strTexName = strComponentTag + m_FXTexList[m_iAddingFXTexIdx];
+				ParticleData.strMaskTexName = strComponentTag + m_FXMaskTexList[m_iAddingFXMaskTexIdx];
+
+				Make_Effect(ParticleData);
+			}
 		}
 
 		EndPopup();
@@ -2065,6 +2112,7 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 	End();
 }
 
+//키프레임 일련을 렌더한다.
 void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidth)
 {
 	if (m_iSelectedFXIdx == -1)
@@ -2238,6 +2286,7 @@ void CFXToolDirector::MakeBar_SingleFXProperty(_float _fTimeDelta, _float _fWidt
 	}
 }
 
+//한 변수의 키프레임을 렌더한다.
 void CFXToolDirector::Make_KeyframeList(_float _fWidth, _float _fInitialYPos, CEffect* _pCurFX, KF_PROPERTY _eRenderProperty)
 {
 	ImVec2 vPos = GetCursorScreenPos();
@@ -2283,7 +2332,6 @@ void CFXToolDirector::Make_KeyframeList(_float _fWidth, _float _fInitialYPos, CE
 	}
 
 }
-
 
 void CFXToolDirector::MakeBar_ParticleFXProperty(_float _fTimeDelta, _float _fWidth)
 {
@@ -2357,81 +2405,68 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 		}
 
 		if (m_iSelectedMultiFXIdx == i && IsItemHovered() && IsMouseReleased(1))
-			OpenPopup("Hi");
-
-
-		//if (bOpenSelectableMenu)
-		if (BeginPopup("Hi"))
-		{
-
-			if (MenuItem(u8"이펙트 그룹에 추가") && m_iSelectedFXIdx != -1 && m_iSelectedMultiFXIdx != -1)
-			{
-				//m_MultiFXs[m_iSelectedMultiFXIdx]->Add_Effect(*m_FXs[m_iSelectedFXIdx]);
-			}
-
-			if (MenuItem(u8"새 이펙트 그룹 생성"))
-			{
-				CMultiEffect::MULTI_FX_DESC FxDesc = {};
-
-				string strBaseName{ "Multi FX " };
-
-				//default 이펙트 이름 뒤에 중복 존재 시 알파벳을 붙인다.
-				char szSuffix = 'A';
-				while (true)
-				{
-					_bool bDoesExistSameName{ false };
-					FxDesc.strFXName = strBaseName + szSuffix;
-
-					//중복 이름 있으면 안됨
-					for (const auto& fx : m_MultiFXs)
-					{
-						if (fx->m_strFXName == FxDesc.strFXName)
-						{
-							bDoesExistSameName = true;
-							break;
-						}
-					}
-
-					//중복 이름이 없거나, 알파벳이 초과하면 반복 끝
-					if (!bDoesExistSameName || 'Z' <= szSuffix)
-						break;
-
-					++szSuffix;
-				}
-
-				CMultiEffect* pMultiFX = static_cast<CMultiEffect*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_MultiEffect"), &FxDesc));
-				m_MultiFXs.emplace_back(pMultiFX);
-
-				//m_MultiFXs.back()->Add_Effect(*m_FXs[m_iSelectedFXIdx]);
-			}
-
-			if (MenuItem(u8"삭제"))
-			{
-				m_eSelected = SELECTED_END;
-
-				Safe_Release(m_MultiFXs[m_iSelectedMultiFXIdx]);
-				m_MultiFXs.erase(m_MultiFXs.begin() + m_iSelectedMultiFXIdx);
-
-				if (m_MultiFXs.size() <= m_iSelectedMultiFXIdx)
-					--m_iSelectedMultiFXIdx;
-				else if (m_MultiFXs.empty())
-				{
-					m_iSelectedMultiFXIdx = -1;
-				}
-			}
-			//if (MenuItem(u8"복사"))
-			//{
-
-			//}
-
-			EndPopup();
-			//End();
-		}
-		//bOpenSelectableMenu = true;
+			OpenPopup("MultiFXMenu");
 
 	}
 
+	//우측 키를 누르면 나오는 메뉴들
+	if (BeginPopup("MultiFXMenu"))
+	{
+
+		//if (MenuItem(u8"이펙트 그룹에 추가") && m_iSelectedFXIdx != -1 && m_iSelectedMultiFXIdx != -1)
+		//{
+		//	static _int iAddingFXIdx = -1;
+
+		//	static ImGuiTextFilter multiFXfilter;
+		//	string szName;
+		//	Text(u8"검색");
+		//	multiFXfilter.Draw();
+
+		//	Begin(u8"목록");
+
+		//	for (_int i = 0; i < m_MultiFXs.size(); ++i)
+		//	{
+
+		//		if (multiFXfilter.PassFilter(m_MultiFXs[i]->m_strFXName.c_str())
+		//			&& Selectable(m_MultiFXs[i]->m_strFXName.c_str(), iAddingFXIdx == i))
+		//		{
+
+		//			iAddingFXIdx = i;
+		//			m_MultiFXs[iAddingFXIdx]->Add_Effect(m_MultiFXs[m_iSelectedFXIdx]);
+
+		//		}
+
+		//	}
+
+		//	End();
+
+		//}
+
+		if (MenuItem(u8"삭제"))
+		{
+			m_eSelected = SELECTED_END;
+
+			Safe_Release(m_MultiFXs[m_iSelectedMultiFXIdx]);
+			m_MultiFXs.erase(m_MultiFXs.begin() + m_iSelectedMultiFXIdx);
+
+			if (m_MultiFXs.size() <= m_iSelectedMultiFXIdx)
+				--m_iSelectedMultiFXIdx;
+			else if (m_MultiFXs.empty())
+			{
+				m_iSelectedMultiFXIdx = -1;
+			}
+		}
+		//if (MenuItem(u8"복사"))
+		//{
+
+		//}
+
+		EndPopup();
+	}
+
+
 	EndChild();
+
 
 	if (m_iSelectedMultiFXIdx != -1)
 	{
@@ -2451,13 +2486,11 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 				//}
 
 		}
-
 	}
 
 
 	End();
 }
-
 
 HRESULT CFXToolDirector::Ready_FXPrototypeVector()
 {
