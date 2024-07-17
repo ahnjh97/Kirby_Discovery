@@ -1710,75 +1710,78 @@ void CFinalBoss_Recovery_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	}
 	else if (CFinalBoss::FINALBOSS_RECOVERYWAIT == pFinalBoss->Get_State())
 	{
-		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		_vector vTargetPos = pFinalBoss->Get_RallyPoint()[5];
-
-		_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vTargetPos)));
-		if (false == m_bMove)
+		if (true == m_bStart)
 		{
-			if (15.f < fDistance)
-			{
-				if (0.f < m_fSpeed)
-					m_fSpeed -= fTimeDelta * 1.2f;
-				else
-					m_fSpeed = 0.f;
+			_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vTargetPos = pFinalBoss->Get_RallyPoint()[5];
 
-				vPos += XMVector3Normalize(vTargetPos - vPos) * fTimeDelta * 22.f * m_fSpeed;
-				vPos.m128_f32[1] = pFinalBoss->Get_Position().m128_f32[1];
-				pController->Move(pTransformCom, vPos, fTimeDelta);
-			}
-			else
+			_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vTargetPos)));
+			if (false == m_bMove)
 			{
-				m_fDelayTime += fTimeDelta;
-				if (0.1f < m_fDelayTime)
-					m_bMove = true;
-			}
-		}
-		else if (true == m_bMove)
-		{
-			if (0.5f < fDistance)
-			{
-				if (0.f < m_fSecondSpeed)
-					m_fSecondSpeed -= fTimeDelta * 0.8f;
+				if (15.f < fDistance)
+				{
+					if (0.f < m_fSpeed)
+						m_fSpeed -= fTimeDelta * 1.2f;
+					else
+						m_fSpeed = 0.f;
+
+					vPos += XMVector3Normalize(vTargetPos - vPos) * fTimeDelta * 22.f * m_fSpeed;
+					vPos.m128_f32[1] = pFinalBoss->Get_Position().m128_f32[1];
+					pController->Move(pTransformCom, vPos, fTimeDelta);
+				}
 				else
 				{
-					m_fSecondSpeed = 0.f;
-
-					m_fItemCycle += fTimeDelta;
-
-					if(3.f > m_fItemCycle)
-					{
-						m_fItemTime += fTimeDelta;
-						if(1.f < m_fItemTime)
-						{
-							m_fItemTime = 0.f;
-							_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-							vPos.m128_f32[1] += 1.f;
-							for (_uint i = 0; i < 3; ++i)
-							{
-								HRESULT hr;
-								// 별 아이템 떨굼
-								CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
-								AbilityItemDesc.fRotateDir = 1.f;																	// 별 회전 방향 오른쪽															// 별 회전 방향 왼쪽
-								AbilityItemDesc.fAngle = 15.f * ((_float)i - 1.f);													// 별의 진행 방향의 각도
-								AbilityItemDesc.vDir = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 2.f;							// 별의 진행 방향
-								AbilityItemDesc.vPosition = vPos;	// 별의 생성 위치
-								AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
-								hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
-								CHECK_FAILED(hr);
-							}
-						}
-					}
+					m_fDelayTime += fTimeDelta;
+					if (0.1f < m_fDelayTime)
+						m_bMove = true;
+				}
+			}
+			else if (true == m_bMove)
+			{
+				if (0.5f < fDistance)
+				{
+					if (0.f < m_fSecondSpeed)
+						m_fSecondSpeed -= fTimeDelta * 0.8f;
 					else
 					{
-						if(7.f < m_fItemCycle)
-							m_fItemCycle = 0.f;
-					}
-				}
+						m_fSecondSpeed = 0.f;
 
-				vPos += XMVector3Normalize(vTargetPos - vPos) * fTimeDelta * 22.f * m_fSecondSpeed;
-				vPos.m128_f32[1] += 1.f;
-				pController->Move(pTransformCom, vPos, fTimeDelta);
+						m_fItemCycle += fTimeDelta;
+
+						if (3.f > m_fItemCycle)
+						{
+							m_fItemTime += fTimeDelta;
+							if (1.f < m_fItemTime)
+							{
+								m_fItemTime = 0.f;
+								_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+								vPos.m128_f32[1] += 1.f;
+								for (_uint i = 0; i < 3; ++i)
+								{
+									HRESULT hr;
+									// 별 아이템 떨굼
+									CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+									AbilityItemDesc.fRotateDir = 1.f;																	// 별 회전 방향 오른쪽															// 별 회전 방향 왼쪽
+									AbilityItemDesc.fAngle = 15.f * ((_float)i - 1.f);													// 별의 진행 방향의 각도
+									AbilityItemDesc.vDir = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 2.f;							// 별의 진행 방향
+									AbilityItemDesc.vPosition = vPos;	// 별의 생성 위치
+									AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+									hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+									CHECK_FAILED(hr);
+								}
+							}
+						}
+						else
+						{
+							if (7.f < m_fItemCycle)
+								m_fItemCycle = 0.f;
+						}
+					}
+
+					vPos += XMVector3Normalize(vTargetPos - vPos) * fTimeDelta * 22.f * m_fSecondSpeed;
+					vPos.m128_f32[1] += 1.f;
+					pController->Move(pTransformCom, vPos, fTimeDelta);
+				}
 			}
 		}
 	}
@@ -1814,6 +1817,7 @@ void CFinalBoss_Recovery_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 void CFinalBoss_Recovery_State::OnStateExit()
 {
+	m_bStart = true;
 }
 
 CFinalBoss_Recovery_State* CFinalBoss_Recovery_State::Create()

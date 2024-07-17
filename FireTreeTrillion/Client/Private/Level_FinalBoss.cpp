@@ -109,7 +109,7 @@ HRESULT CLevel_FinalBoss::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
 
-	LightDesc.vDiffuse = _float4(.7f, .2f, .2f, 1.f);
+	LightDesc.vDiffuse = _float4(.5f, .1f, .1f, 1.f);
 	LightDesc.vAmbient = _float4(1.f, .15f, .1f, 1.f);
 
 #pragma endregion
@@ -118,7 +118,7 @@ HRESULT CLevel_FinalBoss::Ready_Lights()
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	m_pGameInstance->Setting_GodRay({ -650.f, 30000.f, 1200.f, 1.f });
+	m_pGameInstance->Setting_GodRay({ 0.f, 1250.f, 2000.f, 1.f });
 	m_pGameInstance->Set_ObjectBlack(.4f);
 	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_FINAL);
 

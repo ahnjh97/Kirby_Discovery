@@ -104,7 +104,12 @@ void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData)
     pFXData->strMaskTexName = CUtils::WstrToStr(m_strMaskTexTag);
 
     pFXData->fDuration = m_fDuration.second;
-    pFXData->fLifetime = m_fLifetime;
+
+    //루프 이펙트의 경우, 라이프 타임을 처음부터 다시 맞춘다.
+    if (m_bIsLoop)
+        pFXData->fLifetime = { 0.f, m_fLifetime.second - m_fLifetime.first };
+    else
+        pFXData->fLifetime = m_fLifetime;
 
     pFXData->iPassIdx = m_iPassIdx;
     pFXData->iTexIdx = m_iTexIdx;
@@ -195,10 +200,13 @@ _bool CEffect::Calculate_Lifetime(_float _fTimeDelta)
 {
     if ( m_fDuration.first < m_fLifetime.first)
         return false;
-    
+
+    if (m_fLifeRatio <= .01f)
+        int a = 0;
+
     if (m_fLifetime.second <= m_fDuration.first)
     {
-        if (m_bIsLoop || m_fDuration.second == FX_MAXDURATION)
+        if (m_bIsLoop/* || m_fDuration.second == FX_MAXDURATION*/)
         {
             _float fLength = m_fLifetime.second - m_fLifetime.first;
             m_fLifetime.first += fLength;
@@ -206,6 +214,7 @@ _bool CEffect::Calculate_Lifetime(_float _fTimeDelta)
         }
         else
         {
+            //m_fLifetime.first = m_fLifetime.second;
             m_fLifeRatio = 1.f;
             return true;
         }
@@ -231,7 +240,7 @@ _float3 CEffect::Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY ePropert
         //루프하지 않는다면, 마지막 키프레임 값으로 제한한다.
         else
         {
-            vResultValue = curKeyframes[m_iCurKeyframeIdxs[eProperty]].vValue;
+            vResultValue = curKeyframes.back().vValue;
             return vResultValue;
         }
     }

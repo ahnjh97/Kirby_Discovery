@@ -2303,8 +2303,9 @@ void CFXToolDirector::Make_KeyframeList(_float _fWidth, _float _fInitialYPos, CE
 
 	for (auto& keyframe : _pCurFX->m_Keyframes[_eRenderProperty])
 	{
-		_float fRatio = (_pCurFX->m_fLifetime.first + (keyframe.fTimeRatio * (_pCurFX->m_fLifetime.second - _pCurFX->m_fLifetime.first)));
-		_float fPosX = fRatio * _fWidth / _pCurFX->m_fDuration.second;
+		//_float fRatio = (_pCurFX->m_fLifetime.first + (keyframe.fTimeRatio * (_pCurFX->m_fLifetime.second - _pCurFX->m_fLifetime.first)));
+		_float fRatio = keyframe.fTimeRatio;
+		_float fPosX = fRatio * _fWidth /*/ _pCurFX->m_fDuration.second*/;
 		ImVec2 vCurPos = vPos + ImVec2{ fPosX, 2.f };
 
 		GetWindowDrawList()->AddCircleFilled(vCurPos, 6.0f, IM_COL32(255, 255, 100, 255));

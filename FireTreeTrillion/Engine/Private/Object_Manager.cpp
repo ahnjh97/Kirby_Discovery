@@ -144,7 +144,7 @@ CGameObject* CObject_Manager::Add_CloneReturn(_uint iLevelIndex, const wstring& 
 }
 
 
-CGameObject * CObject_Manager::Clone_GameObject(const wstring & strPrototypeTag, void * pArg)
+CGameObject* CObject_Manager::Clone_GameObject(const wstring & strPrototypeTag, void * pArg)
 {
 	/* 복제해야할 원형객체를 검색한다. */
 	CGameObject*	pPrototype = Find_Prototype(strPrototypeTag);

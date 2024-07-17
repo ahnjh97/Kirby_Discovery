@@ -450,7 +450,7 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Final",
 		COLOR_DATA{
-		1.1f, 1.f, 1.08023f, 0.809684f, 0.990206f, 1.03727f, 1.20983f,
+		1.1f, 1.f, 1.08023f, 0.809684f, 0.990206f, 1.1f, 1.f,
 		0.74032f, 0.6f, 0.6f, 1.03f, 0.96f, 1.04f, 0.243137f, 0.00784314f,
 		0.00784314f, 0.00971069f, 0.917647f, 0.513726f, 0.145098f, 0.00992562f,
 		1.f, 0.847059f, 0.254902f, 0.00999975f, 0.13f, 0.55f
@@ -1919,7 +1919,6 @@ HRESULT CRenderer::Render_UI()
 void CRenderer::Render_IMGUI()
 {
 
-
 	ImGui::Begin(u8"렌더러");
 
 	ImGui::SeparatorText(u8"렌더옵션");
@@ -1934,91 +1933,119 @@ void CRenderer::Render_IMGUI()
 
 
 
-	ImGui::SeparatorText(u8"포그");
+	if (ImGui::TreeNode(u8"갓 포즈"))
+	{
+		if (ImGui::DragFloat3(u8"갓 위치", &(m_vGodPos.x), 1.f, -10000.f, 10000.f, "%.1f"))
+		{
+			Setting_GodRay(m_vGodPos);
+		}
 
-	ImGui::DragFloat3(u8"가로 포그", &(m_vFogYColor.x), .01f, 0.f, 1.f, "%.2f");
-	ImGui::DragFloat(u8"가로 포그 밑", &m_fFogYBottom, .1f, -1000.f, 1000.f, "%.2f");
-	ImGui::DragFloat(u8"가로 포그 위", &m_fFogYTopY, .1f, -1000.f, 1000.f, "%.2f");
-	ImGui::DragFloat(u8"가로 포그 강도", &m_fFogYIntensity, .01f, 0.f, 1.f, "%.2f");
+		ImGui::TreePop();
+	}
 
-	ImGui::Dummy({ 0.f, 10.f });
-	ImGui::DragFloat3(u8"뷰 포그", &(m_vFogViewColor.x), .01f, 0.f, 1.f, "%.2f");
-	ImGui::DragFloat(u8"뷰 포그 앞", &m_fFogViewStart, .1f, -1000.f, 1000.f, "%.2f");
-	ImGui::DragFloat(u8"뷰 포그 뒤", &m_fFogViewEnd, .1f, -1000.f, 1000.f, "%.2f");
-	ImGui::DragFloat(u8"뷰 포그 강도", &m_fFogViewIntensity, .01f, 0.f, 1.f, "%.2f");
+	if (ImGui::TreeNode(u8"포그"))
+	{
+
+		ImGui::DragFloat3(u8"가로 포그", &(m_vFogYColor.x), .01f, 0.f, 1.f, "%.2f");
+		ImGui::DragFloat(u8"가로 포그 밑", &m_fFogYBottom, .1f, -1000.f, 1000.f, "%.2f");
+		ImGui::DragFloat(u8"가로 포그 위", &m_fFogYTopY, .1f, -1000.f, 1000.f, "%.2f");
+		ImGui::DragFloat(u8"가로 포그 강도", &m_fFogYIntensity, .01f, 0.f, 1.f, "%.2f");
+
+		ImGui::Dummy({ 0.f, 10.f });
+		ImGui::DragFloat3(u8"뷰 포그", &(m_vFogViewColor.x), .01f, 0.f, 1.f, "%.2f");
+		ImGui::DragFloat(u8"뷰 포그 앞", &m_fFogViewStart, .1f, -1000.f, 1000.f, "%.2f");
+		ImGui::DragFloat(u8"뷰 포그 뒤", &m_fFogViewEnd, .1f, -1000.f, 1000.f, "%.2f");
+		ImGui::DragFloat(u8"뷰 포그 강도", &m_fFogViewIntensity, .01f, 0.f, 1.f, "%.2f");
+
+		ImGui::TreePop();
+
+	}
+
+	if (ImGui::TreeNode(u8"SSAO"))
+	{
+
+		ImGui::DragFloat(u8"원근 허용", &m_fSSAOScale, .01f, 0.f, 2.f, "%.2f");
+		ImGui::DragFloat(u8"차폐 확인 각도", &m_fSSAOBias, .01f, 0.f, 1.f, "%.2f");
+		ImGui::DragFloat(u8"탐색 반경", &m_fSSAOSampleRadius, .01f, 0.1f, 10.f, "%.2f");
+		ImGui::DragFloat(u8"음영 강도", &m_fSSAOIntensity, .01f, 0.01f, 5.f, "%.2f");
+
+		ImGui::TreePop();
+
+	}
+
+	if (ImGui::TreeNode(u8"림 라이트"))
+	{
+
+		ImGui::DragFloat(u8"림 라이트 배율", &m_fRimLightRatio.second, .01f, 0.f, 1.f, "%.2f");
+		ImGui::DragFloat(u8"림 라이트 범위", &(m_fRimLightRadius.second), .01f, 0.f, 10.f, "%.2f");
+		ImGui::DragFloat3(u8"림 라이트 색상", &(m_vRimColor.second.x), .01f, 0.f, 1.f, "%.2f");
+
+		ImGui::TreePop();
+
+	}
+
+	if (ImGui::TreeNode(u8"DOF"))
+	{
+		ImGui::DragFloat(u8"DOF 강도", &m_fDOFIntensity, .01f, 0.f, 10.f, "%.2f");
+		ImGui::DragFloat3(u8"DOF 색상", &(m_vDOFColor.x), .01f, -1.f, 1.f, "%.2f");
+
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode(u8"컬러코렉션"))
+	{
+
+		ImGui::DragFloat(u8"노출", &m_DestColorData.fExposure, .01f, 0.f, 3.f, "%.2f");
+		//ImGui::DragFloat(u8"색조", &m_DestColorData.fHue, .01f, 0.f, 1.5f, "%.2f");
+		ImGui::DragFloat(u8"채도", &m_DestColorData.fSaturation, .01f, 0.f, 2.f, "%.2f");
+		ImGui::DragFloat(u8"명도", &m_DestColorData.fBrightness, .01f, 0.f, 3.f, "%.2f");
+		ImGui::DragFloat(u8"감마", &m_DestColorData.fGamma, .01f, 0.f, 3.f, "%.2f");
+		ImGui::DragFloat(u8"활기", &m_DestColorData.fVibrance, .01f, 0.f, 3.f, "%.2f");
+		ImGui::DragFloat(u8"대비", &m_DestColorData.fContrast, .01f, 0.f, 3.f, "%.2f");
+
+		ImGui::DragFloat3(u8"화이트 밸런스", m_DestColorData.vWhiteBalance, .01f, 0.f, 3.f, "%.2f");
+		ImGui::DragFloat3(u8"색상 균형", m_DestColorData.vColorBalance, .01f, 0.f, 3.f, "%.2f");
+
+		ImGui::ColorEdit3(u8"그림자 색상", m_DestColorData.vShadowColor);
+		ImGui::DragFloat(u8"그림자 세기", &m_DestColorData.fShadowIntensity, .01f, 0.f, 1.f, "%.2f");
+
+		ImGui::ColorEdit3(u8"중간 색상", m_DestColorData.vMidtoneColor);
+		ImGui::DragFloat(u8"중간 세기", &m_DestColorData.fMidtoneIntensity, .01f, 0.f, 1.f, "%.2f");
+
+		ImGui::ColorEdit3(u8"하이라이트 색상", m_DestColorData.vHighlightColor);
+		ImGui::DragFloat(u8"하이라이트 세기", &m_DestColorData.fHighlightIntensity, .01f, 0.f, 1.f, "%.2f");
+
+		ImGui::DragFloat(u8"그림자 임계", &m_DestColorData.fShadowThreshold, .01f, 0.f, 1.f, "%.2f");
+		ImGui::DragFloat(u8"하이라이트 임계", &m_DestColorData.fHighlightThreshold, .01f, 0.f, 1.f, "%.2f");
 
 
+		ostringstream oss;
+		oss << m_fExposure << "f, "
+			<< m_fHue << "f, "
+			<< m_fSaturation << "f, "
+			<< m_fBrightness << "f, "
+			<< m_fGamma << "f, " << endl
+			<< m_fVibrance << "f, "
+			<< m_fContrast << "f, " << endl
+			<< m_vWhiteBalance[0] << "f, " << m_vWhiteBalance[1] << "f, " << m_vWhiteBalance[2] << "f, "
+			<< m_vColorBalance[0] << "f, " << m_vColorBalance[1] << "f, " << m_vColorBalance[2] << "f, " << endl
+			<< m_vShadowColor[0] << "f, " << m_vShadowColor[1] << "f, " << m_vShadowColor[2] << "f, "
+			<< m_fShadowIntensity << "f, " << endl
+			<< m_vMidtoneColor[0] << "f, " << m_vMidtoneColor[1] << "f, " << m_vMidtoneColor[2] << "f, "
+			<< m_fMidtoneIntensity << "f, " << endl
+			<< m_vHighlightColor[0] << "f, " << m_vHighlightColor[1] << "f, " << m_vHighlightColor[2] << "f, "
+			<< m_fHighlightIntensity << "f, " << endl
+			<< m_fShadowThreshold << "f, "
+			<< m_fHighlightThreshold << "f";
 
-	ImGui::SeparatorText(u8"SSAO");
+		std::string colorDataStr = oss.str();
 
+		// ImGui 텍스트 박스에 표시
+		ImGui::InputTextMultiline("Color Data", &colorDataStr[0], colorDataStr.size() + 1, ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 16), ImGuiInputTextFlags_ReadOnly);
 
-	ImGui::DragFloat(u8"원근 허용", &m_fSSAOScale, .01f, 0.f, 2.f, "%.2f");
-	ImGui::DragFloat(u8"차폐 확인 각도", &m_fSSAOBias, .01f, 0.f, 1.f, "%.2f");
-	ImGui::DragFloat(u8"탐색 반경", &m_fSSAOSampleRadius, .01f, 0.1f, 10.f, "%.2f");
-	ImGui::DragFloat(u8"음영 강도", &m_fSSAOIntensity, .01f, 0.01f, 5.f, "%.2f");
+		ImGui::TreePop();
 
-	ImGui::SeparatorText(u8"림 라이트");
-
-	ImGui::DragFloat(u8"림 라이트 배율", &m_fRimLightRatio.second, .01f, 0.f, 1.f, "%.2f");
-	ImGui::DragFloat(u8"림 라이트 범위", &(m_fRimLightRadius.second), .01f, 0.f, 10.f, "%.2f");
-	ImGui::DragFloat3(u8"림 라이트 색상", &(m_vRimColor.second.x), .01f, 0.f, 1.f, "%.2f");
-
-	//ImGui::DragFloat3(u8"림 라이트 색상", m_vRimColor.second, .01f, 0.f, 3.f, "%.2f");
-
-	ImGui::SeparatorText(u8"DOF");
-
-	ImGui::DragFloat(u8"DOF 강도", &m_fDOFIntensity, .01f, 0.f, 10.f, "%.2f");
-	ImGui::DragFloat3(u8"DOF 색상", &(m_vDOFColor.x), .01f, -1.f, 1.f, "%.2f");
-
-	ImGui::SeparatorText(u8"컬러코렉션");
-
-	ImGui::DragFloat(u8"노출", &m_DestColorData.fExposure, .01f, 0.f, 3.f, "%.2f");
-	//ImGui::DragFloat(u8"색조", &m_DestColorData.fHue, .01f, 0.f, 1.5f, "%.2f");
-	ImGui::DragFloat(u8"채도", &m_DestColorData.fSaturation, .01f, 0.f, 2.f, "%.2f");
-	ImGui::DragFloat(u8"명도", &m_DestColorData.fBrightness, .01f, 0.f, 3.f, "%.2f");
-	ImGui::DragFloat(u8"감마", &m_DestColorData.fGamma, .01f, 0.f, 3.f, "%.2f");
-	ImGui::DragFloat(u8"활기", &m_DestColorData.fVibrance, .01f, 0.f, 3.f, "%.2f");
-	ImGui::DragFloat(u8"대비", &m_DestColorData.fContrast, .01f, 0.f, 3.f, "%.2f");
-
-	ImGui::DragFloat3(u8"화이트 밸런스", m_DestColorData.vWhiteBalance, .01f, 0.f, 3.f, "%.2f");
-	ImGui::DragFloat3(u8"색상 균형", m_DestColorData.vColorBalance, .01f, 0.f, 3.f, "%.2f");
-
-	ImGui::ColorEdit3(u8"그림자 색상", m_DestColorData.vShadowColor);
-	ImGui::DragFloat(u8"그림자 세기", &m_DestColorData.fShadowIntensity, .01f, 0.f, 1.f, "%.2f");
-
-	ImGui::ColorEdit3(u8"중간 색상", m_DestColorData.vMidtoneColor);
-	ImGui::DragFloat(u8"중간 세기", &m_DestColorData.fMidtoneIntensity, .01f, 0.f, 1.f, "%.2f");
-
-	ImGui::ColorEdit3(u8"하이라이트 색상", m_DestColorData.vHighlightColor);
-	ImGui::DragFloat(u8"하이라이트 세기", &m_DestColorData.fHighlightIntensity, .01f, 0.f, 1.f, "%.2f");
-
-	ImGui::DragFloat(u8"그림자 임계", &m_DestColorData.fShadowThreshold, .01f, 0.f, 1.f, "%.2f");
-	ImGui::DragFloat(u8"하이라이트 임계", &m_DestColorData.fHighlightThreshold, .01f, 0.f, 1.f, "%.2f");
-
-
-	ostringstream oss;
-	oss << m_fExposure << ", "
-		<< m_fHue << ", "
-		<< m_fSaturation << ", "
-		<< m_fBrightness << ", "
-		<< m_fGamma << ", "
-		<< m_fVibrance << ", "
-		<< m_fContrast << ", "
-		<< m_vWhiteBalance[0] << ", " << m_vWhiteBalance[1] << ", " << m_vWhiteBalance[2] << ", "
-		<< m_vColorBalance[0] << ", " << m_vColorBalance[1] << ", " << m_vColorBalance[2] << ", "
-		<< m_vShadowColor[0] << ", " << m_vShadowColor[1] << ", " << m_vShadowColor[2] << ", "
-		<< m_fShadowIntensity << ", "
-		<< m_vMidtoneColor[0] << ", " << m_vMidtoneColor[1] << ", " << m_vMidtoneColor[2] << ", "
-		<< m_fMidtoneIntensity << ", "
-		<< m_vHighlightColor[0] << ", " << m_vHighlightColor[1] << ", " << m_vHighlightColor[2] << ", "
-		<< m_fHighlightIntensity << ", "
-		<< m_fShadowThreshold << ", "
-		<< m_fHighlightThreshold;
-
-	std::string colorDataStr = oss.str();
-
-	// ImGui 텍스트 박스에 표시
-	ImGui::InputTextMultiline("Color Data", &colorDataStr[0], colorDataStr.size() + 1, ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 16), ImGuiInputTextFlags_ReadOnly);
+	}
 
 	ImGui::End();
 }

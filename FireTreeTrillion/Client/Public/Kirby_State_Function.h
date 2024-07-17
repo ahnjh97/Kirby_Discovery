@@ -1201,11 +1201,18 @@ static void BombSmoke(CTransform* pTransformCom, _float3 vPos, _float3 vScale)
 
 static void ComeOn_Dash(CTransform* pTransformCom)
 {
-	CEffect::FX_DESC FXDesc{};
+	//CEffect::FX_DESC FXDesc{};
+	//FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+	//FXDesc.vInitPos = { 0.f, 1.4f, -1.0f };
+	//FXDesc.vInitScale = { 8.f, 8.f, 8.f };
+	//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Come On Dash"), &FXDesc)))
+	//	return;
+
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
 	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 	FXDesc.vInitPos = { 0.f, 1.4f, -1.0f };
 	FXDesc.vInitScale = { 8.f, 8.f, 8.f };
-	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Come On Dash"), &FXDesc)))
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Come On Dash"), &FXDesc)))
 		return;
 }
 
@@ -1215,7 +1222,7 @@ static void ComeOn_Dash_For_Dump(CTransform* pTransformCom)
 	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 	FXDesc.vInitPos = { 0.f, 3.5f, -10.f };
 	FXDesc.vInitScale = { 15.f, 15.f, 30.f };
-	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Come On Dash"), &FXDesc)))
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Come On Dash Dump"), &FXDesc)))
 		return;
 }
 
@@ -1280,11 +1287,19 @@ static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
 		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
 			return;
 
-		//CParticle::PARTICLE_DESC ParticleDesc{};
-		//ParticleDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_particle center test"), &ParticleDesc)))
+		//CParticle::PARTICLE_DESC SingleFXDesc{};
+		//SingleFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerChargeParticle"), &SingleFXDesc)))
 		//	return;
 
+
+		/*
+		CParticle::PARTICLE_DESC ParticleDesc{};
+		ParticleDesc.vInitScale = { .1f, .1f, .1f };
+		ParticleDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_particle center test"), &ParticleDesc)))
+			return;
+			*/
 		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Lunch Time Icon"), &ParticleDesc)))
 		//	return;
 
