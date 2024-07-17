@@ -1441,7 +1441,7 @@ void CKirby::SetUp_Event()
 // ·¹ÀÌ½Ì¸Ê ÄÆ¾À 1.
 void CKirby::Event_Racing_Cut1(CGameObject* pObj)
 {
-	Delete_Effect("Come On Dash");
+	Delete_Effect("YW Come On Dash");
 
 	INFO(m_bBooster) = false;
 	INFO(m_bCarJump) = false;
@@ -1460,7 +1460,7 @@ void CKirby::Event_Racing_Cut1(CGameObject* pObj)
 
 void CKirby::Event_Racing_Cut2(CGameObject* pObj)
 {
-	Delete_Effect("Come On Dash");
+	Delete_Effect("YW Come On Dash");
 
 	INFO(m_bBooster) = false;
 	INFO(m_bCarJump) = false;

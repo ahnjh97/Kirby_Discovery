@@ -216,8 +216,6 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 		}
 	}
 
-	Compute_ViewZ();
-
 	m_pVIBufferCom->Compute_AllLifeTime(fMyTimeDelta);
 
 	if ( m_fDuration.second <= m_fDuration.first )
@@ -237,6 +235,8 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 		m_pTransformCom->Set_WorldMatrix(*m_pSoketMatrix);
 
 	m_pTransformCom->Set_Scaled(m_vInitScale);
+
+	Compute_ViewZ();
 
 	VTXMATRIX* pVertices = m_pVIBufferCom->Map();
 
