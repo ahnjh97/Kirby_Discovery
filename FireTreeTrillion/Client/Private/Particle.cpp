@@ -236,6 +236,8 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	if (m_pSoketMatrix != nullptr)
 		m_pTransformCom->Set_WorldMatrix(*m_pSoketMatrix);
 
+	m_pTransformCom->Set_Scaled(m_vInitScale);
+
 	VTXMATRIX* pVertices = m_pVIBufferCom->Map();
 
 
@@ -268,7 +270,7 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY])
-		m_pVIBufferCom->Gravity(fMyTimeDelta);
+		m_pVIBufferCom->Gravity(fMyTimeDelta, pVertices);
 
 
 	m_pVIBufferCom->Apply_Velocity(fMyTimeDelta, pVertices);

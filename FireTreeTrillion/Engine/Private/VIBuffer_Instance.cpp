@@ -472,7 +472,7 @@ void CVIBuffer_Instance::Tail(_float fTimeDelta, VTXMATRIX* pVertices)
 	}
 }
 
-void CVIBuffer_Instance::Gravity(_float fTimeDelta)
+void CVIBuffer_Instance::Gravity(_float fTimeDelta, VTXMATRIX* pVertices)
 {
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
@@ -480,7 +480,7 @@ void CVIBuffer_Instance::Gravity(_float fTimeDelta)
 			continue;
 
 		//m_pDirections[i].y -= GRAVITY * fTimeDelta;
-		m_pVelocities[i].y -= GRAVITY * 2.5f * fTimeDelta;
+		 m_pVelocities[i].y -= GRAVITY * 2.5f * fTimeDelta;
 	}
 }
 
@@ -495,7 +495,8 @@ void CVIBuffer_Instance::Orbit(_float fTimeDelta, VTXMATRIX* pVertices)
 		_float4x4 RotMatrix = _float4x4::Identity;
 		CUtils::Turn_OtherMatrix(RotMatrix, m_pPreAxis[i], fTimeDelta, fOrbitSpeed);
 
-		_float3 vEditDir = XMVector3Transform(vDistance, XMLoadFloat4x4(&RotMatrix));
+		//_float3 vEditDir = XMVector3Transform(vDistance, XMLoadFloat4x4(&RotMatrix));
+		_float3 vEditDir = m_InstanceDesc.vCenter + (_float3)XMVector3Transform(vDistance, XMLoadFloat4x4(&RotMatrix));
 		pVertices[i].vPosition = XMVectorSetW(vEditDir, 1.f);
 	}
 }
@@ -727,6 +728,7 @@ void CVIBuffer_Instance::Free()
 	Safe_Delete_Array(m_pSpeeds);
 	Safe_Delete_Array(m_pInitialSpeeds);
 	Safe_Delete_Array(m_pInitialScales);
+	Safe_Delete_Array(m_pOrbitSpeed);
 	Safe_Delete_Array(m_pPrePositions);
 	Safe_Delete_Array(m_pStartDelays);
 	Safe_Delete_Array(m_pDirections);
