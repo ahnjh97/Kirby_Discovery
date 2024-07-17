@@ -489,7 +489,7 @@ void CVIBuffer_Instance::Orbit(_float fTimeDelta, VTXMATRIX* pVertices)
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 		_float3 vPos = (_float3)pVertices[i].vPosition;
-		_float3 vDistance = vPos - m_InstanceDesc.vCenter;
+		_float3 vDistance = vPos - m_InstanceDesc.vPivot;
 		_float fOrbitSpeed = m_pOrbitSpeed[i];
 
 		_float4x4 RotMatrix = _float4x4::Identity;\
@@ -702,7 +702,7 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT] == true)
 	{
 		_float3 vPos = pVertices[iInstanceIndex].vPosition;
-		_float3 vDistance = vPos - m_InstanceDesc.vCenter;
+		_float3 vDistance = vPos - m_InstanceDesc.vPivot;
 		_float3 vDir = XMVector3Normalize(vDistance);
 		if (vDistance == _float3(0.f, 0.f, 0.f))
 			return;
