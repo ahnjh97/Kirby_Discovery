@@ -61,6 +61,7 @@ public:
 
 	enum SIMBA_EYETEX { EYETEX_DIFFUSE, EYETEX_NORMAL, EYETEX_MRA, EYETEX_END };
 	enum SIMBA_EYESTATE { SIMBAEYE_LONG, SIMBAEYE_SMALL, SIMBAEYE_BIG, SIMBAEYE_END };
+	enum SIMBA_ROTATION { ATTACKJUMP, BITERUSH, BITERUSHJUMP, ROTATION_END };
 
 private:
 	CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -139,12 +140,15 @@ private:
 	unordered_set<SIMBA_ANIM> m_setAppear1Anims;
 	unordered_set<SIMBA_ANIM> m_setUndamagableAnims;
 
+	unordered_set<SIMBA_ANIM> m_mapRotation[ROTATION_END];			
+
 	vector<MONSTER_DESC> m_vecMonsterDescs;
 
 	_float			m_fHpRatio = { 1.f };
 	_bool			m_bPhaseTwo = { false };
 	_bool			m_bDeathAnimPlayed = { false };
 	_bool			m_bRenderEyeLid = { false };
+	_float4x4		m_matPrevWorld = _float4x4::Identity;
 
 private:
 	HRESULT		Add_Components();
@@ -168,6 +172,9 @@ private:
 	void		OnWave2Dead(CGameObject* pObj);
 
 	void		SpawnMonsters(_uint iTriggerIndex);
+	void		DetermineSimbaRotation();
+	void		TurnSimba(_float fAngle);
+	void		ResetRotation();
 
 public:
 	static CSimba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

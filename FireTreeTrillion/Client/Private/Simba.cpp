@@ -57,6 +57,8 @@ HRESULT CSimba::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pMonDesc)))
 		return E_FAIL;
 
+	m_matPrevWorld = m_pTransformCom->Get_WorldFloat4x4();
+
 	m_pKirby = m_pGameInstance->Get_GameObject(LEVEL_SIMBA, TEXT("Layer_Player"));
 	Safe_AddRef(m_pKirby);
 
@@ -150,6 +152,8 @@ _int CSimba::Tick(_float fTimeDelta)
 
 	m_fHpRatio =  m_fHp / m_fMaxHp;
 
+	ResetRotation();
+
 	if (true == m_pModelCom->IsFinished() || m_pModelCom->Get_Trackposition() == 0.f) // IsAnimFinished
 		Reset_HitBoxTimingMap(SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex()));
 
@@ -202,6 +206,8 @@ _int CSimba::Tick(_float fTimeDelta)
 		Turn_RotationBoneMatrix(-2.5f);
 		Change_State(Simba_Damage, 50.f, false, true);
 	}
+
+	DetermineSimbaRotation();
 
 	return OBJ_NOEVENT;
 }
@@ -379,7 +385,7 @@ void CSimba::CreateHpBar()
 
 void CSimba::Turn_RotationBoneMatrix(_float fAngle)
 {
-	_float4x4 RotationMatrix = _float4x4::Identity;
+	/*_float4x4 RotationMatrix = _float4x4::Identity;
 	if (0 == fAngle) 
 	{
 		*m_pRotationBoneMatrix = RotationMatrix;
@@ -387,7 +393,7 @@ void CSimba::Turn_RotationBoneMatrix(_float fAngle)
 	}
 
 	CUtils::Turn_OtherMatrix(RotationMatrix, _float4(1, 0, 0, 0), 1.f, fAngle);
-	*m_pRotationBoneMatrix = RotationMatrix;
+	*m_pRotationBoneMatrix = RotationMatrix;*/
 }
 
 void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
@@ -564,23 +570,31 @@ void CSimba::SetUp_FSM()
 	for(_uint i = Simba_BackStep; i <= Simba_BackStepStart; i++)
 		m_pFSM->Add_State(i, CSimba_BackStep::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
-	for(_uint i = Simba_AttackJump; i <= Simba_AttackJumpWait; i++)
+	for (_uint i = Simba_AttackJump; i <= Simba_AttackJumpWait; i++) {
 		m_pFSM->Add_State(i, CSimba_AttackJump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
-
+		m_mapRotation[ATTACKJUMP].insert(SIMBA_ANIM(i));
+	}
+		
 	m_pFSM->Add_State(Simba_Damage, CSimba_Damage::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
 	m_pFSM->Add_State(Simba_Roar2, CSimba_Roar::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
-	for(_uint i = Simba_BiteRushFallL; i<= Simba_BiteRushLandingR; i++)
+	for (_uint i = Simba_BiteRushFallL; i <= Simba_BiteRushLandingR; i++) {
 		m_pFSM->Add_State(i, CSimba_BiteRushJump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
-
+		m_mapRotation[BITERUSHJUMP].insert(SIMBA_ANIM(i));
+	}
+	
 	for(_uint i = Simba_DimensionClaw; i<= Simba_DimensionClawWait; i++)
 		m_pFSM->Add_State(i, CSimba_DimensionClaw::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
-	for(_uint i = Simba_BiteRush; i<= Simba_BiteRushEnd; i++)
+	for (_uint i = Simba_BiteRush; i <= Simba_BiteRushEnd; i++) {
 		m_pFSM->Add_State(i, CSimba_BiteRush::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
-	for (_uint i = Simba_BiteRushStart; i <= Simba_BiteRushStartStraight; i++)
+		m_mapRotation[BITERUSH].insert(SIMBA_ANIM(i));
+	}	
+	for (_uint i = Simba_BiteRushStart; i <= Simba_BiteRushTiredWait; i++){
 		m_pFSM->Add_State(i, CSimba_BiteRush::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+		m_mapRotation[BITERUSH].insert(SIMBA_ANIM(i));
+	}
 
 	for (_uint i = Simba_DimensionLaser; i <= Simba_DimensionLaserWait; i++)
 		m_pFSM->Add_State(i, CSimba_DimensionLaser::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
@@ -771,6 +785,47 @@ void CSimba::SpawnMonsters(_uint iTriggerIndex)
 				return;
 		}
 	}
+}
+
+void CSimba::DetermineSimbaRotation()
+{
+	m_fAngle = 0.f;
+	_uint iState = Get_State();
+	for (_uint i = 0; i < ROTATION_END; i++)
+	{
+		if (m_mapRotation[i].end() != m_mapRotation[i].find(SIMBA_ANIM(iState)))
+		{
+			if (ATTACKJUMP == i) {
+				TurnSimba(AttackJump);
+				break;
+			}
+			else if (BITERUSH == i)
+			{
+				TurnSimba(BiteRush);
+				break;
+			}
+			else if (BITERUSHJUMP == i)
+			{
+				TurnSimba(BiteRushJump);
+				break;
+			}
+		}
+	}
+
+	if (Simba_Damage == iState)
+		TurnSimba(-2.5f);
+}
+
+void CSimba::TurnSimba(_float fAngle)
+{
+	fAngle *= 0.95f;
+	m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), -1, fAngle);
+	m_fAngle = fAngle;
+}
+
+void CSimba::ResetRotation()
+{
+	m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), -1, -m_fAngle);
 }
 
 CSimba* CSimba::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

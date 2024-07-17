@@ -2,6 +2,10 @@
 #include "Client_Defines.h"
 #include "FSM_State.h"
 
+#define	AttackJump -2.f
+#define BiteRush -9.f
+#define BiteRushJump -8.f
+
 BEGIN(Client)
 
 // *********************** APPEAR1 ***********************
