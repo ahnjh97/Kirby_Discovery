@@ -1633,6 +1633,11 @@ HRESULT CLoader::Add_FXTexture()
 	//Dissolve
 	hr = Add_Texture(LEVEL_STATIC, "FX_FireDissolve", "Dissolve/FireDissolve.png");	CHECK_FAILED(hr);
 
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Orange", "Effects/Particle/Glow_Orange.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Green", "Effects/Particle/Glow_Green.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Blue", "Effects/Particle/Glow_Blue.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_BludParticle", "Effects/Particle/Glow_BludParticle.png");	CHECK_FAILED(hr);
+
 
 	return S_OK;
 }
