@@ -21,7 +21,7 @@ public: //괄호의 숫자는 실제 인게임의 기믹 애님 순서. index는 아님
 	enum LAMP_TYPE { LAMP_GREEN, LAMP_RED, LAMP_YELLOW, LAMP_NONE };
 
 public:
-	PANELONCE_STATE Get_AnimState() { return m_eCurState; }
+	PANELONCE_STATE Get_CurState() { return m_eCurState; }
 	_uint Get_GimmickIndex() { return m_iGimmickIndex; }
 
 private:

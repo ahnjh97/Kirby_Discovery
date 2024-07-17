@@ -1007,20 +1007,23 @@ HRESULT CLevel_Park::Ready_Objects()
 		//원더리아 입구
 		if ("FhEntranceAlien_NonAnim" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkFhEntranceAlien"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), 
+				TEXT("Prototype_GameObject_Gm_ParkFhEntranceAlien"), &tDesc)))
 				continue;
 		}
 
 		//태양광 패널 기믹
 		if ("SolarPanelCharge_NonAnim" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"), TEXT("Prototype_GameObject_Gm_ParkSolarPanelCharge"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"), 
+				TEXT("Prototype_GameObject_Gm_ParkSolarPanelCharge"), &tDesc)))
 				continue;
 		}
 
 		if ("SolarPanelOnce_NonAnim" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"), TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"), 
+				TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc)))
 				continue;
 		}
 	}
@@ -1028,22 +1031,21 @@ HRESULT CLevel_Park::Ready_Objects()
 
 #pragma region SET_GIMMICK_SOLARPANEL
 
-	//기믹 오브젝트를 기준으로, 가장 가까운 거리를 검사하여 다이나믹 필드를 세팅
 	list<CGameObject*>* GimmickList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"));
 	list<CGameObject*>* DFieldList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField"));
 
 	for (auto& field : *DFieldList)
 	{
 		CGm_DynamicField* pField = dynamic_cast<CGm_DynamicField*>(field);
-		_uint iFieldIndex = pField->Get_GimmickIndex();
+		_uint iFieldIx = pField->Get_GimmickIndex();
 
 		for (auto& gimmick : *GimmickList)
 		{
 			if (TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce") == gimmick->Get_PrototypeTag())
 			{
 				CGm_ParkSolarPanelOnce* pGimmick = dynamic_cast<CGm_ParkSolarPanelOnce*>(gimmick);
-				_uint iGimmickIndex = pGimmick->Get_GimmickIndex();
-				if (iFieldIndex == iGimmickIndex) {
+				_uint iGimmickIx = pGimmick->Get_GimmickIndex();
+				if (iFieldIx == iGimmickIx) {
 					pField->Set_SolarPanelOnce(pGimmick);
 					break;
 				}
@@ -1052,7 +1054,7 @@ HRESULT CLevel_Park::Ready_Objects()
 			{
 				CGm_ParkSolarPanelCharge* pGimmick = dynamic_cast<CGm_ParkSolarPanelCharge*>(gimmick);
 				_uint iGimmickIndex = pGimmick->Get_GimmickIndex();
-				if (iFieldIndex == iGimmickIndex) {
+				if (iFieldIx == iGimmickIndex) {
 					pField->Set_SolarPanelCharge(pGimmick);
 					break;
 				}

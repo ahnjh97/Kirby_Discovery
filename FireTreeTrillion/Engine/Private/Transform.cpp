@@ -196,8 +196,10 @@ void CTransform::Go_Up(_float fTimeDelta)
 void CTransform::Go_Down(_float fTimeDelta)
 {
 	_vector		vPosition = Get_State_Vector(STATE_POSITION);
+	_vector		vUp = Get_State_Vector(STATE_UP);
 
-	vPosition += XMVector3Normalize(m_WorldMatrix.Down()) * m_fSpeedPerSec * fTimeDelta;
+	//vPosition += XMVector3Normalize(m_WorldMatrix.Down()) * m_fSpeedPerSec * fTimeDelta;
+	vPosition -= XMVector3Normalize(vUp) * m_fSpeedPerSec * fTimeDelta;
 
 	Set_State(STATE_POSITION, vPosition);
 }

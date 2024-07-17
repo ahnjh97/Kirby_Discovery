@@ -1554,6 +1554,7 @@ void CKirby::RayCast_Crumbles()
 	}
 }
 
+//LEVEL_PARK의 BlubZone 다이나믹필드와의 체크
 void CKirby::RayCast_DynamicFields()
 {
 	if (m_pControllerCom == nullptr) 
@@ -1566,10 +1567,9 @@ void CKirby::RayCast_DynamicFields()
 	_vector vRight = XMVectorSet(1, 0, 0, 0);
 
 	_float fLookOffset = 5.f;
-
 	_float fActivationDistance = 6.f;
 
-	if (20.f <= m_pControllerCom->RayCastToStaticActor(-vRight, 20.f, vLook * fLookOffset))
+	if (20.f <= m_pControllerCom->RayCastToStaticActor(-vRight, 20.f, vLook))
 	{
 		_float fLeftDis = m_pTransformCom->RayCast(CTransform::DYNAMIC, -vRight, 20.f, vLook * fLookOffset + XMVectorSet(0, 0.5f, 0, 0));
 		if (fActivationDistance > fLeftDis)
@@ -1586,7 +1586,7 @@ void CKirby::RayCast_DynamicFields()
 		}
 	}
 
-	if (20.f <= m_pControllerCom->RayCastToStaticActor(vRight, 20.f, vLook * fLookOffset))
+	if (20.f <= m_pControllerCom->RayCastToStaticActor(vRight, 20.f, vLook))
 	{
 		_float fRightDis = m_pControllerCom->RayCastToDynamicActor(vRight, vLook * fLookOffset);
 		if (fActivationDistance > fRightDis)
