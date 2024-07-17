@@ -1553,6 +1553,7 @@ void CKirby::RayCast_Crumbles()
 	}
 }
 
+//LEVEL_PARK의 BlubZone 다이나믹필드와의 체크
 void CKirby::RayCast_DynamicFields()
 {
 	if (m_pControllerCom == nullptr) 

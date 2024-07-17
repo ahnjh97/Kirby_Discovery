@@ -57,9 +57,9 @@ private:
 
 	PANELCHARGE_STATE		m_eCurState = { STATE_NONE };
 
-	_float					m_fDecreasesTime = { 0.f };
 	_float					m_fWhiteColorDiffuse = { 0.f };
 	_float4					m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
+	//_float				m_fDecreasesTime = { 0.f };
 	//_float				m_fHitPower = {};
 	
 	_bool					m_IsInteraction = { FALSE };

@@ -66,47 +66,40 @@ _int CGm_ParkSolarPanelCharge::Tick(_float fTimeDelta)
 	//if (TRUE == m_bDead)
 	//	return OBJ_DEAD;
 
-	switch (m_eCurState)
+	if (TRUE == m_pModelCom->IsFinished())
 	{
-	case STATE_OFFWAIT: break;//충전 전 대기
-	case STATE_OFFWAITSTART: //충전 전
-		if (TRUE == m_pModelCom->IsFinished())
+		switch (m_eCurState)
 		{
+		case STATE_OFFWAIT: //충전 전 대기
+			break;
+		case STATE_OFFWAITSTART: //충전 전
 			m_pModelCom->Set_Animation(STATE_OFFWAIT, 60.f, FALSE, TRUE);
 			m_eCurState = STATE_OFFWAIT;
-		}
-		break;
+			break;
 
-	case STATE_CHARGE: //충전 중
-		if (TRUE == m_pModelCom->IsFinished()) //충전 중 애님 종료 시 충전 완료 상태 변경
-		{
+		case STATE_CHARGE: //충전 중
 			m_pModelCom->Set_Animation(STATE_CHARGEDSTART, 60.f, FALSE, TRUE);
 			m_eCurState = STATE_CHARGEDSTART;
-		}
-		break;
+			break;
 		
-	case STATE_CHARGEDSTART: //충전 완료
-		if (TRUE == m_pModelCom->IsFinished())
-		{
-			m_pModelCom->Set_Animation(STATE_CHARGEDWAIT, 60.f, FALSE, TRUE);
+		case STATE_CHARGEDSTART: //충전 완료
+			m_pModelCom->Set_Animation(STATE_CHARGEDWAIT, 30.f, FALSE, TRUE);
 			m_eCurState = STATE_CHARGEDWAIT;
-		}
-		break;
+			break;
 
-	case STATE_CHARGEDWAIT: //충전 완료 대기
-		//해당 애니메이션 재생 시간 동안 관련 기믹 활성화
-		m_pModelCom->Set_Animation(STATE_DECREASES, 15.f, FALSE, TRUE);
-		m_eCurState = STATE_DECREASES;
-		break;
+		case STATE_CHARGEDWAIT: //충전 완료 대기
+			m_pModelCom->Set_Animation(STATE_DECREASES, 10.f, FALSE, TRUE);
+			m_eCurState = STATE_DECREASES;
+			break;
 
-	case STATE_DECREASES: //충전 해제
-		if (TRUE == m_pModelCom->IsFinished()) //충전 해제 중 애님 종료 시 충전 전 상태 변경
-		{
-			m_pModelCom->Set_Animation(STATE_OFFWAITSTART, 60.f, FALSE, TRUE);
+		case STATE_DECREASES: //충전 해제
+			m_pModelCom->Set_Animation(STATE_OFFWAITSTART, 30.f, FALSE, TRUE);
 			m_eCurState = STATE_OFFWAITSTART;
+			break;
+		case STATE_NONE:	
+		default:	
+			break;
 		}
-		break;
-	case STATE_NONE:	default:	break;
 	}
 
 	return OBJ_NOEVENT;
@@ -149,12 +142,17 @@ HRESULT CGm_ParkSolarPanelCharge::Render()
 			switch (m_eCurState)
 			{
 			case STATE_CHARGE:case STATE_CHARGEDSTART:
-				eLampType = LAMP_YELLOW;	break;
-			case STATE_CHARGEDWAIT:case STATE_DECREASES:
-				eLampType = LAMP_GREEN;	break;
-			case STATE_OFFWAIT:case STATE_OFFWAITSTART:
-				eLampType = LAMP_RED;	break;
-			case STATE_NONE:	default:	break;
+				eLampType = LAMP_YELLOW;	
+				break;
+			case STATE_CHARGEDWAIT: case STATE_DECREASES:
+				eLampType = LAMP_GREEN;	
+				break;
+			case STATE_OFFWAIT: case STATE_OFFWAITSTART:
+				eLampType = LAMP_RED;	
+				break;
+			case STATE_NONE:	
+			default:	
+				break;
 			}
 
 			hr = m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", eLampType);
@@ -218,12 +216,12 @@ void CGm_ParkSolarPanelCharge::Render_IMGUI()
 
 void CGm_ParkSolarPanelCharge::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	m_IsInteraction = TRUE;
 
 	//충전 대기 상태에서 키꾹 > 충전 시작
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && STATE_OFFWAIT == m_eCurState)
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS) && STATE_OFFWAIT == m_eCurState)
 	{
-		m_pModelCom->Set_Animation(STATE_CHARGE, 30.f, FALSE, TRUE);
+		m_IsInteraction = TRUE;
+		m_pModelCom->Set_Animation(STATE_CHARGE, 60.f, FALSE, TRUE);
 		m_eCurState = STATE_CHARGE;
 	}
 

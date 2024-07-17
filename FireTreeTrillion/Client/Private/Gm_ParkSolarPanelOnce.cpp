@@ -62,32 +62,34 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 {
 	//if (TRUE == m_bDead)
 	//	return OBJ_DEAD;
-	_float fAnimRatio = { 0.f };
-	switch (m_eCurState)
-	{
-	case STATE_OFFWAIT: break;//충전 전 대기
-	case STATE_CHARGE: //충전 중
-		if (TRUE == m_pModelCom->IsFinished()) //충전 중 애님 종료 시 충전 완료 상태 변경
+		_float fAnimRatio = { 0.f };
+		switch (m_eCurState)
 		{
-			m_pModelCom->Set_Animation(STATE_ONWAITSTART, 60.f, FALSE, TRUE);
-			m_eCurState = STATE_ONWAITSTART;
-		}
-		break;
+		case STATE_OFFWAIT: //충전 전 대기
+			break;
+		case STATE_CHARGE: //충전 중
+			if (TRUE == m_pModelCom->IsFinished()) //충전 중 애님 종료 시 충전 완료 상태 변경
+			{
+				m_pModelCom->Set_Animation(STATE_ONWAITSTART, 60.f, FALSE, TRUE);
+				m_eCurState = STATE_ONWAITSTART;
+			}
+			break;
 
-	case STATE_ONWAITSTART: //충전 시작
-		fAnimRatio = m_pModelCom->Get_AnimRatio();
-		if (0.5f < fAnimRatio)
-		{
-			m_eCurState = STATE_ONWAIT;
-			m_pModelCom->Set_Animation(STATE_ONWAIT, 60.f, TRUE, TRUE);
-		}
-		break;
+		case STATE_ONWAITSTART: //충전 시작
+			fAnimRatio = m_pModelCom->Get_AnimRatio();
+			if (0.15f < fAnimRatio)
+			{
+				m_eCurState = STATE_ONWAIT;
+				m_pModelCom->Set_Animation(STATE_ONWAIT, 60.f, TRUE, TRUE);
+			}
+			break;
 		
-	case STATE_ONWAIT: break; //충전 완료
-	case STATE_NONE:	
-		break;
-		default:	break;
-	}
+		case STATE_ONWAIT: //충전 완료
+			break; 
+		case STATE_NONE:	
+			break;
+			default:	break;
+		}
 
 	return OBJ_NOEVENT;
 }
@@ -190,10 +192,10 @@ void CGm_ParkSolarPanelOnce::Render_IMGUI()
 void CGm_ParkSolarPanelOnce::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {	
 	//충전 대기 상태에서 키꾹 > 충전 시작
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && STATE_OFFWAIT == m_eCurState)
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_PRESS) && STATE_OFFWAIT == m_eCurState)
 	{
 		m_IsInteraction = TRUE;
-		m_pModelCom->Set_Animation(STATE_CHARGE, 30.f, FALSE, TRUE);
+		m_pModelCom->Set_Animation(STATE_CHARGE, 60.f, FALSE, TRUE);
 		m_eCurState = STATE_CHARGE;
 	}
 
