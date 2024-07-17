@@ -693,6 +693,50 @@ void CCollisionCenter::Simba_Battle()
 			pObject->Set_PhyXState(PO_FLYDEADAWAY);
 		});
 
+	// Simba 공격히트박스와 커비 충돌
+	Collision_Collider(m_GameObjects[HITBOX_SIMBA], m_GameObjects[PLAYER], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+
+			CKirby* pKirby = static_cast<CKirby*>(Src);
+			CSimba* pSimba = static_cast<CSimba*>(Dst);
+
+			// 커비가 혹시 닷지를 하였는가? 만약 닷지를 했다면 충돌이 발생하지않는다.
+			if (pthis->Kirby_Dodge_SlowMotionSystem(pKirby) == true)
+			{
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+				return;
+			}
+
+			if (pKirby->isOverPower() == false)
+			{
+				CTransform* pMonsterTransformCom = pSimba->Get_TransformCom();
+				_vector vMonsterPos = pMonsterTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+				_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				_float4 vDistance = vKirbyPos - vMonsterPos;
+				vDistance.y = 0.f;
+				vDistance.Normalize();
+				_vector vKnockbackDir = vDistance;
+				pthis->Knock_back(pKirby, vKnockbackDir * 1.5f, 7.f);
+				pthis->Compute_HitBoxDamage(pKirby, pSimba);
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+				pKirby->Collision(CONTENT_ATTACK, pSimba);
+				
+				if (CSimba::Simba_BiteRush == pSimba->Get_State())
+				{
+					pSimba->Turn_RotationBoneMatrix(0.f);
+					pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 50.f, false, true);
+				}
+			}
+		});
 }
 
 void CCollisionCenter::FinalStage_Battle()

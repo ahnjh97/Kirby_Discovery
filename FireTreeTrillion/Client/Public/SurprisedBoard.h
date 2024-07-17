@@ -57,6 +57,8 @@ public:
 	void				Go_Left_Rigid(_float fOffset = 1.f);
 	void				Go_Right_Rigid(_float fOffset = 1.f);
 
+	void				RegisterSurpriseBoardAndDynamicField(CGameObject* pDynamicField);
+
 private:
 	HRESULT				Add_Components();
 	HRESULT				Add_HitBoxes(_float3 vPos);
@@ -73,6 +75,11 @@ private:
 
 	MODEL_COLOR			m_eModelColor;
 	_float4x4			m_matWorld = _float4x4();
+
+	CGameObject*		m_pDynamicField = { nullptr };
+	_float				m_fTime = {};
+	_bool				m_bActivated = { false };
+	_bool				m_bNotified = { false };
 
 public:
 	static CSurprisedBoard* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

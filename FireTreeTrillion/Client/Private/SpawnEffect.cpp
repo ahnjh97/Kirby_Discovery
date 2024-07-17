@@ -154,6 +154,8 @@ HRESULT CSpawnEffect::Bind_ShaderResources()
 
 	hr = m_pShaderCom->Bind_RawValue("g_fTimeDelta", &m_fShaderTime, sizeof(_float));
 	CHECK_FAILED(hr);
+
+	return S_OK;
 }
 
 CSpawnEffect* CSpawnEffect::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

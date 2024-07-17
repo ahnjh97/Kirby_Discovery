@@ -469,6 +469,8 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 	default:
 		break;
 	}
+
+	return OBJ_NOEVENT;
 }
 
 CGm_DynamicField* CGm_DynamicField::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

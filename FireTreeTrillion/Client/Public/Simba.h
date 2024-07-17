@@ -17,7 +17,7 @@ public:
 		Simba_AttackJump, Simba_AttackJumpEnd, Simba_AttackJumpHit, Simba_AttackJumpPre, Simba_AttackJumpStart, Simba_AttackJumpWait,
 		Simba_BackStep, Simba_BackStepEnd, Simba_BackStepLanding, Simba_BackStepStart,
 		Simba_BiteRush, Simba_BiteRushEnd, 
-		Simba_BiteFallL, Simba_BiteFallR,
+		Simba_BiteRushFallL, Simba_BiteRushFallR,
 		Simba_BiteRushJumpL, Simba_BiteRushJumpR, Simba_BiteRushJumpStartL, Simba_BiteRushJumpStartR,
 		Simba_BiteRushLandingL, Simba_BiteRushLandingR,
 		Simba_BiteRushStart, Simba_BiteRushStartStraight,

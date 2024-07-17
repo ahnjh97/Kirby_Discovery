@@ -98,6 +98,10 @@ protected:
 	_float3*					m_pColors = { nullptr };
 	_float*						m_pAlphas = { nullptr };
 
+	// Orbit 도는 속도 (Degree값) 랜덤 필요함
+	_float*						m_pOrbitSpeed = { nullptr };
+
+	_float3*					m_pPreAxis = { nullptr };
 	
 
 	//void	Update_Buffer(_uint _iNumInstance);
