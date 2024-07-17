@@ -450,7 +450,7 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Final",
 		COLOR_DATA{
-		2.5f, 1.f, 1.08023f, 0.809684f, 0.990206f, 1.03727f, 1.20983f,
+		1.1f, 1.f, 1.08023f, 0.809684f, 0.990206f, 1.03727f, 1.20983f,
 		0.74032f, 0.6f, 0.6f, 1.03f, 0.96f, 1.04f, 0.243137f, 0.00784314f,
 		0.00784314f, 0.00971069f, 0.917647f, 0.513726f, 0.145098f, 0.00992562f,
 		1.f, 0.847059f, 0.254902f, 0.00999975f, 0.13f, 0.55f
@@ -843,11 +843,12 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	{
 		m_DestColorData = Find_ColorSet("Final");
 
-		m_fRimLightRatio.second = 0.f;
-		m_vRimColor.second = _float3(.83f, .07f, .1f);
+		m_fRimLightRatio.second = .8f;
+		m_fRimLightRadius.second = 2.f;
+		m_vRimColor.second = _float3(1.f, .6f, .35f);
 
-		m_fDOFIntensity = .4f;
-		m_vDOFColor = _float3{ .08f, .07f, .10f };
+		m_fDOFIntensity = 1.f;
+		m_vDOFColor = _float3{ .26f, 0.f, -.11f };
 	}
 	break;
 	case 8:

@@ -65,6 +65,7 @@ HRESULT CLevel_Intro::Initialize()
 	// 셰이더 트리거
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_BEACH);
+	m_pGameInstance->Set_ObjectBlack(1.f);
 
 	// 레벨전환 트리거
 	function<void(_int)> func = bind(&CLevel_Intro::Change_Levels, this);
@@ -182,9 +183,8 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 	InitMat.Translation({ 53.38f, 22.19f, 348.12f });
 	ObjDesc.matWorld = InitMat;
 	// Car Test
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Breakable"), TEXT("Prototype_GameObject_PortalSoftEffect"), &ObjDesc)))
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Portal"), TEXT("Prototype_GameObject_PortalSoftEffect"), &ObjDesc)))
 		return E_FAIL;
-
 
 	return S_OK;
 }

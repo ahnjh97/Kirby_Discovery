@@ -81,6 +81,7 @@ HRESULT CLevel_Park::Initialize()
 	
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_PARK);
+	m_pGameInstance->Set_ObjectBlack(1.f);
 
 	// PARK 도착했으면 오픈해주세요
 	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
@@ -412,7 +413,8 @@ HRESULT CLevel_Park::Ready_Map()
 		else if ("Gimmick_PkFunHouseDarkness01" == strModelName || "Gimmick_PkFunHouseDarkness02" == strModelName 
 			|| "Gimmick_PkFunHouseDarkness03" == strModelName || "Gimmick_PkFunHouseDarkness04" == strModelName 
 			|| "Gimmick_PkFunHouseDarkness05" == strModelName || "Gimmick_PkFunHouse06" == strModelName 
-			|| "Gimmick_PkFunHouse07" == strModelName)
+			|| "Gimmick_PkFunHouse06A" == strModelName || "Gimmick_PkFunHouse06B" == strModelName
+			|| "Gimmick_PkFunHouse06C" == strModelName	|| "Gimmick_PkFunHouse07" == strModelName)
 			wstrGameObjectTag = TEXT("DynamicField");
 			
 		else
@@ -440,7 +442,9 @@ HRESULT CLevel_Park::Ready_Map()
 
 			//동적 필드
 			if ("Gimmick_PkFunHouseDarkness01" == strModelName || "Gimmick_PkFunHouseDarkness04" == strModelName
-				|| "Gimmick_PkFunHouseDarkness05" == strModelName || "Gimmick_PkFunHouse06" == strModelName)
+				|| "Gimmick_PkFunHouseDarkness05" == strModelName || "Gimmick_PkFunHouse06" == strModelName
+				|| "Gimmick_PkFunHouse06A" == strModelName || "Gimmick_PkFunHouse06B" == strModelName
+				|| "Gimmick_PkFunHouse06C" == strModelName)
 			{
 				if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DynamicField"), 
 					TEXT("Prototype_GameObject_Gm_") + wstrGameObjectTag, &tDesc)))
@@ -884,8 +888,8 @@ HRESULT CLevel_Park::Ready_Monsters()
 		surprisedDesc.matWorld = transformationMatrix;
 		surprisedDesc.eColor = CSurprisedBoard::GREEN;
 		surprisedDesc.eStartState = CSurprisedBoard::WAIT_R; 
-		surprisedDesc.vPosition = _float3(-24.27f, 59.f, 16.f);
-		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
+		surprisedDesc.vPosition = _float3(-24.27f, 59.f, 31.5f);
+		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_LegendBoard"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 
 	#pragma endregion
@@ -901,8 +905,8 @@ HRESULT CLevel_Park::Ready_Monsters()
 		surprisedDesc.matWorld = transformationMatrix;
 		surprisedDesc.eColor = CSurprisedBoard::RED;
 		surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
-		surprisedDesc.vPosition = _float3(35.5f, 58.5f, 65.f);
-		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
+		surprisedDesc.vPosition = _float3(35.5f, 58.5f, 78.2f);
+		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_LegendBoard"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 
 	#pragma endregion
@@ -1054,20 +1058,23 @@ HRESULT CLevel_Park::Ready_Objects()
 		//원더리아 입구
 		if ("FhEntranceAlien_NonAnim" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Gm_ParkFhEntranceAlien"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), 
+				TEXT("Prototype_GameObject_Gm_ParkFhEntranceAlien"), &tDesc)))
 				continue;
 		}
 
 		//태양광 패널 기믹
 		if ("SolarPanelCharge_NonAnim" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"), TEXT("Prototype_GameObject_Gm_ParkSolarPanelCharge"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"), 
+				TEXT("Prototype_GameObject_Gm_ParkSolarPanelCharge"), &tDesc)))
 				continue;
 		}
 
 		if ("SolarPanelOnce_NonAnim" == strModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"), TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"), 
+				TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc)))
 				continue;
 		}
 	}
@@ -1075,22 +1082,21 @@ HRESULT CLevel_Park::Ready_Objects()
 
 #pragma region SET_GIMMICK_SOLARPANEL
 
-	//기믹 오브젝트를 기준으로, 가장 가까운 거리를 검사하여 다이나믹 필드를 세팅
 	list<CGameObject*>* GimmickList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"));
 	list<CGameObject*>* DFieldList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField"));
 
 	for (auto& field : *DFieldList)
 	{
 		CGm_DynamicField* pField = dynamic_cast<CGm_DynamicField*>(field);
-		_uint iFieldIndex = pField->Get_GimmickIndex();
+		_uint iFieldIx = pField->Get_GimmickIndex();
 
 		for (auto& gimmick : *GimmickList)
 		{
 			if (TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce") == gimmick->Get_PrototypeTag())
 			{
 				CGm_ParkSolarPanelOnce* pGimmick = dynamic_cast<CGm_ParkSolarPanelOnce*>(gimmick);
-				_uint iGimmickIndex = pGimmick->Get_GimmickIndex();
-				if (iFieldIndex == iGimmickIndex) {
+				_uint iGimmickIx = pGimmick->Get_GimmickIndex();
+				if (iFieldIx == iGimmickIx) {
 					pField->Set_SolarPanelOnce(pGimmick);
 					break;
 				}
@@ -1099,7 +1105,7 @@ HRESULT CLevel_Park::Ready_Objects()
 			{
 				CGm_ParkSolarPanelCharge* pGimmick = dynamic_cast<CGm_ParkSolarPanelCharge*>(gimmick);
 				_uint iGimmickIndex = pGimmick->Get_GimmickIndex();
-				if (iFieldIndex == iGimmickIndex) {
+				if (iFieldIx == iGimmickIndex) {
 					pField->Set_SolarPanelCharge(pGimmick);
 					break;
 				}
@@ -1107,15 +1113,33 @@ HRESULT CLevel_Park::Ready_Objects()
 		}
 	}
 
-	// 좌우로 움직이는 DynamicField를 커비에게 등록
+	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT("Layer_Player")));
+	if (nullptr == pKirby)
+		return S_OK;
+
 	list<CGameObject*>* leftRightList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField_SurpriseBoard"));
+	if(nullptr == leftRightList)
+		return S_OK;
+
 	for (auto& leftRight : *leftRightList)
 	{
 		CGm_DynamicField* pLeftRight = dynamic_cast<CGm_DynamicField*>(leftRight);
-		pLeftRight->RegisterToActorToKirby();
-	}
+		if (nullptr == pLeftRight)
+			continue;
+		_uint iGimmickIndex = pLeftRight->Get_GimmickIndex();
 
-	// m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT(""), 1); -> 내가 원하는 서프라이즈보드
+		CSurprisedBoard* pSurpriseBoard = { nullptr };
+		if (11 == iGimmickIndex)
+		{
+			pSurpriseBoard = dynamic_cast<CSurprisedBoard*>(m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT("Layer_LegendBoard"), 0));
+			pSurpriseBoard->RegisterSurpriseBoardAndDynamicField(pLeftRight);
+		}
+		else if (12 == iGimmickIndex)
+		{
+			pSurpriseBoard = dynamic_cast<CSurprisedBoard*>(m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT("Layer_LegendBoard"), 1));
+			pSurpriseBoard->RegisterSurpriseBoardAndDynamicField(pLeftRight);
+		}
+	}
 
 #pragma endregion
 

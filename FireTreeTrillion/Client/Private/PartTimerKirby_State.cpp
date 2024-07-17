@@ -53,13 +53,6 @@ void CPartTimerKirby_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			_float4 vPos = pTransform->Get_State(CTransform::STATE_POSITION);
 			pAlbaKirby->Set_PrePosition(vPos);
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_INCORRECTSTART, 50.f, false, true);
-
-#pragma region ÀÌÆåÆ®WI QZR 
-			CEffect::FX_DESC FXDesc{};
-			FXDesc.vInitPos = _float3(vPos.x, vPos.y + 0.4f, vPos.z);
-			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
-			pAlbaKirby->Add_Effect("FoodGame_IncorrectBboong", FXDesc, true);
-#pragma endregion
 		}
 	}
 }
@@ -320,7 +313,7 @@ void CPartTimerKirby_Grab_State::RenderOn_AllFood(CPartTimerKirby* pKirby)
 		if (false == pFood->Get_Render())
 		{
 			pFood->Set_Render(true);
-#pragma region ÀÌÆåÆ®
+#pragma region ÀÌÆåÆ®WI
 			_float4 vPos = pFood->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
 			CEffect::FX_DESC FXDesc{};
 			FXDesc.vInitPos = _float3(vPos.x, vPos.y + 0.1f, vPos.z);

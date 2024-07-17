@@ -59,6 +59,8 @@ HRESULT CParticle::Initialize(void* pArg)
 	hr = __super::Initialize(&FXDesc);
 	CHECK_FAILED(hr);
 
+	m_bIsBillboard = false;
+
 	hr = Add_Components(FXDesc);
 	CHECK_FAILED(hr);
 
@@ -218,7 +220,7 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 
 	m_pVIBufferCom->Compute_AllLifeTime(fMyTimeDelta);
 
-	if (m_fDuration.second <= m_fDuration.first)
+	if ( m_fDuration.second <= m_fDuration.first )
 	{
 		m_fDuration.first = m_fDuration.second;
 
@@ -234,7 +236,10 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	if (m_pSoketMatrix != nullptr)
 		m_pTransformCom->Set_WorldMatrix(*m_pSoketMatrix);
 
+	m_pTransformCom->Set_Scaled(m_vInitScale);
+
 	VTXMATRIX* pVertices = m_pVIBufferCom->Map();
+
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_DROP])
 		m_pVIBufferCom->Drop(fMyTimeDelta, pVertices);
@@ -257,15 +262,15 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_TAIL])
 		m_pVIBufferCom->Tail(fMyTimeDelta, pVertices);
 
-	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT])
-		m_pVIBufferCom->Orbit(fMyTimeDelta, pVertices);
-
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ASSEMBLE])
 		m_pVIBufferCom->Assemble(fMyTimeDelta, pVertices);
 
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT])
+		m_pVIBufferCom->Orbit(fMyTimeDelta, pVertices);
+
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY])
-		m_pVIBufferCom->Gravity(fMyTimeDelta);
+		m_pVIBufferCom->Gravity(fMyTimeDelta, pVertices);
 
 
 	m_pVIBufferCom->Apply_Velocity(fMyTimeDelta, pVertices);
@@ -311,6 +316,9 @@ HRESULT CParticle::Add_Components(PARTICLE_DESC& _FXDesc)
 	CHECK_FAILED(hr);
 
 
+	m_iMaxTexIdx = m_pTextureCom[TEX_DIFFUSE]->Get_TextureNum() - 1;
+
+	m_iMaxMaskTexIdx = m_pTextureCom[TEX_MASK]->Get_TextureNum() - 1;
 
 	if (_FXDesc.strBufferTag == "Prototype_Component_VIBuffer_Instance_Point")
 	{

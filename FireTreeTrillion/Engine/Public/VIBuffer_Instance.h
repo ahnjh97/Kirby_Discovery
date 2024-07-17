@@ -46,7 +46,7 @@ public:
 	virtual void Tail(_float fTimeDelta, VTXMATRIX* pVertices);
 
 	//중력을 적용한다.(velocity에 중력 값을 부여한다)
-	virtual void Gravity(_float fTimeDelta);
+	virtual void Gravity(_float fTimeDelta, VTXMATRIX* pVertices);
 
 	//중점 주위를 돈다.
 	virtual void Orbit(_float fTimeDelta, VTXMATRIX* pVertices);
@@ -98,6 +98,10 @@ protected:
 	_float3*					m_pColors = { nullptr };
 	_float*						m_pAlphas = { nullptr };
 
+	// Orbit 도는 속도 (Degree값) 랜덤 필요함
+	_float*						m_pOrbitSpeed = { nullptr };
+
+	_float3*					m_pPreAxis = { nullptr };
 	
 
 	//void	Update_Buffer(_uint _iNumInstance);

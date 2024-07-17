@@ -604,6 +604,14 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				return;
 			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 			DESC(m_bFirstChargeEffectTrigger) = false;
+
+
+			CParticle::PARTICLE_DESC PartDesc{};
+			PartDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
+			PartDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerChargeParticle"), &PartDesc)))
+				return;
+			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 		}
 		else if (DESC(m_fHammerChargeTime) > 2.f && DESC(m_bSecondChargeEffectTrigger) == true)
 		{
@@ -642,6 +650,8 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				DESC(m_fHammerChargeTime) = 0.f;
 				DESC(m_bFirstChargeEffectTrigger) = true;
 				DESC(m_bSecondChargeEffectTrigger) = true;
+				pKirby->Delete_Effect("YW HammerChargeParticle");
+
 				return;
 			}
 			else if (DESC(m_fHammerChargeTime) >= 2.f)
@@ -653,6 +663,8 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				DESC(m_fHammerChargeTime) = 0.f;
 				DESC(m_bFirstChargeEffectTrigger) = true;
 				DESC(m_bSecondChargeEffectTrigger) = true;
+				pKirby->Delete_Effect("YW HammerChargeParticle");
+
 				pKirby->Set_WeaponAnim(10);
 				return;
 			}
@@ -686,6 +698,14 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Light Cluster"), &MulFXDesc)))
 				return;
 			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+			CParticle::PARTICLE_DESC PartDesc{};
+			PartDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
+			PartDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerChargeParticle"), &PartDesc)))
+				return;
+			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
 			DESC(m_bFirstChargeEffectTrigger) = false;
 		}
 		else if (DESC(m_fHammerChargeTime) > 2.f && DESC(m_bSecondChargeEffectTrigger) == true)
@@ -734,7 +754,7 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				DESC(m_fHammerChargeTime) = 0.f;
 				DESC(m_bFirstChargeEffectTrigger) = true;
 				DESC(m_bSecondChargeEffectTrigger) = true;
-
+				pKirby->Delete_Effect("YW HammerChargeParticle");
 				return;
 			}
 			else if (DESC(m_fHammerChargeTime) >= 2.f)
@@ -747,7 +767,7 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				DESC(m_fHammerChargeTime) = 0.f;
 				DESC(m_bFirstChargeEffectTrigger) = true;
 				DESC(m_bSecondChargeEffectTrigger) = true;
-
+				pKirby->Delete_Effect("YW HammerChargeParticle");
 				return;
 			}
 			else

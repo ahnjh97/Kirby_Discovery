@@ -1416,17 +1416,19 @@ void CFXToolDirector::Render_FXProperty()
 			pCurFX->Reset_Duration();
 			static_cast<CParticle*>(pCurFX)->Update_InstanceInfo();
 		}
-		SameLine();
-		if (Checkbox(u8"빌보딩", &pCurFX->m_bIsBillboard) && bIsParticle)
-		{
-			m_bPlayingBar = false;
-			pCurFX->Reset_Duration();
-			static_cast<CParticle*>(pCurFX)->Update_InstanceInfo();
-		}
+
 
 		//ui처럼 보이는 직교 이펙트
 		if (!bIsParticle)
 		{
+			SameLine();
+			if (Checkbox(u8"빌보딩", &pCurFX->m_bIsBillboard))
+			{
+				//m_bPlayingBar = false;
+				//pCurFX->Reset_Duration();
+				//static_cast<CParticle*>(pCurFX)->Update_InstanceInfo();
+			}
+
 			SameLine();
 			Checkbox(u8"직교", &pCurFX->m_bIsOrthographic);
 		}

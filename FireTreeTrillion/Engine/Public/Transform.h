@@ -15,6 +15,7 @@ public:
 
 public:
 	enum STATE { STATE_RIGHT, STATE_UP, STATE_LOOK, STATE_POSITION, STATE_END };
+	enum ACTOR { STATIC, DYNAMIC, BOTH, ACTOR_END };
 
 public:
 	CTransform(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -87,6 +88,7 @@ public:
 	}
 	_matrix Get_WorldMatrix_Inverse() const {return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));}
 
+	PxRigidActor* Get_MostRecentActor() { return m_pMostRecentActor; }
 
 public:
 	void Go_Straight(_float fTimeDelta);
@@ -117,6 +119,8 @@ public:
 
 	_float Get_SpeedPerSec() const { return m_fSpeedPerSec; }
 
+	_float RayCast(ACTOR eActorType, _float3 vDir, _float fRayCastDistance = 25.f, _float3 vOffset = _float3());
+
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -128,6 +132,7 @@ private:
 	_float4x4				m_WorldMatrix;
 	_float					m_fSpeedPerSec = { 0.0f };
 	_float					m_fRotationPerSec = { 90.0f };
+	PxRigidActor*			m_pMostRecentActor = { nullptr };
 
 public:
 	static CTransform* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
