@@ -1124,10 +1124,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 덜 차징 회전베기이다. 약하게 이동이 가능하다.
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_GIGANTSPINSLASH)
 	{
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
 		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
 		{
 			DESC(m_fMoveSpeed) += fTimeDelta * 10.f;
@@ -1211,10 +1208,6 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 슈퍼 스핀의 시작단계
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SUPERSPINSLASHSTART)
 	{
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
 		{
 			DESC(m_fMoveSpeed) += fTimeDelta * 30.f;

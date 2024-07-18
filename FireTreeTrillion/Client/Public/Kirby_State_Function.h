@@ -1284,12 +1284,9 @@ static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
 
 		//CParticle::PARTICLE_DESC SingleFXDesc{};
 		//SingleFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-<<<<<<< Updated upstream
 		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerChargeParticle"), &SingleFXDesc)))
-=======
 		//SingleFXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_start particle test A"), &SingleFXDesc)))
->>>>>>> Stashed changes
 		//	return;
 
 
@@ -1397,8 +1394,6 @@ static void SwordSpinCharge(CTransform* pTransformCom)
 
 }
 
-<<<<<<< Updated upstream
-=======
 static void SwordSpinChargeBig(CTransform* pTransformCom)
 {
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
@@ -1418,7 +1413,6 @@ static void SwordSpinChargeBig(CTransform* pTransformCom)
 }
 
 
->>>>>>> Stashed changes
 static void SwordSpinSlash_One(CTransform* pTransformCom)
 {
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
