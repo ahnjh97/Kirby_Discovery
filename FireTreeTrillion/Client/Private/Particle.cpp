@@ -110,7 +110,10 @@ void CParticle::Update_InstanceInfo(INSTANCE_DESC* _instanceDesc)
 	//loop가 두개여
 	m_InstanceDesc.fDuration = m_fDuration.second;
 	m_InstanceDesc.bIsLoop = m_bIsLoop;
+
 	m_InstanceDesc.vCenter += m_vInitPos;
+	m_InstanceDesc.vPivot += m_vInitPos;
+
 	m_InstanceDesc.vInitScale = m_vInitScale;
 	m_InstanceDesc.vInitRot = m_vInitRot;
 
