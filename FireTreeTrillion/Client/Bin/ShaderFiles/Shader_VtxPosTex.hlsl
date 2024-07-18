@@ -685,12 +685,13 @@ PS_OUT PS_SPAWNEFFECT(PS_IN In)
     //vector vMask = g_MaskTexture.Sample(LinearSampler, In.vTexcoord) /*+ vector(1.f, 0.f, 1.f, 0.f)*/;
 
     vector vDiffuse = vSourDiffuse * vMask;
-    vDiffuse.a *= 0.6f;
     
     Out.vColor = vDiffuse;
 
-    if (0.35f >= Out.vColor.a)
+    if (0.5f >= Out.vColor.a)
         discard;
+    
+    Out.vColor.a *= 0.6f * g_fAlpha;
     
     return Out;
 }

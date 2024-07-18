@@ -88,7 +88,6 @@ void CChannel::Ratio_TransformationMatrix(const vector<class CBone*>& Bones, _fl
 	{
 		// 현재 상태를 그대로 받아옴.
 		_float4x4 RatioTransform = Bones[m_iBoneIndex]->Get_TransformationMatrix();
-
 		_vector vScale;
 		_vector vRotation;
 		_vector vTranslation;

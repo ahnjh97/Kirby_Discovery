@@ -117,6 +117,9 @@ _int CAbility::Tick(_float fTimeDelta)
 
 	if (ABILITY_DEFAULT == m_eAbilityType)
 	{
+		if (m_ePhyXState == PO_KIRBYMOUTH)
+			Delete_AllEffect();
+
 		CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 		CHECK_NULLPTR(pCameraMain);
 

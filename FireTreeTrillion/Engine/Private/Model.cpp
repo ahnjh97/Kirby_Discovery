@@ -819,6 +819,17 @@ HRESULT CModel::Bind_WorldMatrixForOctree(CShader* pShader, string& strConstantN
 	return S_OK;
 }
 
+_bool CModel::CheckHideAfterAnimFinish()
+{
+	if (-1 == m_iActionAnimIndex)
+		return false;
+
+	if (m_iCurrentAnimIndex == m_iActionAnimIndex)
+		return true;
+
+	return false;
+}
+
 _uint CModel::Find_MeshIndex(const string& _strMeshName)
 {
 	for (_uint i = 0; i < m_iNumMeshes; i++)

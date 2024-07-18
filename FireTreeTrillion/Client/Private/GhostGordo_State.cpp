@@ -32,7 +32,7 @@ void CGhostGordo_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
 
 	// 일정 거리 안으로 플레이어가 들어오면 상태 전환
-	if (7.f > fDistance)
+	if (15.f > fDistance)
 	{
 		if(/*true == pGhostGordo->Get_Light()*/true == pKirby->Get_KirbyInfo()->m_bLightOn)
 			pGhostGordo->Change_State(CGhostGordo::GORDO_EYEOPENSTART, 40.f, false, true);

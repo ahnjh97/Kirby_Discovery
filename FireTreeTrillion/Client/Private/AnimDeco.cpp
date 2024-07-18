@@ -34,13 +34,6 @@ HRESULT CAnimDeco::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(&tAnimDecoDesc)))
 		return E_FAIL;
 
-	CHitBox::HITBOX_DESC HitBox{};
-	HitBox.pOwner = this;
-	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = ANIMDECO;
-	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
-		return E_FAIL;
-
 	string strModelName = m_pAnimDecoModel->Get_ModelName();
 	_float fOffSetY{}, fRadius{};
 	if ("BushL" == strModelName) {
@@ -58,13 +51,18 @@ HRESULT CAnimDeco::Initialize(void* pArg)
 		fRadius = 0.4f;
 		m_wstrNonAnimDecoName = TEXT("BushSRemainder");
 	}
-	else if ("PopFlower" == strModelName) {
+	else if ("PopFlower" == strModelName || "SmallBirds" == strModelName)
 		return S_OK;
-	}
-	//else if ("BoxWood" == strModelName || "BoxPlastic" == strModelName) {
-	//	return S_OK;
-	//}
 
+	if (m_wstrNonAnimDecoName != L"")
+	{
+		CHitBox::HITBOX_DESC HitBox{};
+		HitBox.pOwner = this;
+		HitBox.pDesc = &m_tColliderDesc[BODY];
+		HitBox.pCollisionType = ANIMDECO;
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+			return E_FAIL;
+	}
 
 	Set_BodyCollider(COLLIDER_SPHERE, fOffSetY, 0.f, fRadius);
 

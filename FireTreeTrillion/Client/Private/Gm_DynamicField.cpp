@@ -79,7 +79,7 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 		|| TEXT("Gimmick_PkFunHouseDarkness04") == wstrModelTag
 		|| TEXT("Gimmick_PkFunHouseDarkness05") == wstrModelTag)
 	{
-		m_eDFieldType = DFMOVE_UPDOWN;
+		m_eDFieldType = DFMOVE_UP;
 		m_eGimmickType = GIMMICK_SPONCE;
 	}
 
@@ -220,7 +220,7 @@ void CGm_DynamicField::Render_IMGUI()
 {
 	switch (m_eDFieldType)
 	{
-	case DFMOVE_UPDOWN:			ImGui::Text(u8"DFMOVE_UPDOWN"); break;
+	case DFMOVE_UP:			ImGui::Text(u8"DFMOVE_UP"); break;
 	case DFMOVE_LEFT:		ImGui::Text(u8"DFMOVE_LEFT"); break;
 	case DFMOVE_RIGHT:		ImGui::Text(u8"DFMOVE_RIGHT"); break;
 	case DFMOVE_FRONTBACK:		ImGui::Text(u8"DFMOVE_FRONTBACK"); break;
@@ -334,47 +334,68 @@ void CGm_DynamicField::Apply_Quake(_float _fTimeDelta, _float _fQuakeDuration, _
 		else
 			m_pTransformCom->Go_Down(-fShakeValue * _fTimeDelta);
 	}
-	/*
 	else
-	{
-		m_bIsQuake = FALSE;
 		m_fQuakeTime = 0.f;
-		vCurWorldPos.y = 36.963f;
-	}
-	*/
 }
 
 _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 {
 	_float3 vCurPos;
+	_float fMoveSpeed;
+	DFMOVEUP_TYPE eDFMoveUPType;
 	switch (m_eDFieldType)
 	{
-	case DFMOVE_UPDOWN:
+	case DFMOVE_UP:
 		vCurPos = GET_POS;
-
 		if (CGm_ParkSolarPanelOnce::STATE_ONWAIT == m_eSPOnceState) //충전 완료
 		{
-			if (56.963f <= vCurPos.y) //56.963 > 36.963 
+			switch (m_eDFMoveUPState)
 			{
-				vCurPos.y = 56.963f; //위치 보정
-				m_bIsQuake = TRUE;
-
-				if (m_bIsQuake)
-					Apply_Quake(_fTimeDelta, 1.f, 0.1f);
-
-				else
+			case DFMOVEUP_UP:
+				eDFMoveUPType = (DFMOVEUP_TYPE)m_iGimmickIndex;
+				switch (eDFMoveUPType)
 				{
-					m_bIsQuake = FALSE;
-					m_fQuakeTime = 0.f;
+				case DFMOVEUP_01:
+					fMoveSpeed = 0.3f;
+					break;
+
+				case DFMOVEUP_02: case DFMOVEUP_03:
+					fMoveSpeed = 0.75f;
+					break;
+
+				case DFMOVEUP_NONE: default:
+					break;
 				}
+
+				m_pTransformCom->Go_Up(_fTimeDelta * fMoveSpeed);
+				break;
+
+			case DFMOVEUP_QUAKE:
+				Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
+				break;
+
+			case DFMOVEUP_WAIT:
+				break;
 			}
 
+			if (56.963f <= vCurPos.y)
+			{
+				vCurPos.y = 56.963f;
+				m_fStartQuake += _fTimeDelta;
+
+				if (m_fStartQuake < 0.5f)
+					m_eDFMoveUPState = DFMOVEUP_QUAKE;
+
+				else
+					m_eDFMoveUPState = DFMOVEUP_WAIT;
+
+			}
 			else
-				m_pTransformCom->Go_Up(_fTimeDelta * 0.3f);
+				m_eDFMoveUPState = DFMOVEUP_UP;
 		}
 		break;
 
-		//깜놀보드 충돌거리 조건에 따라 DFMOVE_LEFT, DFMOVE_RIGHT를 체크
+	//깜놀보드 충돌거리 조건에 따라 DFMOVE_LEFT, DFMOVE_RIGHT를 체크
 	case DFMOVE_LEFT:
 		vCurPos = GET_POS;
 
@@ -386,13 +407,40 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				m_bIsQuake = TRUE;
 
 				if (m_bIsQuake)
-					Apply_Quake(_fTimeDelta, 1.f, 0.1f);
+				{
+					Apply_Quake(_fTimeDelta, 0.5f, 0.2f);
+					m_bIsQuake = FALSE;
+					m_bIsInteraction = FALSE;
+				}
 			}
 
 			else
 				m_pTransformCom->Go_Left(_fTimeDelta * 0.5f);
 		}
+		if (m_bIsReturnMove)
+		{
+			if (24.460f <= vCurPos.x)
+			{
+				vCurPos.x = 24.460f;
+				m_bIsQuake = TRUE;
+
+				if (m_bIsQuake)
+				{
+					Apply_Quake(_fTimeDelta, 0.5f, 0.2f);
+					m_bIsQuake = FALSE;
+					m_bIsReturnMove = FALSE;
+					return OBJ_NOEVENT;
+				}
+
+				//m_bIsReturnMove = FALSE;
+				//return OBJ_NOEVENT;
+			}
+
+			else
+				m_pTransformCom->Go_Right(_fTimeDelta * 2.25f);
+		}
 		break;
+
 	case DFMOVE_RIGHT:
 		vCurPos = GET_POS;
 
@@ -404,16 +452,17 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				m_bIsQuake = TRUE;
 
 				if (m_bIsQuake)
-					Apply_Quake(_fTimeDelta, 1.f, 0.1f);
+				{
+					Apply_Quake(_fTimeDelta, 1.f, 0.2f);
+					m_bIsInteraction = FALSE;
+				}
 			}
-
 			//원작의 경우는 0.25f 속도인데 좀 더 빠르게 변경
 			else
 				m_pTransformCom->Go_Right(_fTimeDelta * 0.5f); //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
 		}
 		//특정 애님 상태일 경우, 필드도 비활성 움직임 처리
-		/*
-		if ()
+		if (m_bIsReturnMove)
 		{
 			if (24.851f >= vCurPos.x)
 			{
@@ -421,14 +470,16 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				m_bIsQuake = TRUE;
 
 				if (m_bIsQuake)
-					Apply_Quake(_fTimeDelta, 1.f, 0.1f);
+				{
+					Apply_Quake(_fTimeDelta, 1.f, 0.2f);
+					m_bIsReturnMove = FALSE;
+					//return OBJ_NOEVENT;
+				}
+
 			}
-
 			else
-				m_pTransformCom->Go_Left(_fTimeDelta * 0.5f);
+				m_pTransformCom->Go_Left(_fTimeDelta * 2.25f);
 		}
-		*/
-
 		break;
 
 	case DFMOVE_FRONTBACK:
@@ -443,7 +494,7 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				m_bIsQuake = TRUE;
 
 				if (m_bIsQuake)
-					Apply_Quake(_fTimeDelta, 1.f, 0.1f);
+					Apply_Quake(_fTimeDelta, 1.f, 0.2f);
 			}
 
 			else

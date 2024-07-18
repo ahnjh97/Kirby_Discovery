@@ -44,6 +44,7 @@ public:
 
 private:
 	_float	m_fTimeDelta = { 0.f };
+	_float	m_fEffectTime = { 0.f };
 	_float	m_fSpeed = { 0.f };
 
 public:

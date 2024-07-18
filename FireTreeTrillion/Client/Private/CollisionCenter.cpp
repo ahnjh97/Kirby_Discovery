@@ -732,8 +732,8 @@ void CCollisionCenter::Simba_Battle()
 				
 				if (CSimba::Simba_BiteRush == pSimba->Get_State())
 				{
-					pSimba->Turn_RotationBoneMatrix(0.f);
-					pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 50.f, false, true);
+					//pSimba->Turn_RotationBoneMatrix(0.f);
+					pSimba->Change_State(CSimba::Simba_BiteRushTiredStart, 50.f, false, false);
 				}
 			}
 		});
