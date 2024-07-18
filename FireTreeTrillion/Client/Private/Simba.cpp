@@ -1065,7 +1065,11 @@ void CSimba::ResetRotation()
 
 void CSimba::LaserAttack()
 {
-	m_pSimbaLaserTransform->Set_WorldMatrix(m_pTransformCom->ComputeBoneWorldMatrix(m_pLaserBone));
+	_matrix matWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pLaserBone);
+	_vector vLook = matWorld.r[2];
+	vLook *= -1.f;
+	matWorld.r[2] = vLook;
+	m_pSimbaLaserTransform->Set_WorldMatrix(matWorld);
 	m_pSimbaLaser->Activate_Attack();
 }
 

@@ -36,6 +36,7 @@ HRESULT CHitBox::Initialize(void* pArg)
 	m_pSocket = pDesc->pSocket;
 	Safe_AddRef(m_pSocket);
 	m_vBoneOffset = pDesc->vBoneOffset;
+	m_vOffset = pDesc->vOffset;
 
 	if (pDesc->matObjectPosition != _float4x4())
 	{
@@ -44,6 +45,17 @@ HRESULT CHitBox::Initialize(void* pArg)
 	}
 	else if (nullptr != m_pSocket)
 		m_pTransformCom->Set_WorldMatrix(m_pOwnerTransform->ComputeBoneWorldMatrix(m_pSocket, m_vBoneOffset));
+	else if (_float3() != m_vOffset)
+	{
+		_float4x4 matWorld = m_pOwnerTransform->Get_WorldFloat4x4();
+		_float4 vRight = XMVector3Normalize(XMVectorSet(matWorld._11, matWorld._12, matWorld._13, 0)) * m_vOffset.x;
+		_float4 vUp = XMVector3Normalize(XMVectorSet(matWorld._21, matWorld._22, matWorld._23, 0)) * m_vOffset.y;
+		_float4 vLook = XMVector3Normalize(XMVectorSet(matWorld._31, matWorld._32, matWorld._33, 0)) * m_vOffset.z;
+
+		matWorld._41 += vRight.x + vUp.x + vLook.x;
+		matWorld._42 += vRight.y + vUp.y + vLook.y;
+		matWorld._43 += vRight.z + vUp.z + vLook.z;
+	}
 	else
 		m_pTransformCom->Set_WorldMatrix(m_pOwnerTransform->Get_WorldFloat4x4());
 
@@ -71,15 +83,17 @@ _int CHitBox::Tick(_float fTimeDelta)
 		pWorldMatrix._42 = matBoneWorld._42 + m_pOwnerCollisionDesc->fOffSetY;
 		pWorldMatrix._43 = matBoneWorld._43;
 	}
-	else if (_float3() != m_pOwnerCollisionDesc->vOffset)
+	else if (_float3() != m_vOffset)
 	{
-		_float3 vOffset = m_pOwnerCollisionDesc->vOffset;
 		pWorldMatrix = m_pOwnerTransform->Get_WorldFloat4x4();
 		CUtils::Set_Scaled_Matrix(pWorldMatrix, 1.f, 1.f, 1.f);
-		_float4 vRight = m_pOwnerTransform->Get_State(CTransform::STATE_RIGHT) * vOffset.x;
-		_float4 vUp = m_pOwnerTransform->Get_State(CTransform::STATE_UP) * vOffset.y;
-		_float4 vLook = m_pOwnerTransform->Get_State(CTransform::STATE_LOOK) * vOffset.z;
+		_float4 vRight = XMVectorSet(pWorldMatrix._11, pWorldMatrix._12, pWorldMatrix._13, 0) * m_vOffset.x;
+		_float4 vUp = XMVectorSet(pWorldMatrix._21, pWorldMatrix._22, pWorldMatrix._23, 0) * m_vOffset.y;
+		_float4 vLook = XMVectorSet(pWorldMatrix._31, pWorldMatrix._32, pWorldMatrix._33, 0) * m_vOffset.z;
 
+		pWorldMatrix._41 += vRight.x + vUp.x + vLook.x;
+		pWorldMatrix._42 += vRight.y + vUp.y + vLook.y;
+		pWorldMatrix._43 += vRight.z + vUp.z + vLook.z;
 	}
 	else
 	{

@@ -928,6 +928,7 @@ void CSimba_DimensionLaser::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _fl
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	m_bStarSpawned = false;
+	m_bLaserActivated = false;
 }
 
 void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -945,6 +946,16 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		
 	if (CSimba::Simba_DimensionLaser == iState)
 	{
+		if (0.55f > fAnimRatio && false == m_bLaserActivated) {
+			m_bLaserActivated = true;
+			pSimba->Set_LaserActivation(true);
+		}
+
+		if (0.55f < fAnimRatio && true == m_bLaserActivated) {
+			m_bLaserActivated = false;
+			pSimba->Set_LaserActivation(false);
+		}
+		
 		if(0.05f > fAnimRatio)
 			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 5.f);
 		else

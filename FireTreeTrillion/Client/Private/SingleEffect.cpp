@@ -17,7 +17,7 @@ HRESULT CSingleEffect::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CSingleEffect::Initialize_Prototype(FX_DESC FXDesc)
+HRESULT CSingleEffect::Initialize_Prototype(FX_DESC& FXDesc)
 {
 	m_strFXName = FXDesc.strFXName;
 	m_FXDesc = FXDesc;

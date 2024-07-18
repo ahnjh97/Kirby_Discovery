@@ -157,13 +157,23 @@ void CBox::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObj
 	if (true == m_bPlayAnim)
 		return;
 
-	if (eContent == CCollisionCenter::CONTENT_ATTACK || eContent == CCollisionCenter::CONTENT_ATTACKBULLET)
+	if (eContent == CCollisionCenter::CONTENT_ATTACK)
 	{
 		CKirby* pKirby = static_cast<CKirby*>(pObject);
 		if (pKirby == nullptr)
 			return;
 
 		pKirby->Set_HitStop();
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+		if (pCamera != nullptr)
+			pCamera->Make_Shake(0.5f);
+
+		m_pGameInstance->DisableActor(m_pDynamicActor);
+		m_pModelCom->Set_Animation(0, 50.f, false, false);
+		m_bPlayAnim = true;
+	}
+	else if (eContent == CCollisionCenter::CONTENT_ATTACKBULLET)
+	{
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 		if (pCamera != nullptr)
 			pCamera->Make_Shake(0.5f);

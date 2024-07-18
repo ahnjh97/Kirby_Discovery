@@ -17,6 +17,7 @@ public:
 		_float4x4		matObjectPosition = _float4x4(); // 정적으로 고정해야하는 위치일 경우 사용합니다.
 		class CBone*	pSocket = { false };
 		_float3			vBoneOffset = { };
+		_float3			vOffset = _float3();
 	};
 
 private:

@@ -52,7 +52,7 @@ void CSimbaLaser::Late_Tick(_float fTimeDelta)
 	if (true == m_bHide)
 		return;
 
-	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), 1, -90.f);
+	//m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), 1, -90.f);
 	_float fScale = 10.f;
 	m_pTransformCom->Set_Scaled(_float3(fScale, fScale, fScale));
 
@@ -97,8 +97,17 @@ HRESULT CSimbaLaser::Add_Components(const wstring& _wstrModelName)
 	CHitBox::HITBOX_DESC tAttack{};
 	tAttack.pOwner = this;
 	tAttack.pDesc = &m_tColliderDesc[ATTACK];
-	tAttack.pCollisionType = HITBOX_SIMBA;
+	tAttack.pCollisionType = MONSTERBULLET;
+	tAttack.vOffset = _float3(0, 0, 3);
+	for (_uint i = 1; i < 5; i++) {
+		tAttack.vOffset = _float3(0, 0, 3.f * i);
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
+			return E_FAIL;
+	}
+	
 
+	//Activate_FrustumCollider(0.f, 80.f, 5.f, ATTACK);
+	Activate_SphereCollider(0.f, 5.f, ATTACK);
 	return S_OK;
 }
 
