@@ -682,7 +682,7 @@ void CCollisionCenter::Simba_Battle()
 			CPhysXObject* pObject = static_cast<CPhysXObject*>(Dst);
 			CMonster* pMonster = static_cast<CMonster*>(Src);
 
-			if (pObject->Get_AbilityType() != PO_FLYAWAY)
+			if (pObject->Get_PhyXState() != PO_FLYAWAY)
 				return;
 
 			_float fAttack = pObject->Get_Attack();
@@ -691,6 +691,7 @@ void CCollisionCenter::Simba_Battle()
 			DstHit->Set_Alive(false);
 			SrcHit->Set_Alive(false);
 			pObject->Set_PhyXState(PO_FLYDEADAWAY);
+
 		});
 
 	// Simba 공격히트박스와 커비 충돌
@@ -771,7 +772,7 @@ void CCollisionCenter::FinalStage_Battle()
 			CPhysXObject* pObject = static_cast<CPhysXObject*>(Dst);
 			CMonster* pMonster = static_cast<CMonster*>(Src);
 
-			if (pObject->Get_AbilityType() != PO_FLYAWAY)
+			if (pObject->Get_PhyXState() != PO_FLYAWAY)
 				return;
 
 			_float fAttack = pObject->Get_Attack();
@@ -1057,6 +1058,9 @@ void CCollisionCenter::Body_To_Body_Collision()
 
 			CPhysXObject* pDst = static_cast<CPhysXObject*>(Dst);
 			CPhysXObject* pSrc = static_cast<CPhysXObject*>(Src);
+
+			if (pSrc->Get_CollisionType() == 99 || Dst->Get_CollisionType() == 99)
+				return;
 
 			if (pDst->Get_PhyXState() == PO_FLYAWAY ||
 				pSrc->Get_PhyXState() == PO_FLYAWAY)

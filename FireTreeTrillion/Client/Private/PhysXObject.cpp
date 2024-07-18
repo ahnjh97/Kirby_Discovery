@@ -37,9 +37,12 @@ _int CPhysXObject::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	//이펙트에게 위치만 동기화시켜주는 소켓 매트릭스를 업데이트한다.
-	//m_EffectSocket = _float4x4::Identity;
-	//CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	if (m_bUpdate_FXSocketMatrix == true)
+	{
+		//이펙트에게 위치만 동기화시켜주는 소켓 매트릭스를 업데이트한다.
+		m_EffectSocket = _float4x4::Identity;
+		CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	}
 
 
 	if (m_ePhyXState == PO_FLYAWAY)

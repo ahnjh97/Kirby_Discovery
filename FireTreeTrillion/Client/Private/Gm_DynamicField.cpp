@@ -93,6 +93,7 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 	{
 		m_eDFieldType = DFMOVE_LEFT;
 		m_eGimmickType = GIMMICK_SURPRISE;
+		m_pStaticActor = m_pModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
 	}
 
 	//if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
@@ -149,6 +150,10 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 
 	if (nullptr != m_pDynamicActor) // 트랜스폼 월드 행렬에 맞춰서 다이나믹 액터도 같이 움직이도록 
 		m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));
+
+	//추후 이름 분기 처리 필요
+	if (nullptr != m_pStaticActor)
+		m_pStaticActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));
 
 	return OBJ_NOEVENT;
 }

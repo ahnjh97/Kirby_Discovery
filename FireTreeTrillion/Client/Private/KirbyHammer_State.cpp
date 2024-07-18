@@ -2,8 +2,6 @@
 #include "KirbyHammer_State.h"
 #include "Kirby_State_Function.h"
 
-#include "Fire.h"
-
 void MakeFireHammer(CTransform* pTransformCom, _float Scale)
 {
 	_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
