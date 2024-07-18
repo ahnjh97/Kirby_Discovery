@@ -7,6 +7,7 @@
 #include "KirbyBomb.h"
 #include "Camera_Main.h"
 #include "Particle.h"
+#include "Fire.h"
 
 #define DESC(state) Kirbydesc->state
 #define GAMEINSTANCE CGameInstance::Get_Instance()->
@@ -1395,7 +1396,7 @@ static void SwordHit(CTransform* pTransformCom)
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
 
 	FXDesc.vInitPos = pTransformCom->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, .4f, 0.f };
-	FXDesc.vInitScale = {3.f, 3.f, 3.f };
+	FXDesc.vInitScale = {5.f, 5.f, 5.f };
 	FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook()).y, CUtils::Make_RandomFloat(-5.f, 5.f)};
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordHit_v1"), &FXDesc)))
 		return;
@@ -1406,11 +1407,30 @@ static void SwordHit_Big(CTransform* pTransformCom)
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
 
 	FXDesc.vInitPos = pTransformCom->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, .4f, 0.f };
-	FXDesc.vInitScale = { 10.f, 10.f, 10.f };
+	FXDesc.vInitScale = { 13.f, 13.f, 13.f };
 	FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook()).y, CUtils::Make_RandomFloat(-5.f, 5.f) };
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SwordHit_v1"), &FXDesc)))
 		return;
 }
+
+
+static void Fire_Maker(_float3 vLocalPos, CTransform* pTransformCom, _float Scale, _float fUpRange, _float4 FColor, _float4 fLColor)
+{
+	_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+	_float4 vRight = pTransformCom->Get_State(CTransform::STATE_RIGHT);
+	_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float4 vUp = pTransformCom->Get_State(CTransform::STATE_UP);
+
+	CFire::FIREDESC Firedesc = {};
+	Firedesc.vFirePos = vPos + (vLook * vLocalPos.z) + (vRight * vLocalPos.x) + (vUp * vLocalPos.y);
+	Firedesc.fUpRange = { fUpRange };
+	Firedesc.vFirstColor = { FColor };
+	Firedesc.vTargetColor = { fLColor };
+	Firedesc.fScale = { Scale };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
+		return;
+}
+
 
 #pragma endregion 
 

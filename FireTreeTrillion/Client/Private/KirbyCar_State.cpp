@@ -4,7 +4,6 @@
 #include "ToppleableBridge.h"
 #include "StarBlock.h"
 #include "Box.h"
-#include "Fire.h"
 
 void MakeFire(CTransform* pTransformCom)
 {
