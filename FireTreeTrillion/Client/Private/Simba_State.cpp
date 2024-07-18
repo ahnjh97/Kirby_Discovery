@@ -124,7 +124,7 @@ void CSimba_Walk::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	_float fDis = m_pGameInstance->Compute_Distance(m_pKirby, pGameObject);
 	if (fDis < 6.5f)
 	{
-		pSimba->Change_State(CSimba::Simba_DimensionClawStart, 60, false, true); // µð¹ö±ë¿ë
+		pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 60, false, true); // µð¹ö±ë¿ë
 		
 		/*if (0 == CUtils::Make_RandomInt(0, 1))
 			pSimba->Change_State(CSimba::Simba_QuickClawStartL, 66.66f, false, true);
@@ -846,30 +846,30 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pSimba->ChangeDimensionClawUpDown();
 		}
 
-		else if (CSimba::Simba_DimensionClawStartContinue == iState) {
+		else if (CSimba::Simba_DimensionClawStartContinue == iState)
 			pSimba->Change_State(CSimba::Simba_DimensionClawContinue, 60.f, false, false);
-			s_iAttackCount++;
-			pSimba->ChangeDimensionClawUpDown();
-		}
 
 		else if (CSimba::Simba_DimensionClawContinue == iState)
 		{
-			if(3 > s_iAttackCount)
+			if (2 > s_iAttackCount) {
 				pSimba->Change_State(CSimba::Simba_DimensionClawStartContinue, 60.f, false, false);
+				s_iAttackCount++;
+				pSimba->ChangeDimensionClawUpDown();
+			}
 			else
 				pSimba->Change_State(CSimba::Simba_DimensionClawEnd, 60.f, false, false);
 		}
 
 		else if (CSimba::Simba_DimensionClawEnd == iState)
 		{
-			pSimba->Change_State(CSimba::Simba_DimensionClawStart, 50.f, false, true);
+			//pSimba->Change_State(CSimba::Simba_DimensionClawStart, 50.f, false, true);
 			
-			/*pSimba->Set_PreState(iState);
+			pSimba->Set_PreState(iState);
 			pSimba->Turn_RotationBoneMatrix(BiteRushJump);
 			if (true == pSimba->IsKirbyOnMyLeft())
 				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 50.f, false, true);
 			else
-				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);*/
+				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);
 		}	
 	}
 }
@@ -878,7 +878,9 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 void CSimba_BiteRush::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
-	if (CSimba::Simba_BiteRush == _iAnimIndex)
+	if (CSimba::Simba_BiteRushStart == _iAnimIndex)
+		m_bStarSpawned = false;
+	else if (CSimba::Simba_BiteRush == _iAnimIndex)
 		m_fTime = 0.f;
 }
 
@@ -905,6 +907,19 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 		if (fDis > m_pController->RayCastToStaticActor(vLook) || fDis > m_pController->RayCastToStaticActor(vLook2)
 			|| fDis > m_pController->RayCastToStaticActor(vLook3) || 2.8f < m_fTime)
 			pSimba->Change_State(CSimba::Simba_BiteRushTiredStart, 50.f, false, false);
+
+		if (0.15f < fAnimRatio && 0.7f > fAnimRatio && false == m_bStarSpawned)
+		{
+			m_bStarSpawned = true;
+			pSimba->Set_StarPosToLeftHand();
+			pSimba->SpawnStar(iState);
+		}
+		else if (0.7f < fAnimRatio && true == m_bStarSpawned) 
+		{
+			m_bStarSpawned = false;
+			pSimba->Set_StarPosToRightHand();
+			pSimba->SpawnStar(iState);
+		}
 	}
 
 	if(CSimba::Simba_BiteRushTiredEnd == iState && 0.8f < fAnimRatio)
@@ -915,12 +930,14 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 		if (CSimba::Simba_BiteRushStart == iState || CSimba::Simba_BiteRushStartStraight == iState)
 			pSimba->Change_State(CSimba::Simba_BiteRush, 50.f, true, false);
 		else if (CSimba::Simba_BiteRushEnd == iState)
-			pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 50.f, false, false);
+			pSimba->Change_State(CSimba::Simba_BiteRushStart, 50.f, false, false); // µð¹ö±ë¿ë
+			//pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 50.f, false, false);
 
 		else if (CSimba::Simba_BiteRushTiredStart == iState)
 			pSimba->Change_State(CSimba::Simba_BiteRushTiredEnd, 50.f, false, false);	
 		else if (CSimba::Simba_BiteRushTiredEnd == iState)
-			pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 50.f, false, false);
+			pSimba->Change_State(CSimba::Simba_BiteRushStart, 50.f, false, false); // µð¹ö±ë¿ë
+			//pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 50.f, false, false);
 	}
 }
 
@@ -928,6 +945,7 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 void CSimba_DimensionLaser::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+	m_bStarSpawned = false;
 }
 
 void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -962,6 +980,24 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 5.f);
 		else
 			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 0.5f);
+
+		if (0.17f < fAnimRatio && 0.21f > fAnimRatio && false == m_bStarSpawned) {
+			m_bStarSpawned = true;
+			pSimba->ResetStarCount();
+			pSimba->SpawnStar(iState);
+		}
+		else if (0.21f < fAnimRatio && 0.25f > fAnimRatio && true == m_bStarSpawned) {
+			m_bStarSpawned = false;
+			pSimba->SpawnStar(iState);
+		}
+		else if (0.25f < fAnimRatio && 0.29f > fAnimRatio && false == m_bStarSpawned) {
+			m_bStarSpawned = true;
+			pSimba->SpawnStar(iState);
+		}
+		else if (0.29f < fAnimRatio && true == m_bStarSpawned) {
+			m_bStarSpawned = false;
+			pSimba->SpawnStar(iState);
+		}
 	}
 
 	if (pSimba->IsAnimFinished())
@@ -972,12 +1008,14 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			pSimba->Change_State(CSimba::Simba_DimensionLaserEnd, 60.f, false, false);
 		else if (CSimba::Simba_DimensionLaserEnd == iState)
 		{
-			pSimba->Set_PreState(iState);
+			pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 60.f, false, false); // µð¹ö±ë¿ë
+
+		/*	pSimba->Set_PreState(iState);
 			pSimba->Turn_RotationBoneMatrix(BiteRushJump);
 			if (true == pSimba->IsKirbyOnMyLeft())
 				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 50.f, false, true);
 			else
-				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);
+				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);*/
 		}
 	}
 }
