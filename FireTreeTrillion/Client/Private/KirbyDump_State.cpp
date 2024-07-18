@@ -8,6 +8,7 @@
 #include "QTE.h"
 #include "Fire.h"
 
+
 void MakeBoosterBBong(_float& fTime, CFinaleKirby* pKirby)
 {
 	static _float fMaxFloatForDump = { 0.f };

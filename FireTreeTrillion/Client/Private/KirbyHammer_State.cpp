@@ -2,6 +2,25 @@
 #include "KirbyHammer_State.h"
 #include "Kirby_State_Function.h"
 
+#include "Fire.h"
+
+void MakeFireHammer(CTransform* pTransformCom, _float Scale)
+{
+	_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+	_float4 vRight = pTransformCom->Get_State(CTransform::STATE_RIGHT);
+	_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float4 vUp = pTransformCom->Get_State(CTransform::STATE_UP);
+
+	CFire::FIREDESC Firedesc = {};
+	Firedesc.vFirePos = (vPos - (vRight * 0.6f) - (vLook * 0.5f) + (vUp * 1.7f) + (_float4)CUtils::Make_Random_Vector(1.2f));
+	Firedesc.fUpRange = { 2.5f };
+	Firedesc.vFirstColor = { 1.f, 0.3f, 0.4f, 0.5f };
+	Firedesc.vTargetColor = { 1.f, 1.f, 1.f, 1.f };
+	Firedesc.fScale = { Scale * CUtils::Make_RandomFloat(0.8f, 1.2f)};
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
+		return;
+}
+
 #pragma region IDLE STATE
 
 CKirbyHammer_Idle_State::CKirbyHammer_Idle_State()
@@ -589,6 +608,11 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	{
 		DESC(m_fHammerChargeTime) += fTimeDelta;
 
+		if (DESC(m_bSecondChargeEffectTrigger) == true)
+			MakeFireHammer(pTransformCom, 0.8f);
+		else
+			MakeFireHammer(pTransformCom, 5.f);
+
 		if (DESC(m_fHammerChargeTime) > 0.5f && DESC(m_bFirstChargeEffectTrigger) == true)
 		{
 			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
@@ -682,6 +706,11 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 차지 중 이동하는 모션
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMERMOVE)
 	{
+		if (DESC(m_bSecondChargeEffectTrigger) == true)
+			MakeFireHammer(pTransformCom, 0.8f);
+		else
+			MakeFireHammer(pTransformCom, 5.f);
+
 		DESC(m_fHammerChargeTime) += fTimeDelta;
 
 		if (DESC(m_fHammerChargeTime) > 0.5f && DESC(m_bFirstChargeEffectTrigger) == true)
@@ -785,7 +814,6 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 덜 차징 애니메이션
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_ONIGOROSIHAMMERFIRST)
 	{
-
 		if (pKirby->isAnimFinish())
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
