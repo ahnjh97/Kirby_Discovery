@@ -201,6 +201,11 @@ _float4 CVIBuffer_Instance_Rect::Compute_RandDirection()
 	return _float4();
 }
 
+_float CVIBuffer_Instance_Rect::Compute_RandOrbitSpeed()
+{
+	return _float();
+}
+
 _float4 CVIBuffer_Instance_Rect::Compute_RandColor()
 {
 	return _float4();

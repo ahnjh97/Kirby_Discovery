@@ -218,6 +218,11 @@ _float4 CVIBuffer_Instance_Point::Compute_RandDirection()
 				m_InstanceDesc.fSpeed + CUtils::Make_RandomFloat(-m_InstanceDesc.fSpeedRandomOffset,m_InstanceDesc.fSpeedRandomOffset)};
 }
 
+_float CVIBuffer_Instance_Point::Compute_RandOrbitSpeed()
+{
+	return {	m_InstanceDesc.fOrbitSpeed + CUtils::Make_RandomFloat(-m_InstanceDesc.fOrbitSpeedRandomOffset, m_InstanceDesc.fOrbitSpeedRandomOffset), };
+}
+
 _float4 CVIBuffer_Instance_Point::Compute_RandColor()
 {
 	return { /*SATURATE*/(m_InstanceDesc.vColor.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.x, m_InstanceDesc.vColorRandomOffset.x)),

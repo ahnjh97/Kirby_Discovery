@@ -53,6 +53,7 @@ private:
 
 	// FSM
 	void SetUp_FSM();
+	void SpawnEffect(CEffect::FX_DESC FXDesc, _fvector vRight, _fvector vUp, string strName);
 
 public:
 	static CSpookStep* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -70,6 +70,8 @@ public:
 private:
 	_float	m_fTimeDelta = { 0.f };
 
+	_bool	m_fEffect = { false };
+
 public:
 	static	CRabbit_Jump_State* Create();
 	virtual void Free() override;
