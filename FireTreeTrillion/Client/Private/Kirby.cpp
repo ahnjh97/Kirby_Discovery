@@ -1992,6 +1992,7 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	Kirby_LookInitialize();
 
 	m_fMaxHp = 100.f;
+	m_fAttack = 5.f; // 고정
 
 	// 임시로 능력 디폴트 화
 	if (*m_pCurrentLevelID == LEVEL_INTRO)
@@ -2004,7 +2005,6 @@ HRESULT CKirby::Kirby_SystemInitialize()
 		CLevelChanger::LEVEL_DATA tLevelData = CLevelChanger::Get_Instance()->Load();
 		m_fHp	  = tLevelData.fKirbyHP;
 		m_uCoin	  = static_cast<_uint>(tLevelData.fKirbyCoin);
-		m_fAttack = 5.f; // 고정
 
 		//m_eAbilityType = static_cast<ABILITYTYPE>(tLevelData.iKirbyState);
 		LEVEL eLEVEL = static_cast<LEVEL>(tLevelData.iLatestLevel);
