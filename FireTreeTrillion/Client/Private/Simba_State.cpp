@@ -5,10 +5,6 @@
 #include "EventCenter.h"
 #include "Camera_Main.h"
 
-#define	AttackJump -2.f
-#define BiteRush -9.f
-#define BiteRushJump -8.f
-
 static _float s_fOffsetY = {};
 static _uint s_iAttackCount = {};
 static _float s_fJumpPower = {};
@@ -128,12 +124,12 @@ void CSimba_Walk::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	_float fDis = m_pGameInstance->Compute_Distance(m_pKirby, pGameObject);
 	if (fDis < 6.5f)
 	{
-		/*pSimba->Turn_RotationBoneMatrix(BiteRushJump);
-		pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 50.f, false, true);*/
-		if (0 == CUtils::Make_RandomInt(0, 1))
+		pSimba->Change_State(CSimba::Simba_DimensionClawStart, 60, false, true); // 디버깅용
+		
+		/*if (0 == CUtils::Make_RandomInt(0, 1))
 			pSimba->Change_State(CSimba::Simba_QuickClawStartL, 66.66f, false, true);
 		else
-			pSimba->Change_State(CSimba::Simba_QuickClawStartR, 66.66f, false, true);
+			pSimba->Change_State(CSimba::Simba_QuickClawStartR, 66.66f, false, true);*/
 	}
 	else
 	{
@@ -159,8 +155,8 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	_float fAnimRatio = pSimba->Get_AnimRatio();
 	_vector vLook = m_pTransform->Get_State(CTransform::STATE_LOOK);
 
-	if ((CSimba::Simba_QuickClawStartL == iState || CSimba::Simba_QuickClawStartR == iState) && fAnimRatio < 0.35f)
-		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 15.f);
+	if ((CSimba::Simba_QuickClawStartL == iState || CSimba::Simba_QuickClawStartR == iState) && fAnimRatio < 0.3f)
+		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 6.f);
 
 	else if ((CSimba::Simba_QuickClawL == iState || CSimba::Simba_QuickClawR == iState))
 	{
@@ -168,6 +164,8 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 		_float fEnd = 0.64f;
 		_float fSpeed = 6.2f;
 
+		if(fStart - 0.02f < fAnimRatio && (fEnd + fStart) * 2.f > fAnimRatio)
+			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 5.f);
 		if (fStart < fAnimRatio && fEnd > fAnimRatio)
 		{
 			_float fRatio = RATIO(fAnimRatio, fStart, fEnd);
@@ -175,7 +173,7 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 			m_pController->Move_Dir(m_pTransform, vDir, fTimeDelta, s_fOffsetY);
 		}
 
-		if (0.8f < fAnimRatio && false == m_bStarSpawned)
+		if (0.46f < fAnimRatio && false == m_bStarSpawned)
 		{
 			m_bStarSpawned = true;
 			pSimba->SpawnStar(iState);
@@ -185,7 +183,7 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	else if ((CSimba::Simba_QuickClaw2L == iState || CSimba::Simba_QuickClaw2R == iState)) {
 		if(0.3f > fAnimRatio)
 			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
-		if (0.45f < fAnimRatio && false == m_bStarSpawned)
+		if (0.34f < fAnimRatio && false == m_bStarSpawned)
 		{
 			m_bStarSpawned = true;
 			pSimba->SpawnStar(iState);
@@ -260,6 +258,8 @@ void CSimba_FinalCrusher::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _floa
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	s_fOffsetY = -0.7f;
+	if(CSimba::Simba_FinalCrusher == _iAnimIndex)
+		m_bStarSpawned = false;
 }
 
 void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -272,9 +272,18 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	_float fAnimRatio = pSimba->Get_AnimRatio();
 	if(CSimba::Simba_FinalCrusherStart == iState && (0.3f > fAnimRatio || 0.93f < fAnimRatio ))
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
-	else if(CSimba::Simba_FinalCrusher == iState && 0.07f > fAnimRatio )
-		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 9.f);
+	else if (CSimba::Simba_FinalCrusher == iState)
+	{
+		if(0.07f > fAnimRatio)
+			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 9.f);
 
+		if (0.125f < fAnimRatio && false == m_bStarSpawned)
+		{
+			m_bStarSpawned = true;
+			pSimba->SpawnStar(iState);
+		}
+	}
+		
 	if (true == pSimba->IsAnimFinished())
 	{
 		switch (iState)
@@ -283,6 +292,8 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			pSimba->Change_State(CSimba::Simba_FinalCrusherEnd, 66.66f, false, false);
 			break;
 		case CSimba::Simba_FinalCrusherEnd:
+			//pSimba->Change_State(CSimba::Simba_FinalCrusherStart, 60, false, true); // 디버깅용
+
 			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 15.f) {
 				pSimba->Set_PreState(iState);
 				//if(0 == CUtils::Make_RandomInt(0, 1))
@@ -292,8 +303,8 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			}
 			else
 				pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 50.f, false, true);
-			break;
 
+			break;
 		case CSimba::Simba_FinalCrusherStart: // After Jump
 			pSimba->Change_State(CSimba::Simba_FinalCrusher, 66.66f, false, false);
 			break;
@@ -306,6 +317,8 @@ void CSimba_DoubleClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float 
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	s_fOffsetY = -0.7f;
+	if(CSimba::Simba_DoubleClaw == _iAnimIndex)
+		m_bStarSpawned = false;
 }
 
 void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -316,8 +329,11 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	_uint iState = pSimba->Get_State();
 	_float fAnimRatio = pSimba->Get_AnimRatio();
 
-	if (CSimba::Simba_DoubleClawChargeStart == iState && fAnimRatio < 0.2f)
-		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
+	if (CSimba::Simba_DoubleClawChargeStart == iState && fAnimRatio < 0.18f) {
+		_float fRatio = RATIO(fAnimRatio, 0, 0.18f);
+		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 7.f * (1 - EASE_IN_FAST(fRatio)));
+	}
+		
 	else if (CSimba::Simba_DoubleClawDash == iState)
 	{
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 1.8f);
@@ -328,9 +344,18 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		if (fDis < 8.5f)
 			pSimba->Change_State(CSimba::Simba_DoubleClaw, 60.f, false, false);
 	}
-	else if(CSimba::Simba_DoubleClaw == iState && fAnimRatio < 0.2f)
-		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
+	else if (CSimba::Simba_DoubleClaw == iState)
+	{
+		if(0.2f > fAnimRatio)
+			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
 
+		if (0.224f < fAnimRatio && false == m_bStarSpawned)
+		{
+			m_bStarSpawned = true;
+			pSimba->SpawnStar(iState);
+		}
+	}
+		
 	if (true == pSimba->IsAnimFinished())
 	{
 		switch (iState)
@@ -384,7 +409,12 @@ void CSimba_Jump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	if (CSimba::Simba_Wait2 == iState)
 	{
 		m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
-		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 5.f);
+		
+		if (0.5f > fAnimRatio) {
+			_float fRatio = RATIO(fAnimRatio, 0, 0.5f);
+			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 8.f * (1 - EASE_IN_FAST(fRatio)));
+		}
+			
 		if (0.3f < fAnimRatio)
 			pSimba->Change_State(CSimba::Simba_JumpStart, 40.f, false, true);
 			
@@ -523,6 +553,8 @@ void CSimba_AttackJump::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float 
 	s_fOffsetY = -0.7f;
 	if (CSimba::Simba_AttackJump == _iAnimIndex)
 		s_fJumpPower = 15.f;
+	else if (CSimba::Simba_AttackJumpHit == _iAnimIndex)
+		m_bStarSpawned = false;
 }
 
 void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -539,6 +571,10 @@ void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		s_fJumpPower -= GRAVITY * fTimeDelta * 9.f;
 
 		_vector vLook = m_pTransform->Get_State(CTransform::STATE_LOOK);
+		_vector vSubtract = XMVector3Normalize(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransform->Get_State_Vector(CTransform::STATE_POSITION));
+
+		vLook = XMVector3Normalize(vLook + vSubtract * 1.5f);
+
 		_float fDis = m_pGameInstance->Compute_Distance(m_pKirby, pSimba);
 
 		_float fSpeed = 2.2f;
@@ -554,6 +590,12 @@ void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	}
 	else
 		m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
+
+	if (CSimba::Simba_AttackJumpHit == iState && 0.12f < fAnimRatio && false == m_bStarSpawned)
+	{
+		m_bStarSpawned = true;
+		pSimba->SpawnStar(iState);
+	}
 
 	if (pSimba->IsAnimFinished())
 	{
@@ -745,6 +787,11 @@ void CSimba_DimensionClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _flo
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	if (CSimba::Simba_DimensionClawStart == _iAnimIndex)
 		s_iAttackCount = 0;
+		
+	else if (CSimba::Simba_DimensionClaw == _iAnimIndex || CSimba::Simba_DimensionClawContinue == _iAnimIndex) {
+		m_bStarSpawned = false;
+		m_bStarSpawned2 = false;
+	}
 }
 
 void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -754,9 +801,38 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	_uint iState = pSimba->Get_State();
 	_float fAnimRatio = pSimba->Get_AnimRatio();
 
-	if ((CSimba::Simba_DimensionClawStart == iState || CSimba::Simba_DimensionClawStartContinue == iState) && 0.82f < fAnimRatio) {
-		float fRatio = RATIO(fAnimRatio, 0.82f, 1);
-		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * (1 - EASE_IN_FAST(fRatio)) * 7.5f);
+	if ((CSimba::Simba_DimensionClawStart == iState) && 0.87f < fAnimRatio) {
+		_float fRatio = RATIO(fAnimRatio, 0.87f, 1);
+		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * (1 - EASE_IN(fRatio)) * 9.5f);
+	}
+
+	if (CSimba::Simba_DimensionClawStartContinue == iState)
+		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta /** (1 - EASE_IN_FAST(fAnimRatio))*/ * 3.f);
+
+	if (CSimba::Simba_DimensionClaw == iState)
+	{
+		if (0.32f < fAnimRatio && false == m_bStarSpawned) {
+			m_bStarSpawned = true;
+			pSimba->ResetStarCount();
+			pSimba->SpawnStar(iState);
+		}
+		if (0.38f < fAnimRatio && false == m_bStarSpawned2)	{
+			m_bStarSpawned2 = true;
+			pSimba->SpawnStar(iState);
+		}
+	}
+
+	if (CSimba::Simba_DimensionClawContinue == iState && false == m_bStarSpawned2)
+	{
+		if (0.53f < fAnimRatio && false == m_bStarSpawned) {
+			m_bStarSpawned = true;
+			pSimba->ResetStarCount();
+			pSimba->SpawnStar(iState);
+		}
+		if (0.63f < fAnimRatio && false == m_bStarSpawned2) {
+			m_bStarSpawned2 = true;
+			pSimba->SpawnStar(iState);
+		}
 	}
 
 	if (pSimba->IsAnimFinished())
@@ -767,11 +843,13 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		else if (CSimba::Simba_DimensionClaw == iState) {
 			pSimba->Change_State(CSimba::Simba_DimensionClawStartContinue, 60.f, false, false);
 			s_iAttackCount++;
+			pSimba->ChangeDimensionClawUpDown();
 		}
 
 		else if (CSimba::Simba_DimensionClawStartContinue == iState) {
 			pSimba->Change_State(CSimba::Simba_DimensionClawContinue, 60.f, false, false);
 			s_iAttackCount++;
+			pSimba->ChangeDimensionClawUpDown();
 		}
 
 		else if (CSimba::Simba_DimensionClawContinue == iState)
@@ -784,30 +862,37 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		else if (CSimba::Simba_DimensionClawEnd == iState)
 		{
-			pSimba->Set_PreState(iState);
+			pSimba->Change_State(CSimba::Simba_DimensionClawStart, 50.f, false, true);
+			
+			/*pSimba->Set_PreState(iState);
 			pSimba->Turn_RotationBoneMatrix(BiteRushJump);
 			if (true == pSimba->IsKirbyOnMyLeft())
 				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 50.f, false, true);
 			else
-				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);
+				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);*/
 		}	
 	}
 }
 
-// *********************** BiteRush *********************** // 종료조건 업글필요
+// *********************** BiteRush *********************** // 완료
 void CSimba_BiteRush::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+	if (CSimba::Simba_BiteRush == _iAnimIndex)
+		m_fTime = 0.f;
 }
 
 void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
-
 	CSimba* pSimba = static_cast<CSimba*>(pGameObject);
 	_uint iState = pSimba->Get_State();
+	_float fAnimRatio = pSimba->Get_AnimRatio();
+
 	if (CSimba::Simba_BiteRush == iState)
 	{
+		m_fTime += fTimeDelta;
+
 		_vector vLook = m_pTransform->Get_State(CTransform::STATE_LOOK);
 		_vector vLook2 = CUtils::TurnDirectionVector(vLook, _float3(0, 1, 0), 30.f);
 		_vector vLook3 = CUtils::TurnDirectionVector(vLook, _float3(0, 1, 0), -30.f);
@@ -816,20 +901,26 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 		m_pController->Move_Dir(m_pTransform, vDir, fTimeDelta, s_fOffsetY);
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 1.6f);
 
-		_float fDis = 10.f;
+		_float fDis = 8.f;
 		if (fDis > m_pController->RayCastToStaticActor(vLook) || fDis > m_pController->RayCastToStaticActor(vLook2)
-			|| fDis > m_pController->RayCastToStaticActor(vLook3))
-			pSimba->Change_State(CSimba::Simba_BiteRushEnd, 50.f, false, true);
+			|| fDis > m_pController->RayCastToStaticActor(vLook3) || 2.8f < m_fTime)
+			pSimba->Change_State(CSimba::Simba_BiteRushTiredStart, 50.f, false, false);
 	}
+
+	if(CSimba::Simba_BiteRushTiredEnd == iState && 0.8f < fAnimRatio)
+		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
 
 	if (pSimba->IsAnimFinished())
 	{
 		if (CSimba::Simba_BiteRushStart == iState || CSimba::Simba_BiteRushStartStraight == iState)
 			pSimba->Change_State(CSimba::Simba_BiteRush, 50.f, true, false);
-		else if (CSimba::Simba_BiteRushEnd == iState) {
-			pSimba->Turn_RotationBoneMatrix(0.f);
-			pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 50.f, false, true);
-		}
+		else if (CSimba::Simba_BiteRushEnd == iState)
+			pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 50.f, false, false);
+
+		else if (CSimba::Simba_BiteRushTiredStart == iState)
+			pSimba->Change_State(CSimba::Simba_BiteRushTiredEnd, 50.f, false, false);	
+		else if (CSimba::Simba_BiteRushTiredEnd == iState)
+			pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 50.f, false, false);
 	}
 }
 
@@ -846,8 +937,25 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	_uint iState = pSimba->Get_State();
 	_float fAnimRatio = pSimba->Get_AnimRatio();
 
-	if (CSimba::Simba_DimensionLaserStart == iState && 0.95f < fAnimRatio)
-		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 5.5f);
+	if (CSimba::Simba_DimensionLaserStart == iState)
+	{
+		_float fMin = 0.f;
+		_float fMax  = 0.2f;
+		if (fMax > fAnimRatio)
+		{
+			_float fRatio = RATIO(fAnimRatio, fMin, fMax);
+			_float fStart = BiteRush;
+			fRatio = EASE_OUT(fRatio);
+			_float fAngle = LERP(fStart, 0, fRatio);
+			pSimba->Turn_RotationBoneMatrix(fAngle);
+		}
+		else
+			pSimba->Turn_RotationBoneMatrix(0);
+
+		if(0.95f < fAnimRatio)
+			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 5.5f);
+	}
+		
 	if (CSimba::Simba_DimensionLaser == iState)
 	{
 		if(0.05f > fAnimRatio)

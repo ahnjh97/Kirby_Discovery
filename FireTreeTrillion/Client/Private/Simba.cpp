@@ -8,6 +8,7 @@
 #include "EventCenter.h"
 #include "Bone.h"
 #include "Camera_Main.h"
+#include "Ability.h"
 
 CSimba::CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -150,6 +151,8 @@ _int CSimba::Tick(_float fTimeDelta)
 
 	m_fHpRatio =  m_fHp / m_fMaxHp;
 
+	ResetRotation();
+
 	if (true == m_pModelCom->IsFinished() || m_pModelCom->Get_Trackposition() == 0.f) // IsAnimFinished
 		Reset_HitBoxTimingMap(SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex()));
 
@@ -202,6 +205,8 @@ _int CSimba::Tick(_float fTimeDelta)
 		Turn_RotationBoneMatrix(-2.5f);
 		Change_State(Simba_Damage, 50.f, false, true);
 	}
+
+	DetermineSimbaRotation();
 
 	return OBJ_NOEVENT;
 }
@@ -379,7 +384,7 @@ void CSimba::CreateHpBar()
 
 void CSimba::Turn_RotationBoneMatrix(_float fAngle)
 {
-	_float4x4 RotationMatrix = _float4x4::Identity;
+	/*_float4x4 RotationMatrix = _float4x4::Identity;
 	if (0 == fAngle) 
 	{
 		*m_pRotationBoneMatrix = RotationMatrix;
@@ -387,19 +392,197 @@ void CSimba::Turn_RotationBoneMatrix(_float fAngle)
 	}
 
 	CUtils::Turn_OtherMatrix(RotationMatrix, _float4(1, 0, 0, 0), 1.f, fAngle);
-	*m_pRotationBoneMatrix = RotationMatrix;
+	*m_pRotationBoneMatrix = RotationMatrix;*/
 }
 
 void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 {
 	_float4x4 matBoneWorld{};
-
+	HRESULT hr{};
+	CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+	AbilityItemDesc.fAngle = 0.f;
+	AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
 	if (Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx)
+	{
 		matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone);
-	else if (Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
-		matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone);
+		_float fOffsetY = 0.4f;
 
-	// 별 생성좀 하하하
+		AbilityItemDesc.fRotateDir = 1.f;
+		AbilityItemDesc.vDir = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * CUtils::Make_RandomFloat(0.7f, 1.4f);
+		AbilityItemDesc.vPosition = _float4(matBoneWorld._41, matBoneWorld._42 + fOffsetY, matBoneWorld._43, 1) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.5f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+	}
+	else if (Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx) {
+		matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone);
+		_float fOffsetY = 0.8f;
+
+		AbilityItemDesc.fRotateDir = -1.f;
+		AbilityItemDesc.vDir = -m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * CUtils::Make_RandomFloat(0.7f, 1.4f);
+		AbilityItemDesc.vPosition = _float4(matBoneWorld._41, matBoneWorld._42 + fOffsetY, matBoneWorld._43, 1) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.5f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+	}
+	else if (Simba_FinalCrusher == iAnimIdx)
+	{
+		_float4 vLeftHandPos{}, vRightHandPos{};
+		memcpy(&vLeftHandPos, m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone).m[3], sizeof(_float4));
+		memcpy(&vRightHandPos, m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone).m[3], sizeof(_float4));
+		_float4 vPos = (vLeftHandPos + vRightHandPos) * 0.5f;
+		_float fOffsetY = -1.f;
+
+		AbilityItemDesc.fRotateDir = 1.f;
+		AbilityItemDesc.vDir = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * CUtils::Make_RandomFloat(0.2f, 0.7f);
+		AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) + m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * 3.3f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+
+		AbilityItemDesc.fRotateDir = 1.f;
+		AbilityItemDesc.vDir = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * CUtils::Make_RandomFloat(0.2f, 0.7f);
+		AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 3.5f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+
+		AbilityItemDesc.fRotateDir = -1.f;
+		AbilityItemDesc.vDir = -m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * CUtils::Make_RandomFloat(0.2f, 0.7f);
+		AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) - m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * 3.3f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+	}
+	else if (Simba_AttackJumpHit == iAnimIdx)
+	{
+		_float4 vLeftHandPos{}, vRightHandPos{};
+		memcpy(&vLeftHandPos, m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone).m[3], sizeof(_float4));
+		memcpy(&vRightHandPos, m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone).m[3], sizeof(_float4));
+		_float4 vPos = (vLeftHandPos + vRightHandPos) * 0.5f;
+		_float fOffsetY = 0.8f;
+
+		_vector vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		_vector vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+		_float4 vFloatLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		_float4 vFloatRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+
+		AbilityItemDesc.fRotateDir = 1.f;
+		AbilityItemDesc.vDir = vLook * CUtils::Make_RandomFloat(0.2f, 0.7f);
+		AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) + vFloatRight * 4.5f + vFloatLook * 2.2f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+
+		AbilityItemDesc.vDir = vLook * CUtils::Make_RandomFloat(0.2f, 0.7f);
+		AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) + vFloatLook * 2.7f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+
+		AbilityItemDesc.vDir = vLook * CUtils::Make_RandomFloat(0.2f, 0.7f);
+		AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) - vFloatRight * 4.5f + vFloatLook * 2.2f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+	}
+	else if (Simba_DoubleClaw == iAnimIdx)
+	{
+		_float4 vLeftHandPos{}, vRightHandPos{};
+		memcpy(&vLeftHandPos, m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone).m[3], sizeof(_float4));
+		memcpy(&vRightHandPos, m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone).m[3], sizeof(_float4));
+		_float4 vPos = (vLeftHandPos + vRightHandPos) * 0.5f;
+		_float fOffsetY = 0.5f;
+
+		_vector vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		_vector vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+		_float4 vFloatLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		_float4 vFloatRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+		
+		if(0 == CUtils::Make_RandomInt(0, 1))
+			AbilityItemDesc.fRotateDir = 1.f;
+		else
+			AbilityItemDesc.fRotateDir = -1.f;
+		AbilityItemDesc.vDir = vLook * CUtils::Make_RandomFloat(0.2f, 0.7f);
+		AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) + vFloatRight * 2.f + vFloatLook * 3.5f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+
+		if (0 == CUtils::Make_RandomInt(0, 1))
+			AbilityItemDesc.fRotateDir = 1.f;
+		else
+			AbilityItemDesc.fRotateDir = -1.f;
+		AbilityItemDesc.vDir = vLook * CUtils::Make_RandomFloat(0.2f, 0.7f);
+		AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) + vFloatLook * 4.2f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+
+		if (0 == CUtils::Make_RandomInt(0, 1))
+			AbilityItemDesc.fRotateDir = 1.f;
+		else
+			AbilityItemDesc.fRotateDir = -1.f;
+		AbilityItemDesc.vDir = vLook * CUtils::Make_RandomFloat(0.2f, 0.7f);
+		AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) - vFloatRight * 2.f + vFloatLook * 3.5f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+	}
+	else if (Simba_DimensionClaw == iAnimIdx || Simba_DimensionClawContinue == iAnimIdx)
+	{
+		_vector vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		_float4 vFloatLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+		_float4 vFloatRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		_float fOffsetY = 0.5f;
+		AbilityItemDesc.vDir = XMVectorZero();
+
+		if (true == m_bDimensionClawUpAttack)
+		{
+			if (0 == m_iStarCount) {
+				if (0 == CUtils::Make_RandomInt(0, 1))
+					AbilityItemDesc.fRotateDir = 1.f;
+				else
+					AbilityItemDesc.fRotateDir = -1.f;
+				AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) + vFloatLook * 8.f + vFloatRight * 8.f;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+				CHECK_FAILED(hr);
+
+				if (0 == CUtils::Make_RandomInt(0, 1))
+					AbilityItemDesc.fRotateDir = 1.f;
+				else
+					AbilityItemDesc.fRotateDir = -1.f;
+				AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) + vFloatLook * 8.f - vFloatRight * 8.f;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+				CHECK_FAILED(hr);
+			}
+				
+			else if (1 == m_iStarCount) {
+				if (0 == CUtils::Make_RandomInt(0, 1))
+					AbilityItemDesc.fRotateDir = 1.f;
+				else
+					AbilityItemDesc.fRotateDir = -1.f;
+				AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) + vFloatLook * 18.f + vFloatRight * 8.f;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+				CHECK_FAILED(hr);
+
+				if (0 == CUtils::Make_RandomInt(0, 1))
+					AbilityItemDesc.fRotateDir = 1.f;
+				else
+					AbilityItemDesc.fRotateDir = -1.f;
+				AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) + vFloatLook * 18.f - vFloatRight * 8.f;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+				CHECK_FAILED(hr);
+			}
+		}
+		else
+		{
+			if (0 == CUtils::Make_RandomInt(0, 1))
+				AbilityItemDesc.fRotateDir = 1.f;
+			else
+				AbilityItemDesc.fRotateDir = -1.f;
+			AbilityItemDesc.vDir = vLook * CUtils::Make_RandomFloat(0.2f, 0.7f);
+
+			if (0 == m_iStarCount)
+				AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) + vFloatLook * 8.f;
+			else if (1 == m_iStarCount)
+				AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) + vFloatLook * 18.f;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+			CHECK_FAILED(hr);
+		}
+
+		m_iStarCount++;
+	}
 }
 
 _bool CSimba::IsKirbyOnMyLeft()
@@ -564,23 +747,31 @@ void CSimba::SetUp_FSM()
 	for(_uint i = Simba_BackStep; i <= Simba_BackStepStart; i++)
 		m_pFSM->Add_State(i, CSimba_BackStep::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
-	for(_uint i = Simba_AttackJump; i <= Simba_AttackJumpWait; i++)
+	for (_uint i = Simba_AttackJump; i <= Simba_AttackJumpWait; i++) {
 		m_pFSM->Add_State(i, CSimba_AttackJump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
-
+		m_mapRotation[ATTACKJUMP].insert(SIMBA_ANIM(i));
+	}
+		
 	m_pFSM->Add_State(Simba_Damage, CSimba_Damage::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
 	m_pFSM->Add_State(Simba_Roar2, CSimba_Roar::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
-	for(_uint i = Simba_BiteRushFallL; i<= Simba_BiteRushLandingR; i++)
+	for (_uint i = Simba_BiteRushFallL; i <= Simba_BiteRushLandingR; i++) {
 		m_pFSM->Add_State(i, CSimba_BiteRushJump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
-
+		m_mapRotation[BITERUSHJUMP].insert(SIMBA_ANIM(i));
+	}
+	
 	for(_uint i = Simba_DimensionClaw; i<= Simba_DimensionClawWait; i++)
 		m_pFSM->Add_State(i, CSimba_DimensionClaw::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
-	for(_uint i = Simba_BiteRush; i<= Simba_BiteRushEnd; i++)
+	for (_uint i = Simba_BiteRush; i <= Simba_BiteRushEnd; i++) {
 		m_pFSM->Add_State(i, CSimba_BiteRush::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
-	for (_uint i = Simba_BiteRushStart; i <= Simba_BiteRushStartStraight; i++)
+		m_mapRotation[BITERUSH].insert(SIMBA_ANIM(i));
+	}	
+	for (_uint i = Simba_BiteRushStart; i <= Simba_BiteRushTiredWait; i++){
 		m_pFSM->Add_State(i, CSimba_BiteRush::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
+		m_mapRotation[BITERUSH].insert(SIMBA_ANIM(i));
+	}
 
 	for (_uint i = Simba_DimensionLaser; i <= Simba_DimensionLaserWait; i++)
 		m_pFSM->Add_State(i, CSimba_DimensionLaser::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
@@ -771,6 +962,47 @@ void CSimba::SpawnMonsters(_uint iTriggerIndex)
 				return;
 		}
 	}
+}
+
+void CSimba::DetermineSimbaRotation()
+{
+	m_fAngle = 0.f;
+	_uint iState = Get_State();
+	for (_uint i = 0; i < ROTATION_END; i++)
+	{
+		if (m_mapRotation[i].end() != m_mapRotation[i].find(SIMBA_ANIM(iState)))
+		{
+			if (ATTACKJUMP == i) {
+				TurnSimba(AttackJump);
+				break;
+			}
+			else if (BITERUSH == i)
+			{
+				TurnSimba(BiteRush);
+				break;
+			}
+			else if (BITERUSHJUMP == i)
+			{
+				TurnSimba(BiteRushJump);
+				break;
+			}
+		}
+	}
+
+	if (Simba_Damage == iState)
+		TurnSimba(-2.5f);
+}
+
+void CSimba::TurnSimba(_float fAngle)
+{
+	fAngle *= 0.95f;
+	m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), -1, fAngle);
+	m_fAngle = fAngle;
+}
+
+void CSimba::ResetRotation()
+{
+	m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), -1, -m_fAngle);
 }
 
 CSimba* CSimba::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

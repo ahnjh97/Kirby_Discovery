@@ -239,7 +239,7 @@ void CDeeDeeDee_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		if ((vPos - DESC(m_vOriginPos)).Length() < 3.f)
 		{
 			// 와들디 들을 존나 팬다.
-			switch (CUtils::Make_RandomInt(3, 3))
+			switch (CUtils::Make_RandomInt(1, 2))
 			{
 			case 0:
 				pDee->Change_State(CDeeDeeDee::STATE_SHOUTSTART, 60.f, false, true);

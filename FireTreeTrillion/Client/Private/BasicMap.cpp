@@ -79,6 +79,10 @@ HRESULT CBasicMap::Initialize(void* pArg)
     SetUpAnimDecoInfo("BushM", 1.1f, 2, 60.f, 0, 50.f);
     SetUpAnimDecoInfo("BushS", 0.8f, 2, 60.f, 0, 50.f);
     SetUpAnimDecoInfo("PopFlower", 0.8f, 2, 120.f, 1, 130.f);
+    SetUpAnimDecoInfo("SmallBirds", 3.5f, 1, 60.f, 0, 60.f);
+
+    // 애니메이션 재생이 끝난 후 숨겨야하는 애님데코들
+    m_setAfterHideAnimDecos = { "SmallBirds" };
 
     // 옥트리를 생성하는 레벨들의 맵
     if(IsOctreeMapModel(wstrModelTag))
@@ -516,6 +520,9 @@ void CBasicMap::InsertMapDecos()
             if (animIter == m_ModelActionAnimMap.end())
                 continue;
 
+            if (m_setAfterHideAnimDecos.end() != m_setAfterHideAnimDecos.find(strModelName))
+                pModel->SetUp_ActionAnimForOctree(animIter->second.first);
+
             m_pGameInstance->Emplace_MapDecoTrigger(pRigidStatic, pModel, animIter->second.first, animIter->second.second);
             CAnimDeco::ANIMDECO_DESC tAnimDeco{};
             tAnimDeco.pAnimDecoModel = pModel;
@@ -719,6 +726,9 @@ void CBasicMap::ReadDecos_ForSmallLevels()
             if (animIter == m_ModelActionAnimMap.end())
                 continue;
 
+            if (m_setAfterHideAnimDecos.end() != m_setAfterHideAnimDecos.find(strModelName))
+                pModel->SetUp_ActionAnimForOctree(animIter->second.first);
+ 
             m_pGameInstance->Emplace_MapDecoTrigger(pRigidStatic, pModel, animIter->second.first, animIter->second.second);
             m_vecAnimDecos.push_back(pModel);
         }
@@ -785,15 +795,21 @@ HRESULT CBasicMap::Render_NonOctreeMapDecos()
 
     for (auto& animDeco : m_vecAnimDecos)
     {
-        if (nullptr == animDeco)
+        if (nullptr == animDeco || true == animDeco->IsHidden())
             continue;
 
         _uint iNumMeshes = animDeco->Get_NumMeshes();
 
         if (FAILED(animDeco->Play_Animation(m_pGameInstance->Get_SecondTimer())))
             return E_FAIL;
-        if (true == animDeco->IsFinished())
-            animDeco->ReturnToIdle();
+
+        if (true == animDeco->IsFinished()) {
+            if (true == animDeco->CheckHideAfterAnimFinish())
+                animDeco->Set_Hide(true);
+            else
+                animDeco->ReturnToIdle();
+        }
+            
         if (FAILED(animDeco->Bind_StencilRimLightMotionBlur(m_pAnimShaderCom, m_vecStencilRimLightMotionBlurNames)))
             return E_FAIL;
         if (FAILED(animDeco->Bind_WorldMatrixForOctree(m_pAnimShaderCom)))
@@ -959,7 +975,7 @@ void CBasicMap::ReleaseMapActors()
 
     for (auto& staticActor : m_vecDecoStaticActors)
         m_pGameInstance->ReleaseActor(staticActor);
-    m_vecDecoStaticActors.clear();
+    m_vecDecoStaticActors.clear(); 
 
     m_pGameInstance->ReleaseActor(m_pStaticActor);
 }

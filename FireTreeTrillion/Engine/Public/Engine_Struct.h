@@ -44,6 +44,8 @@ namespace Engine
 	
 	typedef struct
 	{
+		_float3		vInitRot = { 0.f, 0.f, 0.f };
+		_float3		vInitScale = { 1.f, 1.f, 1.f };
 
 		//¼ö¸í
 		_float		fLifetime = { 1.f };
@@ -69,6 +71,9 @@ namespace Engine
 
 		_float		fSpeed = {1.f};
 		_float		fSpeedRandomOffset;
+
+		_float		fOrbitSpeed = { 1.f };
+		_float		fOrbitSpeedRandomOffset;
 
 
 		_float3		vColor = {1.f, 1.f, 1.f};
@@ -207,6 +212,8 @@ namespace Engine
 		_float		fSpeed = { 1.f };
 		_float		fSpeedRandomOffset;
 
+		_float		fOrbitSpeed = { 1.f };
+		_float		fOrbitSpeedRandomOffset;
 
 		_float3		vColor = { 1.f, 1.f, 1.f };
 		_float3		vColorRandomOffset;

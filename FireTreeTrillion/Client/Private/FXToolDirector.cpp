@@ -192,7 +192,9 @@ HRESULT CFXToolDirector::Save_AllEffect()
 		wstring wstrName = CUtils::StrToWstr(FX->Get_Name());
 
 		(dynamic_cast<CSingleEffect*>(FX) != nullptr) ?
+			//단일 이펙트
 			Save_Effect(FX, wstrName) :
+			//파티클
 			Save_Particle(FX, wstrName);
 	}
 
@@ -337,8 +339,12 @@ HRESULT CFXToolDirector::Save_Particle(CEffect* pEffect, const wstring& strFileN
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fSpeed), sizeof(_float));
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fSpeedRandomOffset), sizeof(_float));
 
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.fOrbitSpeed), sizeof(_float));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.fOrbitSpeedRandomOffset), sizeof(_float));
+
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vColor), sizeof(_float3));
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vColorRandomOffset), sizeof(_float3));
+
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fAlpha), sizeof(_float));
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fAlphaRandomOffset), sizeof(_float));
@@ -620,6 +626,9 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->fSpeed), sizeof(_float));
 	InputFile.read(reinterpret_cast<char*>(&_pData->fSpeedRandomOffset), sizeof(_float));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeed), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeedRandomOffset), sizeof(_float));
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->vColor), sizeof(_float3));
 	InputFile.read(reinterpret_cast<char*>(&_pData->vColorRandomOffset), sizeof(_float3));
@@ -1638,6 +1647,15 @@ void CFXToolDirector::Render_FXProperty()
 	_bool bEdited{ false };
 	auto moveIter = pCurParticle->m_InstanceDesc.vecMoveCommands.begin();
 
+	_bool bSimpleMove = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE];
+
+	if (Checkbox(u8"SimpleMove", &bSimpleMove))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE] = bSimpleMove;
+		bEdited = true;
+	}
+	SameLine();
+
 	_bool bDrop = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DROP];
 
 	if (Checkbox(u8"Drop", &bDrop))
@@ -1729,28 +1747,47 @@ void CFXToolDirector::Render_FXProperty()
 	if (DragFloat(u8"시작 딜레이 랜덤", &pCurParticle->m_InstanceDesc.fStarDelayRandomOffset, .1f, 0.f, 100.f, "%.1f"))
 		bEdited = true;
 
-
+	Dummy({ 0.f, 10.f });
+	Separator();
+	Dummy({ 0.f, 10.f });
 
 	if (DragFloat3(u8"중점", m_vCenter, .01f, -100.f, 100.f, "%.2f"))
 	{
 		pCurParticle->m_InstanceDesc.vCenter = { m_vCenter[0], m_vCenter[1], m_vCenter[2] };
 		bEdited = true;
 	}
+
 	if (DragFloat3(u8"범위", m_vRange, .01f, 0.f, 100.f, "%.2f"))
 	{
 		pCurParticle->m_InstanceDesc.vRange = { m_vRange[0], m_vRange[1], m_vRange[2] };
 		bEdited = true;
 	}
+	Dummy({ 0.f, 10.f });
+
+	if (DragFloat3(u8"피봇", m_vPivot, .1f, -50.f, 50.f, "%.2f"))
+	{
+		pCurParticle->m_InstanceDesc.vPivot = { m_vPivot[0], m_vPivot[1], m_vPivot[2] };
+		bEdited = true;
+	}
+
+	Dummy({ 0.f, 10.f });
+	Separator();
+	Dummy({ 0.f, 10.f });
+
 	if (DragFloat3(u8"회전", m_vRotation, .01f, -180.f, 180.f, "%.2f"))
 	{
 		pCurParticle->m_InstanceDesc.vRotation = { m_vRotation[0], m_vRotation[1], m_vRotation[2] };
 		bEdited = true;
 	}
+
 	if (DragFloat3(u8"회전 랜덤", m_vRotationRandomOffset, .01f, 0.f, 50.f, "%.2f"))
 	{
 		pCurParticle->m_InstanceDesc.vRotationRandomOffset = { m_vRotationRandomOffset[0], m_vRotationRandomOffset[1], m_vRotationRandomOffset[2] };
 		bEdited = true;
 	}
+
+	Dummy({ 0.f, 10.f });
+
 	if (DragFloat3(u8"크기", m_vScale, .01f, 0.011f, 100.f, "%.2f"))
 	{
 		pCurParticle->m_InstanceDesc.vScale = { m_vScale[0], m_vScale[1], m_vScale[2] };
@@ -1761,6 +1798,9 @@ void CFXToolDirector::Render_FXProperty()
 		pCurParticle->m_InstanceDesc.vScaleRandomOffset = { m_vScaleRandomOffset[0], m_vScaleRandomOffset[1], m_vScaleRandomOffset[2] };
 		bEdited = true;
 	}
+
+	Dummy({ 0.f, 10.f });
+
 	if (DragFloat3(u8"방향", m_vDir, .01f, 0.f, 100.f, "%.2f"))
 	{
 		pCurParticle->m_InstanceDesc.vDir = { m_vDir[0], m_vDir[1], m_vDir[2] };
@@ -1771,10 +1811,24 @@ void CFXToolDirector::Render_FXProperty()
 		pCurParticle->m_InstanceDesc.vDirRandomOffset = { m_vDirRandomOffset[0], m_vDirRandomOffset[1], m_vDirRandomOffset[2] };
 		bEdited = true;
 	}
+
+	Dummy({ 0.f, 10.f });
+
 	if (DragFloat(u8"속도", &pCurParticle->m_InstanceDesc.fSpeed, .01f, 0.f, 100.f, "%.2f"))
 		bEdited = true;
 	if (DragFloat(u8"속도 랜덤", &pCurParticle->m_InstanceDesc.fSpeedRandomOffset, .01f, 0.f, 100.f, "%.2f"))
 		bEdited = true;
+
+	Dummy({ 0.f, 10.f });
+
+	if (DragFloat(u8"공전 속도", &pCurParticle->m_InstanceDesc.fOrbitSpeed, .01f, 0.f, 10000.f, "%.2f"))
+		bEdited = true;
+	if (DragFloat(u8"공전 속도 랜덤", &pCurParticle->m_InstanceDesc.fOrbitSpeedRandomOffset, .01f, 0.f, 10000.f, "%.2f"))
+		bEdited = true;
+
+	Dummy({ 0.f, 10.f });
+	Separator();
+	Dummy({ 0.f, 10.f });
 
 	if (ColorEdit3(u8"색상", m_vColor))
 	{
@@ -1788,16 +1842,14 @@ void CFXToolDirector::Render_FXProperty()
 		bEdited = true;
 	}
 
+	Dummy({ 0.f, 10.f });
+
 	if (DragFloat(u8"알파", &pCurParticle->m_InstanceDesc.fAlpha, .01f, 0.f, 1.f, "%.2f"))
 		bEdited = true;
 	if (DragFloat(u8"알파 랜덤", &pCurParticle->m_InstanceDesc.fAlphaRandomOffset, .01f, 0.f, 1.f, "%.2f"))
 		bEdited = true;
 
-	if (DragFloat3(u8"피봇", m_vPivot, .1f, -50.f, 50.f, "%.2f"))
-	{
-		pCurParticle->m_InstanceDesc.vPivot = { m_vPivot[0], m_vPivot[1], m_vPivot[2] };
-		bEdited = true;
-	}
+
 
 #pragma endregion
 
@@ -2303,8 +2355,9 @@ void CFXToolDirector::Make_KeyframeList(_float _fWidth, _float _fInitialYPos, CE
 
 	for (auto& keyframe : _pCurFX->m_Keyframes[_eRenderProperty])
 	{
-		_float fRatio = (_pCurFX->m_fLifetime.first + (keyframe.fTimeRatio * (_pCurFX->m_fLifetime.second - _pCurFX->m_fLifetime.first)));
-		_float fPosX = fRatio * _fWidth / _pCurFX->m_fDuration.second;
+		//_float fRatio = (_pCurFX->m_fLifetime.first + (keyframe.fTimeRatio * (_pCurFX->m_fLifetime.second - _pCurFX->m_fLifetime.first)));
+		_float fRatio = keyframe.fTimeRatio;
+		_float fPosX = fRatio * _fWidth /*/ _pCurFX->m_fDuration.second*/;
 		ImVec2 vCurPos = vPos + ImVec2{ fPosX, 2.f };
 
 		GetWindowDrawList()->AddCircleFilled(vCurPos, 6.0f, IM_COL32(255, 255, 100, 255));

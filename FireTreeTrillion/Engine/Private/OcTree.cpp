@@ -669,7 +669,13 @@ void COcTree::RenderAll(CGameInstance* pGameInstance, CShader* pMapShader, CShad
 		if (FAILED(colAnim->Play_Animation(pGameInstance->Get_SecondTimer())))
 			return;
 		if (true == colAnim->IsFinished())
-			colAnim->ReturnToIdle();
+		{
+			if (true == colAnim->CheckHideAfterAnimFinish())
+				colAnim->Set_Hide(true);
+			else
+				colAnim->ReturnToIdle();
+		}
+			
 		if (FAILED(colAnim->Bind_StencilRimLightMotionBlur(pAnimShader, vecStrings)))
 			return;
 		if (FAILED(colAnim->Bind_WorldMatrixForOctree(pAnimShader)))
@@ -771,7 +777,12 @@ void COcTree::RenderMyMesh(CGameInstance* pGameInstance, CShader* pMapShader, CS
 		if (FAILED(myColAnim->Play_Animation(pGameInstance->Get_SecondTimer())))
 			return;
 		if (true == myColAnim->IsFinished())
-			myColAnim->ReturnToIdle();
+		{
+			if (true == myColAnim->CheckHideAfterAnimFinish())
+				myColAnim->Set_Hide(true);
+			else
+				myColAnim->ReturnToIdle();
+		}
 		if (FAILED(myColAnim->Bind_StencilRimLightMotionBlur(pAnimShader, vecStrings)))
 			return;
 		if (FAILED(myColAnim->Bind_WorldMatrixForOctree(pAnimShader)))

@@ -38,6 +38,9 @@ public:
 	void				Set_EffectPos(_float3 vPos) { m_vEffectPos = vPos; }
 	_float3				Get_EffectPos() const { return m_vEffectPos; }
 
+	void				Set_TimeAttack(_bool bTimeAttack) { m_bTimeAttack = bTimeAttack; }
+	_bool				Get_TimeAttack() const { return m_bTimeAttack; }
+
 	// 문제 냅니다.
 	void				Make_RandomItem();
 	// 문제 잘 풀었는지 검사합니다.
@@ -61,6 +64,7 @@ private:
 	_float						m_fScore = 0.f;
 	_int						m_iDeeWaitingNum = { 0 };
 	_float3						m_vEffectPos = _float3();
+	_bool						m_bTimeAttack = _bool();
 
 public:
 	virtual void Free() override;
