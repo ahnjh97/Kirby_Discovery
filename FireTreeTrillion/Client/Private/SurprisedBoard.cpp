@@ -84,11 +84,23 @@ _int CSurprisedBoard::Tick(_float fTimeDelta)
 			if (0.45f < m_arrModelCom[m_eModelColor]->Get_AnimRatio())
 			{
 				m_bNotified = true;
+				m_bReturnMove = TRUE;
 				CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(m_pDynamicField);
 				pDynamicField->Set_Interaction(true);
 			}
 		}
 		
+	}
+
+	if (m_bReturnMove)
+	{
+		_uint iAnimIndex = Get_State();
+		if (RETURN_L == iAnimIndex || RETURN_R == iAnimIndex)
+		{
+			m_bReturnMove = FALSE;
+			CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(m_pDynamicField);
+			pDynamicField->Set_ReturnMove(TRUE);
+		}
 	}
 	return OBJ_NOEVENT;
 }
