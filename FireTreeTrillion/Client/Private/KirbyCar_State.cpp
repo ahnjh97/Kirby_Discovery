@@ -18,7 +18,7 @@ void MakeFire(CTransform* pTransformCom)
 	Firedesc.fUpRange = { 2.5f };
 	Firedesc.vFirstColor = { .8f, 0.5f, 0.5f, 1.f };
 	Firedesc.vTargetColor = { 1.f, 0.f, 0.f, 1.f };
-	Firedesc.fScale = { 0.3f };
+	Firedesc.fScale = { 1.f };
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
 		return;
 
@@ -122,7 +122,7 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pKirby->Change_State(CKirby::STATE_SPITDEFORM, 60.f, false, false, CKirby::BODY_VACUUM);
 
 			DESC(m_bBooster) = false;
-			pKirby->Delete_Effect("Come On Dash");
+			pKirby->Delete_Effect("YW Come On Dash");
 			DESC(m_pKirbyAssistLight1)->Set_DeadLight(true);
 			Safe_Release(DESC(m_pKirbyAssistLight1));
 			DESC(m_pKirbyAssistLight1) = nullptr;
@@ -374,7 +374,7 @@ void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
-			pKirby->Delete_Effect("Come On Dash");
+			pKirby->Delete_Effect("YW Come On Dash");
 		}
 	}
 	else if (DESC(m_bBooster) == false)
@@ -682,7 +682,7 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
-			pKirby->Delete_Effect("Come On Dash");
+			pKirby->Delete_Effect("YW Come On Dash");
 			if (JoyStick_On() == false)
 			{
 				pKirby->Change_State(CKirby::CARSTATE_BOOSTEND, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
@@ -742,7 +742,7 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			pKirby->Change_State(CKirby::CARSTATE_CRASH, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
-			pKirby->Delete_Effect("Come On Dash");
+			pKirby->Delete_Effect("YW Come On Dash");
 			Kirbydesc->m_fMoveSpeed = 0.f;
 			DESC(m_bCarJump) = true;
 			DESC(m_fJumpVelocity) = 20.f;

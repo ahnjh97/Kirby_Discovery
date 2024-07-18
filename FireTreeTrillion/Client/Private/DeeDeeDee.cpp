@@ -12,6 +12,8 @@
 #include "Ability.h"
 #include "UI_MessageWindow.h"
 
+#include "UI_Interactable.h"
+
 #define INFO(Dst) m_tInfo.Dst
 
 CDeeDeeDee::CDeeDeeDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -63,8 +65,9 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 	_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	m_vNeckLook = m_vLEyeLook = m_vREyeLook = m_tInfo.m_vMoveDir = m_tInfo.m_vTargetDir = vLook;
 
-
-	//if (*m_pCurrentLevelID != LEVEL_TOWN) Make_TargetToCams();
+	m_pUI_Interactable = dynamic_cast<CUI_Interactable*>(m_pGameInstance->Add_CloneReturn(*m_pCurrentLevelID, L"Layer_UI", L"Prototype_GameObject_UI_Interactable"));
+	m_pUI_Interactable->Set_Owner(this);
+	m_pUI_Interactable->Set_Offset(7.f);
 
 	return S_OK;
 }
@@ -204,9 +207,13 @@ void CDeeDeeDee::Add_AnimEvent()
 
 void CDeeDeeDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+	static _bool bOnce = false;
+
 	// PARK로 이동하기 위한 다이얼로그 출력
 	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN)) //07.14) 키 변경 C > A
 	{
+		m_pUI_Interactable->Set_IsRender(false);
+
 		CUI_MessageWindow* pMWindow = dynamic_cast<CUI_MessageWindow*>
 			(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_DeeDeeDee")));
 		CHECK_NULLPTR(pMWindow);
@@ -214,8 +221,13 @@ void CDeeDeeDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 
 		CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 		CHECK_NULLPTR(pCameraMain);
-		pCameraMain->Lock_All({ -10.014f, 38.f, 30.908f }, { 0.f, -0.148f, 0.989f }, true);
+		pCameraMain->Lock_All({ -5.f, 39.f, 30.f }, { -0.3f, -0.2f, 0.93f }, true);
+
+		bOnce = true;
 	}
+
+	if (bOnce == false)
+		m_pUI_Interactable->Set_IsRender(true);
 }
 
 void CDeeDeeDee::Change_State(STATE_TYPE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)

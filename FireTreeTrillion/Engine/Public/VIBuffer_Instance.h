@@ -46,7 +46,7 @@ public:
 	virtual void Tail(_float fTimeDelta, VTXMATRIX* pVertices);
 
 	//중력을 적용한다.(velocity에 중력 값을 부여한다)
-	virtual void Gravity(_float fTimeDelta);
+	virtual void Gravity(_float fTimeDelta, VTXMATRIX* pVertices);
 
 	//중점 주위를 돈다.
 	virtual void Orbit(_float fTimeDelta, VTXMATRIX* pVertices);

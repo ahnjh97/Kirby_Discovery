@@ -81,6 +81,7 @@ HRESULT CLevel_Town::Initialize()
 	// 셰이더 트리거
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_TOWN);
+	m_pGameInstance->Set_ObjectBlack(1.f, .1f);
 
 	// 레벨전환 트리거
 	function<void(_int)> func = bind(&CLevel_Town::Change_Levels, this);
@@ -206,6 +207,22 @@ HRESULT CLevel_Town::Ready_Layer_BackGround(const wstring& strLayerTag)
 
 	HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &TownSkyDesc);
 	CHECK_FAILED(hr);
+
+	// 파크로 들어가는 입구 포탈
+	CGameObject::GAMEOBJECT_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+
+	_float4x4 InitMat = _float4x4::Identity;
+	
+	_float4x4 translationMatrix = XMMatrixTranslation(180.f, 23.23f, 99.f);
+	_float	  rotationY = XMConvertToRadians(85.f);
+	_float4x4 rotationMatrixY = XMMatrixRotationY(rotationY);
+
+	InitMat = rotationMatrixY * translationMatrix;
+	ObjDesc.matWorld = InitMat;
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Portal"), TEXT("Prototype_GameObject_PortalSoftEffect"), &ObjDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }

@@ -65,6 +65,7 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_TOWN);
+	m_pGameInstance->Set_ObjectBlack(1.f);
 
 
 	// DeeTest

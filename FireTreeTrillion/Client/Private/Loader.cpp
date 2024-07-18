@@ -207,6 +207,7 @@
 #include "UI_MessageWindow.h"
 #include "UI_BtnIcon.h"
 #include "UI_Fading.h"
+#include "UI_Interactable.h"
 
 // 아이템
 #include "Food.h"
@@ -396,6 +397,8 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_TransingStar"), CTransingStar);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Fading"), CUI_Fading);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Interactable"), CUI_Interactable);
 
 	//DIALOG
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Dialog"), CDialog);
@@ -1174,7 +1177,7 @@ HRESULT CLoader::Loading_For_FinalBoss()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Moon", "Moon.png")))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "Level_0_Env", "Map/Level_0_Env.dds")))
+	if (FAILED(Add_Texture(eLevel, "Level_Final_Env", "Map/Level_Final_Env.dds")))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "BRDF_LUT", "Map/BRDF_LUT.png")))
 		return E_FAIL;
@@ -1611,6 +1614,7 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultTop", "Effects/UI/MGameFood/result top.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultBottom", "Effects/UI/MGameFood/result bottom.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_TitleLogo", "Effects/UI/TitleLogo.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_TalkIconBalloon", "Effects/UI/TalkIconBalloon.png");	CHECK_FAILED(hr);
 
 	//파티클
 	hr = Add_Texture(LEVEL_STATIC, "FX_Rock", "Effects/Particle/rock_%d.png", 4);	CHECK_FAILED(hr);
@@ -1668,8 +1672,10 @@ HRESULT CLoader::Add_StaticUITexture()
 	hr = Add_Texture(LEVEL_STATIC, "UI_BtnIconBright", "UI/BtnIcon/BtnIcon_Bright.dds"); CHECK_FAILED(hr);
 
 	//UI_Fading
-	hr = Add_Texture(LEVEL_STATIC, "Fade", "UI/Fade.png");
-	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "Fade", "UI/Fade.png");	CHECK_FAILED(hr);
+
+	//UI_Interacting
+	hr = Add_Texture(LEVEL_STATIC, "UI_Interacting", "UI/Quest/TalkIconBalloon.png");	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -2033,7 +2039,13 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("Gimmick_PkFunHouseDarkness03", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Gimmick_PkFunHouseDarkness04", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Gimmick_PkFunHouseDarkness05", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		
+		//해당 모델 추후 삭제 필요 (아래 메쉬3개로 세분화)
 		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse06", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse06A", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse06B", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse06C", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Gimmick_PkFunHouse07", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		//기믹 오브젝트

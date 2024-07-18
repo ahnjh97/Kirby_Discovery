@@ -330,11 +330,11 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	{
 		//부슽 이펙트
 
-		CEffect::FX_DESC FXDesc{};
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = { 0.f, 3.5f, -10.f };
 		FXDesc.vInitScale = { 15.f, 15.f, 30.f };
 		FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
-		pKirby->Add_Effect("Come On Dash", FXDesc, true);
+		pKirby->Add_Effect("YW Come On Dash Dump", FXDesc, true);
 
 		DESC(m_bBooster) = true;
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
@@ -357,7 +357,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	if (DESC(m_fBoosterTime) <= 0.f)
 	{
 		DESC(m_bBooster) = false;
-		pKirby->Delete_Effect("Come On Dash");
+		pKirby->Delete_Effect("YW Come On Dash Dump");
 	}
 	//트럭방구
 	else
@@ -376,16 +376,16 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 			_float fScale = CUtils::Make_RandomFloat(1.5f, 3.f);
 			fxDesc.vInitScale = { fScale, fScale, fScale };
-			//pKirby->Add_Effect("dump dash smoke", fxDesc);
-			pKirby->Add_Effect("real dump smoke test", fxDesc);
+			pKirby->Add_Effect("dump dash smoke", fxDesc);
+			//pKirby->Add_Effect("real dump smoke test", fxDesc);
 			fxDesc.vInitPos = vCenterPos;
 			fxDesc.vInitPos -= (_float3)pTransformCom->Get_State(CTransform::STATE_RIGHT) * (2.3f + CUtils::Make_RandomFloat(-.2f, .2f));
 			fxDesc.vInitPos += (_float3)pTransformCom->Get_State(CTransform::STATE_UP) * 7.2f;
 
 			fScale = CUtils::Make_RandomFloat(1.5f, 3.f);
 			fxDesc.vInitScale = { fScale, fScale, fScale };
-			//pKirby->Add_Effect("dump dash smoke", fxDesc);
-			pKirby->Add_Effect("real dump smoke test", fxDesc);
+			pKirby->Add_Effect("dump dash smoke", fxDesc);
+			//pKirby->Add_Effect("real dump smoke test", fxDesc);
 			fBoostTime = 0.f;
 		}
 	}
@@ -446,11 +446,11 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	{
 		//부슽 이펙트
 		//ComeOn_Dash_For_Dump(pTransformCom);
-		CEffect::FX_DESC FXDesc{};
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = { 0.f, 3.5f, -10.f };
 		FXDesc.vInitScale = { 15.f, 15.f, 30.f };
 		FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
-		pKirby->Add_Effect("Come On Dash", FXDesc, true);
+		pKirby->Add_Effect("YW Come On Dash Dump", FXDesc, true);
 
 		//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 		DESC(m_bBooster) = true;
@@ -473,7 +473,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	if (DESC(m_fBoosterTime) <= 0.f)
 	{
 		DESC(m_bBooster) = false;
-		pKirby->Delete_Effect("Come On Dash");
+		pKirby->Delete_Effect("YW Come On Dash Dump");
 	}
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_LEFT, KEY_PRESS) == true)
@@ -715,7 +715,8 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 			MultiFXDesc.vInitPos = vMyPos;
 			MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
-			pKirby->Add_Effect("real dump smoke test", MultiFXDesc);
+			//pKirby->Add_Effect("real dump smoke test", MultiFXDesc);
+			pKirby->Add_Effect("dump smoke", MultiFXDesc);
 
 			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_dump smoke"), &MultiFXDesc)))
 			//	return;
@@ -791,10 +792,10 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (m_bShakeTrigger1)
 		{
-			CEffect::FX_DESC FXDesc{};
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
 			FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
-			pKirby->Add_Effect("Come On Dash", FXDesc, true);
+			pKirby->Add_Effect("YW Come On Dash Dump", FXDesc, true);
 			m_bShakeTrigger1 = false;
 		}
 

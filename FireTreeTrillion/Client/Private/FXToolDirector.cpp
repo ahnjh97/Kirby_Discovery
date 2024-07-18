@@ -1416,17 +1416,19 @@ void CFXToolDirector::Render_FXProperty()
 			pCurFX->Reset_Duration();
 			static_cast<CParticle*>(pCurFX)->Update_InstanceInfo();
 		}
-		SameLine();
-		if (Checkbox(u8"빌보딩", &pCurFX->m_bIsBillboard) && bIsParticle)
-		{
-			m_bPlayingBar = false;
-			pCurFX->Reset_Duration();
-			static_cast<CParticle*>(pCurFX)->Update_InstanceInfo();
-		}
+
 
 		//ui처럼 보이는 직교 이펙트
 		if (!bIsParticle)
 		{
+			SameLine();
+			if (Checkbox(u8"빌보딩", &pCurFX->m_bIsBillboard))
+			{
+				//m_bPlayingBar = false;
+				//pCurFX->Reset_Duration();
+				//static_cast<CParticle*>(pCurFX)->Update_InstanceInfo();
+			}
+
 			SameLine();
 			Checkbox(u8"직교", &pCurFX->m_bIsOrthographic);
 		}
@@ -2301,8 +2303,9 @@ void CFXToolDirector::Make_KeyframeList(_float _fWidth, _float _fInitialYPos, CE
 
 	for (auto& keyframe : _pCurFX->m_Keyframes[_eRenderProperty])
 	{
-		_float fRatio = (_pCurFX->m_fLifetime.first + (keyframe.fTimeRatio * (_pCurFX->m_fLifetime.second - _pCurFX->m_fLifetime.first)));
-		_float fPosX = fRatio * _fWidth / _pCurFX->m_fDuration.second;
+		//_float fRatio = (_pCurFX->m_fLifetime.first + (keyframe.fTimeRatio * (_pCurFX->m_fLifetime.second - _pCurFX->m_fLifetime.first)));
+		_float fRatio = keyframe.fTimeRatio;
+		_float fPosX = fRatio * _fWidth /*/ _pCurFX->m_fDuration.second*/;
 		ImVec2 vCurPos = vPos + ImVec2{ fPosX, 2.f };
 
 		GetWindowDrawList()->AddCircleFilled(vCurPos, 6.0f, IM_COL32(255, 255, 100, 255));

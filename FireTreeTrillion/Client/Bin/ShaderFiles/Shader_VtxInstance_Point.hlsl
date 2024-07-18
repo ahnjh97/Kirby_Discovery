@@ -283,9 +283,6 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN In)
     float fOldViewZ = vDepthDesc.y * g_fFar;
 
     Out.vColor.a = Out.vColor.a * saturate(fOldViewZ - In.vProjPos.w);
-    
-    if (0.01f <= Out.vColor.a)
-        Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
 	
     return Out;
 }
@@ -312,18 +309,9 @@ PS_OUT PS_FOG(PS_IN In)
     if (vDiffuse.a < .01f || ((vDiffuse.r + vDiffuse.g + vDiffuse.b) / 3 < 0.1f))
         discard;
     
-	 //소프트 이펙트 보정
-        float2 vTexcoord = (float2) 0.f;
 
-    vTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
-    vTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
-
-    float4 vDepthDesc = g_DepthTexture.Sample(PointSampler, vTexcoord);
-    float fOldViewZ = vDepthDesc.y * g_fFar;
-
-    Out.vColor.a = vDiffuse.a * saturate(fOldViewZ - In.vProjPos.w) * g_fAlpha;
+    Out.vColor.a = vDiffuse.a * g_fAlpha;
     Out.vColor.rgb = vDiffuse.rgb;
-    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     
     return Out;
 }
@@ -358,11 +346,11 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_DEFAULT_FX();
     }
 
-	// 화이트 이펙트 패스. 알파 테스팅 + 마스크 + no z text ( 2 )
+	// 화이트 이펙트 패스. 알파 테스팅 + 마스크( 2 )
     pass WhiteFX
     {
         SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
@@ -372,11 +360,11 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX();
     }
 
-	// 블렌드되는 이펙트. 알파 블렌딩 + 마스크 + 소프트 이펙트 ( 3 )
+	// 블렌드되는 이펙트. 알파 블렌딩 + 마스크( 3 )
     pass BlendFX
     {
         SetRasterizerState(RS_NonCull);
-        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();

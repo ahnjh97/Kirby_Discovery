@@ -44,6 +44,8 @@ namespace Engine
 	
 	typedef struct
 	{
+		_float3		vInitRot = { 0.f, 0.f, 0.f };
+		_float3		vInitScale = { 1.f, 1.f, 1.f };
 
 		//¼ö¸í
 		_float		fLifetime = { 1.f };

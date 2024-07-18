@@ -95,7 +95,10 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 		m_eGimmickType = GIMMICK_SURPRISE;
 	}
 
-	if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
+	//if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
+	if (TEXT("Gimmick_PkFunHouse06A") == wstrModelTag
+		|| TEXT("Gimmick_PkFunHouse06B") == wstrModelTag
+		|| TEXT("Gimmick_PkFunHouse06C") == wstrModelTag)
 	{
 		m_eDFieldType = DFMOVE_FRONTBACK;
 		m_eGimmickType = GIMMICK_SPCHARGE;
@@ -321,24 +324,25 @@ HRESULT CGm_DynamicField::SetUp_ShaderInfo(const wstring& _wstrModelTag)
 
 void CGm_DynamicField::Apply_Quake(_float _fTimeDelta, _float _fQuakeDuration, _float _fShakeIntensity)
 {
-	m_fQuakeTime += _fTimeDelta;
-	if (m_fQuakeTime <= _fQuakeDuration) //지진 지속시간 체크
+	if (m_bIsQuake)
 	{
-		_float fShakeValue = _fShakeIntensity * std::sin(m_fQuakeTime * 70.0f); //지진 강도(진폭) 설정
-		if (fShakeValue > 0)
-			m_pTransformCom->Go_Up(fShakeValue * _fTimeDelta);
+		m_fQuakeTime += _fTimeDelta;
+		if (m_fQuakeTime <= _fQuakeDuration) //지진 지속시간 체크
+		{
+			_float fShakeValue = _fShakeIntensity * std::sin(m_fQuakeTime * 70.0f); //지진 강도(진폭) 설정
+			if (fShakeValue > 0)
+				m_pTransformCom->Go_Up(fShakeValue * _fTimeDelta);
 
+			else
+				m_pTransformCom->Go_Down(-fShakeValue * _fTimeDelta);
+		}
 		else
-			m_pTransformCom->Go_Down(-fShakeValue * _fTimeDelta);
+			m_bIsQuake = FALSE;
 	}
-	/*
 	else
 	{
-		m_bIsQuake = FALSE;
 		m_fQuakeTime = 0.f;
-		vCurWorldPos.y = 36.963f;
 	}
-	*/
 }
 
 _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
@@ -356,14 +360,8 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				vCurPos.y = 56.963f; //위치 보정
 				m_bIsQuake = TRUE;
 
-				if (m_bIsQuake)
-					Apply_Quake(_fTimeDelta, 1.f, 0.1f);
+				Apply_Quake(_fTimeDelta, 1.f, 0.1f);
 
-				else
-				{
-					m_bIsQuake = FALSE;
-					m_fQuakeTime = 0.f;
-				}
 			}
 
 			else
@@ -377,29 +375,9 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 
 		if (m_bIsInteraction) //RayCast 상호작용 검사
 		{
-			/*
-			if (34.851f <= vCurPos.x) //24.851 > 34.851
+			if (19.460f >= vCurPos.x) //24.460 > 14.460
 			{
-				vCurPos.x = 34.851f;
-				m_bIsQuake = TRUE;
-
-				if (m_bIsQuake)
-					Apply_Quake(fTimeDelta, 1.f, 0.1f);
-			}
-
-			else
-				m_pTransformCom->Go_Right(fTimeDelta * 0.5f);
-			*/
-		}
-		break;
-	case DFMOVE_RIGHT:
-		vCurPos = GET_POS;
-
-		if (m_bIsInteraction) //RayCast 상호작용 검사
-		{
-			if (34.851f <= vCurPos.x) //24.851 > 34.851
-			{
-				vCurPos.x = 34.851f;
+				vCurPos.x = 19.460f;
 				m_bIsQuake = TRUE;
 
 				if (m_bIsQuake)
@@ -407,12 +385,29 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			}
 
 			else
-				//여기에다가 해당 애님의 상태가 종료되었을 경우 (index:: 5번, 6번)
-				m_pTransformCom->Go_Right(_fTimeDelta * 0.25f); //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
+				m_pTransformCom->Go_Left(_fTimeDelta * 0.5f);
+		}
+
+
+		break;
+	case DFMOVE_RIGHT:
+		vCurPos = GET_POS;
+
+		if (m_bIsInteraction) //RayCast 상호작용 검사
+		{
+			Apply_Quake(_fTimeDelta, 1.f, 0.1f);
+			if (29.851f <= vCurPos.x) //24.851 > 34.851
+			{
+				vCurPos.x = 29.851f;
+				m_bIsQuake = TRUE;
+			}
+
+			//원작의 경우는 0.25f 속도인데 좀 더 빠르게 변경
+			else
+				m_pTransformCom->Go_Right(_fTimeDelta * 0.5f); //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
 		}
 		//특정 애님 상태일 경우, 필드도 비활성 움직임 처리
-		/*
-		if ()
+		if (m_bIsReturnMove)
 		{
 			if (24.851f >= vCurPos.x)
 			{
@@ -424,10 +419,8 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			}
 
 			else
-				m_pTransformCom->Go_Left(_fTimeDelta * 0.5f);
+				m_pTransformCom->Go_Left(_fTimeDelta * 0.75f);
 		}
-		*/
-
 		break;
 
 	case DFMOVE_FRONTBACK:

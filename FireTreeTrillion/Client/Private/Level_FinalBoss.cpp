@@ -26,7 +26,7 @@ CLevel_FinalBoss::CLevel_FinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 HRESULT CLevel_FinalBoss::Initialize()
 {
-	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
 
 	HRESULT hr;
 	hr = __super::Initialize();
@@ -100,19 +100,86 @@ HRESULT CLevel_FinalBoss::Render()
 
 HRESULT CLevel_FinalBoss::Ready_Lights()
 {
-	//// 예시코드 1 : 태양광
+	
+	//Directional Light
+
+#pragma region DIRECTIONAL
+
 	LIGHT_DESC			LightDesc{};
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.f, -1.f, 0.f, 0.f);
 
-	LightDesc.vDiffuse = _float4(0.6f, 0.21f, 0.15f, 1.f);
-	LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
-	LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
+	LightDesc.vDiffuse = _float4(.5f, .1f, .1f, 1.f);
+	LightDesc.vAmbient = _float4(1.f, .15f, .1f, 1.f);
 
-	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+#pragma endregion
+
+
+	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({-650.f, 30000.f, 1200.f, 1.f});
+	m_pGameInstance->Setting_GodRay({ 0.f, 1250.f, 2000.f, 1.f });
+	m_pGameInstance->Set_ObjectBlack(.4f);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_FINAL);
+
+#pragma region POINTS
+
+	string strFileName = "../../../objects_txt/FinalBoss_Lights.txt";
+
+	ifstream fileInput(strFileName, ios::binary);
+	if (fileInput.is_open() == false)
+	{
+		MSG_BOX(TEXT("Failed to open : FinalBoss_Lights.txt"));
+		return E_FAIL;
+	}
+
+	_uint iNumObjects{};
+	fileInput.read(reinterpret_cast<char*>(&iNumObjects), sizeof(iNumObjects));
+
+	_uint iStrLength{};
+	string strModelName;
+	_float4x4 matWorld{};
+	_uint iShaderVars{};
+	_float fRimWidth{};
+
+	LIGHT_DESC			tPointLightDesc{};
+	tPointLightDesc.eType = LIGHT_DESC::TYPE_POINT;
+
+	// 지역 vector에 임시로 넣어두기
+	vector<LIGHT_DESC> vecLight;
+	for (_uint i = 0; i < iNumObjects; i++)
+	{
+		fileInput.read(reinterpret_cast<char*>(&iStrLength), sizeof(iStrLength));
+		strModelName.resize(iStrLength);
+		fileInput.read(&strModelName[0], iStrLength);
+		fileInput.read(reinterpret_cast<char*>(&matWorld), sizeof(_float4x4));
+		fileInput.read(reinterpret_cast<char*>(&iShaderVars), sizeof(iShaderVars));
+		fileInput.read(reinterpret_cast<char*>(&fRimWidth), sizeof(fRimWidth));
+
+		tPointLightDesc.fRange = fRimWidth;
+		tPointLightDesc.vDiffuse = _float4(matWorld._11, matWorld._12, matWorld._13, 1.f);
+		tPointLightDesc.vAmbient = _float4(matWorld._21, matWorld._22, matWorld._23, 1.f);
+		tPointLightDesc.vSpecular = _float4(matWorld._31, matWorld._32, matWorld._33, 1.f);
+		tPointLightDesc.vPosition = _float4(matWorld._41, matWorld._42, matWorld._43, 1.f);
+
+		vecLight.push_back(tPointLightDesc);
+	}
+
+	// z값으로 정렬
+	sort(vecLight.begin(), vecLight.end(), [](const LIGHT_DESC& a, const LIGHT_DESC& b) {
+		return a.vPosition.z <= b.vPosition.z;
+		});
+
+	// 정렬된 vector에서 light를 하나씩 꺼내어, 진짜 Light_Manager에게 보내기
+	for (auto& tLight : vecLight)
+	{
+		HRESULT hr = CGameInstance::Get_Instance()->Add_Light(tLight);
+		CHECK_FAILED(hr);
+	}
+
+	fileInput.close();
+
+#pragma endregion
 
 	return S_OK;
 }
@@ -784,7 +851,7 @@ HRESULT CLevel_FinalBoss::Add_EnvMap()
 {
 	HRESULT hr;
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Level_0_Env"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Level_Final_Env"),
 		TEXT("Com_Texture1"), (CComponent**)&m_pEnvTexture[TYPE_ENV]);
 	CHECK_FAILED(hr);
 
