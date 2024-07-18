@@ -99,6 +99,8 @@ public:
 		STATE			m_ePreAttackState = { SWORDSTATE_DECISIVESLASH };
 		_bool			m_bWalkingCharge = { true };
 		_bool			m_bUpWardSlash = { false };
+		_bool			m_bSwordCharge1 = { true };
+		_bool			m_bSwordCharge2 = { true };
 
 		// Ability Bomb
 		// 폭탄을 들고 있어야하는 상황인가?

@@ -29,7 +29,6 @@ _int CItemObject::Tick(_float fTimeDelta)
 {
     __super::Tick(fTimeDelta);
 
-
     return OBJ_NOEVENT;
 }
 

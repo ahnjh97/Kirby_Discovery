@@ -73,6 +73,7 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
         return E_FAIL;
 
     m_fOffsetTurn = 2.f;
+    m_bUpdate_FXSocketMatrix = false;
 
     return S_OK;
 }
