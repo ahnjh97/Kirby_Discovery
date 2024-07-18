@@ -825,7 +825,7 @@ void CKirbySword_ChargeSpin_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 	break;
 	case CKirby::SWORDSTATE_GIGANTSPINSLASH:
 	{
-		SwordSpinSlash_One(pKirby->Get_TransformCom());
+		SwordSpinSlash_Two(pKirby->Get_TransformCom());
 	}
 	break;
 	case CKirby::SWORDSTATE_SUPERSPINSLASHCHARGE:

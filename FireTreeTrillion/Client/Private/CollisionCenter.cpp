@@ -204,11 +204,10 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 			CTransform* pConeTransform = Src->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
 			vConeLookDir.Normalize();
-			_float2 vDir = XMVector2Normalize(vDstXZ - vSrcXZ);
-			_float2 vConeDir = XMVector2Normalize(_float2(vConeLookDir.x, vConeLookDir.z));
+			_float4 vDir = XMVector3Normalize(vDstPos - vSrcPos);
 
 			// 중점간의 각도를 구하였다.
-			_float fAngle = ToDegree(acos(vConeDir.Dot(vDir)));
+			_float fAngle = ToDegree(acos(vConeLookDir.Dot(vDir)));
 
 			// 만약, 실제 앵글의 범위가 내가 설정한 각도보다 작을 경우
 			if (fAngle < pSrcDesc->fAngle * 0.5f)
@@ -286,11 +285,10 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 			CTransform* pConeTransform = Src->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
 			vConeLookDir.Normalize();
-			_float2 vDir = XMVector2Normalize(vDstXZ - vSrcXZ);
-			_float2 vConeDir = XMVector2Normalize(_float2(vConeLookDir.x, vConeLookDir.z));
+			_float4 vDir = XMVector3Normalize(vDstPos - vSrcPos);
 
 			// 중점간의 각도를 구하였다.
-			_float fAngle = ToDegree(acos(vConeDir.Dot(vDir)));
+			_float fAngle = ToDegree(acos(vConeLookDir.Dot(vDir)));
 
 			// 만약, 실제 앵글의 범위가 내가 설정한 각도보다 작을 경우
 			if (fAngle < pSrcDesc->fAngle * 0.5f)
@@ -326,11 +324,10 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 			CTransform* pConeTransform = Dst->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
 			vConeLookDir.Normalize();
-			_float2 vDir = XMVector2Normalize(vSrcXZ - vDstXZ);
-			_float2 vConeDir = XMVector2Normalize(_float2(vConeLookDir.x, vConeLookDir.z));
+			_float4 vDir = XMVector3Normalize(vSrcPos - vDstPos);
 
 			// 중점간의 각도를 구하였다.
-			_float fAngle = ToDegree(acos(vConeDir.Dot(vDir)));
+			_float fAngle = ToDegree(acos(vConeLookDir.Dot(vDir)));
 
 			// 만약, 실제 앵글의 범위가 내가 설정한 각도보다 작을 경우
 			if (fAngle < pDstDesc->fAngle * 0.5f)
@@ -359,11 +356,10 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 			CTransform* pConeTransform = Dst->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
 			vConeLookDir.Normalize();
-			_float2 vDir = XMVector2Normalize(vSrcXZ - vDstXZ);
-			_float2 vConeDir = XMVector2Normalize(_float2(vConeLookDir.x, vConeLookDir.z));
+			_float4 vDir = XMVector3Normalize(vSrcPos - vDstPos);
 
 			// 중점간의 각도를 구하였다.
-			_float fAngle = ToDegree(acos(vConeDir.Dot(vDir)));
+			_float fAngle = ToDegree(acos(vConeLookDir.Dot(vDir)));
 
 			// 만약, 실제 앵글의 범위가 내가 설정한 각도보다 작을 경우
 			if (fAngle < pDstDesc->fAngle * 0.5f)

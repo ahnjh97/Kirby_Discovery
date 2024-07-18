@@ -60,7 +60,9 @@ public:
 	}
 
 
-	_float	Get_Hp() { return m_fHp; }
+	_float	Get_Hp() { 
+		return m_fHp; 
+	}
 	_float	Get_MaxHp() { return m_fMaxHp; }
 	_uint Get_State();
 
