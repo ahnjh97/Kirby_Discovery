@@ -1,0 +1,163 @@
+#include "stdafx.h"
+#include "SimbaLaser.h"
+#include "HitBox.h"
+
+CSimbaLaser::CSimbaLaser(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	: CGameObject{ pDevice, pContext }
+{
+}
+
+CSimbaLaser::CSimbaLaser(const CSimbaLaser& rhs)
+	: CGameObject{ rhs }
+{
+}
+
+HRESULT CSimbaLaser::Initialize_Prototype()
+{
+	return S_OK;
+}
+
+HRESULT CSimbaLaser::Initialize(void* pArg)
+{
+	GAMEOBJECT_DESC* Desc = { nullptr };
+
+	if (pArg != nullptr) {
+		Desc = (GAMEOBJECT_DESC*)pArg;
+		Desc->fSpeedPerSec = 7.f;
+		Desc->fRotationPerSec = XMConvertToRadians(90.f);
+	}
+	
+	if (FAILED(__super::Initialize(Desc)))
+		return E_FAIL;
+
+	if (FAILED(Add_Components(Desc->wstrModelName)))
+		return E_FAIL;
+
+	m_bMotionBlur = false;
+	m_bRimLight = false;
+
+	return S_OK;
+}
+
+_int CSimbaLaser::Tick(_float fTimeDelta)
+{
+	if (true == m_bDead)
+		return OBJ_DEAD;
+
+	return OBJ_NOEVENT;
+}
+
+void CSimbaLaser::Late_Tick(_float fTimeDelta)
+{
+	if (true == m_bHide)
+		return;
+
+	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), 1, -90.f);
+	_float fScale = 10.f;
+	m_pTransformCom->Set_Scaled(_float3(fScale, fScale, fScale));
+
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+}
+
+HRESULT CSimbaLaser::Render()
+{
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+			return E_FAIL;
+
+		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+		if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_X)))
+			return E_FAIL;
+
+		m_pModelCom->Render(i);
+	}
+
+	return S_OK;
+}
+
+HRESULT CSimbaLaser::Add_Components(const wstring& _wstrModelName)
+{
+	HRESULT hr;
+
+	/* For.Com_Shader */
+	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
+		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
+	CHECK_FAILED(hr);
+
+	wstring wstrModelTag = TEXT("Prototype_Component_Model_SimbaLaser");
+	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	CHECK_FAILED(hr);
+
+	CHitBox::HITBOX_DESC tAttack{};
+	tAttack.pOwner = this;
+	tAttack.pDesc = &m_tColliderDesc[ATTACK];
+	tAttack.pCollisionType = HITBOX_SIMBA;
+
+	return S_OK;
+}
+
+HRESULT CSimbaLaser::Bind_ShaderResources()
+{
+	if (nullptr == m_pShaderCom)
+		return E_FAIL;
+
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+CSimbaLaser* CSimbaLaser::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+	CSimbaLaser* pInstance = new CSimbaLaser(pDevice, pContext);
+
+	if (FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSG_BOX(TEXT("Failed To Create : CSimbaLaser"));
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CGameObject* CSimbaLaser::Clone(void* pArg)
+{
+	CSimbaLaser* pInstance = new CSimbaLaser(*this);
+
+	if (FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX(TEXT("Failed To Clone : CSimbaLaser"));
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+void CSimbaLaser::Free()
+{
+	__super::Free();
+
+	Safe_Release(m_pTextureCom);
+	Safe_Release(m_pModelCom);
+	Safe_Release(m_pShaderCom);
+}

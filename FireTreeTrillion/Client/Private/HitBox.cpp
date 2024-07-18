@@ -71,6 +71,16 @@ _int CHitBox::Tick(_float fTimeDelta)
 		pWorldMatrix._42 = matBoneWorld._42 + m_pOwnerCollisionDesc->fOffSetY;
 		pWorldMatrix._43 = matBoneWorld._43;
 	}
+	else if (_float3() != m_pOwnerCollisionDesc->vOffset)
+	{
+		_float3 vOffset = m_pOwnerCollisionDesc->vOffset;
+		pWorldMatrix = m_pOwnerTransform->Get_WorldFloat4x4();
+		CUtils::Set_Scaled_Matrix(pWorldMatrix, 1.f, 1.f, 1.f);
+		_float4 vRight = m_pOwnerTransform->Get_State(CTransform::STATE_RIGHT) * vOffset.x;
+		_float4 vUp = m_pOwnerTransform->Get_State(CTransform::STATE_UP) * vOffset.y;
+		_float4 vLook = m_pOwnerTransform->Get_State(CTransform::STATE_LOOK) * vOffset.z;
+
+	}
 	else
 	{
 		pWorldMatrix = m_pOwnerTransform->Get_WorldFloat4x4();

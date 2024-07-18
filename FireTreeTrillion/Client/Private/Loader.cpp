@@ -150,6 +150,7 @@
 
 // Simba
 #include "Simba.h"
+#include "SimbaLaser.h"
 
 // 피날레 스테이지 기믹들
 #include "Baum.h"
@@ -562,6 +563,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OriginCage"), COriginCage);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Simba"), CSimba);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaLaser"), CSimbaLaser);
 #pragma endregion
 
 #pragma endregion
@@ -2127,6 +2129,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Boss 
 		m_vecModelInfo.emplace_back("Simba", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("SimbaLaser", TYPE_NONANIM);
 
 		// For Item
 		Load_ItemModels();

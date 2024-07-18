@@ -703,6 +703,9 @@
     <Filter Include="02.GameObjects\UI\Interactable">
       <UniqueIdentifier>{58d57529-1fa3-4790-acf3-59d50bd2b31c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Simba\SimbaLaser">
+      <UniqueIdentifier>{42035ce9-5d3d-45ba-b6f6-1ecbf083be9c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1396,6 +1399,9 @@
     <ClInclude Include="..\Public\UI_Interactable.h">
       <Filter>02.GameObjects\UI\Interactable</Filter>
     </ClInclude>
+    <ClInclude Include="SimbaLaser.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -2069,6 +2075,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_Interactable.cpp">
       <Filter>02.GameObjects\UI\Interactable</Filter>
+    </ClCompile>
+    <ClCompile Include="SimbaLaser.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

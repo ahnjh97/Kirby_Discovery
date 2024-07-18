@@ -57,6 +57,7 @@ private:
 	COLLISION_VALUE     m_eValue = { VALUE_END };
 	_float4x4			m_matFixed = _float4x4();
 	_float3				m_vBoneOffset = {};
+	_float3				m_vOffset = _float3();
 
 public:
 	static CHitBox* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

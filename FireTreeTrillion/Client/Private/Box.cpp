@@ -157,7 +157,7 @@ void CBox::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObj
 	if (true == m_bPlayAnim)
 		return;
 
-	if (eContent == CCollisionCenter::CONTENT_ATTACK)
+	if (eContent == CCollisionCenter::CONTENT_ATTACK || eContent == CCollisionCenter::CONTENT_ATTACKBULLET)
 	{
 		CKirby* pKirby = static_cast<CKirby*>(pObject);
 		if (pKirby == nullptr)

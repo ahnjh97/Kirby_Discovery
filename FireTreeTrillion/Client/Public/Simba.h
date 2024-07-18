@@ -89,6 +89,7 @@ public:
 	void ChangeDimensionClawUpDown() { m_bDimensionClawUpAttack = !m_bDimensionClawUpAttack; }
 	void Set_StarPosToRightHand() { m_bBiteRushSpawnStarAtLeft = false; }
 	void Set_StarPosToLeftHand() { m_bBiteRushSpawnStarAtLeft = true; }
+	void Set_LaserActivation(_bool bLaserActivation) { m_bLaserActivated = bLaserActivation; }
 
 public:
 	virtual HRESULT Initialize_Prototype()			override;
@@ -108,7 +109,6 @@ public:
 	_bool			IsAnimFinished() { return m_pModelCom->IsFinished(); }
 	_bool			IsAnimFinished(_uint iCurrentAnimIndex) { return m_pModelCom->IsFinished(iCurrentAnimIndex); }
 	void			CreateHpBar();
-	void			Turn_RotationBoneMatrix(_float fAngle);
 	void			SpawnStar(_uint iAnimIdx);
 	_bool			IsKirbyOnMyLeft();
 
@@ -116,10 +116,12 @@ private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
 	CGameObject*	m_pKirby = { nullptr };
 	class CBone*	m_pLipBone = { nullptr };
-	class CBone*	m_pRotationBone = { nullptr };
-	_float4x4*		m_pRotationBoneMatrix = { nullptr };
 	class CBone*	m_pLeftHandBone = { nullptr };
 	class CBone*	m_pRightHandBone = { nullptr };
+	class CBone*	m_pLaserBone = { nullptr };
+	const _float4x4* m_pLaserBoneMatrix = { nullptr };
+	CGameObject*	m_pSimbaLaser = { nullptr };
+	CTransform*		m_pSimbaLaserTransform = { nullptr };
 
 	SIMBA_ANIM		m_eCurrentState = { SIMBA_END };
 	SIMBA_ANIM		m_ePreState = { SIMBA_END };
@@ -157,6 +159,8 @@ private:
 	_bool			m_bDimensionClawUpAttack = { false };
 	_bool			m_bBiteRushSpawnStarAtLeft = { true };
 
+	_bool			m_bLaserActivated = { false };
+
 private:
 	HRESULT		Add_Components();
 	HRESULT		Bind_ShaderResources();
@@ -182,6 +186,7 @@ private:
 	void		DetermineSimbaRotation();
 	void		TurnSimba(_float fAngle);
 	void		ResetRotation();
+	void		LaserAttack();
 
 public:
 	static CSimba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

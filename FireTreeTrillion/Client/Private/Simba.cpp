@@ -125,9 +125,9 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_pLipBone = m_pModelCom->Get_BonePtr("T_LLip0J");
 	Safe_AddRef(m_pLipBone);
 
-	m_pRotationBone = m_pModelCom->Get_BonePtr("TopL");
-	Safe_AddRef(m_pRotationBone);
-	m_pRotationBoneMatrix = m_pRotationBone->Get_EditMatrixPtr();
+	m_pLaserBone = m_pModelCom->Get_BonePtr("LaserL");
+	Safe_AddRef(m_pLaserBone);
+	m_pLaserBoneMatrix = m_pLaserBone->Get_CombinedTransformationMatrix();
 
 	m_pLeftHandBone = m_pModelCom->Get_BonePtr("L_HaveL");
 	Safe_AddRef(m_pLeftHandBone);
@@ -141,6 +141,8 @@ HRESULT CSimba::Initialize(void* pArg)
 
 	SetCamSequence(CCamera_Main::SEQ_SIMBA_START);
 
+	m_bLaserActivated = true;
+
 	return S_OK;
 }
 
@@ -152,6 +154,9 @@ _int CSimba::Tick(_float fTimeDelta)
 	m_fHpRatio =  m_fHp / m_fMaxHp;
 
 	ResetRotation();
+
+	if (true == m_bLaserActivated)
+		LaserAttack();
 
 	if (true == m_pModelCom->IsFinished() || m_pModelCom->Get_Trackposition() == 0.f) // IsAnimFinished
 		Reset_HitBoxTimingMap(SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex()));
@@ -195,14 +200,12 @@ _int CSimba::Tick(_float fTimeDelta)
 	if (m_fHp <= 0.f && false == m_bDeathAnimPlayed)
 	{
 		m_bDeathAnimPlayed = true;
-		Turn_RotationBoneMatrix(0.f);
 		TransformToDefault(0.f);
 		Change_State(Simba_Death, 2.f, false, true);
 	}
 
 	if (0.6f > m_fHpRatio && 0.f < m_fHpRatio && m_bPhaseTwo == false) {
 		m_bPhaseTwo = true;
-		Turn_RotationBoneMatrix(-2.5f);
 		Change_State(Simba_Damage, 50.f, false, true);
 	}
 
@@ -213,6 +216,9 @@ _int CSimba::Tick(_float fTimeDelta)
 
 void CSimba::Late_Tick(_float fTimeDelta)
 {
+	if (m_pSimbaLaser != nullptr && true == m_bLaserActivated)
+		m_pSimbaLaser->Late_Tick(fTimeDelta);
+
 	_bool bIsFinished = m_pModelCom->IsFinished();
 	m_pModelCom->Play_Animation(m_fTimeDelta);
 
@@ -382,19 +388,6 @@ void CSimba::CreateHpBar()
 	}
 }
 
-void CSimba::Turn_RotationBoneMatrix(_float fAngle)
-{
-	/*_float4x4 RotationMatrix = _float4x4::Identity;
-	if (0 == fAngle) 
-	{
-		*m_pRotationBoneMatrix = RotationMatrix;
-		return;
-	}
-
-	CUtils::Turn_OtherMatrix(RotationMatrix, _float4(1, 0, 0, 0), 1.f, fAngle);
-	*m_pRotationBoneMatrix = RotationMatrix;*/
-}
-
 void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 {
 	_float4x4 matBoneWorld{};
@@ -402,6 +395,7 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 	CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
 	AbilityItemDesc.fAngle = 0.f;
 	AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+
 	if (Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx)
 	{
 		matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone);
@@ -715,7 +709,6 @@ HRESULT CSimba::Add_Components()
 	tAttack.pDesc = &m_tColliderDesc[ATTACK]; // Left Hand
 	tAttack.pCollisionType = HITBOX_SIMBA;
 	tAttack.pSocket = m_pModelCom->Get_BonePtr("L_HaveL");
-	//tAttack.vBoneOffset = _float3(0, 0, -3);
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
 		return E_FAIL;
 	
@@ -729,12 +722,14 @@ HRESULT CSimba::Add_Components()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
 		return E_FAIL;
 
-	//Activate_SphereCollider(0.f, 4.5f);
-	//Activate_SphereCollider(0.f, 4.5f, ATTACK2);
-	//Activate_SphereCollider(2.f, 8.f, ATTACK3);
 	Activate_FrustumCollider(0.f, 8.f, 150.f, ATTACK);
 	Activate_FrustumCollider(0.f, 8.f, 150.f, ATTACK2);
 	Activate_FrustumCollider(0.f, 11.5f, 150.f, ATTACK3);
+
+	m_pSimbaLaser = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_SimbaLaser"));
+	m_pSimbaLaserTransform = m_pSimbaLaser->Get_TransformCom();
+	Safe_AddRef(m_pSimbaLaserTransform);
+
 	return S_OK;
 }
 
@@ -1018,6 +1013,8 @@ void CSimba::DetermineSimbaRotation()
 {
 	m_fAngle = 0.f;
 	_uint iState = Get_State();
+	_float fAnimRatio = m_pModelCom->Get_AnimRatio();
+
 	for (_uint i = 0; i < ROTATION_END; i++)
 	{
 		if (m_mapRotation[i].end() != m_mapRotation[i].find(SIMBA_ANIM(iState)))
@@ -1041,6 +1038,17 @@ void CSimba::DetermineSimbaRotation()
 
 	if (Simba_Damage == iState)
 		TurnSimba(-2.5f);
+
+	if (Simba_DimensionLaserStart == iState)
+	{
+		if (0.2f > fAnimRatio) {
+			_float fRatio = RATIO(fAnimRatio, 0.f, 0.2f);
+			_float fStart = BiteRush;
+			fRatio = EASE_OUT(fRatio);
+			_float fAngle = LERP(fStart, 0, fRatio);
+			TurnSimba(fAngle);
+		}
+	}
 }
 
 void CSimba::TurnSimba(_float fAngle)
@@ -1053,6 +1061,12 @@ void CSimba::TurnSimba(_float fAngle)
 void CSimba::ResetRotation()
 {
 	m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), -1, -m_fAngle);
+}
+
+void CSimba::LaserAttack()
+{
+	m_pSimbaLaserTransform->Set_WorldMatrix(m_pTransformCom->ComputeBoneWorldMatrix(m_pLaserBone));
+	m_pSimbaLaser->Activate_Attack();
 }
 
 CSimba* CSimba::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -1086,10 +1100,12 @@ void CSimba::Free()
 {
 	CEventCenter::Get_Instance()->Unsubscribe(this);
 	Safe_Release(m_pLipBone);
-	Safe_Release(m_pRotationBone);
+	Safe_Release(m_pLaserBone);
 	Safe_Release(m_pLeftHandBone);
 	Safe_Release(m_pRightHandBone);
 	Safe_Release(m_pKirby);
+	Safe_Release(m_pSimbaLaserTransform);
+	Safe_Release(m_pSimbaLaser);
 
 	__super::Free();
 
