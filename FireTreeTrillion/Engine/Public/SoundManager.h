@@ -30,8 +30,17 @@ public:
 	int  BGMVolumeUp(_float _vol);
 	int  BGMVolumeDown(_float _vol);
 	int  Pause(CHANNELID eID);
+	void Pause(CHANNELID eID, _bool bStop);
+	_bool IsChannelPaused(CHANNELID eID);
+
 	void PlayMySound(TCHAR* pSoundKey, CHANNELID eID, _float _vol);
 	void PlayBGM(TCHAR* pSoundKey);
+	void PlayBGM(CHANNELID eID, TCHAR* pSoundKey);
+
+	void PlaySmoothUp(CHANNELID eID, _float targetVolume, _float fAddValue);
+	void PlaySmoothDown(CHANNELID eID, _float targetVolume, _float fMinusValue);
+	void PlaySmoothKill(CHANNELID eID, _float fMinusValue);
+
 	void StopSound(CHANNELID eID);
 	void StopAll();
 	void PlaySound_Free(TCHAR* pSoundKey, _float fvolume);
@@ -40,6 +49,8 @@ public:
 
 	void ApplyLowPass(_bool bSet);
 	void AddLowPass();
+
+	wstring Get_CurSound(CHANNELID eID);
 
 private:
 	float m_volume = SOUND_DEFAULT;
@@ -51,6 +62,8 @@ private:
 
 private:
 	void LoadSoundFile();
+	void LoadSoundFile(const char* szDir);
+	void LoadSoundFile(const wchar_t* szDir);
 
 private:
 	// 사운드 리소스 정보를 갖는 객체 
