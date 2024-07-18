@@ -187,8 +187,14 @@ private:
 
 	//이펙트용 컴포넌트 준비 작업
 	HRESULT	Ready_FXPrototypeVector();
+
+	void MoveTo_TrashBin(string& filePath);
+
 	//컴포넌트 맵에서 검색 문자열과 동일한 친구들을 찾아 벡터에 저장한다.
 	void Ready_Ingredient(wstring wstrSearchTag, vector<char*>* vecCombo, CComponent_Manager::PROTOTYPES* comMap);
+
+	//void FilteredCombo(const char* label, int* current_item, const vector<char*>& items);
+
 
 	HRESULT Add_Components();
 

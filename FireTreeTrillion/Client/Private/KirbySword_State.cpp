@@ -818,20 +818,20 @@ void CKirbySword_ChargeSpin_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 
 	switch (_iAnimIndex)
 	{
-	case CKirby::SWORDSTATE_SPINSLASHCHARGE:
-	{
-		SwordSpinCharge(pKirby->Get_TransformCom());
-	}
+	//case CKirby::SWORDSTATE_SPINSLASHCHARGE:
+	//{
+	//	SwordSpinCharge(pKirby->Get_TransformCom());
+	//}
 	break;
 	case CKirby::SWORDSTATE_GIGANTSPINSLASH:
 	{
 		SwordSpinSlash_Two(pKirby->Get_TransformCom());
 	}
 	break;
-	case CKirby::SWORDSTATE_SUPERSPINSLASHCHARGE:
-	{
-		SwordSpinCharge(pKirby->Get_TransformCom());
-	}
+	//case CKirby::SWORDSTATE_SUPERSPINSLASHCHARGE:
+	//{
+	//	SwordSpinCharge(pKirby->Get_TransformCom());
+	//}
 	break;
 	case CKirby::SWORDSTATE_SUPERSPINSLASHLOOP:
 	{
@@ -856,6 +856,13 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 기본 차징 모션이다. 
 	if (pKirby->Get_State() == CKirby::SWORDSTATE_SPINSLASHCHARGE)
 	{
+		if (DESC(m_bSwordCharge1) == true)
+		{
+			SwordSpinCharge(pKirby->Get_TransformCom());
+			DESC(m_bSwordCharge1) = false;
+		}
+
+
 		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 		DESC(m_bWalkingCharge) = true;
 
@@ -909,6 +916,13 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 슈퍼차징 시작애님.
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SUPERSPINSLASHCHARGESTART)
 	{
+
+		if (DESC(m_bSwordCharge2) == true)
+		{
+			SwordSpinChargeBig(pKirby->Get_TransformCom());
+			DESC(m_bSwordCharge2) = false;
+		}
+
 		DESC(m_bWalkingCharge) = false;
 
 		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
@@ -1124,6 +1138,8 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 덜 차징 회전베기이다. 약하게 이동이 가능하다.
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_GIGANTSPINSLASH)
 	{
+		DESC(m_bSwordCharge1) = true;
+		DESC(m_bSwordCharge2) = true;
 
 		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
 		{
@@ -1208,6 +1224,9 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 슈퍼 스핀의 시작단계
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SUPERSPINSLASHSTART)
 	{
+		DESC(m_bSwordCharge1) = true;
+		DESC(m_bSwordCharge2) = true;
+
 		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
 		{
 			DESC(m_fMoveSpeed) += fTimeDelta * 30.f;

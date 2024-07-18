@@ -87,9 +87,25 @@ void CAnimDeco::HideModel()
 			CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 
 			MultiFXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			MultiFXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			_float fScale = CUtils::Make_RandomFloat(0.6f, 0.7f);
+			MultiFXDesc.vInitScale = { fScale, fScale, fScale };
+			MultiFXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
+
 			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Bush Cut"), &MultiFXDesc)))
 				return;
+
+			fScale = CUtils::Make_RandomFloat(1.f, 1.1f);
+			MultiFXDesc.vInitScale = { fScale, fScale, fScale };
+			MultiFXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Bush Cut"), &MultiFXDesc)))
+				return;
+
+			fScale = CUtils::Make_RandomFloat(1.4f, 1.5f);
+			MultiFXDesc.vInitScale = { fScale, fScale, fScale };
+			MultiFXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Bush Cut"), &MultiFXDesc)))
+				return;
+
 		}
 
 		Set_Dead();
