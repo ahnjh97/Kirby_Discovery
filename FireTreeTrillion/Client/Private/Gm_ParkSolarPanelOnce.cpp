@@ -60,8 +60,9 @@ HRESULT CGm_ParkSolarPanelOnce::Initialize(void* pArg)
 
 _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 {
-	//if (TRUE == m_bDead)
-	//	return OBJ_DEAD;
+	if (TRUE == m_bDead)
+		return OBJ_DEAD;
+
 	_float fAnimRatio = { 0.f };
 	switch (m_eCurState)
 	{
@@ -85,6 +86,9 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 		break;
 		
 	case STATE_ONWAIT: //충전 완료
+		if (4 == m_iGimmickIndex) //크래시 능력 몬스터를 생성
+			_uint iA = 10;
+
 		break; 
 	case STATE_NONE:	
 		break;
