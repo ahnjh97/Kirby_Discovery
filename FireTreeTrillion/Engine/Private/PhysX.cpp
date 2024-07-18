@@ -84,7 +84,8 @@ HRESULT CPhysX::Initialize()
 
 void CPhysX::Tick(_float fTimeDelta)
 {
-    m_pScene->simulate(fTimeDelta);
+
+    m_pScene->simulate(CGameInstance::Get_Instance()->Get_SecondTimer());
     m_pScene->fetchResults(true);
 
     //CheckPvdConnection(m_pPvd);

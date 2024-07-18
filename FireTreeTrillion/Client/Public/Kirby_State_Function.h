@@ -1378,6 +1378,8 @@ static void SwordSpinCharge(CTransform* pTransformCom)
 	FXDesc.vInitScale = { 4.f, 4.f, 4.f };
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword_Copy Bubble_One"), &FXDesc)))
 		return;
+
+
 }
 
 static void SwordSpinSlash_One(CTransform* pTransformCom)
