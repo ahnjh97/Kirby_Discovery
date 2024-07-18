@@ -124,12 +124,12 @@ void CSimba_Walk::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	_float fDis = m_pGameInstance->Compute_Distance(m_pKirby, pGameObject);
 	if (fDis < 6.5f)
 	{
-		//pSimba->Change_State(CSimba::Simba_DimensionClawStart, 50.f, false, true); // µð¹ö±ë¿ë
+		pSimba->Change_State(CSimba::Simba_DimensionClawStart, 60, false, true); // µð¹ö±ë¿ë
 		
-		if (0 == CUtils::Make_RandomInt(0, 1))
+		/*if (0 == CUtils::Make_RandomInt(0, 1))
 			pSimba->Change_State(CSimba::Simba_QuickClawStartL, 66.66f, false, true);
 		else
-			pSimba->Change_State(CSimba::Simba_QuickClawStartR, 66.66f, false, true);
+			pSimba->Change_State(CSimba::Simba_QuickClawStartR, 66.66f, false, true);*/
 	}
 	else
 	{
@@ -258,6 +258,8 @@ void CSimba_FinalCrusher::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _floa
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	s_fOffsetY = -0.7f;
+	if(CSimba::Simba_FinalCrusher == _iAnimIndex)
+		m_bStarSpawned = false;
 }
 
 void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -270,9 +272,18 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	_float fAnimRatio = pSimba->Get_AnimRatio();
 	if(CSimba::Simba_FinalCrusherStart == iState && (0.3f > fAnimRatio || 0.93f < fAnimRatio ))
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
-	else if(CSimba::Simba_FinalCrusher == iState && 0.07f > fAnimRatio )
-		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 9.f);
+	else if (CSimba::Simba_FinalCrusher == iState)
+	{
+		if(0.07f > fAnimRatio)
+			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 9.f);
 
+		if (0.125f < fAnimRatio && false == m_bStarSpawned)
+		{
+			m_bStarSpawned = true;
+			pSimba->SpawnStar(iState);
+		}
+	}
+		
 	if (true == pSimba->IsAnimFinished())
 	{
 		switch (iState)
@@ -281,6 +292,8 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			pSimba->Change_State(CSimba::Simba_FinalCrusherEnd, 66.66f, false, false);
 			break;
 		case CSimba::Simba_FinalCrusherEnd:
+			//pSimba->Change_State(CSimba::Simba_FinalCrusherStart, 60, false, true); // µð¹ö±ë¿ë
+
 			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 15.f) {
 				pSimba->Set_PreState(iState);
 				//if(0 == CUtils::Make_RandomInt(0, 1))
@@ -290,8 +303,8 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			}
 			else
 				pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 50.f, false, true);
-			break;
 
+			break;
 		case CSimba::Simba_FinalCrusherStart: // After Jump
 			pSimba->Change_State(CSimba::Simba_FinalCrusher, 66.66f, false, false);
 			break;
@@ -304,6 +317,8 @@ void CSimba_DoubleClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float 
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	s_fOffsetY = -0.7f;
+	if(CSimba::Simba_DoubleClaw == _iAnimIndex)
+		m_bStarSpawned = false;
 }
 
 void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -329,9 +344,18 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		if (fDis < 8.5f)
 			pSimba->Change_State(CSimba::Simba_DoubleClaw, 60.f, false, false);
 	}
-	else if(CSimba::Simba_DoubleClaw == iState && fAnimRatio < 0.2f)
-		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
+	else if (CSimba::Simba_DoubleClaw == iState)
+	{
+		if(0.2f > fAnimRatio)
+			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
 
+		if (0.224f < fAnimRatio && false == m_bStarSpawned)
+		{
+			m_bStarSpawned = true;
+			pSimba->SpawnStar(iState);
+		}
+	}
+		
 	if (true == pSimba->IsAnimFinished())
 	{
 		switch (iState)
@@ -529,6 +553,8 @@ void CSimba_AttackJump::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float 
 	s_fOffsetY = -0.7f;
 	if (CSimba::Simba_AttackJump == _iAnimIndex)
 		s_fJumpPower = 15.f;
+	else if (CSimba::Simba_AttackJumpHit == _iAnimIndex)
+		m_bStarSpawned = false;
 }
 
 void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -564,6 +590,12 @@ void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	}
 	else
 		m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
+
+	if (CSimba::Simba_AttackJumpHit == iState && 0.12f < fAnimRatio && false == m_bStarSpawned)
+	{
+		m_bStarSpawned = true;
+		pSimba->SpawnStar(iState);
+	}
 
 	if (pSimba->IsAnimFinished())
 	{
@@ -755,6 +787,11 @@ void CSimba_DimensionClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _flo
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	if (CSimba::Simba_DimensionClawStart == _iAnimIndex)
 		s_iAttackCount = 0;
+		
+	else if (CSimba::Simba_DimensionClaw == _iAnimIndex || CSimba::Simba_DimensionClawContinue == _iAnimIndex) {
+		m_bStarSpawned = false;
+		m_bStarSpawned2 = false;
+	}
 }
 
 void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -772,6 +809,32 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	if (CSimba::Simba_DimensionClawStartContinue == iState)
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta /** (1 - EASE_IN_FAST(fAnimRatio))*/ * 3.f);
 
+	if (CSimba::Simba_DimensionClaw == iState)
+	{
+		if (0.32f < fAnimRatio && false == m_bStarSpawned) {
+			m_bStarSpawned = true;
+			pSimba->ResetStarCount();
+			pSimba->SpawnStar(iState);
+		}
+		if (0.38f < fAnimRatio && false == m_bStarSpawned2)	{
+			m_bStarSpawned2 = true;
+			pSimba->SpawnStar(iState);
+		}
+	}
+
+	if (CSimba::Simba_DimensionClawContinue == iState && false == m_bStarSpawned2)
+	{
+		if (0.53f < fAnimRatio && false == m_bStarSpawned) {
+			m_bStarSpawned = true;
+			pSimba->ResetStarCount();
+			pSimba->SpawnStar(iState);
+		}
+		if (0.63f < fAnimRatio && false == m_bStarSpawned2) {
+			m_bStarSpawned2 = true;
+			pSimba->SpawnStar(iState);
+		}
+	}
+
 	if (pSimba->IsAnimFinished())
 	{
 		if (CSimba::Simba_DimensionClawStart == iState)
@@ -780,11 +843,13 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		else if (CSimba::Simba_DimensionClaw == iState) {
 			pSimba->Change_State(CSimba::Simba_DimensionClawStartContinue, 60.f, false, false);
 			s_iAttackCount++;
+			pSimba->ChangeDimensionClawUpDown();
 		}
 
 		else if (CSimba::Simba_DimensionClawStartContinue == iState) {
 			pSimba->Change_State(CSimba::Simba_DimensionClawContinue, 60.f, false, false);
 			s_iAttackCount++;
+			pSimba->ChangeDimensionClawUpDown();
 		}
 
 		else if (CSimba::Simba_DimensionClawContinue == iState)

@@ -85,6 +85,8 @@ public:
 	void Set_RenderEyeLid(_bool _bRenderEyeLid) { m_bRenderEyeLid = _bRenderEyeLid; }
 
 	void SetCamSequence(_uint iCamSeq);
+	void ResetStarCount() { m_iStarCount = 0; }
+	void ChangeDimensionClawUpDown() { m_bDimensionClawUpAttack = !m_bDimensionClawUpAttack; }
 
 public:
 	virtual HRESULT Initialize_Prototype()			override;
@@ -148,7 +150,9 @@ private:
 	_bool			m_bPhaseTwo = { false };
 	_bool			m_bDeathAnimPlayed = { false };
 	_bool			m_bRenderEyeLid = { false };
-	_float4x4		m_matPrevWorld = _float4x4::Identity;
+
+	_uint			m_iStarCount = {};
+	_bool			m_bDimensionClawUpAttack = { false };
 
 private:
 	HRESULT		Add_Components();

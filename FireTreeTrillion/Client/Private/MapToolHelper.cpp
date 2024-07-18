@@ -152,8 +152,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setTriggerNames = { "NonAnim_Kirby", "Trigger", "Camera", "Dummy", "Fog", "Ladder", "NonAnim_KirbyPartTimer" };
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt", "NonAnim_FinalBoss" };
 
-	/*m_setNonColDecos = { "BushMCut" };*/
-	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower" };
+	// 트리거로 작동하는 애님 데코
+	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower", "SmallBirds" };
 
 	//아래는 피직스 처리가 필요한 오브젝트들. (지형 충돌 필요)
 	m_setActorDecos = {  "CMBillBoardC", "CmBuilding1stRoof", "CMBuildingParts", "CMGuardrailAL", "CMGuardrailBL"
@@ -1099,7 +1099,7 @@ void CMapToolHelper::Menu_GimmickInfo()
 	else
 	{
 		CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(m_pPickedObject);
-		s_iTriggerIdx = round(pBasicMap->Get_MinX());
+		s_iTriggerIdx = _int(round(pBasicMap->Get_MinX()));
 
 		ImGui::SetCursorPosX(33);
 		ImGui::Text("INDEX");
@@ -2271,7 +2271,7 @@ _bool CMapToolHelper::Save_Map(const string& _strLevel, vector<CGameObject*>& _v
 		if (true == IsParkGimmick(strModelName))
 		{
 			CBasicMap* pBasicMap = dynamic_cast<CBasicMap*>(map);
-			vMin.x = pBasicMap->Get_MinX();
+			vMin.x = _float(pBasicMap->Get_MinX());
 		}
 
 		outputFile.write(reinterpret_cast<const char*>(&iStrLength), sizeof(iStrLength));
