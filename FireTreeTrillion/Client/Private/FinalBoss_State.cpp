@@ -161,7 +161,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		}
 
 		// ㄹㅇ랜덤으로 가면 딱일듯
-		//if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
+		/*
+		//if (pFinalBoss->IsAnimFinished()0.5f < pFinalBoss->Get_AnimRatio())
 		//{
 			// 메테오 패턴
 			//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
@@ -238,6 +239,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			//		}
 			//	}
 		//}
+	*/
 	}
 	else
 	{
