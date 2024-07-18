@@ -143,13 +143,6 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 
 		m_eSPChargeState = m_pSolarPanelCharge->Get_CurState();
 		break;
-
-	case GIMMICK_SURPRISE:
-		break;
-
-	case GIMMICK_NONE:
-	default:
-		break;
 	}
 
 	Movement_Field(fTimeDelta);
@@ -340,18 +333,18 @@ void CGm_DynamicField::Apply_Quake(_float _fTimeDelta, _float _fQuakeDuration, _
 
 _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 {
-	_float3 vCurPos;
-	_float fMoveSpeed;
-	DFMOVEUP_TYPE eDFMoveUPType;
+	_float3 vCurPos = { 0.f, 0.f, 0.f };
+	_float fMoveSpeed = { 0.f };
+	DFMOVEUP_TYPE eDFMoveUPType = { DFMOVEUP_END };
 	switch (m_eDFieldType)
 	{
 	case DFMOVE_UP:
 		vCurPos = GET_POS;
 		if (CGm_ParkSolarPanelOnce::STATE_ONWAIT == m_eSPOnceState) //충전 완료
 		{
-			switch (m_eDFMoveUPState)
+			switch (m_eDFMoveState)
 			{
-			case DFMOVEUP_UP:
+			case DFIELD_MOVE:
 				eDFMoveUPType = (DFMOVEUP_TYPE)m_iGimmickIndex;
 				switch (eDFMoveUPType)
 				{
@@ -363,18 +356,16 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 					fMoveSpeed = 0.75f;
 					break;
 
-				case DFMOVEUP_NONE: default:
+				case DFMOVEUP_END: default:
+					fMoveSpeed = 0.f;
 					break;
 				}
 
 				m_pTransformCom->Go_Up(_fTimeDelta * fMoveSpeed);
 				break;
 
-			case DFMOVEUP_QUAKE:
+			case DFIELD_QUAKE:
 				Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
-				break;
-
-			case DFMOVEUP_WAIT:
 				break;
 			}
 
@@ -384,60 +375,84 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				m_fStartQuake += _fTimeDelta;
 
 				if (m_fStartQuake < 0.5f)
-					m_eDFMoveUPState = DFMOVEUP_QUAKE;
+					m_eDFMoveState = DFIELD_QUAKE;
 
 				else
-					m_eDFMoveUPState = DFMOVEUP_WAIT;
+					m_eDFMoveState = DFIELD_WAIT;
 
 			}
 			else
-				m_eDFMoveUPState = DFMOVEUP_UP;
+				m_eDFMoveState = DFIELD_MOVE;
 		}
 		break;
 
-	//깜놀보드 충돌거리 조건에 따라 DFMOVE_LEFT, DFMOVE_RIGHT를 체크
+		//깜놀보드 충돌거리 조건에 따라 DFMOVE_LEFT, DFMOVE_RIGHT를 체크
 	case DFMOVE_LEFT:
 		vCurPos = GET_POS;
 
 		if (m_bIsInteraction) //RayCast 상호작용 검사
 		{
+			switch (m_eDFMoveState)
+			{
+			case DFIELD_MOVE:
+				//깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
+				m_pTransformCom->Go_Left(_fTimeDelta * 0.5f); //원작의 경우는 0.25f 속도인데 좀 더 빠르게 변경
+				break;
+
+			case DFIELD_QUAKE:
+				Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
+				break;
+			}
+
 			if (19.460f >= vCurPos.x) //24.460 > 14.460
 			{
 				vCurPos.x = 19.460f;
-				m_bIsQuake = TRUE;
+				m_fStartQuake += _fTimeDelta;
 
-				if (m_bIsQuake)
+				if (m_fStartQuake < 0.5f)
+					m_eDFMoveState = DFIELD_QUAKE;
+
+				else
 				{
-					Apply_Quake(_fTimeDelta, 0.5f, 0.2f);
-					m_bIsQuake = FALSE;
+					m_eDFMoveState = DFIELD_WAIT;
+					m_fStartQuake = 0.f;
 					m_bIsInteraction = FALSE;
 				}
 			}
-
 			else
-				m_pTransformCom->Go_Left(_fTimeDelta * 0.5f);
+				m_eDFMoveState = DFIELD_MOVE;
 		}
+	
 		if (m_bIsReturnMove)
 		{
+			switch (m_eDFMoveState)
+			{
+			case DFIELD_MOVE:
+				m_pTransformCom->Go_Right(_fTimeDelta * 2.25f);
+				break;
+
+			case DFIELD_QUAKE:
+				Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
+				break;
+			}
+
 			if (24.460f <= vCurPos.x)
 			{
 				vCurPos.x = 24.460f;
-				m_bIsQuake = TRUE;
+				m_fStartQuake += _fTimeDelta;
 
-				if (m_bIsQuake)
+				if (m_fStartQuake < 0.5f)
+					m_eDFMoveState = DFIELD_QUAKE;
+
+				else
 				{
-					Apply_Quake(_fTimeDelta, 0.5f, 0.2f);
-					m_bIsQuake = FALSE;
+					m_eDFMoveState = DFIELD_WAIT;
+					m_fStartQuake = 0.f;
 					m_bIsReturnMove = FALSE;
-					return OBJ_NOEVENT;
 				}
-
-				//m_bIsReturnMove = FALSE;
-				//return OBJ_NOEVENT;
 			}
-
 			else
-				m_pTransformCom->Go_Right(_fTimeDelta * 2.25f);
+				m_eDFMoveState = DFIELD_MOVE;
 		}
 		break;
 
@@ -446,39 +461,68 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 
 		if (m_bIsInteraction) //RayCast 상호작용 검사
 		{
-			if (29.851f <= vCurPos.x) //24.851 > 34.851
+			switch (m_eDFMoveState)
+			{
+			case DFIELD_MOVE:
+				//깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
+				m_pTransformCom->Go_Right(_fTimeDelta * 0.5f); //원작의 경우는 0.25f 속도인데 좀 더 빠르게 변경
+				break;
+
+			case DFIELD_QUAKE:
+				Apply_Quake(_fTimeDelta, 0.25f, 0.2f); 
+				break;
+			}
+
+			if (29.851f <= vCurPos.x) //24.851 > 29.851
 			{
 				vCurPos.x = 29.851f;
-				m_bIsQuake = TRUE;
+				m_fStartQuake += _fTimeDelta;
 
-				if (m_bIsQuake)
+				if (m_fStartQuake < 0.5f)
+					m_eDFMoveState = DFIELD_QUAKE;
+
+				else
 				{
-					Apply_Quake(_fTimeDelta, 1.f, 0.2f);
+					m_eDFMoveState = DFIELD_WAIT;
+					m_fStartQuake = 0.f;
 					m_bIsInteraction = FALSE;
 				}
 			}
-			//원작의 경우는 0.25f 속도인데 좀 더 빠르게 변경
 			else
-				m_pTransformCom->Go_Right(_fTimeDelta * 0.5f); //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
+				m_eDFMoveState = DFIELD_MOVE;
 		}
+
 		//특정 애님 상태일 경우, 필드도 비활성 움직임 처리
 		if (m_bIsReturnMove)
 		{
+			switch (m_eDFMoveState)
+			{
+			case DFIELD_MOVE:
+				m_pTransformCom->Go_Left(_fTimeDelta * 2.25f);
+				break;
+
+			case DFIELD_QUAKE:
+				Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
+				break;
+			}
+
 			if (24.851f >= vCurPos.x)
 			{
 				vCurPos.x = 24.851f;
-				m_bIsQuake = TRUE;
+				m_fStartQuake += _fTimeDelta;
 
-				if (m_bIsQuake)
+				if (m_fStartQuake < 0.5f)
+					m_eDFMoveState = DFIELD_QUAKE;
+
+				else
 				{
-					Apply_Quake(_fTimeDelta, 1.f, 0.2f);
+					m_eDFMoveState = DFIELD_WAIT;
+					m_fStartQuake = 0.f;
 					m_bIsReturnMove = FALSE;
-					//return OBJ_NOEVENT;
 				}
-
 			}
 			else
-				m_pTransformCom->Go_Left(_fTimeDelta * 2.25f);
+				m_eDFMoveState = DFIELD_MOVE;
 		}
 		break;
 
@@ -488,34 +532,87 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 		//충전 완료 시에 빠르게 활성화
 		if (CGm_ParkSolarPanelCharge::STATE_CHARGEDWAIT == m_eSPChargeState)
 		{
-			if (-77.289f >= vCurPos.z) //-67.289 > -77.289
+			switch (m_eDFMoveState)
 			{
-				vCurPos.z = -77.289f;
-				m_bIsQuake = TRUE;
+			case DFIELD_MOVE:
+				m_pTransformCom->Go_Backward(_fTimeDelta * 2.f);
+				break;
 
-				if (m_bIsQuake)
-					Apply_Quake(_fTimeDelta, 1.f, 0.2f);
+			case DFIELD_QUAKE:
+				Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
+				break;
 			}
 
+			if (-76.289f >= vCurPos.z) //-67.289 > -77.289
+			{
+				vCurPos.z = -76.289f;
+				m_fStartQuake += _fTimeDelta;
+
+				if (m_fStartQuake < 0.5f)
+					m_eDFMoveState = DFIELD_QUAKE;
+
+				else
+				{
+					m_eDFMoveState = DFIELD_WAIT;
+					m_fStartQuake = 0.f;
+				}
+			}
 			else
-				m_pTransformCom->Go_Backward(_fTimeDelta * 2.f);
+				m_eDFMoveState = DFIELD_MOVE;
 		}
 		//충전 해제 상태동안은 천천히 이동 후 비활성화 처리
 		if (CGm_ParkSolarPanelCharge::STATE_DECREASES == m_eSPChargeState) //충전 해제
 		{
+			switch (m_eDFMoveState)
+			{
+			case DFIELD_MOVE:
+				m_pTransformCom->Go_Straight(_fTimeDelta * 0.2f); 
+				break;
+
+			//case DFIELD_QUAKE:
+			//	Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
+			//	break;
+			}
+
 			if (-67.289f <= vCurPos.z)
 			{
 				vCurPos.z = -67.289f;
-				return OBJ_NOEVENT;
+				m_eDFMoveState = DFIELD_WAIT;
+
+				/*
+				m_fStartQuake += _fTimeDelta;
+
+				if (m_fStartQuake < 0.5f)
+					m_eDFMoveState = DFIELD_QUAKE;
+
+				else
+				{
+					m_eDFMoveState = DFIELD_WAIT;
+					m_fStartQuake = 0.f;
+				}
+				*/
+			}
+			else
+				m_eDFMoveState = DFIELD_MOVE;
+		}
+		if (CGm_ParkSolarPanelCharge::STATE_OFFWAITSTART == m_eSPChargeState) //충전 해제
+		{
+			switch (m_eDFMoveState)
+			{
+			case DFIELD_QUAKE:
+				Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
+				break;
 			}
 
-			else
-				m_pTransformCom->Go_Straight(_fTimeDelta * 0.2f); //난이도 너프함..
-		}
-		break;
+			if (m_fStartQuake < 0.5f)
+				m_eDFMoveState = DFIELD_QUAKE;
 
-	case DFMOVE_NONE:
-	default:
+			else
+			{
+				m_eDFMoveState = DFIELD_WAIT;
+				m_fStartQuake = 0.f;
+			}
+		}
 		break;
 	}
 

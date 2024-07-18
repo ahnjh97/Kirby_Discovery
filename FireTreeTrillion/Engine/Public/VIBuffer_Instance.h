@@ -89,6 +89,8 @@ protected:
 	random_device				m_RandomDevice;
 	mt19937_64					m_RandomNumber;
 
+	_float						m_fRemainedDuration = { 0.f };
+
 	//ÆÄ½Ì º¯¼öµé
 	_float2*					m_pLifeTimes = { nullptr };
 

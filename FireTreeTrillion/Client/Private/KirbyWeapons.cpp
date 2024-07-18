@@ -3,6 +3,8 @@
 #include "Bone.h"
 #include "Kirby.h"
 
+#include "Fire.h"
+
 CKirbyWeapons::CKirbyWeapons(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPartObject{ pDevice, pContext }
 {
@@ -46,6 +48,7 @@ _int CKirbyWeapons::Tick(_float fTimeDelta)
         return OBJ_DEAD;
 
     m_fTimeDelta = m_pGameInstance->Get_FirstTimer();
+    m_fEffectAccTime += m_fTimeDelta;
 
     if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
     {
@@ -58,6 +61,30 @@ _int CKirbyWeapons::Tick(_float fTimeDelta)
         Compute_MotionBlur();
     }
     m_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * *m_pBoneMatrix * *m_pParentMatrix;
+
+    if (m_isAnim == true && m_eAnimType == ONIGOROSIHAMMEREND)
+    {
+        if (m_fEffectAccTime > 0.015f)
+        {
+            CBone* pBone = m_pModelCom[ABILITY_HAMMER]->Get_BonePtr("HammertopJ");
+            _float4x4 pBoneLocalMatrix = *pBone->Get_CombinedTransformationMatrix();
+            _float4x4 pBoneWorldMatrix = pBoneLocalMatrix * m_WorldMatrix;
+
+            _float4 vPos = CUtils::Get_State_Vector_Matrix(pBoneWorldMatrix, CUtils::STATE_POSITION);
+
+            CFire::FIREDESC Firedesc = {};
+            Firedesc.vFirePos = vPos + (_float4)CUtils::Make_Random_Vector(1.f);
+            Firedesc.fUpRange = { 2.5f };
+            Firedesc.vFirstColor = { 1.f, 0.3f, 0.4f, 0.5f };
+            Firedesc.vTargetColor = { 1.f, 1.f, 1.f, 1.f };
+            Firedesc.fScale = { 6.f };
+            if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
+                return OBJ_NOEVENT;
+
+            m_fEffectAccTime = 0.f;
+        }
+
+    }
 
     return OBJ_NOEVENT;
 }

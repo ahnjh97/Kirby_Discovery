@@ -20,6 +20,7 @@ public:
 public:
 	_float	m_fParticalDelay = { 0.f };
 	_bool	m_bBreak = { false };
+	_float	m_fBBongTime = { 0.f };
 	static	CKirbyDump_Run_State* Create();
 	virtual void				  Free() override;
 };
@@ -85,6 +86,8 @@ public:
 	_bool	m_bShakeTrigger2 = { true };
 	_bool	m_bShakeTrigger3 = { true };
 	_float	m_fEffectTime = { 0.f };
+
+	_float m_fBBongTime = { 0.f };
 
 	_int	m_iQTECnt = { 0 };
 	_float	m_fQTERatio = { 0.f };

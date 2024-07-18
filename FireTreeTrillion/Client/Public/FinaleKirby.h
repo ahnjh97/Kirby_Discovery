@@ -80,6 +80,10 @@ public:
 
 		// 트럭이 전부 빨렸을 때, 이 불값은 트루가된다.
 		_bool			m_bVacuumComplete = { false };
+
+		class CLight* m_pLight1 = { nullptr };
+		class CLight* m_pLight2 = { nullptr };
+
 	}FINALEKIRBY_INFODESC;
 
 private:
@@ -113,6 +117,7 @@ public:
 	_bool					isAnimFinish();
 	_float					Get_AnimTrackPosition();
 	void					Bone_Rotation(_float fTimeDelta);
+	void					Update_EffectSocket();
 
 	void					Set_HitStop(_float fHitStopMaxTime = 0.12f) { 
 		m_bHitStop = true; m_fHitStopMaxTime = fHitStopMaxTime; }

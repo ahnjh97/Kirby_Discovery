@@ -334,13 +334,16 @@ void CVIBuffer_Instance::Decelerate(_float fTimeDelta, VTXMATRIX* pVertices)
 		if (m_pLifeTimes[i].x / m_pLifeTimes[i].y < .5f)
 			continue;
 
-		_float fTimeRatio = 1.f - ((m_pLifeTimes[i].x / m_pLifeTimes[i].y) - .5f) * 2.f;
-		fTimeRatio = EASE_OUT(fTimeRatio);
+		_float fTimeRatio = ( 1.f - (m_pLifeTimes[i].x / m_pLifeTimes[i].y)) * 2.f;
+		//fTimeRatio = EASE_OUT(fTimeRatio);
 
 		m_pSpeeds[i] = m_pInitialSpeeds[i] * fTimeRatio;
-		if (m_pSpeeds[i] < 0.f)
-			m_pSpeeds[i] = 0.f;
 
+		if (m_pSpeeds[i] < 0.f)
+		{
+			m_pSpeeds[i] = 0.f;
+			m_pLifeTimes[i].x = m_pLifeTimes[i].y;
+		}
 	}
 }
 
@@ -522,17 +525,6 @@ void CVIBuffer_Instance::Assemble(_float fTimeDelta, VTXMATRIX* pVertices)
 		{
 			m_pLifeTimes[i].x = m_pLifeTimes[i].y;
 			return;
-			////루프가 아니였다면 죽어!!
-			//if (!m_InstanceDesc.bIsLoop)
-			//{
-			//	pVertices[i].bAlive = false;
-			//	m_pLifeTimes[i].x = m_pLifeTimes[i].y;
-			//}
-			////아니라면 다시 초기화~
-			//else
-			//{
-			//	Change_InstanceInfo(pVertices, i);
-			//}
 		}
 
 		vDistance.Normalize();
@@ -545,6 +537,14 @@ void CVIBuffer_Instance::Assemble(_float fTimeDelta, VTXMATRIX* pVertices)
 
 void CVIBuffer_Instance::Compute_AllLifeTime(_float fTimeDelta)
 {
+	if (0.f < m_fRemainedDuration)
+	{
+		m_fRemainedDuration -= fTimeDelta;
+
+		if (m_fRemainedDuration <= 0.f)
+			m_fRemainedDuration = 0.f;
+	}
+
 	D3D11_MAPPED_SUBRESOURCE		SubResource{};
 
 	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
@@ -626,7 +626,7 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 void CVIBuffer_Instance::Update_InstanceDesc(const INSTANCE_DESC& _InstanceDesc)
 {
 	m_InstanceDesc = _InstanceDesc;
-
+	m_fRemainedDuration = _InstanceDesc.fDuration;
 
 	D3D11_MAPPED_SUBRESOURCE		SubResource{};
 	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
@@ -639,19 +639,6 @@ void CVIBuffer_Instance::Update_InstanceDesc(const INSTANCE_DESC& _InstanceDesc)
 	}
 
 	m_pContext->Unmap(m_pVBInstance, 0);
-
-
-
-	//_float3 vScaleRandomOffset = m_InstanceDesc.vScaleRandomOffset;
-	//
-
-	////준 desc 대로 값 모두 채워줘야해~~
-	//for (_uint i = 0; i < m_iNumInstance; ++i)
-	//{
-	//	m_pInstanceVertices[i].vRight = Vector4::UnitX * (m_InstanceDesc.vScale.x + CUtils::Make_RandomFloat(-vScaleRandomOffset.x, vScaleRandomOffset.x));
-	//	m_pInstanceVertices[i].vUp = Vector4::UnitY * (m_InstanceDesc.vScale.y + CUtils::Make_RandomFloat(-vScaleRandomOffset.y, vScaleRandomOffset.y));
-	//	m_pInstanceVertices[i].vLook = Vector4::UnitZ * (m_InstanceDesc.vScale.y + CUtils::Make_RandomFloat(-vScaleRandomOffset.z, vScaleRandomOffset.z));
-	//}
 
 }
 
@@ -674,9 +661,14 @@ void CVIBuffer_Instance::Revive()
 void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstanceIndex)
 {
 
+	_float fDestLifeTime = Compute_RandLifetime();
+
+	if (m_fRemainedDuration < fDestLifeTime)
+		return;
+
 	m_pLifeTimes[iInstanceIndex].x = 0.f;
 
-	m_pLifeTimes[iInstanceIndex].y = Compute_RandLifetime();
+	m_pLifeTimes[iInstanceIndex].y = fDestLifeTime;
 	m_pStartDelays[iInstanceIndex] = Compute_RandStartDelay();
 
 

@@ -1441,7 +1441,7 @@ void CKirby::SetUp_Event()
 // ∑π¿ÃΩÃ∏  ƒ∆æ¿ 1.
 void CKirby::Event_Racing_Cut1(CGameObject* pObj)
 {
-	Delete_Effect("YW Come On Dash");
+	Delete_Effect("YW Real Dash");
 
 	INFO(m_bBooster) = false;
 	INFO(m_bCarJump) = false;
@@ -1460,7 +1460,7 @@ void CKirby::Event_Racing_Cut1(CGameObject* pObj)
 
 void CKirby::Event_Racing_Cut2(CGameObject* pObj)
 {
-	Delete_Effect("YW Come On Dash");
+	Delete_Effect("YW Real Dash");
 
 	INFO(m_bBooster) = false;
 	INFO(m_bCarJump) = false;
@@ -1992,6 +1992,7 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	Kirby_LookInitialize();
 
 	m_fMaxHp = 100.f;
+	m_fAttack = 5.f; // ∞Ì¡§
 
 	// ¿”Ω√∑Œ ¥…∑¬ µ∆˙∆Æ »≠
 	if (*m_pCurrentLevelID == LEVEL_INTRO)
@@ -2004,7 +2005,6 @@ HRESULT CKirby::Kirby_SystemInitialize()
 		CLevelChanger::LEVEL_DATA tLevelData = CLevelChanger::Get_Instance()->Load();
 		m_fHp	  = tLevelData.fKirbyHP;
 		m_uCoin	  = static_cast<_uint>(tLevelData.fKirbyCoin);
-		m_fAttack = 5.f; // ∞Ì¡§
 
 		//m_eAbilityType = static_cast<ABILITYTYPE>(tLevelData.iKirbyState);
 		LEVEL eLEVEL = static_cast<LEVEL>(tLevelData.iLatestLevel);
