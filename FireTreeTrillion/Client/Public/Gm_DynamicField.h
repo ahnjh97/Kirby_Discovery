@@ -15,8 +15,11 @@ BEGIN(Client)
 class CGm_DynamicField final : public CPhysXObject
 {
 public: 
-	enum DYNAMICFILED_TYPE { DFMOVE_UPDOWN, DFMOVE_LEFT, DFMOVE_RIGHT, DFMOVE_FRONTBACK, DFMOVE_NONE };
+	enum DYNAMICFILED_TYPE { DFMOVE_UP, DFMOVE_LEFT, DFMOVE_RIGHT, DFMOVE_FRONTBACK, DFMOVE_NONE };
 	enum GIMMICK_TYPE { GIMMICK_SPONCE, GIMMICK_SPCHARGE, GIMMICK_SURPRISE, GIMMICK_NONE };
+
+	enum DFMOVEUP_TYPE { DFMOVEUP_01, DFMOVEUP_02, DFMOVEUP_03, DFMOVEUP_END };
+	enum DFMOVEUP_STATE { DFMOVEUP_UP, DFMOVEUP_QUAKE, DFMOVEUP_WAIT, DFMOVEUP_NONE };
 
 public:
 	void Set_SolarPanelOnce(class CGm_ParkSolarPanelOnce* _pSolarPanel);
@@ -72,14 +75,20 @@ private:
 
 	DYNAMICFILED_TYPE		m_eDFieldType = { DFMOVE_NONE };
 	GIMMICK_TYPE			m_eGimmickType = { GIMMICK_NONE };
+	DFMOVEUP_STATE			m_eDFMoveUPState = { DFMOVEUP_NONE };
+
+
 	CGm_ParkSolarPanelOnce::PANELONCE_STATE m_eSPOnceState = {};
 	CGm_ParkSolarPanelCharge::PANELCHARGE_STATE m_eSPChargeState = {};
 
 	_float					m_fTime = { 0.f };
 	_float					m_fQuakeTime = { 0.f };
+	_float					m_fStartQuake = { 0.f };
 	
 	_bool					m_bIsInteraction = { FALSE };
 	_bool					m_bIsQuake = { FALSE };
+	_bool					m_bStartQuake = { FALSE };
+
 	_bool					m_bIsReturnMove = { FALSE };
 
 	_uint					m_iGimmickIndex = {};

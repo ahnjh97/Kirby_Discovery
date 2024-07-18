@@ -227,9 +227,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 		, "FhPlanetOrnamentAL", "FhPlanetOrnamentBL", "FhPlanetOrnamentCL", "FhPlanetOrnamentDL"
 		, "FhStackOrnamentAL", "FhStackOrnamentBL", "FhStackOrnamentCL", "FhStackOrnamentDL", "FhStackOrnamentEL"
-		, "FhWallDecorationAL", "FhWallDecorationBL", "FhWallDecorationCL", "FhWallDecorationDL"
-
-		, "FhWallDecorationStickAL", "FhWallDecorationStickBL", "FhWallDecorationStickCL"
+		//, "FhWallDecorationAL", "FhWallDecorationBL", "FhWallDecorationCL", "FhWallDecorationDL"
+		//, "FhWallDecorationStickAL", "FhWallDecorationStickBL", "FhWallDecorationStickCL"
 		, "ParkDoor"
 		
 		// 현재 사용안함. 추후 사용을 대비해 주석 처리
