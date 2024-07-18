@@ -124,11 +124,11 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 		FXDesc.vInitScale = { 4.f, 4.f, 4.f };
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_FlyingBubble_v1"), &FXDesc)))
-			return;
+		Add_Effect("FlyingBubble_v1", true);
 
-		Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
-
+		//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_FlyingBubble_v1"), &FXDesc)))
+		//	return;
+		//Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
 	}
 	else if (ePreState == PO_FLYAWAY && eState == PO_FLYDEADAWAY)
@@ -141,8 +141,10 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(m_pGameInstance->Get_CamLook());
 		FXDesc.vInitScale = { 3.f, 3.f, 1.8f };
 
-		if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
-			return;
+		Add_Effect("Colliding", FXDesc);
+
+		//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
+		//	return;
 	}
 	else if (eState == PO_PRESSED)
 	{
@@ -150,11 +152,31 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 
 		FXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 		FXDesc.vInitScale = { 1.8f, 1.8f, 1.8f };
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_start particle test A"), &FXDesc)))
-			return;
+
+		Add_Effect("start particle test A", FXDesc);
+
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_start particle test A"), &FXDesc)))
+		//	return;
 	}
 }
 
+
+void CPhysXObject::Add_Effect(string strName, _bool bAddToList)
+{
+	wstring strProtoTag = TEXT("Prototype_GameObject_");
+	strProtoTag += CUtils::StrToWstr(strName);
+
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strProtoTag)))
+		return;
+
+	if (bAddToList)
+	{
+		CEffect* pEffect = static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back());
+
+		m_FXList.emplace_back(pEffect);
+		Safe_AddRef(pEffect);
+	}
+}
 
 void CPhysXObject::Add_Effect(string strName, CEffect::FX_DESC fxDesc, _bool bAddToList)
 {
@@ -165,8 +187,18 @@ void CPhysXObject::Add_Effect(string strName, CEffect::FX_DESC fxDesc, _bool bAd
 		return;
 
 	if (bAddToList)
-		Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+	{
+		CEffect* pEffect = static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back());
 
+		m_FXList.emplace_back(pEffect);
+		Safe_AddRef(pEffect);
+	}
+		//Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+}
+
+void CPhysXObject::Add_Effect(string strName, CParticle::PARTICLE_DESC fxDesc, _bool bAddToList)
+{
 }
 
 void CPhysXObject::Add_Effect(string strName, CMultiEffect::MULTI_FX_DESC fxDesc, _bool bAddToList)
@@ -178,7 +210,13 @@ void CPhysXObject::Add_Effect(string strName, CMultiEffect::MULTI_FX_DESC fxDesc
 		return;
 
 	if (bAddToList)
-		Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+	{
+		CEffect* pEffect = static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back());
+
+		m_FXList.emplace_back(pEffect);
+		Safe_AddRef(pEffect);
+	}
+		//Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 }
 
 void CPhysXObject::Add_Effect(CEffect* pEffect)
