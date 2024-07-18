@@ -23,7 +23,7 @@ CFinalBoss::CFinalBoss(const CFinalBoss& rhs)
 void CFinalBoss::Appear_Event(CGameObject* pObj)
 {
 	//Change_State(CFinalBoss::FINALBOSS_DEMOAPPEARCUT5, 50.f, false, true);
-	m_pGameInstance->Set_ObjectBlack(.7f, 1.f);
+	//m_pGameInstance->Set_ObjectBlack(.7f, 1.f);
 
 	Add_Effect("HS_bidm A");
 }
@@ -205,11 +205,20 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
 		vPos.m128_f32[1] = 0.f;
 		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
+
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
+		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+		FXDesc.vInitPos = vPos;
+		Add_Effect("HS_FB rock slash", FXDesc);
+
 		++m_iGullyCnt;
 		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
-
 		vPos.m128_f32[1] = 0.f;
 		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
+
+		FXDesc.vInitPos = vPos;
+		Add_Effect("HS_FB rock slash", FXDesc);
+
 		++m_iGullyCnt;
 		if (m_vecGully.size() <= m_iGullyCnt)
 			m_iGullyCnt = 0;

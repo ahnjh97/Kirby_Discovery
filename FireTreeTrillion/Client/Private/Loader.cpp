@@ -1592,7 +1592,7 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Wind", "Effects/Basic/wind_%d.png", 2);	CHECK_FAILED(hr);
 
 	hr = Add_Texture(LEVEL_STATIC, "FX_Scroll", "Effects/Basic/scroll_%d.png", 9);	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Shockwave", "Effects/Basic/shockwave_%d.png", 5);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Shockwave", "Effects/Basic/shockwave_%d.png", 6);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Swing", "Effects/Basic/swing_%d.png", 1);	CHECK_FAILED(hr);
 
 	//Į
