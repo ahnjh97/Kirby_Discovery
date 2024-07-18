@@ -199,6 +199,11 @@ HRESULT CVIBuffer_Instance::Initialize(void* pArg)
 	m_pOrbitSpeed = new _float[m_iNumInstance];
 	ZeroMemory(m_pOrbitSpeed, sizeof(_float) * m_iNumInstance);
 
+	m_pAccSupplyAmount = new _float[m_iNumInstance];
+	ZeroMemory(m_pAccSupplyAmount, sizeof(_float) * m_iNumInstance);
+
+	m_pTurnSupplyAmount = new _float[m_iNumInstance];
+	ZeroMemory(m_pTurnSupplyAmount, sizeof(_float) * m_iNumInstance);
 
 	return S_OK;
 }
@@ -285,7 +290,11 @@ void CVIBuffer_Instance::Drop(_float fTimeDelta, VTXMATRIX* pVertices)
 		if (!pVertices[i].bAlive/* || 0.f < m_pStartDelays[i]*/)
 			continue;
 
-		m_pVelocities[i].y -= m_pSpeeds[i] * fTimeDelta * m_InstanceDesc.vInitScale.y;
+		_float4 vPos = pVertices[i].vPosition;
+		vPos.y -= m_pSpeeds[i] * fTimeDelta * m_InstanceDesc.vInitScale.y;
+		pVertices[i].vPosition = vPos;
+
+		//m_pVelocities[i].y -= m_pSpeeds[i] * fTimeDelta * m_InstanceDesc.vInitScale.y;
 
 	}
 
@@ -309,21 +318,30 @@ void CVIBuffer_Instance::Spread(_float fTimeDelta, VTXMATRIX* pVertices)
 		//{
 		//	continue;
 		//}
-
-		_float4		vDir = Dir(pVertices[i].vPosition - Pos(m_InstanceDesc.vPivot));
+		_float4 vPos = pVertices[i].vPosition;
+		_float4	vDir = Dir(vPos - Pos(m_InstanceDesc.vPivot));
 		vDir.Normalize();
 
+		pVertices[i].vPosition = vPos + (_float3(vDir) * m_InstanceDesc.vInitScale * m_pSpeeds[i] * fTimeDelta);
 
-		m_pVelocities[i] += _float3(vDir) * m_InstanceDesc.vInitScale * m_pSpeeds[i] * fTimeDelta;
-
-
+		//m_pVelocities[i] += _float3(vDir) * m_InstanceDesc.vInitScale * m_pSpeeds[i] * fTimeDelta;
 		//Compute_LifeTime(pVertices, i, fTimeDelta);
 	}
 
 	//m_pContext->Unmap(m_pVBInstance, 0);
 }
 
-//Disappear 느낌으로 스케일도 줄여보기
+void CVIBuffer_Instance::Acceleration(_float fTimeDelta, VTXMATRIX* pVertices)
+{
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		if (!pVertices[i].bAlive)
+			continue;
+
+		m_pSpeeds[i] += fTimeDelta * m_pAccSupplyAmount[i];
+	}
+}
+
 void CVIBuffer_Instance::Decelerate(_float fTimeDelta, VTXMATRIX* pVertices)
 {
 	for (size_t i = 0; i < m_iNumInstance; i++)
@@ -331,21 +349,62 @@ void CVIBuffer_Instance::Decelerate(_float fTimeDelta, VTXMATRIX* pVertices)
 		if (!pVertices[i].bAlive)
 			continue;
 
-		if (m_pLifeTimes[i].x / m_pLifeTimes[i].y < .5f)
+		if (m_pSpeeds[i] == 0.f)
 			continue;
 
-		_float fTimeRatio = ( 1.f - (m_pLifeTimes[i].x / m_pLifeTimes[i].y)) * 2.f;
-		//fTimeRatio = EASE_OUT(fTimeRatio);
+		m_pSpeeds[i] -= fTimeDelta * m_pAccSupplyAmount[i];
+		if (m_pSpeeds[i] < 0.f) m_pSpeeds[i] = 0.f;
 
-		m_pSpeeds[i] = m_pInitialSpeeds[i] * fTimeRatio;
-
-		if (m_pSpeeds[i] < 0.f)
-		{
-			m_pSpeeds[i] = 0.f;
-			m_pLifeTimes[i].x = m_pLifeTimes[i].y;
-		}
+		//if (m_pLifeTimes[i].x / m_pLifeTimes[i].y < .5f)
+		//	continue;
+		//_float fTimeRatio = ( 1.f - (m_pLifeTimes[i].x / m_pLifeTimes[i].y)) * 2.f;
+		////fTimeRatio = EASE_OUT(fTimeRatio);
+		//m_pSpeeds[i] = m_pInitialSpeeds[i] * fTimeRatio;
+		//if (m_pSpeeds[i] < 0.f)
+		//{
+		//	m_pSpeeds[i] = 0.f;
+		//	m_pLifeTimes[i].x = m_pLifeTimes[i].y;
+		//}
 	}
 }
+
+void CVIBuffer_Instance::OrbitAcceleration(_float fTimeDelta, VTXMATRIX* pVertices)
+{
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		if (!pVertices[i].bAlive)
+			continue;
+
+		m_pOrbitSpeed[i] += fTimeDelta * m_pTurnSupplyAmount[i];
+	}
+}
+
+void CVIBuffer_Instance::OrbitDecelerate(_float fTimeDelta, VTXMATRIX* pVertices)
+{
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		if (!pVertices[i].bAlive)
+			continue;
+
+		if (m_pOrbitSpeed[i] == 0.f) 
+			continue;
+
+		m_pOrbitSpeed[i] -= fTimeDelta * m_pTurnSupplyAmount[i];
+		if (m_pOrbitSpeed[i] < 0.f) m_pOrbitSpeed[i] = 0.f;
+	}
+}
+
+void CVIBuffer_Instance::Save_PrePos(VTXMATRIX* pVertices)
+{
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		if (!pVertices[i].bAlive)
+			continue;
+
+		m_pPrePositions[i] = static_cast<_float3>(pVertices[i].vPosition);
+	}
+}
+
 
 void CVIBuffer_Instance::Appear(_float fTimeDelta, VTXMATRIX* pVertices)
 {
@@ -355,7 +414,7 @@ void CVIBuffer_Instance::Appear(_float fTimeDelta, VTXMATRIX* pVertices)
 			continue;
 
 		_float fTimeRatio = clamp((m_pLifeTimes[i].x / m_pLifeTimes[i].y) * 5.f, .01f, 1.f);
-		fTimeRatio = SATURATE(EASE_IN(fTimeRatio));
+		fTimeRatio = SATURATE(EASE_OUT(fTimeRatio));
 		if (1.f < fTimeRatio)
 			continue;
 
@@ -426,8 +485,8 @@ void CVIBuffer_Instance::Wiggle(_float fTimeDelta, VTXMATRIX* pVertices)
 		rotationMatrix = XMMatrixRotationY(XMConvertToRadians(120.f * fTimeDelta));
 		XMStoreFloat3(&m_pDirections[i], XMVector4Transform(XMLoadFloat3(&m_pDirections[i]), rotationMatrix));
 
-		m_pVelocities[i] += m_pDirections[i] * m_pSpeeds[i] * m_InstanceDesc.vInitScale * fTimeDelta;
-		//pVertices[i].vPosition += Dir(m_pDirections[i]) * m_pSpeeds[i] * fTimeDelta;
+		//m_pVelocities[i] += m_pDirections[i] * m_pSpeeds[i] * m_InstanceDesc.vInitScale * fTimeDelta;
+		pVertices[i].vPosition += Dir(m_pDirections[i]) * m_pSpeeds[i] * fTimeDelta;
 	}
 }
 
@@ -438,6 +497,14 @@ void CVIBuffer_Instance::Tail(_float fTimeDelta, VTXMATRIX* pVertices)
 	{
 		if (!pVertices[i].bAlive)
 			continue;
+
+		_int iSoloVertice = m_iNumInstance % 10;
+
+		if (i > m_iNumInstance - iSoloVertice)
+		{
+			pVertices[i].bAlive = false;
+			return;
+		}
 
 		//꼬리
 		if (i % 10 != 0)
@@ -470,10 +537,10 @@ void CVIBuffer_Instance::Tail(_float fTimeDelta, VTXMATRIX* pVertices)
 		}
 	}
 
-	for (size_t i = 0; i < m_iNumInstance; i++)
-	{
-		m_pPrePositions[i] = static_cast<_float3>(pVertices[i].vPosition);
-	}
+	//for (size_t i = 0; i < m_iNumInstance; i++)
+	//{
+	//	m_pPrePositions[i] = static_cast<_float3>(pVertices[i].vPosition);
+	//}
 }
 
 void CVIBuffer_Instance::Gravity(_float fTimeDelta, VTXMATRIX* pVertices)
@@ -484,7 +551,10 @@ void CVIBuffer_Instance::Gravity(_float fTimeDelta, VTXMATRIX* pVertices)
 			continue;
 
 		//m_pDirections[i].y -= GRAVITY * fTimeDelta;
-		m_pVelocities[i].y -= GRAVITY * 2.5f * m_InstanceDesc.vInitScale.y * fTimeDelta;
+		_float4 vPos = pVertices[i].vPosition;
+		vPos.y -= GRAVITY * 2.5f * m_InstanceDesc.vInitScale.y * fTimeDelta;
+		pVertices[i].vPosition = vPos;
+		//m_pVelocities[i].y -= GRAVITY * 2.5f * m_InstanceDesc.vInitScale.y * fTimeDelta;
 	}
 }
 
@@ -499,11 +569,12 @@ void CVIBuffer_Instance::Orbit(_float fTimeDelta, VTXMATRIX* pVertices)
 		_float3 vDistance = vPos - m_InstanceDesc.vPivot;
 		_float fOrbitSpeed = m_pOrbitSpeed[i];
 
-		_float4x4 RotMatrix = _float4x4::Identity; \
-			if (m_pPreAxis[i] != _float3(0.f, 0.f, 0.f))
-			{
-				CUtils::Turn_OtherMatrix(RotMatrix, m_pPreAxis[i], fTimeDelta, fOrbitSpeed);
-			}
+		_float4x4 RotMatrix = _float4x4::Identity;
+
+		if (m_pPreAxis[i] != _float3(0.f, 0.f, 0.f))
+		{
+			CUtils::Turn_OtherMatrix(RotMatrix, m_pPreAxis[i], fTimeDelta, fOrbitSpeed);
+		}
 
 		//_float3 vEditDir = XMVector3Transform(vDistance, XMLoadFloat4x4(&RotMatrix));
 		_float3 vEditDir = m_InstanceDesc.vPivot + (_float3)XMVector3Transform(vDistance, XMLoadFloat4x4(&RotMatrix));
@@ -681,12 +752,19 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 
 	_float3 vRot = Compute_RandRotation();
 	vRot = { vRot.x, vRot.y, vRot.z };
-	//vRot = 
+	pVertices[iInstanceIndex].fAngleZ = ToRadian(vRot.z);
+
 	Quaternion vResultQuat = Quaternion::CreateFromYawPitchRoll(vRot);
 	instanceMat.Transform(instanceMat, vResultQuat, instanceMat);
 
+	_float3 vPosition = {};
 
-	_float3 vPosition = Compute_RandPosition();
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SPHERERANDOM] == true)
+		vPosition = (_float3)Compute_RandRangePosition();
+	else
+		vPosition = (_float3)Compute_RandPosition();
+
+
 	instanceMat.Translation(vPosition);
 
 	pVertices[iInstanceIndex].vRight = Dir(instanceMat.Right());
@@ -694,8 +772,6 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 	pVertices[iInstanceIndex].vLook = Dir(instanceMat.Forward());
 	pVertices[iInstanceIndex].vPosition = Pos(instanceMat.Translation());
 	pVertices[iInstanceIndex].bAlive = false;
-
-
 
 	_float4 vDirection = m_InstanceDesc.vecMoveCommands[INSTANCE_WIGGLE] == true ? CUtils::Make_Random_Vector(1.f) : Compute_RandDirection();
 	m_pDirections[iInstanceIndex] = _float3{ vDirection.x, vDirection.y, vDirection.z };
@@ -725,6 +801,8 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 
 
 	_float4 vColor = Compute_RandColor();
+	pVertices[iInstanceIndex].vColor = vColor;
+
 	m_pColors[iInstanceIndex] = _float3{ vColor.x, vColor.y, vColor.z };
 	m_pAlphas[iInstanceIndex] = vColor.w;
 
@@ -733,6 +811,7 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE] == true)
 		m_pVelocities[iInstanceIndex] = m_pDirections[iInstanceIndex] * m_pSpeeds[iInstanceIndex];
 
+	m_pPrePositions[iInstanceIndex] = vPosition;
 }
 void CVIBuffer_Instance::Free()
 {
@@ -753,6 +832,8 @@ void CVIBuffer_Instance::Free()
 
 	Safe_Delete_Array(m_pOrbitSpeed);
 	Safe_Delete_Array(m_pPreAxis);
+	Safe_Delete_Array(m_pAccSupplyAmount);
+	Safe_Delete_Array(m_pTurnSupplyAmount);
 
 	Safe_Delete_Array(m_pInstanceVertices);
 	Safe_Release(m_pVBInstance);

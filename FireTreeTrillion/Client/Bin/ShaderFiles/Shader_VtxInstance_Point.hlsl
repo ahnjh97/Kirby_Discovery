@@ -23,6 +23,8 @@ struct VS_IN
     float3 vPosition : POSITION;
     row_major float4x4 TransformMatrix : WORLD;
     bool bAlive : COLOR0;
+    float fAngleZ : COLOR1;
+    float4 vColor : COLOR2;
 };
 
 
@@ -32,6 +34,8 @@ struct VS_OUT
     row_major float4x4 TransformMatrix : WORLD;
     float2 vPSize : PSIZE;
     bool bAlive : COLOR0;
+    float fAngleZ : COLOR1;
+    float4 vColor : COLOR2;
     float4 vProjPos : TEXCOORD1;
 };
 
@@ -118,6 +122,9 @@ VS_OUT VS_MAIN(VS_IN In)
     Out.vPosition = mul(vPosition, g_WorldMatrix);
     Out.vPSize = float2(In.TransformMatrix._11, In.TransformMatrix._22);
     Out.bAlive = In.bAlive;
+    Out.fAngleZ = In.fAngleZ;
+    Out.vColor = In.vColor;
+
     Out.TransformMatrix = In.TransformMatrix;
   
     matrix matWV, matWVP;
@@ -149,6 +156,9 @@ struct GS_IN
     row_major float4x4 TransformMatrix : WORLD;
     float2 vPSize : PSIZE;
     bool bAlive : COLOR0;
+    float fAngleZ : COLOR1;
+    float4 vColor : COLOR2;
+
     float4 vProjPos : TEXCOORD1;
 };
 
@@ -157,6 +167,8 @@ struct GS_OUT
     float4 vPosition : SV_POSITION;
     float2 vTexcoord : TEXCOORD0;
     bool bAlive : COLOR0;
+    float4 vColor : COLOR1;
+
     float4 vProjPos : TEXCOORD1;
 };
 
@@ -173,9 +185,9 @@ void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
     float3 vUp = normalize(cross(vLook, vRight)) * In[0].vPSize.y * 0.5f;
     
     
-    float fZAngle = atan2(In[0].TransformMatrix._21, In[0].TransformMatrix._11);
+    //float fZAngle = atan2(In[0].TransformMatrix._21, In[0].TransformMatrix._11);
     
-    matrix ZRotMatrix = CreateRotationMatrix(vLook, fZAngle);
+    matrix ZRotMatrix = CreateRotationMatrix(vLook, In[0].fAngleZ);
 
     
     vRight = mul(float4(vRight, 0), ZRotMatrix).xyz;
@@ -190,27 +202,39 @@ void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
 
     Out[0].vPosition = vector(In[0].vPosition.xyz + vRight + vUp, 1.f);
     Out[0].vTexcoord = float2(0.0f, 0.0f);
-    Out[0].vPosition = mul(Out[0].vPosition, matVP);
-    Out[0].bAlive = In[0].bAlive;
-    Out[0].vProjPos = In[0].vProjPos;
+    //Out[0].vPosition = mul(Out[0].vPosition, matVP);
+    //Out[0].bAlive = In[0].bAlive;
+    //Out[0].vColor = In[0].vColor;
+    //Out[0].vProjPos = In[0].vProjPos;
 
     Out[1].vPosition = vector(In[0].vPosition.xyz - vRight + vUp, 1.f);
     Out[1].vTexcoord = float2(1.0f, 0.0f);
-    Out[1].vPosition = mul(Out[1].vPosition, matVP);
-    Out[1].bAlive = In[0].bAlive;
-    Out[1].vProjPos = In[0].vProjPos;
+    //Out[1].vPosition = mul(Out[1].vPosition, matVP);
+    //Out[1].bAlive = In[0].bAlive;
+    //Out[1].vColor = In[0].vColor;
+    //Out[1].vProjPos = In[0].vProjPos;
 
     Out[2].vPosition = vector(In[0].vPosition.xyz - vRight - vUp, 1.f);
     Out[2].vTexcoord = float2(1.0f, 1.0f);
-    Out[2].vPosition = mul(Out[2].vPosition, matVP);
-    Out[2].bAlive = In[0].bAlive;
-    Out[2].vProjPos = In[0].vProjPos;
+    //Out[2].vPosition = mul(Out[2].vPosition, matVP);
+    //Out[2].bAlive = In[0].bAlive;
+    //Out[2].vColor = In[0].vColor;
+    //Out[2].vProjPos = In[0].vProjPos;
 
     Out[3].vPosition = vector(In[0].vPosition.xyz + vRight - vUp, 1.f);
     Out[3].vTexcoord = float2(0.0f, 1.0f);
-    Out[3].vPosition = mul(Out[3].vPosition, matVP);
-    Out[3].bAlive = In[0].bAlive;
-    Out[3].vProjPos = In[0].vProjPos;
+    //Out[3].vPosition = mul(Out[3].vPosition, matVP);
+    //Out[3].bAlive = In[0].bAlive;
+    //Out[3].vColor = In[0].vColor;
+    //Out[3].vProjPos = In[0].vProjPos;
+    
+    for (int i = 0; i < 4; ++i)
+    {
+        Out[i].vPosition = mul(Out[i].vPosition, matVP);
+        Out[i].bAlive = In[0].bAlive;
+        Out[i].vColor = In[0].vColor;
+        Out[i].vProjPos = In[0].vProjPos;
+    }
 
     Vertices.Append(Out[0]);
     Vertices.Append(Out[1]);
@@ -227,6 +251,8 @@ struct PS_IN
     float4 vPosition : SV_POSITION;
     float2 vTexcoord : TEXCOORD0;
     bool bAlive : COLOR0;
+    float4 vColor : COLOR1;
+
     float4 vProjPos : TEXCOORD1;
 };
 
@@ -270,7 +296,7 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN In)
     if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f) || !In.bAlive)
         discard;
 	
-    Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
+    Out.vColor.rgb = vDiffuse.rgb * In.vColor.rgb;
     Out.vColor.a = vDiffuse.a * g_fAlpha;
 	
 		//소프트 이펙트 보정
@@ -283,6 +309,10 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN In)
     float fOldViewZ = vDepthDesc.y * g_fFar;
 
     Out.vColor.a = Out.vColor.a * saturate(fOldViewZ - In.vProjPos.w);
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
 	
     return Out;
 }
@@ -295,8 +325,12 @@ PS_OUT PS_MAIN_WHITE_FX(PS_IN In)
     if (vBrightness.a < .01f || ( (vBrightness.r + vBrightness.g + vBrightness.b) / 3 < 0.1f) || !In.bAlive)
         discard;
 	
-    Out.vColor.rgb = g_vRColor;
+    Out.vColor.rgb = In.vColor.rgb;
     Out.vColor.a = vBrightness.r * g_fAlpha; // 어두울수록 투명
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
 
     return Out;
 }
@@ -312,6 +346,11 @@ PS_OUT PS_FOG(PS_IN In)
 
     Out.vColor.a = vDiffuse.a * g_fAlpha;
     Out.vColor.rgb = vDiffuse.rgb;
+    
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
     
     return Out;
 }

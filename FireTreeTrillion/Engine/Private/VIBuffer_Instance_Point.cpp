@@ -231,6 +231,32 @@ _float4 CVIBuffer_Instance_Point::Compute_RandColor()
 				/*SATURATE*/(m_InstanceDesc.fAlpha + CUtils::Make_RandomFloat(-m_InstanceDesc.fAlphaRandomOffset, m_InstanceDesc.fAlphaRandomOffset)) };
 }
 
+_float4 CVIBuffer_Instance_Point::Compute_RandRangePosition()
+{
+	if (m_InstanceDesc.fMinRange >= m_InstanceDesc.fMaxRange)
+		return _float4();
+
+	_float3 vCenter = m_InstanceDesc.vCenter;
+
+	_float4 vPos = vCenter + (_float3)CUtils::Make_Random_Vector(CUtils::Make_RandomFloat(m_InstanceDesc.fMinRange, m_InstanceDesc.fMaxRange));
+
+	_float fMinX = vCenter.x - m_InstanceDesc.vRange.x;
+	_float fMaxX = vCenter.x + m_InstanceDesc.vRange.x;
+	_float fMinY = vCenter.y - m_InstanceDesc.vRange.y;
+	_float fMaxY = vCenter.y + m_InstanceDesc.vRange.y;
+	_float fMinZ = vCenter.z - m_InstanceDesc.vRange.z;
+	_float fMaxZ = vCenter.z + m_InstanceDesc.vRange.z;
+
+	if (vPos.x < fMinX || vPos.x > fMaxX)
+		vPos.x = MAPVALUE(vPos.x, vCenter.x - m_InstanceDesc.fMaxRange, vCenter.x + m_InstanceDesc.fMaxRange, fMinX, fMaxX);
+	if (vPos.y < fMinY || vPos.y > fMaxY)
+		vPos.y = MAPVALUE(vPos.y, vCenter.y - m_InstanceDesc.fMaxRange, vCenter.y + m_InstanceDesc.fMaxRange, fMinY, fMaxY);
+	if (vPos.z < fMinZ || vPos.z > fMaxZ)
+		vPos.z = MAPVALUE(vPos.z, vCenter.z - m_InstanceDesc.fMaxRange, vCenter.z + m_InstanceDesc.fMaxRange, fMinZ, fMaxZ);
+
+	return vPos;
+}
+
 
 //CVIBuffer_Instance_Point * CVIBuffer_Instance_Point::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const INSTANCE_DESC& InstanceDesc)
 //{

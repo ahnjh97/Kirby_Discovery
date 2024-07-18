@@ -59,6 +59,8 @@ namespace Engine
 		//시작 범위(랜덤X)
 		_float3		vCenter;
 		_float3		vRange;
+		_float		fMinRange = { 0.f };
+		_float		fMaxRange = { 1.f };
 
 		//회전
 		_float3		vRotation;
@@ -334,7 +336,9 @@ namespace Engine
 		_float4		vUp;
 		_float4		vLook;
 		_float4		vPosition;		
-		bool			bAlive;
+		_bool		bAlive;
+		_float		fAngleZ;
+		_float4		vColor;
 
 	}VTXMATRIX;
 
@@ -346,8 +350,8 @@ namespace Engine
 
 	typedef struct ENGINE_DLL
 	{
-		static const unsigned int	iNumElements = { 6 };
-		static const D3D11_INPUT_ELEMENT_DESC	Elements[6];
+		static const unsigned int	iNumElements = { 8 };
+		static const D3D11_INPUT_ELEMENT_DESC	Elements[8];
 	}VTXINSTANCE_POINT;
 
 

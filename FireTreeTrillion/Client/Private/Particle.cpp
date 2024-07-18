@@ -281,12 +281,25 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT])
 		m_pVIBufferCom->Orbit(fMyTimeDelta, pVertices);
 
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ACCELERATION])
+		m_pVIBufferCom->Acceleration(fMyTimeDelta, pVertices);
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE])
+		m_pVIBufferCom->Decelerate(fMyTimeDelta, pVertices);
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITACCELERATION])
+		m_pVIBufferCom->OrbitAcceleration(fMyTimeDelta, pVertices);
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITDECELERATE])
+		m_pVIBufferCom->OrbitDecelerate(fMyTimeDelta, pVertices);
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY])
 		m_pVIBufferCom->Gravity(fMyTimeDelta, pVertices);
 
+	m_pVIBufferCom->Save_PrePos(pVertices);
 
-	m_pVIBufferCom->Apply_Velocity(fMyTimeDelta, pVertices);
+
+	//m_pVIBufferCom->Apply_Velocity(fMyTimeDelta, pVertices);
 
 	m_pVIBufferCom->Unmap();
 

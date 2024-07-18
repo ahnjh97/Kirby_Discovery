@@ -1284,7 +1284,12 @@ static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
 
 		//CParticle::PARTICLE_DESC SingleFXDesc{};
 		//SingleFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+<<<<<<< Updated upstream
 		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerChargeParticle"), &SingleFXDesc)))
+=======
+		//SingleFXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_start particle test A"), &SingleFXDesc)))
+>>>>>>> Stashed changes
 		//	return;
 
 
@@ -1390,13 +1395,33 @@ static void SwordSpinCharge(CTransform* pTransformCom)
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword_Copy Bubble_One"), &FXDesc)))
 		return;
 
-
 }
 
-static void SwordSpinSlash_One(CTransform* pTransformCom)
+<<<<<<< Updated upstream
+=======
+static void SwordSpinChargeBig(CTransform* pTransformCom)
 {
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
 
+	FXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, -.4f, 0.f, 0.f });
+	FXDesc.vInitRot = CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook());
+	FXDesc.vInitScale = { 6.f, 6.f, 6.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword_Copy Bubble_One"), &FXDesc)))
+		return;
+
+	//CParticle::PARTICLE_DESC FXPDesc{};
+	//FXPDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+	//FXPDesc.vInitPos = _float3{ 0.f, 0.8f, 0.f };
+	//FXPDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+	//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW SwordParticle"), &FXPDesc)))
+	//	return;
+}
+
+
+>>>>>>> Stashed changes
+static void SwordSpinSlash_One(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
 	FXDesc.vInitPos = _float3{ 0.f, .2f, 0.f};
 	FXDesc.vInitScale = { 5.f, 5.f, 5.f };
 	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();

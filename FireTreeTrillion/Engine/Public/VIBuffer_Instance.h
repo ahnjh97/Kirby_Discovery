@@ -26,9 +26,12 @@ public:
 	virtual _float4 Compute_RandDirection() = 0;
 	//공전 스피드 계산
 	virtual _float Compute_RandOrbitSpeed() = 0;
-
 	//Color + Alpha 계산
 	virtual _float4 Compute_RandColor() = 0;
+	// 범위 기준 랜덤 선택일 때, 랜덤으로 포지셔닝이 된다.
+	virtual _float4 Compute_RandRangePosition() = 0;
+
+
 
 	_float4 Compute_RectanglePos(_uint iIndex);
 
@@ -42,7 +45,6 @@ public:
 
 	virtual void Drop(_float fTimeDelta, VTXMATRIX* pVertices);
 	virtual void Spread(_float fTimeDelta, VTXMATRIX* pVertices);
-	virtual void Decelerate(_float fTimeDelta, VTXMATRIX* pVertices);
 	virtual void Appear(_float fTimeDelta, VTXMATRIX* pVertices);
 	virtual void Disappear(_float fTimeDelta, VTXMATRIX* pVertices);
 	virtual void Wiggle(_float fTimeDelta, VTXMATRIX* pVertices);
@@ -55,8 +57,19 @@ public:
 
 	//중점 주위를 돈다.
 	virtual void Orbit(_float fTimeDelta, VTXMATRIX* pVertices);
+
 	//중점으로 모인다.
 	virtual void Assemble(_float fTimeDelta, VTXMATRIX* pVertices);
+
+	//감속, 가속한다.
+	virtual void Acceleration(_float fTimeDelta, VTXMATRIX* pVertices);
+	virtual void Decelerate(_float fTimeDelta, VTXMATRIX* pVertices);
+	//공전 감속, 가속한다.
+	virtual void OrbitAcceleration(_float fTimeDelta, VTXMATRIX* pVertices);
+	virtual void OrbitDecelerate(_float fTimeDelta, VTXMATRIX* pVertices);
+
+	virtual void Save_PrePos(VTXMATRIX* pVertices);
+
 
 	void Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta);
 
@@ -113,8 +126,10 @@ protected:
 	_float3*					m_pPrePositions = { nullptr };
 	_float3*					m_pVelocities = { nullptr };
 
-
 	_float3*					m_pPreAxis = { nullptr };
+
+	_float*						m_pAccSupplyAmount = { nullptr };
+	_float*						m_pTurnSupplyAmount = { nullptr };
 	
 
 	//void	Update_Buffer(_uint _iNumInstance);

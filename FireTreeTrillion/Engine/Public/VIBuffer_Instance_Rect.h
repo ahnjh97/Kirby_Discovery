@@ -25,9 +25,12 @@ public:
 
 	virtual _float4 Compute_RandColor() override;
 
+	virtual _float4 Compute_RandRangePosition() override;
+
 
 	//virtual HRESULT Initialize_Prototype(const INSTANCE_DESC& InstanceDesc);
 	virtual HRESULT Initialize(void* pArg) override;
+
 
 
 public:
