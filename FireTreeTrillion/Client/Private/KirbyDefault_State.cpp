@@ -1127,12 +1127,50 @@ void CKirbyDefault_Slide_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		if (pKirby->isAnimFinish())
 		{
 			DESC(m_fMoveSpeed) = 18.f;
+
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
+			FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
+			FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y + 40.f, 0.f };
+			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+				return;
+
+			FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+				return;
+
+			FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y - 40.f, 0.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+				return;
+
 			pKirby->Change_State(CKirby::STATE_SLIDE, 60.f, true, false, CKirby::BODY_DEFAULT);
 			return;
+
 		}
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_SLIDE)
 	{
+		m_fEffectTime += fTimeDelta;
+
+		if (m_fEffectTime > 0.05f)
+		{
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
+			FXDesc.vInitPos = { vMyPos.x + CUtils::Make_RandomFloat(0.f, 0.3f), vMyPos.y + .3f, vMyPos.z + CUtils::Make_RandomFloat(0.f, 0.3f) };
+			FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y + CUtils::Make_RandomFloat(-3.f, 3.f), 0.f };
+			FXDesc.vInitScale = { 0.7f, 0.7f, 0.7f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+				return;
+
+			m_fEffectTime = 0.f;
+		}
+
+
 		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 		_vector vMoveDelta = DESC(m_vDodgeDir) * fTimeDelta * DESC(m_fMoveSpeed);
 		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);

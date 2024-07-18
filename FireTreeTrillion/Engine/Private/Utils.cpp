@@ -98,7 +98,9 @@ _vector CUtils::Make_Random_Vector(_float fVectorLength)
 		XMMatrixRotationY(XMConvertToRadians(Make_RandomFloat(0.f, 360.f))) *
 		XMMatrixRotationZ(XMConvertToRadians(Make_RandomFloat(0.f, 360.f)));
 
-	return vTempVector = XMVector4Transform(vTempVector, rotationMatrix);
+	vTempVector = XMVector4Transform(vTempVector, rotationMatrix);
+	return XMVectorSetW(vTempVector, 0.f);
+
 }
 
 // 벡터의 방향과 랜덤 범위각도 및 벡터의 길이를 지정해주면, 각도 내에서 랜덤한 벡터를 리턴한다.
