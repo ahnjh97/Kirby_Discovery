@@ -241,6 +241,7 @@ CRabbit_Jump_State::CRabbit_Jump_State()
 void CRabbit_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	m_fEffect = false;
 }
 
 void CRabbit_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -253,6 +254,32 @@ void CRabbit_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
 
 	pTransformCom->Look_At_Axis(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+
+	if(CRabbit::RABBIT_JUMPSTART == pRabbit->Get_State())
+	{
+		if (false == m_fEffect)
+		{
+			m_fEffect = true;
+			for (_uint i = 0; i < 6; ++i)
+			{
+				_float4 vRotatePos = {};
+				_float4 vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+				_float fAngle = CUtils::Make_RandomFloat(10.f, 90.f);
+				vRotatePos.x = vPos.x + (0.8f * sin(XMConvertToRadians((_float)i * 60.f + fAngle)));
+				vRotatePos.y = vPos.y;
+				vRotatePos.z = vPos.z - (0.8f * cos(XMConvertToRadians((_float)i * 60.f + fAngle)));
+
+				CEffect::FX_DESC FXDesc{};
+				FXDesc.vInitPos = { vRotatePos.x, vRotatePos.y + 0.25f, vRotatePos.z };
+				//FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 90.f), 0.f };
+				FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+				//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+				pRabbit->Add_Effect("BBongBBongE", FXDesc);
+			}
+		}
+	}
 
 	if (true == pRabbit->IsAnimFinished())
 	{

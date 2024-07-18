@@ -122,7 +122,9 @@ public:
 	_float4x4 Get_WorldMatrixForOctree() { return m_matWorld; }
 	HRESULT Bind_WorldMatrixForOctree(class CShader* pShader, string& strConstantName = string("g_WorldMatrix"));
 	void SetUp_ModelIdleAnimForOctree(_uint iAnimIndex, _float fTickPerSec) { m_iIdleAnimIndex = iAnimIndex; m_fIdleAnimTickPerSec = fTickPerSec; }
+	void SetUp_ActionAnimForOctree(_uint iAnimIndex) { m_iActionAnimIndex = iAnimIndex; }
 	void ReturnToIdle() { Set_Animation(m_iIdleAnimIndex, m_fIdleAnimTickPerSec, true, true, 0.1f); }
+	_bool CheckHideAfterAnimFinish();
 	
 	void Set_Hide(_bool bHide) { m_bHide = bHide; }
 	_bool IsHidden() { return m_bHide; }
@@ -186,6 +188,7 @@ private:
 	_uint						m_iIdleAnimIndex = {};
 	_float						m_fIdleAnimTickPerSec = {};
 	_bool						m_bHide = { false };
+	_int						m_iActionAnimIndex = { -1 };
 
 	unordered_map<_uint, pair<vector<_uint>, unordered_set<_uint>>>	m_mapValidBones;
 

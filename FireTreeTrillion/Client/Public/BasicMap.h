@@ -96,6 +96,8 @@ private:
 	unordered_set<string> m_setShadowDecos;
 	vector<CGameObject*> m_vecShadowObjects;
 
+	unordered_set<string> m_setAfterHideAnimDecos;
+
 	_float m_fMinX = {};
 
 private:

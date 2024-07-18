@@ -61,7 +61,7 @@ private:
 	ANIM_TYPE m_eAnimType = { ANIM_END };
 	ANIM_TYPE m_ePreAnimType = { ANIM_END };
 	_float	m_fTimeDelta = { 0.f };
-
+	_float	m_fEffectAccTime = { 0.f };
 
 private:
 	_float2			m_vPreScreenPos = { 0.f, 0.f };
