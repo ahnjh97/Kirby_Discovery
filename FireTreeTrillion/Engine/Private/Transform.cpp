@@ -380,6 +380,8 @@ void CTransform::Turn(_fvector vAxis, _float fTimeDelta, _float fAngle)
 {
 	if (XMVector3Equal(vAxis, XMVectorZero()))
 		return;
+	if (XMVector3IsInfinite(vAxis))
+		return;
 
 	_matrix			RotationMatrix = XMMatrixRotationAxis(vAxis, XMConvertToRadians(fAngle) * fTimeDelta);
 

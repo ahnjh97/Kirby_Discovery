@@ -1282,10 +1282,11 @@ static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
 		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
 			return;
 
-		//CParticle::PARTICLE_DESC SingleFXDesc{};
-		//SingleFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerChargeParticle"), &SingleFXDesc)))
-		//	return;
+		CParticle::PARTICLE_DESC SingleFXDesc{};
+		SingleFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+		SingleFXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_start particle test A"), &SingleFXDesc)))
+			return;
 
 
 		/*

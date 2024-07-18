@@ -247,7 +247,7 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	if (m_pSoketMatrix != nullptr)
 		m_pTransformCom->Set_WorldMatrix(*m_pSoketMatrix);
 
-	m_pTransformCom->Set_Scaled(m_vInitScale);
+	//m_pTransformCom->Set_Scaled(m_vInitScale);
 
 	Compute_ViewZ();
 
