@@ -1366,7 +1366,18 @@ static void SwordDash(CTransform* pTransformCom)
 	FXDesc.fStartDelay = .1f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword Dash Test A"), &FXDesc)))
 		return;
+}
 
+static void BodySlide(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
+	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+
+	FXDesc.vInitPos = _float3{ 0.1f, 0.f, 2.1f };
+	FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+	FXDesc.fStartDelay = 0.f;
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword Dash Test A"), &FXDesc)))
+		return;
 }
 
 static void SwordSpinCharge(CTransform* pTransformCom)
@@ -1390,6 +1401,17 @@ static void SwordSpinSlash_One(CTransform* pTransformCom)
 	FXDesc.vInitScale = { 5.f, 5.f, 5.f };
 	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword_Spin Attack A"), &FXDesc)))
+		return;
+}
+
+static void SwordSpinSlash_Two(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
+
+	FXDesc.vInitPos = _float3{ 0.f, .2f, 0.f };
+	FXDesc.vInitScale = { 5.f, 5.f, 5.f };
+	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword_Spin Attack B"), &FXDesc)))
 		return;
 }
 

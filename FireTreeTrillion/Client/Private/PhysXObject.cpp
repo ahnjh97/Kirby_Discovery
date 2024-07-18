@@ -127,7 +127,7 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 		FXDesc.vInitScale = { 4.f, 4.f, 4.f };
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-		Add_Effect("FlyingBubble_v1", true);
+		Add_Effect("FlyingBubble_v1",  FXDesc, true);
 
 		//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_FlyingBubble_v1"), &FXDesc)))
 		//	return;
