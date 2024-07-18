@@ -40,11 +40,13 @@ HRESULT CFood::Initialize(void* pArg)
 	m_eItemType = ITEM_FOOD;
 	m_iItemPoint = 30;
 
-	//CMultiEffect::MULTI_FX_DESC FXDesc{};
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
+	FXDesc.vInitPos = { 0.f, .3f, 0.f };
+	FXDesc.pSocketMatrix = &m_EffectSocket;
+	FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 
-	//FXDesc.vInitPos = { 0.f, .3f, 0.f };
-	//FXDesc.pSocketMatrix = &m_EffectSocket;
-	//FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+	Add_Effect("ItemBubble1", FXDesc, true);
+
 	//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
 	//	return E_FAIL;
 

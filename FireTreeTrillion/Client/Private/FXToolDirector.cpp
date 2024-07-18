@@ -140,6 +140,8 @@ void CFXToolDirector::Make_Effect(PARTICLE_DATA& _FXData)
 	InstanceDesc.vDirRandomOffset = _FXData.vDirRandomOffset;
 	InstanceDesc.fSpeed = _FXData.fSpeed;
 	InstanceDesc.fSpeedRandomOffset = _FXData.fSpeedRandomOffset;
+	InstanceDesc.fOrbitSpeed = _FXData.fOrbitSpeed;
+	InstanceDesc.fOrbitSpeedRandomOffset = _FXData.fOrbitSpeedRandomOffset;
 	InstanceDesc.vColor = _FXData.vColor;
 	InstanceDesc.vColorRandomOffset = _FXData.vColorRandomOffset;
 	InstanceDesc.fAlpha = _FXData.fAlpha;
