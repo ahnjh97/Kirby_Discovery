@@ -159,6 +159,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			pFinalBoss->Set_AirArrow(false);
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
 		}
+
 		// ¤©¤··£´ýÀ¸·Î °¡¸é µüÀÏµí
 		//if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 		//{

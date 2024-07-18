@@ -224,6 +224,8 @@ void CKirbyHammer_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex,
 		FXDesc.fStartDelay = 0.1f;
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+
+
 		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail"), &FXDesc)))
 			return;
 		static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
