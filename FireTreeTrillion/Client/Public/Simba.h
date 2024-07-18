@@ -87,6 +87,8 @@ public:
 	void SetCamSequence(_uint iCamSeq);
 	void ResetStarCount() { m_iStarCount = 0; }
 	void ChangeDimensionClawUpDown() { m_bDimensionClawUpAttack = !m_bDimensionClawUpAttack; }
+	void Set_StarPosToRightHand() { m_bBiteRushSpawnStarAtLeft = false; }
+	void Set_StarPosToLeftHand() { m_bBiteRushSpawnStarAtLeft = true; }
 
 public:
 	virtual HRESULT Initialize_Prototype()			override;
@@ -153,6 +155,7 @@ private:
 
 	_uint			m_iStarCount = {};
 	_bool			m_bDimensionClawUpAttack = { false };
+	_bool			m_bBiteRushSpawnStarAtLeft = { true };
 
 private:
 	HRESULT		Add_Components();
