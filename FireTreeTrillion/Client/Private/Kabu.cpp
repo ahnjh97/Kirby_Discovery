@@ -200,47 +200,6 @@ _int CKabu::Tick(_float fTimeDelta)
 					}
 				}
 			}
-			//m_fMoveTime += m_fTimeDelta;
-
-			//if (1.f < m_fMoveTime)
-			//	m_fSpeed -= m_fTimeDelta * 5.f;
-			//else if (1.f >= m_fMoveTime)
-			//	m_fSpeed += m_fTimeDelta * 5.f;
-
-			//if (2.f < m_fMoveTime)
-			//{
-			//	m_fMoveTime = 0.f;
-			//	m_fSpeed = 0.f;
-
-			//	if (m_iCnt == 0)
-			//	{
-			//		m_bConvert = false;
-			//		m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
-			//		m_iCnt++;
-			//	}
-			//	else if (m_iCnt < m_vecRallyPoint.size() - 1)
-			//	{
-			//		if (false == m_bConvert)
-			//		{
-			//			m_vRally = m_vecRallyPoint[m_iCnt + 1] - m_vecRallyPoint[m_iCnt];
-			//			m_iCnt++;
-			//		}
-			//		else
-			//		{
-			//			m_iCnt--;
-			//			m_vRally = m_vecRallyPoint[m_iCnt] - m_vecRallyPoint[m_iCnt + 1];
-			//		}
-			//	}
-			//	else
-			//	{
-			//		//m_iCnt = 0;
-			//		m_bConvert = true;
-			//		m_iCnt--;
-			//		m_vRally = m_vecRallyPoint[m_iCnt] - m_vecRallyPoint[m_iCnt + 1];
-			//	}
-			//}
-
-			//m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
 		}
 	}
 

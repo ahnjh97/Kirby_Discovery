@@ -61,7 +61,7 @@ _int CBomber::Tick(_float fTimeDelta)
 	__super::Tick(m_fTimeDelta);
 
 	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
-		Change_State(BOMBER_DAMAGE, 50.f, false, true);
+		Change_State(BOMBER_EXPLOSION, 50.f, false, true);
 
 
 	return OBJ_NOEVENT;
@@ -156,7 +156,7 @@ void CBomber::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* p
 	{
 		if (m_ePhyXState == PO_NORMAL)
 		{
-			Change_State(BOMBER_DAMAGE, 50.f, false, true);
+			Change_State(BOMBER_EXPLOSION, 50.f, false, true);
 		}
 	}
 	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
@@ -167,7 +167,7 @@ void CBomber::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* p
 	{
 		if (m_ePhyXState == PO_NORMAL)
 		{
-			Change_State(BOMBER_DAMAGE, 50.f, false, true);
+			Change_State(BOMBER_EXPLOSION, 50.f, false, true);
 		}
 	}
 }
