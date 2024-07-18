@@ -569,14 +569,17 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				m_pTransformCom->Go_Straight(_fTimeDelta * 0.2f); 
 				break;
 
-			case DFIELD_QUAKE:
-				Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
-				break;
+			//case DFIELD_QUAKE:
+			//	Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
+			//	break;
 			}
 
 			if (-67.289f <= vCurPos.z)
 			{
 				vCurPos.z = -67.289f;
+				m_eDFMoveState = DFIELD_WAIT;
+
+				/*
 				m_fStartQuake += _fTimeDelta;
 
 				if (m_fStartQuake < 0.5f)
@@ -587,6 +590,7 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 					m_eDFMoveState = DFIELD_WAIT;
 					m_fStartQuake = 0.f;
 				}
+				*/
 			}
 			else
 				m_eDFMoveState = DFIELD_MOVE;
