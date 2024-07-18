@@ -118,6 +118,9 @@ protected:
 
 	_float*						m_pStartDelays = { nullptr };
 
+	_float*						m_pAccSupplyAmount = { nullptr };
+	_float*						m_pTurnSupplyAmount = { nullptr };
+
 
 	//나머지 계산용 변수들
 	_float3*					m_pInitialScales = { nullptr };
@@ -128,8 +131,6 @@ protected:
 
 	_float3*					m_pPreAxis = { nullptr };
 
-	_float*						m_pAccSupplyAmount = { nullptr };
-	_float*						m_pTurnSupplyAmount = { nullptr };
 	
 
 	//void	Update_Buffer(_uint _iNumInstance);

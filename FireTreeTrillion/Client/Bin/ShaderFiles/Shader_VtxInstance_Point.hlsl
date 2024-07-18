@@ -24,7 +24,7 @@ struct VS_IN
     row_major float4x4 TransformMatrix : WORLD;
     bool bAlive : COLOR0;
     float fAngleZ : COLOR1;
-    float4 vColor : COLOR2;
+    float4 vColor : TEXCOORD0;
 };
 
 

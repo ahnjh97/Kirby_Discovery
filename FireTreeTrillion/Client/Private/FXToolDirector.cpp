@@ -136,17 +136,24 @@ void CFXToolDirector::Make_Effect(PARTICLE_DATA& _FXData)
 	InstanceDesc.fStartDelay = _FXData.fStartDelay;
 	InstanceDesc.fStarDelayRandomOffset = _FXData.fStarDelayRandomOffset;
 	InstanceDesc.vCenter = _FXData.vCenter;
+
 	InstanceDesc.vRange = _FXData.vRange;
 	InstanceDesc.vRotation = _FXData.vRotation;
 	InstanceDesc.vRotationRandomOffset = _FXData.vRotationRandomOffset;
+
 	InstanceDesc.vScale = _FXData.vScale;
 	InstanceDesc.vScaleRandomOffset = _FXData.vScaleRandomOffset;
 	InstanceDesc.vDir = _FXData.vDir;
 	InstanceDesc.vDirRandomOffset = _FXData.vDirRandomOffset;
 	InstanceDesc.fSpeed = _FXData.fSpeed;
 	InstanceDesc.fSpeedRandomOffset = _FXData.fSpeedRandomOffset;
+
 	InstanceDesc.fOrbitSpeed = _FXData.fOrbitSpeed;
 	InstanceDesc.fOrbitSpeedRandomOffset = _FXData.fOrbitSpeedRandomOffset;
+
+	InstanceDesc.fAccSupplyAmount = _FXData.fAccSupplyAmount;
+	InstanceDesc.fTurnSupplyAmount = _FXData.fTurnSupplyAmount;
+
 	InstanceDesc.vColor = _FXData.vColor;
 	InstanceDesc.vColorRandomOffset = _FXData.vColorRandomOffset;
 	InstanceDesc.fAlpha = _FXData.fAlpha;
@@ -348,6 +355,9 @@ HRESULT CFXToolDirector::Save_Particle(CEffect* pEffect, const wstring& strFileN
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fOrbitSpeed), sizeof(_float));
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fOrbitSpeedRandomOffset), sizeof(_float));
+
+	//OutputFile.write(reinterpret_cast<const char*>(&FXData.fAccSupplyAmount), sizeof(_float));
+	//OutputFile.write(reinterpret_cast<const char*>(&FXData.fTurnSupplyAmount), sizeof(_float));
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vColor), sizeof(_float3));
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vColorRandomOffset), sizeof(_float3));
@@ -636,6 +646,9 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeed), sizeof(_float));
 	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeedRandomOffset), sizeof(_float));
+
+	//InputFile.read(reinterpret_cast<char*>(&_pData->fAccSupplyAmount), sizeof(_float));
+	//InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSupplyAmount), sizeof(_float));
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->vColor), sizeof(_float3));
 	InputFile.read(reinterpret_cast<char*>(&_pData->vColorRandomOffset), sizeof(_float3));
@@ -1715,99 +1728,139 @@ void CFXToolDirector::Render_FXProperty()
 	_bool bEdited{ false };
 	auto moveIter = pCurParticle->m_InstanceDesc.vecMoveCommands.begin();
 
-	_bool bSimpleMove = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE];
+	_bool bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE];
 
-	if (Checkbox(u8"SimpleMove", &bSimpleMove))
+
+	SeparatorText(u8"이동");
+
+	if (Checkbox(u8"SimpleMove", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE] = bSimpleMove;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE] = bCommand;
+		bEdited = true;
+	}
+
+	SameLine();
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DROP];
+
+	if (Checkbox(u8"Drop", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DROP] = bCommand;
 		bEdited = true;
 	}
 	SameLine();
 
-	_bool bDrop = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DROP];
-
-	if (Checkbox(u8"Drop", &bDrop))
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD];
+	if (Checkbox(u8"Spread", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DROP] = bDrop;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD] = bCommand;
 		bEdited = true;
 	}
 	SameLine();
 
-	_bool bSpread = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD];
-	if (Checkbox(u8"Spread", &bSpread))
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ASSEMBLE];
+	if (Checkbox(u8"Assemble", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD] = bSpread;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ASSEMBLE] = bCommand;
 		bEdited = true;
 	}
-	SameLine();
 
-	_bool bDecelerate = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE];
-	if (Checkbox(u8"Decelerate", &bDecelerate))
+	SeparatorText(u8"가감속");
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ACCELERATION];
+	if (Checkbox(u8"Accelerate", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE] = bDecelerate;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ACCELERATION] = bCommand;
+		bEdited = true;
+	}
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE];
+	if (Checkbox(u8"Decelerate", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE] = bCommand;
+		bEdited = true;
+	}
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITACCELERATION];
+	if (Checkbox(u8"Orbit Accelerate", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITACCELERATION] = bCommand;
+		bEdited = true;
+	}
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITDECELERATE];
+	if (Checkbox(u8"Orbit Decelerate", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITDECELERATE] = bCommand;
 		bEdited = true;
 	}
 
 	Spacing();
 
-	_bool bAppear = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_APPEAR];
-	if (Checkbox(u8"Appear", &bAppear))
+	SeparatorText(u8"회전");
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_WIGGLE];
+	if (Checkbox(u8"Wiggle", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_APPEAR] = bAppear;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_WIGGLE] = bCommand;
+		bEdited = true;
+	}
+
+	 SameLine();
+
+	 bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT];
+	 if (Checkbox(u8"Orbit", &bCommand))
+	 {
+		 pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT] = bCommand;
+		bEdited = true;
+	}
+
+
+	SameLine();
+
+	SeparatorText(u8"크기");
+
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_APPEAR];
+	if (Checkbox(u8"Appear", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_APPEAR] = bCommand;
 		bEdited = true;
 	}
 	SameLine();
 
-	_bool bDisappear = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DISAPPEAR];
-	if (Checkbox(u8"Disappear", &bDisappear))
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DISAPPEAR];
+	if (Checkbox(u8"Disappear", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DISAPPEAR] = bDisappear;
-		bEdited = true;
-	}
-	SameLine();
-
-	_bool bWiggle = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_WIGGLE];
-	if (Checkbox(u8"Wiggle", &bWiggle))
-	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_WIGGLE] = bWiggle;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DISAPPEAR] = bCommand;
 		bEdited = true;
 	}
 
 	SameLine();
 
-	_bool bTail = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TAIL];
-	if (Checkbox(u8"Tail", &bTail))
+	SeparatorText(u8"기타");
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TAIL];
+	if (Checkbox(u8"Tail", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TAIL] = bTail;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TAIL] = bCommand;
 		bEdited = true;
 	}
 
 	Spacing();
 
-	_bool bGravity = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY];
-	if (Checkbox(u8"Gravity", &bGravity))
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY];
+	if (Checkbox(u8"Gravity", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY] = bGravity;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY] = bCommand;
 		bEdited = true;
 	}
 
 	SameLine();
 
-	_bool bEdit = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT];
-	if (Checkbox(u8"Orbit", &bEdit))
-	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT] = bEdit;
-		bEdited = true;
-	}
+	
 
-	SameLine();
 
-	bEdit = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ASSEMBLE];
-	if (Checkbox(u8"Assemble", &bEdit))
-	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ASSEMBLE] = bEdit;
-		bEdited = true;
-	}
 	Separator();
 
 	if (DragFloat(u8"시작 딜레이", &pCurParticle->m_InstanceDesc.fStartDelay, .1f, 0.f, 100.f, "%.2f"))
@@ -1893,6 +1946,17 @@ void CFXToolDirector::Render_FXProperty()
 		bEdited = true;
 	if (DragFloat(u8"공전 속도 랜덤", &pCurParticle->m_InstanceDesc.fOrbitSpeedRandomOffset, .01f, 0.f, 10000.f, "%.2f"))
 		bEdited = true;
+
+	Dummy({ 0.f, 10.f });
+
+	if (DragFloat(u8"이동 감속 속력", &pCurParticle->m_InstanceDesc.fAccSupplyAmount, .01f, 0.f, 10000.f, "%.2f"))
+		bEdited = true;
+
+	Dummy({ 0.f, 10.f });
+
+	if (DragFloat(u8"회전 감속 속력", &pCurParticle->m_InstanceDesc.fTurnSupplyAmount, .01f, 0.f, 10000.f, "%.2f"))
+		bEdited = true;
+
 
 	Dummy({ 0.f, 10.f });
 	Separator();

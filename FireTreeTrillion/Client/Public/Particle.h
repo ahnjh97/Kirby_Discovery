@@ -21,6 +21,8 @@ public:
 		//_float fStarDelayRandomOffset = { 0.f };
 
 
+		
+
 	}PARTICLE_DESC;
 
 private:
