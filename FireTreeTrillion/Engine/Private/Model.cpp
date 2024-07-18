@@ -826,6 +826,8 @@ _bool CModel::CheckHideAfterAnimFinish()
 
 	if (m_iCurrentAnimIndex == m_iActionAnimIndex)
 		return true;
+
+	return false;
 }
 
 _uint CModel::Find_MeshIndex(const string& _strMeshName)
