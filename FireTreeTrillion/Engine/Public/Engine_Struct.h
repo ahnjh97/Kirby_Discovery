@@ -72,6 +72,9 @@ namespace Engine
 		_float		fSpeed = {1.f};
 		_float		fSpeedRandomOffset;
 
+		_float		fOrbitSpeed = { 1.f };
+		_float		fOrbitSpeedRandomOffset;
+
 
 		_float3		vColor = {1.f, 1.f, 1.f};
 		_float3		vColorRandomOffset;
@@ -209,6 +212,8 @@ namespace Engine
 		_float		fSpeed = { 1.f };
 		_float		fSpeedRandomOffset;
 
+		_float		fOrbitSpeed = { 1.f };
+		_float		fOrbitSpeedRandomOffset;
 
 		_float3		vColor = { 1.f, 1.f, 1.f };
 		_float3		vColorRandomOffset;

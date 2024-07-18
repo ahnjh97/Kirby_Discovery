@@ -127,7 +127,7 @@ HRESULT CVIBuffer_Instance::Initialize(void* pArg)
 			m_pInstanceVertices[i].bAlive = false;
 		}
 	}
-	else if(INSTANCE_SHAPE_RECTANGLE == tInstanceDesc.eInstanceShape)
+	else if (INSTANCE_SHAPE_RECTANGLE == tInstanceDesc.eInstanceShape)
 	{
 		for (size_t i = 0; i < m_iNumInstance; i++)
 		{
@@ -254,7 +254,7 @@ _float4 CVIBuffer_Instance::Compute_RectanglePos(_uint iIndex)
 
 	_uint iRow = iIndex / iInstancePerRow;
 	_uint iCol = iIndex % iInstancePerRow;
-	
+
 	_float fX = -m_InstanceDesc.vRange.x + (iCol + 1) * fSpacingX;
 	if (iRow % 2 == 1)
 		fX += fSpacingX * 0.5f;
@@ -279,12 +279,12 @@ void CVIBuffer_Instance::Unmap()
 
 void CVIBuffer_Instance::Drop(_float fTimeDelta, VTXMATRIX* pVertices)
 {
-	
+
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 		if (!pVertices[i].bAlive/* || 0.f < m_pStartDelays[i]*/)
 			continue;
-		
+
 		m_pVelocities[i].y -= m_pSpeeds[i] * fTimeDelta * m_InstanceDesc.vInitScale.y;
 
 	}
@@ -355,7 +355,7 @@ void CVIBuffer_Instance::Appear(_float fTimeDelta, VTXMATRIX* pVertices)
 		fTimeRatio = SATURATE(EASE_IN(fTimeRatio));
 		if (1.f < fTimeRatio)
 			continue;
-		
+
 		_float4x4 InstanceMat = { _float4x4::Identity };
 
 		InstanceMat.Right(*(_float3*)&pVertices[i].vRight);
@@ -433,17 +433,18 @@ void CVIBuffer_Instance::Tail(_float fTimeDelta, VTXMATRIX* pVertices)
 
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
+		if (!pVertices[i].bAlive)
+			continue;
+
 		//꼬리
 		if (i % 10 != 0)
 		{
-			if (!pVertices[i].bAlive)
-				continue;
 
 			_float4x4 PreInstanceMat = { _float4x4::Identity };
 
-			PreInstanceMat.Right(*(_float3*)&pVertices[i-1].vRight);
-			PreInstanceMat.Up(*(_float3*)&pVertices[i-1].vUp);
-			PreInstanceMat.Forward(*(_float3*)&pVertices[i-1].vLook);
+			PreInstanceMat.Right(*(_float3*)&pVertices[i - 1].vRight);
+			PreInstanceMat.Up(*(_float3*)&pVertices[i - 1].vUp);
+			PreInstanceMat.Forward(*(_float3*)&pVertices[i - 1].vLook);
 			_float3 vScale = CUtils::Get_Scaled_Matrix(PreInstanceMat);
 			vScale.x = clamp(vScale.x, .01f, 1.f);
 
@@ -455,7 +456,7 @@ void CVIBuffer_Instance::Tail(_float fTimeDelta, VTXMATRIX* pVertices)
 			MyInstanceMat.Forward(*(_float3*)&pVertices[i].vLook);
 			MyInstanceMat.Translation(*(_float3*)&pVertices[i].vPosition);
 
-			CUtils::Set_Scaled_Matrix(MyInstanceMat, vScale.x - fTimeDelta*.5f, vScale.x - fTimeDelta*.5f, vScale.x - fTimeDelta*.5f);
+			CUtils::Set_Scaled_Matrix(MyInstanceMat, vScale.x - fTimeDelta * .5f, vScale.x - fTimeDelta * .5f, vScale.x - fTimeDelta * .5f);
 
 			pVertices[i].vRight = Dir(MyInstanceMat.Right());
 			pVertices[i].vUp = Dir(MyInstanceMat.Up());
@@ -480,7 +481,7 @@ void CVIBuffer_Instance::Gravity(_float fTimeDelta, VTXMATRIX* pVertices)
 			continue;
 
 		//m_pDirections[i].y -= GRAVITY * fTimeDelta;
-		 m_pVelocities[i].y -= GRAVITY * 2.5f * m_InstanceDesc.vInitScale.y * fTimeDelta;
+		m_pVelocities[i].y -= GRAVITY * 2.5f * m_InstanceDesc.vInitScale.y * fTimeDelta;
 	}
 }
 
@@ -488,18 +489,21 @@ void CVIBuffer_Instance::Orbit(_float fTimeDelta, VTXMATRIX* pVertices)
 {
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
+		if (!pVertices[i].bAlive)
+			continue;
+
 		_float3 vPos = (_float3)pVertices[i].vPosition;
 		_float3 vDistance = vPos - m_InstanceDesc.vPivot;
 		_float fOrbitSpeed = m_pOrbitSpeed[i];
 
-		_float4x4 RotMatrix = _float4x4::Identity;\
-		if (m_pPreAxis[i] != _float3(0.f, 0.f, 0.f))
-		{
-			CUtils::Turn_OtherMatrix(RotMatrix, m_pPreAxis[i], fTimeDelta, fOrbitSpeed);
-		}
+		_float4x4 RotMatrix = _float4x4::Identity; \
+			if (m_pPreAxis[i] != _float3(0.f, 0.f, 0.f))
+			{
+				CUtils::Turn_OtherMatrix(RotMatrix, m_pPreAxis[i], fTimeDelta, fOrbitSpeed);
+			}
 
 		//_float3 vEditDir = XMVector3Transform(vDistance, XMLoadFloat4x4(&RotMatrix));
-		_float3 vEditDir = m_InstanceDesc.vCenter + (_float3)XMVector3Transform(vDistance, XMLoadFloat4x4(&RotMatrix));
+		_float3 vEditDir = m_InstanceDesc.vPivot + (_float3)XMVector3Transform(vDistance, XMLoadFloat4x4(&RotMatrix));
 		pVertices[i].vPosition = XMVectorSetW(vEditDir, 1.f);
 	}
 }
@@ -508,21 +512,27 @@ void CVIBuffer_Instance::Assemble(_float fTimeDelta, VTXMATRIX* pVertices)
 {
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
+		if (!pVertices[i].bAlive)
+			continue;
+
 		_float3 vPos = (_float3)pVertices[i].vPosition;
-		_float3 vDistance = m_InstanceDesc.vCenter - vPos;
-		if (vDistance.Length() < 0.2f)
+		_float3 vDistance = m_InstanceDesc.vPivot - vPos;
+
+		if (vDistance.Length() < 0.1f)
 		{
-			//루프가 아니였다면 죽어!!
-			if (!m_InstanceDesc.bIsLoop)
-			{
-				pVertices[i].bAlive = false;
-				m_pLifeTimes[i].x = m_pLifeTimes[i].y;
-			}
-			//아니라면 다시 초기화~
-			else
-			{
-				Change_InstanceInfo(pVertices, i);
-			}
+			m_pLifeTimes[i].x = m_pLifeTimes[i].y;
+			return;
+			////루프가 아니였다면 죽어!!
+			//if (!m_InstanceDesc.bIsLoop)
+			//{
+			//	pVertices[i].bAlive = false;
+			//	m_pLifeTimes[i].x = m_pLifeTimes[i].y;
+			//}
+			////아니라면 다시 초기화~
+			//else
+			//{
+			//	Change_InstanceInfo(pVertices, i);
+			//}
 		}
 
 		vDistance.Normalize();
@@ -590,6 +600,9 @@ void CVIBuffer_Instance::Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceI
 		}
 		return;
 	}
+	else if (0.f == m_pStartDelays[iInstanceIndex])
+		pVertices[iInstanceIndex].bAlive = true;
+
 
 	m_pLifeTimes[iInstanceIndex].x += fTimeDelta;
 
@@ -699,6 +712,8 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 		CUtils::Make_RandomFloat(m_InstanceDesc.fSpeed - m_InstanceDesc.fSpeedRandomOffset, m_InstanceDesc.fSpeed + m_InstanceDesc.fSpeedRandomOffset) : vDirection.w;
 	m_pInitialSpeeds[iInstanceIndex] = vDirection.w;
 
+
+	//공전 시의 세팅
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT] == true)
 	{
 		_float3 vPos = pVertices[iInstanceIndex].vPosition;
@@ -713,7 +728,7 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 		_float fSpeed = m_pSpeeds[iInstanceIndex];
 		m_pPreAxis[iInstanceIndex] = vDirection.Cross(vDir);
 
-		m_pOrbitSpeed[iInstanceIndex] = CUtils::Make_RandomFloat(300.f, 400.f);
+		m_pOrbitSpeed[iInstanceIndex] = Compute_RandOrbitSpeed();
 	}
 
 
@@ -722,6 +737,9 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 	m_pAlphas[iInstanceIndex] = vColor.w;
 
 	m_pVelocities[iInstanceIndex] = _float3();
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE] == true)
+		m_pVelocities[iInstanceIndex] = m_pDirections[iInstanceIndex] * m_pSpeeds[iInstanceIndex];
 
 }
 void CVIBuffer_Instance::Free()
