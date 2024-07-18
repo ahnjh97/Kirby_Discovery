@@ -1144,6 +1144,9 @@ void CCollisionCenter::Hitbox_Collision()
 			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
 				return;
 
+			if (Src->Get_CollisionType() == 99)
+				return;
+
 			CKirby* pKirby = static_cast<CKirby*>(Dst);
 			CPhysXObject* pObject = static_cast<CPhysXObject*>(Src);
 
@@ -1313,10 +1316,39 @@ void CCollisionCenter::Hitbox_Collision()
 
 			CKirby* pKirby = static_cast<CKirby*>(Dst);
 			CAnimDeco* pAnimDeco = static_cast<CAnimDeco*>(Src);
+
+			if (pKirby->Get_KirbyInfo()->m_eBodyState != CKirby::BODY_SWORDDEFAULT)
+				return;
+
 			if (true == pAnimDeco->IsHidden())
 				return;
 
 			pAnimDeco->HideModel();
+			SwordHit(pAnimDeco->Get_TransformCom());
+		});
+
+	// 풀 등과 플레이어
+	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[ANIMDECO], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CAnimDeco* pAnimDeco = static_cast<CAnimDeco*>(Src);
+
+			if (true == pAnimDeco->IsHidden())
+				return;
+
+			if (pKirby->Get_KirbyInfo()->m_eBodyState != CKirby::BODY_CARDEFAULT)
+				return;
+
+			if (pKirby->Get_KirbyInfo()->m_bBooster == true)
+			{
+				pAnimDeco->HideModel();
+			}
 		});
 
 	// PhysX의 트리거 외에 객체호출 등 작은 단위의 트리거용

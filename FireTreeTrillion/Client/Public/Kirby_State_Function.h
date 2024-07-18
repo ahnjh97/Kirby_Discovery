@@ -626,7 +626,6 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 	if (DESC(m_pObject) != nullptr)
 		return false;
 
-
 	// 0Â÷ ¸ñÇ¥ÀÎ ¹ö¼¸ÀÇ °«À» Å½»öÇÑ´Ù.
 	if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_CappyHat")))
 	{
@@ -1393,6 +1392,20 @@ static void SwordSpinCharge(CTransform* pTransformCom)
 
 
 }
+
+static void SwordSpinChargeBig(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
+
+	FXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, -.4f, 0.f, 0.f });
+	FXDesc.vInitRot = CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook());
+	FXDesc.vInitScale = { 6.f, 6.f, 6.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword_Copy Bubble_One"), &FXDesc)))
+		return;
+
+
+}
+
 
 static void SwordSpinSlash_One(CTransform* pTransformCom)
 {
