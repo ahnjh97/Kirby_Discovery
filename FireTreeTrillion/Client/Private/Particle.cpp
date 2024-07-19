@@ -157,7 +157,9 @@ void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
 	pFXData->eTimer = m_eTimer;
 
 	pFXData->vCenter = m_InstanceDesc.vCenter;
+
 	pFXData->vRange = m_InstanceDesc.vRange;
+
 	pFXData->vRotation = m_InstanceDesc.vRotation;
 	pFXData->vRotationRandomOffset = m_InstanceDesc.vRotationRandomOffset;
 	pFXData->vScale = m_InstanceDesc.vScale;
@@ -175,6 +177,10 @@ void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
 
 	pFXData->vColor = m_InstanceDesc.vColor;
 	pFXData->vColorRandomOffset = m_InstanceDesc.vColorRandomOffset;
+
+	pFXData->vtarget = m_InstanceDesc.vTargetColor;
+	pFXData->vTargetColorRandomOffset = m_InstanceDesc.vTargetColorRandomOffset;
+
 	pFXData->fAlpha = m_InstanceDesc.fAlpha;
 	pFXData->fAlphaRandomOffset = m_InstanceDesc.fAlphaRandomOffset;
 
