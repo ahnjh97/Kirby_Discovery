@@ -273,6 +273,10 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE])
 		m_pVIBufferCom->SimpleMove(fMyTimeDelta, pVertices);
 
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE])
+		m_pVIBufferCom->SimpleMove(fMyTimeDelta, pVertices);
+
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_DROP])
 		m_pVIBufferCom->Drop(fMyTimeDelta, pVertices);
 

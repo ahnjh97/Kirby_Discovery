@@ -139,6 +139,10 @@ void CFXToolDirector::Make_Effect(PARTICLE_DATA& _FXData)
 	InstanceDesc.vCenter = _FXData.vCenter;
 
 	InstanceDesc.vRange = _FXData.vRange;
+	InstanceDesc.fMinRange = _FXData.fMinRange;
+	InstanceDesc.fMaxRange = _FXData.fMaxRange;
+
+
 	InstanceDesc.vRotation = _FXData.vRotation;
 	InstanceDesc.vRotationRandomOffset = _FXData.vRotationRandomOffset;
 
@@ -157,6 +161,10 @@ void CFXToolDirector::Make_Effect(PARTICLE_DATA& _FXData)
 
 	InstanceDesc.vColor = _FXData.vColor;
 	InstanceDesc.vColorRandomOffset = _FXData.vColorRandomOffset;
+
+	InstanceDesc.vTargetColor = _FXData.vTargetColor;
+	InstanceDesc.vTargetColorRandomOffset = _FXData.vTargetColorRandomOffset;
+
 	InstanceDesc.fAlpha = _FXData.fAlpha;
 	InstanceDesc.fAlphaRandomOffset = _FXData.fAlpha;
 	InstanceDesc.vPivot = _FXData.vPivot;
@@ -344,7 +352,6 @@ HRESULT CFXToolDirector::Save_Particle(CEffect* pEffect, const wstring& strFileN
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fMinRange), sizeof(_float));
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fMaxRange), sizeof(_float));
-
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vRotation), sizeof(_float3));
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vRotationRandomOffset), sizeof(_float3));
@@ -598,6 +605,10 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	_pData->strName.resize(_pData->iNameStrLen);
 	InputFile.read(&_pData->strName[0], _pData->iNameStrLen);
 
+	if (_pData->strName == "particle parse test")
+	{
+		_int a = 0;
+	}
 
 	//버퍼 이름
 	InputFile.read(reinterpret_cast<char*>(&_pData->iBufferStrLen), sizeof(_int));

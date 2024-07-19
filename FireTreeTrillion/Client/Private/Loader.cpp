@@ -2730,6 +2730,7 @@ void CLoader::Load_KirbyBodyModels()
 
 	m_vecModelInfo.emplace_back("KirbyDumpVacuum", TYPE_ANIM, 0.8f);
 	m_vecModelInfo.emplace_back("KirbyDumpCut", TYPE_ANIM, 0.8f);
+	m_vecModelInfo.emplace_back("KirbyFinalCut", TYPE_ANIM, 1.f);
 
 	// Deform
 	m_vecModelInfo.emplace_back("Bulb", TYPE_ANIM, 1.f, 180.f);
