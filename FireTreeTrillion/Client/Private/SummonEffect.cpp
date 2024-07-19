@@ -1,14 +1,15 @@
 #include "stdafx.h"
 #include "SummonEffect.h"
 #include "Camera_Main.h"
+#include "Bomber.h"
 
 CSummonEffect::CSummonEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice, pContext }
+	: CPhysXObject{ pDevice, pContext }
 {
 }
 
 CSummonEffect::CSummonEffect(const CSummonEffect& rhs)
-	: CGameObject{ rhs }
+	: CPhysXObject{ rhs }
 {
 }
 
@@ -27,8 +28,7 @@ HRESULT CSummonEffect::Initialize(void* pArg)
 
 		pSummonEffectDesc->fSpeedPerSec = 7.f;
 		pSummonEffectDesc->fRotationPerSec = XMConvertToRadians(90.0f);
-		m_vPosition = pSummonEffectDesc->vPosition;
-		m_vColor = pSummonEffectDesc->vColor;
+		m_vPosition = pSummonEffectDesc->vPosition; 
 		m_fAlpha = pSummonEffectDesc->fAlpha;
 		m_fScale = pSummonEffectDesc->fScale;
 	}
@@ -39,18 +39,21 @@ HRESULT CSummonEffect::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	m_fRatio = 1.f;
+
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);
 	m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 
-	//CEffect::FX_DESC FXDesc{};
+	CEffect::FX_DESC FXDesc{};
 
-	//FXDesc.vInitPos = GET_POS;
-	////FXDesc.vInitRot = { CUtils::Make_RandomFloat(0.f, 90.f), 0.f, 0.f };
-	////FXDesc.vInitScale = { 1.f, 1.f, 1.f };
-	////FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	FXDesc.vInitPos = m_vPosition;
+	//FXDesc.vInitRot = { CUtils::Make_RandomFloat(0.f, 90.f), 0.f, 0.f };
+	//FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+	//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-	//Add_Effect("ParkParticle3JS", FXDesc, true);
-	//Add_Effect("ParkParticle4JS", FXDesc, true);
+	Add_Effect("ParticleSummonJS", FXDesc);
+
+	m_vColor = XMVectorSet(1.f, 0.f, 0.f, 0.f);
 
 	return S_OK;
 }
@@ -64,13 +67,26 @@ _int CSummonEffect::Tick(_float fTimeDelta)
 
 	m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), ToRadian(CUtils::Make_RandomFloat(0.f, 360.f)));
 
-	if (0.f < m_fScale)
+	if (0.f < m_fRatio)
 	{
-		m_fScale -= m_fTimeDelta * 2.f;
-		m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
+		m_fRatio -= m_fTimeDelta * 0.75f;
+		m_pTransformCom->Set_Scaled(m_fScale * m_fRatio, m_fScale * m_fRatio, m_fScale * m_fRatio);
 	}
 	else
+	{
+		//HRESULT hr;
+		//_float4x4 matWorld = XMMatrixIdentity();
+		//matWorld._41 = 35.5f;
+		//matWorld._42 = 75.f;
+		//matWorld._43 = 175.5f;
+		//matWorld._44 = 1.f;
+		//CMonster::MONSTER_DESC MonsterDesc = {};
+		//MonsterDesc.matWorld = matWorld;
+		//hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Bomber"), &MonsterDesc);
+		//CHECK_FAILED(hr);
+
 		m_bDead = true;
+	}
 
 	Compute_ViewZ();
 	Billboarding();

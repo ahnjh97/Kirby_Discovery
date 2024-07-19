@@ -39,7 +39,7 @@ HRESULT CBomber::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), ToRadian(180.f));
+	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), ToRadian(90.f));
 
 	m_pModelCom->Set_Animation(BOMBER_WAIT, 50.f, true, true);
 

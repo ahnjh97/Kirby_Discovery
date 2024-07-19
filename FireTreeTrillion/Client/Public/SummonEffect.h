@@ -11,13 +11,12 @@ END
 
 BEGIN(Client)
 
-class CSummonEffect final : public CGameObject
+class CSummonEffect final : public CPhysXObject
 {
 public:
 	struct SUMMONEFFECT_DESC : public CGameObject::GAMEOBJECT_DESC {
 		_float	fScale = { 0.f };
 		_float	fAlpha = { 0.f };
-		_vector vColor = {};
 		_vector vPosition = {};
 	};
 
@@ -43,6 +42,7 @@ private:
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 
 	_float	m_fScale = { 0.f };
+	_float	m_fRatio = { 0.f };
 	_float	m_fTimeDelta = { 0.f };
 	_float	m_fAlpha = { 0.f };
 

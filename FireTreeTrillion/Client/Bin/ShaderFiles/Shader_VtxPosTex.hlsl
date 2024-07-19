@@ -785,10 +785,6 @@ PS_OUT PS_SUMMONEFFECT(PS_IN_ALPHABLEND In)
 		
     Out.vColor.a *= g_fAlpha;
     
-    if (0.03f >= Out.vColor.a)
-        discard;
-
-    
     return Out;
 }
 
