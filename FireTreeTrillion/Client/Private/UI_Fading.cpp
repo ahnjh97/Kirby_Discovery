@@ -18,7 +18,6 @@ HRESULT CUI_Fading::Initialize_Prototype()
 
 	return S_OK;
 }
-
 HRESULT CUI_Fading::Initialize(void* pArg)
 {
 	HRESULT hr = __super::Initialize(pArg);
