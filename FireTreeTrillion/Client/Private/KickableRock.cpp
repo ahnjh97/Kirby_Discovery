@@ -82,11 +82,6 @@ _int CKickableRock::Tick(_float fTimeDelta)
 		m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), m_fTimeDelta, 360.f);
 		m_fFlyTime += m_fTimeDelta;
 
-		if (RayCast_Terrain(XMVector3Normalize(vDamegeDir)) == true)
-		{
-			Set_PhyXState(PO_FLYDEADAWAY);
-			Set_DamageMoving(-1.f * vDamegeDir, 10.f);
-		}
 		if (m_fFlyTime > 2.f)
 			m_bDead = true;
 	}
@@ -120,6 +115,12 @@ void CKickableRock::Late_Tick(_float fTimeDelta)
 	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
 	if (m_ePhyXState == PO_KIRBYMOUTH)
 		return;
+
+	if (RayCast_Terrain(XMVector3Normalize(m_vDamegeDir)) == true)
+	{
+		Set_PhyXState(PO_FLYDEADAWAY);
+		Set_DamageMoving(-1.f * m_vDamegeDir, 10.f);
+	}
 
 	if (m_bLockCollision == true)
 	{
@@ -342,7 +343,7 @@ _bool CKickableRock::RayCast_Terrain(const _float3 vMoveDir)
 	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 	PxVec3 rayOrigin = PxVec3((_float)vPos.x, (_float)vPos.y, (_float)vPos.z);
 	PxVec3 rayDirection = PxVec3(vMoveDir.x, vMoveDir.y, vMoveDir.z);
-	_float fMaxDistance = 1.f;
+	_float fMaxDistance = 0.5f;
 
 	PxRaycastHit hit;
 	PxRaycastBuffer hitBuffer;
