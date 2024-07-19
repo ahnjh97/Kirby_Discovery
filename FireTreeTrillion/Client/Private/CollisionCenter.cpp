@@ -14,6 +14,8 @@
 #include "Kirby_State_Function.h"
 #include "HitBox.h"
 #include "FinaleKirby.h"
+#include "CollisionCenter.h"
+#include "EventCenter.h"
 
 #define GAMEINSTANCE CGameInstance::Get_Instance()->
 
@@ -732,6 +734,55 @@ void CCollisionCenter::Simba_Battle()
 					//pSimba->Turn_RotationBoneMatrix(0.f);
 					pSimba->Change_State(CSimba::Simba_BiteRushTiredStart, 50.f, false, false);
 				}
+			}
+		});
+
+	// Simba Laser와 커비 충돌
+	Collision_Collider(m_GameObjects[LASER_SIMBA], m_GameObjects[PLAYER], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Src);
+			CSimba* pSimba = static_cast<CSimba*>(GAMEINSTANCE Get_GameObject(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Simba")));
+
+			// 커비가 혹시 닷지를 하였는가? 만약 닷지를 했다면 충돌이 발생하지않는다.
+			if (pthis->Kirby_Dodge_SlowMotionSystem(pKirby) == true)
+			{
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+				return;
+			}
+
+			if (pKirby->isOverPower() == false)
+			{
+				CTransform* pMonsterTransformCom = pSimba->Get_TransformCom();
+				_vector vMonsterPos = pMonsterTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+				_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				_float4 vDistance = vKirbyPos - vMonsterPos;
+				vDistance.y = 0.f;
+				vDistance.Normalize();
+
+				_float4 vNewDir{};
+				_float4 vSimbaRight = pMonsterTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+				vSimbaRight.Normalize();
+
+				if (true == pSimba->IsKirbyOnMyLeft())
+					vNewDir = vDistance - vSimbaRight * 2.5f;
+				else 
+					vNewDir = vDistance + vSimbaRight * 2.5f;
+				vNewDir.Normalize();
+
+				_vector vKnockbackDir = vNewDir;
+				pthis->Knock_back(pKirby, vKnockbackDir * 2.4f, 8.2f); // 심바 레이저 전용 넉백
+				pthis->Compute_HitBoxDamage(pKirby, pSimba);
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+				pKirby->Collision(CONTENT_ATTACK, pSimba);
 			}
 		});
 }

@@ -73,7 +73,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용
-	m_eAbilityType = ABILITY_SWORD;
+	m_eAbilityType = ABILITY_HAMMER;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 		m_eAbilityType = ABILITY_HAMMER;
 
@@ -2041,8 +2041,8 @@ HRESULT CKirby::Kirby_SystemInitialize()
 		}
 		else
 		{
-			//m_fHp = 100.f; // 기존 사용하던 HP입니다.
-			//m_fMaxHp = 100.f;
+			m_fHp = 100.f; // 기존 사용하던 HP입니다.
+			m_fMaxHp = 100.f;
 			m_eAbilityType = ABILITY_DEFAULT;
 		}
 	}

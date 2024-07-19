@@ -172,6 +172,16 @@ void CBox::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObj
 		m_pModelCom->Set_Animation(0, 50.f, false, false);
 		m_bPlayAnim = true;
 	}
+	else if (eContent == CCollisionCenter::CONTENT_ATTACKBULLET)
+	{
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+		if (pCamera != nullptr)
+			pCamera->Make_Shake(0.5f);
+
+		m_pGameInstance->DisableActor(m_pDynamicActor);
+		m_pModelCom->Set_Animation(0, 50.f, false, false);
+		m_bPlayAnim = true;
+	}
 }
 
 void CBox::Break_From_Car()

@@ -86,8 +86,8 @@ _int CCappyHat::Tick(_float fTimeDelta)
 			m_vPosition = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 			CCharacterController::CONTROLLER_DESC desc{};
 			desc.vInitialPos = m_vPosition;
-			desc.tCapsuleShape.fHeight = 0.5f;
-			desc.tCapsuleShape.fRadius = 0.5f;
+			desc.tCapsuleShape.fHeight = 0.3f;
+			desc.tCapsuleShape.fRadius = 0.3f;
 			hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
 				TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
 			CHECK_FAILED(hr);
@@ -101,7 +101,7 @@ _int CCappyHat::Tick(_float fTimeDelta)
 			HitBox.pCollisionType = MONSTER;
 			if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 				return E_FAIL;
-			Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
+			Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 1.f);
 
 			m_bController = true;
 		}

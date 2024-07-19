@@ -381,6 +381,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		InstanceDesc.fAlphaRandomOffset = FXData.fAlpha;
 		InstanceDesc.vPivot = FXData.vPivot;
 
+		InstanceDesc.vRotationAxis = FXData.vRotationAxis;
 
 		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
 

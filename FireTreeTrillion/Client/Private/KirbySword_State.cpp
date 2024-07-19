@@ -421,6 +421,25 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 		if (pKirby->isAnimFinish())
 		{
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
+			FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
+			FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y + 40.f, 0.f };
+			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+				return;
+
+			FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+				return;
+
+			FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y - 40.f, 0.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+				return;
+
+
 			pKirby->Change_State(CKirby::SWORDSTATE_SWORDSLIDE, 60.f, true, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_fMoveSpeed) = 18.f;
 			return;
@@ -428,6 +447,24 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	}
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SWORDSLIDE)
 	{
+		m_fEffectTime += fTimeDelta;
+
+		if (m_fEffectTime > 0.05f)
+		{
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+			vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
+			FXDesc.vInitPos = { vMyPos.x + CUtils::Make_RandomFloat(0.f, 0.3f), vMyPos.y + .3f, vMyPos.z + CUtils::Make_RandomFloat(0.f, 0.3f) };
+			FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y + CUtils::Make_RandomFloat(-3.f, 3.f), 0.f };
+			FXDesc.vInitScale = { 0.7f, 0.7f, 0.7f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
+				return;
+
+			m_fEffectTime = 0.f;
+		}
+
+
 		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 		_vector vMoveDelta = DESC(m_vDodgeDir) * fTimeDelta * DESC(m_fMoveSpeed);
 		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
@@ -826,6 +863,7 @@ void CKirbySword_ChargeSpin_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 	case CKirby::SWORDSTATE_GIGANTSPINSLASH:
 	{
 		SwordSpinSlash_Two(pKirby->Get_TransformCom());
+		pKirby->Delete_Effect("YW SwordParticle");
 	}
 	break;
 	//case CKirby::SWORDSTATE_SUPERSPINSLASHCHARGE:
@@ -836,6 +874,7 @@ void CKirbySword_ChargeSpin_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 	case CKirby::SWORDSTATE_SUPERSPINSLASHLOOP:
 	{
 		SwordSpinSlash_One(pKirby->Get_TransformCom());
+		pKirby->Delete_Effect("YW SwordParticle");
 	}
 	break;
 	default:
@@ -858,9 +897,15 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	{
 		if (DESC(m_bSwordCharge1) == true)
 		{
-			SwordSpinCharge(pKirby->Get_TransformCom());
+			SwordSpinCharge(pKirby->Get_TransformCom(), pKirby);
 			DESC(m_bSwordCharge1) = false;
 		}
+
+
+		_float fRight = CUtils::Make_RandomFloat(-1.5f , -0.5f);
+		_float fUp = CUtils::Make_RandomFloat(0.5f, 1.f);
+		_float fLook = CUtils::Make_RandomFloat(0.f, 1.2f);
+		Fire_Maker(_float3(fRight, fUp, fLook), pTransformCom, 1.8f, 2.5f, _float4(0.3f, 0.8f, 1.f, 0.5f), _float4(1.f, 1.f, 1.f, 1.f));
 
 
 		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
@@ -966,6 +1011,11 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	{
 		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 
+		_float fRight = CUtils::Make_RandomFloat(-1.5f, -0.5f);
+		_float fUp = CUtils::Make_RandomFloat(0.5f, 1.f);
+		_float fLook = CUtils::Make_RandomFloat(0.f, 1.2f);
+		Fire_Maker(_float3(fRight, fUp, fLook), pTransformCom, 1.8f, 2.5f, _float4(0.3f, 0.8f, 1.f, 0.5f), _float4(1.f, 1.f, 1.f, 1.f));
+
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
 		{
 			DESC(m_fChargeTime) += fTimeDelta;
@@ -1003,6 +1053,11 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		DESC(m_fMoveSpeed) += fTimeDelta * 10.f;
 		if (DESC(m_fMoveSpeed) > 3.f)
 			DESC(m_fMoveSpeed) = 3.f;
+
+		_float fRight = CUtils::Make_RandomFloat(-1.5f, -0.5f);
+		_float fUp = CUtils::Make_RandomFloat(0.5f, 1.f);
+		_float fLook = CUtils::Make_RandomFloat(0.f, 1.2f);
+		Fire_Maker(_float3(fRight, fUp, fLook), pTransformCom, 1.8f, 2.5f, _float4(0.3f, 0.8f, 1.f, 0.5f), _float4(1.f, 1.f, 1.f, 1.f));
 
 		// Å¸°Ù±âÁØ
 		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
@@ -1077,6 +1132,12 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 		_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
 		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
+		_float fRight = CUtils::Make_RandomFloat(-1.5f, -0.5f);
+		_float fUp = CUtils::Make_RandomFloat(0.5f, 1.f);
+		_float fLook = CUtils::Make_RandomFloat(0.f, 1.2f);
+		Fire_Maker(_float3(fRight, fUp, fLook), pTransformCom, 1.8f, 2.5f, _float4(0.3f, 0.8f, 1.f, 0.5f), _float4(1.f, 1.f, 1.f, 1.f));
+
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
 		{
@@ -1198,12 +1259,12 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW SwordSpin Fin"), &FXSDesc)))
 				return;
 
-		/*	CParticle::PARTICLE_DESC FXPDesc{};
+			CParticle::PARTICLE_DESC FXPDesc{};
 			FXPDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-			FXPDesc.vInitPos = _float3{ 0.f, .2f, 0.f };
+			FXPDesc.vInitPos = _float3{ 0.f, 2.f, 0.f };
 			FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
 			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Sword SpinFin Particle"), &FXPDesc)))
-				return;*/
+				return;
 
 			DESC(m_bSwordCharge1) = true;
 			DESC(m_bSwordCharge2) = true;
@@ -1309,12 +1370,12 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW SwordSpin Fin"), &FXSDesc)))
 				return;
 
-			//CParticle::PARTICLE_DESC FXPDesc{};
-			//FXPDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-			//FXPDesc.vInitPos = _float3{ 0.f, .2f, 0.f };
-			//FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
-			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Sword SpinFin Particle"), &FXPDesc)))
-			//	return;
+			CParticle::PARTICLE_DESC FXPDesc{};
+			FXPDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			FXPDesc.vInitPos = _float3{ 0.f, 2.f, 0.f };
+			FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Sword SpinFin Particle"), &FXPDesc)))
+				return;
 
 			DESC(m_bSwordCharge1) = true;
 			DESC(m_bSwordCharge2) = true;

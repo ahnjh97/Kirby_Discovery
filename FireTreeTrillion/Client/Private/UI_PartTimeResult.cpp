@@ -161,7 +161,7 @@ void CUI_PartTimeResult::Render_Digits()
 	{
 		m_fMoveRatio = 1.f;
 		fTimeAcc += m_fTimeDelta;
-		if (fTimeAcc >= 0.2f)
+		if (fTimeAcc >= 0.1f)
 		{
 			_int iAddNum = 1;
 			//iAddNum만큼 와들디 등장 // 효선아 여기야
@@ -415,14 +415,14 @@ void CUI_PartTimeResult::Repose_TotalScoreTextures()
 		m_arrPosition[3] = _float2(800.f, 220.f);
 	else if (m_fScore < 100.f)		// 십의 자리 일때
 	{
-		m_arrPosition[2] = _float2(780.f, 220.f);
-		m_arrPosition[3] = _float2(820.f, 220.f);
+		m_arrPosition[2] = _float2(777.f, 220.f); //40 > 46                                
+		m_arrPosition[3] = _float2(823.f, 220.f);
 	}
 	else							// 백의 자리 일때
 	{
-		m_arrPosition[1] = _float2(755.f, 220.f);
+		m_arrPosition[1] = _float2(754.f, 220.f);
 		m_arrPosition[2] = _float2(800.f, 220.f);
-		m_arrPosition[3] = _float2(845.f, 220.f);
+		m_arrPosition[3] = _float2(846.f, 220.f);
 	}
 }
 
@@ -433,17 +433,18 @@ void CUI_PartTimeResult::Repose_ScoreTextures()
 	m_arrPosition[6] = _float2(-100.f, -100.f);
 	m_arrPosition[7] = _float2(-100.f, -100.f);
 	
-	if (m_fScore <= 0.f)			// 0일 때
+	_float fScore = m_arrScoreDigits[0] * 100 + m_arrScoreDigits[1] * 10 + m_arrScoreDigits[2];
+	if (fScore <= 0.f)			// 0일 때
 		m_arrPosition[7] = _float2(1035.f, 490.f);
-	else if (m_fScore < 100.f)		// 십의 자리 일때
+	else if (fScore < 100.f)		// 십의 자리 일때
 	{
-		m_arrPosition[6] = _float2(1025.f, 490.f);
-		m_arrPosition[7] = _float2(1050.5f, 490.f);
+		m_arrPosition[6] = _float2(1024.f, 490.f);
+		m_arrPosition[7] = _float2(1058.f, 490.f);
 	}
 	else							// 백의 자리 일때
 	{
-		m_arrPosition[5] = _float2(1005.f, 490.f);
-		m_arrPosition[6] = _float2(1035.f, 490.f);
+		m_arrPosition[5] = _float2(1001.f, 490.f); //30 > 32
+		m_arrPosition[6] = _float2(1033.f, 490.f);
 		m_arrPosition[7] = _float2(1065.f, 490.f);
 	}
 }

@@ -46,7 +46,7 @@ private:
 	CTexture*				m_pTextureCom = { nullptr }; // 마스킹을 위한 텍스쳐
 							
 	_float					m_fTimeDelta = _float();
-	_float					m_fFadeOutRatio = 1.f;
+	_float					m_fFadeOutRatio = 0.f;
 
 	STATE					m_eState = STATE_END;
 
