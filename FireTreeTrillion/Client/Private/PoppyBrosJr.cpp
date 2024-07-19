@@ -108,8 +108,8 @@ HRESULT CPoppyBrosJr::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		//if (Custom_Face(i) == true)
-		//	continue;
+		if (i == m_iEyeMeshIdx)
+			continue;
 
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
 			return E_FAIL;
@@ -127,6 +127,8 @@ HRESULT CPoppyBrosJr::Render()
 
 		m_pModelCom->Render(i);
 	}
+
+	Custom_Face(m_iEyeMeshIdx);
 
 	return S_OK;
 }
@@ -168,6 +170,8 @@ void CPoppyBrosJr::Render_IMGUI()
 
 void CPoppyBrosJr::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+	m_eEyeState = POPPYEYE_DAMAGE;
+
 	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
 		if (m_ePhyXState == PO_NORMAL)
@@ -214,10 +218,10 @@ HRESULT CPoppyBrosJr::Add_Components()
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom;
 
-	///* For.Com_Texture */
-	//hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Buffahorn_Eye"),
-	//	TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
-	//CHECK_FAILED(hr);
+	/* For.Com_Texture */
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_Poppy_Eye"),
+		TEXT("Com_Texture"), (CComponent**)&m_pEyeTextureCom);
+	CHECK_FAILED(hr);
 
 	/* For.Com_CharacterController */
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
@@ -294,6 +298,37 @@ void CPoppyBrosJr::SetUp_FSM()
 	m_pFSM->Initialize(&FSM_Desc);
 }
 
+_bool CPoppyBrosJr::Custom_Face(_uint iMeshIndex)
+{
+	if (iMeshIndex == m_iEyeMeshIdx)
+	{
+		HRESULT hr;
+
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iMeshIndex, TextureType_DIFFUSE);
+		CHECK_FAILED(hr);
+
+		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", iMeshIndex);
+		CHECK_FAILED(hr);
+
+		hr = m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_KirbyEyeTexture", (_uint)m_eEyeState);
+		CHECK_FAILED(hr);
+
+		_bool bStencil = true;
+		_bool bRimLight = true;
+		_bool bMotionBlur = true;
+		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+
+		m_pShaderCom->Begin(ANIMMODEL_EYE);
+		m_pModelCom->Render(iMeshIndex);
+
+		return true;
+	}
+
+	return false;
+}
+
 _float4 CPoppyBrosJr::Compute_BoneWorldMatrix()
 {
 	CBone* pBone = m_pModelCom->Get_BonePtr("RHaveL");
@@ -335,4 +370,6 @@ CGameObject* CPoppyBrosJr::Clone(void* pArg)
 void CPoppyBrosJr::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pEyeTextureCom);
 }

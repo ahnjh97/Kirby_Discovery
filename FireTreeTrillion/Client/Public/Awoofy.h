@@ -64,7 +64,7 @@ private:
 	_bool				m_bRenderBody = { true };
 	_bool				m_bEffect = { false };
 
-	_uint				m_iEyeMeshIdx = {};
+	_uint				m_iEyeMeshIdx = { 0 };
 
 private:
 	HRESULT			Add_Components(const wstring& wstrModelName);

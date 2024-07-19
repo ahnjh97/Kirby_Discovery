@@ -287,6 +287,11 @@ void CCappyBody_HatLose_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, 
 void CCappyBody_HatLose_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CCappyBody* pCappyBody = static_cast<CCappyBody*>(pGameObject);
+	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	// ÀÚÀ¯ ³«ÇÏ
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	pCappyBody->Set_Render(false);
 }

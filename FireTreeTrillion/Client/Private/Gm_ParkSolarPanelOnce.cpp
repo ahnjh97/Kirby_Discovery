@@ -97,7 +97,7 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 				_float4x4 matWorld = XMMatrixIdentity();
 				matWorld._41 = 35.5;
 				matWorld._42 = 73.;
-				matWorld._43 = -17.5f;
+				matWorld._43 = 175.5f;
 				matWorld._44 = 1.f;
 				CMonster::MONSTER_DESC MonsterDesc = {};
 				MonsterDesc.matWorld = matWorld;

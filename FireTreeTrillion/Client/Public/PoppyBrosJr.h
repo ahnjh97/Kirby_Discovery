@@ -27,7 +27,7 @@ public:
 	//	POPPY_STATE ePoppyState = { PS_END };
 	//};
 
-	//enum POPPY_STATE { BUFFAHORNEYE_IDLE, BUFFAHORNEYE_HALF, BUFFAHORNEYE_SLEEP, BUFFAHORNEYE_SURPRISE, BUFFAHORNEYE_END };
+	enum POPPYEYE_STATE { POPPYEYE_IDLE, POPPYEYE_HALF, POPPYEYE_SLEEP, POPPYEYE_SURPRISE, POPPYEYE_DAMAGE, POPPYEYE_END };
 
 private:
 	CPoppyBrosJr(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -37,6 +37,9 @@ private:
 public:
 	void Set_BombActivate(_bool bBomb) {
 		m_bBomb = bBomb;
+	}
+	void Set_PoppyEye(POPPYEYE_STATE eEyeState) {
+		m_eEyeState = eEyeState;
 	}
 
 	_float Get_AnimRatio() {
@@ -68,11 +71,13 @@ private:
 
 	POPPY_ANIM	m_eCurrentState = { POPPY_END };
 	POPPY_STATE	m_ePoppyState = { PS_END };
-	//BUFFAHORNEYE_STATE	m_eEyeState = { BUFFAHORNEYE_END };
+	POPPYEYE_STATE	m_eEyeState = { POPPYEYE_END };
 
 	_float			m_fJumpTime = { 0.f };
 
 	_bool			m_bBomb = { false };
+
+	_uint				m_iEyeMeshIdx = { 2 };
 
 	_float4x4		m_WorldMatrix = {};
 
@@ -82,7 +87,7 @@ private:
 
 	// FSM
 	void SetUp_FSM();
-	//_bool Custom_Face(_uint iMeshIndex);
+	_bool Custom_Face(_uint iMeshIndex);
 
 public:
 	static CPoppyBrosJr* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
