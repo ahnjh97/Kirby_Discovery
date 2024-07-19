@@ -79,10 +79,18 @@ HRESULT CBasicMap::Initialize(void* pArg)
     SetUpAnimDecoInfo("BushM", 1.1f, 2, 60.f, 0, 50.f);
     SetUpAnimDecoInfo("BushS", 0.8f, 2, 60.f, 0, 50.f);
     SetUpAnimDecoInfo("PopFlower", 0.8f, 2, 120.f, 1, 130.f);
+
     SetUpAnimDecoInfo("SmallBirds", 3.5f, 1, 60.f, 0, 60.f);
+    SetUpAnimDecoInfo("ButterflySingle", 3.5f, 1, 60.f, 0, 60.f);
+    SetUpAnimDecoInfo("ButterflyTriple", 3.5f, 1, 60.f, 0, 60.f);
+
+    SetUpAnimDecoInfo("Lizard", 3.5f, 1, 60.f, 0, 60.f);
+    SetUpAnimDecoInfo("LizardWall", 3.5f, 0, 60.f, 1, 60.f);
+
+    SetUpAnimDecoInfo("SeaBird", 3.5f, 0, 60.f, 1, 60.f);
 
     // 애니메이션 재생이 끝난 후 숨겨야하는 애님데코들
-    m_setAfterHideAnimDecos = { "SmallBirds" };
+    m_setAfterHideAnimDecos = { "SmallBirds", "ButterflySingle", "ButterflyTriple", "Lizard", "LizardWall", "SeaBird" };
 
     // 옥트리를 생성하는 레벨들의 맵
     if(IsOctreeMapModel(wstrModelTag))
