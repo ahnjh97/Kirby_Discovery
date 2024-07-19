@@ -1138,8 +1138,8 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 덜 차징 회전베기이다. 약하게 이동이 가능하다.
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_GIGANTSPINSLASH)
 	{
-		DESC(m_bSwordCharge1) = true;
-		DESC(m_bSwordCharge2) = true;
+		//DESC(m_bSwordCharge1) = true;
+		//DESC(m_bSwordCharge2) = true;
 
 		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
 		{
@@ -1198,12 +1198,12 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW SwordSpin Fin"), &FXSDesc)))
 				return;
 
-			CParticle::PARTICLE_DESC FXPDesc{};
+		/*	CParticle::PARTICLE_DESC FXPDesc{};
 			FXPDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 			FXPDesc.vInitPos = _float3{ 0.f, .2f, 0.f };
 			FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
 			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Sword SpinFin Particle"), &FXPDesc)))
-				return;
+				return;*/
 
 			DESC(m_bSwordCharge1) = true;
 			DESC(m_bSwordCharge2) = true;
@@ -1224,8 +1224,8 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 슈퍼 스핀의 시작단계
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SUPERSPINSLASHSTART)
 	{
-		DESC(m_bSwordCharge1) = true;
-		DESC(m_bSwordCharge2) = true;
+		//DESC(m_bSwordCharge1) = true;
+		//DESC(m_bSwordCharge2) = true;
 
 		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
 		{
@@ -1309,12 +1309,12 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW SwordSpin Fin"), &FXSDesc)))
 				return;
 
-			CParticle::PARTICLE_DESC FXPDesc{};
-			FXPDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-			FXPDesc.vInitPos = _float3{ 0.f, .2f, 0.f };
-			FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Sword SpinFin Particle"), &FXPDesc)))
-				return;
+			//CParticle::PARTICLE_DESC FXPDesc{};
+			//FXPDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			//FXPDesc.vInitPos = _float3{ 0.f, .2f, 0.f };
+			//FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
+			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Sword SpinFin Particle"), &FXPDesc)))
+			//	return;
 
 				DESC(m_bSwordCharge1) = true;
 				DESC(m_bSwordCharge2) = true;
