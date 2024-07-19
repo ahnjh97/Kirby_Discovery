@@ -320,8 +320,8 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 void CCamera_Main::System_Tick(_float fTimeDelta)
 {
 	//이펙트 소켓 업데이트
-	//m_EffectSocket = _float4x4::Identity;
-	//CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	m_EffectSocket = _float4x4::Identity;
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
 }
 

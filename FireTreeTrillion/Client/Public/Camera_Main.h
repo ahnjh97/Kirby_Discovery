@@ -160,6 +160,8 @@ public:
 	//카메라에게 특정 동작들을 시퀀스로 선예약한다.
 	void Make_Sequence(CAMSEQ eSeq);
 
+	_bool IsSequencePlaying() { return m_eSpecialSeq == SEQ_END; }
+
 	//카메라에게 동작을 수행시킨다.
 	void Make_One_Sequence(CAMACTION newAction);
 
