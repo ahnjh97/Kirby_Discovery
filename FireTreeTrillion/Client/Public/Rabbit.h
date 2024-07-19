@@ -24,10 +24,10 @@ public:
 
 	enum RABBIT_STATE { RS_TARGET, RS_NONTARGET, RS_END };
 
-public:
-	struct RABBIT_DESC : public CMonster::MONSTER_DESC {
-		RABBIT_STATE eRabbitState = { RS_END };
-	};
+//public:
+//	struct RABBIT_DESC : public CMonster::MONSTER_DESC {
+//		RABBIT_STATE eRabbitState = { RS_END };
+//	};
 
 private:
 	CRabbit(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

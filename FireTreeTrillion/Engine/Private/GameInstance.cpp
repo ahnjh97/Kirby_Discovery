@@ -949,6 +949,16 @@ _int CGameInstance::Pause(CHANNELID eID)
 {
 	return m_pSound_Manager->Pause(eID);
 }
+// true면 정지, false면 재생
+void CGameInstance::Pause(CHANNELID eID, _bool bStop)
+{
+	return m_pSound_Manager->Pause(eID, bStop);
+}
+// 정지되었으면 true반환, 정지되어있지 않았다면 false 반환
+_bool CGameInstance::IsChannelPaused(CHANNELID eID)
+{
+	return m_pSound_Manager->IsChannelPaused(eID);
+}
 void CGameInstance::PlayMySound(TCHAR* pSoundKey, CHANNELID eID, _float _vol)
 {
 	m_pSound_Manager->PlayMySound(pSoundKey, eID, _vol);
@@ -956,6 +966,22 @@ void CGameInstance::PlayMySound(TCHAR* pSoundKey, CHANNELID eID, _float _vol)
 void CGameInstance::PlayBGM(TCHAR* pSoundKey)
 {
 	m_pSound_Manager->PlayBGM(pSoundKey);
+}
+void CGameInstance::PlayBGM(CHANNELID eID, TCHAR* pSoundKey)
+{
+	m_pSound_Manager->PlayBGM(eID, pSoundKey);
+}
+void CGameInstance::PlaySmoothUp(CHANNELID eID, _float targetVolume, _float fAddValue)
+{
+	m_pSound_Manager->PlaySmoothUp(eID, targetVolume, fAddValue);
+}
+void CGameInstance::PlaySmoothDown(CHANNELID eID, _float targetVolume, _float fMinusValue)
+{
+	m_pSound_Manager->PlaySmoothDown(eID, targetVolume, fMinusValue);
+}
+void CGameInstance::PlaySmoothKill(CHANNELID eID, _float fMinusValue)
+{
+	m_pSound_Manager->PlaySmoothKill(eID, fMinusValue);
 }
 void CGameInstance::StopSound(CHANNELID eID)
 {

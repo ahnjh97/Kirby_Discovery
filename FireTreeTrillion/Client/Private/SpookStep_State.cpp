@@ -76,7 +76,8 @@ void CSpookStep_Move_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
 	
-	//pController->FreeFall(pTransformCom, fTimeDelta);
+	// 자유 낙하
+	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	// 플레이어를 향해 바라본다
 	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 3.f);
