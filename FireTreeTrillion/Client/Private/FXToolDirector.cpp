@@ -169,6 +169,7 @@ void CFXToolDirector::Make_Effect(PARTICLE_DATA& _FXData)
 	InstanceDesc.fAlphaRandomOffset = _FXData.fAlpha;
 	InstanceDesc.vPivot = _FXData.vPivot;
 
+	InstanceDesc.vRotationAxis = _FXData.vRotationAxis;
 
 	CParticle* pParticle = static_cast<CParticle*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle"), &ParticleDesc));
 	m_Particles.emplace_back(pParticle);
@@ -834,7 +835,7 @@ void CFXToolDirector::Late_Tick(_float _fTimeDelta)
 	else
 	{
 		//복합 이펙트 아니면 FX에 있는 이펙트 업데이트
-		if (m_eSelected == SELECTED_SINGLE_FX )
+		if (m_eSelected == SELECTED_SINGLE_FX)
 			m_FXs[m_iSelectedFXIdx]->Add_RenderGroup();
 		else if (m_eSelected == SELECTED_PARTICLE_FX)
 			m_Particles[m_iSelectedParticleIdx]->Add_RenderGroup();
@@ -1196,7 +1197,7 @@ void CFXToolDirector::Render_FXHierarchy()
 			ParticleDesc.strFXName = strBaseName + szSuffix;
 
 			//중복 이름 있으면 안됨
-			for (const auto& fx : m_FXs)
+			for (const auto& fx : m_Particles)
 			{
 				if (fx->m_strFXName == ParticleDesc.strFXName)
 				{
@@ -1355,14 +1356,6 @@ void CFXToolDirector::Render_FXHierarchy()
 					}
 				}
 
-				for (const auto& fx : m_Particles)
-				{
-					if (fx->m_strFXName == strName)
-					{
-						bDoesExistSameName = true;
-						break;
-					}
-				}
 
 				//중복 이름이 없거나, 알파벳이 초과하면 반복 끝
 				if (!bDoesExistSameName || 'Z' <= szSuffix)
@@ -1407,25 +1400,23 @@ void CFXToolDirector::Render_FXHierarchy()
 				++szSuffix;
 			}
 
-			if (m_eSelected == SELECTED_SINGLE_FX)
-			{
-				//일단 단일 이펙트만
-				SINGLE_FX_DATA FXData{};
-				m_FXs[m_iSelectedFXIdx]->Fill_SaveData(&FXData);
 
-				FXData.strName = strName;
 
-				//버퍼, 텍스쳐, 마스크 텍스쳐 컴포넌트 이름 떤져준다.
-				string strComponentTag = "Prototype_Component_";
-				FXData.strBufferName = strComponentTag + m_FXBufferList[m_iAddingFXBufferIdx];
-				FXData.strTexName = strComponentTag + m_FXTexList[m_iAddingFXTexIdx];
-				FXData.strMaskTexName = strComponentTag + m_FXMaskTexList[m_iAddingFXMaskTexIdx];
-				FXData.iPassIdx = 0;
-				FXData.iMaskTexIdx = 0;
-				FXData.iTexIdx = 0;
+			SINGLE_FX_DATA FXData{};
+			m_FXs[m_iSelectedFXIdx]->Fill_SaveData(&FXData);
+			FXData.strName = strName;
 
-				Make_Effect(FXData);
-			}
+			//버퍼, 텍스쳐, 마스크 텍스쳐 컴포넌트 이름 떤져준다.
+			string strComponentTag = "Prototype_Component_";
+			FXData.strBufferName = strComponentTag + m_FXBufferList[m_iAddingFXBufferIdx];
+			FXData.strTexName = strComponentTag + m_FXTexList[m_iAddingFXTexIdx];
+			FXData.strMaskTexName = strComponentTag + m_FXMaskTexList[m_iAddingFXMaskTexIdx];
+			FXData.iPassIdx = 0;
+			FXData.iMaskTexIdx = 0;
+			FXData.iTexIdx = 0;
+
+			Make_Effect(FXData);
+
 		}
 
 		EndPopup();
@@ -1568,16 +1559,6 @@ void CFXToolDirector::Render_FXHierarchy()
 				_bool bDoesExistSameName{ false };
 				strName = strBaseName + szSuffix;
 
-
-				for (const auto& fx : m_FXs)
-				{
-					if (fx->m_strFXName == strName)
-					{
-						bDoesExistSameName = true;
-						break;
-					}
-				}
-
 				for (const auto& fx : m_Particles)
 				{
 					if (fx->m_strFXName == strName)
@@ -1599,7 +1580,6 @@ void CFXToolDirector::Render_FXHierarchy()
 			m_Particles[m_iSelectedParticleIdx]->Fill_SaveData(&ParticleData);
 			ParticleData.strName = strName;
 			Make_Effect(ParticleData);
-
 
 		}
 
@@ -1669,8 +1649,12 @@ void CFXToolDirector::Render_FXProperty()
 		return;
 
 	//단일 or 파티클 이펙트를 특정하지 않으면 보이지 않음
-	if ((m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX) && m_iSelectedFXIdx == -1)
+	if (m_eSelected == SELECTED_SINGLE_FX && m_iSelectedFXIdx == -1)
 		return;
+
+	if (m_eSelected == SELECTED_PARTICLE_FX && m_iSelectedParticleIdx == -1)
+		return;
+
 	//복합 이펙트를 특정하지 않으면 보이지 않음
 	if (m_eSelected == SELECTED_MULTI_FX && m_iSelectedMultiFXIdx == -1)
 		return;
@@ -1681,17 +1665,17 @@ void CFXToolDirector::Render_FXProperty()
 
 	//현재 선택한 이펙트를 다르게 한다.
 	CEffect* pCurFX{ nullptr };
-	
+
 	if (m_eSelected == SELECTED_SINGLE_FX)
 		pCurFX = m_FXs[m_iSelectedFXIdx];
 	else if (m_eSelected == SELECTED_PARTICLE_FX)
 		pCurFX = m_Particles[m_iSelectedParticleIdx];
-
 	else
 		pCurFX = m_MultiFXs[m_iSelectedMultiFXIdx];
 
 	//파티클인가?
-	_bool bIsParticle = _bool{ dynamic_cast<CSingleEffect*>(pCurFX) == nullptr };
+	_bool bIsParticle = (m_eSelected == SELECTED_PARTICLE_FX);
+	//_bool{ m_eSelected == SELECTED_PARTICLE_FX && (dynamic_cast<CSingleEffect*>(pCurFX) == nullptr) };
 
 
 	char tempBuf[256];
@@ -1720,6 +1704,10 @@ void CFXToolDirector::Render_FXProperty()
 	SameLine();
 	Text(CUtils::WstrToStr(pCurFX->m_strMaskTexTag).c_str());
 
+	Dummy({ 0.f, 10.f });
+
+	Separator();
+	Spacing();
 	//단일 이펙트가 가지고 있는 변수
 	if (m_eSelected != SELECTED_MULTI_FX)
 	{
@@ -1755,6 +1743,10 @@ void CFXToolDirector::Render_FXProperty()
 			pCurFX->Reset_Duration();
 			static_cast<CParticle*>(pCurFX)->Update_InstanceInfo();
 		}
+		Spacing();
+
+		Separator();
+		Spacing();
 
 		//렌더 그룹 설정
 		if (RadioButton(u8"No Render", m_iCurRenderGroup == CRenderer::RENDER_END))
@@ -1807,6 +1799,8 @@ void CFXToolDirector::Render_FXProperty()
 			pCurFX->m_eRenderGroup = CRenderer::RENDER_SUPERUI;
 		}
 
+		Separator();
+
 		Spacing();
 
 		//타이머 설정
@@ -1840,6 +1834,13 @@ void CFXToolDirector::Render_FXProperty()
 	}
 
 	Separator();
+
+	Dummy({ 0.f, 2.f });
+	if (bIsParticle)
+	{
+		Text(u8"인스턴스 갯수\t%d", static_cast<CParticle*>(pCurFX)->m_InstanceDesc.iNumInstance);
+	}
+	Dummy({ 0.f, 2.f });
 
 	//전체 시간
 	if (DragFloat(u8"재생 시간", &pCurFX->m_fDuration.second, .1f, 0.f, 300.f, "%.2f"))

@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "ItemObject.h"
+#include "Kirby.h"
+#include "Gm_DynamicField.h"
 
 CItemObject::CItemObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPhysXObject{ pDevice , pContext }
@@ -9,6 +11,27 @@ CItemObject::CItemObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 CItemObject::CItemObject(const CItemObject& rhs)
     : CPhysXObject{ rhs }
 {
+}
+
+void CItemObject::RegisterToDynamicField()
+{
+    CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+    if (nullptr == pKirby)
+        return;
+
+    _float fDis = m_pTransformCom->RayCast(CTransform::DYNAMIC, _float3(0, -1, 0));
+    if (6.f > fDis)
+    {
+        CGameObject* pObj = pKirby->FindDynamicField(m_pTransformCom->Get_MostRecentActor());
+        if (nullptr == pObj)
+            return;
+
+        CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(pObj);
+        if (nullptr == pDynamicField)
+            return;
+
+        pDynamicField->EmplaceBackItem(this);
+    }
 }
 
 HRESULT CItemObject::Initialize_Prototype()

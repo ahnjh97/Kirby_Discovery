@@ -703,6 +703,15 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\SpawnEffect">
       <UniqueIdentifier>{4b97fb20-26cc-4d63-a220-15d7ce0851f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Simba\SimbaLaser">
+      <UniqueIdentifier>{42035ce9-5d3d-45ba-b6f6-1ecbf083be9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Simba\SimbaRock">
+      <UniqueIdentifier>{dadcfbc4-119b-4281-a673-9df0181afb35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Simba\DimensionClaw">
+      <UniqueIdentifier>{fd798ad1-1b75-4c18-956c-cab357105e85}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1399,6 +1408,12 @@
     <ClInclude Include="..\Public\SummonEffect.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\SpawnEffect</Filter>
     </ClInclude>
+    <ClInclude Include="SimbaLaser.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DimensionClaw.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\DimensionClaw</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -2075,6 +2090,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\SummonEffect.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\SpawnEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="SimbaLaser.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DimensionClaw.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\DimensionClaw</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

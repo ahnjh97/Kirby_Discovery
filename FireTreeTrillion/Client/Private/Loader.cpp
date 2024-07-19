@@ -151,6 +151,8 @@
 
 // Simba
 #include "Simba.h"
+#include "SimbaLaser.h"
+#include "DimensionClaw.h"
 
 // 피날레 스테이지 기믹들
 #include "Baum.h"
@@ -564,6 +566,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OriginCage"), COriginCage);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Simba"), CSimba);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaLaser"), CSimbaLaser);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DimensionClaw"), CDimensionClaw);
 #pragma endregion
 
 #pragma endregion
@@ -1612,6 +1616,7 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_LunchTimeIcon", "Effects/UI/MGameFood/lunch time icon.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_LunchTimeBanner", "Effects/UI/MGameFood/lunch time banner.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_LunchTimeTypo", "UI/MGameFood/LunchType_%d.png", 6);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Food_LunchClearTypo", "UI/MGameFood/LunchClearType.png");	CHECK_FAILED(hr);
 
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultTop", "Effects/UI/MGameFood/result top.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultBottom", "Effects/UI/MGameFood/result bottom.png");	CHECK_FAILED(hr);
@@ -2132,15 +2137,22 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// For Boss 
 		m_vecModelInfo.emplace_back("Simba", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("SimbaLaser", TYPE_NONANIM);
+
+		for (_uint i = 0; i <= 16; i++) {
+			string strTunnelRock = "TunnelRock" + to_string(i);
+			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM, 0.1f);
+		}
 
 		// For Item
 		Load_ItemModels();
 	}
 	else if (eLevel == LEVEL_FINALBOSS)
 	{
-		for (_uint i = 0; i <= 17; i++) {
-			string strTunnelRock = "TunnelRock" + to_string(i);
-			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM, 0.1f);
+		vector<_uint> vecTunnelRocks = { 2, 4, 5, 7, 8, 9, 10, 12, 13, 16 };
+		for (auto& rockIndex : vecTunnelRocks) {
+			string strTunnelRock = "TunnelRock" + to_string(rockIndex);
+			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM);
 		}
 
 		//보스전 필드에서만 생성하는 SUB_SKYSPHERE (BackGround 요소)

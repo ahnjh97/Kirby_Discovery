@@ -619,13 +619,8 @@ PS_OUT PS_FOCUSING_UI(PS_IN_ALPHABLEND In)
             break;
     }
     
-    if (0.03f >= Out.vColor.a)
-        discard;
-
-    
     return Out;
 }
-
 
 PS_OUT PS_FADE_INOUT(PS_IN_ALPHABLEND In)
 {
@@ -638,10 +633,6 @@ PS_OUT PS_FADE_INOUT(PS_IN_ALPHABLEND In)
     
     if (g_iFade == 1)
         Out.vColor.a *= g_fFadeRatio;
-    
-    if (0.03f >= Out.vColor.a)
-        discard;
-
     
     return Out;
 }

@@ -250,11 +250,13 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	//여러 이벤트에 함수를 등록한다.
 	Subscribe_Events();
 
+	//y로 올리는 오프셋
 	m_CamTriggerUpOffsets.reserve(LEVEL_END);
 	m_CamTriggerUpOffsets.resize(LEVEL_END);
+
 	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f };
 	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .05f };
-	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f , .4f , .5f , 0.2f , 0.2f, 0.f };
+	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f, .4f, .5f, 0.2f, 0.2f, 0.f };
 
 
 	//시퀀스 이벤트 트리거를 초기화
@@ -318,8 +320,8 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 void CCamera_Main::System_Tick(_float fTimeDelta)
 {
 	//이펙트 소켓 업데이트
-	//m_EffectSocket = _float4x4::Identity;
-	//CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	m_EffectSocket = _float4x4::Identity;
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
 }
 
@@ -1134,7 +1136,8 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 
 
 	//카메라 보는 기준점 위로 올려주는 놈
-	if (*m_pCurrentLevelID == LEVEL_PARTTIME
+	if (*m_pCurrentLevelID == LEVEL_INTRO
+		|| *m_pCurrentLevelID == LEVEL_PARTTIME
 		|| *m_pCurrentLevelID == LEVEL_FINALBOSS
 		|| *m_pCurrentLevelID == LEVEL_FINALE
 		)

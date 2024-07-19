@@ -18,6 +18,9 @@ protected:
 	virtual ~CItemObject() = default;
 
 public:
+	void RegisterToDynamicField();
+
+public:
 	enum ITEMTYPE {
 		ITEM_COIN, ITEM_FOOD, ITEM_SUPERPOWER,
 		ITEM_END

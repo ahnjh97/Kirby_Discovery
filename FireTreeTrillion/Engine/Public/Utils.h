@@ -79,6 +79,7 @@ public:
 	static _vector			To_Vector(const PxVec3 pxVec3);
 	static PxTransform		mat44ToTransform(const PxMat44& mat);
 	static PxTransform		TransformToPxTransform(class CTransform* pTransform);
+	static PxTransform		ToPxTransform(const _float4x4& mat);
 
 
 	//이펙트 관련 함수

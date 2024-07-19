@@ -23,6 +23,8 @@
 #include "Gm_ParkSolarPanelOnce.h"
 #include "Gm_ParkSolarPanelCharge.h"
 
+#include "ItemObject.h"
+
 #define MONSTER_TRIGGER(index) (index - 11)
 
 CLevel_Park::CLevel_Park(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -1053,6 +1055,7 @@ HRESULT CLevel_Park::Ready_Objects()
 	{
 		CGm_DynamicField* pField = dynamic_cast<CGm_DynamicField*>(field);
 		_uint iFieldIx = pField->Get_GimmickIndex();
+		pField->RegisterToActorToKirby();
 
 		for (auto& gimmick : *GimmickList)
 		{
@@ -1107,6 +1110,15 @@ HRESULT CLevel_Park::Ready_Objects()
 
 #pragma endregion
 
+#pragma region SetUpItemsToDynamicFields
+	list<CGameObject*>* pItemList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_NoVacuumItem"));
+	for (auto& item : *pItemList)
+	{
+		CItemObject* pItemObject = dynamic_cast<CItemObject*>(item);
+		pItemObject->RegisterToDynamicField(); // dynamic field 위에 있는 아이템을 dynamic field에게 등록시킴 
+	}
+
+#pragma endregion
 	return S_OK;
 }
 

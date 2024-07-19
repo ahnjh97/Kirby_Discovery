@@ -15,7 +15,8 @@ public:
 	virtual void	Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
-	void			Sound_Tick(_float fTimeDelta);
+	void	Ready_FadeIn();
+	void	Sound_Tick(_float fTimeDelta);
 
 private:
 	HRESULT Ready_Lights();

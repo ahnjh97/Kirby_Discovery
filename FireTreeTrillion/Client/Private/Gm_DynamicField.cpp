@@ -57,7 +57,7 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 	if (pArg != nullptr)
 		DynamicFieldDesc = *(GAMEOBJECT_DESC*)pArg;
 
-	DynamicFieldDesc.fSpeedPerSec = 10.f;
+	m_fSpeed = DynamicFieldDesc.fSpeedPerSec = 10.f;
 	DynamicFieldDesc.fRotationPerSec = 90.f;
 	m_iGimmickIndex = DynamicFieldDesc.iShaderVars;
 	DynamicFieldDesc.iShaderVars = 6;
@@ -372,6 +372,7 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				}
 
 				m_pTransformCom->Go_Up(_fTimeDelta * fMoveSpeed);
+				MoveItems(_float3(0, 1, 0), _fTimeDelta * fMoveSpeed);
 				break;
 
 			case DFIELD_QUAKE:
@@ -416,6 +417,7 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			case DFIELD_MOVE:
 				//깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
 				m_pTransformCom->Go_Left(_fTimeDelta * 0.3f); //원작의 속도는 약 0.25f 수준
+				MoveItems(_float3(-1, 0, 0), _fTimeDelta * 0.3f);
 				break;
 
 			case DFIELD_QUAKE:
@@ -453,8 +455,11 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 					m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vInitPos);
 				}
 				
-				else
+				else {
 					m_pTransformCom->Go_Right(_fTimeDelta * 2.f); //2.25 > 2.0
+					MoveItems(_float3(1, 0, 0), _fTimeDelta * 2.f);
+				}
+					
 				break;
 
 			case DFIELD_QUAKE:
@@ -526,8 +531,11 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 					m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vInitPos);
 				}
 
-				else
+				else {
 					m_pTransformCom->Go_Left(_fTimeDelta * 2.f); //2.25 > 2.0
+					MoveItems(_float3(-1, 0, 0), _fTimeDelta * 2.f);
+				}
+					
 				break;
 
 			case DFIELD_QUAKE:
@@ -563,6 +571,7 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			{
 			case DFIELD_MOVE:
 				m_pTransformCom->Go_Backward(_fTimeDelta * 2.f);
+				MoveItems(_float3(0, 0, -1), _fTimeDelta * 2.f);
 				break;
 
 			case DFIELD_QUAKE:
@@ -595,8 +604,11 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 					vCurPos.z = m_vInitPos.z;
 					m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vInitPos);
 				}
-				else
-					m_pTransformCom->Go_Straight(_fTimeDelta * 0.2f); 
+				else {
+					m_pTransformCom->Go_Straight(_fTimeDelta * 0.2f);
+					MoveItems(_float3(0, 0, 1), _fTimeDelta * 0.2f);
+				}
+					
 				break;
 			}
 
@@ -626,6 +638,15 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 	}
 
 	return OBJ_NOEVENT;
+}
+
+void CGm_DynamicField::MoveItems(_float3 _vDir, _float _fTimeDelta)
+{
+	_float4 vDir = _float4(_vDir.x * m_fSpeed * _fTimeDelta, _vDir.y * m_fSpeed * _fTimeDelta, _vDir.z * m_fSpeed * _fTimeDelta, 0);
+	for (auto& item : m_vecItems) {
+		if(nullptr != item)
+			item->Get_TransformCom()->Move(vDir);
+	}	
 }
 
 CGm_DynamicField* CGm_DynamicField::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -660,6 +681,9 @@ void CGm_DynamicField::Free()
 
 	m_pGameInstance->ReleaseActor(m_pDynamicActor);
 	m_pGameInstance->ReleaseActor(m_pStaticActor);
+
+	for (auto& item : m_vecItems)
+		Safe_Release(item);
 
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);

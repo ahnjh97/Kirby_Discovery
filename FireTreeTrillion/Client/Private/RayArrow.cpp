@@ -144,7 +144,7 @@ _int CRayArrow::Tick(_float fTimeDelta)
 						CMultiEffect::MULTI_FX_DESC FXDesc{};
 						FXDesc.vInitPos = (_float3)GET_POS + _float3{0.f, -.5f, 0.f};
 						FXDesc.vInitScale = {5.f, 5.f, 5.f};
-						Add_Effect("HS_ground arrow bomb", FXDesc);
+						//Add_Effect("HS_ground arrow bomb", FXDesc);
 						m_bCollided = true;
 					}
 
