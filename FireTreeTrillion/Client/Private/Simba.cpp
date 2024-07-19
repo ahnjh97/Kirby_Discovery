@@ -9,6 +9,10 @@
 #include "Bone.h"
 #include "Camera_Main.h"
 #include "Ability.h"
+#include "Kirby.h"
+#include "DimensionClaw.h"
+#include "CollisionCenter.h"
+#include "SimbaLaser.h"
 
 CSimba::CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -125,9 +129,9 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_pLipBone = m_pModelCom->Get_BonePtr("T_LLip0J");
 	Safe_AddRef(m_pLipBone);
 
-	m_pRotationBone = m_pModelCom->Get_BonePtr("TopL");
-	Safe_AddRef(m_pRotationBone);
-	m_pRotationBoneMatrix = m_pRotationBone->Get_EditMatrixPtr();
+	m_pLaserBone = m_pModelCom->Get_BonePtr("LaserL");
+	Safe_AddRef(m_pLaserBone);
+	m_pLaserBoneMatrix = m_pLaserBone->Get_CombinedTransformationMatrix();
 
 	m_pLeftHandBone = m_pModelCom->Get_BonePtr("L_HaveL");
 	Safe_AddRef(m_pLeftHandBone);
@@ -141,6 +145,8 @@ HRESULT CSimba::Initialize(void* pArg)
 
 	SetCamSequence(CCamera_Main::SEQ_SIMBA_START);
 
+	CreateDimensionClawActor();
+
 	return S_OK;
 }
 
@@ -152,6 +158,10 @@ _int CSimba::Tick(_float fTimeDelta)
 	m_fHpRatio =  m_fHp / m_fMaxHp;
 
 	ResetRotation();
+	m_bRenderDimensionClaw = false;
+
+	if (true == m_bLaserActivated)
+		LaserAttack();
 
 	if (true == m_pModelCom->IsFinished() || m_pModelCom->Get_Trackposition() == 0.f) // IsAnimFinished
 		Reset_HitBoxTimingMap(SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex()));
@@ -195,24 +205,28 @@ _int CSimba::Tick(_float fTimeDelta)
 	if (m_fHp <= 0.f && false == m_bDeathAnimPlayed)
 	{
 		m_bDeathAnimPlayed = true;
-		Turn_RotationBoneMatrix(0.f);
 		TransformToDefault(0.f);
 		Change_State(Simba_Death, 2.f, false, true);
 	}
 
 	if (0.6f > m_fHpRatio && 0.f < m_fHpRatio && m_bPhaseTwo == false) {
 		m_bPhaseTwo = true;
-		Turn_RotationBoneMatrix(-2.5f);
 		Change_State(Simba_Damage, 50.f, false, true);
 	}
 
 	DetermineSimbaRotation();
+
+	if (m_pSimbaLaser != nullptr && true == m_bLaserActivated)
+		m_pSimbaLaser->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
 
 void CSimba::Late_Tick(_float fTimeDelta)
 {
+	if (m_pSimbaLaser != nullptr && true == m_bLaserActivated)
+		m_pSimbaLaser->Late_Tick(fTimeDelta);
+
 	_bool bIsFinished = m_pModelCom->IsFinished();
 	m_pModelCom->Play_Animation(m_fTimeDelta);
 
@@ -382,19 +396,6 @@ void CSimba::CreateHpBar()
 	}
 }
 
-void CSimba::Turn_RotationBoneMatrix(_float fAngle)
-{
-	/*_float4x4 RotationMatrix = _float4x4::Identity;
-	if (0 == fAngle) 
-	{
-		*m_pRotationBoneMatrix = RotationMatrix;
-		return;
-	}
-
-	CUtils::Turn_OtherMatrix(RotationMatrix, _float4(1, 0, 0, 0), 1.f, fAngle);
-	*m_pRotationBoneMatrix = RotationMatrix;*/
-}
-
 void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 {
 	_float4x4 matBoneWorld{};
@@ -402,6 +403,7 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 	CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
 	AbilityItemDesc.fAngle = 0.f;
 	AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
+
 	if (Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx)
 	{
 		matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone);
@@ -623,11 +625,11 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 		if (0 == m_iStarCount)
 			AbilityItemDesc.vPosition = vPos + vFloatLook * 4.f;
 		else if (1 == m_iStarCount)
-			AbilityItemDesc.vPosition = vPos + vFloatLook * 8.5f;
+			AbilityItemDesc.vPosition = vPos + vFloatLook * 9.f;
 		else if (2 == m_iStarCount)
-			AbilityItemDesc.vPosition = vPos + vFloatLook * 14.f;
+			AbilityItemDesc.vPosition = vPos + vFloatLook * 15.f;
 		else if (3 == m_iStarCount)
-			AbilityItemDesc.vPosition = vPos + vFloatLook * 20.5f;
+			AbilityItemDesc.vPosition = vPos + vFloatLook * 22.f;
 
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);
@@ -658,6 +660,60 @@ _bool CSimba::IsKirbyOnMyLeft()
 		return true;
 	else
 		return false;
+}
+
+void CSimba::SetUpDimensionClawWorldMatrix()
+{
+	if (nullptr == m_pDimensionClawActor)
+		return;
+
+	_float4x4 matLeftHandMatrix = m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone);
+	_float4x4 matRightHandMatrix = m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone);
+	_float4 vLeftHandPos{}, vRightHandPos{};
+	memcpy(&vLeftHandPos, &matLeftHandMatrix.m[3], sizeof(_float4));
+	memcpy(&vRightHandPos, &matRightHandMatrix.m[3], sizeof(_float4));
+	
+	_float4 vPos = (vLeftHandPos + vRightHandPos) * 0.5f;
+	if (true == m_bDimensionClawUpAttack)
+		vPos.y = 6.5f;
+	else
+		vPos.y = 0.8f;
+	_float4x4 matWorld = m_pTransformCom->Get_WorldMatrix();
+	memcpy(&matWorld.m[3], &vPos, sizeof(_float4));
+
+	m_pDimensionClawActor->setKinematicTarget(CUtils::ToPxTransform(matWorld));
+}
+
+void CSimba::MoveDimensionClaw(_float fTimeDelta)
+{
+	if (nullptr == m_pDimensionClawActor)
+		return;
+
+	PxTransform pxTransform = m_pDimensionClawActor->getGlobalPose();
+
+	_float4x4 matWorld = CUtils::To_Float4x4(pxTransform);
+	_float4 vLook{}, vPos{};
+	memcpy(&vLook, &(matWorld.m[2]), sizeof(_float4)); // Look 받아오기
+	memcpy(&vPos, &(matWorld.m[3]), sizeof(_float4)); // Pos 받아오기
+	vLook.Normalize();
+
+	vPos += vLook * 20.f * fTimeDelta;
+
+	memcpy(&(matWorld.m[3]), &vPos, sizeof(_float4)); // 새로운 위치 대입
+
+	m_pDimensionClawActor->setGlobalPose(CUtils::ToPxTransform(matWorld));
+}
+
+void CSimba::HideDimensionClawActor()
+{
+	if(nullptr != m_pDimensionClawActor)
+		m_pDimensionClawActor->setKinematicTarget(PxTransform(0, 0, 0));
+}
+
+void CSimba::HideDimensionLaserActor()
+{
+	if (nullptr != m_pSimbaLaser)
+		static_cast<CSimbaLaser*>(m_pSimbaLaser)->HideLaser();
 }
 
 HRESULT CSimba::Add_Components()
@@ -715,7 +771,6 @@ HRESULT CSimba::Add_Components()
 	tAttack.pDesc = &m_tColliderDesc[ATTACK]; // Left Hand
 	tAttack.pCollisionType = HITBOX_SIMBA;
 	tAttack.pSocket = m_pModelCom->Get_BonePtr("L_HaveL");
-	//tAttack.vBoneOffset = _float3(0, 0, -3);
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
 		return E_FAIL;
 	
@@ -729,12 +784,14 @@ HRESULT CSimba::Add_Components()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
 		return E_FAIL;
 
-	//Activate_SphereCollider(0.f, 4.5f);
-	//Activate_SphereCollider(0.f, 4.5f, ATTACK2);
-	//Activate_SphereCollider(2.f, 8.f, ATTACK3);
 	Activate_FrustumCollider(0.f, 8.f, 150.f, ATTACK);
 	Activate_FrustumCollider(0.f, 8.f, 150.f, ATTACK2);
 	Activate_FrustumCollider(0.f, 11.5f, 150.f, ATTACK3);
+
+	m_pSimbaLaser = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_SimbaLaser"));
+	m_pSimbaLaserTransform = m_pSimbaLaser->Get_TransformCom();
+	Safe_AddRef(m_pSimbaLaserTransform);
+
 	return S_OK;
 }
 
@@ -1018,6 +1075,8 @@ void CSimba::DetermineSimbaRotation()
 {
 	m_fAngle = 0.f;
 	_uint iState = Get_State();
+	_float fAnimRatio = m_pModelCom->Get_AnimRatio();
+
 	for (_uint i = 0; i < ROTATION_END; i++)
 	{
 		if (m_mapRotation[i].end() != m_mapRotation[i].find(SIMBA_ANIM(iState)))
@@ -1041,6 +1100,17 @@ void CSimba::DetermineSimbaRotation()
 
 	if (Simba_Damage == iState)
 		TurnSimba(-2.5f);
+
+	if (Simba_DimensionLaserStart == iState)
+	{
+		if (0.2f > fAnimRatio) {
+			_float fRatio = RATIO(fAnimRatio, 0.f, 0.2f);
+			_float fStart = BiteRush;
+			fRatio = EASE_OUT(fRatio);
+			_float fAngle = LERP(fStart, 0, fRatio);
+			TurnSimba(fAngle);
+		}
+	}
 }
 
 void CSimba::TurnSimba(_float fAngle)
@@ -1053,6 +1123,96 @@ void CSimba::TurnSimba(_float fAngle)
 void CSimba::ResetRotation()
 {
 	m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), -1, -m_fAngle);
+}
+
+void CSimba::LaserAttack()
+{
+	_float4x4 matWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pLaserBone);
+	_float fScale = 24.f;
+	CUtils::Set_Scaled_Matrix(matWorld, fScale, fScale, fScale);
+	_float4 vLook{};
+	memcpy(&vLook, &(matWorld.m[2]), sizeof(_float4));
+	vLook = _float4(-vLook.x, -vLook.y, -vLook.z, 0);
+	memcpy(&(matWorld.m[2]), &vLook, sizeof(_float4));
+	m_pSimbaLaserTransform->Set_WorldMatrix(matWorld);
+	m_pSimbaLaser->Activate_Attack();
+}
+
+void CSimba::CreateDimensionClawActor()
+{
+	auto pPhysics = m_pGameInstance->Get_Physics();
+	PxMaterial* pMtrl = m_pGameInstance->Get_Material();
+	
+	PxTransform transform(PxVec3(0, 0, 0));
+	PxRigidDynamic* pRigidDynamic = pPhysics->createRigidDynamic(transform);
+	PxBoxGeometry boxGeometry(10.f, 1.f, 5.f);
+	
+	PxQuat rotation1(XMConvertToRadians(35), PxVec3(0, 0, 1)); // z축기준 35도 회전
+	PxQuat rotation2(-XMConvertToRadians(35), PxVec3(0, 0, 1)); // z축기준 35도 회전
+	PxTransform transform1(PxVec3(0.f, 0.f, 0.f), rotation1);
+	PxTransform transform2(PxVec3(0.f, 0.f, 0.f), rotation2);
+
+	PxShape* pShape1 = pPhysics->createShape(boxGeometry, *pMtrl);
+	pShape1->setLocalPose(transform1);
+	pShape1->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+	pShape1->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
+	pShape1->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+	pRigidDynamic->attachShape(*pShape1);
+
+	PxShape* pShape2 = pPhysics->createShape(boxGeometry, *pMtrl);
+	pShape2->setLocalPose(transform2);
+	pShape2->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+	pShape2->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
+	pShape2->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+	pRigidDynamic->attachShape(*pShape2);
+	
+	m_pGameInstance->AddActor(*pRigidDynamic);
+	m_pDimensionClawActor = pRigidDynamic;
+	m_pDimensionClawActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+	m_pGameInstance->Register_Trigger(m_pDimensionClawActor, TRIGGER_SIMBA_ATTACK, 0);
+
+	function<void(_int)> func = bind(&CSimba::OnSimbaAttackTrigger, this);
+	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_SIMBA_ATTACK, func);
+
+	pShape1->release();
+	pShape2->release();
+}
+
+void CSimba::OnSimbaAttackTrigger()
+{
+	CKirby* pKirby = static_cast<CKirby*>(m_pKirby);
+
+	if (true == CCollisionCenter::Get_Instance()->Kirby_Dodge_SlowMotionSystem(pKirby))
+		return;
+	
+	if (pKirby->isOverPower() == false) // 무적이 아닐 경우
+	{
+		CTransform* pKirbyTransform = m_pKirby->Get_TransformCom();
+		_vector vKirbyPos = pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION);
+		_float4 vDistance = vKirbyPos - GET_POS;
+		vDistance.y = 0.f;
+		vDistance.Normalize();
+
+		_float4 vNewDir{};
+		_float4 vSimbaRight = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+		vSimbaRight.Normalize();
+
+		if (true == IsKirbyOnMyLeft())
+			vNewDir = vDistance + vSimbaRight * 2.5f;
+		else
+			vNewDir = vDistance - vSimbaRight * 2.5f;
+		vNewDir.Normalize();
+		_vector vKnockbackDir = vNewDir;
+
+		pKirby->Set_DamageMoving(vKnockbackDir * 2.3f, 8.2f); // 심바 전용 넉백
+
+		_float fMonsterAttack = Get_Attack();
+		pKirby->Minus_Hp(fMonsterAttack);
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+		pCamera->Make_Shake(1.2f, 0.5f, _float2(0.f, -1.f));
+
+		pKirby->Collision(CCollisionCenter::CONTENT_ATTACK, this);
+	}
 }
 
 CSimba* CSimba::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -1084,14 +1244,18 @@ CGameObject* CSimba::Clone(void* pArg)
 
 void CSimba::Free()
 {
+	m_pGameInstance->ReleaseActor(m_pDimensionClawActor);
 	CEventCenter::Get_Instance()->Unsubscribe(this);
+
+	__super::Free();
+
 	Safe_Release(m_pLipBone);
-	Safe_Release(m_pRotationBone);
+	Safe_Release(m_pLaserBone);
 	Safe_Release(m_pLeftHandBone);
 	Safe_Release(m_pRightHandBone);
 	Safe_Release(m_pKirby);
-
-	__super::Free();
+	Safe_Release(m_pSimbaLaserTransform);
+	Safe_Release(m_pSimbaLaser);
 
 	for(_uint i = 0; i < EYETEX_END; i++)
 		Safe_Release(m_pEyeTextureCom[i]);

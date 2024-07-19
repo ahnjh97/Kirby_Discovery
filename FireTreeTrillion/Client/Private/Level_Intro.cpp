@@ -19,6 +19,8 @@
 #include "HUD.h"
 #include "TransingStar.h"
 
+#include "UI_Fading.h"
+
 #define BEACH_TO_JUNGLE			-66.f
 #define JUNGLE_TO_NOWHERE		57.f
 #define NOWHERE_TO_BUILDING		80.f
@@ -59,7 +61,7 @@ HRESULT CLevel_Intro::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Monsters();
 	CHECK_FAILED(hr);
-	hr = Ready_Items();
+	//hr = Ready_Items();
 	CHECK_FAILED(hr);
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
@@ -77,6 +79,11 @@ HRESULT CLevel_Intro::Initialize()
 	// 레벨전환 트리거
 	function<void(_int)> func = bind(&CLevel_Intro::Change_Levels, this);
 	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_LEVELCHANGER, func);
+
+	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+	CHECK_NULLPTR(pUIObj);
+	CUI_Fading* pFadingUI = dynamic_cast<CUI_Fading*>(pUIObj);
+	pFadingUI->Set_IsRender(true);
 
 	return S_OK;
 }
@@ -160,6 +167,12 @@ void CLevel_Intro::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
 	Sound_Tick(fTimeDelta);
+
+	// 처음 시작할때 FADE-IN	
+	static _float fTimeAcc = 0.f;
+	fTimeAcc += fTimeDelta;
+	//if (fTimeAcc > 2.f) // 2초뒤 페이드인
+	//	Ready_FadeIn();
 }
 
 HRESULT CLevel_Intro::Render()
@@ -181,6 +194,35 @@ HRESULT CLevel_Intro::Render()
 	}
 
 	return S_OK;
+}
+
+void CLevel_Intro::Ready_FadeIn()
+{
+	static _bool bOnceFade = false;
+	static _bool bOnceChanger = false;
+
+	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+	CHECK_NULLPTR(pUIObj);
+	CUI_Fading* pFadingUI = dynamic_cast<CUI_Fading*>(pUIObj);
+
+	// FadingUI가 이전에 FadeOut 안되어있다면 NO FadeIn
+	//if (pFadingUI->Get_State() != CUI_Fading::FADEOUT) return;
+
+	if (bOnceChanger == false)
+	{
+		if (bOnceFade == false)
+		{
+			pFadingUI->Set_InOutState(CUI_Fading::FADEIN);
+			pFadingUI->Set_IsRender(true);
+			bOnceFade = true;
+		}
+		else if (pFadingUI->Get_FadeRatio() >= 1.f)
+		{
+
+			pFadingUI->Set_IsRender(false);
+			bOnceChanger = true;
+		}
+	}
 }
 
 void CLevel_Intro::Sound_Tick(_float fTimeDelta)
