@@ -8,7 +8,7 @@
 #include "Kirby.h"
 
 #include "Awoofy.h"
-#include "Rabbit.h"
+#include "Rabbit.h" 
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"

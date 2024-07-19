@@ -240,6 +240,7 @@ void CTransingStar::Tick_GreenStar(_float fTimeDelta)
     CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[2], m_InitialSize.x, m_InitialSize.y, 1.f);
     if (m_eNextLevel != LEVEL_END) return;
 
+    // 레벨이동 트리거가 아닌 커비 이동 트리거를 밟았을때 2초 뒤에 TransingStar는 오픈됩니다.
     if (*m_pCurrentLevelID == LEVEL_PARK || *m_pCurrentLevelID == LEVEL_TOWN )
     {
         if (m_InitialSize.x <= m_fDecreaseValue)

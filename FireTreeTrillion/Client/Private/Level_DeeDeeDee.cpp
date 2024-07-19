@@ -95,35 +95,6 @@ void CLevel_DeeDeeDee::Tick(_float fTimeDelta)
 		Ready_FadeIn();
 }
 
-void CLevel_DeeDeeDee::Ready_FadeIn()
-{
-	static _bool bOnceFade = false;
-	static _bool bOnceChanger = false;
-
-	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
-	CHECK_NULLPTR(pUIObj);
-	CUI_Fading* pFadingUI = dynamic_cast<CUI_Fading*>(pUIObj);
-
-	// FadingUI가 이전에 FadeOut 안되어있다면 NO FadeIn
-	//if (pFadingUI->Get_State() != CUI_Fading::FADEOUT) return;
-	
-	if (bOnceChanger == false)
-	{
-		if (bOnceFade == false)
-		{
-			pFadingUI->Set_InOutState(CUI_Fading::FADEIN);
-			pFadingUI->Set_IsRender(true);
-			bOnceFade = true;
-		}
-		else if (pFadingUI->Get_FadeRatio() >= 1.f)
-		{
-
-			pFadingUI->Set_IsRender(false);
-			bOnceChanger = true;
-		}
-	}
-}
-
 HRESULT CLevel_DeeDeeDee::Render()
 {
 	if (FAILED(__super::Render()))
@@ -145,6 +116,35 @@ HRESULT CLevel_DeeDeeDee::Render()
 	return S_OK;
 }
 
+
+void CLevel_DeeDeeDee::Ready_FadeIn()
+{
+	static _bool bOnceFade = false;
+	static _bool bOnceChanger = false;
+
+	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+	CHECK_NULLPTR(pUIObj);
+	CUI_Fading* pFadingUI = dynamic_cast<CUI_Fading*>(pUIObj);
+
+	// FadingUI가 이전에 FadeOut 안되어있다면 NO FadeIn
+	//if (pFadingUI->Get_State() != CUI_Fading::FADEOUT) return;
+
+	if (bOnceChanger == false)
+	{
+		if (bOnceFade == false)
+		{
+			pFadingUI->Set_InOutState(CUI_Fading::FADEIN);
+			pFadingUI->Set_IsRender(true);
+			bOnceFade = true;
+		}
+		else if (pFadingUI->Get_FadeRatio() >= 1.f)
+		{
+
+			pFadingUI->Set_IsRender(false);
+			bOnceChanger = true;
+		}
+	}
+}
 
 HRESULT CLevel_DeeDeeDee::Ready_Lights()
 {

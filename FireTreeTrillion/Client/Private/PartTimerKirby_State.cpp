@@ -155,12 +155,43 @@ void CPartTimerKirby_Grab_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	m_fSpeed = 5.f;
 	m_bEffect = false;
-}
 
+	static _bool bForFirstDee = false;
+	if (CPartTimerKirby::FOODSHOP_CORRECT == (CPartTimerKirby::ANIM)_iAnimIndex)
+	{
+		if (false == bForFirstDee)
+		{
+#pragma region 멀티이펙트WI
+			HRESULT hr(S_OK);
+			CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+			MultiFXDesc.vInitPos = _float3(-100.f, 0.f, 0.f);
+			MultiFXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			hr = CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_UI_FoodGame_CorrectScoreUpUp"), &MultiFXDesc);
+			CHECK_FAILED(hr);
+#pragma endregion
+
+			bForFirstDee = true;
+		}
+		else
+		{
+#pragma region 멀티이펙트WI
+			HRESULT hr(S_OK);
+			CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+			MultiFXDesc.vInitPos = _float3(0.f, 0.f, 0.f);
+			MultiFXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			hr = CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_UI_FoodGame_CorrectScoreUpUp"), &MultiFXDesc);
+			CHECK_FAILED(hr);
+#pragma endregion
+		}
+
+	}
+}
+                                                        
 void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	CPartTimerKirby* pAlbaKirby = static_cast<CPartTimerKirby*>(pGameObject);
 	CTransform* pTransform = pAlbaKirby->Get_TransformCom();
+	// 애니메이션이 거의 완료되는 시점
 	if (pAlbaKirby->IsAnimFinished())
 	{
 		switch (pAlbaKirby->Get_State())
@@ -208,20 +239,14 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			case PARTTIME_ITEM::BURGER:
 			{
 				pAlbaKirby->Change_State(CPartTimerKirby::HANDOVERSHORTL, 80.f, false, true);
-			}
+			} 
 			break;
 			}
-
-#pragma region 이펙트WI
-			CEffect::FX_DESC FXDesc{};
-			FXDesc.vInitPos = _float3(0.f, 0.f, 0.f);
-			FXDesc.vInitScale = { 1.f, 1.f, 1.f }; // 고정 사이즈
-			pAlbaKirby->Add_Effect("UI_FoodGame_CorrectScoreUp", FXDesc, true);
-#pragma endregion
 		}
 		break;
 		}
 	}
+	// 애니메이션 진행중인 상황
 	else
 	{
 		switch (pAlbaKirby->Get_State())
@@ -239,7 +264,7 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			auto listFood = m_pGameInstance->Get_List(iLevel, TEXT("Layer_Food"));
 			for (auto& GameObj : *listFood)
 			{
-				CPartTimeFood* pFood = static_cast<CPartTimeFood*>(GameObj);
+				CPartTimeFood* pFood = dynamic_cast<CPartTimeFood*>(GameObj);
 				if (pFood->Get_Item() == curItem) // 해당 푸드일 경우, 푸드 날려버리기
 				{
 					m_pFood = pFood;
@@ -355,7 +380,7 @@ void CPartTimerKirby_Grab_State::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pFood);
+	//Safe_Release(m_pFood);
 }
 
 #pragma endregion
