@@ -15,6 +15,7 @@
 #include "KirbyHammer_State.h"
 #include "KirbyBulb_State.h"
 #include "KirbyCrash_State.h"
+#include "KirbyFinalCut_State.h"
 
 #include "KirbyWeapons.h"
 #include "KirbyArmours.h"
@@ -925,6 +926,12 @@ HRESULT CKirby::Add_Components()
 		TEXT("Com_Model_CrashDefault"), (CComponent**)&m_pModelCom[BODY_CRASHDEFAULT]);
 	CHECK_FAILED(hr);
 
+	// Ä¿ºñÀÇ Final »óÅÂ ¸ðµ¨
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyFinalCut"),
+		TEXT("Com_Model_FinalCutDefault"), (CComponent**)&m_pModelCom[BODY_FINALCUT]);
+	CHECK_FAILED(hr);
+
+
 #pragma endregion
 
 #pragma region Kirby Eye
@@ -1418,6 +1425,11 @@ void CKirby::SetUp_FSM()
 #pragma endregion
 
 
+#pragma region final ÄÆ¾À
+	m_pFSM->Add_State(FINALCUTSTATE_CUT1, CKirbyFinalCut_State::Create());
+	m_pFSM->Add_State(FINALCUTSTATE_CUT2, CKirbyFinalCut_State::Create());
+#pragma endregion
+
 	CFSM::FSM_INFO		FSM_Info_Desc = {};
 	FSM_Info_Desc.iState = STATE_IDLE;
 	FSM_Info_Desc.uNumModel = BODY_END;
@@ -1501,6 +1513,14 @@ void CKirby::HitBoxChanger(_uint eState)
 	// °øÁß¾îÆÛÄÆ Çü½ÄÀÇ °ø°Ý
 	case SWORDSTATE_UPWARDSLASH:
 		Activate_FrustumCollider(0.5f, 5.f, 90.f);
+		break;
+	// Ç® Â÷Â¡ ¿£µå
+	case SWORDSTATE_SUPERSPINSLASHEND:
+		Activate_SphereCollider(0.5f, 6.5f);
+		break;
+	// ´ú Â÷Â¡ ¿£µå
+	case SWORDSTATE_SPINSLASHEND:
+		Activate_SphereCollider(0.5f, 8.f);
 		break;
 	// ÇØ¸Ó 5Å¸ Åë ¾Ö´Ô (¸·Å¸)
 	case HAMMERSTATE_HAMMERATTACKFINALTOY:

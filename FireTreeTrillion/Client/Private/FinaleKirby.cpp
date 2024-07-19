@@ -65,12 +65,12 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
         return E_FAIL;
 
     ////BDBY
-    CParticle::PARTICLE_DESC FXDesc{};
-    FXDesc.pSocketMatrix = &m_EffectSocket;
-    FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+    //CParticle::PARTICLE_DESC FXDesc{};
+    //FXDesc.pSocketMatrix = &m_EffectSocket;
+    //FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 
-    if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_bdby3"), &FXDesc)))
-        return E_FAIL;
+    //if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_bdby3"), &FXDesc)))
+    //    return E_FAIL;
 
     m_fOffsetTurn = 2.f;
     m_bUpdate_FXSocketMatrix = false;

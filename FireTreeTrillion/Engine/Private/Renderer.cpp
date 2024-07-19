@@ -2317,8 +2317,6 @@ void CRenderer::Update_Option(OPTION Option, _bool bOn)
 		return;
 }
 
-#ifdef _DEBUG
-
 void CRenderer::ObjectBlack(_float fTimeDelta)
 {
 	if (m_bObjectBlack == true)
@@ -2361,6 +2359,7 @@ void CRenderer::ObjectBlack(_float fTimeDelta)
 	}
 }
 
+#ifdef _DEBUG
 HRESULT CRenderer::Render_Debug()
 {
 

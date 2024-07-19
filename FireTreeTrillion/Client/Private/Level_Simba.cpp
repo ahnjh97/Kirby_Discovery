@@ -458,72 +458,34 @@ HRESULT CLevel_Simba::Ready_Monsters()
 			vecRallyPoints.push_back(_float4(vRallyPointPos.x, vRallyPointPos.y, vRallyPointPos.z, 1));
 		}
 
-		CGameObject::GAMEOBJECT_DESC tempDesc = {};
+		CMonster::MONSTER_DESC tempDesc = {};
 		tempDesc.matWorld = matWorld;
 		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 		tempDesc.iShaderVars = iShaderVars;
 		tempDesc.fRimWidth = fRimWidth;
-
+		tempDesc.eMonState = iTriggerIndex;
+		tempDesc.vecRallyPoints = vecRallyPoints;
 		if (strModelName.size() >= 8) { // NonAnim_ 부분 지우기
 			if ("NonAnim" == strModelName.substr(0, 7))
 				tempDesc.wstrModelName.erase(0, 8);
 		}
 
-		CMonster::MONSTER_DESC tMonsterDesc = *static_cast<CMonster::MONSTER_DESC*>(&tempDesc);
-		tMonsterDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
-		if (iTriggerIndex > 10) {
-			vecMonsterDescs.push_back(tMonsterDesc);
+		if (iTriggerIndex > 10 && "Crumble" != strModelName) {
+			vecMonsterDescs.push_back(tempDesc);
 			continue;
 		}
 
 		if (L"Awoofy" == tempDesc.wstrModelName)
 		{
-			CMonster::MONSTER_DESC MonsterDesc = {};
-			MonsterDesc.matWorld = matWorld;
-			MonsterDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			MonsterDesc.iShaderVars = iShaderVars;
-			MonsterDesc.fRimWidth = fRimWidth;
-			MonsterDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &MonsterDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (L"Rabbit" == tempDesc.wstrModelName)
 		{
-			CMonster::MONSTER_DESC RabbitDesc = {};
-			RabbitDesc.matWorld = matWorld;
-			RabbitDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			RabbitDesc.iShaderVars = iShaderVars;
-			RabbitDesc.fRimWidth = fRimWidth;
-			RabbitDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &RabbitDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (L"Buffahorn" == tempDesc.wstrModelName)
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Buffahorn"), &tempDesc)))
-				return E_FAIL;
-		}
-		else if (L"BladeKnight" == tempDesc.wstrModelName)
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BladeKnight"), &tempDesc)))
-				return E_FAIL;
-		}
-		else if (L"CappyBody" == tempDesc.wstrModelName)
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
-				return E_FAIL;
-		}
-		else if (L"FinalBoss" == tempDesc.wstrModelName)
-		{
-			CFinalBoss::FINALBOSS_DESC FinalBossDesc = {};
-			FinalBossDesc.matWorld = matWorld;
-			FinalBossDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			FinalBossDesc.iShaderVars = iShaderVars;
-			FinalBossDesc.fRimWidth = fRimWidth;
-			FinalBossDesc.vecRallyPoints = vecRallyPoints;
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_FinalBoss"), &FinalBossDesc)))
-				return E_FAIL;
-		}
+
 		else if ("NonAnim_Simba" == strModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Simba"), TEXT("Prototype_GameObject_Simba"), &tempDesc)))

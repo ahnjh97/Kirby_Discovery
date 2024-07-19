@@ -131,31 +131,47 @@ void CFXToolDirector::Make_Effect(PARTICLE_DATA& _FXData)
 	if (InstanceDesc.vecMoveCommands.size() < INSTANCE_END)
 		InstanceDesc.vecMoveCommands.resize(INSTANCE_END);
 
+	InstanceDesc.iNumInstance = _FXData.iNumInstance;
 	InstanceDesc.fLifetime = _FXData.fLifetime;
 	InstanceDesc.fLifetimeRandomOffset = _FXData.fLifetimeRandomOffset;
 	InstanceDesc.fStartDelay = _FXData.fStartDelay;
 	InstanceDesc.fStarDelayRandomOffset = _FXData.fStarDelayRandomOffset;
 	InstanceDesc.vCenter = _FXData.vCenter;
+
 	InstanceDesc.vRange = _FXData.vRange;
+	InstanceDesc.fMinRange = _FXData.fMinRange;
+	InstanceDesc.fMaxRange = _FXData.fMaxRange;
+
+
 	InstanceDesc.vRotation = _FXData.vRotation;
 	InstanceDesc.vRotationRandomOffset = _FXData.vRotationRandomOffset;
+
 	InstanceDesc.vScale = _FXData.vScale;
 	InstanceDesc.vScaleRandomOffset = _FXData.vScaleRandomOffset;
 	InstanceDesc.vDir = _FXData.vDir;
 	InstanceDesc.vDirRandomOffset = _FXData.vDirRandomOffset;
 	InstanceDesc.fSpeed = _FXData.fSpeed;
 	InstanceDesc.fSpeedRandomOffset = _FXData.fSpeedRandomOffset;
+
 	InstanceDesc.fOrbitSpeed = _FXData.fOrbitSpeed;
 	InstanceDesc.fOrbitSpeedRandomOffset = _FXData.fOrbitSpeedRandomOffset;
+
+	InstanceDesc.fAccSupplyAmount = _FXData.fAccSupplyAmount;
+	InstanceDesc.fTurnSupplyAmount = _FXData.fTurnSupplyAmount;
+
 	InstanceDesc.vColor = _FXData.vColor;
 	InstanceDesc.vColorRandomOffset = _FXData.vColorRandomOffset;
+
+	InstanceDesc.vTargetColor = _FXData.vTargetColor;
+	InstanceDesc.vTargetColorRandomOffset = _FXData.vTargetColorRandomOffset;
+
 	InstanceDesc.fAlpha = _FXData.fAlpha;
 	InstanceDesc.fAlphaRandomOffset = _FXData.fAlpha;
 	InstanceDesc.vPivot = _FXData.vPivot;
 
 
 	CParticle* pParticle = static_cast<CParticle*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle"), &ParticleDesc));
-	m_FXs.emplace_back(pParticle);
+	m_Particles.emplace_back(pParticle);
 	pParticle->Update_InstanceInfo(&InstanceDesc);
 
 }
@@ -181,6 +197,12 @@ CEffect* CFXToolDirector::Find_Effect(string strName)
 			return FX;
 	}
 
+	for (CEffect* FX : m_Particles)
+	{
+		if (FX != nullptr && FX->Get_Name() == strName)
+			return FX;
+	}
+
 	for (CEffect* FX : m_MultiFXs)
 	{
 		if (FX != nullptr && FX->Get_Name() == strName)
@@ -198,11 +220,15 @@ HRESULT CFXToolDirector::Save_AllEffect()
 	{
 		wstring wstrName = CUtils::StrToWstr(FX->Get_Name());
 
-		(dynamic_cast<CSingleEffect*>(FX) != nullptr) ?
-			//단일 이펙트
-			Save_Effect(FX, wstrName) :
-			//파티클
-			Save_Particle(FX, wstrName);
+		Save_Effect(FX, wstrName);
+	}
+
+	for (auto& FX : m_Particles)
+	{
+		wstring wstrName = CUtils::StrToWstr(FX->Get_Name());
+
+		//파티클
+		Save_Particle(FX, wstrName);
 	}
 
 	for (auto& FX : m_MultiFXs)
@@ -334,6 +360,9 @@ HRESULT CFXToolDirector::Save_Particle(CEffect* pEffect, const wstring& strFileN
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vCenter), sizeof(_float3));
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vRange), sizeof(_float3));
 
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.fMinRange), sizeof(_float));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.fMaxRange), sizeof(_float));
+
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vRotation), sizeof(_float3));
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vRotationRandomOffset), sizeof(_float3));
 
@@ -349,15 +378,21 @@ HRESULT CFXToolDirector::Save_Particle(CEffect* pEffect, const wstring& strFileN
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fOrbitSpeed), sizeof(_float));
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fOrbitSpeedRandomOffset), sizeof(_float));
 
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.fAccSupplyAmount), sizeof(_float));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.fTurnSupplyAmount), sizeof(_float));
+
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vColor), sizeof(_float3));
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vColorRandomOffset), sizeof(_float3));
 
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.vTargetColor), sizeof(_float3));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.vTargetColorRandomOffset), sizeof(_float3));
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fAlpha), sizeof(_float));
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fAlphaRandomOffset), sizeof(_float));
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vPivot), sizeof(_float3));
 
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.vRotationAxis), sizeof(_float3));
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.iMoveCommandsNum), sizeof(_int));
 
@@ -580,6 +615,10 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	_pData->strName.resize(_pData->iNameStrLen);
 	InputFile.read(&_pData->strName[0], _pData->iNameStrLen);
 
+	if (_pData->strName == "particle parse test")
+	{
+		_int a = 0;
+	}
 
 	//버퍼 이름
 	InputFile.read(reinterpret_cast<char*>(&_pData->iBufferStrLen), sizeof(_int));
@@ -622,6 +661,9 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	InputFile.read(reinterpret_cast<char*>(&_pData->vCenter), sizeof(_float3));
 	InputFile.read(reinterpret_cast<char*>(&_pData->vRange), sizeof(_float3));
 
+	InputFile.read(reinterpret_cast<char*>(&_pData->fMinRange), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fMaxRange), sizeof(_float));
+
 	InputFile.read(reinterpret_cast<char*>(&_pData->vRotation), sizeof(_float3));
 	InputFile.read(reinterpret_cast<char*>(&_pData->vRotationRandomOffset), sizeof(_float3));
 
@@ -637,8 +679,14 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeed), sizeof(_float));
 	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeedRandomOffset), sizeof(_float));
 
+	InputFile.read(reinterpret_cast<char*>(&_pData->fAccSupplyAmount), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSupplyAmount), sizeof(_float));
+
 	InputFile.read(reinterpret_cast<char*>(&_pData->vColor), sizeof(_float3));
 	InputFile.read(reinterpret_cast<char*>(&_pData->vColorRandomOffset), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->vTargetColor), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&_pData->vTargetColorRandomOffset), sizeof(_float3));
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->fAlpha), sizeof(_float));
 	InputFile.read(reinterpret_cast<char*>(&_pData->fAlphaRandomOffset), sizeof(_float));
@@ -646,6 +694,7 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->vPivot), sizeof(_float3));
 
+	InputFile.read(reinterpret_cast<char*>(&_pData->vRotationAxis), sizeof(_float3));
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->iMoveCommandsNum), sizeof(_int));
 	_pData->vecMoveCommands.clear();
@@ -774,9 +823,10 @@ void CFXToolDirector::Late_Tick(_float _fTimeDelta)
 	if (m_bPlayingBar)
 	{
 		//복합 이펙트 아니면 FX에 있는 이펙트 업데이트
-		if (m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX)
+		if (m_eSelected == SELECTED_SINGLE_FX)
 			m_FXs[m_iSelectedFXIdx]->Late_Tick(_fTimeDelta);
-
+		else if (m_eSelected == SELECTED_PARTICLE_FX)
+			m_Particles[m_iSelectedParticleIdx]->Late_Tick(_fTimeDelta);
 		//아니면 복합 이펙트 업데이트
 		else if (m_eSelected == SELECTED_MULTI_FX)
 			m_MultiFXs[m_iSelectedMultiFXIdx]->Late_Tick(_fTimeDelta);
@@ -784,9 +834,10 @@ void CFXToolDirector::Late_Tick(_float _fTimeDelta)
 	else
 	{
 		//복합 이펙트 아니면 FX에 있는 이펙트 업데이트
-		if (m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX)
+		if (m_eSelected == SELECTED_SINGLE_FX )
 			m_FXs[m_iSelectedFXIdx]->Add_RenderGroup();
-
+		else if (m_eSelected == SELECTED_PARTICLE_FX)
+			m_Particles[m_iSelectedParticleIdx]->Add_RenderGroup();
 		//아니면 복합 이펙트 업데이트
 		else if (m_eSelected == SELECTED_MULTI_FX)
 			m_MultiFXs[m_iSelectedMultiFXIdx]->Add_RenderGroup();
@@ -916,12 +967,12 @@ void CFXToolDirector::Render_FXHierarchy()
 	DiffuseFilter.Draw(u8"디퓨즈 검색");
 
 	//색 텍스쳐
-	if (BeginCombo(u8"디퓨즈 텍스쳐", m_FXTexList[m_iAddingFXTexIdx], ImGuiComboFlags_PopupAlignLeft ))
+	if (BeginCombo(u8"디퓨즈 텍스쳐", m_FXTexList[m_iAddingFXTexIdx], ImGuiComboFlags_PopupAlignLeft))
 	{
 		for (size_t i = 0; i < (_int)m_FXTexList.size(); i++)
 		{
 			const bool bSelected = (m_iAddingFXTexIdx == i);
-			if (DiffuseFilter.PassFilter(m_FXTexList[i]) && 
+			if (DiffuseFilter.PassFilter(m_FXTexList[i]) &&
 				Selectable(m_FXTexList[i], bSelected))
 				m_iAddingFXTexIdx = i;
 
@@ -964,7 +1015,7 @@ void CFXToolDirector::Render_FXHierarchy()
 	BufferFilter.Draw(u8"버퍼 검색");
 
 	//버퍼
-	if (BeginCombo(u8"버퍼", m_FXBufferList[m_iAddingFXBufferIdx], ImGuiComboFlags_PopupAlignLeft ))
+	if (BeginCombo(u8"버퍼", m_FXBufferList[m_iAddingFXBufferIdx], ImGuiComboFlags_PopupAlignLeft))
 	{
 		for (size_t i = 0; i < (_int)m_FXBufferList.size(); i++)
 		{
@@ -1169,21 +1220,22 @@ void CFXToolDirector::Render_FXHierarchy()
 		ParticleDesc.iNumInstance = m_iAddingInstanceNum;
 		ParticleDesc.fDuration = 5.f;
 		CParticle* pParticle = static_cast<CParticle*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Particle"), &ParticleDesc));
-		m_FXs.emplace_back(pParticle);
+		m_Particles.emplace_back(pParticle);
 	}
 
 	End();
 
+
+
 	//이펙트 초기 값과 키프레임 값을 편집한다.
 	Begin(u8"편집하기");
 
-	static ImGuiTextFilter filter;
-	string szName;
-	Text(u8"검색");
-	filter.Draw();
-
 	SeparatorText(u8"단일 이펙트 목록");
-	BeginChild(u8"목록", ImVec2(0, 200), true);
+
+	static ImGuiTextFilter filter;
+	filter.Draw(u8"단일 이펙트 검색");
+
+	BeginChild(u8"목록", ImVec2(0, 150), true);
 
 
 	for (_int i = 0; i < m_FXs.size(); ++i)
@@ -1195,7 +1247,7 @@ void CFXToolDirector::Render_FXHierarchy()
 		{
 			m_iSelectedFXIdx = i;
 
-			m_eSelected = _bool{ dynamic_cast<CSingleEffect*>(m_FXs[i]) != nullptr } ? SELECTED_SINGLE_FX : SELECTED_PARTICLE_FX;
+			m_eSelected = SELECTED_SINGLE_FX;
 			m_bPlayingBar = false;
 			m_bLooping = m_FXs[i]->m_bIsLoop;
 			m_iCurFXPassIdx = m_FXs[i]->m_iPassIdx;
@@ -1208,23 +1260,6 @@ void CFXToolDirector::Render_FXHierarchy()
 			memcpy(m_fLifetime, &m_FXs[i]->m_fLifetime, sizeof(_float2));
 			memcpy(m_vRotation, &m_FXs[i]->m_vContinuousRotation, sizeof(_float3));
 
-
-			//파티클이면 추가 변수 매칭
-			if (m_eSelected == SELECTED_PARTICLE_FX)
-			{
-				CParticle* pCurParticle = static_cast<CParticle*>(m_FXs[i]);
-				memcpy(m_vCenter, &pCurParticle->m_InstanceDesc.vCenter, sizeof(_float3));
-				memcpy(m_vRange, &pCurParticle->m_InstanceDesc.vRange, sizeof(_float3));
-				memcpy(m_vRotation, &pCurParticle->m_InstanceDesc.vRotation, sizeof(_float3));
-				memcpy(m_vRotationRandomOffset, &pCurParticle->m_InstanceDesc.vRotationRandomOffset, sizeof(_float3));
-				memcpy(m_vScale, &pCurParticle->m_InstanceDesc.vScale, sizeof(_float3));
-				memcpy(m_vScaleRandomOffset, &pCurParticle->m_InstanceDesc.vScaleRandomOffset, sizeof(_float3));
-				memcpy(m_vDir, &pCurParticle->m_InstanceDesc.vDir, sizeof(_float3));
-				memcpy(m_vDirRandomOffset, &pCurParticle->m_InstanceDesc.vDirRandomOffset, sizeof(_float3));
-				memcpy(m_vColor, &pCurParticle->m_InstanceDesc.vColor, sizeof(_float3));
-				memcpy(m_vColorRandomOffset, &pCurParticle->m_InstanceDesc.vColorRandomOffset, sizeof(_float3));
-				memcpy(m_vPivot, &pCurParticle->m_InstanceDesc.vPivot, sizeof(_float3));
-			}
 		}
 
 
@@ -1232,7 +1267,6 @@ void CFXToolDirector::Render_FXHierarchy()
 			OpenPopup("FXMenu");
 
 	}
-
 
 	//우측 키를 누르면 나오는 메뉴들
 	if (BeginPopup("FXMenu"))
@@ -1281,10 +1315,10 @@ void CFXToolDirector::Render_FXHierarchy()
 		if (MenuItem(u8"삭제"))
 		{
 			string strName = m_FXs[m_iSelectedFXIdx]->m_strFXName;
-			string strPath = m_eSelected == SELECTED_SINGLE_FX ? SINGLEFX_PATH : PARTICLE_PATH;
+			string strPath = SINGLEFX_PATH;
 			strPath += strName + ".bin";
 			MoveTo_TrashBin(strPath);
-			
+
 
 			Safe_Release(m_FXs[m_iSelectedFXIdx]);
 			m_FXs.erase(m_FXs.begin() + m_iSelectedFXIdx);
@@ -1321,32 +1355,25 @@ void CFXToolDirector::Render_FXHierarchy()
 					}
 				}
 
+				for (const auto& fx : m_Particles)
+				{
+					if (fx->m_strFXName == strName)
+					{
+						bDoesExistSameName = true;
+						break;
+					}
+				}
+
 				//중복 이름이 없거나, 알파벳이 초과하면 반복 끝
 				if (!bDoesExistSameName || 'Z' <= szSuffix)
 					break;
 				++szSuffix;
 			}
 
-			if (m_eSelected == SELECTED_SINGLE_FX)
-			{
-				//일단 단일 이펙트만
-				SINGLE_FX_DATA FXData{};
-				m_FXs[m_iSelectedFXIdx]->Fill_SaveData(&FXData);
-
-				FXData.strName = strName;
-
-				Make_Effect(FXData);
-
-			}
-			else if (m_eSelected == SELECTED_PARTICLE_FX)
-			{
-				PARTICLE_DATA ParticleData{};
-				m_FXs[m_iSelectedFXIdx]->Fill_SaveData(&ParticleData);
-
-				ParticleData.strName = strName;
-
-				Make_Effect(ParticleData);
-			}
+			SINGLE_FX_DATA FXData{};
+			m_FXs[m_iSelectedFXIdx]->Fill_SaveData(&FXData);
+			FXData.strName = strName;
+			Make_Effect(FXData);
 
 		}
 
@@ -1386,7 +1413,6 @@ void CFXToolDirector::Render_FXHierarchy()
 				SINGLE_FX_DATA FXData{};
 				m_FXs[m_iSelectedFXIdx]->Fill_SaveData(&FXData);
 
-
 				FXData.strName = strName;
 
 				//버퍼, 텍스쳐, 마스크 텍스쳐 컴포넌트 이름 떤져준다.
@@ -1399,25 +1425,6 @@ void CFXToolDirector::Render_FXHierarchy()
 				FXData.iTexIdx = 0;
 
 				Make_Effect(FXData);
-
-			}
-			else if (m_eSelected == SELECTED_PARTICLE_FX)
-			{
-
-				PARTICLE_DATA ParticleData{};
-				m_FXs[m_iSelectedFXIdx]->Fill_SaveData(&ParticleData);
-
-				ParticleData.strName = strName;
-
-				ParticleData.iPassIdx = 0;
-				ParticleData.iMaskTexIdx = 0;
-				ParticleData.iTexIdx = 0;
-
-				string strComponentTag = "Prototype_Component_";
-				ParticleData.strTexName = strComponentTag + m_FXTexList[m_iAddingFXTexIdx];
-				ParticleData.strMaskTexName = strComponentTag + m_FXMaskTexList[m_iAddingFXMaskTexIdx];
-
-				Make_Effect(ParticleData);
 			}
 		}
 
@@ -1426,6 +1433,229 @@ void CFXToolDirector::Render_FXHierarchy()
 
 
 	EndChild();
+
+
+	//파티클 목록
+
+	SeparatorText(u8"파티클 목록");
+
+	static ImGuiTextFilter ParticleFilter;
+	ParticleFilter.Draw(u8"파티클 검색");
+
+	BeginChild(u8"파티클 목록", ImVec2(0, 150), true);
+
+
+	for (_int i = 0; i < m_Particles.size(); ++i)
+	{
+
+		// 목록 중 하나 선택하면 해당 객체의 값을 ui에 매칭
+		if (ParticleFilter.PassFilter(m_Particles[i]->m_strFXName.c_str())
+			&& Selectable(m_Particles[i]->m_strFXName.c_str(), m_iSelectedParticleIdx == i))
+		{
+			m_iSelectedParticleIdx = i;
+
+			m_eSelected = SELECTED_PARTICLE_FX;
+			m_bPlayingBar = false;
+			m_bLooping = m_Particles[i]->m_bIsLoop;
+			m_iCurFXPassIdx = m_Particles[i]->m_iPassIdx;
+			m_iCurFXTexIdx = m_Particles[i]->m_iTexIdx;
+			m_iCurFXMaskTexIdx = m_Particles[i]->m_iMaskTexIdx;
+			m_iCurRenderGroup = m_Particles[i]->m_eRenderGroup;
+			m_iCurTimer = m_Particles[i]->m_eTimer;
+			m_fTotalPlayDuration = m_Particles[i]->m_fDuration.second;
+
+			memcpy(m_fLifetime, &m_Particles[i]->m_fLifetime, sizeof(_float2));
+			memcpy(m_vRotation, &m_Particles[i]->m_vContinuousRotation, sizeof(_float3));
+
+
+			//파티클이면 추가 변수 매칭
+
+			CParticle* pCurParticle = static_cast<CParticle*>(m_Particles[i]);
+			memcpy(m_vCenter, &pCurParticle->m_InstanceDesc.vCenter, sizeof(_float3));
+			memcpy(m_vRange, &pCurParticle->m_InstanceDesc.vRange, sizeof(_float3));
+			memcpy(m_vRotation, &pCurParticle->m_InstanceDesc.vRotation, sizeof(_float3));
+			memcpy(m_vRotationRandomOffset, &pCurParticle->m_InstanceDesc.vRotationRandomOffset, sizeof(_float3));
+			memcpy(m_vScale, &pCurParticle->m_InstanceDesc.vScale, sizeof(_float3));
+			memcpy(m_vScaleRandomOffset, &pCurParticle->m_InstanceDesc.vScaleRandomOffset, sizeof(_float3));
+			memcpy(m_vDir, &pCurParticle->m_InstanceDesc.vDir, sizeof(_float3));
+			memcpy(m_vDirRandomOffset, &pCurParticle->m_InstanceDesc.vDirRandomOffset, sizeof(_float3));
+			memcpy(m_vColor, &pCurParticle->m_InstanceDesc.vColor, sizeof(_float3));
+			memcpy(m_vColorRandomOffset, &pCurParticle->m_InstanceDesc.vColorRandomOffset, sizeof(_float3));
+			memcpy(m_vPivot, &pCurParticle->m_InstanceDesc.vPivot, sizeof(_float3));
+
+		}
+
+
+		if (m_iSelectedParticleIdx == i && IsItemHovered() && IsMouseReleased(1))
+			OpenPopup("ParticleMenu");
+
+	}
+
+	//우측 키를 누르면 나오는 메뉴들
+	if (BeginPopup("ParticleMenu"))
+	{
+		if (MenuItem(u8"선택된 이펙트 그룹에 추가") && m_iSelectedParticleIdx != -1 && m_iSelectedMultiFXIdx != -1)
+		{
+			m_MultiFXs[m_iSelectedMultiFXIdx]->Add_Effect(m_Particles[m_iSelectedParticleIdx]);
+		}
+
+		if (MenuItem(u8"새 이펙트 그룹 생성"))
+		{
+			CMultiEffect::MULTI_FX_DESC FxDesc = {};
+
+			string strBaseName{ "Multi FX " };
+
+			//default 이펙트 이름 뒤에 중복 존재 시 알파벳을 붙인다.
+			char szSuffix = 'A';
+			while (true)
+			{
+				_bool bDoesExistSameName{ false };
+				FxDesc.strFXName = strBaseName + szSuffix;
+
+				//중복 이름 있으면 안됨
+				for (const auto& fx : m_MultiFXs)
+				{
+					if (fx->m_strFXName == FxDesc.strFXName)
+					{
+						bDoesExistSameName = true;
+						break;
+					}
+				}
+
+				//중복 이름이 없거나, 알파벳이 초과하면 반복 끝
+				if (!bDoesExistSameName || 'Z' <= szSuffix)
+					break;
+
+				++szSuffix;
+			}
+
+			CMultiEffect* pMultiFX = static_cast<CMultiEffect*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_MultiEffect"), &FxDesc));
+			m_MultiFXs.emplace_back(pMultiFX);
+
+			m_MultiFXs.back()->Add_Effect(m_Particles[m_iSelectedParticleIdx]);
+		}
+
+		if (MenuItem(u8"삭제"))
+		{
+			string strName = m_Particles[m_iSelectedParticleIdx]->m_strFXName;
+			string strPath = m_eSelected == SELECTED_SINGLE_FX ? SINGLEFX_PATH : PARTICLE_PATH;
+			strPath += strName + ".bin";
+			MoveTo_TrashBin(strPath);
+
+
+			Safe_Release(m_Particles[m_iSelectedParticleIdx]);
+			m_Particles.erase(m_Particles.begin() + m_iSelectedParticleIdx);
+			m_eSelected = SELECTED_END;
+
+			if (m_Particles.size() <= m_iSelectedParticleIdx)
+				--m_iSelectedFXIdx;
+			else if (m_Particles.empty())
+			{
+				m_iSelectedParticleIdx = -1;
+			}
+		}
+
+		if (MenuItem(u8"모두 복사 생성"))
+		{
+			//이름 정해줘
+			string strBaseName{ "New FX " };
+			string strName{};
+
+			//default 이펙트 이름 뒤에 중복 존재 시 알파벳을 붙인다.
+			char szSuffix = 'A';
+			while (true)
+			{
+				_bool bDoesExistSameName{ false };
+				strName = strBaseName + szSuffix;
+
+
+				for (const auto& fx : m_FXs)
+				{
+					if (fx->m_strFXName == strName)
+					{
+						bDoesExistSameName = true;
+						break;
+					}
+				}
+
+				for (const auto& fx : m_Particles)
+				{
+					if (fx->m_strFXName == strName)
+					{
+						bDoesExistSameName = true;
+						break;
+					}
+				}
+
+				//중복 이름이 없거나, 알파벳이 초과하면 반복 끝
+				if (!bDoesExistSameName || 'Z' <= szSuffix)
+					break;
+
+				++szSuffix;
+			}
+
+
+			PARTICLE_DATA ParticleData{};
+			m_Particles[m_iSelectedParticleIdx]->Fill_SaveData(&ParticleData);
+			ParticleData.strName = strName;
+			Make_Effect(ParticleData);
+
+
+		}
+
+		if (MenuItem(u8"변수만 복사 생성"))
+		{
+			//이름 정해줘
+			string strBaseName{ "New FX " };
+			string strName{};
+
+			//default 이펙트 이름 뒤에 중복 존재 시 알파벳을 붙인다.
+			char szSuffix = 'A';
+			while (true)
+			{
+				_bool bDoesExistSameName{ false };
+				strName = strBaseName + szSuffix;
+
+				for (const auto& fx : m_Particles)
+				{
+					if (fx->m_strFXName == strName)
+					{
+						bDoesExistSameName = true;
+						break;
+					}
+				}
+
+				//중복 이름이 없거나, 알파벳이 초과하면 반복 끝
+				if (!bDoesExistSameName || 'Z' <= szSuffix)
+					break;
+
+				++szSuffix;
+			}
+
+
+			PARTICLE_DATA ParticleData{};
+			m_Particles[m_iSelectedParticleIdx]->Fill_SaveData(&ParticleData);
+
+			ParticleData.strName = strName;
+
+			ParticleData.iPassIdx = 0;
+			ParticleData.iMaskTexIdx = 0;
+			ParticleData.iTexIdx = 0;
+			ParticleData.iNumInstance = m_iAddingInstanceNum;
+			string strComponentTag = "Prototype_Component_";
+			ParticleData.strTexName = strComponentTag + m_FXTexList[m_iAddingFXTexIdx];
+			ParticleData.strMaskTexName = strComponentTag + m_FXMaskTexList[m_iAddingFXMaskTexIdx];
+
+			Make_Effect(ParticleData);
+
+		}
+		EndPopup();
+	}
+
+
+	EndChild();
+
+
 	End();
 
 }
@@ -1450,8 +1680,15 @@ void CFXToolDirector::Render_FXProperty()
 	Begin(u8"속성 편집");
 
 	//현재 선택한 이펙트를 다르게 한다.
-	CEffect* pCurFX = m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX ?
-		m_FXs[m_iSelectedFXIdx] : m_MultiFXs[m_iSelectedMultiFXIdx];
+	CEffect* pCurFX{ nullptr };
+	
+	if (m_eSelected == SELECTED_SINGLE_FX)
+		pCurFX = m_FXs[m_iSelectedFXIdx];
+	else if (m_eSelected == SELECTED_PARTICLE_FX)
+		pCurFX = m_Particles[m_iSelectedParticleIdx];
+
+	else
+		pCurFX = m_MultiFXs[m_iSelectedMultiFXIdx];
 
 	//파티클인가?
 	_bool bIsParticle = _bool{ dynamic_cast<CSingleEffect*>(pCurFX) == nullptr };
@@ -1547,7 +1784,6 @@ void CFXToolDirector::Render_FXProperty()
 			pCurFX->m_eRenderGroup = CRenderer::RENDER_NONLIGHT;
 		}
 
-		SameLine();
 
 		if (RadioButton(u8"Blend", m_iCurRenderGroup == CRenderer::RENDER_BLEND))
 		{
@@ -1625,9 +1861,18 @@ void CFXToolDirector::Render_FXProperty()
 	if (DragFloat2(u8"수명", m_fLifetime, .1f, 0.f, pCurFX->m_fDuration.second, "%.2f"))
 	{
 		memcpy(&pCurFX->m_fLifetime, m_fLifetime, sizeof(_float2));
+
 		if (bIsParticle)
 		{
 			static_cast<CParticle*>(pCurFX)->m_InstanceDesc.fLifetime = m_fLifetime[1];
+			static_cast<CParticle*>(pCurFX)->Update_InstanceInfo();
+		}
+	}
+
+	if (bIsParticle)
+	{
+		if (DragFloat(u8"수명 랜덤", &(static_cast<CParticle*>(pCurFX)->m_InstanceDesc.fLifetimeRandomOffset), .1f, 0.f, 1000.f, "%.2f"))
+		{
 			static_cast<CParticle*>(pCurFX)->Update_InstanceInfo();
 		}
 	}
@@ -1715,100 +1960,184 @@ void CFXToolDirector::Render_FXProperty()
 	_bool bEdited{ false };
 	auto moveIter = pCurParticle->m_InstanceDesc.vecMoveCommands.begin();
 
-	_bool bSimpleMove = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE];
+	_bool bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE];
 
-	if (Checkbox(u8"SimpleMove", &bSimpleMove))
+
+	SeparatorText(u8"이동");
+
+	if (Checkbox(u8"SimpleMove", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE] = bSimpleMove;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE] = bCommand;
+		bEdited = true;
+	}
+
+	SameLine();
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DROP];
+
+	if (Checkbox(u8"Drop", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DROP] = bCommand;
 		bEdited = true;
 	}
 	SameLine();
 
-	_bool bDrop = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DROP];
-
-	if (Checkbox(u8"Drop", &bDrop))
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD];
+	if (Checkbox(u8"Spread", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DROP] = bDrop;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD] = bCommand;
 		bEdited = true;
 	}
 	SameLine();
 
-	_bool bSpread = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD];
-	if (Checkbox(u8"Spread", &bSpread))
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ASSEMBLE];
+	if (Checkbox(u8"Assemble", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SPREAD] = bSpread;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ASSEMBLE] = bCommand;
+		bEdited = true;
+	}
+
+	SeparatorText(u8"가감속");
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ACCELERATION];
+	if (Checkbox(u8"Accelerate", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ACCELERATION] = bCommand;
 		bEdited = true;
 	}
 	SameLine();
 
-	_bool bDecelerate = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE];
-	if (Checkbox(u8"Decelerate", &bDecelerate))
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE];
+	if (Checkbox(u8"Decelerate", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE] = bDecelerate;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE] = bCommand;
+		bEdited = true;
+	}
+	SameLine();
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITACCELERATION];
+	if (Checkbox(u8"Orbit Accelerate", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITACCELERATION] = bCommand;
+		bEdited = true;
+	}
+	SameLine();
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITDECELERATE];
+	if (Checkbox(u8"Orbit Decelerate", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITDECELERATE] = bCommand;
 		bEdited = true;
 	}
 
 	Spacing();
 
-	_bool bAppear = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_APPEAR];
-	if (Checkbox(u8"Appear", &bAppear))
-	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_APPEAR] = bAppear;
-		bEdited = true;
-	}
-	SameLine();
+	SeparatorText(u8"회전");
 
-	_bool bDisappear = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DISAPPEAR];
-	if (Checkbox(u8"Disappear", &bDisappear))
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_WIGGLE];
+	if (Checkbox(u8"Wiggle", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DISAPPEAR] = bDisappear;
-		bEdited = true;
-	}
-	SameLine();
-
-	_bool bWiggle = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_WIGGLE];
-	if (Checkbox(u8"Wiggle", &bWiggle))
-	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_WIGGLE] = bWiggle;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_WIGGLE] = bCommand;
 		bEdited = true;
 	}
 
 	SameLine();
 
-	_bool bTail = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TAIL];
-	if (Checkbox(u8"Tail", &bTail))
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT];
+	if (Checkbox(u8"공전", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TAIL] = bTail;
-		bEdited = true;
-	}
-
-	Spacing();
-
-	_bool bGravity = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY];
-	if (Checkbox(u8"Gravity", &bGravity))
-	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY] = bGravity;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT] = bCommand;
 		bEdited = true;
 	}
 
 	SameLine();
 
-	_bool bEdit = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT];
-	if (Checkbox(u8"Orbit", &bEdit))
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_CUSTOMORBITAXIS];
+	if (Checkbox(u8"회전축 고정", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT] = bEdit;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_CUSTOMORBITAXIS] = bCommand;
+		bEdited = true;
+	}
+
+	SeparatorText(u8"크기");
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_APPEAR];
+	if (Checkbox(u8"Appear", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_APPEAR] = bCommand;
+		bEdited = true;
+	}
+	SameLine();
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DISAPPEAR];
+	if (Checkbox(u8"Disappear", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DISAPPEAR] = bCommand;
+		bEdited = true;
+	}
+
+
+
+	SeparatorText(u8"기타");
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TAIL];
+	if (Checkbox(u8"Tail", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TAIL] = bCommand;
+		bEdited = true;
+	}
+
+	if (IsItemHovered())
+	{
+		BeginTooltip();
+		Text(u8"이펙트가 꼬리에 꼬리를 뭅니다.");
+		EndTooltip();
+	}
+
+	SameLine();
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY];
+	if (Checkbox(u8"Gravity", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY] = bCommand;
 		bEdited = true;
 	}
 
 	SameLine();
 
-	bEdit = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ASSEMBLE];
-	if (Checkbox(u8"Assemble", &bEdit))
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SPHERERANDOM];
+	if (Checkbox(u8"구 범위 생성", &bCommand))
 	{
-		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ASSEMBLE] = bEdit;
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_SPHERERANDOM] = bCommand;
 		bEdited = true;
 	}
+
+	if (IsItemHovered())
+	{
+		BeginTooltip();
+		Text(u8"이펙트 생성 범위를 구로 설정합니다. 구 최소 범위와 최대 범위에 따라 범위가 결정됩니다.");
+		EndTooltip();
+	}
+
+	SameLine();
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_COLORINTERPOLATE];
+
+	if (Checkbox(u8"색상 보간", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_COLORINTERPOLATE] = bCommand;
+		bEdited = true;
+	}
+	if (IsItemHovered())
+	{
+		BeginTooltip();
+		Text(u8"색상을 라이프 타임에 따라 목표 색상으로 보간합니다.");
+		EndTooltip();
+	}
+
+	Dummy({ 0.f, 10.f });
 	Separator();
+	Dummy({ 0.f, 10.f });
 
 	if (DragFloat(u8"시작 딜레이", &pCurParticle->m_InstanceDesc.fStartDelay, .1f, 0.f, 100.f, "%.2f"))
 		bEdited = true;
@@ -1819,22 +2148,36 @@ void CFXToolDirector::Render_FXProperty()
 	Separator();
 	Dummy({ 0.f, 10.f });
 
-	if (DragFloat3(u8"중점", m_vCenter, .01f, -100.f, 100.f, "%.2f"))
+	if (DragFloat3(u8"중점", m_vCenter, .01f, -1000.f, 1000.f, "%.2f"))
 	{
 		pCurParticle->m_InstanceDesc.vCenter = { m_vCenter[0], m_vCenter[1], m_vCenter[2] };
 		bEdited = true;
 	}
 
-	if (DragFloat3(u8"범위", m_vRange, .01f, 0.f, 100.f, "%.2f"))
+	if (DragFloat3(u8"범위", m_vRange, .01f, 0.f, 1000.f, "%.2f"))
 	{
 		pCurParticle->m_InstanceDesc.vRange = { m_vRange[0], m_vRange[1], m_vRange[2] };
 		bEdited = true;
 	}
+
 	Dummy({ 0.f, 10.f });
 
-	if (DragFloat3(u8"피봇", m_vPivot, .1f, -50.f, 50.f, "%.2f"))
+	if (DragFloat(u8"최소 구 범위", &pCurParticle->m_InstanceDesc.fMinRange, .01f, 0.f, 1000.f, "%.2f"))
+		bEdited = true;
+	if (DragFloat(u8"최대 구 범위", &pCurParticle->m_InstanceDesc.fMaxRange, .01f, 0.f, 1000.f, "%.2f"))
+		bEdited = true;
+
+	Dummy({ 0.f, 10.f });
+
+	if (DragFloat3(u8"피봇", m_vPivot, .01f, -1000.f, 1000.f, "%.2f"))
 	{
 		pCurParticle->m_InstanceDesc.vPivot = { m_vPivot[0], m_vPivot[1], m_vPivot[2] };
+		bEdited = true;
+	}
+	Dummy({ 0.f, 10.f });
+
+	if (DragFloat3(u8"회전 축", &(pCurParticle->m_InstanceDesc.vRotationAxis.x), .01f, -1.f, 1.f, "%.2f"))
+	{
 		bEdited = true;
 	}
 
@@ -1842,28 +2185,28 @@ void CFXToolDirector::Render_FXProperty()
 	Separator();
 	Dummy({ 0.f, 10.f });
 
-	if (DragFloat3(u8"회전", m_vRotation, .01f, -180.f, 180.f, "%.2f"))
+	if (DragFloat(u8"회전", &(pCurParticle->m_InstanceDesc.vRotation.z), .01f, -360.f, 360.f, "%.2f"))
 	{
-		pCurParticle->m_InstanceDesc.vRotation = { m_vRotation[0], m_vRotation[1], m_vRotation[2] };
+		//pCurParticle->m_InstanceDesc.vRotation = { m_vRotation[0], m_vRotation[1], m_vRotation[2] };
 		bEdited = true;
 	}
 
-	if (DragFloat3(u8"회전 랜덤", m_vRotationRandomOffset, .01f, 0.f, 50.f, "%.2f"))
+	if (DragFloat(u8"회전 랜덤", &(pCurParticle->m_InstanceDesc.vRotationRandomOffset.z), .01f, 0.f, 360.f, "%.2f"))
 	{
-		pCurParticle->m_InstanceDesc.vRotationRandomOffset = { m_vRotationRandomOffset[0], m_vRotationRandomOffset[1], m_vRotationRandomOffset[2] };
+		//pCurParticle->m_InstanceDesc.vRotationRandomOffset = { m_vRotationRandomOffset[0], m_vRotationRandomOffset[1], m_vRotationRandomOffset[2] };
 		bEdited = true;
 	}
 
 	Dummy({ 0.f, 10.f });
 
-	if (DragFloat3(u8"크기", m_vScale, .01f, 0.011f, 100.f, "%.2f"))
+	if (DragFloat(u8"크기", &pCurParticle->m_InstanceDesc.vScale.x, .01f, 0.001f, 1000.f, "%.3f"))
 	{
-		pCurParticle->m_InstanceDesc.vScale = { m_vScale[0], m_vScale[1], m_vScale[2] };
+		//pCurParticle->m_InstanceDesc.vScale = { m_vScale[0], m_vScale[1], m_vScale[2] };
 		bEdited = true;
 	}
-	if (DragFloat3(u8"크기 랜덤", m_vScaleRandomOffset, .01f, 0.f, 50.f, "%.2f"))
+	if (DragFloat(u8"크기 랜덤", &pCurParticle->m_InstanceDesc.vScaleRandomOffset.x, .01f, 0.f, 999.f, "%.3f"))
 	{
-		pCurParticle->m_InstanceDesc.vScaleRandomOffset = { m_vScaleRandomOffset[0], m_vScaleRandomOffset[1], m_vScaleRandomOffset[2] };
+		//pCurParticle->m_InstanceDesc.vScaleRandomOffset = { m_vScaleRandomOffset[0], m_vScaleRandomOffset[1], m_vScaleRandomOffset[2] };
 		bEdited = true;
 	}
 
@@ -1882,17 +2225,28 @@ void CFXToolDirector::Render_FXProperty()
 
 	Dummy({ 0.f, 10.f });
 
-	if (DragFloat(u8"속도", &pCurParticle->m_InstanceDesc.fSpeed, .01f, 0.f, 100.f, "%.2f"))
+	if (DragFloat(u8"속도", &(pCurParticle->m_InstanceDesc.fSpeed), .01f, 0.f, 100.f, "%.2f"))
 		bEdited = true;
 	if (DragFloat(u8"속도 랜덤", &pCurParticle->m_InstanceDesc.fSpeedRandomOffset, .01f, 0.f, 100.f, "%.2f"))
 		bEdited = true;
 
 	Dummy({ 0.f, 10.f });
 
-	if (DragFloat(u8"공전 속도", &pCurParticle->m_InstanceDesc.fOrbitSpeed, .01f, 0.f, 10000.f, "%.2f"))
+	if (DragFloat(u8"공전 속도", &(pCurParticle->m_InstanceDesc.fOrbitSpeed), .01f, 0.f, 10000.f, "%.2f"))
 		bEdited = true;
 	if (DragFloat(u8"공전 속도 랜덤", &pCurParticle->m_InstanceDesc.fOrbitSpeedRandomOffset, .01f, 0.f, 10000.f, "%.2f"))
 		bEdited = true;
+
+	Dummy({ 0.f, 10.f });
+
+	if (DragFloat(u8"이동 감가속 속력", &(pCurParticle->m_InstanceDesc.fAccSupplyAmount), .01f, 0.f, 10000.f, "%.2f"))
+		bEdited = true;
+
+	Dummy({ 0.f, 10.f });
+
+	if (DragFloat(u8"회전 감가속 속력", &(pCurParticle->m_InstanceDesc.fTurnSupplyAmount), .01f, 0.f, 10000.f, "%.2f"))
+		bEdited = true;
+
 
 	Dummy({ 0.f, 10.f });
 	Separator();
@@ -1904,18 +2258,27 @@ void CFXToolDirector::Render_FXProperty()
 		bEdited = true;
 	}
 
-	if (DragFloat3(u8"색상 랜덤", m_vColorRandomOffset, .02f, 0.f, 1.f, "%.2f"))
+	if (DragFloat3(u8"색상 랜덤", m_vColorRandomOffset, .01f, 0.f, 1.f, "%.2f"))
 	{
 		pCurParticle->m_InstanceDesc.vColorRandomOffset = { m_vColorRandomOffset[0], m_vColorRandomOffset[1], m_vColorRandomOffset[2] };
 		bEdited = true;
 	}
 
+	if (ColorEdit3(u8"목표 색상", &(pCurParticle->m_InstanceDesc.vTargetColor.x)))
+		bEdited = true;
+
+
+	if (DragFloat3(u8"목표 색상 랜덤", &(pCurParticle->m_InstanceDesc.vTargetColorRandomOffset.x), .01f, 0.f, 1.f, "%.2f"))
+		bEdited = true;
+
+
 	Dummy({ 0.f, 10.f });
 
 	if (DragFloat(u8"알파", &pCurParticle->m_InstanceDesc.fAlpha, .01f, 0.f, 1.f, "%.2f"))
 		bEdited = true;
-	if (DragFloat(u8"알파 랜덤", &pCurParticle->m_InstanceDesc.fAlphaRandomOffset, .01f, 0.f, 1.f, "%.2f"))
-		bEdited = true;
+
+	//if (DragFloat(u8"알파 랜덤", &pCurParticle->m_InstanceDesc.fAlphaRandomOffset, .01f, 0.f, 1.f, "%.2f"))
+	//	bEdited = true;
 
 
 
@@ -1943,8 +2306,11 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 	Begin(u8"Bar", nullptr, ImGuiWindowFlags_NoTitleBar);
 
 	CEffect* pCurFX{ nullptr };
-	if (m_eSelected == SELECTED_SINGLE_FX || m_eSelected == SELECTED_PARTICLE_FX)
+
+	if (m_eSelected == SELECTED_SINGLE_FX)
 		pCurFX = m_FXs[m_iSelectedFXIdx];
+	else if (m_eSelected == SELECTED_PARTICLE_FX)
+		pCurFX = m_Particles[m_iSelectedParticleIdx];
 	else if (m_eSelected == SELECTED_MULTI_FX)
 		pCurFX = m_MultiFXs[m_iSelectedMultiFXIdx];
 
@@ -2043,108 +2409,112 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 
 	}
 
-	//SetColumnWidth(0, 70.f);
+
 	NextColumn();
+
 	Dummy(ImVec2(0, 98));
 
-	if (SmallButton(u8"위치 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+	if (m_eSelected == SELECTED_SINGLE_FX)
 	{
-		////m_bOpenKeyframeEditor = false;
-		FX_KEYFRAME newKeyframe{};
-		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-		newKeyframe.eEasing = EASE_OUT;
-		newKeyframe.vValue = pCurFX->m_vCurPos;
+		if (SmallButton(u8"위치 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+		{
 
-		pCurFX->Add_Keyframe(newKeyframe, KF_POS);
-	}
+			FX_KEYFRAME newKeyframe{};
+			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+			newKeyframe.eEasing = EASE_OUT;
+			newKeyframe.vValue = pCurFX->m_vCurPos;
 
-	if (SmallButton(u8"회전 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-	{
-		////m_bOpenKeyframeEditor = false;
-		FX_KEYFRAME newKeyframe{};
-		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-		newKeyframe.eEasing = EASE_OUT;
-		newKeyframe.vValue = pCurFX->m_vCurRot;
+			pCurFX->Add_Keyframe(newKeyframe, KF_POS);
+		}
 
-		pCurFX->Add_Keyframe(newKeyframe, KF_ROT);
-	}
+		if (SmallButton(u8"회전 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+		{
 
+			FX_KEYFRAME newKeyframe{};
+			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+			newKeyframe.eEasing = EASE_OUT;
+			newKeyframe.vValue = pCurFX->m_vCurRot;
 
-	if (SmallButton(u8"크기 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-	{
-		////m_bOpenKeyframeEditor = false;
-		FX_KEYFRAME newKeyframe{};
-		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-		newKeyframe.eEasing = EASE_OUT;
-		newKeyframe.vValue = pCurFX->m_vCurScale;
-
-		pCurFX->Add_Keyframe(newKeyframe, KF_SCALE);
-	}
-
-	if (SmallButton(u8"색 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-	{
-		////m_bOpenKeyframeEditor = false;
-		FX_KEYFRAME newKeyframe{};
-		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-		newKeyframe.eEasing = EASE_OUT;
-		newKeyframe.vValue = pCurFX->m_vCurRColor;
-
-		pCurFX->Add_Keyframe(newKeyframe, KF_RCOLOR);
-	}
+			pCurFX->Add_Keyframe(newKeyframe, KF_ROT);
+		}
 
 
-	if (SmallButton(u8"알파 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-	{
-		FX_KEYFRAME newKeyframe{};
-		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-		newKeyframe.eEasing = EASE_OUT;
-		newKeyframe.vValue = { pCurFX->m_fCurAlpha, 0.f, 0.f };
+		if (SmallButton(u8"크기 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+		{
 
-		pCurFX->Add_Keyframe(newKeyframe, KF_ALPHA);
-	}
+			FX_KEYFRAME newKeyframe{};
+			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+			newKeyframe.eEasing = EASE_OUT;
+			newKeyframe.vValue = pCurFX->m_vCurScale;
 
+			pCurFX->Add_Keyframe(newKeyframe, KF_SCALE);
+		}
 
-	if (SmallButton(u8"임계 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-	{
-		FX_KEYFRAME newKeyframe{};
-		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-		newKeyframe.eEasing = EASE_OUT;
-		newKeyframe.vValue = { pCurFX->m_fCurMaskThreshold, 0.f, 0.f };
+		if (SmallButton(u8"색 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+		{
+			////m_bOpenKeyframeEditor = false;
+			FX_KEYFRAME newKeyframe{};
+			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+			newKeyframe.eEasing = EASE_OUT;
+			newKeyframe.vValue = pCurFX->m_vCurRColor;
 
-		pCurFX->Add_Keyframe(newKeyframe, KF_MASK);
-	}
-
-	if (SmallButton(u8"uv 이동 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-	{
-
-		FX_KEYFRAME newKeyframe{};
-		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-		newKeyframe.eEasing = EASE_OUT;
-		newKeyframe.vValue = { pCurFX->m_vCurUVOffset.x, pCurFX->m_vCurUVOffset.y, 0.f };
-
-		pCurFX->Add_Keyframe(newKeyframe, KF_UVOFFSET);
-	}
-
-	if (SmallButton(u8"Mask 이동 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-	{
-
-		FX_KEYFRAME newKeyframe{};
-		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-		newKeyframe.eEasing = EASE_OUT;
-		newKeyframe.vValue = { pCurFX->m_vCurMaskUVOffset.x, pCurFX->m_vCurMaskUVOffset.y, 0.f };
-
-		pCurFX->Add_Keyframe(newKeyframe, KF_MASKUVOFFSET);
-	}
+			pCurFX->Add_Keyframe(newKeyframe, KF_RCOLOR);
+		}
 
 
-	if (SmallButton(u8"Mask 회전 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
-	{
-		FX_KEYFRAME newKeyframe{};
-		newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
-		newKeyframe.eEasing = EASE_OUT;
-		newKeyframe.vValue = { pCurFX->m_vCurMaskUVAngle, 0.f, 0.f };
+		if (SmallButton(u8"알파 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+		{
+			FX_KEYFRAME newKeyframe{};
+			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+			newKeyframe.eEasing = EASE_OUT;
+			newKeyframe.vValue = { pCurFX->m_fCurAlpha, 0.f, 0.f };
 
-		pCurFX->Add_Keyframe(newKeyframe, KF_MASKUVANGLE);
+			pCurFX->Add_Keyframe(newKeyframe, KF_ALPHA);
+		}
+
+
+		if (SmallButton(u8"임계 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+		{
+			FX_KEYFRAME newKeyframe{};
+			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+			newKeyframe.eEasing = EASE_OUT;
+			newKeyframe.vValue = { pCurFX->m_fCurMaskThreshold, 0.f, 0.f };
+
+			pCurFX->Add_Keyframe(newKeyframe, KF_MASK);
+		}
+
+		if (SmallButton(u8"uv 이동 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+		{
+
+			FX_KEYFRAME newKeyframe{};
+			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+			newKeyframe.eEasing = EASE_OUT;
+			newKeyframe.vValue = { pCurFX->m_vCurUVOffset.x, pCurFX->m_vCurUVOffset.y, 0.f };
+
+			pCurFX->Add_Keyframe(newKeyframe, KF_UVOFFSET);
+		}
+
+		if (SmallButton(u8"Mask 이동 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+		{
+
+			FX_KEYFRAME newKeyframe{};
+			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+			newKeyframe.eEasing = EASE_OUT;
+			newKeyframe.vValue = { pCurFX->m_vCurMaskUVOffset.x, pCurFX->m_vCurMaskUVOffset.y, 0.f };
+
+			pCurFX->Add_Keyframe(newKeyframe, KF_MASKUVOFFSET);
+		}
+
+
+		if (SmallButton(u8"Mask 회전 추가") && (0.f < pCurFX->m_fLifeRatio && pCurFX->m_fLifeRatio < 1.f))
+		{
+			FX_KEYFRAME newKeyframe{};
+			newKeyframe.fTimeRatio = pCurFX->m_fLifeRatio;
+			newKeyframe.eEasing = EASE_OUT;
+			newKeyframe.vValue = { pCurFX->m_vCurMaskUVAngle, 0.f, 0.f };
+
+			pCurFX->Add_Keyframe(newKeyframe, KF_MASKUVANGLE);
+		}
 	}
 
 
@@ -2163,13 +2533,12 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 		//재생 다시 시작하는 상태에서 
 		if (m_bPlayingBar)
 		{
-
 			//파티클은 무조건 reset duration 하도록 하세요
 			if (m_eSelected == SELECTED_PARTICLE_FX)
 			{
-				m_FXs[m_iSelectedFXIdx]->Reset_Duration();
+				m_Particles[m_iSelectedParticleIdx]->Reset_Duration();
 				m_fCurPlayDuration = 0.f;
-				static_cast<CParticle*>(m_FXs[m_iSelectedFXIdx])->Update_InstanceInfo();
+				static_cast<CParticle*>(m_Particles[m_iSelectedParticleIdx])->Update_InstanceInfo();
 			}
 			//나머지 fx 편집 중 재생 시 duration이 넘어가 있었다면 ? duration reset
 			else if (m_fCurPlayDuration >= m_fTotalPlayDuration)
@@ -2203,15 +2572,15 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 	PushItemWidth(fWidth);
 
 
-	if (m_eSelected == SELECTED_SINGLE_FX /*&& m_iSelectedFXIdx != -1*/)
+	if (m_eSelected == SELECTED_SINGLE_FX)
 	{
 		MakeBar_SingleFXProperty(_fTimeDelta, fWidth);
 	}
-	else if (m_eSelected == SELECTED_PARTICLE_FX /*&& m_iSelectedFXIdx != -1*/)
+	else if (m_eSelected == SELECTED_PARTICLE_FX)
 	{
 		MakeBar_ParticleFXProperty(_fTimeDelta, fWidth);
 	}
-	else if (m_eSelected == SELECTED_MULTI_FX/* && m_iSelectedMultiFXIdx != -1*/)
+	else if (m_eSelected == SELECTED_MULTI_FX)
 	{
 		MakeBar_MultiFXProperty(_fTimeDelta, fWidth);
 	}
@@ -2224,7 +2593,6 @@ void CFXToolDirector::Render_FXPlayBar(_float _fTimeDelta)
 		{
 			m_fCurPlayDuration = m_fTotalPlayDuration;
 			m_bPlayingBar = m_bLoopingBar ? true : false;
-
 
 		}
 	}
@@ -2458,18 +2826,18 @@ void CFXToolDirector::Make_KeyframeList(_float _fWidth, _float _fInitialYPos, CE
 
 void CFXToolDirector::MakeBar_ParticleFXProperty(_float _fTimeDelta, _float _fWidth)
 {
-	if (m_iSelectedFXIdx == -1)
+	if (m_iSelectedParticleIdx == -1)
 		return;
 
 
-	CEffect* pCurFX = m_FXs[m_iSelectedFXIdx];
+	CEffect* pCurFX = m_Particles[m_iSelectedParticleIdx];
 	CHECK_NULLPTR(pCurFX);
 
 
 	if (SliderFloat("##", &m_fCurPlayDuration, 0.f, m_fTotalPlayDuration, "%.2f"))
 	{
-		m_FXs[m_iSelectedFXIdx]->Late_Tick(_fTimeDelta);
-		m_FXs[m_iSelectedFXIdx]->m_fDuration.first = m_fCurPlayDuration;
+		m_Particles[m_iSelectedParticleIdx]->Late_Tick(_fTimeDelta);
+		m_Particles[m_iSelectedParticleIdx]->m_fDuration.first = m_fCurPlayDuration;
 	}
 }
 
@@ -2498,8 +2866,7 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 
 	static ImGuiTextFilter filter;
 	string szName;
-	Text(u8"검색");
-	filter.Draw();
+	filter.Draw(u8"복합 이펙트 검색");
 
 	BeginChild(u8"목록", ImVec2(0, 200), true);
 
@@ -2536,35 +2903,6 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 	if (BeginPopup("MultiFXMenu"))
 	{
 
-		//if (MenuItem(u8"이펙트 그룹에 추가") && m_iSelectedFXIdx != -1 && m_iSelectedMultiFXIdx != -1)
-		//{
-		//	static _int iAddingFXIdx = -1;
-
-		//	static ImGuiTextFilter multiFXfilter;
-		//	string szName;
-		//	Text(u8"검색");
-		//	multiFXfilter.Draw();
-
-		//	Begin(u8"목록");
-
-		//	for (_int i = 0; i < m_MultiFXs.size(); ++i)
-		//	{
-
-		//		if (multiFXfilter.PassFilter(m_MultiFXs[i]->m_strFXName.c_str())
-		//			&& Selectable(m_MultiFXs[i]->m_strFXName.c_str(), iAddingFXIdx == i))
-		//		{
-
-		//			iAddingFXIdx = i;
-		//			m_MultiFXs[iAddingFXIdx]->Add_Effect(m_MultiFXs[m_iSelectedFXIdx]);
-
-		//		}
-
-		//	}
-
-		//	End();
-
-		//}
-
 		if (MenuItem(u8"삭제"))
 		{
 			string strName = m_MultiFXs[m_iSelectedMultiFXIdx]->m_strFXName;
@@ -2583,10 +2921,7 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 				m_iSelectedMultiFXIdx = -1;
 			}
 		}
-		//if (MenuItem(u8"복사"))
-		//{
 
-		//}
 
 		EndPopup();
 	}

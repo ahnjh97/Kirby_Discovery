@@ -858,6 +858,8 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 
 				if (!ISDEFAULTFLOAT(curAction.fZAngle))
 					m_fDestZAngle = m_fCurZAngle = curAction.fZAngle;
+				else
+					m_fDestZAngle = m_fCurZAngle = 0.f;
 
 				if (!ISDEFAULTFLOAT(curAction.fZoomOffset))
 					m_fDestZoomOffset = m_fCurZoomOffset = curAction.fZoomOffset;
@@ -921,6 +923,8 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 					m_fStartZAngle = m_fCurZAngle;
 					m_fDestZAngle = curAction.fZAngle;
 				}
+				else
+					m_fDestZAngle = m_fStartZAngle = 0.f;
 
 				if (!ISDEFAULTFLOAT(curAction.fZoomOffset))
 				{

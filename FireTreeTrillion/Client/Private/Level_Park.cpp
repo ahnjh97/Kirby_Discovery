@@ -662,7 +662,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 				tempDesc.wstrModelName.erase(0, 8);
 		}
 
-		if (10 < iTriggerIndex)
+		if (10 < iTriggerIndex && "Crumble" != strModelName)
 		{
 			m_vecMonsterDescs[MONSTER_TRIGGER(iTriggerIndex)].push_back(tempDesc);
 			continue;
@@ -738,7 +738,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 			CrumbleDesc.uInitialState = (_uint)iTriggerIndex;
 			CrumbleDesc.fSpeedPerSec = 10.f;
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Crumble"), &CrumbleDesc)))
-				return E_FAIL; 
+				return E_FAIL;
 		}
 	}
 	fileInput.close();
