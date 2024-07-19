@@ -710,8 +710,9 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 			{
 			case SEQ_BREAKCARSHOP:
 			{
-				m_pGameInstance->StopSound(CHANNEL_BGM);
-				m_pGameInstance->PlayBGM(L"Welcome to the New World!.mp3");
+				m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
+				m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"Welcome to the New World!.mp3");
+				m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, 0.5f);
 			}
 			break;
 

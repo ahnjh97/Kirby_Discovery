@@ -112,6 +112,7 @@ _int CDeeDeeDee::Tick(_float fTimeDelta)
 	if (m_pWeapons != nullptr)
 		m_pWeapons->Tick(m_fTimeDelta);
 
+	m_bCheckCollision = false;
 	return OBJ_NOEVENT;
 }
 
@@ -126,13 +127,15 @@ void CDeeDeeDee::Late_Tick(_float fTimeDelta)
 	if (Compute_OptimizationAnimation(m_fTimeDelta) == true)
 		m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : m_pModelCom->Play_Animation(m_fAccTime);
 
+	// tick-collision_tick을 거쳐서 충돌처리가 안되었다고 판단되면 InteractableUI를 띄우지 않습니다.
+	if (false == m_bCheckCollision)
+		m_pUI_Interactable->Set_IsRender(false);
+
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 6.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
-
-
 }
 
 HRESULT CDeeDeeDee::Render()
@@ -207,8 +210,6 @@ void CDeeDeeDee::Add_AnimEvent()
 
 void CDeeDeeDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	static _bool bOnce = false;
-
 	// PARK로 이동하기 위한 다이얼로그 출력
 	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN)) //07.14) 키 변경 C > A
 	{
@@ -222,12 +223,10 @@ void CDeeDeeDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 		CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 		CHECK_NULLPTR(pCameraMain);
 		pCameraMain->Lock_All({ -5.f, 39.f, 30.f }, { -0.3f, -0.2f, 0.93f }, true);
-
-		bOnce = true;
 	}
 
-	if (bOnce == false)
-		m_pUI_Interactable->Set_IsRender(true);
+	m_pUI_Interactable->Set_IsRender(true);
+	m_bCheckCollision = true;
 }
 
 void CDeeDeeDee::Change_State(STATE_TYPE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)

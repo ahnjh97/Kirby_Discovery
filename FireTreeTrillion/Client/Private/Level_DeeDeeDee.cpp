@@ -22,6 +22,8 @@
 #include "UI_Fading.h"
 
 
+#define SOUND_TRIGGER_Z		-100.f
+
 CLevel_DeeDeeDee::CLevel_DeeDeeDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {

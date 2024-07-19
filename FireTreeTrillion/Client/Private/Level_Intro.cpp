@@ -19,6 +19,13 @@
 #include "HUD.h"
 #include "TransingStar.h"
 
+#define BEACH_TO_JUNGLE			-66.f
+#define JUNGLE_TO_NOWHERE		-57.f
+#define NOWHERE_TO_BUILDING		80.f
+
+#define VOLUME_BGM				0.5f
+#define VOLUME_JUNGLE_BGM		0.4f
+
 CLevel_Intro::CLevel_Intro(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
@@ -135,16 +142,16 @@ void CLevel_Intro::Check_KirbyPosState()
 	if (m_ePreKirbyPosState != m_eKirbyPosState)
 		m_ePreKirbyPosState = m_eKirbyPosState;
 
-	if (vPos.z < -66.f) // 바다 소리
+	if (vPos.z < BEACH_TO_JUNGLE) // 바다 소리
 		m_eKirbyPosState = BEACH;
 
-	else if (vPos.z < 57.f && vPos.z >= -66.f) // 정글 소리
+	else if (vPos.z < JUNGLE_TO_NOWHERE && vPos.z >= BEACH_TO_JUNGLE) // 정글 소리
 		m_eKirbyPosState = JUNGLE;
 
-	else if (vPos.z < 72.f && vPos.z >= 57.f) // 정글 소리가 거의 안들리는 NO-BGM 상태
+	else if (vPos.z < NOWHERE_TO_BUILDING && vPos.z >= JUNGLE_TO_NOWHERE) // 정글 소리가 거의 안들리는 NO-BGM 상태
 		m_eKirbyPosState = NOBGM;
 
-	else if (vPos.z >= 72.f) // 빌딩 나오는 곳
+	else if (vPos.z >= NOWHERE_TO_BUILDING) // 빌딩 나오는 곳
 		m_eKirbyPosState = BUILDING;
 }
 
@@ -190,20 +197,20 @@ void CLevel_Intro::Sound_Tick(_float fTimeDelta)
 	{
 	case BEACH:
 	{
-		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM_SUB, 0.5f, fTimeDelta * 0.03f);
-		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.04f);
+		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM_SUB, VOLUME_BGM, fTimeDelta * 0.04f);
+		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.08f);
 	}
 	break;
 	case JUNGLE:
 	{
-		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, 0.4f, fTimeDelta * 0.03f);
-		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM_SUB, 0.0f, fTimeDelta * 0.04f);
+		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_JUNGLE_BGM, fTimeDelta * 0.04f);
+		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM_SUB, 0.0f, fTimeDelta * 0.08f);
 	}
 	break;
 	case NOBGM:
 	{
 		if (eState == BUILDING)
-			m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, 0.4f, fTimeDelta * 0.1f);
+			m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_JUNGLE_BGM, fTimeDelta * 0.1f);
 
 		else if (eState == JUNGLE)
 			m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.1f);
@@ -211,7 +218,7 @@ void CLevel_Intro::Sound_Tick(_float fTimeDelta)
 	break;
 	case BUILDING:
 	{
-		m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, 0.4f);
+		m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, VOLUME_BGM);
 	}
 	break;
 	}

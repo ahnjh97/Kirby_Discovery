@@ -86,10 +86,15 @@ HRESULT CLevel_Town::Initialize()
 	// 레벨전환 트리거
 	function<void(_int)> func = bind(&CLevel_Town::Change_Levels, this);
 	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_LEVELCHANGER, func);
-
+	
 	// 이동 트리거
 	function<void(_int)> funcTeleport = bind(&CLevel_Town::Teleport_Player, this);
 	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_STAR, funcTeleport);
+
+	// BGM
+	m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
+	m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"K15_TownNewWorld1.marker.wav"); // SOUND_WI
+	m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, 0.5f);
 
 	return S_OK;
 }
