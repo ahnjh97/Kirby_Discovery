@@ -61,7 +61,7 @@ HRESULT CLevel_Intro::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Monsters();
 	CHECK_FAILED(hr);
-	hr = Ready_Items();
+	//hr = Ready_Items();
 	CHECK_FAILED(hr);
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);
@@ -79,7 +79,6 @@ HRESULT CLevel_Intro::Initialize()
 	// 레벨전환 트리거
 	function<void(_int)> func = bind(&CLevel_Intro::Change_Levels, this);
 	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_LEVELCHANGER, func);
-
 
 	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
 	CHECK_NULLPTR(pUIObj);

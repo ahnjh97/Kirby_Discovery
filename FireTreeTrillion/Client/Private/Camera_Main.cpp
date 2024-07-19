@@ -320,8 +320,8 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 void CCamera_Main::System_Tick(_float fTimeDelta)
 {
 	//이펙트 소켓 업데이트
-	//m_EffectSocket = _float4x4::Identity;
-	//CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	m_EffectSocket = _float4x4::Identity;
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
 }
 
@@ -1136,7 +1136,8 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 
 
 	//카메라 보는 기준점 위로 올려주는 놈
-	if (*m_pCurrentLevelID == LEVEL_PARTTIME
+	if (*m_pCurrentLevelID == LEVEL_INTRO
+		|| *m_pCurrentLevelID == LEVEL_PARTTIME
 		|| *m_pCurrentLevelID == LEVEL_FINALBOSS
 		|| *m_pCurrentLevelID == LEVEL_FINALE
 		)

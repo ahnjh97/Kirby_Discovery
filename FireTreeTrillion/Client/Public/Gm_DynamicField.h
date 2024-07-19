@@ -32,6 +32,7 @@ public:
 	void Set_Interaction(_bool bInteraction) { m_bIsInteraction = bInteraction; }
 	void RegisterToActorToKirby();
 	void Set_ReturnMove(_bool _bReturnMove) { m_bIsReturnMove = _bReturnMove; }
+	void EmplaceBackItem(CPhysXObject* pItem) { m_vecItems.emplace_back(pItem); Safe_AddRef(pItem); }
 
 private:
 	CGm_DynamicField(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -57,11 +58,13 @@ private:
 	HRESULT				SetUp_ShaderInfo(const wstring& _wstrModelTag);
 	void				Apply_Quake(_float _fTimeDelta, _float _fQuakeDuration, _float _fShakeIntensity);
 	_int				Movement_Field(_float _fTimeDelta);
+	void				MoveItems(_float3 _vDir, _float _fTimeDelta);
 	
 
 	unordered_set<_uint>	m_setUpdateMeshs;
 	vector<_uint>			m_vecPassIndices;
 	vector<_float>			m_vecSamplingFactors;
+	vector<CPhysXObject*>	m_vecItems;
 
 	CModel*					m_pModelCom = { nullptr };
 	CShader*				m_pShaderCom = { nullptr };
@@ -81,6 +84,7 @@ private:
 	CGm_ParkSolarPanelOnce::PANELONCE_STATE m_eSPOnceState = {};
 	CGm_ParkSolarPanelCharge::PANELCHARGE_STATE m_eSPChargeState = {};
 
+	_float					m_fSpeed = {};
 	_float					m_fTime = { 0.f };
 	_float					m_fQuakeTime = { 0.f };
 	_float					m_fStartQuake = { 0.f };

@@ -17,7 +17,7 @@ HRESULT CSingleEffect::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CSingleEffect::Initialize_Prototype(FX_DESC FXDesc)
+HRESULT CSingleEffect::Initialize_Prototype(FX_DESC& FXDesc)
 {
 	m_strFXName = FXDesc.strFXName;
 	m_FXDesc = FXDesc;
@@ -50,6 +50,8 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 	}
 
 	HRESULT hr;
+
+	FXDesc.bIsSingleFX = true;
 
 	hr = __super::Initialize(&FXDesc);
 	CHECK_FAILED(hr);

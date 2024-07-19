@@ -37,7 +37,7 @@ public:
 	}
 
 	HRESULT Initialize_Prototype();
-	HRESULT Initialize_Prototype(FX_DESC FXDesc);
+	HRESULT Initialize_Prototype(FX_DESC& FXDesc);
 	virtual HRESULT Initialize(void* pArg) override;
 
 	virtual _int Tick(_float fTimeDelta) override;
