@@ -1138,8 +1138,8 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 덜 차징 회전베기이다. 약하게 이동이 가능하다.
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_GIGANTSPINSLASH)
 	{
-		DESC(m_bSwordCharge1) = true;
-		DESC(m_bSwordCharge2) = true;
+		//DESC(m_bSwordCharge1) = true;
+		//DESC(m_bSwordCharge2) = true;
 
 		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
 		{
@@ -1188,6 +1188,28 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * Kirbydesc->m_fMoveSpeed;
 		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 
+
+		if (DESC(m_bSwordCharge1) == false)
+		{
+			CEffect::FX_DESC FXSDesc{};
+			FXSDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			FXSDesc.vInitPos = _float3{ 0.f, .5f, 0.f };
+			FXSDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW SwordSpin Fin"), &FXSDesc)))
+				return;
+
+		/*	CParticle::PARTICLE_DESC FXPDesc{};
+			FXPDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			FXPDesc.vInitPos = _float3{ 0.f, .2f, 0.f };
+			FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Sword SpinFin Particle"), &FXPDesc)))
+				return;*/
+
+			DESC(m_bSwordCharge1) = true;
+			DESC(m_bSwordCharge2) = true;
+		}
+
+
 		if (pKirby->isAnimFinish())
 		{
 			DESC(m_fChargeTime) = 0.f;
@@ -1202,8 +1224,8 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 슈퍼 스핀의 시작단계
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SUPERSPINSLASHSTART)
 	{
-		DESC(m_bSwordCharge1) = true;
-		DESC(m_bSwordCharge2) = true;
+		//DESC(m_bSwordCharge1) = true;
+		//DESC(m_bSwordCharge2) = true;
 
 		if (JoyStick_controller_Attack(Kirbydesc, pCamera) == true)
 		{
@@ -1278,6 +1300,28 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	// 슈퍼 스핀의 마지막 단계
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_SUPERSPINSLASHEND)
 	{
+		if (DESC(m_bSwordCharge1) == false)
+		{
+			CEffect::FX_DESC FXSDesc{};
+			FXSDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			FXSDesc.vInitPos = _float3{ 0.f, .5f, 0.f };
+			FXSDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW SwordSpin Fin"), &FXSDesc)))
+				return;
+
+			//CParticle::PARTICLE_DESC FXPDesc{};
+			//FXPDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			//FXPDesc.vInitPos = _float3{ 0.f, .2f, 0.f };
+			//FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
+			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Sword SpinFin Particle"), &FXPDesc)))
+			//	return;
+
+				DESC(m_bSwordCharge1) = true;
+				DESC(m_bSwordCharge2) = true;
+		}
+
+
+
 		// 0.1초간 풀 감속 (최대 속도 8이라 가정)
 		if (Kirbydesc->m_fMoveSpeed > 0.f)
 			Kirbydesc->m_fMoveSpeed -= 90.f * fTimeDelta;

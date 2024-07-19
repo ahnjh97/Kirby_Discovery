@@ -20,7 +20,7 @@
 #include "TransingStar.h"
 
 #define BEACH_TO_JUNGLE			-66.f
-#define JUNGLE_TO_NOWHERE		-57.f
+#define JUNGLE_TO_NOWHERE		57.f
 #define NOWHERE_TO_BUILDING		80.f
 
 #define VOLUME_BGM				0.5f
@@ -198,13 +198,13 @@ void CLevel_Intro::Sound_Tick(_float fTimeDelta)
 	case BEACH:
 	{
 		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM_SUB, VOLUME_BGM, fTimeDelta * 0.04f);
-		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.08f);
+		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.06f);
 	}
 	break;
 	case JUNGLE:
 	{
-		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_JUNGLE_BGM, fTimeDelta * 0.04f);
-		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM_SUB, 0.0f, fTimeDelta * 0.08f);
+		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_JUNGLE_BGM, fTimeDelta * 0.03f);
+		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM_SUB, 0.0f, fTimeDelta * 0.06f);
 	}
 	break;
 	case NOBGM:
