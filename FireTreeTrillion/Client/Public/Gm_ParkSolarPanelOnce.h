@@ -65,6 +65,7 @@ private:
 	
 	_bool					m_IsInteraction = { FALSE };
 	_bool					m_bStartCharge = { FALSE };
+	_bool					m_bSpawn = { false };
 
 	vector<_uint>			m_vecPassIndices;
 

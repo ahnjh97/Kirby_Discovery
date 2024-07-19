@@ -3,6 +3,7 @@
 
 #include "HitBox.h"
 #include "Kirby.h"
+#include "Bomber.h"
 //#include "BreakableRockParticle.h"
 
 CGm_ParkSolarPanelOnce::CGm_ParkSolarPanelOnce(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -86,8 +87,24 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 		break;
 		
 	case STATE_ONWAIT: //충전 완료
-		if (4 == m_iGimmickIndex) //크래시 능력 몬스터를 생성
-			_uint iA = 10;
+		if(false == m_bSpawn)
+		{
+			m_bSpawn = true;
+			if (4 == m_iGimmickIndex) //크래시 능력 몬스터를 생성
+			{
+				HRESULT hr;
+
+				_float4x4 matWorld = XMMatrixIdentity();
+				matWorld._41 = 35.5;
+				matWorld._42 = 73.;
+				matWorld._43 = -17.5f;
+				matWorld._44 = 1.f;
+				CMonster::MONSTER_DESC MonsterDesc = {};
+				MonsterDesc.matWorld = matWorld;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Bomber"), &MonsterDesc);
+				CHECK_FAILED(hr);
+			}
+		}
 
 		break; 
 	case STATE_NONE:	

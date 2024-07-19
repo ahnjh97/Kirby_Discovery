@@ -233,7 +233,7 @@ HRESULT CBuffahorn::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.fOffset = 1.f;
+	desc.fOffset = 0.8f;
 	desc.tCapsuleShape.fHeight = 1.5f;
 	desc.tCapsuleShape.fRadius = 1.5f;
 	hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),

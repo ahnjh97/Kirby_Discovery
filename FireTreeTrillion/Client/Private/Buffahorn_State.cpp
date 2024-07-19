@@ -87,8 +87,8 @@ void CBuffahorn_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	// 자유 낙하
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
-	// 플레이어를 향해 바라본다
-	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 3.f);
+	//// 플레이어를 향해 바라본다
+	//pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 3.f);
 
 	if (true == pBuffahorn->IsAnimFinished())
 	{
@@ -140,7 +140,7 @@ void CBuffahorn_Wait_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 
-	pTransformCom->Look_At(vKirbyPos);
+	//pTransformCom->Look_At(vKirbyPos);
 
 	// 자유 낙하
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
@@ -212,7 +212,7 @@ void CBuffahorn_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	{
 		m_fTimeDelta += fTimeDelta;
 
-		if (2.f > m_fTimeDelta)
+		if (3.f > m_fTimeDelta)
 			pController->Move_Dir(pTransformCom, pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 10.f, fTimeDelta);
 		else
 		{
