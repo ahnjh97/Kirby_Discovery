@@ -104,12 +104,12 @@ _int CPartTimerKirby::Tick(_float fTimeDelta)
 		static _bool bOnce = false;
 		if (false == bOnce)
 		{
-			#pragma region ¿Ã∆Â∆ÆWI QZR 
+#pragma region ¿Ã∆Â∆ÆWI QZR 
 			CEffect::FX_DESC FXDesc{};
 			FXDesc.vInitPos = _float3(0.f, 0.f, 0.f);
 			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 			Add_Effect("FoodGame_TimeAttack", FXDesc, true);
-			#pragma endregion
+#pragma endregion
 			bOnce = true;
 		}
 	}
