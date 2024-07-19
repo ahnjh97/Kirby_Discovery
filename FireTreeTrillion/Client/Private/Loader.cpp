@@ -1610,6 +1610,7 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_LunchTimeIcon", "Effects/UI/MGameFood/lunch time icon.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_LunchTimeBanner", "Effects/UI/MGameFood/lunch time banner.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_LunchTimeTypo", "UI/MGameFood/LunchType_%d.png", 6);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Food_LunchClearTypo", "UI/MGameFood/LunchClearType.png");	CHECK_FAILED(hr);
 
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultTop", "Effects/UI/MGameFood/result top.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Food_ResultBottom", "Effects/UI/MGameFood/result bottom.png");	CHECK_FAILED(hr);

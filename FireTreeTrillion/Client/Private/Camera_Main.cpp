@@ -1136,7 +1136,8 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 
 
 	//카메라 보는 기준점 위로 올려주는 놈
-	if (*m_pCurrentLevelID == LEVEL_PARTTIME
+	if (*m_pCurrentLevelID == LEVEL_INTRO
+		|| *m_pCurrentLevelID == LEVEL_PARTTIME
 		|| *m_pCurrentLevelID == LEVEL_FINALBOSS
 		|| *m_pCurrentLevelID == LEVEL_FINALE
 		)
