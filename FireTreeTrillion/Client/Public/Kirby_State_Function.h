@@ -626,7 +626,6 @@ static _bool Vacuum_Object(CKirby* pKirby, _float fTimeDelta)
 	if (DESC(m_pObject) != nullptr)
 		return false;
 
-
 	// 0Â÷ ¸ñÇ¥ÀÎ ¹ö¼¸ÀÇ °«À» Å½»öÇÑ´Ù.
 	if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_CappyHat")))
 	{
@@ -1282,10 +1281,11 @@ static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
 		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
 			return;
 
-		//CParticle::PARTICLE_DESC SingleFXDesc{};
-		//SingleFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerChargeParticle"), &SingleFXDesc)))
-		//	return;
+		CParticle::PARTICLE_DESC SingleFXDesc{};
+		SingleFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+		SingleFXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_start particle test A"), &SingleFXDesc)))
+			return;
 
 
 		/*
@@ -1366,7 +1366,18 @@ static void SwordDash(CTransform* pTransformCom)
 	FXDesc.fStartDelay = .1f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword Dash Test A"), &FXDesc)))
 		return;
+}
 
+static void BodySlide(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
+	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+
+	FXDesc.vInitPos = _float3{ 0.1f, 0.f, 2.1f };
+	FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+	FXDesc.fStartDelay = 0.f;
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword Dash Test A"), &FXDesc)))
+		return;
 }
 
 static void SwordSpinCharge(CTransform* pTransformCom)
@@ -1382,6 +1393,20 @@ static void SwordSpinCharge(CTransform* pTransformCom)
 
 }
 
+static void SwordSpinChargeBig(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
+
+	FXDesc.vInitPos = static_cast<_float3>(pTransformCom->Get_State(CTransform::STATE_POSITION) + _float4{ 0.f, -.4f, 0.f, 0.f });
+	FXDesc.vInitRot = CUtils::Make_Degree_FromDir(CGameInstance::Get_Instance()->Get_CamLook());
+	FXDesc.vInitScale = { 6.f, 6.f, 6.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword_Copy Bubble_One"), &FXDesc)))
+		return;
+
+
+}
+
+
 static void SwordSpinSlash_One(CTransform* pTransformCom)
 {
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
@@ -1390,6 +1415,17 @@ static void SwordSpinSlash_One(CTransform* pTransformCom)
 	FXDesc.vInitScale = { 5.f, 5.f, 5.f };
 	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword_Spin Attack A"), &FXDesc)))
+		return;
+}
+
+static void SwordSpinSlash_Two(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
+
+	FXDesc.vInitPos = _float3{ 0.f, .2f, 0.f };
+	FXDesc.vInitScale = { 5.f, 5.f, 5.f };
+	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword_Spin Attack B"), &FXDesc)))
 		return;
 }
 

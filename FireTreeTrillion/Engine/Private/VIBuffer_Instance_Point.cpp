@@ -202,12 +202,12 @@ _float3 CVIBuffer_Instance_Point::Compute_RandRotation()
 
 _float4 CVIBuffer_Instance_Point::Compute_RandPosition()
 {
-	_float3 vPosition = {	m_InstanceDesc.vCenter.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.x),
-							m_InstanceDesc.vCenter.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.y),
-							m_InstanceDesc.vCenter.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.z, m_InstanceDesc.vRange.z)};
+	_float3 vPosition = {	m_InstanceDesc.vCenter.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.x) * m_InstanceDesc.vInitScale.x,
+							m_InstanceDesc.vCenter.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.y) * m_InstanceDesc.vInitScale.y,
+							m_InstanceDesc.vCenter.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.z, m_InstanceDesc.vRange.z) * m_InstanceDesc.vInitScale.z };
 
 
-	return Pos(vPosition * m_InstanceDesc.vInitScale);
+	return Pos(vPosition);
 }
 
 _float4 CVIBuffer_Instance_Point::Compute_RandDirection()

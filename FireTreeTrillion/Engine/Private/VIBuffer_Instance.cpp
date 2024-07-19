@@ -575,7 +575,6 @@ void CVIBuffer_Instance::Apply_Velocity(_float fTimeDelta, VTXMATRIX* pVertices)
 
 		CUtils::Set_Scaled_Matrix(InstanceMat, vScale.x, vScale.x, vScale.x);
 
-
 		CUtils::Set_State_Matrix(InstanceMat, CUtils::STATE_POSITION, pVertices[i].vPosition + m_pVelocities[i] * fTimeDelta);
 
 		pVertices[i].vRight = Dir(InstanceMat.Right());

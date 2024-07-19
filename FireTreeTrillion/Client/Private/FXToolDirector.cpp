@@ -17,6 +17,11 @@
 #define COLOR_PINK				ImVec4(0.8f, 0.18f, 0.37f, 1.0f)
 #define COLOR_LIGHTPINK			ImVec4(1.0f, 0.18f, 0.37f, 1.0f)
 
+#define MULTIFX_PATH			"../Bin/Resources/Effects/Multi/"
+#define SINGLEFX_PATH			"../Bin/Resources/Effects/Single/"
+#define PARTICLE_PATH			"../Bin/Resources/Effects/Particle/"
+
+
 static const vector<char*> s_ModelPasses = { "0 | NORMAL_0", "1 | NORMAL_X", "2 | SHADOW", "3 | SKY", "4 | BLOOM", "5 | NONBLUR"
 	,"6 | TRIGGER", "7 | ALPHABLEND", "8 | DEFERREDINFO", "9 | NEARCLIP", "10 | KIRBYPART WHITEFX", "11 | MONSTERPART",
 	"12 | DEFAULTFX","13 | BLENDFX_LINEARDIFFUSE", "14 | BLENDFX_CLAMPDIFFUSE",	"15 | WHITEFX_LINEARDIFFUSE", "16 | WHITEFX_CLAMPDIFFUSE"
@@ -821,7 +826,7 @@ void CFXToolDirector::Render_AxisLines()
 
 	ImVec4 color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
 
-	std::vector<ImVec2> bottomCircle, topCircle;
+	vector<ImVec2> bottomCircle, topCircle;
 
 
 	// Define points in world space
@@ -902,23 +907,79 @@ void CFXToolDirector::Draw_Cylinder(const ImVec2& center, float bottomRadius, fl
 }
 
 
-
 //단일 이펙트들의 생성 세팅, 계층을 보여준다.
 void CFXToolDirector::Render_FXHierarchy()
 {
 	Begin(u8"만들기");
 
+	static ImGuiTextFilter DiffuseFilter;
+	DiffuseFilter.Draw(u8"디퓨즈 검색");
+
 	//색 텍스쳐
-	Combo(u8"디퓨즈 텍스쳐", &m_iAddingFXTexIdx, m_FXTexList.data(), (_int)m_FXTexList.size());
+	if (BeginCombo(u8"디퓨즈 텍스쳐", m_FXTexList[m_iAddingFXTexIdx], ImGuiComboFlags_PopupAlignLeft ))
+	{
+		for (size_t i = 0; i < (_int)m_FXTexList.size(); i++)
+		{
+			const bool bSelected = (m_iAddingFXTexIdx == i);
+			if (DiffuseFilter.PassFilter(m_FXTexList[i]) && 
+				Selectable(m_FXTexList[i], bSelected))
+				m_iAddingFXTexIdx = i;
+
+
+			if (bSelected)
+				SetItemDefaultFocus();
+		}
+		EndCombo();
+	}
+
+	Dummy({ 0.f, 10.f });
+
+
+
+	static ImGuiTextFilter MaskFilter;
+	MaskFilter.Draw(u8"마스크 검색");
 
 	//마스크 텍스쳐
-	Combo(u8"마스크 텍스쳐", &m_iAddingFXMaskTexIdx, m_FXMaskTexList.data(), (_int)m_FXMaskTexList.size());
+	if (BeginCombo(u8"마스크 텍스쳐", m_FXMaskTexList[m_iAddingFXMaskTexIdx], ImGuiComboFlags_PopupAlignLeft))
+	{
+		for (size_t i = 0; i < (_int)m_FXMaskTexList.size(); i++)
+		{
+			const bool bSelected = (m_iAddingFXMaskTexIdx == i);
+			if (MaskFilter.PassFilter(m_FXMaskTexList[i]) &&
+				Selectable(m_FXMaskTexList[i], bSelected))
+				m_iAddingFXMaskTexIdx = i;
+
+
+			if (bSelected)
+				SetItemDefaultFocus();
+		}
+		EndCombo();
+	}
+
 
 	Separator();
 	Columns(2);
 
+	static ImGuiTextFilter BufferFilter;
+	BufferFilter.Draw(u8"버퍼 검색");
+
 	//버퍼
-	Combo(u8"버퍼", &m_iAddingFXBufferIdx, m_FXBufferList.data(), (_int)m_FXBufferList.size());
+	if (BeginCombo(u8"버퍼", m_FXBufferList[m_iAddingFXBufferIdx], ImGuiComboFlags_PopupAlignLeft ))
+	{
+		for (size_t i = 0; i < (_int)m_FXBufferList.size(); i++)
+		{
+			const bool bSelected = (m_iAddingFXBufferIdx == i);
+			if (BufferFilter.PassFilter(m_FXBufferList[i]) &&
+				Selectable(m_FXBufferList[i], bSelected))
+				m_iAddingFXBufferIdx = i;
+
+
+			if (bSelected)
+				SetItemDefaultFocus();
+		}
+		EndCombo();
+	}
+
 
 	//single effect를 생성한다.
 	if (Button(u8"이펙트 생성"))
@@ -1219,10 +1280,15 @@ void CFXToolDirector::Render_FXHierarchy()
 
 		if (MenuItem(u8"삭제"))
 		{
-			m_eSelected = SELECTED_END;
+			string strName = m_FXs[m_iSelectedFXIdx]->m_strFXName;
+			string strPath = m_eSelected == SELECTED_SINGLE_FX ? SINGLEFX_PATH : PARTICLE_PATH;
+			strPath += strName + ".bin";
+			MoveTo_TrashBin(strPath);
+			
 
 			Safe_Release(m_FXs[m_iSelectedFXIdx]);
 			m_FXs.erase(m_FXs.begin() + m_iSelectedFXIdx);
+			m_eSelected = SELECTED_END;
 
 			if (m_FXs.size() <= m_iSelectedFXIdx)
 				--m_iSelectedFXIdx;
@@ -1529,7 +1595,7 @@ void CFXToolDirector::Render_FXProperty()
 		}
 
 		Spacing();
-		if (!bIsParticle && DragFloat3(u8"지속 회전", m_vRotation, .05f, -180.f, 180.f, "%.2f"))
+		if (!bIsParticle && DragFloat3(u8"지속 회전", m_vRotation, .05f, -180.f, 180.f, "%.2f", ImGuiSliderFlags_None))
 		{
 			pCurFX->m_vContinuousRotation.x = m_vRotation[0];
 			pCurFX->m_vContinuousRotation.y = m_vRotation[1];
@@ -2501,10 +2567,14 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 
 		if (MenuItem(u8"삭제"))
 		{
-			m_eSelected = SELECTED_END;
+			string strName = m_MultiFXs[m_iSelectedMultiFXIdx]->m_strFXName;
+			string strPath = MULTIFX_PATH + strName + ".bin";
+			MoveTo_TrashBin(strPath);
+
 
 			Safe_Release(m_MultiFXs[m_iSelectedMultiFXIdx]);
 			m_MultiFXs.erase(m_MultiFXs.begin() + m_iSelectedMultiFXIdx);
+			m_eSelected = SELECTED_END;
 
 			if (m_MultiFXs.size() <= m_iSelectedMultiFXIdx)
 				--m_iSelectedMultiFXIdx;
@@ -2592,6 +2662,34 @@ HRESULT CFXToolDirector::Ready_FXPrototypeVector()
 	return S_OK;
 }
 
+void CFXToolDirector::MoveTo_TrashBin(string& filePath)
+{
+	path trashFolderPath("../Bin/Resources/Effects/TrashBin/");
+
+	try
+	{
+		if (exists(filePath))
+		{
+			path srcPath(filePath);
+			path dstPath = path(trashFolderPath) / srcPath.filename();
+
+			// 휴지통 폴더로 파일 이동
+			rename(srcPath, dstPath);
+
+			cout << "File moved to trash folder: " << dstPath << endl;
+		}
+		else
+		{
+			cout << "File does not exist: " << filePath << endl;
+		}
+	}
+	catch (const filesystem_error& e)
+	{
+		cerr << "Filesystem error: " << e.what() << endl;
+	}
+
+}
+
 void CFXToolDirector::Ready_Ingredient(wstring wstrSearchTag, vector<char*>* vecCombo, CComponent_Manager::PROTOTYPES* comMap)
 {
 	for (auto& comPair : *comMap)
@@ -2607,6 +2705,55 @@ void CFXToolDirector::Ready_Ingredient(wstring wstrSearchTag, vector<char*>* vec
 		}
 	}
 }
+//
+//void CFXToolDirector::FilteredCombo(const char* label, int* current_item, const vector<char*>& items)
+//{
+//	static unordered_map<string, ImGuiTextFilter> filter_map;
+//
+//	// 유일한 필터 키를 생성
+//	string key = label;
+//	if (filter_map.find(key) == filter_map.end())
+//	{
+//		filter_map[key] = ImGuiTextFilter();
+//	}
+//
+//	ImGuiTextFilter& filter = filter_map[key];
+//	vector<char*> filtered_items;
+//
+//	// 검색 입력 필드
+//	filter.Draw((string("Search##") + label).c_str());
+//
+//	// 검색어에 따라 아이템 필터링
+//	for (const auto& item : items)
+//	{
+//		if (filter.PassFilter(item))
+//		{
+//			filtered_items.push_back(item);
+//		}
+//	}
+//
+//	// 현재 선택된 아이템의 표시
+//	const char* current_item_text = (filtered_items.empty() || *current_item >= static_cast<int>(filtered_items.size()))
+//		? "" : filtered_items[*current_item];
+//
+//	// 콤보박스 아이템 표시
+//	if (ImGui::BeginCombo(label, current_item_text))
+//	{
+//		for (size_t i = 0; i < filtered_items.size(); i++)
+//		{
+//			bool is_selected = (find(items.begin(), items.end(), filtered_items[i]) - items.begin()) == *current_item;
+//			if (ImGui::Selectable(filtered_items[i], is_selected))
+//			{
+//				*current_item = static_cast<int>(distance(items.begin(), find(items.begin(), items.end(), filtered_items[i])));
+//			}
+//			if (is_selected)
+//			{
+//				ImGui::SetItemDefaultFocus();
+//			}
+//		}
+//		ImGui::EndCombo();
+//	}
+//}
 
 HRESULT CFXToolDirector::Add_Components()
 {
