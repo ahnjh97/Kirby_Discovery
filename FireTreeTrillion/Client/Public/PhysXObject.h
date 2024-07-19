@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "CollisionCenter.h"
 #include "MultiEffect.h"
+#include "Particle.h"
 
 BEGIN(Client)
 
@@ -58,10 +59,14 @@ public:
 	//이펙트를 자신의 리스트에 추가한다.
 
 
-	void	Add_Effect(CEffect* pEffect);
+	//void	Add_Effect(CEffect* pEffect);
 	_float4x4* Get_EffectSocket() { return &m_EffectSocket; }
 
+	void	Add_Effect(CEffect* pEffects);
+
+	void	Add_Effect(string strName, _bool bAddToList = false);
 	void	Add_Effect(string strName, CEffect::FX_DESC fxDesc, _bool bAddToList = false);
+	void	Add_Effect(string strName, CParticle::PARTICLE_DESC fxDesc, _bool bAddToList = false);
 	void	Add_Effect(string strName, CMultiEffect::MULTI_FX_DESC fxDesc, _bool bAddToList = false);
 
 	void	Delete_AllEffect();
@@ -104,6 +109,9 @@ protected:
 	//피직스 오브젝트들에게 귀속되어 움직이는 이펙트들
 	list<CEffect*>	m_FXList;
 	_float4x4		m_EffectSocket;
+
+	// 소켓 업데이트를 하지 않을 놈들은 false 해주세요.
+	_bool	m_bUpdate_FXSocketMatrix = { true };
 };
 
 END

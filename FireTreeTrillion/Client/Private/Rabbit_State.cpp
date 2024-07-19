@@ -45,7 +45,7 @@ void CRabbit_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 		// 몬스터와 플레이어 사이의 각도 계산
 		_float fAngle = XMVectorGetX(XMVector3AngleBetweenVectors(XMVector3Normalize(vLook), XMVector3Normalize(XMVectorSubtract(vKirbyPos, vPos))));
 
-		if (LEVEL_SIMBA == *m_pGameInstance->Get_CurrentLevelID()) {
+		if (LEVEL_SIMBA == *m_pGameInstance->Get_CurrentLevelID() || LEVEL_PARK == *m_pGameInstance->Get_CurrentLevelID()) {
 			if (15.f < fDistance)
 				fDistance = 7.1f;
 			fAngle = 0.f;
@@ -60,7 +60,7 @@ void CRabbit_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 				// 플레이어를 향해 회전
 				pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
 				_bool IsAnimFinished = pRabbit->IsAnimFinished();
-				if (LEVEL_SIMBA == *m_pGameInstance->Get_CurrentLevelID()) {
+				if (LEVEL_SIMBA == *m_pGameInstance->Get_CurrentLevelID() || LEVEL_PARK == *m_pGameInstance->Get_CurrentLevelID()) {
 					if(pRabbit->Get_AnimRatio() > 0.2f)
 						IsAnimFinished = true;
 				}
@@ -241,6 +241,7 @@ CRabbit_Jump_State::CRabbit_Jump_State()
 void CRabbit_Jump_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	m_fEffect = false;
 }
 
 void CRabbit_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -253,6 +254,23 @@ void CRabbit_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
 
 	pTransformCom->Look_At_Axis(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
+
+	if(CRabbit::RABBIT_JUMPSTART == pRabbit->Get_State())
+	{
+		if (false == m_fEffect)
+		{
+			m_fEffect = true;
+			_float4 vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitPos = _float3(vPos.x, vPos.y + 0.25f, vPos.z);
+			FXDesc.vInitRot = { 0.f, (_float)CUtils::Make_RandomInt(0, 90), 0.f };
+			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_JumpEffectJS"), &FXDesc)))
+				return;
+		}
+	}
 
 	if (true == pRabbit->IsAnimFinished())
 	{
@@ -293,6 +311,16 @@ void CRabbit_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 		{
 			// 자유 낙하
 			pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
+
+			_float4 vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			vPos -= pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 1.5f;
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitPos = _float3(vPos.x, vPos.y + 0.25f, vPos.z);
+			FXDesc.vInitRot = { 0.f, (_float)CUtils::Make_RandomInt(0, 90), 0.f };
+			FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
+			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_RabbitLandingJS"), &FXDesc)))
+				return;
 
 			pRabbit->Set_RabbitEye(CRabbit::RABBITEYE_IDLE);
 			pRabbit->Change_State(CRabbit::RABBIT_JUMPLANDING, 45.f, false, true);

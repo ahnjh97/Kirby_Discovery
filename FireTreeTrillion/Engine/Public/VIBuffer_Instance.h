@@ -24,6 +24,9 @@ public:
 
 	//Dir(float3) + Speed(float1) 계산
 	virtual _float4 Compute_RandDirection() = 0;
+	//공전 스피드 계산
+	virtual _float Compute_RandOrbitSpeed() = 0;
+
 	//Color + Alpha 계산
 	virtual _float4 Compute_RandColor() = 0;
 
@@ -34,6 +37,8 @@ public:
 
 	void Compute_AllLifeTime( _float fTimeDelta);
 	void Apply_Velocity(_float fTimeDelta, VTXMATRIX* pVertices);
+
+	//virtual void Assemble(_float fTimeDelta, VTXMATRIX* pVertices);
 
 	virtual void Drop(_float fTimeDelta, VTXMATRIX* pVertices);
 	virtual void Spread(_float fTimeDelta, VTXMATRIX* pVertices);
@@ -84,22 +89,30 @@ protected:
 	random_device				m_RandomDevice;
 	mt19937_64					m_RandomNumber;
 
+	_float						m_fRemainedDuration = { 0.f };
 
+	//파싱 변수들
 	_float2*					m_pLifeTimes = { nullptr };
-	_float*						m_pStartDelays = { nullptr };
+
 	_float3*					m_pDirections = { nullptr };
+	_float*						m_pSpeeds = { nullptr };
+
+	_float3*					m_pColors = { nullptr };
+	_float*						m_pAlphas = { nullptr };
+
+	// Orbit 도는 속도 (Degree값) 랜덤 필요함
+	_float*						m_pOrbitSpeed = { nullptr };
+
+	_float*						m_pStartDelays = { nullptr };
+
+
+	//나머지 계산용 변수들
 	_float3*					m_pInitialScales = { nullptr };
 	_float*						m_pInitialSpeeds = { nullptr };
 
 	_float3*					m_pPrePositions = { nullptr };
 	_float3*					m_pVelocities = { nullptr };
 
-	_float*						m_pSpeeds = { nullptr };
-	_float3*					m_pColors = { nullptr };
-	_float*						m_pAlphas = { nullptr };
-
-	// Orbit 도는 속도 (Degree값) 랜덤 필요함
-	_float*						m_pOrbitSpeed = { nullptr };
 
 	_float3*					m_pPreAxis = { nullptr };
 	

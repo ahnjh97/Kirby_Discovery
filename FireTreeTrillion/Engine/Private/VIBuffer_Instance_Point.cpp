@@ -202,12 +202,12 @@ _float3 CVIBuffer_Instance_Point::Compute_RandRotation()
 
 _float4 CVIBuffer_Instance_Point::Compute_RandPosition()
 {
-	_float3 vPosition = {	m_InstanceDesc.vCenter.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.x),
-							m_InstanceDesc.vCenter.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.y),
-							m_InstanceDesc.vCenter.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.z, m_InstanceDesc.vRange.z)};
+	_float3 vPosition = {	m_InstanceDesc.vCenter.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.x) * m_InstanceDesc.vInitScale.x,
+							m_InstanceDesc.vCenter.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.y) * m_InstanceDesc.vInitScale.y,
+							m_InstanceDesc.vCenter.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vRange.z, m_InstanceDesc.vRange.z) * m_InstanceDesc.vInitScale.z };
 
 
-	return Pos(vPosition * m_InstanceDesc.vInitScale);
+	return Pos(vPosition);
 }
 
 _float4 CVIBuffer_Instance_Point::Compute_RandDirection()
@@ -216,6 +216,11 @@ _float4 CVIBuffer_Instance_Point::Compute_RandDirection()
 				m_InstanceDesc.vDir.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vDirRandomOffset.y, m_InstanceDesc.vDirRandomOffset.y),
 				m_InstanceDesc.vDir.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vDirRandomOffset.z, m_InstanceDesc.vDirRandomOffset.z),
 				m_InstanceDesc.fSpeed + CUtils::Make_RandomFloat(-m_InstanceDesc.fSpeedRandomOffset,m_InstanceDesc.fSpeedRandomOffset)};
+}
+
+_float CVIBuffer_Instance_Point::Compute_RandOrbitSpeed()
+{
+	return {	m_InstanceDesc.fOrbitSpeed + CUtils::Make_RandomFloat(-m_InstanceDesc.fOrbitSpeedRandomOffset, m_InstanceDesc.fOrbitSpeedRandomOffset), };
 }
 
 _float4 CVIBuffer_Instance_Point::Compute_RandColor()

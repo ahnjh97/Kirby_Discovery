@@ -47,6 +47,8 @@ namespace Engine
 		_float3		vInitRot = { 0.f, 0.f, 0.f };
 		_float3		vInitScale = { 1.f, 1.f, 1.f };
 
+		_float		fDuration = { 1.f };
+
 		//¼ö¸í
 		_float		fLifetime = { 1.f };
 		_float		fLifetimeRandomOffset;
@@ -72,6 +74,9 @@ namespace Engine
 		_float		fSpeed = {1.f};
 		_float		fSpeedRandomOffset;
 
+		_float		fOrbitSpeed = { 1.f };
+		_float		fOrbitSpeedRandomOffset;
+
 
 		_float3		vColor = {1.f, 1.f, 1.f};
 		_float3		vColorRandomOffset;
@@ -84,9 +89,6 @@ namespace Engine
 		_float3		vPivot;
 
 		_bool		bIsLoop;
-		//_bool		bIsBillboard;
-		//_bool		bIsColorRender;
-		//_bool		bIsBloom;
 
 		vector<_bool> vecMoveCommands;
 
@@ -94,6 +96,7 @@ namespace Engine
 		INSTANCE_SHAPE eInstanceShape = { INSTANCE_SHAPE_END };
 		_uint		iRows = { 1 };
 		_bool		bRandPos = { false };
+
 	}INSTANCE_DESC;
 
 	typedef struct 
@@ -209,6 +212,8 @@ namespace Engine
 		_float		fSpeed = { 1.f };
 		_float		fSpeedRandomOffset;
 
+		_float		fOrbitSpeed = { 1.f };
+		_float		fOrbitSpeedRandomOffset;
 
 		_float3		vColor = { 1.f, 1.f, 1.f };
 		_float3		vColorRandomOffset;

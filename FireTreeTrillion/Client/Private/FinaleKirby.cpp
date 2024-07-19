@@ -18,6 +18,8 @@
 
 #include "FinalePartical_Maker.h"
 
+#include "Light.h"
+
 
 CFinaleKirby::CFinaleKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
@@ -71,6 +73,7 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
         return E_FAIL;
 
     m_fOffsetTurn = 2.f;
+    m_bUpdate_FXSocketMatrix = false;
 
     return S_OK;
 }
@@ -84,6 +87,46 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
 
     HitStop_System(m_fTimeDelta);
 
+    if (INFO(m_pLight1) == nullptr && INFO(m_pLight2) == nullptr && INFO(m_eBodyState) == BODY_DUMPDEFAULT)
+    {
+        Update_EffectSocket();
+        _float4x4 KirbyEffectSocketMatrix = *Get_EffectSocket();
+        _float4 vLook = CUtils::Get_State_Vector_Matrix(KirbyEffectSocketMatrix, CUtils::STATE_LOOK);
+        _float4 vUp = CUtils::Get_State_Vector_Matrix(KirbyEffectSocketMatrix, CUtils::STATE_UP);
+        _float4 vRight = CUtils::Get_State_Vector_Matrix(KirbyEffectSocketMatrix, CUtils::STATE_RIGHT);
+        _float4 vPos = CUtils::Get_State_Vector_Matrix(KirbyEffectSocketMatrix, CUtils::STATE_POSITION);
+
+        LIGHT_DESC			LightDesc{};
+        LightDesc.eType = LIGHT_DESC::TYPE_HORONG;
+        LightDesc.vPosition = (vPos - (vUp * 3.f) - (vLook * 11.f) + (vRight * 2.f));
+        LightDesc.fRange = 7.f;
+        LightDesc.vDiffuse = _float4(1.f, 0.6f, 0.2f, 1.f);
+        LightDesc.vAmbient = _float4(.5f, .5f, .5f, 1.f);
+        LightDesc.vSpecular = _float4(0.f, 0.f, 0.0f, 1.f);
+        if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+            return OBJ_NOEVENT;
+        INFO(m_pLight1) = CGameInstance::Get_Instance()->Get_LightLastAddress();
+        Safe_AddRef(INFO(m_pLight1));
+
+        LightDesc.vPosition = (vPos - (vUp * 3.f) - (vLook * 11.f) - (vRight * 2.f));
+        if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+            return OBJ_NOEVENT;
+        INFO(m_pLight2) = CGameInstance::Get_Instance()->Get_LightLastAddress();
+        Safe_AddRef(INFO(m_pLight2));
+    }
+
+    if (INFO(m_pLight1) != nullptr)
+    {
+        _float4x4 KirbyEffectSocketMatrix = *Get_EffectSocket();
+        _float4 vLook = CUtils::Get_State_Vector_Matrix(KirbyEffectSocketMatrix, CUtils::STATE_LOOK);
+        _float4 vUp = CUtils::Get_State_Vector_Matrix(KirbyEffectSocketMatrix, CUtils::STATE_UP);
+        _float4 vRight = CUtils::Get_State_Vector_Matrix(KirbyEffectSocketMatrix, CUtils::STATE_RIGHT);
+        _float4 vPos = CUtils::Get_State_Vector_Matrix(KirbyEffectSocketMatrix, CUtils::STATE_POSITION);
+
+        INFO(m_pLight1)->Update_LightPos((vPos - (vUp * 3.f) - (vLook * 11.f) + (vRight * 2.f)));
+        INFO(m_pLight2)->Update_LightPos((vPos - (vUp * 3.f) - (vLook * 11.f) - (vRight * 2.f)));
+    }
+
     if (INFO(m_eBodyState) != BODY_DUMPCUT)
     {
         // 커비의 기본적인 축 보정, 밸런스 보정을 담당한다.
@@ -92,17 +135,9 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
         // 특정 상황에서 뼈를 돌려준다.
         Bone_Rotation(m_fTimeDelta);
 
+        Update_EffectSocket();
         // 유틸업데이트가 들어가있다. (FSM)
         __super::Tick(m_fTimeDelta);
-
-        //이펙트 소켓의 회전을 업데이트한다.
-        m_EffectSocket = _float4x4::Identity;
-        _float3 vAngle = CUtils::Make_Degree_FromDir(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
-        vAngle = _float3{ ToRadian(vAngle.x), ToRadian(vAngle.y), ToRadian(vAngle.z) };
-        _float4x4 RotMat = _float4x4::CreateFromYawPitchRoll(vAngle);
-        m_EffectSocket *= RotMat;
-
-        CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
         // 지면의 up벡터
         PxVec3 slope = m_pControllerCom->Compute_Slope_DynamicActor(m_pTransformCom);
@@ -122,19 +157,15 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
     }
     else if (INFO(m_eBodyState) == BODY_DUMPCUT)
     {
+        //확인을 위해 계속 갱신하겠슴_HS
+        m_vBonePos = Compute_RootPos();
+
+        Update_EffectSocket();
+
         // 유틸업데이트가 들어가있다. (FSM)
         //__super::Tick(m_fTimeDelta);
         if (m_pFSM != nullptr)
             m_pFSM->Update(this, fTimeDelta);
-
-        
-        m_vBonePos = Compute_RootPos();
-        //이펙트 소켓의 회전을 업데이트한다.
-        m_EffectSocket = m_pTransformCom->ComputeBoneWorldMatrix(m_pModelCom[BODY_DUMPCUT]->Get_BonePtr("TopL"));
-
-        _float3 vAngle = {90.f, 0.f, 0.f};
-        _float4x4 RotMat = _float4x4::CreateFromYawPitchRoll(CUtils::Degree_ToRadian(vAngle));
-        m_EffectSocket *= RotMat;
 
         //캡슐의 위치만 업데이트한다.
         m_pControllerCom->Set_CapsulePosition(m_vBonePos);
@@ -343,6 +374,36 @@ void CFinaleKirby::Bone_Rotation(_float fTimeDelta)
         _float4x4 RotationMatrix = _float4x4::Identity;
         CUtils::Turn_OtherMatrix(RotationMatrix, _float4(0.f, 1.f, 0.f, 0.f), 1.f, fHandleAngle);
         *BoneMatrix = RotationMatrix;
+    }
+}
+
+void CFinaleKirby::Update_EffectSocket()
+{
+    if (INFO(m_eBodyState) == BODY_DUMPCUT || INFO(m_eBodyState) == BODY_DUMPDEFAULT)
+    {
+        _float4x4 pFrontBoneWorldMatrix = m_pTransformCom->ComputeBoneWorldMatrix(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("C_ContainerBJ"));
+        _float4 vFrontBonePos = CUtils::Get_State_Vector_Matrix(pFrontBoneWorldMatrix, CUtils::STATE_POSITION);
+
+        _float4x4 pBackBoneWorldMatrix = m_pTransformCom->ComputeBoneWorldMatrix(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr("C_WheelDJ"));
+        _float4 vBackBonePos = CUtils::Get_State_Vector_Matrix(pBackBoneWorldMatrix, CUtils::STATE_POSITION);
+
+        _float4 vRootLook = vFrontBonePos - vBackBonePos;
+        vRootLook.Normalize();
+        _float4 vRootRight = XMVector3Cross(_float4(0.f, 1.f, 0.f, 0.f), vRootLook);
+        vRootRight.Normalize();
+        _float4 vRootUp = XMVector3Cross(vRootLook, vRootRight);
+        vRootUp.Normalize();
+
+        //이펙트 소켓 업데이트
+        m_EffectSocket = {
+            vRootRight.x, vRootRight.y, vRootRight.z, vRootRight.w,
+            vRootUp.x, vRootUp.y, vRootUp.z, vRootUp.w,
+            vRootLook.x, vRootLook.y, vRootLook.z, vRootLook.w,
+            vFrontBonePos.x, vFrontBonePos.y, vFrontBonePos.z, vFrontBonePos.w
+        };
+
+        if (vRootRight != _float4(0.f, 0.f, 0.f, 0.f))
+            CUtils::Turn_OtherMatrix(m_EffectSocket, vRootRight, 1.f, 15.f);
     }
 }
 
@@ -841,5 +902,10 @@ void CFinaleKirby::Free()
         Safe_Release(pMouthTexture);
 
     Safe_Release(m_pCamera);
+
+    if (INFO(m_pLight1) != nullptr)
+        Safe_Release(INFO(m_pLight1));
+    if (INFO(m_pLight2) != nullptr)
+        Safe_Release(INFO(m_pLight2));
 
 }

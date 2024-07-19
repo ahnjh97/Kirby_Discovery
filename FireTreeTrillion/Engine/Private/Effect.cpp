@@ -314,7 +314,9 @@ _float4 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProper
         //루프하지 않는다면, 마지막 키프레임 값으로 제한한다.
         else
         {
-            vResultValue = Quaternion::CreateFromYawPitchRoll(curKeyframes[m_iCurKeyframeIdxs[eProperty]].vValue);
+            //vResultValue = curKeyframes.back().vValue;
+
+            vResultValue = Quaternion::CreateFromYawPitchRoll(curKeyframes.back().vValue);
             return vResultValue;
         }
     }
@@ -402,10 +404,10 @@ void CEffect::Billboard_Effect()
     m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScale.z);
 
     _float3 vValue = Calculate_CurValue_Lerp(0.f, KF_ROT);
-    _float fAngleZ = vValue.z * 360.f;
+    //_float fAngleZ = vValue.z * 360.f;
 
     vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-    m_pTransformCom->Turn(vLook, 1.f, fAngleZ);
+    m_pTransformCom->Turn(vLook, 1.f, vValue.z);
 
 }
 

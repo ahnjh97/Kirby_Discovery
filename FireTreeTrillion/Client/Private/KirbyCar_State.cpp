@@ -4,7 +4,6 @@
 #include "ToppleableBridge.h"
 #include "StarBlock.h"
 #include "Box.h"
-#include "Fire.h"
 
 void MakeFire(CTransform* pTransformCom)
 {
@@ -41,7 +40,6 @@ void MakeBoosterBBong(CTransform* pTransformCom, _float& fTime)
 
 
 		CEffect::FX_DESC FXDesc{};
-		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 		_float fScale = CUtils::Make_RandomFloat(0.3f, 1.f);
 		FXDesc.vInitScale = { fScale,fScale, fScale };
 
@@ -122,7 +120,7 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pKirby->Change_State(CKirby::STATE_SPITDEFORM, 60.f, false, false, CKirby::BODY_VACUUM);
 
 			DESC(m_bBooster) = false;
-			pKirby->Delete_Effect("YW Come On Dash");
+			pKirby->Delete_Effect("YW Real Dash");
 			DESC(m_pKirbyAssistLight1)->Set_DeadLight(true);
 			Safe_Release(DESC(m_pKirbyAssistLight1));
 			DESC(m_pKirbyAssistLight1) = nullptr;
@@ -374,7 +372,7 @@ void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
-			pKirby->Delete_Effect("YW Come On Dash");
+			pKirby->Delete_Effect("YW Real Dash");
 		}
 	}
 	else if (DESC(m_bBooster) == false)
@@ -682,7 +680,7 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
-			pKirby->Delete_Effect("YW Come On Dash");
+			pKirby->Delete_Effect("YW Real Dash");
 			if (JoyStick_On() == false)
 			{
 				pKirby->Change_State(CKirby::CARSTATE_BOOSTEND, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
@@ -742,7 +740,7 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			pKirby->Change_State(CKirby::CARSTATE_CRASH, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
-			pKirby->Delete_Effect("YW Come On Dash");
+			pKirby->Delete_Effect("YW Real Dash");
 			Kirbydesc->m_fMoveSpeed = 0.f;
 			DESC(m_bCarJump) = true;
 			DESC(m_fJumpVelocity) = 20.f;

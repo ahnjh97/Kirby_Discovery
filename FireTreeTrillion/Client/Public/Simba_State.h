@@ -3,7 +3,7 @@
 #include "FSM_State.h"
 
 #define	AttackJump -2.f
-#define BiteRush -9.f
+#define BiteRush -7.5f
 #define BiteRushJump -8.f
 
 BEGIN(Client)
@@ -405,6 +405,7 @@ private:
 	CTransform* m_pKirbyTransform = { nullptr };
 
 	_float m_fTime = { false };
+	_bool m_bStarSpawned = { false };
 
 public:
 	static	CSimba_BiteRush* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
@@ -433,6 +434,7 @@ private:
 	CTransform* m_pTransform = { nullptr };
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
+	_bool m_bStarSpawned = { false };
 
 public:
 	static	CSimba_DimensionLaser* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)

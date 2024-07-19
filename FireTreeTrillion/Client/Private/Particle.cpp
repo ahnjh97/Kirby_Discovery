@@ -108,8 +108,12 @@ void CParticle::Update_InstanceInfo(INSTANCE_DESC* _instanceDesc)
 		m_InstanceDesc = *_instanceDesc;
 
 	//loop가 두개여
+	m_InstanceDesc.fDuration = m_fDuration.second;
 	m_InstanceDesc.bIsLoop = m_bIsLoop;
+
 	m_InstanceDesc.vCenter += m_vInitPos;
+	m_InstanceDesc.vPivot += m_vInitPos;
+
 	m_InstanceDesc.vInitScale = m_vInitScale;
 	m_InstanceDesc.vInitRot = m_vInitRot;
 
@@ -158,10 +162,17 @@ void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
 	pFXData->vRotationRandomOffset = m_InstanceDesc.vRotationRandomOffset;
 	pFXData->vScale = m_InstanceDesc.vScale;
 	pFXData->vScaleRandomOffset = m_InstanceDesc.vScaleRandomOffset;
+
+
 	pFXData->vDir = m_InstanceDesc.vDir;
 	pFXData->vDirRandomOffset = m_InstanceDesc.vDirRandomOffset;
 	pFXData->fSpeed = m_InstanceDesc.fSpeed;
 	pFXData->fSpeedRandomOffset = m_InstanceDesc.fSpeedRandomOffset;
+
+	//추가
+	pFXData->fOrbitSpeed = m_InstanceDesc.fOrbitSpeed;
+	pFXData->fOrbitSpeedRandomOffset = m_InstanceDesc.fOrbitSpeedRandomOffset;
+
 	pFXData->vColor = m_InstanceDesc.vColor;
 	pFXData->vColorRandomOffset = m_InstanceDesc.vColorRandomOffset;
 	pFXData->fAlpha = m_InstanceDesc.fAlpha;
@@ -202,9 +213,9 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	default:
 		break;
 	}
-
+	 
 	//duration 다 끝났다면
-	if (Calculate_Duration(fMyTimeDelta))
+ 	if (Calculate_Duration(fMyTimeDelta))
 	{
 		//툴에서는 다시 시작하기
 		if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
@@ -236,7 +247,7 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	if (m_pSoketMatrix != nullptr)
 		m_pTransformCom->Set_WorldMatrix(*m_pSoketMatrix);
 
-	m_pTransformCom->Set_Scaled(m_vInitScale);
+	//m_pTransformCom->Set_Scaled(m_vInitScale);
 
 	Compute_ViewZ();
 

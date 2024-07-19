@@ -59,21 +59,21 @@ _int CFire::Tick(_float fTimeDelta)
 	m_fSpeed += m_fTimeDelta * 0.5f;
 
 	_float4 vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	vPos.y += m_fSpeed * (60.f * fTimeDelta);
+	vPos.y += m_fSpeed * (60.f * m_fTimeDelta);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
 	if (vPos.y > m_vOriginPos.y + (m_fMaxRange * 0.01f))
 	{
-		m_vColor.x -= (m_vFirstColor.x - m_vTargetColor.x) / 20.f * (150.f * fTimeDelta);
-		m_vColor.y -= (m_vFirstColor.y - m_vTargetColor.y) / 20.f * (150.f * fTimeDelta);
-		m_vColor.z -= (m_vFirstColor.z - m_vTargetColor.z) / 20.f * (150.f * fTimeDelta);
+		m_vColor.x -= (m_vFirstColor.x - m_vTargetColor.x) / 20.f * (150.f * m_fTimeDelta);
+		m_vColor.y -= (m_vFirstColor.y - m_vTargetColor.y) / 20.f * (150.f * m_fTimeDelta);
+		m_vColor.z -= (m_vFirstColor.z - m_vTargetColor.z) / 20.f * (150.f * m_fTimeDelta);
 	}
 
 
 	if (vPos.y > m_vOriginPos.y + (m_fMaxRange * 0.01f))
 	{
-		m_fDissolve += 0.15f * (60.f * fTimeDelta);
-		m_fScale -= (m_fScale / 6.f) * (60.f * fTimeDelta);
+		m_fDissolve += 0.15f * (60.f * m_fTimeDelta);
+		m_fScale -= (m_fScale / 6.f) * (60.f * m_fTimeDelta);
 		if (m_fScale <= 0.f)
 			m_fScale = 0.00001f;
 
@@ -81,7 +81,7 @@ _int CFire::Tick(_float fTimeDelta)
 	}
 	else
 	{
-		m_fScale += 0.1f * (60.f * fTimeDelta);
+		m_fScale += 0.1f * (60.f * m_fTimeDelta);
 		if (m_fScale > m_fMaxScale)
 		{
 			m_fScale = m_fMaxScale;
@@ -89,8 +89,8 @@ _int CFire::Tick(_float fTimeDelta)
 		m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 	}
 
-	m_pTransformCom->Turn(XMVectorSet(1.f, 1.f, 0.f, 0.f), fTimeDelta, 360.f);
-	m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), fTimeDelta, 270.f);
+	m_pTransformCom->Turn(XMVectorSet(1.f, 1.f, 0.f, 0.f), m_fTimeDelta, 360.f);
+	m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), m_fTimeDelta, 270.f);
 
 	if (vPos.y > m_fMaxRange)
 	{
