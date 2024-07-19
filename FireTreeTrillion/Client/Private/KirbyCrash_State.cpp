@@ -134,16 +134,43 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 
 	if (pKirby->Get_State() == CKirby::CRASHSTATE_BIGATTACKFIRE)
 	{
+		static_cast<CCamera_Main*>(pCamera)->Zoom(20.f - (pKirby->Get_AnimRatio() * 20.f));
+		_float4 vMakingPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vMakingPos.y += (-DESC(m_fCrashChargeTime) + 2.5f);
 
 		_float fTime = m_pGameInstance->Get_OriginalTimer();
+
+		m_fParticleTime += fTimeDelta;
+		m_fRange += fTime * 4.f;
+
+		if (m_fParticleTime > 0.2f)
+		{
+			for (_int i = 0; i < 10; ++i)
+			{
+				_float4 vTemp = { m_fRange, 0.f, 0.f, 0.f };
+				_float4x4 RotMat = _float4x4::Identity;
+				CUtils::Turn_OtherMatrix(RotMat, XMVectorSet(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
+				vTemp = XMVectorSetW(XMVector3Transform(vTemp, RotMat), 0.f);
+				CCrashParticle::CRASHPARTICLEDESC Crashdesc = {};
+				Crashdesc.vPos = vMakingPos + vTemp;
+				Crashdesc.vDir = vTemp;
+				Crashdesc.vDir.Normalize();
+				Crashdesc.vDir.y += 1.f;
+				Crashdesc.vDir.Normalize();
+				Crashdesc.fSpeed = CUtils::Make_RandomFloat(60.f, 150.f);
+				Crashdesc.bGravity = true;
+				Crashdesc.fScale = { CUtils::Make_RandomFloat(0.1f, 0.6f) };
+				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_CrashParticle"), TEXT("Prototype_GameObject_CrashParticle"), &Crashdesc)))
+					return;
+			}
+			m_fParticleTime = 0.f;
+		}
 
 		DESC(m_fTimeRatio) += fTime * 0.3f;
 		if (DESC(m_fTimeRatio) > 1.f)
 			DESC(m_fTimeRatio) = 1.f;
 
-		m_pGameInstance->Get_DirectionLightAddress()->Interpolate_Light(_float4(0.02f, 0.02f, 0.02f, 0.02f), 1.f, 1.f);
-		m_pGameInstance->Set_ObjectBlack(0.1f, 1.f);
-
+		m_pGameInstance->Get_DirectionLightAddress()->Interpolate_Light(_float4(0.001f, 0.001f, 0.001f, 0.001f), 1.f, 1.f);
 		m_pGameInstance->Set_FirstTimerRatio(DESC(m_fTimeRatio));
 		m_pGameInstance->Set_SecondTimerRatio(DESC(m_fTimeRatio) * 0.2f);
 
@@ -173,13 +200,18 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 
 		}
 
-		pKirby->Large_Light(_float4(0.6f, 1.f, 1.f, 1.f), 5.f + (m_fLightRange * 5.f), 0.001f);
+		_float fLargeLight = 5.f + (m_fLightRange * 7.f);
+		if (fLargeLight < 5.f)
+			fLargeLight = 5.f;
+
+		pKirby->Large_Light(_float4(CUtils::Make_RandomFloat(0.1f, 1.f), CUtils::Make_RandomFloat(0.1f, 1.f), CUtils::Make_RandomFloat(0.1f, 1.f), 1.f), fLargeLight, 0.001f);
 		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), fOffset);
 
 		if (pKirby->isAnimFinish())
 		{
+			m_pGameInstance->Set_Brown(0.5f, true);
 			m_pGameInstance->Get_DirectionLightAddress()->Interpolate_Light(DESC(m_vPreDiffuseLight), 1.f, 2.f);
-			m_pGameInstance->Set_ObjectBlack(1.f, 2.f);
+			static_cast<CCamera_Main*>(pCamera)->Zoom(0.f);
 			m_bTerrainOn = true;
 		}
 
@@ -212,6 +244,9 @@ void CKirbyCrash_BigAttack_State::OnStateExit()
 
 	m_bLightRangeInv = false;
 	m_fLightRange = 0.f;
+
+	m_fParticleTime = 0.f;
+	m_fRange = 0.f;
 }
 
 CKirbyCrash_BigAttack_State* CKirbyCrash_BigAttack_State::Create()
@@ -267,6 +302,7 @@ void CKirbyCrash_Charge_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		m_fRockCreate = 0.f;
 	}
 
+	pKirby->Large_Light(_float4(0.9f, 1.f, 1.f, 1.f), 9.f, 0.001f);
 
 	if (m_bNextState == true)
 	{
@@ -452,6 +488,13 @@ void CKirbyCrash_BigCharge_State::OnStateUpdate(CGameObject* pGameObject, _float
 		// 1Æ½ ¹ßµ¿
 		if (m_bTrigger == true)
 		{
+			CParticle::PARTICLE_DESC FXPDesc{};
+			FXPDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			FXPDesc.vInitPos = _float3{ 0.f, 2.f, 0.f };
+			FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash Start Particle2"), &FXPDesc)))
+				return;
+
 			m_pGameInstance->Set_FirstTimerRatio(0.f);
 			m_pGameInstance->Set_SecondTimerRatio(0.f);
 			DESC(m_vPreDiffuseLight) = m_pGameInstance->Get_DirectionLightAddress()->Get_LightDesc()->vDiffuse;
@@ -470,6 +513,7 @@ void CKirbyCrash_BigCharge_State::OnStateUpdate(CGameObject* pGameObject, _float
 		return;
 	}
 
+	pKirby->Large_Light(_float4(0.9f, 1.f, 1.f, 1.f), 12.f, 0.001f);
 
 
 	if (pKirby->Get_State() == CKirby::CRASHSTATE_BIGATTACKCHARGESTART)

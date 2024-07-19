@@ -65,6 +65,7 @@ public: /* For.Renderer */
 	void Setting_LensFlare(_bool bOnOff);
 
 	void Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime = 0.f, _bool RealBlack = false);
+	void Set_Brown(_float fTime, _bool bOnOff);
 
 #ifdef _DEBUG
 public:

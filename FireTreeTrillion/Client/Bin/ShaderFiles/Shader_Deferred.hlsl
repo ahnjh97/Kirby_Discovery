@@ -188,6 +188,8 @@ float g_fOceanIntensity = { 0.f };
 float g_fObjectBlack = { 1.f };
 float g_fRealObjectBlack = { 1.f };
 
+float g_fBrownTone;
+
 
 float3 FOGY(float fWorldY, float4 vColor, float3 vFogColor, float fFogBottomY, float fFogTopY, float fintensity)
 {
@@ -1424,6 +1426,17 @@ PS_OUT PS_MAIN_COLORCORRECT(PS_IN In)
     
     Out.vColor = vColor + vLensFlare;
     
+    float fAvg = (Out.vColor.r + Out.vColor.g + Out.vColor.b) / 3;
+    float fBrownR = Out.vColor.r - fAvg;
+    float fBrownG = Out.vColor.g - fAvg;
+    float fBrownB = Out.vColor.b - fAvg;
+    Out.vColor.r -= fBrownR * g_fBrownTone;
+    Out.vColor.g -= fBrownG * g_fBrownTone;
+    Out.vColor.b -= fBrownB * g_fBrownTone;
+    
+    Out.vColor.r *= 1.f + (g_fBrownTone * 0.2f);
+    Out.vColor.b *= 1.f - (g_fBrownTone * 0.2f);
+
     Out.vColor = saturate(Out.vColor);
     return Out;
 }

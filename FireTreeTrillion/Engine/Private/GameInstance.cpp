@@ -453,6 +453,13 @@ void CGameInstance::Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime
 	m_pRenderer->Set_ObjectBlack(fObjectBlackTarget, fBlackTime, RealBlack);
 }
 
+void CGameInstance::Set_Brown(_float fTime, _bool bOnOff)
+{
+	if (nullptr == m_pRenderer)
+		return;
+	m_pRenderer->Set_Brown(fTime, bOnOff);
+}
+
 #ifdef _DEBUG
 
 HRESULT CGameInstance::Add_DebugComponents(CComponent* pRenderComponent)

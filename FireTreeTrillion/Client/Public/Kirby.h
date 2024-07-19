@@ -190,6 +190,7 @@ public:
 	void			Plus_Coin(_uint uCoin) { m_uCoin += uCoin;	}
 
 	_bool			isAnimFinish();
+	_float			Get_AnimRatio();
 	_float			Get_AnimTrackPosition();
 	void			DefaultIdle();
 
