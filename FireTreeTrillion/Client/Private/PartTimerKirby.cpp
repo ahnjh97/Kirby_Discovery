@@ -378,7 +378,7 @@ HRESULT CPartTimerKirby::Add_PartObjects()
 
 	CPartTimeFood::FOOD_DESC	FoodDesc{};
 	FoodDesc.pBoneMatrix = &m_matHand;
-	m_pPartTimeFood = static_cast<CPartTimeFood*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc));
+	m_pPartTimeFood = dynamic_cast<CPartTimeFood*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_PartTimeFood"), &FoodDesc));
 	CHECK_NULLPTR(m_pPartTimeFood);
 	m_pPartTimeFood->Set_Render(false);
 
