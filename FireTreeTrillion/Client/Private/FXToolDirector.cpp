@@ -2866,8 +2866,7 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 
 	static ImGuiTextFilter filter;
 	string szName;
-	Text(u8"검색");
-	filter.Draw();
+	filter.Draw(u8"복합 이펙트 검색");
 
 	BeginChild(u8"목록", ImVec2(0, 200), true);
 
