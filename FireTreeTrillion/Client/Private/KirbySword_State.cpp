@@ -1305,7 +1305,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			CEffect::FX_DESC FXSDesc{};
 			FXSDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 			FXSDesc.vInitPos = _float3{ 0.f, .5f, 0.f };
-			FXSDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+			FXSDesc.vInitScale = { 2.f, 2.f, 2.f };
 			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW SwordSpin Fin"), &FXSDesc)))
 				return;
 
@@ -1316,8 +1316,8 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Sword SpinFin Particle"), &FXPDesc)))
 			//	return;
 
-				DESC(m_bSwordCharge1) = true;
-				DESC(m_bSwordCharge2) = true;
+			DESC(m_bSwordCharge1) = true;
+			DESC(m_bSwordCharge2) = true;
 		}
 
 
