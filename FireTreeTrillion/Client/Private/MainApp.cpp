@@ -243,7 +243,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	path FXPath("../Bin/Resources/Effects/Single/");
 	if (!exists(FXPath) || !is_directory(FXPath))
 	{
-		ALARM_FAIL(TEXT("���߾� ��� ����"));
+		ALARM_FAIL("싱글이펙트 로드 망함");
 		return E_FAIL;
 	}
 
@@ -304,7 +304,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	FXPath = "../Bin/Resources/Effects/Particle/";
 	if (!exists(FXPath) || !is_directory(FXPath))
 	{
-		ALARM_FAIL(TEXT("���߾� ��� ����"));
+		ALARM_FAIL(TEXT("fail"));
 		return E_FAIL;
 	}
 
@@ -352,7 +352,12 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		InstanceDesc.fStartDelay = FXData.fStartDelay;
 		InstanceDesc.fStarDelayRandomOffset = FXData.fStarDelayRandomOffset;
 		InstanceDesc.vCenter = FXData.vCenter;
+
 		InstanceDesc.vRange = FXData.vRange;
+
+		InstanceDesc.fMinRange = FXData.fMinRange;
+		InstanceDesc.fMaxRange = FXData.fMaxRange;
+
 		InstanceDesc.vRotation = FXData.vRotation;
 		InstanceDesc.vRotationRandomOffset = FXData.vRotationRandomOffset;
 		InstanceDesc.vScale = FXData.vScale;
@@ -370,6 +375,8 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 		InstanceDesc.vColor = FXData.vColor;
 		InstanceDesc.vColorRandomOffset = FXData.vColorRandomOffset;
+		InstanceDesc.vTargetColor = FXData.vTargetColor;
+		InstanceDesc.vTargetColorRandomOffset = FXData.vTargetColorRandomOffset;
 		InstanceDesc.fAlpha = FXData.fAlpha;
 		InstanceDesc.fAlphaRandomOffset = FXData.fAlpha;
 		InstanceDesc.vPivot = FXData.vPivot;
