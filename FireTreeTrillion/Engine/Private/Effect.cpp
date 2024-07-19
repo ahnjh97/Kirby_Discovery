@@ -314,7 +314,9 @@ _float4 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProper
         //루프하지 않는다면, 마지막 키프레임 값으로 제한한다.
         else
         {
-            vResultValue = Quaternion::CreateFromYawPitchRoll(curKeyframes[m_iCurKeyframeIdxs[eProperty]].vValue);
+            //vResultValue = curKeyframes.back().vValue;
+
+            vResultValue = Quaternion::CreateFromYawPitchRoll(curKeyframes.back().vValue);
             return vResultValue;
         }
     }

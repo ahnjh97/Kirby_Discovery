@@ -48,6 +48,7 @@ HRESULT CAbility::Initialize(void* pArg)
 
 	if (ABILITY_DEFAULT == m_eAbilityType)
 	{
+		m_eCollisionGroup = 99;
 		_matrix matRotate = XMMatrixRotationY(ToRadian(m_fAngle));
 		m_vDir = XMVector3TransformNormal(m_vDir, matRotate);
 

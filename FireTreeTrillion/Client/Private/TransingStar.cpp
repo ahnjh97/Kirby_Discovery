@@ -67,7 +67,7 @@ _int CTransingStar::Tick(_float fTimeDelta)
     {
         // activate상태일 경우만 별들이 움직임니다.
         if (CUtils::Get_Scaled_Matrix(m_arrayStarMatrix[0]).x != 0.f)
-            Tick_AlphaStar(fTimeDelta);
+            Tick_AlphaStar(m_fTimeDelta);
 
         if (CUtils::Get_Scaled_Matrix(m_arrayStarMatrix[1]).x != 0.f)
             Tick_YeonDooStar(m_fTimeDelta);
@@ -192,7 +192,7 @@ void CTransingStar::Deactivate()
 void CTransingStar::Tick_AlphaStar(_float fTimeDelta)
 {
     if (m_fAlphaTime > 0.f)
-        m_fAlphaTime -= m_fTimeDelta * TIMEDELTA_OFFSET;
+        m_fAlphaTime -= fTimeDelta * TIMEDELTA_OFFSET;
     else
         m_fAlphaTime = 0.f;
 
@@ -211,18 +211,18 @@ void CTransingStar::Tick_YeonDooStar(_float fTimeDelta)
     {
         // 연두 돌아가유
         if (m_bDeadYeonDoo)
-            CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), m_fTimeDelta, 720.f);
+            CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta, 720.f);
         else
-            CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), m_fTimeDelta * TIMEDELTA_OFFSET, g_fTurnOffset);
+            CUtils::Turn_OtherMatrix(m_arrayStarMatrix[1], _float4(0.f, 0.f, 1.f, 0.f), fTimeDelta * TIMEDELTA_OFFSET, g_fTurnOffset);
 
         // 연두 사이즈 감소
-        m_fDecreaseValue += m_fTimeDelta * m_fDecreaseOffset * TIMEDELTA_OFFSET;
+        m_fDecreaseValue += fTimeDelta * m_fDecreaseOffset * TIMEDELTA_OFFSET;
         CUtils::Set_Scaled_Matrix(m_arrayStarMatrix[1], m_InitialSize.x - m_fDecreaseValue, m_InitialSize.y - m_fDecreaseValue, 1.f);
 
         // 연두가 투명해지는 조건 == m_fYeonDooTime(1초)가 되었을때
         if (m_fYeonDooTime <= 0.f)
             m_bDeadYeonDoo = true;
-        m_fYeonDooTime -= m_fTimeDelta * TIMEDELTA_OFFSET;
+        m_fYeonDooTime -= fTimeDelta * TIMEDELTA_OFFSET;
 
         // 사이즈가 다시 커지는 것에 대한 예외처리
         if (m_InitialSize.x <= m_fDecreaseValue)
@@ -244,7 +244,7 @@ void CTransingStar::Tick_GreenStar(_float fTimeDelta)
     {
         if (m_InitialSize.x <= m_fDecreaseValue)
         {
-            m_fMovingTime += m_fTimeDelta;
+            m_fMovingTime += fTimeDelta;
             if (m_fMovingTime >= 2.f)
             {
                 m_fMovingTime = 0.f;

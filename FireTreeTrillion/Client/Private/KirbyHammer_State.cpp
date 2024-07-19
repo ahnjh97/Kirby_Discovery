@@ -2,8 +2,6 @@
 #include "KirbyHammer_State.h"
 #include "Kirby_State_Function.h"
 
-#include "Fire.h"
-
 void MakeFireHammer(CTransform* pTransformCom, _float Scale)
 {
 	_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
@@ -355,7 +353,6 @@ void CKirbyHammer_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			CParticle::PARTICLE_DESC ParticleDesc{};
 			ParticleDesc.vInitPos = (_float3)vHammerHitPos;
 			ParticleDesc.vInitRot = vRot;
-			ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
 			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_start particle test A"), &ParticleDesc)))
 				return;
 
@@ -468,7 +465,6 @@ void CKirbyHammer_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 				CParticle::PARTICLE_DESC ParticleDesc{};
 				ParticleDesc.vInitPos = (_float3)vHammerHitPos;
 				ParticleDesc.vInitRot = vRot;
-				ParticleDesc.vInitScale = { 3.f, 3.f, 2.f };
 				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_start particle test A"), &ParticleDesc)))
 					return;
 

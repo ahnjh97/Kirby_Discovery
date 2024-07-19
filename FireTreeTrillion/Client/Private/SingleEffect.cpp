@@ -143,11 +143,14 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 	Quaternion vCurQuat = Calculate_CurValue_Slerp(fMyTimeDelta, KF_ROT);
 	_float3 vRadianEuler = vCurQuat.ToEuler();
 	m_vCurRot = { ToDegree(vRadianEuler.x), ToDegree(vRadianEuler.y), ToDegree(vRadianEuler.z) };
+
+
 	m_vCurScale = Calculate_CurValue_Lerp(fMyTimeDelta, KF_SCALE);
 
 	m_vCurRColor = Calculate_CurValue_Lerp(fMyTimeDelta, KF_RCOLOR);
 	m_vCurGColor = Calculate_CurValue_Lerp(fMyTimeDelta, KF_GCOLOR);
 	m_vCurBColor = Calculate_CurValue_Lerp(fMyTimeDelta, KF_BCOLOR);
+
 	m_fCurAlpha = Calculate_CurValue_Lerp(fMyTimeDelta, KF_ALPHA).x;
 	m_fCurMaskThreshold = Calculate_CurValue_Lerp(fMyTimeDelta, KF_MASK).x;
 
@@ -165,16 +168,17 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 	if (KF_MASKUVANGLE < m_Keyframes.size())
 		m_vCurMaskUVAngle = Calculate_CurValue_Lerp(fMyTimeDelta, KF_MASKUVANGLE).x;
 
+
 	//초기 회전 세팅
 	_float3 vInitRadianRot = { ToRadian(m_vInitRot.x), ToRadian(m_vInitRot.y) , ToRadian(m_vInitRot.z) };
-
-
 	_float4x4 RotMat = _float4x4::CreateFromYawPitchRoll(vInitRadianRot);
 	_float3 vDir = _float3::TransformNormal(m_vCurPos, RotMat);
 
 
+	//위치 갱신
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Pos(m_vInitPos) + Dir(vDir * m_vInitScale));
 
+	//회전 갱신
 	Quaternion vInitQuat = Quaternion::CreateFromYawPitchRoll(vInitRadianRot);
 
 	_float3 vCurContinueRot = { ToRadian(m_vContinuousRotation.x), ToRadian(m_vContinuousRotation.y) , ToRadian(m_vContinuousRotation.z) };
@@ -184,8 +188,10 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 
 	m_pTransformCom->Turn_Absolute(vResultQuat);
 
+	//크기 갱신
 	m_pTransformCom->Set_Scaled(m_vInitScale * m_vCurScale);
 
+	//소켓 매트릭스
 	if (m_pSoketMatrix != nullptr)
 	{
 		_float4x4 socketMatrix = *m_pSoketMatrix;

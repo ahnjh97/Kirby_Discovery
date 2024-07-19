@@ -52,13 +52,9 @@ HRESULT CRayArrow::Initialize(void* pArg)
 
 	_float3		vScaled = m_pTransformCom->Get_Scaled();
 
-	//m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScaled.x);
-	//m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScaled.y);
-	//m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScaled.z);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);
 	m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), 1.f);
-	//m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), -0.5f);
 
 	m_vRight = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
 	m_vUp = m_pTransformCom->Get_State_Vector(CTransform::STATE_UP);
@@ -66,6 +62,13 @@ HRESULT CRayArrow::Initialize(void* pArg)
 
 	m_fRotateSpeed = 10.f;
 	m_bNonDead = true;
+
+	CEffect::FX_DESC FXDesc{};
+	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	//FXDesc.vInitPos = { 0.f, 3.f, 0.f };
+	FXDesc.vInitScale = { 1.2f, 1.2f, 1.2f };
+
+	Add_Effect("HS_RayArrow test", FXDesc, true);
 
 	return S_OK;
 }
@@ -97,13 +100,13 @@ _int CRayArrow::Tick(_float fTimeDelta)
 		m_bFireActive = true;
 	}
 
-	if(true == m_bFireActive)
+	if (true == m_bFireActive)
 		m_fFireTime += fTimeDelta;
 
 	// 화살 발사
 	if (true == m_bFire)
 	{
-		if(m_fDelayTime < m_fFireTime)
+		if (m_fDelayTime < m_fFireTime)
 		{
 			m_fRotateTime += m_fTimeDelta;
 			if (0.5f > m_fRotateTime)
@@ -124,9 +127,27 @@ _int CRayArrow::Tick(_float fTimeDelta)
 					m_pTransformCom->Look_At_Axis(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - XMVectorSetW(vNewPosition, 1.f));
 					m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSetW(vNewPosition, 1.f));
 					m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), ToRadian(-m_fAngle));
+
+					m_fFlyingTime += fTimeDelta;
+					if (.1f < m_fFlyingTime)
+					{
+						CEffect::FX_DESC FXDesc{};
+						FXDesc.vInitPos = GET_POS;
+						Add_Effect("HS_FB_arrow trail dot", FXDesc);
+						m_fFlyingTime = 0.f;
+					}
 				}
 				else
 				{
+					if (!m_bCollided)
+					{
+						CMultiEffect::MULTI_FX_DESC FXDesc{};
+						FXDesc.vInitPos = (_float3)GET_POS + _float3{0.f, -.5f, 0.f};
+						FXDesc.vInitScale = {5.f, 5.f, 5.f};
+						Add_Effect("HS_ground arrow bomb", FXDesc);
+						m_bCollided = true;
+					}
+
 					// 땅에 박히고 n초 후 dead처리
 					m_fDeadTime += m_fTimeDelta;
 					if (1.f < m_fDeadTime)
@@ -142,7 +163,7 @@ _int CRayArrow::Tick(_float fTimeDelta)
 		}
 	}
 	// 화살 활성화
-	else if(true == m_bActive)
+	else if (true == m_bActive)
 	{
 		m_fTurnTime += m_fTimeDelta;
 		{
@@ -158,7 +179,7 @@ _int CRayArrow::Tick(_float fTimeDelta)
 			{
 				m_bFire = true;
 				m_bActive = false;
-				
+
 				m_vControllPos.m128_f32[0] = (m_vPosition.m128_f32[0] + m_vKirbyPos.m128_f32[0]) * 0.5f + m_vSide.m128_f32[0];
 				m_vControllPos.m128_f32[1] = (m_vPosition.m128_f32[1] + m_vKirbyPos.m128_f32[1]) * 0.5f + m_fHeight; // Y축 높이 조정
 				m_vControllPos.m128_f32[2] = (m_vPosition.m128_f32[2] + m_vKirbyPos.m128_f32[2]) * 0.5f + m_vSide.m128_f32[2];
@@ -182,6 +203,8 @@ void CRayArrow::Late_Tick(_float fTimeDelta)
 
 HRESULT CRayArrow::Render()
 {
+	return S_OK;
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -329,6 +352,8 @@ CGameObject* CRayArrow::Clone(void* pArg)
 
 void CRayArrow::Free()
 {
+	Delete_AllEffect();
+
 	__super::Free();
 
 	Safe_Release(m_pModelCom);

@@ -109,6 +109,9 @@ protected:
 	//피직스 오브젝트들에게 귀속되어 움직이는 이펙트들
 	list<CEffect*>	m_FXList;
 	_float4x4		m_EffectSocket;
+
+	// 소켓 업데이트를 하지 않을 놈들은 false 해주세요.
+	_bool	m_bUpdate_FXSocketMatrix = { true };
 };
 
 END
