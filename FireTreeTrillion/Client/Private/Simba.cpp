@@ -52,7 +52,7 @@ HRESULT CSimba::Initialize(void* pArg)
 		pMonDesc = (MONSTER_DESC*)pArg;
 		pMonDesc->fSpeedPerSec = 7.f;
 		pMonDesc->fRotationPerSec = XMConvertToRadians(90.0f);
-		m_eMonState = pMonDesc->eMonState;
+		m_eMonState = (MONSTER_STATE)pMonDesc->eMonState;
 	}
 
 	if (FAILED(__super::Initialize(pMonDesc)))

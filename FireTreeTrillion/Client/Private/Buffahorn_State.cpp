@@ -223,7 +223,7 @@ void CBuffahorn_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	_float fHeight = pController->Compute_Height(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK));
 
-	if(2.f < fHeight)
+	if(3.f < fHeight)
 	{
 		pBuffahorn->Set_JumpTime(15.f);
 		pBuffahorn->Set_BuffahornEye(CBuffahorn::BUFFAHORNEYE_IDLE);

@@ -24,15 +24,15 @@ HRESULT CPoppyBrosJr::Initialize_Prototype()
 
 HRESULT CPoppyBrosJr::Initialize(void* pArg)
 {
-	POPPY_DESC* pPoppySDesc = nullptr;
+	MONSTER_DESC* pPoppySDesc = nullptr;
 
 	if (nullptr != pArg)
 	{
-		pPoppySDesc = (POPPY_DESC*)pArg;
+		pPoppySDesc = (MONSTER_DESC*)pArg;
 
 		pPoppySDesc->fSpeedPerSec = 7.f;
 		pPoppySDesc->fRotationPerSec = XMConvertToRadians(90.0f);
-		m_ePoppyState = pPoppySDesc->ePoppyState;
+		m_ePoppyState = (POPPY_STATE)pPoppySDesc->eMonState;
 	}
 
 	if (FAILED(__super::Initialize(pPoppySDesc)))
@@ -223,7 +223,7 @@ HRESULT CPoppyBrosJr::Add_Components()
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = vPos;
-	desc.fOffset = 0.8f;
+	desc.fOffset = 0.6f;
 	desc.tCapsuleShape.fRadius = 0.4f;
 	desc.tCapsuleShape.fHeight = 0.4f;
 	desc.uCollisionType = m_eCollisionGroup;
