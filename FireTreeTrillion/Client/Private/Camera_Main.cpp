@@ -250,11 +250,13 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	//여러 이벤트에 함수를 등록한다.
 	Subscribe_Events();
 
+	//y로 올리는 오프셋
 	m_CamTriggerUpOffsets.reserve(LEVEL_END);
 	m_CamTriggerUpOffsets.resize(LEVEL_END);
+
 	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f };
 	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .05f };
-	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f , .4f , .5f , 0.2f , 0.2f, 0.f };
+	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f, .4f, .5f, 0.2f, 0.2f, 0.f };
 
 
 	//시퀀스 이벤트 트리거를 초기화

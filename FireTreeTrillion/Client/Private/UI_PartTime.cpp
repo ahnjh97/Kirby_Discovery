@@ -491,6 +491,7 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 	if (m_fStandardTime - m_fBeforeTime >= 1.f)
 	{
 		m_fCurTime = 50.f - m_fStandardTime;
+		//m_fCurTime = 10.f - m_fStandardTime;
 		if (m_fCurTime <= 0.f) m_fCurTime = 0.f;
 		Change_TimeTexures(m_fCurTime);
 
@@ -581,20 +582,20 @@ void CUI_PartTime::Repose_ScoreTextures()
 	m_arrPosition[14] = _float2(-100.f, -100.f);
 
 	_float fScore = m_arrScoreDigits[0] * 100 + m_arrScoreDigits[1] * 10 + m_arrScoreDigits[2];
-	if (fScore <= 0.f)// 0일 때
+	if (fScore <= 0.f)				// 0일 때
 	{
 		m_arrPosition[14] = _float2(180.f, 817.f);
 	}
-	else if (fScore < 100.f)// 십의 자리 일때
+	else if (fScore < 100.f)		// 십의 자리 일때
 	{
 		m_arrPosition[13] = _float2(157.5f, 817.f);
 		m_arrPosition[14] = _float2(202.5f, 817.f);
 	}
 	else // 백의 자리 일때
 	{
-		m_arrPosition[12] = _float2(135.f, 817.f);
-		m_arrPosition[13] = _float2(180.f, 817.f);
-		m_arrPosition[14] = _float2(225.f, 817.f);
+		m_arrPosition[12] = _float2(138.f, 817.f);
+		m_arrPosition[13] = _float2(180.f, 817.f);	
+		m_arrPosition[14] = _float2(222.f, 817.f);
 	}
 }	
 

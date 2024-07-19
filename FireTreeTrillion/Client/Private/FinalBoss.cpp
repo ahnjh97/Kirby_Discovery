@@ -675,20 +675,61 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 			pCamera->Make_Shake(0.3f, 0.5f);
 
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
+
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
+		Add_Effect("HS_FB slash R", FXDesc);
+
+		CParticle::PARTICLE_DESC ParticleDesc{};
+		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
+		Add_Effect("HS_FinalBossSlash particle L", FXDesc);
+
 	}
-		break;
+	break;
 	case FINALBOSS_SWINGLEFT:
+	{
 		if (pCamera != nullptr)
 			pCamera->Make_Shake(0.3f, 0.5f);
 
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
-		break;
+
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
+		Add_Effect("HS_FB slash L", FXDesc);
+
+		CParticle::PARTICLE_DESC ParticleDesc{};
+		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
+		Add_Effect("HS_FinalBossSlash particle R", FXDesc);
+	}
+	break;
 	case FINALBOSS_SWINGFINISHLEFT:
+	{
 		if (pCamera != nullptr)
 			pCamera->Make_Shake(0.3f, 0.5f);
 
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
-		break;
+
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
+		Add_Effect("HS_FB slash L", FXDesc, true);
+
+		CParticle::PARTICLE_DESC ParticleDesc{};
+		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
+		Add_Effect("HS_FinalBossSlash particle R", FXDesc);
+	}
+	break;
 	default:
 		break;
 	}
