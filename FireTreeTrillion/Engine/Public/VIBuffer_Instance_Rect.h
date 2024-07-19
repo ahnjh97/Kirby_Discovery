@@ -24,6 +24,7 @@ public:
 	virtual _float Compute_RandOrbitSpeed() override;
 
 	virtual _float4 Compute_RandColor() override;
+	virtual _float4 Compute_RandTargetColor() override;
 
 	virtual _float4 Compute_RandRangePosition() override;
 

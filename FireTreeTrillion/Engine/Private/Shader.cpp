@@ -49,11 +49,14 @@ HRESULT CShader::Initialize_Prototype(const wstring & strShaderFilePath, const D
 		
 
 		if (FAILED(m_pDevice->CreateInputLayout(/* 내 정점의 구성정보*/pElements,
-			iNumElements, 
+			iNumElements,
 			PassDesc.pIAInputSignature,
 			PassDesc.IAInputSignatureSize,
 			&pInputLayout)))
+		{
+			ALARM_FAIL("createInputLayout 망");
 			return E_FAIL;
+		}
 
 		m_InputLayouts.push_back(pInputLayout);
 	}

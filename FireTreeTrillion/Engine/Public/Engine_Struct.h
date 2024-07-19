@@ -79,9 +79,16 @@ namespace Engine
 		_float		fOrbitSpeed = { 1.f };
 		_float		fOrbitSpeedRandomOffset;
 
+		_float		fAccSupplyAmount = { 1.f };
+		_float		fTurnSupplyAmount = { 1.f };
 
 		_float3		vColor = {1.f, 1.f, 1.f};
 		_float3		vColorRandomOffset;
+
+		_float3		vTargetColor = { 1.f, 1.f, 1.f };
+		_float3		vTargetColorRandomOffset;
+
+		_float3		vRotationAxis = { 0.f, 1.f, 0.f };
 
 		_float		fAlpha = {1.f};
 		_float		fAlphaRandomOffset;
@@ -197,32 +204,43 @@ namespace Engine
 
 
 		//시작 범위(랜덤X)
-		_float3		vCenter;
-		_float3		vRange;
+		_float3		vCenter = { 0.f, 0.f, 0.f };
+		_float3		vRange = { 1.f, 1.f, 1.f };
+
+		//구 기반 범위
+		_float		fMinRange = { 0.f };
+		_float		fMaxRange = { 1.f };
 
 		//회전
-		_float3		vRotation;
-		_float3		vRotationRandomOffset;
+		_float3		vRotation = { 0.f, 0.f, 0.f };
+		_float3		vRotationRandomOffset = { 0.f, 0.f, 0.f };
 
 		//크기
 		_float3		vScale = { 1.f, 1.f, 1.f };
 		_float3		vScaleRandomOffset;
 
 		_float3		vDir = { 1.f, 1.f, 1.f };
-		_float3		vDirRandomOffset;
+		_float3		vDirRandomOffset = { 0.f, 0.f, 0.f };
 
 		_float		fSpeed = { 1.f };
-		_float		fSpeedRandomOffset;
+		_float		fSpeedRandomOffset = { 0.f };
 
 		_float		fOrbitSpeed = { 1.f };
-		_float		fOrbitSpeedRandomOffset;
+		_float		fOrbitSpeedRandomOffset = { 0.f };
+
+		_float		fAccSupplyAmount = { 1.f };
+		_float		fTurnSupplyAmount = { 1.f };
 
 		_float3		vColor = { 1.f, 1.f, 1.f };
 		_float3		vColorRandomOffset;
 
+		_float3		vTargetColor = { 1.f, 1.f, 1.f };
+		_float3		vTargetColorRandomOffset;
+
 		_float		fAlpha = { 1.f };
 		_float		fAlphaRandomOffset;
 
+		_float3		vRotationAxis = { 0.f, 1.f, 0.f };
 
 		//기준점(랜덤X)
 		_float3		vPivot;

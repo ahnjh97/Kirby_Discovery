@@ -28,6 +28,7 @@ public:
 	virtual _float Compute_RandOrbitSpeed() = 0;
 	//Color + Alpha 계산
 	virtual _float4 Compute_RandColor() = 0;
+	virtual _float4 Compute_RandTargetColor() = 0;
 	// 범위 기준 랜덤 선택일 때, 랜덤으로 포지셔닝이 된다.
 	virtual _float4 Compute_RandRangePosition() = 0;
 
@@ -42,6 +43,8 @@ public:
 	void Apply_Velocity(_float fTimeDelta, VTXMATRIX* pVertices);
 
 	//virtual void Assemble(_float fTimeDelta, VTXMATRIX* pVertices);
+
+	virtual void SimpleMove(_float fTimeDelta, VTXMATRIX* pVertices);
 
 	virtual void Drop(_float fTimeDelta, VTXMATRIX* pVertices);
 	virtual void Spread(_float fTimeDelta, VTXMATRIX* pVertices);
@@ -67,6 +70,9 @@ public:
 	//공전 감속, 가속한다.
 	virtual void OrbitAcceleration(_float fTimeDelta, VTXMATRIX* pVertices);
 	virtual void OrbitDecelerate(_float fTimeDelta, VTXMATRIX* pVertices);
+
+	// 색상이 보간된다
+	virtual void Color_Interpolate(_float fTImeDelta, VTXMATRIX* pVertices);
 
 	virtual void Save_PrePos(VTXMATRIX* pVertices);
 
@@ -111,6 +117,8 @@ protected:
 	_float*						m_pSpeeds = { nullptr };
 
 	_float3*					m_pColors = { nullptr };
+	_float3*					m_pTargetColors = { nullptr };
+
 	_float*						m_pAlphas = { nullptr };
 
 	// Orbit 도는 속도 (Degree값) 랜덤 필요함
@@ -131,6 +139,7 @@ protected:
 
 	_float3*					m_pPreAxis = { nullptr };
 
+	_float*						m_fGravity = { nullptr };
 	
 
 	//void	Update_Buffer(_uint _iNumInstance);

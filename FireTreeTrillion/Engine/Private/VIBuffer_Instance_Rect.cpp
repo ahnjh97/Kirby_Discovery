@@ -211,6 +211,11 @@ _float4 CVIBuffer_Instance_Rect::Compute_RandColor()
 	return _float4();
 }
 
+_float4 CVIBuffer_Instance_Rect::Compute_RandTargetColor()
+{
+	return _float4();
+}
+
 _float4 CVIBuffer_Instance_Rect::Compute_RandRangePosition()
 {
 	return _float4();

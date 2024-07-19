@@ -1,6 +1,32 @@
 #include "VIBuffer_Instance_Point.h"
 #include "GameInstance.h"
 
+
+void AdjustVertex( _float4& vVec, _float fScaleX, _float fScaleY, _float fScaleZ)
+{
+	// 원래 구의 반경 (길이)
+	_float radius = sqrt(vVec.x * vVec.x + vVec.y * vVec.y + vVec.z * vVec.z);
+
+	// 비율에 따른 조정된 정점
+	_float3 scaledVertex;
+	scaledVertex.x = vVec.x * fScaleX;
+	scaledVertex.y = vVec.y * fScaleY;
+	scaledVertex.z = vVec.z * fScaleZ;
+
+	// 조정된 반경 계산
+	_float scaledRadius = sqrt(scaledVertex.x * scaledVertex.x + scaledVertex.y * scaledVertex.y + scaledVertex.z * scaledVertex.z);
+
+	// 구의 표면에 위치하도록 조정
+	_float scaleFactor = radius / scaledRadius;
+	_float3 adjustedVertex;
+	adjustedVertex.x = scaledVertex.x * scaleFactor;
+	adjustedVertex.y = scaledVertex.y * scaleFactor;
+	adjustedVertex.z = scaledVertex.z * scaleFactor;
+
+	vVec = Pos(adjustedVertex);
+}
+
+
 CVIBuffer_Instance_Point::CVIBuffer_Instance_Point(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CVIBuffer_Instance{ pDevice, pContext }
 {
@@ -165,6 +191,9 @@ HRESULT CVIBuffer_Instance_Point::Initialize(void * pArg)
 	m_iNumInstance = instanceDesc.iNumInstance;
 	m_InstanceDesc = instanceDesc;
 
+	if (0 == instanceDesc.iNumInstance)
+		instanceDesc.iNumInstance = 1;
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -225,10 +254,18 @@ _float CVIBuffer_Instance_Point::Compute_RandOrbitSpeed()
 
 _float4 CVIBuffer_Instance_Point::Compute_RandColor()
 {
-	return { /*SATURATE*/(m_InstanceDesc.vColor.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.x, m_InstanceDesc.vColorRandomOffset.x)),
-				/*SATURATE*/(m_InstanceDesc.vColor.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.y, m_InstanceDesc.vColorRandomOffset.y)),
-				/*SATURATE*/(m_InstanceDesc.vColor.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.z, m_InstanceDesc.vColorRandomOffset.z)),
-				/*SATURATE*/(m_InstanceDesc.fAlpha + CUtils::Make_RandomFloat(-m_InstanceDesc.fAlphaRandomOffset, m_InstanceDesc.fAlphaRandomOffset)) };
+	return { SATURATE(m_InstanceDesc.vColor.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.x, m_InstanceDesc.vColorRandomOffset.x)),
+				SATURATE(m_InstanceDesc.vColor.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.y, m_InstanceDesc.vColorRandomOffset.y)),
+				SATURATE(m_InstanceDesc.vColor.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vColorRandomOffset.z, m_InstanceDesc.vColorRandomOffset.z)),
+				SATURATE(m_InstanceDesc.fAlpha + CUtils::Make_RandomFloat(-m_InstanceDesc.fAlphaRandomOffset, m_InstanceDesc.fAlphaRandomOffset)) };
+}
+
+_float4 CVIBuffer_Instance_Point::Compute_RandTargetColor()
+{
+	return { SATURATE(m_InstanceDesc.vTargetColor.x + CUtils::Make_RandomFloat(-m_InstanceDesc.vTargetColorRandomOffset.x, m_InstanceDesc.vTargetColorRandomOffset.x)),
+				SATURATE(m_InstanceDesc.vTargetColor.y + CUtils::Make_RandomFloat(-m_InstanceDesc.vTargetColorRandomOffset.y, m_InstanceDesc.vTargetColorRandomOffset.y)),
+				SATURATE(m_InstanceDesc.vTargetColor.z + CUtils::Make_RandomFloat(-m_InstanceDesc.vTargetColorRandomOffset.z, m_InstanceDesc.vTargetColorRandomOffset.z)),
+				1.f };
 }
 
 _float4 CVIBuffer_Instance_Point::Compute_RandRangePosition()
@@ -236,24 +273,72 @@ _float4 CVIBuffer_Instance_Point::Compute_RandRangePosition()
 	if (m_InstanceDesc.fMinRange >= m_InstanceDesc.fMaxRange)
 		return _float4();
 
-	_float3 vCenter = m_InstanceDesc.vCenter;
 
+	_float3 vCenter = m_InstanceDesc.vCenter;
+	_float4 vPos = vCenter + (_float3)CUtils::Make_Random_Vector(CUtils::Make_RandomFloat(m_InstanceDesc.fMinRange, m_InstanceDesc.fMaxRange));
+	
+	AdjustVertex(vPos, m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.z);
+	AdjustVertex(vPos, m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.z);
+	AdjustVertex(vPos, m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.z);
+	AdjustVertex(vPos, m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.z);
+	/*
+
+	_float3 vDir = { CUtils::Make_RandomFloat(m_InstanceDesc.fMinRange, m_InstanceDesc.fMaxRange), 0.f, 0.f };
+
+	_float4x4 RotMat = _float4x4::Identity;
+	CUtils::Turn_OtherMatrix(RotMat, {0.f, 1.f, 0.f}, 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
+
+	vDir = XMVector4Transform(vDir, RotMat);
+
+
+	_float4 vPos = vDir;
+
+	vPos.y = CUtils::Make_RandomFloat(vCenter.y - m_InstanceDesc.vRange.y, vCenter.y + m_InstanceDesc.vRange.y);
+
+	return vPos;
+
+
+	_float fMinY = vCenter.y - m_InstanceDesc.vRange.y;
+	_float fMaxY = vCenter.y + m_InstanceDesc.vRange.y;
+
+	//2안
+	
+	if(vPos.y < fMinY || fMaxY < vPos.y)
+		vPos.y = CUtils::Make_RandomFloat(vCenter.y - m_InstanceDesc.vRange.y, vCenter.y + m_InstanceDesc.vRange.y);
+
+	*/
+
+	/*
 	_float4 vPos = vCenter + (_float3)CUtils::Make_Random_Vector(CUtils::Make_RandomFloat(m_InstanceDesc.fMinRange, m_InstanceDesc.fMaxRange));
 
 	_float fMinX = vCenter.x - m_InstanceDesc.vRange.x;
 	_float fMaxX = vCenter.x + m_InstanceDesc.vRange.x;
-	_float fMinY = vCenter.y - m_InstanceDesc.vRange.y;
-	_float fMaxY = vCenter.y + m_InstanceDesc.vRange.y;
 	_float fMinZ = vCenter.z - m_InstanceDesc.vRange.z;
 	_float fMaxZ = vCenter.z + m_InstanceDesc.vRange.z;
 
-	if (vPos.x < fMinX || vPos.x > fMaxX)
-		vPos.x = MAPVALUE(vPos.x, vCenter.x - m_InstanceDesc.fMaxRange, vCenter.x + m_InstanceDesc.fMaxRange, fMinX, fMaxX);
-	if (vPos.y < fMinY || vPos.y > fMaxY)
-		vPos.y = MAPVALUE(vPos.y, vCenter.y - m_InstanceDesc.fMaxRange, vCenter.y + m_InstanceDesc.fMaxRange, fMinY, fMaxY);
-	if (vPos.z < fMinZ || vPos.z > fMaxZ)
-		vPos.z = MAPVALUE(vPos.z, vCenter.z - m_InstanceDesc.fMaxRange, vCenter.z + m_InstanceDesc.fMaxRange, fMinZ, fMaxZ);
 
+	if (vPos.y < fMinY || vPos.y > fMaxY)
+	{
+		_float fRatio = vPos.y / ((vCenter.y + m_InstanceDesc.fMaxRange) - (vCenter.y - m_InstanceDesc.fMaxRange));
+		vPos.y = fMinY + (fRatio * (fMaxY - fMinY));
+	}
+	if (vPos.x < fMinX || vPos.x > fMaxX)
+	{
+		_float fRatio = vPos.x / ((vCenter.x + m_InstanceDesc.fMaxRange) - (vCenter.x - m_InstanceDesc.fMaxRange));
+		vPos.x = fMinX + (fRatio * (fMaxX - fMinX));
+	}
+	if (vPos.z < fMinZ || vPos.z > fMaxZ)
+	{
+		_float fRatio = vPos.z / ((vCenter.z + m_InstanceDesc.fMaxRange) - (vCenter.z - m_InstanceDesc.fMaxRange));
+		vPos.z = fMinZ + (fRatio * (fMaxZ - fMinZ));
+	}
+
+	if (vPos.x < fMinX || )
+	{
+		vPos.x < vCenter.x ?
+
+	}
+	*/
 	return vPos;
 }
 

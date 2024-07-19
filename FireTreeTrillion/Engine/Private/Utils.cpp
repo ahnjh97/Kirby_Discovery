@@ -165,7 +165,7 @@ _float3 CUtils::Make_Degree_FromDir(const _float4& _dir)
 	Quaternion vQuat = Make_Quat_FromDir(_dir);
 	_float3 vEulerAngle = vQuat.ToEuler();
 
-	return _float3( ToDegree(vEulerAngle.x), ToDegree(vEulerAngle.y), ToDegree(vEulerAngle.z) );
+	return _float3(ToDegree(vEulerAngle.x), ToDegree(vEulerAngle.y), ToDegree(vEulerAngle.z));
 }
 
 _float3 CUtils::Make_Degree_FromDir(const _float3& _dir)
@@ -183,7 +183,7 @@ _float3 CUtils::SlerpDirVec(_float3 vStart, _float3 vEnd, _float fRatio)
 	_float fTheta = acosf(fDot) * fRatio;
 	_float3 vRelative = XMVector3Normalize(vEnd - vStart * fRatio);
 
-	return XMVector3Normalize( vStart * cosf(fTheta) + vRelative * sinf(fTheta) );
+	return XMVector3Normalize(vStart * cosf(fTheta) + vRelative * sinf(fTheta));
 }
 
 _vector CUtils::TurnDirectionVector(_fvector vDirVec, _float3 vAxis, _float fAngle)
@@ -212,8 +212,8 @@ void CUtils::Set_State_Matrix(_Inout_ _float4x4& matrix, STATE eState, const _fl
 void CUtils::Set_Scaled_Matrix(_Inout_ _float4x4& matrix, _float fScaleX, _float fScaleY, _float fScaleZ)
 {
 	Set_State_Matrix(matrix, STATE_RIGHT, XMVector3Normalize(Get_State_Vector_Matrix(matrix, STATE_RIGHT)) * fScaleX);
-	Set_State_Matrix(matrix, STATE_UP,    XMVector3Normalize(Get_State_Vector_Matrix(matrix, STATE_UP))    * fScaleY);
-	Set_State_Matrix(matrix, STATE_LOOK,  XMVector3Normalize(Get_State_Vector_Matrix(matrix, STATE_LOOK))  * fScaleZ);
+	Set_State_Matrix(matrix, STATE_UP, XMVector3Normalize(Get_State_Vector_Matrix(matrix, STATE_UP)) * fScaleY);
+	Set_State_Matrix(matrix, STATE_LOOK, XMVector3Normalize(Get_State_Vector_Matrix(matrix, STATE_LOOK)) * fScaleZ);
 }
 
 _vector CUtils::Get_State_Vector_Matrix(_Inout_ _float4x4& matrix, STATE eState)
@@ -298,7 +298,7 @@ _float3 CUtils::Make_World_ToScreen(_float3 vPos)
 
 	return vPos;
 }
- 
+
 _float3 CUtils::Make_Screen_ToWorld(_float3 vPos)
 {
 	vPos = _float3::Transform(vPos, CGameInstance::Get_Instance()->Get_Transform_Inv(CPipeLine::D3DTS_PROJ));
@@ -314,7 +314,7 @@ ImVec2 CUtils::WorldPosTo_ImguiProjPos(_float3 vWorldPos)
 	CGameInstance* pGameInstance = CGameInstance::Get_Instance();
 
 	_float4x4 VPMatrix = pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW) *
-						 pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ);
+		pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ);
 
 
 	_float2 vWinSize = pGameInstance->Get_WinSize();
@@ -347,7 +347,7 @@ _float4x4 CUtils::To_Float4x4(const physx::PxMat44& mat)
 	return out;
 }
 
-PxVec3 CUtils::To_PxVec3(const _fvector& vector) 
+PxVec3 CUtils::To_PxVec3(const _fvector& vector)
 {
 	_float3 temp;
 	XMStoreFloat3(&temp, vector);
@@ -550,6 +550,9 @@ HRESULT CUtils::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	InputFile.read(reinterpret_cast<char*>(&_pData->vCenter), sizeof(_float3));
 	InputFile.read(reinterpret_cast<char*>(&_pData->vRange), sizeof(_float3));
 
+	InputFile.read(reinterpret_cast<char*>(&_pData->fMinRange), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fMaxRange), sizeof(_float));
+
 	InputFile.read(reinterpret_cast<char*>(&_pData->vRotation), sizeof(_float3));
 	InputFile.read(reinterpret_cast<char*>(&_pData->vRotationRandomOffset), sizeof(_float3));
 
@@ -565,11 +568,14 @@ HRESULT CUtils::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeed), sizeof(_float));
 	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeedRandomOffset), sizeof(_float));
 
-	//InputFile.read(reinterpret_cast<char*>(&_pData->fAccSupplyAmount), sizeof(_float));
-	//InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSupplyAmount), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fAccSupplyAmount), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSupplyAmount), sizeof(_float));
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->vColor), sizeof(_float3));
 	InputFile.read(reinterpret_cast<char*>(&_pData->vColorRandomOffset), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&_pData->vTargetColor), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&_pData->vTargetColorRandomOffset), sizeof(_float3));
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->fAlpha), sizeof(_float));
 	InputFile.read(reinterpret_cast<char*>(&_pData->fAlphaRandomOffset), sizeof(_float));
@@ -577,6 +583,7 @@ HRESULT CUtils::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->vPivot), sizeof(_float3));
 
+	InputFile.read(reinterpret_cast<char*>(&_pData->vRotationAxis), sizeof(_float3));
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->iMoveCommandsNum), sizeof(_int));
 	_pData->vecMoveCommands.clear();

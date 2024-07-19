@@ -22,9 +22,9 @@ struct VS_IN
 {
     float3 vPosition : POSITION;
     row_major float4x4 TransformMatrix : WORLD;
-    bool bAlive : COLOR0;
-    float fAngleZ : COLOR1;
-    float4 vColor : TEXCOORD0;
+    bool    bAlive      : COLOR0;
+    float   fAngleZ     : COLOR1;
+    float4  vColor      : COLOR2;
 };
 
 
@@ -39,13 +39,6 @@ struct VS_OUT
     float4 vProjPos : TEXCOORD1;
 };
 
-//struct VS_OUT_ALPHABLEND
-//{
-//    float4 vPosition : POSITION;
-//    float2 vPSize : PSIZE;
-//    float4 bAlive : COLOR0;
-//    float4 vProjPos : TEXCOORD1;
-//};
 
 float2 RotateZ(float2 vVec, float fAngle)
 {
@@ -158,7 +151,6 @@ struct GS_IN
     bool bAlive : COLOR0;
     float fAngleZ : COLOR1;
     float4 vColor : COLOR2;
-
     float4 vProjPos : TEXCOORD1;
 };
 
