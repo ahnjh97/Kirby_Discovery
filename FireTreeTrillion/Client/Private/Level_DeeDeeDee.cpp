@@ -22,6 +22,8 @@
 #include "UI_Fading.h"
 
 
+#define SOUND_TRIGGER_Z		-100.f
+
 CLevel_DeeDeeDee::CLevel_DeeDeeDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
@@ -103,18 +105,19 @@ void CLevel_DeeDeeDee::Ready_FadeIn()
 	CUI_Fading* pFadingUI = dynamic_cast<CUI_Fading*>(pUIObj);
 
 	// FadingUI가 이전에 FadeOut 안되어있다면 NO FadeIn
-	if (pFadingUI->Get_State() != CUI_Fading::FADEOUT) return;
+	//if (pFadingUI->Get_State() != CUI_Fading::FADEOUT) return;
 	
-	if (bOnceFade == false)
+	if (bOnceChanger == false)
 	{
-		pFadingUI->Set_InOutState(CUI_Fading::FADEIN);
-		pFadingUI->Set_IsRender(true);
-		bOnceFade = true;
-	}
-	else if (pFadingUI->Get_FadeRatio() >= 1.f)
-	{
-		if (bOnceChanger == false)
+		if (bOnceFade == false)
 		{
+			pFadingUI->Set_InOutState(CUI_Fading::FADEIN);
+			pFadingUI->Set_IsRender(true);
+			bOnceFade = true;
+		}
+		else if (pFadingUI->Get_FadeRatio() >= 1.f)
+		{
+
 			pFadingUI->Set_IsRender(false);
 			bOnceChanger = true;
 		}
@@ -679,12 +682,12 @@ HRESULT CLevel_DeeDeeDee::Ready_Monsters()
 		}
 		else if (L"Rabbit" == tempDesc.wstrModelName)
 		{
-			CRabbit::RABBIT_DESC RabbitDesc = {};
+			CMonster::MONSTER_DESC RabbitDesc = {};
 			RabbitDesc.matWorld = matWorld;
 			RabbitDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			RabbitDesc.iShaderVars = iShaderVars;
 			RabbitDesc.fRimWidth = fRimWidth;
-			RabbitDesc.eRabbitState = CRabbit::RABBIT_STATE(iTriggerIndex);
+			RabbitDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &RabbitDesc)))
 				return E_FAIL;
 		}
@@ -700,12 +703,12 @@ HRESULT CLevel_DeeDeeDee::Ready_Monsters()
 		}
 		else if (L"PoppyBrosJr" == tempDesc.wstrModelName)
 		{
-			CPoppyBrosJr::POPPY_DESC PoppyDesc = {};
+			CMonster::MONSTER_DESC PoppyDesc = {};
 			PoppyDesc.matWorld = matWorld;
 			PoppyDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			PoppyDesc.iShaderVars = iShaderVars;
 			PoppyDesc.fRimWidth = fRimWidth;
-			PoppyDesc.ePoppyState = CPoppyBrosJr::POPPY_STATE(iTriggerIndex);
+			PoppyDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBrosJr"), &PoppyDesc)))
 				return E_FAIL;
 		}
@@ -716,24 +719,24 @@ HRESULT CLevel_DeeDeeDee::Ready_Monsters()
 		}
 		else if (L"Kabu" == tempDesc.wstrModelName)
 		{
-			CKabu::KABU_DESC KabuDesc = {};
+			CMonster::MONSTER_DESC KabuDesc = {};
 			KabuDesc.matWorld = matWorld;
 			KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			KabuDesc.iShaderVars = iShaderVars;
 			KabuDesc.fRimWidth = fRimWidth;
-			KabuDesc.eMonState = CKabu::MONSTER_STATE(iTriggerIndex);
+			KabuDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
 			KabuDesc.vecRallyPoints = vecRallyPoints;
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_BrontoBurt")
 		{
-			CBrontoBurt::BRONTOBURT_DESC BrontoBurtDesc = {};
+			CMonster::MONSTER_DESC BrontoBurtDesc = {};
 			BrontoBurtDesc.matWorld = matWorld;
 			BrontoBurtDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			BrontoBurtDesc.iShaderVars = iShaderVars;
 			BrontoBurtDesc.fRimWidth = fRimWidth;
-			BrontoBurtDesc.eMonState = CBrontoBurt::MONSTER_STATE(iTriggerIndex);
+			BrontoBurtDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
 			BrontoBurtDesc.vecRallyPoints = vecRallyPoints;
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &BrontoBurtDesc)))
 				return E_FAIL;

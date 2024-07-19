@@ -12,8 +12,10 @@ private:
 
 public:
 	virtual HRESULT Initialize() override;
-	virtual void Tick(_float fTimeDelta) override;
+	virtual void	Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+
+	void			Sound_Tick(_float fTimeDelta);
 
 private:
 	HRESULT Ready_Lights();
@@ -29,10 +31,16 @@ private:
 	HRESULT Ready_Objects();
 
 	void	Change_Levels();
+	void	Manage_BGM();
+	void	Check_KirbyPosState();
 
 	HRESULT Add_EnvMap();
 	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };
 	CTexture* m_pEnvTexture[TYPE_END] = { nullptr, nullptr, nullptr };
+
+	enum KIRBY_POS_STATE { BEACH, JUNGLE, NOBGM, BUILDING, STATE_END };
+	KIRBY_POS_STATE m_eKirbyPosState = STATE_END;
+	KIRBY_POS_STATE m_ePreKirbyPosState = STATE_END;
 
 public:
 	static CLevel_Intro* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

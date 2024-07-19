@@ -171,7 +171,7 @@ void CKabu_Warp_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 			pKabu->Set_Dead();
 
 			HRESULT hr;
-			CKabu::KABU_DESC KabuDesc = {};
+			CMonster::MONSTER_DESC KabuDesc = {};
 			_float4x4 WorldMatrix = pTransformCom->Get_WorldMatrix();
 			WorldMatrix.m[3][0] = pKabu->Get_Position().x;
 			WorldMatrix.m[3][1] = pKabu->Get_Position().y;
