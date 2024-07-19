@@ -14,6 +14,7 @@
 #include "Kirby_State_Function.h"
 #include "HitBox.h"
 #include "FinaleKirby.h"
+#include "CollisionCenter.h"
 
 #define GAMEINSTANCE CGameInstance::Get_Instance()->
 

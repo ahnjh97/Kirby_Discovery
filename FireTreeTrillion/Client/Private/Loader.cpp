@@ -151,6 +151,7 @@
 // Simba
 #include "Simba.h"
 #include "SimbaLaser.h"
+#include "DimensionClaw.h"
 
 // 피날레 스테이지 기믹들
 #include "Baum.h"
@@ -564,6 +565,7 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Simba"), CSimba);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaLaser"), CSimbaLaser);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DimensionClaw"), CDimensionClaw);
 #pragma endregion
 
 #pragma endregion

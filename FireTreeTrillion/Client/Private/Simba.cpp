@@ -9,6 +9,8 @@
 #include "Bone.h"
 #include "Camera_Main.h"
 #include "Ability.h"
+#include "Kirby.h"
+#include "DimensionClaw.h"
 
 CSimba::CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -141,7 +143,7 @@ HRESULT CSimba::Initialize(void* pArg)
 
 	SetCamSequence(CCamera_Main::SEQ_SIMBA_START);
 
-	//m_bLaserActivated = true;
+	CreateDimensionClawActor();
 
 	return S_OK;
 }
@@ -154,6 +156,7 @@ _int CSimba::Tick(_float fTimeDelta)
 	m_fHpRatio =  m_fHp / m_fMaxHp;
 
 	ResetRotation();
+	m_bRenderDimensionClaw = false;
 
 	if (true == m_bLaserActivated)
 		LaserAttack();
@@ -654,6 +657,45 @@ _bool CSimba::IsKirbyOnMyLeft()
 		return false;
 }
 
+void CSimba::SetUpDimensionClawWorldMatrix()
+{
+	if (nullptr == m_pDimensionClawActor)
+		return;
+
+	_float4x4 matLeftHandMatrix = m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone);
+	_float4x4 matRightHandMatrix = m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone);
+	_float4 vLeftHandPos{}, vRightHandPos{};
+	memcpy(&vLeftHandPos, &matLeftHandMatrix.m[3], sizeof(_float4));
+	memcpy(&vRightHandPos, &matRightHandMatrix.m[3], sizeof(_float4));
+	
+	_float4 vPos = (vLeftHandPos + vRightHandPos) * 0.5f;
+	if (true == m_bDimensionClawUpAttack)
+		vPos.y = 6.5f;
+	else
+		vPos.y = 0.8f;
+	_float4x4 matWorld = m_pTransformCom->Get_WorldMatrix();
+	memcpy(&matWorld.m[3], &vPos, sizeof(_float4));
+
+	m_pDimensionClawActor->setKinematicTarget(CUtils::mat44ToTransform(CUtils::To_Float4x4(matWorld)));
+}
+
+void CSimba::MoveDimensionClaw(_float fTimeDelta)
+{
+	PxTransform pxTransform = m_pDimensionClawActor->getGlobalPose();
+
+	_float4x4 matWorld = CUtils::To_Float4x4(pxTransform);
+	_float4 vLook{}, vPos{};
+	memcpy(&vLook, &(matWorld.m[2]), sizeof(_float4)); // Look 받아오기
+	memcpy(&vPos, &(matWorld.m[3]), sizeof(_float4)); // Pos 받아오기
+	vLook.Normalize();
+
+	vPos += vLook * 20.f * fTimeDelta;
+
+	memcpy(&(matWorld.m[3]), &vPos, sizeof(_float4)); // 새로운 위치 대입
+
+	m_pDimensionClawActor->setGlobalPose(CUtils::mat44ToTransform(CUtils::To_Float4x4(matWorld)));
+} 
+
 HRESULT CSimba::Add_Components()
 {
 	HRESULT hr;
@@ -1073,6 +1115,81 @@ void CSimba::LaserAttack()
 	m_pSimbaLaser->Activate_Attack();
 }
 
+void CSimba::CreateDimensionClawActor()
+{
+	auto pPhysics = m_pGameInstance->Get_Physics();
+	PxMaterial* pMtrl = m_pGameInstance->Get_Material();
+	
+	PxTransform transform(CUtils::To_PxVec3(m_pControllerCom->Get_Position()));
+	PxRigidDynamic* pRigidDynamic = pPhysics->createRigidDynamic(transform);
+	PxBoxGeometry boxGeometry(10.f, 1.f, 5.f);
+	
+	PxQuat rotation1(XMConvertToRadians(35), PxVec3(0, 0, 1)); // z축기준 35도 회전
+	PxQuat rotation2(-XMConvertToRadians(35), PxVec3(0, 0, 1)); // z축기준 35도 회전
+	PxTransform transform1(PxVec3(0.f, 0.f, 0.f), rotation1);
+	PxTransform transform2(PxVec3(0.f, 0.f, 0.f), rotation2);
+
+	PxShape* pShape1 = pPhysics->createShape(boxGeometry, *pMtrl);
+	pShape1->setLocalPose(transform1);
+	pShape1->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+	pShape1->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
+	pShape1->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+	pRigidDynamic->attachShape(*pShape1);
+
+	PxShape* pShape2 = pPhysics->createShape(boxGeometry, *pMtrl);
+	pShape2->setLocalPose(transform2);
+	pShape2->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+	pShape2->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
+	pShape2->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+	pRigidDynamic->attachShape(*pShape2);
+	
+	m_pGameInstance->AddActor(*pRigidDynamic);
+	m_pDimensionClawActor = pRigidDynamic;
+	m_pDimensionClawActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+	m_pGameInstance->Register_Trigger(m_pDimensionClawActor, TRIGGER_SIMBA_ATTACK, 0);
+
+	function<void(_int)> func = bind(&CSimba::OnDimensionClawCollision, this);
+	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_SIMBA_ATTACK, func);
+
+	pShape1->release();
+	pShape2->release();
+}
+
+void CSimba::OnDimensionClawCollision()
+{
+	CKirby* pKirby = static_cast<CKirby*>(m_pKirby);
+
+	// 무적이 아닐 경우
+	if (pKirby->isOverPower() == false)
+	{
+		CTransform* pKirbyTransform = m_pKirby->Get_TransformCom();
+		_vector vKirbyPos = pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION);
+		_float4 vDistance = vKirbyPos - GET_POS;
+		vDistance.y = 0.f;
+		vDistance.Normalize();
+
+		_float4 vNewDir{};
+		_float4 vSimbaRight = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+		vSimbaRight.Normalize();
+
+		if (true == IsKirbyOnMyLeft())
+			vNewDir = vDistance - vSimbaRight * 2.5f;
+		else
+			vNewDir = vDistance + vSimbaRight * 2.5f;
+		vNewDir.Normalize();
+		_vector vKnockbackDir = vNewDir;
+
+		pKirby->Set_DamageMoving(vKnockbackDir * 2.4f, 8.2f); // 심바 전용 넉백
+
+		_float fMonsterAttack = Get_Attack();
+		pKirby->Minus_Hp(fMonsterAttack);
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+		pCamera->Make_Shake(1.2f, 0.5f, _float2(0.f, -1.f));
+
+		pKirby->Collision(CCollisionCenter::CONTENT_ATTACK, this);
+	}
+}
+
 CSimba* CSimba::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CSimba* pInstance = new CSimba(pDevice, pContext);
@@ -1102,7 +1219,11 @@ CGameObject* CSimba::Clone(void* pArg)
 
 void CSimba::Free()
 {
+	m_pGameInstance->ReleaseActor(m_pDimensionClawActor);
 	CEventCenter::Get_Instance()->Unsubscribe(this);
+
+	__super::Free();
+
 	Safe_Release(m_pLipBone);
 	Safe_Release(m_pLaserBone);
 	Safe_Release(m_pLeftHandBone);
@@ -1110,8 +1231,6 @@ void CSimba::Free()
 	Safe_Release(m_pKirby);
 	Safe_Release(m_pSimbaLaserTransform);
 	Safe_Release(m_pSimbaLaser);
-
-	__super::Free();
 
 	for(_uint i = 0; i < EYETEX_END; i++)
 		Safe_Release(m_pEyeTextureCom[i]);

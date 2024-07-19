@@ -90,6 +90,7 @@ HRESULT CSimbaLaser::Add_Components(const wstring& _wstrModelName)
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
+	/* For.Com_Model */
 	wstring wstrModelTag = TEXT("Prototype_Component_Model_SimbaLaser");
 	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);

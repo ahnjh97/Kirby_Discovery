@@ -709,6 +709,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Simba\SimbaRock">
       <UniqueIdentifier>{dadcfbc4-119b-4281-a673-9df0181afb35}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Simba\DimensionClaw">
+      <UniqueIdentifier>{fd798ad1-1b75-4c18-956c-cab357105e85}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1405,6 +1408,9 @@
     <ClInclude Include="SimbaLaser.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\DimensionClaw.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\DimensionClaw</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -2081,6 +2087,9 @@
     </ClCompile>
     <ClCompile Include="SimbaLaser.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DimensionClaw.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\DimensionClaw</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

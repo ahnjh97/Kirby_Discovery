@@ -229,6 +229,7 @@
     <ClInclude Include="..\Public\Crumble.h" />
     <ClInclude Include="..\Public\Debris.h" />
     <ClInclude Include="..\public\DecoObject.h" />
+    <ClInclude Include="..\Public\DimensionClaw.h" />
     <ClInclude Include="..\public\Finale_SpecialDebris_A.h" />
     <ClInclude Include="..\Public\Finale_SpecialDebris_B.h" />
     <ClInclude Include="..\Public\Finale_SpecialDebris_C.h" />
@@ -484,6 +485,7 @@
     <ClCompile Include="..\Private\Crumble.cpp" />
     <ClCompile Include="..\Private\Debris.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
+    <ClCompile Include="..\Private\DimensionClaw.cpp" />
     <ClCompile Include="..\private\Finale_SpecialDebris_A.cpp" />
     <ClCompile Include="..\Private\Finale_SpecialDebris_B.cpp" />
     <ClCompile Include="..\Private\Finale_SpecialDebris_C.cpp" />

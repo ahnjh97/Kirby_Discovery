@@ -111,6 +111,8 @@ public:
 	void			CreateHpBar();
 	void			SpawnStar(_uint iAnimIdx);
 	_bool			IsKirbyOnMyLeft();
+	void			SetUpDimensionClawWorldMatrix();
+	void			MoveDimensionClaw(_float fTimeDelta);
 
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
@@ -122,6 +124,7 @@ private:
 	const _float4x4* m_pLaserBoneMatrix = { nullptr };
 	CGameObject*	m_pSimbaLaser = { nullptr };
 	CTransform*		m_pSimbaLaserTransform = { nullptr };
+	PxRigidDynamic* m_pDimensionClawActor = { nullptr };
 
 	SIMBA_ANIM		m_eCurrentState = { SIMBA_END };
 	SIMBA_ANIM		m_ePreState = { SIMBA_END };
@@ -160,6 +163,7 @@ private:
 	_bool			m_bBiteRushSpawnStarAtLeft = { true };
 
 	_bool			m_bLaserActivated = { false };
+	_bool			m_bRenderDimensionClaw = { false };
 
 private:
 	HRESULT		Add_Components();
@@ -187,6 +191,8 @@ private:
 	void		TurnSimba(_float fAngle);
 	void		ResetRotation();
 	void		LaserAttack();
+	void		CreateDimensionClawActor();
+	void		OnDimensionClawCollision();
 
 public:
 	static CSimba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
