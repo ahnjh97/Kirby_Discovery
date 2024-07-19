@@ -18,11 +18,11 @@ public:
 		KABU_END
 	};
 
-	struct KABU_DESC : public CMonster::MONSTER_DESC {
-		_bool bRealDead = { false };
-		_float fAngle = { 0.f };
-		vector<_float4> vecRallyPoints;
-	};
+	//struct KABU_DESC : public CMonster::MONSTER_DESC {
+	//	_bool bRealDead = { false };
+	//	_float fAngle = { 0.f };
+	//	vector<_float4> vecRallyPoints;
+	//};
 
 private:
 	CKabu(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

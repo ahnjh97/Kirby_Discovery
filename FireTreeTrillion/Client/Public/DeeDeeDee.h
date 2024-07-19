@@ -125,7 +125,7 @@ private:
 
 
 	_float					m_ftext = { 0.f };
-
+	_bool					m_bCheckCollision = false;
 
 
 

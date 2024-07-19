@@ -169,18 +169,24 @@ public: /* For.Extractor */
 #endif
 
 public: // Sound Manager
-	_int SetVolume(CHANNELID eID, _float _vol);
+	_int  SetVolume(CHANNELID eID, _float _vol);
 	_int  VolumeUp(CHANNELID eID, _float _vol);
 	_int  VolumeDown(CHANNELID eID, _float _vol);
 	_int  BGMVolumeUp(_float _vol);
 	_int  BGMVolumeDown(_float _vol);
 	_int  Pause(CHANNELID eID);
-	void PlayMySound(TCHAR* pSoundKey, CHANNELID eID, _float _vol);
-	void PlayBGM(TCHAR* pSoundKey);
-	void StopSound(CHANNELID eID);
-	void StopAll();
-	void ApplyLowPass(_bool bSet);
-	void AddLowPass();
+	void  Pause(CHANNELID eID, _bool bStop);
+	_bool IsChannelPaused(CHANNELID eID);
+	void  PlayMySound(TCHAR* pSoundKey, CHANNELID eID, _float _vol);
+	void  PlayBGM(TCHAR* pSoundKey);
+	void  PlayBGM(CHANNELID eID, TCHAR* pSoundKey);
+	void  PlaySmoothUp(CHANNELID eID, _float targetVolume, _float fAddValue);
+	void  PlaySmoothDown(CHANNELID eID, _float targetVolume, _float fMinusValue);
+	void  PlaySmoothKill(CHANNELID eID, _float fMinusValue);
+	void  StopSound(CHANNELID eID);
+	void  StopAll();
+	void  ApplyLowPass(_bool bSet);
+	void  AddLowPass();
 	_int  VolumeMin(CHANNELID eID);
 	_int  VolumeRestore(CHANNELID eID);
 	void PlaySound_Free(TCHAR* pSoundKey, _float _vol);

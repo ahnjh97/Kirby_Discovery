@@ -22,15 +22,15 @@ HRESULT CKabu::Initialize_Prototype()
 
 HRESULT CKabu::Initialize(void* pArg)
 {
-	KABU_DESC* pKabuDesc = nullptr;
+	MONSTER_DESC* pKabuDesc = nullptr;
 
 	if (nullptr != pArg)
 	{
-		pKabuDesc = (KABU_DESC*)pArg;
+		pKabuDesc = (MONSTER_DESC*)pArg;
 
 		pKabuDesc->fSpeedPerSec = 7.f;
 		pKabuDesc->fRotationPerSec = XMConvertToRadians(90.0f);
-		m_eMonState = pKabuDesc->eMonState;
+		m_eMonState = (MONSTER_STATE)pKabuDesc->eMonState;
 		m_vecRallyPoint = pKabuDesc->vecRallyPoints;
 		m_bRealDead = pKabuDesc->bRealDead;
 		m_fAngle = pKabuDesc->fAngle;

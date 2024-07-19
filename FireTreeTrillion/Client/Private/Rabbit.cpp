@@ -39,15 +39,15 @@ HRESULT CRabbit::Initialize(void* pArg)
 		wstrModelName = TEXT("Rabbit");
 	else
 	{
-		RABBIT_DESC* pRabbitDesc = nullptr;
+		MONSTER_DESC* pRabbitDesc = nullptr;
 
 		if (nullptr != pArg)
 		{
-			pRabbitDesc = (RABBIT_DESC*)pArg;
+			pRabbitDesc = (MONSTER_DESC*)pArg;
 
 			pRabbitDesc->fSpeedPerSec = 7.f;
 			pRabbitDesc->fRotationPerSec = XMConvertToRadians(90.0f);
-			m_eRabbitState = pRabbitDesc->eRabbitState;
+			m_eRabbitState = (RABBIT_STATE)pRabbitDesc->eMonState;
 			wstrModelName = pRabbitDesc->wstrModelName;
 		}
 

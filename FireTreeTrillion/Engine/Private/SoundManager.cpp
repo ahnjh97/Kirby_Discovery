@@ -3,6 +3,8 @@
 //#include "fmod_dsp_effects.h"
 //#include "fmod_dsp.h"
 
+#include "Utils.h"
+
 CSound_Manager::CSound_Manager()
 {
 	m_pSystem = nullptr;
@@ -15,7 +17,8 @@ HRESULT CSound_Manager::Initialize()
 	// 1. 시스템 포인터, 2. 사용할 가상채널 수 , 초기화 방식) 
 	FMOD_System_Init(m_pSystem, 32, FMOD_INIT_NORMAL, NULL);
 
-	LoadSoundFile();
+	//LoadSoundFile();
+	LoadSoundFile(L"../../../Resources/Sounds");
 
 	FMOD_System_CreateDSPByType(m_pSystem, FMOD_DSP_TYPE_LOWPASS, &m_LowPassFilter);
 	FMOD_DSP_SetParameterFloat(m_LowPassFilter, FMOD_DSP_LOWPASS_CUTOFF, m_fCurLowPass);
@@ -60,12 +63,17 @@ void CSound_Manager::AddLowPass()
 
 }
 
+//wstring CSound_Manager::Get_CurSound(CHANNELID eID)
+//{
+//	m_pChannelArr[eID]->
+//
+//}
+
 int CSound_Manager::SetVolume(CHANNELID eID, _float _vol)
 {
 	FMOD_Channel_SetVolume(m_pChannelArr[eID], _vol);
 
 	return 0;
-
 }
 
 int CSound_Manager::VolumeUp(CHANNELID eID, _float _vol)
@@ -138,6 +146,17 @@ int CSound_Manager::Pause(CHANNELID eID)
 	return 0;
 }
 
+void CSound_Manager::Pause(CHANNELID eID, _bool bStop)
+{
+	FMOD_Channel_SetPaused(m_pChannelArr[eID], bStop);
+}
+
+_bool CSound_Manager::IsChannelPaused(CHANNELID eID)
+{
+	FMOD_BOOL isPaused = FALSE;
+	FMOD_Channel_GetPaused(m_pChannelArr[eID], &isPaused);
+	return isPaused;
+}
 
 void CSound_Manager::PlayMySound(TCHAR* pSoundKey, CHANNELID eID, _float _vol)
 {
@@ -215,7 +234,6 @@ FMOD_SOUND* CSound_Manager::FindSoundByKey(TCHAR* pSoundKey)
 	return iter->second;
 }
 
-
 void CSound_Manager::PlayBGM(TCHAR* pSoundKey)
 {
 	map<TCHAR*, FMOD_SOUND*>::iterator iter;
@@ -230,7 +248,88 @@ void CSound_Manager::PlayBGM(TCHAR* pSoundKey)
 
 	FMOD_System_PlaySound(m_pSystem, iter->second, nullptr, FALSE, &m_pChannelArr[CHANNEL_BGM]);
 	FMOD_Channel_SetMode(m_pChannelArr[CHANNEL_BGM], FMOD_LOOP_NORMAL);
+    FMOD_Channel_SetVolume(m_pChannelArr[CHANNEL_BGM], 0.f);
+
 	FMOD_System_Update(m_pSystem);
+}
+
+// BGM을 재생하는 채널이 CHANNEL_BGM이 아닐 경우, 해당 함수를 사용할 수 있습니다.
+void CSound_Manager::PlayBGM(CHANNELID eID, TCHAR* pSoundKey)
+{
+	if (eID != CHANNEL_BGM && eID != CHANNEL_BGM_SUB && eID != CHANNEL_BGM_STREAMING)
+	{
+		ALARM_FAIL("PlayBGM에서 채널을 넣어줄 대 BGM채널 enum값을 넣어주지 않았습니다.");
+		return;
+	}
+
+	map<TCHAR*, FMOD_SOUND*>::iterator iter;
+	iter = find_if(m_mapSound.begin(), m_mapSound.end(), [&](auto& iter)
+		{
+			return !lstrcmp(pSoundKey, iter.first);
+		});
+
+	if (iter == m_mapSound.end())
+		return;
+
+	FMOD_System_PlaySound(m_pSystem, iter->second, nullptr, FALSE, &m_pChannelArr[eID]);
+	FMOD_Channel_SetMode(m_pChannelArr[eID], FMOD_LOOP_NORMAL);
+	FMOD_Channel_SetVolume(m_pChannelArr[eID], 0.f);
+
+	FMOD_System_Update(m_pSystem);
+}
+
+/// <summary> 특정 채널을 목표 수치까지 볼륨을 점진적으로 올린다. </summary>
+/// <param name="eID"> 특정 채널 </param>
+/// <param name="targetVolume"> 목표 수치 </param>
+/// <param name="fAddValue"> 점진적 수치 </param>
+void CSound_Manager::PlaySmoothUp(CHANNELID eID, _float targetVolume, _float fAddValue)
+{
+	_float volume = 0.f;
+	FMOD_Channel_GetVolume(m_pChannelArr[eID], &volume);
+
+	if(volume < targetVolume)
+	{
+		volume += fAddValue;
+		if (volume > targetVolume)
+			volume = targetVolume;
+
+		FMOD_Channel_SetVolume(m_pChannelArr[eID], volume);
+	}
+}
+
+// 특정 볼륨까지 점진적으로 내려갑니다.
+void CSound_Manager::PlaySmoothDown(CHANNELID eID, _float targetVolume, _float fMinusValue)
+{
+	_float volume = 0.f;
+	FMOD_Channel_GetVolume(m_pChannelArr[eID], &volume);
+
+	if (volume > targetVolume)
+	{
+		volume -= fMinusValue;
+		if (volume < targetVolume)
+			volume = targetVolume;
+
+		FMOD_Channel_SetVolume(m_pChannelArr[eID], volume);
+	}
+}
+
+// 볼륨이 0을 향해 점진적으로 내려갑니다
+void CSound_Manager::PlaySmoothKill(CHANNELID eID, _float fMinusValue)
+{
+	_float volume = 0.f;
+	FMOD_Channel_GetVolume(m_pChannelArr[eID], &volume);
+
+	if (volume > 0.f)
+	{
+		volume -= fMinusValue;
+		if (volume < 0.f)
+		{
+			FMOD_Channel_Stop(m_pChannelArr[eID]);
+			volume = 0.f;
+			return;
+		}
+		FMOD_Channel_SetVolume(m_pChannelArr[eID], volume);
+	}
 }
 
 void CSound_Manager::StopSound(CHANNELID eID)
@@ -284,6 +383,62 @@ void CSound_Manager::LoadSoundFile()
 	_findclose(handle);
 }
 
+void CSound_Manager::LoadSoundFile(const wchar_t* szDir)
+{
+	_wfinddata64_t fd;
+
+	wchar_t szSearchPath[MAX_PATH];
+	swprintf_s(szSearchPath, L"%s/*.*", szDir);
+
+	__int64 handle = _wfindfirst64(szSearchPath, &fd);
+	if (handle == -1 || handle == 0)
+		return;
+
+	int iResult = 0;
+
+	while (iResult != -1)
+	{
+		// 디렉토리인지 확인합니다.0
+		if (fd.attrib & _A_SUBDIR)
+		{
+			// . 및 .. 디렉토리는 무시합니다.
+			if (wcscmp(fd.name, L".") != 0 && wcscmp(fd.name, L"..") != 0)
+			{
+				// 새로운 디렉토리 경로를 조합합니다.
+				wchar_t szNewDir[MAX_PATH];
+				swprintf_s(szNewDir, L"%s/%s", szDir, fd.name);
+
+				// 재귀적으로 함수를 호출하여 서브디렉토리를 탐색합니다.
+				LoadSoundFile(szNewDir);
+			}
+		}
+		else
+		{
+			wchar_t szFullPath[MAX_PATH];
+			swprintf_s(szFullPath, L"%s/%s", szDir, fd.name);
+
+			char szFullPathMB[MAX_PATH];
+			WideCharToMultiByte(CP_UTF8, 0, szFullPath, -1, szFullPathMB, sizeof(szFullPathMB), NULL, NULL);
+
+			FMOD_SOUND* pSound = nullptr;
+			FMOD_RESULT eRes = FMOD_System_CreateSound(m_pSystem, szFullPathMB, FMOD_DEFAULT, 0, &pSound);
+			if (eRes == FMOD_OK)
+			{
+				int iLength = wcslen(fd.name) + 1;
+				wchar_t* pSoundKey = new wchar_t[iLength];
+				wcscpy_s(pSoundKey, iLength, fd.name);
+
+				m_mapSound.emplace(pSoundKey, pSound);
+			}
+		}
+
+		iResult = _wfindnext64(handle, &fd);
+	}
+
+	FMOD_System_Update(m_pSystem);
+	_findclose(handle);
+}
+
 CSound_Manager* CSound_Manager::Create()
 {
 	CSound_Manager* pInstance = new CSound_Manager();
@@ -316,3 +471,4 @@ void CSound_Manager::Free()
 }
 
 
+ 

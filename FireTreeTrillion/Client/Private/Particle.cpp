@@ -177,10 +177,6 @@ void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
 
 	pFXData->vColor = m_InstanceDesc.vColor;
 	pFXData->vColorRandomOffset = m_InstanceDesc.vColorRandomOffset;
-
-	pFXData->vtarget = m_InstanceDesc.vTargetColor;
-	pFXData->vTargetColorRandomOffset = m_InstanceDesc.vTargetColorRandomOffset;
-
 	pFXData->fAlpha = m_InstanceDesc.fAlpha;
 	pFXData->fAlphaRandomOffset = m_InstanceDesc.fAlphaRandomOffset;
 

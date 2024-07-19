@@ -23,6 +23,8 @@ HRESULT CMonster::Initialize(void* pArg)
 	hr = __super::Initialize(pArg);
 	CHECK_FAILED(hr);
 
+	m_fY = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION).m128_f32[1];
+
 	return S_OK;
 }
 
@@ -32,6 +34,9 @@ _int CMonster::Tick(_float fTimeDelta)
 
 	// 무적시간을 담당한다.
 	Damage_Delay(fTimeDelta);
+
+	if (m_fY - 300.f > m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION).m128_f32[1])
+		m_bDead = true;
 
 	return OBJ_NOEVENT;
 }
