@@ -2358,6 +2358,7 @@ void CRenderer::ObjectBlack(_float fTimeDelta)
 		}
 	}
 }
+
 #ifdef _DEBUG
 HRESULT CRenderer::Render_Debug()
 {

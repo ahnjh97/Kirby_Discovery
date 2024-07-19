@@ -375,7 +375,16 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				break;
 
 			case DFIELD_QUAKE:
-				Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
+				m_fStartQuake += _fTimeDelta;
+
+				if (m_fStartQuake < 0.5f)
+					Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
+
+				else
+				{
+					m_fStartQuake = 0.f;
+					return OBJ_NOEVENT;
+				}
 				break;
 			}
 
@@ -390,7 +399,6 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 
 				else
 					m_eDFMoveState = DFIELD_WAIT;
-
 			}
 			else
 				m_eDFMoveState = DFIELD_MOVE;
@@ -530,7 +538,6 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 
 				else
 				{
-					//m_eDFMoveState = DFIELD_WAIT;
 					m_fStartQuake = 0.f;
 					m_bIsReturnMove = FALSE;
 					return OBJ_NOEVENT;
@@ -609,7 +616,6 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 
 				else
 				{
-					//m_eDFMoveState = DFIELD_WAIT;
 					m_fStartQuake = 0.f;
 					return OBJ_NOEVENT;
 				}
