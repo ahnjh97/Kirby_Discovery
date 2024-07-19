@@ -162,12 +162,9 @@ void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
 
 	pFXData->vRange = m_InstanceDesc.vRange;
 
-<<<<<<< HEAD
-=======
 	pFXData->fMinRange = m_InstanceDesc.fMinRange;
 	pFXData->fMaxRange = m_InstanceDesc.fMaxRange;
 
->>>>>>> main
 	pFXData->vRotation = m_InstanceDesc.vRotation;
 	pFXData->vRotationRandomOffset = m_InstanceDesc.vRotationRandomOffset;
 	pFXData->vScale = m_InstanceDesc.vScale;
@@ -271,6 +268,10 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 
 	VTXMATRIX* pVertices = m_pVIBufferCom->Map();
 
+
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE])
+		m_pVIBufferCom->SimpleMove(fMyTimeDelta, pVertices);
 
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE])
