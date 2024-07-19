@@ -21,7 +21,10 @@ public:
 
 	struct MONSTER_DESC : public CGameObject::GAMEOBJECT_DESC
 	{
-		MONSTER_STATE eMonState = { MON_END };
+		_bool bRealDead = { false };
+		_uint eMonState = { 0 };
+		_float fAngle = { 0.f };
+		vector<_float4> vecRallyPoints;
 	};
 
 protected:
@@ -64,6 +67,7 @@ protected:
 	_float					m_fMonsterOverPowerTime = { 0.f };
 	_float					m_fMonsterOverPowerMaxTime = { 0.f };
 	_float					m_fPreHp = { 0.f };
+	_float					m_fY = { 0.f };
 
 	// ³³ÀÛÇØÁ³´Ù°¡ Á×À» ½Ã°£
 	_float	m_fPressedTime = { 0.f };

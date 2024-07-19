@@ -31,6 +31,7 @@ void CPoppyBrosJr_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 
+	pPoppyJr->Set_PoppyEye(CPoppyBrosJr::POPPYEYE_IDLE);
 	// ÀÚÀ¯ ³«ÇÏ
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 

@@ -2468,6 +2468,9 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 	// BrontoBurt Eye
 	if (FAILED(Add_Texture(eLevel, "BrontoBurt_Eye", "BrontoBurtEye/Face.0%d.dds", 2)))
 		return E_FAIL;
+	// BrontoBurt Eye
+	if (FAILED(Add_Texture(eLevel, "Poppy_Eye", "PoppyEye/FaceTexturePattern.0%d.dds", 11)))
+		return E_FAIL;
 
 	// WaddleDee Eye
 	HRESULT hr = Add_Texture(eLevel, "Dee_Eye", "WaddleDeeEye/eye_%d.png", 6);

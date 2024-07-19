@@ -97,6 +97,7 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 	{
 		m_eDFieldType = DFMOVE_FRONTBACK;
 		m_eGimmickType = GIMMICK_SPCHARGE;
+		m_vInitPos = GET_POS;
 	}
 
 	if (TEXT("Gimmick_PkFunHouse07") == wstrModelTag)
@@ -109,6 +110,7 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 	{
 		m_eDFieldType = DFMOVE_LEFT;
 		m_eGimmickType = GIMMICK_SURPRISE;
+		m_vInitPos = GET_POS;
 		m_pStaticActor = m_pModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
 	}
 	
@@ -393,8 +395,8 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 		}
 		break;
 
-		//깜놀보드 충돌거리 조건에 따라 DFMOVE_LEFT, DFMOVE_RIGHT를 체크
-	case DFMOVE_LEFT:
+	//깜놀보드 충돌거리 조건에 따라 DFMOVE_LEFT, DFMOVE_RIGHT를 체크
+	case DFMOVE_LEFT: //24.500 36.963 -67.289
 		vCurPos = GET_POS;
 
 		if (m_bIsInteraction) //RayCast 상호작용 검사
@@ -403,7 +405,7 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			{
 			case DFIELD_MOVE:
 				//깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
-				m_pTransformCom->Go_Left(_fTimeDelta * 0.5f); //원작의 경우는 0.25f 속도인데 좀 더 빠르게 변경
+				m_pTransformCom->Go_Left(_fTimeDelta * 0.3f); //원작의 속도는 약 0.25f 수준
 				break;
 
 			case DFIELD_QUAKE:
@@ -411,9 +413,10 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				break;
 			}
 
-			if (19.460f >= vCurPos.x) //24.460 > 14.460
+			_float fOffsetPosX = m_vInitPos.x - 6.f;
+			if (fOffsetPosX >= vCurPos.x)
 			{
-				vCurPos.x = 19.460f;
+				vCurPos.x = fOffsetPosX;
 				m_fStartQuake += _fTimeDelta;
 
 				if (m_fStartQuake < 0.5f)
@@ -421,7 +424,6 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 
 				else
 				{
-					m_eDFMoveState = DFIELD_WAIT;
 					m_fStartQuake = 0.f;
 					m_bIsInteraction = FALSE;
 				}
@@ -435,54 +437,52 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			switch (m_eDFMoveState)
 			{
 			case DFIELD_MOVE:
-				m_pTransformCom->Go_Right(_fTimeDelta * 2.25f);
+				if (m_vInitPos.x <= vCurPos.x)
+				{
+					vCurPos.x = m_vInitPos.x;
+					m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vInitPos);
+				}
+				
+				else
+					m_pTransformCom->Go_Right(_fTimeDelta * 2.f); //2.25 > 2.0
 				break;
 
 			case DFIELD_QUAKE:
-				Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
-				break;
-			}
-
-			if (24.460f <= vCurPos.x)
-			{
-				vCurPos.x = 24.460f;
 				m_fStartQuake += _fTimeDelta;
 
 				if (m_fStartQuake < 0.5f)
-					m_eDFMoveState = DFIELD_QUAKE;
-
-				else
-				{
-					m_eDFMoveState = DFIELD_WAIT;
-					m_fStartQuake = 0.f;
-					m_bIsReturnMove = FALSE;
-				}
+					Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
+				break;
 			}
+
+			if (m_vInitPos.x <= vCurPos.x)
+				m_eDFMoveState = DFIELD_QUAKE;
+
 			else
 				m_eDFMoveState = DFIELD_MOVE;
 		}
 		break;
 
-	case DFMOVE_RIGHT:
+	case DFMOVE_RIGHT: //24.350 36.963 -67.289
 		vCurPos = GET_POS;
 
-		if (m_bIsInteraction) //RayCast 상호작용 검사
+		if (m_bIsInteraction)
 		{
 			switch (m_eDFMoveState)
 			{
 			case DFIELD_MOVE:
-				//깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
-				m_pTransformCom->Go_Right(_fTimeDelta * 0.5f); //원작의 경우는 0.25f 속도인데 좀 더 빠르게 변경
+				m_pTransformCom->Go_Right(_fTimeDelta * 0.3f);
 				break;
 
 			case DFIELD_QUAKE:
 				Apply_Quake(_fTimeDelta, 0.25f, 0.2f); 
 				break;
 			}
-
-			if (29.851f <= vCurPos.x) //24.851 > 29.851
+			
+			_float fOffsetPosX = m_vInitPos.x + 6.f;
+			if (fOffsetPosX <= vCurPos.x)
 			{
-				vCurPos.x = 29.851;
+				vCurPos.x = fOffsetPosX;
 				m_fStartQuake += _fTimeDelta;
 
 				if (m_fStartQuake < 0.5f)
@@ -490,7 +490,6 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 
 				else
 				{
-					m_eDFMoveState = DFIELD_WAIT;
 					m_fStartQuake = 0.f;
 					m_bIsInteraction = FALSE;
 				}
@@ -499,42 +498,40 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				m_eDFMoveState = DFIELD_MOVE;
 		}
 
-		//특정 애님 상태일 경우, 필드도 비활성 움직임 처리
 		if (m_bIsReturnMove)
 		{
 			switch (m_eDFMoveState)
 			{
 			case DFIELD_MOVE:
-				m_pTransformCom->Go_Left(_fTimeDelta * 2.25f);
+				if (m_vInitPos.x >= vCurPos.x)
+				{
+					vCurPos.x = m_vInitPos.x; 
+					m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCurPos);
+				}
+
+				else
+					m_pTransformCom->Go_Left(_fTimeDelta * 2.f); //2.25 > 2.0
 				break;
 
 			case DFIELD_QUAKE:
-				Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
-				break;
-
-			case DFIELD_WAIT:
-				break;
-			}
-
-			if (24.851f >= vCurPos.x)
-			{
-				vCurPos.x = 24.851f;
-				_float4 vSetPos = { vCurPos.x, vCurPos.y, vCurPos.z, 1.f };
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vSetPos);
-
 				m_fStartQuake += _fTimeDelta;
 
 				if (m_fStartQuake < 0.5f)
-					m_eDFMoveState = DFIELD_QUAKE;
+					Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
 
 				else
 				{
-					m_eDFMoveState = DFIELD_WAIT;
+					//m_eDFMoveState = DFIELD_WAIT;
 					m_fStartQuake = 0.f;
 					m_bIsReturnMove = FALSE;
 					return OBJ_NOEVENT;
 				}
+				break;
 			}
+
+			if (m_vInitPos.x >= vCurPos.x)
+				m_eDFMoveState = DFIELD_QUAKE;
+
 			else
 				m_eDFMoveState = DFIELD_MOVE;
 		}
@@ -553,24 +550,21 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				break;
 
 			case DFIELD_QUAKE:
-				Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
-				break;
-			}
-
-			if (-76.289f >= vCurPos.z) //-67.289 > -77.289
-			{
-				vCurPos.z = -76.289f;
 				m_fStartQuake += _fTimeDelta;
 
 				if (m_fStartQuake < 0.5f)
-					m_eDFMoveState = DFIELD_QUAKE;
+					Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
 
 				else
-				{
-					m_eDFMoveState = DFIELD_WAIT;
 					m_fStartQuake = 0.f;
-				}
+
+				break;
 			}
+
+			_float fOffsetPosZ = m_vInitPos.z - 8.f;
+			if (fOffsetPosZ >= vCurPos.z)
+				m_eDFMoveState = DFIELD_QUAKE;
+
 			else
 				m_eDFMoveState = DFIELD_MOVE;
 		}
@@ -580,32 +574,19 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			switch (m_eDFMoveState)
 			{
 			case DFIELD_MOVE:
-				m_pTransformCom->Go_Straight(_fTimeDelta * 0.2f); 
-				break;
-
-			//case DFIELD_QUAKE:
-			//	Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
-			//	break;
-			}
-
-			if (-67.289f <= vCurPos.z)
-			{
-				vCurPos.z = -67.289f;
-				m_eDFMoveState = DFIELD_WAIT;
-
-				/*
-				m_fStartQuake += _fTimeDelta;
-
-				if (m_fStartQuake < 0.5f)
-					m_eDFMoveState = DFIELD_QUAKE;
-
-				else
+				if (m_vInitPos.z <= vCurPos.z)
 				{
-					m_eDFMoveState = DFIELD_WAIT;
-					m_fStartQuake = 0.f;
+					vCurPos.z = m_vInitPos.z;
+					m_pTransformCom->Set_State(CTransform::STATE_POSITION, vCurPos);
 				}
-				*/
+				else
+					m_pTransformCom->Go_Straight(_fTimeDelta * 0.2f); 
+				break;
 			}
+
+			if (m_vInitPos.z <= vCurPos.z)
+				m_eDFMoveState = DFIELD_QUAKE;
+
 			else
 				m_eDFMoveState = DFIELD_MOVE;
 		}
@@ -614,17 +595,16 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			switch (m_eDFMoveState)
 			{
 			case DFIELD_QUAKE:
-				Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
+				if (m_fStartQuake < 0.5f)
+					Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
+
+				else
+				{
+					//m_eDFMoveState = DFIELD_WAIT;
+					m_fStartQuake = 0.f;
+					return OBJ_NOEVENT;
+				}
 				break;
-			}
-
-			if (m_fStartQuake < 0.5f)
-				m_eDFMoveState = DFIELD_QUAKE;
-
-			else
-			{
-				m_eDFMoveState = DFIELD_WAIT;
-				m_fStartQuake = 0.f;
 			}
 		}
 		break;
