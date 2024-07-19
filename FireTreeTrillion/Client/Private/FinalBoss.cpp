@@ -675,20 +675,44 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 			pCamera->Make_Shake(0.3f, 0.5f);
 
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
+
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		FXDesc.vInitScale = { 1.2f, 1.2f, 1.2f };
+		FXDesc.vInitPos = { 0.f, 2.f, 0.f };
+		Add_Effect("HS_FB slash R", FXDesc, true);
 	}
-		break;
+	break;
 	case FINALBOSS_SWINGLEFT:
+	{
 		if (pCamera != nullptr)
 			pCamera->Make_Shake(0.3f, 0.5f);
 
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
-		break;
+
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		FXDesc.vInitScale = { 1.2f, 1.2f, 1.2f };
+		FXDesc.vInitPos = { 0.f, 2.f, 0.f };
+
+		Add_Effect("HS_FB slash L", FXDesc, true);
+	}
+	break;
 	case FINALBOSS_SWINGFINISHLEFT:
+	{
 		if (pCamera != nullptr)
 			pCamera->Make_Shake(0.3f, 0.5f);
 
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
-		break;
+
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		FXDesc.vInitScale = { 1.2f, 1.2f, 1.2f };
+		FXDesc.vInitPos = { 0.f, 2.f, -1.f };
+
+		Add_Effect("HS_FB slash L", FXDesc, true);
+	}
+	break;
 	default:
 		break;
 	}
