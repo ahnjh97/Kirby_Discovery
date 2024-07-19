@@ -39,7 +39,9 @@
 #include "Particle.h"
 #include "MultiEffect.h"
 
+// 기타 이펙트스러운거
 #include "Fire.h"
+#include "CrashParticle.h"
 
 //애님 툴
 #include "AnimToolHelper.h"
@@ -420,6 +422,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BulbFlare"), CBulbFlare);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Fire"), CFire);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CrashParticle"), CCrashParticle);
 
 	// Deform
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Car"), CCar);
@@ -2243,7 +2246,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("Road", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadEnd", TYPE_NONANIM, 1.f, 0.f, 0);
-		m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 0.2f, 0.f, 0);
 
 		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.2f, 0.f, 0);
 
@@ -2734,6 +2736,10 @@ void CLoader::Load_KirbyBodyModels()
 
 	// Deform
 	m_vecModelInfo.emplace_back("Bulb", TYPE_ANIM, 1.f, 180.f);
+
+	// AbilityEffect
+	m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 0.2f, 0.f, 0);
+
 }
 
 void CLoader::Load_KirbyWeaponModels()

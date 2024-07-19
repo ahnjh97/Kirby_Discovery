@@ -132,6 +132,7 @@ public: /* For.Light_Manager */
 	HRESULT Render_Lights(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer, _bool bForTool = false);
 	void Clear_Light();
 	class CLight* Get_LightLastAddress();
+	class CLight* Get_DirectionLightAddress();
 
 #pragma region FONT_MANAGER
 

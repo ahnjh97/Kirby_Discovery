@@ -775,6 +775,14 @@ CLight* CGameInstance::Get_LightLastAddress()
 	return m_pLight_Manager->Get_LightLastAddress();
 }
 
+CLight* CGameInstance::Get_DirectionLightAddress()
+{
+	if (m_pLight_Manager == nullptr)
+		return nullptr;
+
+	return m_pLight_Manager->Get_DirectionLightAddress();
+}
+
 #pragma region FONT_MANAGER
 
 HRESULT CGameInstance::Add_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& strFontTag, const wstring& strFontFilePath)
