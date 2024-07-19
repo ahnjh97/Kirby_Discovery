@@ -141,7 +141,7 @@ HRESULT CSimba::Initialize(void* pArg)
 
 	SetCamSequence(CCamera_Main::SEQ_SIMBA_START);
 
-	m_bLaserActivated = true;
+	//m_bLaserActivated = true;
 
 	return S_OK;
 }
@@ -617,11 +617,11 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 		if (0 == m_iStarCount)
 			AbilityItemDesc.vPosition = vPos + vFloatLook * 4.f;
 		else if (1 == m_iStarCount)
-			AbilityItemDesc.vPosition = vPos + vFloatLook * 8.5f;
+			AbilityItemDesc.vPosition = vPos + vFloatLook * 9.f;
 		else if (2 == m_iStarCount)
-			AbilityItemDesc.vPosition = vPos + vFloatLook * 14.f;
+			AbilityItemDesc.vPosition = vPos + vFloatLook * 15.f;
 		else if (3 == m_iStarCount)
-			AbilityItemDesc.vPosition = vPos + vFloatLook * 20.5f;
+			AbilityItemDesc.vPosition = vPos + vFloatLook * 22.f;
 
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);

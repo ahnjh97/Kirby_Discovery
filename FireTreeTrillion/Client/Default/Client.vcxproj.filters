@@ -706,6 +706,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Simba\SimbaLaser">
       <UniqueIdentifier>{42035ce9-5d3d-45ba-b6f6-1ecbf083be9c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Simba\SimbaRock">
+      <UniqueIdentifier>{dadcfbc4-119b-4281-a673-9df0181afb35}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

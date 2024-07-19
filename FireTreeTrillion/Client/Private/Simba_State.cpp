@@ -946,7 +946,7 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		
 	if (CSimba::Simba_DimensionLaser == iState)
 	{
-		if (0.55f > fAnimRatio && false == m_bLaserActivated) {
+		if (0.23f < fAnimRatio && 0.55f > fAnimRatio && false == m_bLaserActivated) {
 			m_bLaserActivated = true;
 			pSimba->Set_LaserActivation(true);
 		}
@@ -958,23 +958,23 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		
 		if(0.05f > fAnimRatio)
 			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 5.f);
-		else
-			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 0.5f);
+		else if(0.33f > fAnimRatio)
+			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 1.f);
 
-		if (0.17f < fAnimRatio && 0.21f > fAnimRatio && false == m_bStarSpawned) {
+		if (0.185f < fAnimRatio && 0.225f > fAnimRatio && false == m_bStarSpawned) {
 			m_bStarSpawned = true;
 			pSimba->ResetStarCount();
 			pSimba->SpawnStar(iState);
 		}
-		else if (0.21f < fAnimRatio && 0.25f > fAnimRatio && true == m_bStarSpawned) {
+		else if (0.225f < fAnimRatio && 0.265f > fAnimRatio && true == m_bStarSpawned) {
 			m_bStarSpawned = false;
 			pSimba->SpawnStar(iState);
 		}
-		else if (0.25f < fAnimRatio && 0.29f > fAnimRatio && false == m_bStarSpawned) {
+		else if (0.265f < fAnimRatio && 0.305f > fAnimRatio && false == m_bStarSpawned) {
 			m_bStarSpawned = true;
 			pSimba->SpawnStar(iState);
 		}
-		else if (0.29f < fAnimRatio && true == m_bStarSpawned) {
+		else if (0.305f < fAnimRatio && true == m_bStarSpawned) {
 			m_bStarSpawned = false;
 			pSimba->SpawnStar(iState);
 		}
