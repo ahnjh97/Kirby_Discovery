@@ -78,6 +78,10 @@ private:
 	vector<CEffect*> m_FXs;
 	_int m_iSelectedFXIdx = { -1 };
 
+	vector<CEffect*> m_Particles;
+	_int m_iSelectedParticleIdx = { -1 };
+
+
 /*복합 이펙트*/
 
 	//존재하는 복합 이펙트 모음
