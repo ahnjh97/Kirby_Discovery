@@ -2041,8 +2041,8 @@ HRESULT CKirby::Kirby_SystemInitialize()
 		}
 		else
 		{
-			//m_fHp = 100.f; // 기존 사용하던 HP입니다.
-			//m_fMaxHp = 100.f;
+			m_fHp = 100.f; // 기존 사용하던 HP입니다.
+			m_fMaxHp = 100.f;
 			m_eAbilityType = ABILITY_DEFAULT;
 		}
 	}

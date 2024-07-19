@@ -419,6 +419,11 @@ PxTransform CUtils::TransformToPxTransform(CTransform* pTransform)
 	return pxTransform;
 }
 
+PxTransform CUtils::ToPxTransform(const _float4x4& mat)
+{
+	return mat44ToTransform(To_Float4x4(mat));
+}
+
 HRESULT CUtils::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
 {
 	ifstream InputFile(_FilePath, ios::binary | ios::in);

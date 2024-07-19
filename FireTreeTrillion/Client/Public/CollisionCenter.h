@@ -42,6 +42,7 @@ public:
     void Collision_Tick(_float fTimeDelta);
     void Add_Ladder(CLadder* pLadder);
     void Add_Collision(COLLISION_TYPE eCollType, class CGameObject* pGameObject);
+    _bool Kirby_Dodge_SlowMotionSystem(class CPhysXObject* pPlayer);
 
 private:
     void Collision_Collider(vector<CGameObject*> Dsts, vector<CGameObject*> Srcs, CCollisionCenter* pthis, 
@@ -79,7 +80,6 @@ private:
 private:
     void Camera_Shaking(_float fPower = 1.f, _float fTime = 0.5f, _float2 vDir = { 0.f, -1.f });
     void Camera_Zooming(_float fZoom);
-    _bool Kirby_Dodge_SlowMotionSystem(CPhysXObject* pPlayer);
 
     // 플레이어와 몬스터의 충돌로, 서로 가볍게넉백된다.
     void Player_Monster_Knock_back(CPhysXObject* pPlayer, CPhysXObject* pMonster);

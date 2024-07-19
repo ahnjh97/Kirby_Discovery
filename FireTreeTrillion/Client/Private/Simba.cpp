@@ -11,6 +11,8 @@
 #include "Ability.h"
 #include "Kirby.h"
 #include "DimensionClaw.h"
+#include "CollisionCenter.h"
+#include "SimbaLaser.h"
 
 CSimba::CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -213,6 +215,9 @@ _int CSimba::Tick(_float fTimeDelta)
 	}
 
 	DetermineSimbaRotation();
+
+	if (m_pSimbaLaser != nullptr && true == m_bLaserActivated)
+		m_pSimbaLaser->Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }
@@ -676,11 +681,14 @@ void CSimba::SetUpDimensionClawWorldMatrix()
 	_float4x4 matWorld = m_pTransformCom->Get_WorldMatrix();
 	memcpy(&matWorld.m[3], &vPos, sizeof(_float4));
 
-	m_pDimensionClawActor->setKinematicTarget(CUtils::mat44ToTransform(CUtils::To_Float4x4(matWorld)));
+	m_pDimensionClawActor->setKinematicTarget(CUtils::ToPxTransform(matWorld));
 }
 
 void CSimba::MoveDimensionClaw(_float fTimeDelta)
 {
+	if (nullptr == m_pDimensionClawActor)
+		return;
+
 	PxTransform pxTransform = m_pDimensionClawActor->getGlobalPose();
 
 	_float4x4 matWorld = CUtils::To_Float4x4(pxTransform);
@@ -693,8 +701,20 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 
 	memcpy(&(matWorld.m[3]), &vPos, sizeof(_float4)); // 새로운 위치 대입
 
-	m_pDimensionClawActor->setGlobalPose(CUtils::mat44ToTransform(CUtils::To_Float4x4(matWorld)));
-} 
+	m_pDimensionClawActor->setGlobalPose(CUtils::ToPxTransform(matWorld));
+}
+
+void CSimba::HideDimensionClawActor()
+{
+	if(nullptr != m_pDimensionClawActor)
+		m_pDimensionClawActor->setKinematicTarget(PxTransform(0, 0, 0));
+}
+
+void CSimba::HideDimensionLaserActor()
+{
+	if (nullptr != m_pSimbaLaser)
+		static_cast<CSimbaLaser*>(m_pSimbaLaser)->HideLaser();
+}
 
 HRESULT CSimba::Add_Components()
 {
@@ -1107,10 +1127,13 @@ void CSimba::ResetRotation()
 
 void CSimba::LaserAttack()
 {
-	_matrix matWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pLaserBone);
-	_vector vLook = matWorld.r[2];
-	vLook *= -1.f;
-	matWorld.r[2] = vLook;
+	_float4x4 matWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pLaserBone);
+	_float fScale = 24.f;
+	CUtils::Set_Scaled_Matrix(matWorld, fScale, fScale, fScale);
+	_float4 vLook{};
+	memcpy(&vLook, &(matWorld.m[2]), sizeof(_float4));
+	vLook = _float4(-vLook.x, -vLook.y, -vLook.z, 0);
+	memcpy(&(matWorld.m[2]), &vLook, sizeof(_float4));
 	m_pSimbaLaserTransform->Set_WorldMatrix(matWorld);
 	m_pSimbaLaser->Activate_Attack();
 }
@@ -1120,7 +1143,7 @@ void CSimba::CreateDimensionClawActor()
 	auto pPhysics = m_pGameInstance->Get_Physics();
 	PxMaterial* pMtrl = m_pGameInstance->Get_Material();
 	
-	PxTransform transform(CUtils::To_PxVec3(m_pControllerCom->Get_Position()));
+	PxTransform transform(PxVec3(0, 0, 0));
 	PxRigidDynamic* pRigidDynamic = pPhysics->createRigidDynamic(transform);
 	PxBoxGeometry boxGeometry(10.f, 1.f, 5.f);
 	
@@ -1148,19 +1171,21 @@ void CSimba::CreateDimensionClawActor()
 	m_pDimensionClawActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 	m_pGameInstance->Register_Trigger(m_pDimensionClawActor, TRIGGER_SIMBA_ATTACK, 0);
 
-	function<void(_int)> func = bind(&CSimba::OnDimensionClawCollision, this);
+	function<void(_int)> func = bind(&CSimba::OnSimbaAttackTrigger, this);
 	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_SIMBA_ATTACK, func);
 
 	pShape1->release();
 	pShape2->release();
 }
 
-void CSimba::OnDimensionClawCollision()
+void CSimba::OnSimbaAttackTrigger()
 {
 	CKirby* pKirby = static_cast<CKirby*>(m_pKirby);
 
-	// 무적이 아닐 경우
-	if (pKirby->isOverPower() == false)
+	if (true == CCollisionCenter::Get_Instance()->Kirby_Dodge_SlowMotionSystem(pKirby))
+		return;
+	
+	if (pKirby->isOverPower() == false) // 무적이 아닐 경우
 	{
 		CTransform* pKirbyTransform = m_pKirby->Get_TransformCom();
 		_vector vKirbyPos = pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION);
@@ -1173,13 +1198,13 @@ void CSimba::OnDimensionClawCollision()
 		vSimbaRight.Normalize();
 
 		if (true == IsKirbyOnMyLeft())
-			vNewDir = vDistance - vSimbaRight * 2.5f;
-		else
 			vNewDir = vDistance + vSimbaRight * 2.5f;
+		else
+			vNewDir = vDistance - vSimbaRight * 2.5f;
 		vNewDir.Normalize();
 		_vector vKnockbackDir = vNewDir;
 
-		pKirby->Set_DamageMoving(vKnockbackDir * 2.4f, 8.2f); // 심바 전용 넉백
+		pKirby->Set_DamageMoving(vKnockbackDir * 2.3f, 8.2f); // 심바 전용 넉백
 
 		_float fMonsterAttack = Get_Attack();
 		pKirby->Minus_Hp(fMonsterAttack);

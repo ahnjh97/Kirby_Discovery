@@ -89,7 +89,7 @@ public:
 	void ChangeDimensionClawUpDown() { m_bDimensionClawUpAttack = !m_bDimensionClawUpAttack; }
 	void Set_StarPosToRightHand() { m_bBiteRushSpawnStarAtLeft = false; }
 	void Set_StarPosToLeftHand() { m_bBiteRushSpawnStarAtLeft = true; }
-	void Set_LaserActivation(_bool bLaserActivation) { m_bLaserActivated = bLaserActivation; }
+	void Set_LaserActivation(_bool bLaserActivation) { m_bLaserActivated = bLaserActivation; HideDimensionLaserActor(); }
 
 public:
 	virtual HRESULT Initialize_Prototype()			override;
@@ -113,6 +113,8 @@ public:
 	_bool			IsKirbyOnMyLeft();
 	void			SetUpDimensionClawWorldMatrix();
 	void			MoveDimensionClaw(_float fTimeDelta);
+	void			HideDimensionClawActor();
+	void			HideDimensionLaserActor();
 
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
@@ -192,7 +194,7 @@ private:
 	void		ResetRotation();
 	void		LaserAttack();
 	void		CreateDimensionClawActor();
-	void		OnDimensionClawCollision();
+	void		OnSimbaAttackTrigger();
 
 public:
 	static CSimba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

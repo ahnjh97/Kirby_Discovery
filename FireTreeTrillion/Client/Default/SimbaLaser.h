@@ -18,6 +18,9 @@ private:
 	virtual ~CSimbaLaser() = default;
 
 public:
+	void HideLaser();
+
+public:
 	virtual HRESULT Initialize_Prototype()						override;
 	virtual HRESULT Initialize(void* pArg)						override;
 	virtual _int	Tick(_float fTimeDelta)						override;
@@ -32,6 +35,7 @@ private:
 	CModel*		m_pModelCom = { nullptr };
 	CShader*	m_pShaderCom = { nullptr };
 	CTexture*	m_pTextureCom = { nullptr };
+	PxRigidDynamic* m_pDynamicActor = { nullptr };
 
 	_float		m_fWhiteColorDiffuse = {};
 

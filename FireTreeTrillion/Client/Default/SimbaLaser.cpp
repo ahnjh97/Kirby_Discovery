@@ -12,6 +12,11 @@ CSimbaLaser::CSimbaLaser(const CSimbaLaser& rhs)
 {
 }
 
+void CSimbaLaser::HideLaser()
+{
+	m_pDynamicActor->setKinematicTarget(PxTransform(0, 0, 0));
+}
+
 HRESULT CSimbaLaser::Initialize_Prototype()
 {
 	return S_OK;
@@ -30,11 +35,30 @@ HRESULT CSimbaLaser::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(Desc)))
 		return E_FAIL;
 
+	_float fScale = 24.f;
+	m_pTransformCom->Set_Scaled(_float3(fScale, fScale, fScale));
+
 	if (FAILED(Add_Components(Desc->wstrModelName)))
 		return E_FAIL;
 
 	m_bMotionBlur = false;
 	m_bRimLight = false;
+
+	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(m_pTransformCom->Get_WorldFloat4x4());
+
+	PxU32 numShapes = m_pDynamicActor->getNbShapes();
+	vector<PxShape*> vecShapes(numShapes);
+	m_pDynamicActor->getShapes(vecShapes.data(), numShapes);
+	for (PxShape* shape : vecShapes) {
+		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+		shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
+		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+	}
+
+	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+
+	m_pGameInstance->AddActor(*m_pDynamicActor);
+	m_pGameInstance->Register_Trigger(m_pDynamicActor, TRIGGER_SIMBA_ATTACK, 1);
 
 	return S_OK;
 }
@@ -44,6 +68,8 @@ _int CSimbaLaser::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	m_pDynamicActor->setKinematicTarget(CUtils::TransformToPxTransform(m_pTransformCom));
+
 	return OBJ_NOEVENT;
 }
 
@@ -51,10 +77,6 @@ void CSimbaLaser::Late_Tick(_float fTimeDelta)
 {
 	if (true == m_bHide)
 		return;
-
-	//m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), 1, -90.f);
-	_float fScale = 24.f;
-	m_pTransformCom->Set_Scaled(_float3(fScale, fScale, fScale));
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
@@ -83,7 +105,7 @@ HRESULT CSimbaLaser::Render()
 
 HRESULT CSimbaLaser::Add_Components(const wstring& _wstrModelName)
 {
-	HRESULT hr;
+	HRESULT hr{};
 
 	/* For.Com_Shader */
 	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel"),
@@ -95,18 +117,18 @@ HRESULT CSimbaLaser::Add_Components(const wstring& _wstrModelName)
 	hr = __super::Add_Component(wstrModelTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
-	CHitBox::HITBOX_DESC tAttack{};
-	tAttack.pOwner = this;
-	tAttack.pDesc = &m_tColliderDesc[ATTACK];
-	tAttack.pCollisionType = LASER_SIMBA;
+	//CHitBox::HITBOX_DESC tAttack{};
+	//tAttack.pOwner = this;
+	//tAttack.pDesc = &m_tColliderDesc[ATTACK];
+	//tAttack.pCollisionType = LASER_SIMBA;
 
-	for (_uint i = 1; i < 12; i++) {
-		tAttack.vOffset = _float3(0, 0, 3.f * i);
-		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
-			return E_FAIL;
-	}
+	//for (_uint i = 1; i < 12; i++) {
+	//	tAttack.vOffset = _float3(0, 0, 3.f * i);
+	//	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
+	//		return E_FAIL;
+	//}
 
-	Activate_SphereCollider(0.f, 3.4f, ATTACK);
+	//Activate_SphereCollider(0.f, 3.4f, ATTACK);
 
 	return S_OK;
 }
@@ -164,6 +186,8 @@ CGameObject* CSimbaLaser::Clone(void* pArg)
 
 void CSimbaLaser::Free()
 {
+	m_pGameInstance->ReleaseActor(m_pDynamicActor);
+
 	__super::Free();
 
 	Safe_Release(m_pTextureCom);

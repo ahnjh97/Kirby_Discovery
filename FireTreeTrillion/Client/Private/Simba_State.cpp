@@ -730,16 +730,6 @@ void CSimba_BiteRushJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		else if (CSimba::Simba_BiteRushFallR == iState)
 			pSimba->Change_State(CSimba::Simba_BiteRushLandingR, 60.f, false, false);
 	}
-
-	/*if (CSimba::Simba_BiteRushFallL == iState && 0.2f < fAnimRatio) {
-		
-		pSimba->Change_State(CSimba::Simba_BiteRushLandingL, 50.f, false, true);
-	}
-		
-	else if (CSimba::Simba_BiteRushFallR == iState && 0.2f < fAnimRatio)
-	{
-		pSimba->Change_State(CSimba::Simba_BiteRushLandingR, 50.f, false, true);
-	}*/
 		
 	if (pSimba->IsAnimFinished())
 	{
@@ -816,8 +806,7 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pSimba->SetUpDimensionClawWorldMatrix();
 		}
 
-		/*if (0.33f > fAnimRatio)
-			*/pSimba->MoveDimensionClaw(fTimeDelta);
+		pSimba->MoveDimensionClaw(fTimeDelta);
 
 		if (0.32f < fAnimRatio && false == m_bStarSpawned) {
 			m_bStarSpawned = true;
@@ -838,8 +827,7 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pSimba->SetUpDimensionClawWorldMatrix();
 		}
 
-		/*if (0.5f > fAnimRatio)
-			*/pSimba->MoveDimensionClaw(fTimeDelta);
+		pSimba->MoveDimensionClaw(fTimeDelta);
 			
 		if (0.53f < fAnimRatio && false == m_bStarSpawned) {
 			m_bStarSpawned = true;
@@ -861,6 +849,7 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pSimba->Change_State(CSimba::Simba_DimensionClawStartContinue, 60.f, false, false);
 			s_iAttackCount++;
 			pSimba->ChangeDimensionClawUpDown();
+			pSimba->HideDimensionClawActor();
 		}
 
 		else if (CSimba::Simba_DimensionClawStartContinue == iState)
@@ -869,9 +858,11 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		else if (CSimba::Simba_DimensionClawContinue == iState)
 		{
 			pSimba->ChangeDimensionClawUpDown();
+			pSimba->HideDimensionClawActor();
+
 			if (2 > s_iAttackCount) {
 				pSimba->Change_State(CSimba::Simba_DimensionClawStartContinue, 60.f, false, false);
-				s_iAttackCount++;	
+				s_iAttackCount++;
 			}
 			else
 				pSimba->Change_State(CSimba::Simba_DimensionClawEnd, 60.f, false, false);
@@ -1022,13 +1013,13 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			pSimba->Change_State(CSimba::Simba_DimensionLaserEnd, 60.f, false, false);
 		else if (CSimba::Simba_DimensionLaserEnd == iState)
 		{
-			//pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 60.f, false, false); // µð¹ö±ë¿ë
+			pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 60.f, false, false); // µð¹ö±ë¿ë
 
-			pSimba->Set_PreState(iState);
+			/*pSimba->Set_PreState(iState);
 			if (true == pSimba->IsKirbyOnMyLeft())
 				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 50.f, false, true);
 			else
-				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);
+				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);*/
 		}
 	}
 }
