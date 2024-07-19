@@ -438,7 +438,12 @@ HRESULT CUI_MessageWindow::Render_Message()
 							{0.f, 3.f} };
 
 		_float4 vMessageShadowRGBA = { 0.1f, 0.1f, 0.1f, 0.1f };
+
 		_float2 vMessageShadowScale = { 1.0f, 1.0f };
+
+		//07.18) 레벨 별 음영 스케일 조정
+		if (LEVEL_DEEDEEDEE == *m_pCurrentLevelID || LEVEL_TOWN == *m_pCurrentLevelID)
+			vMessageShadowScale = { 1.2f, 1.2f };
 
 		// 스크립트 그림자
 		wstring& wstrSubstrMessage = wstrMsg.substr(0, m_iCurCharIndex);
@@ -654,7 +659,6 @@ void CUI_MessageWindow::Ready_FadeOut()
 		}
 	}
 }
-
 
 CUI_MessageWindow* CUI_MessageWindow::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

@@ -23,15 +23,15 @@ HRESULT CBrontoBurt::Initialize_Prototype()
 
 HRESULT CBrontoBurt::Initialize(void* pArg)
 {
-	BRONTOBURT_DESC* pBrontoBurtDesc = nullptr;
+	MONSTER_DESC* pBrontoBurtDesc = nullptr;
 
 	if (nullptr != pArg)
 	{
-		pBrontoBurtDesc = (BRONTOBURT_DESC*)pArg;
+		pBrontoBurtDesc = (MONSTER_DESC*)pArg;
 
 		pBrontoBurtDesc->fSpeedPerSec = 7.f;
 		pBrontoBurtDesc->fRotationPerSec = XMConvertToRadians(90.0f);
-		m_eMonState = pBrontoBurtDesc->eMonState;
+		m_eMonState = (MONSTER_STATE)pBrontoBurtDesc->eMonState;
 		m_vecRallyPoint = pBrontoBurtDesc->vecRallyPoints;
 	}
 

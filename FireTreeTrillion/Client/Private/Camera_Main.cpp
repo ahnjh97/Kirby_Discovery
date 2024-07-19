@@ -710,8 +710,9 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 			{
 			case SEQ_BREAKCARSHOP:
 			{
-				m_pGameInstance->StopSound(CHANNEL_BGM);
-				m_pGameInstance->PlayBGM(L"Welcome to the New World!.mp3");
+				m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
+				m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"Welcome to the New World!.mp3");
+				m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, 0.5f);
 			}
 			break;
 
@@ -857,6 +858,8 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 
 				if (!ISDEFAULTFLOAT(curAction.fZAngle))
 					m_fDestZAngle = m_fCurZAngle = curAction.fZAngle;
+				else
+					m_fDestZAngle = m_fCurZAngle = 0.f;
 
 				if (!ISDEFAULTFLOAT(curAction.fZoomOffset))
 					m_fDestZoomOffset = m_fCurZoomOffset = curAction.fZoomOffset;
@@ -920,6 +923,8 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 					m_fStartZAngle = m_fCurZAngle;
 					m_fDestZAngle = curAction.fZAngle;
 				}
+				else
+					m_fDestZAngle = m_fStartZAngle = 0.f;
 
 				if (!ISDEFAULTFLOAT(curAction.fZoomOffset))
 				{

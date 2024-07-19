@@ -653,45 +653,33 @@ HRESULT CLevel_Park::Ready_Monsters()
 			vecRallyPoints.push_back(_float4(vRallyPointPos.x, vRallyPointPos.y, vRallyPointPos.z, 1));
 		}
 
-		CGameObject::GAMEOBJECT_DESC tempDesc = {};
+
+		CMonster::MONSTER_DESC tempDesc = {};
 		tempDesc.matWorld = matWorld;
 		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 		tempDesc.iShaderVars = iShaderVars;
 		tempDesc.fRimWidth = fRimWidth;
+		tempDesc.eMonState = iTriggerIndex;
+		tempDesc.vecRallyPoints = vecRallyPoints;
 		if (strModelName.size() >= 8) { // NonAnim_ 부분 지우기
 			if ("NonAnim" == strModelName.substr(0, 7))
 				tempDesc.wstrModelName.erase(0, 8);
 		}
 
-		if (10 < iTriggerIndex)
+		if (10 < iTriggerIndex && "Crumble" != strModelName)
 		{
-			CMonster::MONSTER_DESC tMonsterDesc = *static_cast<CMonster::MONSTER_DESC*>(&tempDesc);
-			tMonsterDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
-
-			m_vecMonsterDescs[MONSTER_TRIGGER(iTriggerIndex)].push_back(tMonsterDesc);
+			m_vecMonsterDescs[MONSTER_TRIGGER(iTriggerIndex)].push_back(tempDesc);
 			continue;
 		}
 
 		if (L"Awoofy" == tempDesc.wstrModelName)
 		{
-			CMonster::MONSTER_DESC MonsterDesc = {};
-			MonsterDesc.matWorld = matWorld;
-			MonsterDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			MonsterDesc.iShaderVars = iShaderVars;
-			MonsterDesc.fRimWidth = fRimWidth;
-			MonsterDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &MonsterDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (L"Rabbit" == tempDesc.wstrModelName)
 		{
-			CRabbit::RABBIT_DESC RabbitDesc = {};
-			RabbitDesc.matWorld = matWorld;
-			RabbitDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			RabbitDesc.iShaderVars = iShaderVars;
-			RabbitDesc.fRimWidth = fRimWidth;
-			RabbitDesc.eRabbitState = CRabbit::RABBIT_STATE(iTriggerIndex);
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &RabbitDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (L"Buffahorn" == tempDesc.wstrModelName)
@@ -706,13 +694,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 		}
 		else if (L"PoppyBrosJr" == tempDesc.wstrModelName)
 		{
-			CPoppyBrosJr::POPPY_DESC PoppyDesc = {};
-			PoppyDesc.matWorld = matWorld;
-			PoppyDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			PoppyDesc.iShaderVars = iShaderVars;
-			PoppyDesc.fRimWidth = fRimWidth;
-			PoppyDesc.ePoppyState = CPoppyBrosJr::POPPY_STATE(iTriggerIndex);
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBrosJr"), &PoppyDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBrosJr"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (L"CappyBody" == tempDesc.wstrModelName)
@@ -742,26 +724,12 @@ HRESULT CLevel_Park::Ready_Monsters()
 		}
 		else if (L"Kabu" == tempDesc.wstrModelName)
 		{
-			CKabu::KABU_DESC KabuDesc = {};
-			KabuDesc.matWorld = matWorld;
-			KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			KabuDesc.iShaderVars = iShaderVars;
-			KabuDesc.fRimWidth = fRimWidth;
-			KabuDesc.eMonState = CKabu::MONSTER_STATE(iTriggerIndex);
-			KabuDesc.vecRallyPoints = vecRallyPoints;
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_BrontoBurt")
 		{
-			CBrontoBurt::BRONTOBURT_DESC BrontoBurtDesc = {};
-			BrontoBurtDesc.matWorld = matWorld;
-			BrontoBurtDesc.wstrModelName = CUtils::StrToWstr(strModelName);
-			BrontoBurtDesc.iShaderVars = iShaderVars;
-			BrontoBurtDesc.fRimWidth = fRimWidth;
-			BrontoBurtDesc.eMonState = CBrontoBurt::MONSTER_STATE(iTriggerIndex);
-			BrontoBurtDesc.vecRallyPoints = vecRallyPoints;
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &BrontoBurtDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_Crumble")
@@ -774,7 +742,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 			CrumbleDesc.uInitialState = (_uint)iTriggerIndex;
 			CrumbleDesc.fSpeedPerSec = 10.f;
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Crumble"), &CrumbleDesc)))
-				return E_FAIL; 
+				return E_FAIL;
 		}
 	}
 	fileInput.close();
@@ -888,7 +856,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 		surprisedDesc.matWorld = transformationMatrix;
 		surprisedDesc.eColor = CSurprisedBoard::GREEN;
 		surprisedDesc.eStartState = CSurprisedBoard::WAIT_R; 
-		surprisedDesc.vPosition = _float3(-24.27f, 59.f, 31.5f);
+		surprisedDesc.vPosition = _float3(-24.27f, 59.f, 29.5f);
 		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_LegendBoard"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 
@@ -905,7 +873,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 		surprisedDesc.matWorld = transformationMatrix;
 		surprisedDesc.eColor = CSurprisedBoard::RED;
 		surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
-		surprisedDesc.vPosition = _float3(35.5f, 58.5f, 78.2f);
+		surprisedDesc.vPosition = _float3(35.5f, 58.5f, 76.2f);
 		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_LegendBoard"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 

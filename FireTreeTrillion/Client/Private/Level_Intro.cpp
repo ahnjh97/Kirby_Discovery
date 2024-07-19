@@ -19,6 +19,13 @@
 #include "HUD.h"
 #include "TransingStar.h"
 
+#define BEACH_TO_JUNGLE			-66.f
+#define JUNGLE_TO_NOWHERE		57.f
+#define NOWHERE_TO_BUILDING		80.f
+
+#define VOLUME_BGM				0.5f
+#define VOLUME_JUNGLE_BGM		0.4f
+
 CLevel_Intro::CLevel_Intro(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
@@ -84,10 +91,75 @@ void CLevel_Intro::Change_Levels()
 	pTransingStar->Activate(CTransingStar::CLOSE);
 }
 
+void CLevel_Intro::Manage_BGM() // SOUND_WI
+{
+	// BGM들 노래 끝날때 자연스럽게 이어지게 해야함.
+	switch (m_eKirbyPosState)
+	{
+	case BEACH:
+	{
+		m_pGameInstance->PlayBGM(CHANNEL_BGM_SUB, L"EnvWaterWave.wav");
+	}
+	break;
+	case JUNGLE:
+	{
+		if (m_ePreKirbyPosState == BEACH)
+			m_pGameInstance->PlayBGM(CHANNEL_BGM, L"EnvJungle.wav"); // SOUND_WI
+	}
+	break;
+	case NOBGM:
+	{
+		if(m_ePreKirbyPosState == BUILDING)
+			m_pGameInstance->PlayBGM(CHANNEL_BGM, L"EnvJungle.wav"); // SOUND_WI
+
+		m_pGameInstance->Pause(CHANNEL_BGM_STREAMING, true);
+	}// 이 구간을 위한 사운드는 따로 없습니다
+	break;
+	case BUILDING:
+	{
+		m_pGameInstance->StopSound(CHANNEL_BGM);
+		m_pGameInstance->StopSound(CHANNEL_BGM_SUB);
+
+		static _bool bOnce(false);
+		if (false == bOnce)
+		{
+			m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"Running Through the New World.mp3");
+			bOnce = true;
+		}
+		else
+			m_pGameInstance->Pause(CHANNEL_BGM_STREAMING, false);
+	}
+	break;
+	}
+}
+
+void CLevel_Intro::Check_KirbyPosState()
+{
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(m_iLevel, TEXT("Layer_Player")));
+	_float4 vPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+
+	// 커비 위치값에 따른 state가 변경될때 이전 state를 저장하는 부분을 업데이트합니다.
+	if (m_ePreKirbyPosState != m_eKirbyPosState)
+		m_ePreKirbyPosState = m_eKirbyPosState;
+
+	if (vPos.z < BEACH_TO_JUNGLE) // 바다 소리
+		m_eKirbyPosState = BEACH;
+
+	else if (vPos.z < JUNGLE_TO_NOWHERE && vPos.z >= BEACH_TO_JUNGLE) // 정글 소리
+		m_eKirbyPosState = JUNGLE;
+
+	else if (vPos.z < NOWHERE_TO_BUILDING && vPos.z >= JUNGLE_TO_NOWHERE) // 정글 소리가 거의 안들리는 NO-BGM 상태
+		m_eKirbyPosState = NOBGM;
+
+	else if (vPos.z >= NOWHERE_TO_BUILDING) // 빌딩 나오는 곳
+		m_eKirbyPosState = BUILDING;
+}
+
 void CLevel_Intro::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
+	Sound_Tick(fTimeDelta);
 }
 
 HRESULT CLevel_Intro::Render()
@@ -108,8 +180,48 @@ HRESULT CLevel_Intro::Render()
 		m_iFPS = 0;
 	}
 
-
 	return S_OK;
+}
+
+void CLevel_Intro::Sound_Tick(_float fTimeDelta)
+{
+	static KIRBY_POS_STATE eState = STATE_END;
+	Check_KirbyPosState();
+	if (m_ePreKirbyPosState != m_eKirbyPosState)
+	{
+		Manage_BGM();
+		eState = m_ePreKirbyPosState;
+	}
+
+	switch (m_eKirbyPosState)
+	{
+	case BEACH:
+	{
+		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM_SUB, VOLUME_BGM, fTimeDelta * 0.04f);
+		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.06f);
+	}
+	break;
+	case JUNGLE:
+	{
+		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_JUNGLE_BGM, fTimeDelta * 0.03f);
+		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM_SUB, 0.0f, fTimeDelta * 0.06f);
+	}
+	break;
+	case NOBGM:
+	{
+		if (eState == BUILDING)
+			m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_JUNGLE_BGM, fTimeDelta * 0.1f);
+
+		else if (eState == JUNGLE)
+			m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.1f);
+	}
+	break;
+	case BUILDING:
+	{
+		m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, VOLUME_BGM);
+	}
+	break;
+	}
 }
 
 HRESULT CLevel_Intro::Ready_Lights()
@@ -133,7 +245,6 @@ HRESULT CLevel_Intro::Ready_Lights()
 
 HRESULT CLevel_Intro::Ready_Layer_Camera(const wstring& strLayerTag)
 {
-
 	CCamera_Main::CAMERA_KIRBY_DESC		MainCamDesc{};
 	MainCamDesc.fFovy = XMConvertToRadians(30.0f);
 	MainCamDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
@@ -555,12 +666,12 @@ HRESULT CLevel_Intro::Ready_Monsters()
 		}
 		else if (L"Rabbit" == tempDesc.wstrModelName)
 		{
-			CRabbit::RABBIT_DESC RabbitDesc = {};
+			CMonster::MONSTER_DESC RabbitDesc = {};
 			RabbitDesc.matWorld = matWorld;
 			RabbitDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			RabbitDesc.iShaderVars = iShaderVars;
 			RabbitDesc.fRimWidth = fRimWidth;
-			RabbitDesc.eRabbitState = CRabbit::RABBIT_STATE(iTriggerIndex);
+			RabbitDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Rabbit"), &RabbitDesc)))
 				return E_FAIL;
 		}
@@ -576,12 +687,12 @@ HRESULT CLevel_Intro::Ready_Monsters()
 		}
 		else if (L"PoppyBrosJr" == tempDesc.wstrModelName)
 		{
-			CPoppyBrosJr::POPPY_DESC PoppyDesc = {};
+			CMonster::MONSTER_DESC PoppyDesc = {};
 			PoppyDesc.matWorld = matWorld;
 			PoppyDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			PoppyDesc.iShaderVars = iShaderVars;
 			PoppyDesc.fRimWidth = fRimWidth;
-			PoppyDesc.ePoppyState = CPoppyBrosJr::POPPY_STATE(iTriggerIndex);
+			PoppyDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_PoppyBrosJr"), &PoppyDesc)))
 				return E_FAIL;
 		}
@@ -592,24 +703,24 @@ HRESULT CLevel_Intro::Ready_Monsters()
 		}
 		else if (L"Kabu" == tempDesc.wstrModelName)
 		{
-			CKabu::KABU_DESC KabuDesc = {};
+			CMonster::MONSTER_DESC KabuDesc = {};
 			KabuDesc.matWorld = matWorld;
 			KabuDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			KabuDesc.iShaderVars = iShaderVars;
 			KabuDesc.fRimWidth = fRimWidth;
-			KabuDesc.eMonState = CKabu::MONSTER_STATE(iTriggerIndex);
+			KabuDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
 			KabuDesc.vecRallyPoints = vecRallyPoints;
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Kabu"), &KabuDesc)))
 				return E_FAIL;
 		}
 		else if (strModelName == "NonAnim_BrontoBurt")
 		{
-			CBrontoBurt::BRONTOBURT_DESC BrontoBurtDesc = {};
+			CMonster::MONSTER_DESC BrontoBurtDesc = {};
 			BrontoBurtDesc.matWorld = matWorld;
 			BrontoBurtDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 			BrontoBurtDesc.iShaderVars = iShaderVars;
 			BrontoBurtDesc.fRimWidth = fRimWidth;
-			BrontoBurtDesc.eMonState = CBrontoBurt::MONSTER_STATE(iTriggerIndex);
+			BrontoBurtDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
 			BrontoBurtDesc.vecRallyPoints = vecRallyPoints;
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_BrontoBurt"), &BrontoBurtDesc)))
 				return E_FAIL;

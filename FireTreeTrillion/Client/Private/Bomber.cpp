@@ -39,6 +39,8 @@ HRESULT CBomber::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), ToRadian(180.f));
+
 	m_pModelCom->Set_Animation(BOMBER_WAIT, 50.f, true, true);
 
 
@@ -46,7 +48,7 @@ HRESULT CBomber::Initialize(void* pArg)
 	m_fHp = 5.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_SMALL;
-	m_eAbilityType = ABILITY_DEFAULT;
+	m_eAbilityType = ABILITY_CRASH;
 
 	return S_OK;
 }

@@ -1451,7 +1451,9 @@ _bool CCollisionCenter::FlyAway_KnockBack(_uint uKirbyState)
 {
 	return uKirbyState == CKirby::HAMMERSTATE_ONIGOROSIHAMMEREND ||
 		uKirbyState == CKirby::CRASHSTATE_ATTACK ||
-		uKirbyState == CKirby::CRASHSTATE_BIGATTACKFIRE;
+		uKirbyState == CKirby::CRASHSTATE_BIGATTACKFIRE ||
+		uKirbyState == CKirby::SWORDSTATE_SUPERSPINSLASHEND ||
+		uKirbyState == CKirby::SWORDSTATE_SPINSLASHEND;
 }
 
 void CCollisionCenter::HitStop_Rogic(CKirby* pKirby, _float fStopTime)
@@ -1540,6 +1542,23 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		SwordHit(pMonsterTransform);
 	}
 	break;
+	// Ç® Â÷Â¡ ¿£µå
+	case CKirby::SWORDSTATE_SUPERSPINSLASHEND:
+	{
+		fAttack = 10.f;
+		Camera_Shaking();
+		SwordHit_Big(pMonsterTransform);
+	}
+	break;
+	// ´ú Â÷Â¡ ¿£µå
+	case CKirby::SWORDSTATE_SPINSLASHEND:
+	{
+		fAttack = 5.f;
+		Camera_Shaking();
+		SwordHit_Big(pMonsterTransform);
+	}
+	break;
+
 	// ÇØ¸Ó 5Å¸ Åë ¾Ö´Ô (¸·Å¸)
 	case CKirby::HAMMERSTATE_HAMMERATTACKFINALTOY:
 	{

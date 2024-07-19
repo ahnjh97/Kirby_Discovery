@@ -83,17 +83,17 @@ _int CGm_ParkSolarPanelCharge::Tick(_float fTimeDelta)
 			break;
 		
 		case STATE_CHARGEDSTART: //충전 완료
-			m_pModelCom->Set_Animation(STATE_CHARGEDWAIT, 75.f, FALSE, TRUE);
+			m_pModelCom->Set_Animation(STATE_CHARGEDWAIT, 60.f, FALSE, TRUE);
 			m_eCurState = STATE_CHARGEDWAIT;
 			break;
 
 		case STATE_CHARGEDWAIT: //충전 완료 대기
-			m_pModelCom->Set_Animation(STATE_DECREASES, 10.f, FALSE, TRUE);
+			m_pModelCom->Set_Animation(STATE_DECREASES, 12.5f, FALSE, TRUE);
 			m_eCurState = STATE_DECREASES;
 			break;
 
 		case STATE_DECREASES: //충전 해제
-			m_pModelCom->Set_Animation(STATE_OFFWAITSTART, 100.f, FALSE, TRUE);
+			m_pModelCom->Set_Animation(STATE_OFFWAITSTART, 60.f, FALSE, TRUE);
 			m_eCurState = STATE_OFFWAITSTART;
 			break;
 		case STATE_NONE:	

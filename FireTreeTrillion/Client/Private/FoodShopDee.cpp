@@ -78,6 +78,7 @@ _int CFoodShopDee::Tick(_float fTimeDelta)
 		fAccTime = 0.f;
 	}
 
+	m_bCheckCollision = false;
 	return OBJ_NOEVENT;
 }
 
@@ -90,6 +91,9 @@ void CFoodShopDee::Late_Tick(_float fTimeDelta)
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Late_Tick(m_fTimeDelta);
 
+	// tick-collision_tick을 거쳐서 충돌처리가 안되었다고 판단되면 InteractableUI를 띄우지 않습니다.
+	if (false == m_bCheckCollision)
+		m_pUI_Interactable->Set_IsRender(false);
 
 	//시야 벗어나면 컬링
 	if (!m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 2.0f))
@@ -97,7 +101,6 @@ void CFoodShopDee::Late_Tick(_float fTimeDelta)
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
-
 }
 
 HRESULT CFoodShopDee::Render()
@@ -162,10 +165,8 @@ void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	m_bIsKirbyInZone = true;
 	m_fResetHiTime = 5.f;
 
-
-	static _bool bOnce = false;
 	//DEE NPC 상호작용 시, MessageWindow UI 출력
-	if (bOnce == false && m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
 	{
 		m_pUI_Interactable->Set_IsRender(false);
 
@@ -178,12 +179,11 @@ void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 		CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 		CHECK_NULLPTR(pCameraMain);
 		pCameraMain->Lock_All({ 12.f, 30.f, 1.9f }, { 0.09f, -0.18f, 0.98f }, true);
-
-		bOnce = true;
 	}
 
-	if(bOnce == false)
-		m_pUI_Interactable->Set_IsRender(true);
+	// Interactable UI 처리
+	m_pUI_Interactable->Set_IsRender(true);
+	m_bCheckCollision = true;
 }
 
 HRESULT CFoodShopDee::Add_Components()

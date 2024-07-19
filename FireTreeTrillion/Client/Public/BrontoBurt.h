@@ -21,9 +21,9 @@ public:
 
 	enum BRONTOBURTEYE_STATE { BRONTOBURTEYE_IDLE, BRONTOBURTEYE_HALF, BRONTOBURTEYE_END };
 
-	struct BRONTOBURT_DESC : public CMonster::MONSTER_DESC {
-		vector<_float4> vecRallyPoints;
-	};
+	//struct BRONTOBURT_DESC : public CMonster::MONSTER_DESC {
+	//	vector<_float4> vecRallyPoints;
+	//};
 
 private:
 	CBrontoBurt(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

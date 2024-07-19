@@ -1631,7 +1631,7 @@ HRESULT CLoader::Add_FXTexture()
 	//안개
 	hr = Add_Texture(LEVEL_STATIC, "FX_Fog", "Map/Fog/Sand_%d.png", 4);	CHECK_FAILED(hr);
 	//불
-	hr = Add_Texture(LEVEL_STATIC, "FX_Fire", "Effects/Basic/fire_%d", 2);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Fire", "Effects/Basic/fire_%d.png", 2);	CHECK_FAILED(hr);
 
 	// 파크 몬스터용
 	hr = Add_Texture(LEVEL_STATIC, "FX_ParkSmoke", "Effects/common_smoke08.png");	CHECK_FAILED(hr);
@@ -2479,6 +2479,9 @@ HRESULT CLoader::Add_KirbyFaceTexture(LEVEL eLevel)
 	// BrontoBurt Eye
 	if (FAILED(Add_Texture(eLevel, "BrontoBurt_Eye", "BrontoBurtEye/Face.0%d.dds", 2)))
 		return E_FAIL;
+	// BrontoBurt Eye
+	if (FAILED(Add_Texture(eLevel, "Poppy_Eye", "PoppyEye/FaceTexturePattern.0%d.dds", 11)))
+		return E_FAIL;
 
 	// WaddleDee Eye
 	HRESULT hr = Add_Texture(eLevel, "Dee_Eye", "WaddleDeeEye/eye_%d.png", 6);
@@ -2738,6 +2741,7 @@ void CLoader::Load_KirbyBodyModels()
 
 	m_vecModelInfo.emplace_back("KirbyDumpVacuum", TYPE_ANIM, 0.8f);
 	m_vecModelInfo.emplace_back("KirbyDumpCut", TYPE_ANIM, 0.8f);
+	m_vecModelInfo.emplace_back("KirbyFinalCut", TYPE_ANIM, 1.f);
 
 	// Deform
 	m_vecModelInfo.emplace_back("Bulb", TYPE_ANIM, 1.f, 180.f);
