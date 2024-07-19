@@ -86,6 +86,7 @@
 #include "GhostGordo.h"
 #include "Bomber.h"
 #include "SpawnEffect.h"
+#include "SummonEffect.h"
 
 // 보스 몬스터
 #include "FinalBoss.h"
@@ -445,6 +446,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("GhostGordo"), CGhostGordo);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Bomber"), CBomber);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SpawnEffect"), CSpawnEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SummonEffect"), CSummonEffect);
 
 	// FinalBoss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBoss"), CFinalBoss);
@@ -1632,6 +1634,7 @@ HRESULT CLoader::Add_FXTexture()
 	// 파크 몬스터용
 	hr = Add_Texture(LEVEL_STATIC, "FX_ParkSmoke", "Effects/common_smoke08.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SmokeNormal", "Effects/indirect3_normal.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SpawnEffect", "Effects/SpawnEffect1.png");	CHECK_FAILED(hr);
 
 	//스카이스피어
 	hr = Add_Texture(LEVEL_STATIC, "FX_FinalBoss_SkySphere", "SkySphere/SkySphere_Lab_Diffuse_%d.dds", 3);	CHECK_FAILED(hr);

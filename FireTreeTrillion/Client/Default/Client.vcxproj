@@ -388,6 +388,7 @@
     <ClInclude Include="..\Public\SpookStep_State.h" />
     <ClInclude Include="..\Public\StarBlock.h" />
     <ClInclude Include="..\Public\StarBlockPiece.h" />
+    <ClInclude Include="..\Public\SummonEffect.h" />
     <ClInclude Include="..\Public\SurprisedBoard.h" />
     <ClInclude Include="..\Public\SurprisedBoard_State.h" />
     <ClInclude Include="..\Public\TerrainFog.h" />
@@ -640,6 +641,7 @@
     <ClCompile Include="..\Private\SpookStep_State.cpp" />
     <ClCompile Include="..\Private\StarBlock.cpp" />
     <ClCompile Include="..\Private\StarBlockPiece.cpp" />
+    <ClCompile Include="..\Private\SummonEffect.cpp" />
     <ClCompile Include="..\Private\SurprisedBoard.cpp" />
     <ClCompile Include="..\Private\SurprisedBoard_State.cpp" />
     <ClCompile Include="..\Private\TerrainFog.cpp" />
