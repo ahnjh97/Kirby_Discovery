@@ -627,6 +627,9 @@ void CRenderer::Render_SystemTick(_float fTimeDelta)
 	// ÄÁÅÙÃ÷ »ö»óº¯È­ ±â´É (°´Ã¼µé ÀüºÎ ¾îµÎ¿öÁü)
 	ObjectBlack(fTimeDelta);
 
+	// ÄÁÅÙÃ÷ »ö»óº¯È­ ±â´É (°´Ã¼µé ÀüºÎ È²»ö)
+	Brown(fTimeDelta);
+
 	Key_Input();
 }
 
@@ -1482,6 +1485,17 @@ HRESULT CRenderer::Render_Result()
 		return E_FAIL;
 	if (FAILED(m_pShader->Bind_RawValue("g_fFogViewIntensity", &m_fFogViewIntensity, sizeof(_float))))
 		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_vOceanTopColor", &m_vOceanTopColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_vOceanBottomColor", &m_vOceanBottomColor, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fOceanTopY", &m_fOceanTopY, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fOceanBottomY", &m_fOceanBottomY, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fOceanIntensity", &m_fOceanIntensity, sizeof(_float))))
+		return E_FAIL;
+
 
 	if (FAILED(m_pShader->Bind_RawValue("g_fObjectBlack", &m_fObjectBlack, sizeof(_float))))
 		return E_FAIL;
@@ -1845,16 +1859,9 @@ HRESULT CRenderer::Render_FinalResult()
 		return E_FAIL;
 
 
-	if (FAILED(m_pShader->Bind_RawValue("g_vOceanTopColor", &m_vOceanTopColor, sizeof(_float3))))
+	if (FAILED(m_pShader->Bind_RawValue("g_fBrownTone", &m_fBrownTone, sizeof(_float))))
 		return E_FAIL;
-	if (FAILED(m_pShader->Bind_RawValue("g_vOceanBottomColor", &m_vOceanBottomColor, sizeof(_float3))))
-		return E_FAIL;
-	if (FAILED(m_pShader->Bind_RawValue("g_fOceanTopY", &m_fOceanTopY, sizeof(_float))))
-		return E_FAIL;
-	if (FAILED(m_pShader->Bind_RawValue("g_fOceanBottomY", &m_fOceanBottomY, sizeof(_float))))
-		return E_FAIL;
-	if (FAILED(m_pShader->Bind_RawValue("g_fOceanIntensity", &m_fOceanIntensity, sizeof(_float))))
-		return E_FAIL;
+
 
 
 #pragma endregion
@@ -2356,6 +2363,24 @@ void CRenderer::ObjectBlack(_float fTimeDelta)
 
 			m_bObjectBlack = false;
 		}
+	}
+}
+
+void CRenderer::Brown(_float fTimeDelta)
+{
+	if (m_bBrowning == true)
+	{
+		m_fBrownTone += fTimeDelta * m_fInterpolateBrownRatio;
+
+		if (m_fBrownTone > 1.f)
+			m_fBrownTone = 1.f;
+	}
+	else
+	{
+		m_fBrownTone -= fTimeDelta * m_fInterpolateBrownRatio;
+
+		if (m_fBrownTone < 0.f)
+			m_fBrownTone = 0.f;
 	}
 }
 

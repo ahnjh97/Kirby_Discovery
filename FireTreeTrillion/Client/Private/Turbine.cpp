@@ -35,7 +35,7 @@ HRESULT CTurbine::Initialize(void* pArg)
 	m_bRimLight = false;
 	m_bStencil = true;
 
-	m_pModelCom->Set_Animation(0, 50.f, true, false);
+	m_pModelCom->Set_Animation(0, 60.f, true, false);
 
 	return S_OK;
 }

@@ -906,7 +906,7 @@ void CKirbyDefault_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		if (m_pGameInstance->Get_DIKeyState(DIK_Z, KEY_PRESS) == false)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
-			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
+			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
 			return;
 		}
 	}

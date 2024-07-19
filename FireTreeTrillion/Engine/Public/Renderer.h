@@ -139,6 +139,12 @@ public:
 		m_fObjectBlackMaxTime = fBlackTime;
 	}
 
+	void Set_Brown(_float fTime, _bool bOnOff)
+	{
+		m_bBrowning = bOnOff;
+		m_fInterpolateBrownRatio = 1.f / fTime;
+	}
+
 #ifdef _DEBUG
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderObject);
@@ -296,6 +302,11 @@ private:
 	_float m_fObjectBlackTarget = { 0.f };
 	_bool  m_bRealBlack = { false };
 	_float m_fRealObjectBlack = { 1.f };
+
+	void   Brown(_float fTimeDelta);
+	_bool  m_bBrowning = { false };
+	_float m_fBrownTone = { 0.f };
+	_float m_fInterpolateBrownRatio = { 0.f };
 
 	_bool  m_bMaptool = { false };
 	//_bool  m_bBloomSky = { false };

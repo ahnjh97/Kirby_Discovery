@@ -73,9 +73,9 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용
-	m_eAbilityType = ABILITY_HAMMER;
+	m_eAbilityType = ABILITY_CRASH;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
-		m_eAbilityType = ABILITY_HAMMER;
+		m_eAbilityType = ABILITY_SWORD;
 
 	// 커비의 상태에 따라, 애니메이션이 시작된다.
 	Kirby_StateInitialize();
@@ -1802,6 +1802,14 @@ _bool CKirby::isAnimFinish()
 	return m_pModelCom[INFO(m_eBodyState)]->IsFinished();
 }
 
+_float CKirby::Get_AnimRatio()
+{
+	if (m_pModelCom[INFO(m_eBodyState)] == nullptr)
+		return 0.f;
+
+	return m_pModelCom[INFO(m_eBodyState)]->Get_AnimRatio();
+}
+
 _float CKirby::Get_AnimTrackPosition()
 {
 	return m_pModelCom[m_tKirbyInfo.m_eBodyState]->Get_AnimTrackPosition();
@@ -1956,6 +1964,7 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 			INFO(m_fDumpAbilityTime) = 0.f;
 	}
 
+
 	if (INFO(m_iCrashTimeSlow) == 1)
 	{
 		m_fCrashRestoreTime += fTimeDelta;
@@ -1963,6 +1972,8 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 
 		if (m_fCrashRestoreTime > 4.f)
 		{
+			m_pGameInstance->Set_Brown(0.5f, false);
+
 			INFO(m_iCrashTimeSlow) = 0;
 			m_pGameInstance->Restore_FirstTimer();
 			m_pGameInstance->Restore_SecondTimer();
@@ -1975,6 +1986,7 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 
 		if (m_fCrashRestoreTime > 7.f)
 		{
+			m_pGameInstance->Set_Brown(0.5f, false);
 			INFO(m_iCrashTimeSlow) = 0;
 			m_pGameInstance->Restore_FirstTimer();
 			m_pGameInstance->Restore_SecondTimer();
@@ -2041,8 +2053,8 @@ HRESULT CKirby::Kirby_SystemInitialize()
 		}
 		else
 		{
-			//m_fHp = 100.f; // 기존 사용하던 HP입니다.
-			//m_fMaxHp = 100.f;
+			m_fHp = 100.f; // 기존 사용하던 HP입니다.
+			m_fMaxHp = 100.f;
 			m_eAbilityType = ABILITY_DEFAULT;
 		}
 	}

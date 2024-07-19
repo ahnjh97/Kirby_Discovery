@@ -17,6 +17,7 @@ public:
 		_float4x4		matObjectPosition = _float4x4(); // 정적으로 고정해야하는 위치일 경우 사용합니다.
 		class CBone*	pSocket = { false };
 		_float3			vBoneOffset = { };
+		_float3			vOffset = _float3();
 	};
 
 private:
@@ -57,6 +58,7 @@ private:
 	COLLISION_VALUE     m_eValue = { VALUE_END };
 	_float4x4			m_matFixed = _float4x4();
 	_float3				m_vBoneOffset = {};
+	_float3				m_vOffset = _float3();
 
 public:
 	static CHitBox* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

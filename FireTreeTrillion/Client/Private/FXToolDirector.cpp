@@ -1674,7 +1674,8 @@ void CFXToolDirector::Render_FXProperty()
 		pCurFX = m_MultiFXs[m_iSelectedMultiFXIdx];
 
 	//파티클인가?
-	_bool bIsParticle = _bool{ dynamic_cast<CSingleEffect*>(pCurFX) == nullptr };
+	_bool bIsParticle = (m_eSelected == SELECTED_PARTICLE_FX);
+	//_bool{ m_eSelected == SELECTED_PARTICLE_FX && (dynamic_cast<CSingleEffect*>(pCurFX) == nullptr) };
 
 
 	char tempBuf[256];
