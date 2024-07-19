@@ -213,7 +213,7 @@ PS_OUT PS_MAIN_BLOOM(PS_IN_ALPHABLEND In)
 
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 	
-	if(0.f == Out.vColor.a)
+	if(0.03f >= Out.vColor.a)
         discard;
 		
     return Out;
@@ -251,6 +251,9 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN_ALPHABLEND In)
     
     if ( 0.01f <= Out.vColor.a )
         Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
 	
     return Out;
 }
@@ -270,6 +273,10 @@ PS_OUT PS_MAIN_BLEND_FX_NOSOFTFX(PS_IN_ALPHABLEND In)
     
     Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
     Out.vColor.a = vDiffuse.a * g_fAlpha;
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
 
     return Out;
 }
@@ -292,6 +299,10 @@ PS_OUT PS_MAIN_SOFTFX(PS_IN_ALPHABLEND In)
     Out.vColor.a = vDiffuse.a * saturate((fOldViewZ - In.vProjPos.w) * 0.3f);
     Out.vColor.rgb = vDiffuse.rgb;
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
     
     return Out;
 }
@@ -317,6 +328,10 @@ PS_OUT PS_MAIN_ALPHA_SOFTFX(PS_IN_ALPHABLEND In)
     Out.vColor.rgb = vDiffuse.rgb;
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     
+    if (0.03f >= Out.vColor.a)
+        discard;
+
+    
     return Out;
 }
 
@@ -338,6 +353,10 @@ PS_OUT PS_MAIN_DEFAULT_FX(PS_IN_ALPHABLEND In)
     
     
     Out.vColor = vDiffuse;
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
 	
     return Out;
 }
@@ -368,6 +387,10 @@ PS_OUT PS_MAIN_WHITEFX(PS_IN_ALPHABLEND In)
     Out.vColor.a = vDiffuse.a * g_fAlpha
     * (bMaskAlpha) ? clamp(vMask.a - g_fMaskThreshold, 0.f, vMask.a - g_fMaskThreshold) : clamp(vMask.r - g_fMaskThreshold, 0.f, vMask.r - g_fMaskThreshold);
 	
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
     return Out;
 }
 
@@ -391,6 +414,10 @@ PS_OUT PS_MAIN_FOR_HP(PS_IN_ALPHABLEND In)
     
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     
+    if (0.03f >= Out.vColor.a)
+        discard;
+
+    
     return Out;
 }
 
@@ -413,6 +440,10 @@ PS_OUT PS_MAIN_FOR_HPDAMAGE(PS_IN_ALPHABLEND In)
     
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     
+    if (0.03f >= Out.vColor.a)
+        discard;
+
+    
     return Out;
 }
 
@@ -429,6 +460,10 @@ PS_OUT PS_MAIN_WHITEUI(PS_IN_ALPHABLEND In)
     Out.vColor.a *= g_fAlpha;
 
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
     return Out;
 }
 
@@ -445,6 +480,10 @@ PS_OUT PS_MAIN_ALPHATEST_COLOR(PS_IN In)
     Out.vColor.rgb *= g_vRColor;
 
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
 	
 	return Out;
 }
@@ -473,6 +512,10 @@ PS_OUT PS_MAIN_ALPHATEST_COLOR_HORIZONTALCUT(PS_IN In)
         if (vMask.r > g_fMaskRatio)
             discard;
     }
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
 
 	return Out;
 }
@@ -495,6 +538,10 @@ PS_OUT PS_MAIN_FOR_BOSSBAR(PS_IN In)
     Out.vColor.a *= g_fAlpha;
     
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
     
     return Out;
 }
@@ -525,6 +572,10 @@ PS_OUT PS_MAIN_ALPHATEST_COLOR_VERTICALCUT(PS_IN_ALPHABLEND In)
 
     if (0.01f <= Out.vColor.a)
         Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
 
     return Out;
 }
@@ -566,6 +617,10 @@ PS_OUT PS_FOCUSING_UI(PS_IN_ALPHABLEND In)
             break;
     }
     
+    if (0.03f >= Out.vColor.a)
+        discard;
+
+    
     return Out;
 }
 
@@ -581,6 +636,10 @@ PS_OUT PS_FADE_INOUT(PS_IN_ALPHABLEND In)
     
     if (g_iFade == 1)
         Out.vColor.a *= g_fFadeRatio;
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
     
     return Out;
 }
@@ -600,6 +659,10 @@ PS_OUT PS_CLAW(PS_IN_ALPHABLEND In)
 
     if (0.01f <= Out.vColor.a)
         Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
 	
     return Out;
 }
@@ -622,6 +685,10 @@ PS_OUT PS_QTEBASE(PS_IN In)
     }
     
     Out.vColor.a *= g_fAlpha;
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
     
     return Out;
 }
@@ -647,6 +714,10 @@ PS_OUT PS_QTEPLATE(PS_IN In)
     
     Out.vColor.a *= g_fAlpha;
     
+    if (0.03f >= Out.vColor.a)
+        discard;
+
+    
     return Out;
 }
 
@@ -662,6 +733,11 @@ PS_OUT PS_QTEEFFECT(PS_IN In)
     
     Out.vColor.rgb *= g_vRColor;
     Out.vColor.a *= g_fAlpha;
+    
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
     
     return Out;
 }
@@ -692,6 +768,10 @@ PS_OUT PS_SPAWNEFFECT(PS_IN In)
         discard;
     
     Out.vColor.a *= 0.6f * g_fAlpha;
+    
+    if (0.03f >= Out.vColor.a)
+        discard;
+
     
     return Out;
 }

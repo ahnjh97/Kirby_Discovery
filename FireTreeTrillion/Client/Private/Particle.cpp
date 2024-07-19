@@ -61,6 +61,8 @@ HRESULT CParticle::Initialize(void* pArg)
 
 	m_bIsBillboard = false;
 
+
+
 	hr = Add_Components(FXDesc);
 	CHECK_FAILED(hr);
 
@@ -160,6 +162,12 @@ void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
 
 	pFXData->vRange = m_InstanceDesc.vRange;
 
+<<<<<<< HEAD
+=======
+	pFXData->fMinRange = m_InstanceDesc.fMinRange;
+	pFXData->fMaxRange = m_InstanceDesc.fMaxRange;
+
+>>>>>>> main
 	pFXData->vRotation = m_InstanceDesc.vRotation;
 	pFXData->vRotationRandomOffset = m_InstanceDesc.vRotationRandomOffset;
 	pFXData->vScale = m_InstanceDesc.vScale;
@@ -175,14 +183,22 @@ void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
 	pFXData->fOrbitSpeed = m_InstanceDesc.fOrbitSpeed;
 	pFXData->fOrbitSpeedRandomOffset = m_InstanceDesc.fOrbitSpeedRandomOffset;
 
+	pFXData->fAccSupplyAmount = m_InstanceDesc.fAccSupplyAmount;
+	pFXData->fTurnSupplyAmount = m_InstanceDesc.fTurnSupplyAmount;
+
 	pFXData->vColor = m_InstanceDesc.vColor;
 	pFXData->vColorRandomOffset = m_InstanceDesc.vColorRandomOffset;
+
+	pFXData->vTargetColor = m_InstanceDesc.vTargetColor;
+	pFXData->vTargetColorRandomOffset = m_InstanceDesc.vTargetColorRandomOffset;
+
 	pFXData->fAlpha = m_InstanceDesc.fAlpha;
 	pFXData->fAlphaRandomOffset = m_InstanceDesc.fAlphaRandomOffset;
 
 	pFXData->vPivot = m_InstanceDesc.vPivot;
 
-	//pFXData->bIsColorRender = m_InstanceDesc.bIsColorRender;
+	pFXData->vRotationAxis = m_InstanceDesc.vRotationAxis;
+
 
 	pFXData->iMoveCommandsNum = m_InstanceDesc.vecMoveCommands.size();
 	pFXData->vecMoveCommands = m_InstanceDesc.vecMoveCommands;
@@ -256,6 +272,10 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	VTXMATRIX* pVertices = m_pVIBufferCom->Map();
 
 
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE])
+		m_pVIBufferCom->SimpleMove(fMyTimeDelta, pVertices);
+
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_DROP])
 		m_pVIBufferCom->Drop(fMyTimeDelta, pVertices);
 
@@ -283,12 +303,29 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ORBIT])
 		m_pVIBufferCom->Orbit(fMyTimeDelta, pVertices);
 
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ACCELERATION])
+		m_pVIBufferCom->Acceleration(fMyTimeDelta, pVertices);
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE])
+		m_pVIBufferCom->Decelerate(fMyTimeDelta, pVertices);
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITACCELERATION])
+		m_pVIBufferCom->OrbitAcceleration(fMyTimeDelta, pVertices);
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITDECELERATE])
+		m_pVIBufferCom->OrbitDecelerate(fMyTimeDelta, pVertices);
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_GRAVITY])
 		m_pVIBufferCom->Gravity(fMyTimeDelta, pVertices);
 
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_COLORINTERPOLATE])
+		m_pVIBufferCom->Color_Interpolate(fMyTimeDelta, pVertices);
 
-	m_pVIBufferCom->Apply_Velocity(fMyTimeDelta, pVertices);
+
+	m_pVIBufferCom->Save_PrePos(pVertices);
+
+
+	//m_pVIBufferCom->Apply_Velocity(fMyTimeDelta, pVertices);
 
 	m_pVIBufferCom->Unmap();
 
