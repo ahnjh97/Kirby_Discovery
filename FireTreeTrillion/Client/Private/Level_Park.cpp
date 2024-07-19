@@ -666,7 +666,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 				tempDesc.wstrModelName.erase(0, 8);
 		}
 
-		if (10 < iTriggerIndex)
+		if (10 < iTriggerIndex && "Crumble" != strModelName)
 		{
 			m_vecMonsterDescs[MONSTER_TRIGGER(iTriggerIndex)].push_back(tempDesc);
 			continue;
