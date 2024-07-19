@@ -254,7 +254,8 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_CamTriggerUpOffsets.reserve(LEVEL_END);
 	m_CamTriggerUpOffsets.resize(LEVEL_END);
 
-	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f };
+	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f, 0.f, 0.1f };
+	//m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, 100.f, .15f, 0.f, 0.f, 0.f, 0.f };
 	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .05f };
 	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f, .4f, .5f, 0.2f, 0.2f, 0.f };
 
@@ -1137,6 +1138,7 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 
 	//카메라 보는 기준점 위로 올려주는 놈
 	if (*m_pCurrentLevelID == LEVEL_PARTTIME
+		|| *m_pCurrentLevelID == LEVEL_INTRO
 		|| *m_pCurrentLevelID == LEVEL_FINALBOSS
 		|| *m_pCurrentLevelID == LEVEL_FINALE
 		)
