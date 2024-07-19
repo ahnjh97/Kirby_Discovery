@@ -73,6 +73,11 @@ private:
 	_bool			m_bFire = { false };
 	_bool			m_bFireActive = { false };
 
+	//이펙트 체크 위한 타임
+	_float			m_fFlyingTime = { 0.f };
+	//땅에 꽂히는 순간 파악하는 1틱
+	_bool			m_bCollided = { false };
+
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();

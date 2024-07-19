@@ -1626,6 +1626,8 @@ HRESULT CLoader::Add_FXTexture()
 
 	//안개
 	hr = Add_Texture(LEVEL_STATIC, "FX_Fog", "Map/Fog/Sand_%d.png", 4);	CHECK_FAILED(hr);
+	//불
+	hr = Add_Texture(LEVEL_STATIC, "FX_Fire", "Effects/Basic/fire_%d", 2);	CHECK_FAILED(hr);
 
 	// 파크 몬스터용
 	hr = Add_Texture(LEVEL_STATIC, "FX_ParkSmoke", "Effects/common_smoke08.png");	CHECK_FAILED(hr);

@@ -204,11 +204,10 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 			CTransform* pConeTransform = Src->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
 			vConeLookDir.Normalize();
-			_float2 vDir = XMVector2Normalize(vDstXZ - vSrcXZ);
-			_float2 vConeDir = XMVector2Normalize(_float2(vConeLookDir.x, vConeLookDir.z));
+			_float4 vDir = XMVector3Normalize(vDstPos - vSrcPos);
 
 			// 중점간의 각도를 구하였다.
-			_float fAngle = ToDegree(acos(vConeDir.Dot(vDir)));
+			_float fAngle = ToDegree(acos(vConeLookDir.Dot(vDir)));
 
 			// 만약, 실제 앵글의 범위가 내가 설정한 각도보다 작을 경우
 			if (fAngle < pSrcDesc->fAngle * 0.5f)
@@ -286,11 +285,10 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 			CTransform* pConeTransform = Src->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
 			vConeLookDir.Normalize();
-			_float2 vDir = XMVector2Normalize(vDstXZ - vSrcXZ);
-			_float2 vConeDir = XMVector2Normalize(_float2(vConeLookDir.x, vConeLookDir.z));
+			_float4 vDir = XMVector3Normalize(vDstPos - vSrcPos);
 
 			// 중점간의 각도를 구하였다.
-			_float fAngle = ToDegree(acos(vConeDir.Dot(vDir)));
+			_float fAngle = ToDegree(acos(vConeLookDir.Dot(vDir)));
 
 			// 만약, 실제 앵글의 범위가 내가 설정한 각도보다 작을 경우
 			if (fAngle < pSrcDesc->fAngle * 0.5f)
@@ -326,11 +324,10 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 			CTransform* pConeTransform = Dst->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
 			vConeLookDir.Normalize();
-			_float2 vDir = XMVector2Normalize(vSrcXZ - vDstXZ);
-			_float2 vConeDir = XMVector2Normalize(_float2(vConeLookDir.x, vConeLookDir.z));
+			_float4 vDir = XMVector3Normalize(vSrcPos - vDstPos);
 
 			// 중점간의 각도를 구하였다.
-			_float fAngle = ToDegree(acos(vConeDir.Dot(vDir)));
+			_float fAngle = ToDegree(acos(vConeLookDir.Dot(vDir)));
 
 			// 만약, 실제 앵글의 범위가 내가 설정한 각도보다 작을 경우
 			if (fAngle < pDstDesc->fAngle * 0.5f)
@@ -359,11 +356,10 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 			CTransform* pConeTransform = Dst->Get_TransformCom();
 			_float4 vConeLookDir = pConeTransform->Get_State(CTransform::STATE_LOOK);
 			vConeLookDir.Normalize();
-			_float2 vDir = XMVector2Normalize(vSrcXZ - vDstXZ);
-			_float2 vConeDir = XMVector2Normalize(_float2(vConeLookDir.x, vConeLookDir.z));
+			_float4 vDir = XMVector3Normalize(vSrcPos - vDstPos);
 
 			// 중점간의 각도를 구하였다.
-			_float fAngle = ToDegree(acos(vConeDir.Dot(vDir)));
+			_float fAngle = ToDegree(acos(vConeLookDir.Dot(vDir)));
 
 			// 만약, 실제 앵글의 범위가 내가 설정한 각도보다 작을 경우
 			if (fAngle < pDstDesc->fAngle * 0.5f)
@@ -1148,6 +1144,9 @@ void CCollisionCenter::Hitbox_Collision()
 			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
 				return;
 
+			if (Src->Get_CollisionType() == 99)
+				return;
+
 			CKirby* pKirby = static_cast<CKirby*>(Dst);
 			CPhysXObject* pObject = static_cast<CPhysXObject*>(Src);
 
@@ -1317,10 +1316,39 @@ void CCollisionCenter::Hitbox_Collision()
 
 			CKirby* pKirby = static_cast<CKirby*>(Dst);
 			CAnimDeco* pAnimDeco = static_cast<CAnimDeco*>(Src);
+
+			if (pKirby->Get_KirbyInfo()->m_eBodyState != CKirby::BODY_SWORDDEFAULT)
+				return;
+
 			if (true == pAnimDeco->IsHidden())
 				return;
 
 			pAnimDeco->HideModel();
+			SwordHit(pAnimDeco->Get_TransformCom());
+		});
+
+	// 풀 등과 플레이어
+	Collision_Collider(m_GameObjects[PLAYER], m_GameObjects[ANIMDECO], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CAnimDeco* pAnimDeco = static_cast<CAnimDeco*>(Src);
+
+			if (true == pAnimDeco->IsHidden())
+				return;
+
+			if (pKirby->Get_KirbyInfo()->m_eBodyState != CKirby::BODY_CARDEFAULT)
+				return;
+
+			if (pKirby->Get_KirbyInfo()->m_bBooster == true)
+			{
+				pAnimDeco->HideModel();
+			}
 		});
 
 	// PhysX의 트리거 외에 객체호출 등 작은 단위의 트리거용

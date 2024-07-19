@@ -103,7 +103,7 @@ void CLevel_DeeDeeDee::Ready_FadeIn()
 	CUI_Fading* pFadingUI = dynamic_cast<CUI_Fading*>(pUIObj);
 
 	// FadingUI가 이전에 FadeOut 안되어있다면 NO FadeIn
-	if (pFadingUI->Get_State() != CUI_Fading::FADEOUT) return;
+	//if (pFadingUI->Get_State() != CUI_Fading::FADEOUT) return;
 	
 	if (bOnceFade == false)
 	{
