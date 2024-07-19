@@ -681,7 +681,6 @@ void CRenderer::Key_Input()
 	{
 		Set_ColorSet(Find_ColorSet("Stage1"));
 		m_fRimLightRatio.second = 1.f;
-		m_pGameInstance->PlayBGM(L"Running Through the New World.mp3");
 	}
 }
 
@@ -731,12 +730,14 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 		m_fRimLightRatio.second = .7f;
 		m_fRimLightRadius.second = 1.f;
 		m_vRimColor.second = _float3(1.f, .7f, 4.f);
+		
 
 		break;
 	case 1:
 		m_DestColorData = Find_ColorSet("Forest");
 		m_fRimLightRatio.second = .1f;
 		m_fRimLightRadius.second = 1.f;
+
 		break;
 	case 2:
 		m_DestColorData = Find_ColorSet("Night");
@@ -751,11 +752,7 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 
 		if (m_iCurColorIdx != iSetIdx)
 		{
-			m_pGameInstance->StopSound(CHANNEL_BGM);
-			m_pGameInstance->PlayBGM(L"Running Through the New World.mp3");
-
 			CEffect::FX_DESC FXDesc{};
-
 			FXDesc.vInitPos = { -44.f, 17.f, 121.f };
 			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Flower Particle"), &FXDesc)))

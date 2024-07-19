@@ -105,16 +105,17 @@ void CLevel_DeeDeeDee::Ready_FadeIn()
 	// FadingUI가 이전에 FadeOut 안되어있다면 NO FadeIn
 	//if (pFadingUI->Get_State() != CUI_Fading::FADEOUT) return;
 	
-	if (bOnceFade == false)
+	if (bOnceChanger == false)
 	{
-		pFadingUI->Set_InOutState(CUI_Fading::FADEIN);
-		pFadingUI->Set_IsRender(true);
-		bOnceFade = true;
-	}
-	else if (pFadingUI->Get_FadeRatio() >= 1.f)
-	{
-		if (bOnceChanger == false)
+		if (bOnceFade == false)
 		{
+			pFadingUI->Set_InOutState(CUI_Fading::FADEIN);
+			pFadingUI->Set_IsRender(true);
+			bOnceFade = true;
+		}
+		else if (pFadingUI->Get_FadeRatio() >= 1.f)
+		{
+
 			pFadingUI->Set_IsRender(false);
 			bOnceChanger = true;
 		}

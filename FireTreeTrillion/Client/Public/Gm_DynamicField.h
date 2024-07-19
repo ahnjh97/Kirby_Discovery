@@ -84,6 +84,7 @@ private:
 	_float					m_fTime = { 0.f };
 	_float					m_fQuakeTime = { 0.f };
 	_float					m_fStartQuake = { 0.f };
+	_float4					m_vInitPos = { 0.f, 0.f, 0.f, 1.f };
 	
 	_bool					m_bIsInteraction = { FALSE };
 	_bool					m_bIsQuake = { FALSE };
