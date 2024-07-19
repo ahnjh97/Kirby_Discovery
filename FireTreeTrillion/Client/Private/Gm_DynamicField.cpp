@@ -87,6 +87,7 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 	{
 		m_eDFieldType = DFMOVE_RIGHT;
 		m_eGimmickType = GIMMICK_SURPRISE;
+		m_vInitPos = GET_POS;
 	}
 
 	//if (TEXT("Gimmick_PkFunHouse06") == wstrModelTag)
