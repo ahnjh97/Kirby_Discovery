@@ -461,7 +461,7 @@ void CVIBuffer_Instance::Appear(_float fTimeDelta, VTXMATRIX* pVertices)
 
 		_float3 vScale = CUtils::Get_Scaled_Matrix(InstanceMat);
 
-		vScale = m_pInitialScales[i] * m_InstanceDesc.vInitScale * fTimeRatio;
+		vScale = m_pInitialScales[i] /** m_InstanceDesc.vInitScale*/ * fTimeRatio;
 
 		CUtils::Set_Scaled_Matrix(InstanceMat, vScale.x, vScale.x, vScale.x);
 
@@ -496,7 +496,7 @@ void CVIBuffer_Instance::Disappear(_float fTimeDelta, VTXMATRIX* pVertices)
 
 		_float3 vScale = CUtils::Get_Scaled_Matrix(InstanceMat);
 
-		vScale = m_pInitialScales[i] * m_InstanceDesc.vInitScale * fTimeRatio;
+		vScale = m_pInitialScales[i] /** m_InstanceDesc.vInitScale*/ * fTimeRatio;
 
 		CUtils::Set_Scaled_Matrix(InstanceMat, vScale.x, vScale.x, vScale.x);
 
