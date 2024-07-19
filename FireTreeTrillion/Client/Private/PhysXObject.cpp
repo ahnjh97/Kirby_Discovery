@@ -154,7 +154,7 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 		CEffect::FX_DESC FXDesc{};
 
 		FXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-		FXDesc.vInitScale = { 1.8f, 1.8f, 1.8f };
+		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 
 		Add_Effect("start particle test A", FXDesc);
 

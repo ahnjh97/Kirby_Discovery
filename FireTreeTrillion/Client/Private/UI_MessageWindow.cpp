@@ -660,7 +660,6 @@ void CUI_MessageWindow::Ready_FadeOut()
 	}
 }
 
-
 CUI_MessageWindow* CUI_MessageWindow::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CUI_MessageWindow* pInstance = new CUI_MessageWindow(pDevice, pContext);
