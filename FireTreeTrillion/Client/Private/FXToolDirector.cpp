@@ -1986,14 +1986,14 @@ void CFXToolDirector::Render_FXProperty()
 
 	Dummy({ 0.f, 10.f });
 
-	if (DragFloat3(u8"Å©±â", m_vScale, .01f, 0.011f, 100.f, "%.2f"))
+	if (DragFloat(u8"Å©±â", &pCurParticle->m_InstanceDesc.vScale.x, .01f, 0.001f, 1000.f, "%.3f"))
 	{
-		pCurParticle->m_InstanceDesc.vScale = { m_vScale[0], m_vScale[1], m_vScale[2] };
+		//pCurParticle->m_InstanceDesc.vScale = { m_vScale[0], m_vScale[1], m_vScale[2] };
 		bEdited = true;
 	}
-	if (DragFloat3(u8"Å©±â ·£´ý", m_vScaleRandomOffset, .01f, 0.f, 50.f, "%.2f"))
+	if (DragFloat(u8"Å©±â ·£´ý", &pCurParticle->m_InstanceDesc.vScaleRandomOffset.x, .01f, 0.f, 999.f, "%.3f"))
 	{
-		pCurParticle->m_InstanceDesc.vScaleRandomOffset = { m_vScaleRandomOffset[0], m_vScaleRandomOffset[1], m_vScaleRandomOffset[2] };
+		//pCurParticle->m_InstanceDesc.vScaleRandomOffset = { m_vScaleRandomOffset[0], m_vScaleRandomOffset[1], m_vScaleRandomOffset[2] };
 		bEdited = true;
 	}
 
