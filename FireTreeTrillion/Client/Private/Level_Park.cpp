@@ -888,7 +888,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 		surprisedDesc.matWorld = transformationMatrix;
 		surprisedDesc.eColor = CSurprisedBoard::GREEN;
 		surprisedDesc.eStartState = CSurprisedBoard::WAIT_R; 
-		surprisedDesc.vPosition = _float3(-24.27f, 59.f, 31.5f);
+		surprisedDesc.vPosition = _float3(-24.27f, 59.f, 29.5f);
 		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_LegendBoard"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 
@@ -905,7 +905,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 		surprisedDesc.matWorld = transformationMatrix;
 		surprisedDesc.eColor = CSurprisedBoard::RED;
 		surprisedDesc.eStartState = CSurprisedBoard::WAIT_L;
-		surprisedDesc.vPosition = _float3(35.5f, 58.5f, 78.2f);
+		surprisedDesc.vPosition = _float3(35.5f, 58.5f, 76.2f);
 		hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_LegendBoard"), TEXT("Prototype_GameObject_SurprisedBoard"), &surprisedDesc);
 		CHECK_FAILED(hr);
 
