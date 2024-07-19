@@ -678,9 +678,16 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 
 		CEffect::FX_DESC FXDesc{};
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		FXDesc.vInitScale = { 1.2f, 1.2f, 1.2f };
-		FXDesc.vInitPos = { 0.f, 2.f, 0.f };
-		Add_Effect("HS_FB slash R", FXDesc, true);
+		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
+		Add_Effect("HS_FB slash R", FXDesc);
+
+		CParticle::PARTICLE_DESC ParticleDesc{};
+		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
+		Add_Effect("HS_FinalBossSlash particle L", FXDesc);
+
 	}
 	break;
 	case FINALBOSS_SWINGLEFT:
@@ -692,10 +699,15 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 
 		CEffect::FX_DESC FXDesc{};
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		FXDesc.vInitScale = { 1.2f, 1.2f, 1.2f };
-		FXDesc.vInitPos = { 0.f, 2.f, 0.f };
+		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
+		Add_Effect("HS_FB slash L", FXDesc);
 
-		Add_Effect("HS_FB slash L", FXDesc, true);
+		CParticle::PARTICLE_DESC ParticleDesc{};
+		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
+		Add_Effect("HS_FinalBossSlash particle R", FXDesc);
 	}
 	break;
 	case FINALBOSS_SWINGFINISHLEFT:
@@ -707,10 +719,15 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 
 		CEffect::FX_DESC FXDesc{};
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		FXDesc.vInitScale = { 1.2f, 1.2f, 1.2f };
-		FXDesc.vInitPos = { 0.f, 2.f, -1.f };
-
+		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
 		Add_Effect("HS_FB slash L", FXDesc, true);
+
+		CParticle::PARTICLE_DESC ParticleDesc{};
+		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
+		Add_Effect("HS_FinalBossSlash particle R", FXDesc);
 	}
 	break;
 	default:
