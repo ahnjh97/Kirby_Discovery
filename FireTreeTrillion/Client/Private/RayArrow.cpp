@@ -65,10 +65,16 @@ HRESULT CRayArrow::Initialize(void* pArg)
 
 	CEffect::FX_DESC FXDesc{};
 	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-	//FXDesc.vInitPos = { 0.f, 3.f, 0.f };
 	FXDesc.vInitScale = { 1.2f, 1.2f, 1.2f };
 
 	Add_Effect("HS_RayArrow test", FXDesc, true);
+
+	FXDesc = {};
+	FXDesc.vInitPos = GET_POS;
+	FXDesc.vInitScale = { 1.2f, 1.2f, 1.2f };
+	Add_Effect("HS_FB white pop arrow bubble");
+
+
 
 	return S_OK;
 }
