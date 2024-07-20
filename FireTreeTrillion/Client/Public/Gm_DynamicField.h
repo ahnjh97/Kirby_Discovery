@@ -19,7 +19,7 @@ public:
 	enum GIMMICK_TYPE { GIMMICK_SPONCE, GIMMICK_SPCHARGE, GIMMICK_SURPRISE, GIMMICK_NONE };
 
 	enum DFMOVEUP_TYPE { DFMOVEUP_01, DFMOVEUP_02, DFMOVEUP_03, DFMOVEUP_END };
-	enum DFMOVE_STATE { DFIELD_MOVE, DFIELD_QUAKE, DFIELD_WAIT, DFIELD_NONE };
+	enum DFMOVE_STATE { DFIELD_MOVE, DFIELD_QUAKE, DFIELD_RETURN, DFIELD_WAIT, DFIELD_IDLE };
 
 public:
 	void Set_SolarPanelOnce(class CGm_ParkSolarPanelOnce* _pSolarPanel);
@@ -29,9 +29,11 @@ public:
 	_uint Get_GimmickIndex() { return  m_iGimmickIndex; }
 	
 	_bool IsActivated() { return m_bIsInteraction; }
-	void Set_Interaction(_bool bInteraction) { m_bIsInteraction = bInteraction; }
+	void Set_Interaction(_bool _bIsInteraction) { m_bIsInteraction = _bIsInteraction; }
+	//void Set_DFMoveState(DFMOVE_STATE _eDFMoveState) { m_eDFMoveState = _eDFMoveState; }
+
 	void RegisterToActorToKirby();
-	void Set_ReturnMove(_bool _bReturnMove) { m_bIsReturnMove = _bReturnMove; }
+	void Set_ReturnMove(_bool _bReturnMove) { m_bReturnMove = _bReturnMove; }
 	void EmplaceBackItem(CPhysXObject* pItem) { m_vecItems.emplace_back(pItem); Safe_AddRef(pItem); }
 
 private:
@@ -78,7 +80,9 @@ private:
 
 	DYNAMICFILED_TYPE		m_eDFieldType = { DFMOVE_NONE };
 	GIMMICK_TYPE			m_eGimmickType = { GIMMICK_NONE };
-	DFMOVE_STATE			m_eDFMoveState = { DFIELD_NONE };
+
+	DFMOVE_STATE			m_eDFMoveState = { DFIELD_IDLE };
+	DFMOVE_STATE			m_eDFMovePreState = { DFIELD_IDLE };
 
 
 	CGm_ParkSolarPanelOnce::PANELONCE_STATE m_eSPOnceState = {};
@@ -94,7 +98,7 @@ private:
 	_bool					m_bIsQuake = { FALSE };
 	_bool					m_bStartQuake = { FALSE };
 
-	_bool					m_bIsReturnMove = { FALSE };
+	_bool					m_bReturnMove = { FALSE };
 
 	_uint					m_iGimmickIndex = {};
 

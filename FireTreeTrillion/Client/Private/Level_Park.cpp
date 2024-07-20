@@ -23,6 +23,7 @@
 #include "Gm_ParkSolarPanelOnce.h"
 #include "Gm_ParkSolarPanelCharge.h"
 
+#include "WaddleDee.h"
 #include "ItemObject.h"
 
 #define MONSTER_TRIGGER(index) (index - 11)
@@ -164,26 +165,23 @@ void CLevel_Park::SummonEffectForMonster(_uint iTriggerIndex)
 		_float4 vRight = _float4(monsterDesc.matWorld._11, monsterDesc.matWorld._12, monsterDesc.matWorld._13, monsterDesc.matWorld._14);
 		_float4 vUp = _float4(monsterDesc.matWorld._21, monsterDesc.matWorld._22, monsterDesc.matWorld._23, monsterDesc.matWorld._24);
 		_float4 vLook = _float4(monsterDesc.matWorld._31, monsterDesc.matWorld._32, monsterDesc.matWorld._33, monsterDesc.matWorld._34);
-		tDesc.vPosition = vPos + vLook * 0.1f;
-		tDesc.fScale = 1.f;
-		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
-		CHECK_FAILED(hr);
-		tDesc.vPosition = vPos + vUp * 0.5f;
-		tDesc.fScale = 1.3f;
-		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
-		CHECK_FAILED(hr);
-		tDesc.vPosition = vPos + vRight * 0.5f;
-		tDesc.fScale = 1.3f;
-		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
-		CHECK_FAILED(hr);
-		tDesc.vPosition = vPos - vRight * 0.5f;
-		tDesc.fScale = 1.3f;
-		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
-		CHECK_FAILED(hr);
-		tDesc.vPosition = vPos - vUp * 0.5f;
-		tDesc.fScale = 1.3f;
-		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
-		CHECK_FAILED(hr);
+
+		_float fAngle = { 0.f };
+		_uint iNum = CUtils::Make_RandomInt(5, 7);
+		for (_uint i = 0; i < iNum; ++i)
+		{
+			_float fDistance = CUtils::Make_RandomFloat(2.f, 4.f);
+			_float4 vRotatePos = {};
+			fAngle += 360.f / (_float)iNum + i + CUtils::Make_RandomFloat(0.f, 10.f);
+			vRotatePos.x = vPos.x + (fDistance * cos(fAngle) * vLook.x) - (fDistance * sin(fAngle) * vLook.z);
+			vRotatePos.y = vPos.y + (fDistance * sin(fAngle) * vLook.x) + (fDistance * cos(fAngle) * vLook.y);
+			vRotatePos.z = vPos.z;
+			vRotatePos.w = 1.f;
+			tDesc.vPosition = vRotatePos;
+			tDesc.fScale = 1.9f;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
+			CHECK_FAILED(hr);
+		}
 	}
 }
 
@@ -655,7 +653,6 @@ HRESULT CLevel_Park::Ready_Monsters()
 			vecRallyPoints.push_back(_float4(vRallyPointPos.x, vRallyPointPos.y, vRallyPointPos.z, 1));
 		}
 
-
 		CMonster::MONSTER_DESC tempDesc = {};
 		tempDesc.matWorld = matWorld;
 		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
@@ -746,6 +743,35 @@ HRESULT CLevel_Park::Ready_Monsters()
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Crumble"), &CrumbleDesc)))
 				return E_FAIL;
 		}
+
+#pragma region WADDLE_DEE
+
+		/*
+		CWaddleDee::DEE_DESC ObjDesc{};
+		ObjDesc.fSpeedPerSec = 5.f;
+		ObjDesc.fRotationPerSec = ToRadian(90.f);
+		_float4x4 InitMat = _float4x4::Identity;
+		InitMat.Translation({ 10.2f, 24.7f, 26.f });
+		ObjDesc.matWorld = InitMat;
+
+		if (L"WaddleDee" == tempDesc.wstrModelName)
+		{
+			CWaddleDee::DEE_DESC DeeDesc = {};
+			DeeDesc.matWorld = matWorld;
+			DeeDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			DeeDesc.iShaderVars = iShaderVars;
+			DeeDesc.fRimWidth = fRimWidth;
+
+			//원래 인덱스를 넘어가면 맨 마지막 놈으로다가 매치
+			DeeDesc.eCharacter = DEECHARACTER_IDLE;
+
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_BattleDee"), &DeeDesc)))
+				return E_FAIL;
+		}
+		*/
+
+#pragma endregion
+
 	}
 	fileInput.close();
 

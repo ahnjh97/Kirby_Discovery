@@ -83,25 +83,30 @@ _int CSurprisedBoard::Tick(_float fTimeDelta)
 		{
 			if (0.45f < m_arrModelCom[m_eModelColor]->Get_AnimRatio())
 			{
-				m_bNotified = true;
+				m_bNotified = TRUE;
 				m_bReturnMove = TRUE;
 				CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(m_pDynamicField);
-				pDynamicField->Set_Interaction(true);
+				pDynamicField->Set_Interaction(TRUE);
+				pDynamicField->Set_ReturnMove(FALSE);
 			}
 		}
 		
 	}
 
-	if (m_bReturnMove)
+	if (m_bReturnMove && nullptr != m_pDynamicField)
 	{
 		_uint iAnimIndex = Get_State();
 		if (RETURN_L == iAnimIndex || RETURN_R == iAnimIndex)
 		{
-			m_bReturnMove = FALSE;
-			CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(m_pDynamicField);
-			pDynamicField->Set_ReturnMove(TRUE);
+			if (0.2f < m_arrModelCom[m_eModelColor]->Get_AnimRatio())
+			{
+				m_bReturnMove = FALSE;
+				CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(m_pDynamicField);
+				pDynamicField->Set_ReturnMove(TRUE);
+			}
 		}
 	}
+
 	return OBJ_NOEVENT;
 }
 
@@ -202,16 +207,20 @@ void CSurprisedBoard::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXO
 	if (true == m_bActivated)
 		return;
 
-	m_bActivated = true;
-
 	if (eContent == CCollisionCenter::CONTENT_TRIGGER)
 	{
 		_uint uState = __super::Get_State();
 		if (uState == WAIT_L)
+		{
 			Change_State(CSurprisedBoard::PREPOP_OUT_L, 60.f, false, false);
-			
+			m_bActivated = true; //깜놀보드 기믹 1회성 > 재수행을 위해 로직 수정
+		}
+
 		else if (uState == WAIT_R)
+		{
 			Change_State(CSurprisedBoard::PREPOP_OUT_R, 60.f, false, false);
+			m_bActivated = true;
+		}
 	}
 }
 

@@ -88,6 +88,7 @@
 #include "GhostGordo.h"
 #include "Bomber.h"
 #include "SpawnEffect.h"
+#include "SummonEffect.h"
 
 // 보스 몬스터
 #include "FinalBoss.h"
@@ -154,6 +155,7 @@
 #include "Simba.h"
 #include "SimbaLaser.h"
 #include "DimensionClaw.h"
+#include "SimbaRock.h"
 
 // 피날레 스테이지 기믹들
 #include "Baum.h"
@@ -450,6 +452,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("GhostGordo"), CGhostGordo);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Bomber"), CBomber);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SpawnEffect"), CSpawnEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SummonEffect"), CSummonEffect);
 
 	// FinalBoss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBoss"), CFinalBoss);
@@ -569,6 +572,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Simba"), CSimba);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaLaser"), CSimbaLaser);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DimensionClaw"), CDimensionClaw);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaRock"), CSimbaRock);
 #pragma endregion
 
 #pragma endregion
@@ -1640,6 +1644,7 @@ HRESULT CLoader::Add_FXTexture()
 	// 파크 몬스터용
 	hr = Add_Texture(LEVEL_STATIC, "FX_ParkSmoke", "Effects/common_smoke08.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SmokeNormal", "Effects/indirect3_normal.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SpawnEffect", "Effects/SpawnEffect1.png");	CHECK_FAILED(hr);
 
 	//스카이스피어
 	hr = Add_Texture(LEVEL_STATIC, "FX_FinalBoss_SkySphere", "SkySphere/SkySphere_Lab_Diffuse_%d.dds", 3);	CHECK_FAILED(hr);
@@ -1750,6 +1755,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FXThunderLine", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXMeteoDash", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXDonut", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("LaserNonAnim", TYPE_NONANIM);
 
 		//공통이펙트 - YW
 		m_vecModelInfo.emplace_back("Cube", TYPE_NONANIM);
@@ -2067,6 +2073,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("SolarPanelOnce_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SolarPanelOnce_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		
+		//와들디
+		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
 
 		// For Kirby Body
@@ -2138,10 +2147,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Boss 
 		m_vecModelInfo.emplace_back("Simba", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("SimbaLaser", TYPE_NONANIM);
-
+		
 		for (_uint i = 0; i <= 16; i++) {
 			string strTunnelRock = "TunnelRock" + to_string(i);
-			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM, 0.1f);
+			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM);
 		}
 
 		// For Item
@@ -2149,10 +2158,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_FINALBOSS)
 	{
-		vector<_uint> vecTunnelRocks = { 2, 4, 5, 7, 8, 9, 10, 12, 13, 16 };
-		for (auto& rockIndex : vecTunnelRocks) {
-			string strTunnelRock = "TunnelRock" + to_string(rockIndex);
-			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM);
+		for (_uint i = 0; i <= 17; i++) {
+			string strTunnelRock = "TunnelRock" + to_string(i);
+			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM, 0.1f);
 		}
 
 		//보스전 필드에서만 생성하는 SUB_SKYSPHERE (BackGround 요소)

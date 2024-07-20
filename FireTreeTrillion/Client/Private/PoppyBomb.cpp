@@ -81,102 +81,105 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 		return Ready_Dead();
 	}
 
-	if (static_cast<CPoppyBrosJr*>(m_pGameObject)->Get_Dead() || CPoppyBrosJr::POPPY_DAMAGE == static_cast<CPoppyBrosJr*>(m_pGameObject)->Get_State())
-		m_bDead = true;
-
-	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
-
-	// 바닥에 닿았을 때 물리 영향을 받음
-	if (true == m_bPhysx)
+	if (m_ePhyXState != PO_VACUUMING)
 	{
-		_vector vGravity = XMVectorSet(0.f, -GRAVITY, 0.f, 0.f);
-
-		// 경사면 법선 벡터
-		_vector vNormal = CUtils::To_Vector(m_pControllerCom->Compute_Slope(m_pTransformCom));
-
-		// 중력 벡터를 경사면 법선에 투영하여 평면상에서의 중력 계산
-		_vector vGravityParallel = XMVector3Dot(vGravity, vNormal) * vNormal;
-		_vector vGravityPerpendicular = vGravity - vGravityParallel;
-
-		// 마찰력 계산
-		// 마찰력은 중력과 반대 방향으로 작용하며, 타임 델타를 반영하여 계산
-		_vector vFriction = -0.5f * vGravityPerpendicular;
-
-		// 가속도 계산
-		_vector vAcceleration = vGravityPerpendicular + vFriction;
-
-		// 속도 계산
-		_vector vVelocity = {};
-		vVelocity += vAcceleration;
-
-		// 이동
-		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-
-		vPos += (vVelocity * m_fTimeDelta * 5.f + (XMVector3Normalize(m_vLookDir) * m_fTimeDelta * m_fMoveTime * 2.f));
-		m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta);
-
-		if (0.f < m_fMoveTime)
-			m_fMoveTime -= m_fTimeDelta;
-		else
-			m_fMoveTime = 0.f;
-
-		if (0.f >= m_fMoveTime)
-			m_fLifeTime += m_fTimeDelta;
-
-		if (2.f < m_fLifeTime)
+		if (static_cast<CPoppyBrosJr*>(m_pGameObject)->Get_Dead() || CPoppyBrosJr::POPPY_DAMAGE == static_cast<CPoppyBrosJr*>(m_pGameObject)->Get_State())
 			m_bDead = true;
 
-		_vector vLook = vPos - m_vBeforePos;
-		_float fDistance = XMVectorGetX(XMVector3Length(vLook)) / m_fTimeDelta;
+		m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-		// 벡터가 0 벡터가 아닌지 확인
-		if (!XMVector3Equal(vLook, XMVectorZero()))
+		// 바닥에 닿았을 때 물리 영향을 받음
+		if (true == m_bPhysx)
 		{
-			_vector vRight = XMVector3Cross(XMVector3Normalize(vLook), XMVector3Normalize(vNormal));
-			if (!XMVector3Equal(vRight, XMVectorZero()))
+			_vector vGravity = XMVectorSet(0.f, -GRAVITY, 0.f, 0.f);
+
+			// 경사면 법선 벡터
+			_vector vNormal = CUtils::To_Vector(m_pControllerCom->Compute_Slope(m_pTransformCom));
+
+			// 중력 벡터를 경사면 법선에 투영하여 평면상에서의 중력 계산
+			_vector vGravityParallel = XMVector3Dot(vGravity, vNormal) * vNormal;
+			_vector vGravityPerpendicular = vGravity - vGravityParallel;
+
+			// 마찰력 계산
+			// 마찰력은 중력과 반대 방향으로 작용하며, 타임 델타를 반영하여 계산
+			_vector vFriction = -0.5f * vGravityPerpendicular;
+
+			// 가속도 계산
+			_vector vAcceleration = vGravityPerpendicular + vFriction;
+
+			// 속도 계산
+			_vector vVelocity = {};
+			vVelocity += vAcceleration;
+
+			// 이동
+			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+			vPos += (vVelocity * m_fTimeDelta * 5.f + (XMVector3Normalize(m_vLookDir) * m_fTimeDelta * m_fMoveTime * 2.f));
+			m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta);
+
+			if (0.f < m_fMoveTime)
+				m_fMoveTime -= m_fTimeDelta;
+			else
+				m_fMoveTime = 0.f;
+
+			if (0.f >= m_fMoveTime)
+				m_fLifeTime += m_fTimeDelta;
+
+			if (2.f < m_fLifeTime)
+				m_bDead = true;
+
+			_vector vLook = vPos - m_vBeforePos;
+			_float fDistance = XMVectorGetX(XMVector3Length(vLook)) / m_fTimeDelta;
+
+			// 벡터가 0 벡터가 아닌지 확인
+			if (!XMVector3Equal(vLook, XMVectorZero()))
 			{
-				m_pTransformCom->Turn(-vRight, m_fTimeDelta * fDistance);
-				m_vBeforePos = vPos;
+				_vector vRight = XMVector3Cross(XMVector3Normalize(vLook), XMVector3Normalize(vNormal));
+				if (!XMVector3Equal(vRight, XMVectorZero()))
+				{
+					m_pTransformCom->Turn(-vRight, m_fTimeDelta * fDistance);
+					m_vBeforePos = vPos;
+				}
 			}
 		}
-	}
-	// 폭탄이 손에서 날아갈 타이밍
-	else if (true == m_bBomb)
-	{
-		// 폭탄이 땅에 떨어졌을 때
-		if (!m_bJump)
+		// 폭탄이 손에서 날아갈 타이밍
+		else if (true == m_bBomb)
 		{
-			//m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 6.f, 0.5f);
-			m_pModelCom->Set_Animation(0, 30.f, true, false);
-			m_bPhysx = true;
+			// 폭탄이 땅에 떨어졌을 때
+			if (!m_bJump)
+			{
+				//m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 6.f, 0.5f);
+				m_pModelCom->Set_Animation(0, 30.f, true, false);
+				m_bPhysx = true;
+			}
+			// 폭탄이 포물선을 그리며 날아감
+			else
+			{
+				m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), m_fTimeDelta * 1.5f);
+
+				m_fJumpTimeDelta += m_fTimeDelta;
+
+				// 매 Tick 점프 중인 위치 벡터 받아오기
+				_vector vGoPos = JumpAttak(m_fJumpTimeDelta);
+
+				// 점프 위치 벡터를 physx에 던지기
+				m_bJump = m_pControllerCom->Jump_Parabola(m_pTransformCom, vGoPos, m_fTimeDelta);
+			}
 		}
-		// 폭탄이 포물선을 그리며 날아감
+		// 폭탄이 몬스터 손에 붙어 있을 때
 		else
 		{
-			m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), m_fTimeDelta * 1.5f);
+			// 폭탄을 몬스터 손에 붙힘
+			_float4 vPos = dynamic_cast<CPoppyBrosJr*>(m_pGameObject)->Compute_BoneWorldMatrix();
+			m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta);
 
-			m_fJumpTimeDelta += m_fTimeDelta;
-
-			// 매 Tick 점프 중인 위치 벡터 받아오기
-			_vector vGoPos = JumpAttak(m_fJumpTimeDelta);
-
-			// 점프 위치 벡터를 physx에 던지기
-			m_bJump = m_pControllerCom->Jump_Parabola(m_pTransformCom, vGoPos, m_fTimeDelta);
-		}
-	}
-	// 폭탄이 몬스터 손에 붙어 있을 때
-	else
-	{
-		// 폭탄을 몬스터 손에 붙힘
-		_float4 vPos = dynamic_cast<CPoppyBrosJr*>(m_pGameObject)->Compute_BoneWorldMatrix();
-		m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta);
-
-		if (0.5f < dynamic_cast<CPoppyBrosJr*>(m_pGameObject)->Get_AnimRatio())
-		{
-			// 타겟 위치에 포물선 궤적 계산
-			m_pTransformCom->Look_At(m_vTargetPosition);
-			Compute_Parabola(m_vTargetPosition);
-			m_bBomb = true;
+			if (0.5f < dynamic_cast<CPoppyBrosJr*>(m_pGameObject)->Get_AnimRatio())
+			{
+				// 타겟 위치에 포물선 궤적 계산
+				m_pTransformCom->Look_At(m_vTargetPosition);
+				Compute_Parabola(m_vTargetPosition);
+				m_bBomb = true;
+			}
 		}
 	}
 
@@ -187,12 +190,11 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 
 void CPoppyBomb::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(m_fTimeDelta/* * (1.f + pow(m_fBombingTime, 4.f))*/);
-
 	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
 	if (m_ePhyXState == PO_KIRBYMOUTH)
 		return;
 
+	m_pModelCom->Play_Animation(m_fTimeDelta/* * (1.f + pow(m_fBombingTime, 4.f))*/);
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
