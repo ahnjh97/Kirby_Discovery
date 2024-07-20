@@ -191,7 +191,6 @@ void CUI_PartTimeResult::Render_Digits()
 				}
 				if (fTimeAcc >= 2.5f && !bTwice)
 				{
-					// 이펙트 넣기 // 여기야 효선아
 
 					//결과 UI
 					if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_FoodGame success UI"))))

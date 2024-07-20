@@ -1721,6 +1721,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		//이펙트 입히는 원기둥
 		m_vecModelInfo.emplace_back("CylinderA", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("CylinderB", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("CylinderC", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("CylinderD", TYPE_NONANIM);
 
 		m_vecModelInfo.emplace_back("Dash", TYPE_NONANIM);
 

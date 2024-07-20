@@ -676,11 +676,11 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
 
-		CEffect::FX_DESC FXDesc{};
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
-		Add_Effect("HS_FB slash R", FXDesc);
+		Add_Effect("HS_FB Slash R Multi", FXDesc);
 
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
@@ -697,11 +697,11 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
 
-		CEffect::FX_DESC FXDesc{};
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
-		Add_Effect("HS_FB slash L", FXDesc);
+		Add_Effect("HS_FB Slash L Multi", FXDesc);
 
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
@@ -717,11 +717,11 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
 
-		CEffect::FX_DESC FXDesc{};
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
-		Add_Effect("HS_FB slash L", FXDesc, true);
+		Add_Effect("HS_FB Slash L Multi", FXDesc, true);
 
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();

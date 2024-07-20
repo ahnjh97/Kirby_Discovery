@@ -394,7 +394,7 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	FXPath = "../Bin/Resources/Effects/Multi/";
 	if (!exists(FXPath) || !is_directory(FXPath))
 	{
-		ALARM_FAIL(TEXT("���߾� ��� ����"));
+		ALARM_FAIL("multi fx load fail");
 		return E_FAIL;
 	}
 
