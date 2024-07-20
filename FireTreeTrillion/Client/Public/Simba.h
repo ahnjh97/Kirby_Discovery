@@ -167,6 +167,9 @@ private:
 	_bool			m_bLaserActivated = { false };
 	_bool			m_bRenderDimensionClaw = { false };
 
+	vector<class CSimbaRock*>	m_vecSimbaRocks;
+	vector<class CDebris*>		m_vecDebris;
+
 private:
 	HRESULT		Add_Components();
 	HRESULT		Bind_ShaderResources();

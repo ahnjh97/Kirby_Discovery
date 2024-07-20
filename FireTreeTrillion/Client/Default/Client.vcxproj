@@ -379,6 +379,7 @@
     <ClInclude Include="..\Public\RayArrow.h" />
     <ClInclude Include="..\Public\RigidObject.h" />
     <ClInclude Include="..\Public\Simba.h" />
+    <ClInclude Include="..\Public\SimbaRock.h" />
     <ClInclude Include="..\Public\SimbaRoomGlass.h" />
     <ClInclude Include="..\Public\Simba_State.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
@@ -634,6 +635,7 @@
     <ClCompile Include="..\Private\RayArrow.cpp" />
     <ClCompile Include="..\Private\RigidObject.cpp" />
     <ClCompile Include="..\Private\Simba.cpp" />
+    <ClCompile Include="..\Private\SimbaRock.cpp" />
     <ClCompile Include="..\Private\SimbaRoomGlass.cpp" />
     <ClCompile Include="..\Private\Simba_State.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />

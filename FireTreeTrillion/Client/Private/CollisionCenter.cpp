@@ -969,7 +969,7 @@ void CCollisionCenter::Body_To_Body_Collision()
 			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
 				return;
 
-			CPhysXObject* pDstObject = static_cast<CMonster*>(Dst);
+			CPhysXObject* pDstObject = static_cast<CPhysXObject*>(Dst);
 			CMonster* pSrcMonster = static_cast<CMonster*>(Src);
 
 			// 반드시, 오브젝트가 날아가는 상황이여야 한다.
@@ -1412,7 +1412,7 @@ void CCollisionCenter::Hitbox_Collision()
 				return;
 
 			CPhysXObject* pPlayer = static_cast<CPhysXObject*>(Dst);
-			CPhysXObject* pMonster = static_cast<CDeeDeeDee*>(Src);
+			CPhysXObject* pMonster = static_cast<CPhysXObject*>(Src);
 
 			//if (pNpc->Get_PhyXState() != PO_NORMAL)
 			//	return;
