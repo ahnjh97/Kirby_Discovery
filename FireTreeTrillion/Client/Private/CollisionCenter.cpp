@@ -220,9 +220,41 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 		}
 		else if (pSrcDesc->eHitbox == COLLIDER_TUBE)
 		{
+			_float4 vDstPos = pDstTransform->Get_State(CTransform::STATE_POSITION);
+			_float4 vSrcPos = pSrcTransform->Get_State(CTransform::STATE_POSITION);
 
+			// 실린더 형태의 X,Z
+			_float2 vDstXZ = { vDstPos.x, vDstPos.z };
+			// 튜브 형태의 X,Z
+			_float2 vSrcXZ = { vSrcPos.x, vSrcPos.z };
+
+			// 위로 보았을 때, 서로의 거리를 구한다.
+			_float vXZDistance = (vDstXZ - vSrcXZ).Length();
+
+			// 각자의 최대 Radius 값을 합산했는데, 실제 거리가 클 경우 false (충돌 안 함)
+			if (vXZDistance > pSrcDesc->fMaxRadius + pDstDesc->fRadius)
+				return false;
+
+			// 둘의 범위가 튜브의 최소 범위에 최소 범위를 뺐는데도 불구하고 작을 경우에도 충돌이 아니다.
+			// 안쪽에 있는 것이다.
+			if (vXZDistance < pSrcDesc->fMinRadius - pDstDesc->fRadius)
+				return false;
+
+			// 이건 원기둥의 높이
+			_float vDstMaxY = vDstPos.y + (pDstDesc->fHeight * 0.5f);
+			_float vDstMinY = vDstPos.y - (pDstDesc->fHeight * 0.5f);
+
+			// 이건 튜브의 높이
+			_float vSrcMaxY = vSrcPos.y + (pSrcDesc->fHeight * 0.5f);
+			_float vSrcMinY = vSrcPos.y - (pSrcDesc->fHeight * 0.5f);
+
+			// 높이가 서로 겹쳤는가?
+			if (vDstMinY <= vSrcMaxY && vDstMaxY >= vSrcMinY) {
+				return true;
+			}
+
+			return false;
 		}
-
 	}
 	else if (pDstDesc->eHitbox == COLLIDER_SPHERE)
 	{
@@ -302,7 +334,40 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 		}
 		else if (pSrcDesc->eHitbox == COLLIDER_TUBE)
 		{
+			_float4 vDstPos = pDstTransform->Get_State(CTransform::STATE_POSITION);
+			_float4 vSrcPos = pSrcTransform->Get_State(CTransform::STATE_POSITION);
 
+			// 실린더 형태의 X,Z
+			_float2 vDstXZ = { vDstPos.x, vDstPos.z };
+			// 튜브 형태의 X,Z
+			_float2 vSrcXZ = { vSrcPos.x, vSrcPos.z };
+
+			// 위로 보았을 때, 서로의 거리를 구한다.
+			_float vXZDistance = (vDstXZ - vSrcXZ).Length();
+
+			// 각자의 최대 Radius 값을 합산했는데, 실제 거리가 클 경우 false (충돌 안 함)
+			if (vXZDistance > pSrcDesc->fMaxRadius + pDstDesc->fRadius)
+				return false;
+
+			// 둘의 범위가 튜브의 최소 범위에 최소 범위를 뺐는데도 불구하고 작을 경우에도 충돌이 아니다.
+			// 안쪽에 있는 것이다.
+			if (vXZDistance < pSrcDesc->fMinRadius - pDstDesc->fRadius)
+				return false;
+
+			// 이건 원기둥의 높이
+			_float vDstMaxY = vDstPos.y + (pDstDesc->fHeight * 0.5f);
+			_float vDstMinY = vDstPos.y - (pDstDesc->fHeight * 0.5f);
+
+			// 이건 튜브의 높이
+			_float vSrcMaxY = vSrcPos.y + (pSrcDesc->fHeight * 0.5f);
+			_float vSrcMinY = vSrcPos.y - (pSrcDesc->fHeight * 0.5f);
+
+			// 높이가 서로 겹쳤는가?
+			if (vDstMinY <= vSrcMaxY && vDstMaxY >= vSrcMinY) {
+				return true;
+			}
+
+			return false;
 		}
 	}
 	else if (pDstDesc->eHitbox == COLLIDER_FRUSTUM)
@@ -383,11 +448,77 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 	{
 		if (pSrcDesc->eHitbox == COLLIDER_CYLINDER)
 		{
+			_float4 vDstPos = pDstTransform->Get_State(CTransform::STATE_POSITION);
+			_float4 vSrcPos = pSrcTransform->Get_State(CTransform::STATE_POSITION);
 
+			// 튜브 형태의 X,Z
+			_float2 vDstXZ = { vDstPos.x, vDstPos.z };
+			// 실린더 형태의 X,Z
+			_float2 vSrcXZ = { vSrcPos.x, vSrcPos.z };
+
+			// 위로 보았을 때, 서로의 거리를 구한다.
+			_float vXZDistance = (vDstXZ - vSrcXZ).Length();
+
+			// 각자의 최대 Radius 값을 합산했는데, 실제 거리가 클 경우 false (충돌 안 함)
+			if (vXZDistance > pDstDesc->fMaxRadius + pSrcDesc->fRadius)
+				return false;
+
+			// 둘의 범위가 튜브의 최소 범위에 최소 범위를 뺐는데도 불구하고 작을 경우에도 충돌이 아니다.
+			// 안쪽에 있는 것이다.
+			if (vXZDistance < pDstDesc->fMinRadius - pSrcDesc->fRadius)
+				return false;
+
+			// 이건 튜브의 높이
+			_float vDstMaxY = vDstPos.y + (pDstDesc->fHeight * 0.5f);
+			_float vDstMinY = vDstPos.y - (pDstDesc->fHeight * 0.5f);
+
+			// 이건 원기둥의 높이
+			_float vSrcMaxY = vSrcPos.y + (pSrcDesc->fHeight * 0.5f);
+			_float vSrcMinY = vSrcPos.y - (pSrcDesc->fHeight * 0.5f);
+
+			// 높이가 서로 겹쳤는가?
+			if (vDstMinY <= vSrcMaxY && vDstMaxY >= vSrcMinY) {
+				return true;
+			}
+			
+			return false;
 		}
 		else if (pSrcDesc->eHitbox == COLLIDER_SPHERE)
 		{
+			_float4 vDstPos = pDstTransform->Get_State(CTransform::STATE_POSITION);
+			_float4 vSrcPos = pSrcTransform->Get_State(CTransform::STATE_POSITION);
 
+			// 튜브 형태의 X,Z
+			_float2 vDstXZ = { vDstPos.x, vDstPos.z };
+			// 실린더 형태의 X,Z
+			_float2 vSrcXZ = { vSrcPos.x, vSrcPos.z };
+
+			// 위로 보았을 때, 서로의 거리를 구한다.
+			_float vXZDistance = (vDstXZ - vSrcXZ).Length();
+
+			// 각자의 최대 Radius 값을 합산했는데, 실제 거리가 클 경우 false (충돌 안 함)
+			if (vXZDistance > pDstDesc->fMaxRadius + pSrcDesc->fRadius)
+				return false;
+
+			// 둘의 범위가 튜브의 최소 범위에 최소 범위를 뺐는데도 불구하고 작을 경우에도 충돌이 아니다.
+			// 안쪽에 있는 것이다.
+			if (vXZDistance < pDstDesc->fMinRadius - pSrcDesc->fRadius)
+				return false;
+
+			// 이건 튜브의 높이
+			_float vDstMaxY = vDstPos.y + (pDstDesc->fHeight * 0.5f);
+			_float vDstMinY = vDstPos.y - (pDstDesc->fHeight * 0.5f);
+
+			// 이건 원기둥의 높이
+			_float vSrcMaxY = vSrcPos.y + (pSrcDesc->fHeight * 0.5f);
+			_float vSrcMinY = vSrcPos.y - (pSrcDesc->fHeight * 0.5f);
+
+			// 높이가 서로 겹쳤는가?
+			if (vDstMinY <= vSrcMaxY && vDstMaxY >= vSrcMinY) {
+				return true;
+			}
+
+			return false;
 		}
 		else if (pSrcDesc->eHitbox == COLLIDER_FRUSTUM)
 		{
@@ -1279,6 +1410,24 @@ void CCollisionCenter::Hitbox_Collision()
 			Dst->Set_Dead();
 			Src->Set_Dead();
 		});
+
+	// 완료.
+	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[MONSTERBULLET], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			if (static_cast<CPhysXObject*>(Src)->Get_AbilityType() != ABILITY_BOMB)
+				return;
+
+			pthis->Camera_Shaking(1.2f);
+			Dst->Set_Dead();
+			Src->Set_Dead();
+		});
+
 
 	// 완료.
 	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[MONSTER], this,
