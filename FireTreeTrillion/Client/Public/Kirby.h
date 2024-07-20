@@ -144,6 +144,7 @@ public:
 		_float			m_fTimeRatio = { 0.f };
 		_int			m_iCrashTimeSlow = { 0 };
 		_float			m_fCrashChargeTime = { 0.f };
+		_float4			m_vPreDiffuseLight = { 0.f, 0.f, 0.f, 0.f };
 
 		// FinalCut Æû
 		_bool			m_bFinalBossDead = { false };
@@ -189,6 +190,7 @@ public:
 	void			Plus_Coin(_uint uCoin) { m_uCoin += uCoin;	}
 
 	_bool			isAnimFinish();
+	_float			Get_AnimRatio();
 	_float			Get_AnimTrackPosition();
 	void			DefaultIdle();
 

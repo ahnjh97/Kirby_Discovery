@@ -65,6 +65,7 @@ public: /* For.Renderer */
 	void Setting_LensFlare(_bool bOnOff);
 
 	void Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime = 0.f, _bool RealBlack = false);
+	void Set_Brown(_float fTime, _bool bOnOff);
 
 #ifdef _DEBUG
 public:
@@ -132,6 +133,7 @@ public: /* For.Light_Manager */
 	HRESULT Render_Lights(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer, _bool bForTool = false);
 	void Clear_Light();
 	class CLight* Get_LightLastAddress();
+	class CLight* Get_DirectionLightAddress();
 
 #pragma region FONT_MANAGER
 
