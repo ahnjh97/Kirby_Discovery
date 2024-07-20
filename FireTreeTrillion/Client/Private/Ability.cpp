@@ -295,9 +295,6 @@ void CAbility::Late_Tick(_float fTimeDelta)
 	if (-2.6f > m_fJumpPower)
 		Sphere_Collision();
 
-	if (m_ePhyXState == PO_KIRBYMOUTH)
-		return;
-
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);

@@ -51,6 +51,8 @@ HRESULT CSingleEffect::Initialize(void* pArg)
 
 	HRESULT hr;
 
+	FXDesc.bIsSingleFX = true;
+
 	hr = __super::Initialize(&FXDesc);
 	CHECK_FAILED(hr);
 

@@ -65,7 +65,7 @@ public:
 		_uint eRenderGroup = { 0 };
 		TIMER eTimer = { TIMER_END };
 
-
+		_bool bIsSingleFX = { false };
 	}FX_DESC;
 
 protected:
@@ -185,6 +185,7 @@ protected:
 	_float2			m_vCurMaskUVOffset = { 0.f, 0.f };
 	_float			m_vCurMaskUVAngle = { 0.f };
 
+	_bool			m_bIsSingleFX = { false };
 protected:
 	_bool			Update_Duration(_float fTimeDelta);
 	_bool			Update_LifeTime(_float fTimeDelta);

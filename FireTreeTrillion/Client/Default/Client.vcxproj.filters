@@ -691,9 +691,6 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Animal\SeaGull%28characterX%29">
       <UniqueIdentifier>{4bd7629d-3a53-42e9-847f-51ec1eac6310}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\Phanta\SpawnEffect">
-      <UniqueIdentifier>{4b97fb20-26cc-4d63-a220-15d7ce0851f4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Player\State\KirbyFinalCut_State">
       <UniqueIdentifier>{78aed1de-cad4-49c4-85c4-7c2eb6bfdb4d}</UniqueIdentifier>
     </Filter>
@@ -703,7 +700,13 @@
     <Filter Include="02.GameObjects\UI\Interactable">
       <UniqueIdentifier>{58d57529-1fa3-4790-acf3-59d50bd2b31c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\PhysXObject\Character\Simba\SimbaLaser">
+    <Filter Include="02.GameObjects\PhysXObject\Character\Monster\SpawnEffect">
+      <UniqueIdentifier>{4b97fb20-26cc-4d63-a220-15d7ce0851f4}</UniqueIdentifier>
+	</Filter>
+    <Filter Include="02.GameObjects\Effect\CrashParticle">
+      <UniqueIdentifier>{47d42697-331c-426e-bafd-b4400924c864}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="02.GameObjects\PhysXObject\Character\Simba\SimbaLaser">
       <UniqueIdentifier>{42035ce9-5d3d-45ba-b6f6-1ecbf083be9c}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Simba\SimbaRock">
@@ -1095,9 +1098,6 @@
     <ClInclude Include="..\Public\DeeDeeDeeHammer.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDeeHammer</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\DeeDeeDeeHammer.h">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\CarShopWallFrame.h">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
     </ClInclude>
@@ -1394,7 +1394,7 @@
       <Filter>02.GameObjects\PhysXObject\Character\Animal\BabyDuck\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SpawnEffect.h">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta\SpawnEffect</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\SpawnEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\KirbyFinalCut_State.h">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyFinalCut_State</Filter>
@@ -1405,7 +1405,13 @@
     <ClInclude Include="..\Public\UI_Interactable.h">
       <Filter>02.GameObjects\UI\Interactable</Filter>
     </ClInclude>
-    <ClInclude Include="SimbaLaser.h">
+    <ClInclude Include="..\Public\SummonEffect.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\SpawnEffect</Filter>
+	</ClInclude>
+    <ClInclude Include="..\Public\CrashParticle.h">
+      <Filter>02.GameObjects\Effect\CrashParticle</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\SimbaLaser.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DimensionClaw.h">
@@ -1773,9 +1779,6 @@
     <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee\DeeDeeDeeHammer</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\DeeDeeDeeHammer.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\CarShopWallFrame.cpp">
       <Filter>02.GameObjects\Map\CarShopWall</Filter>
     </ClCompile>
@@ -2074,7 +2077,7 @@
       <Filter>02.GameObjects\PhysXObject\Character\Animal\BabyDuck\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SpawnEffect.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\Monster\Phanta\SpawnEffect</Filter>
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\SpawnEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyFinalCut_State.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Player\State\KirbyFinalCut_State</Filter>
@@ -2085,9 +2088,15 @@
     <ClCompile Include="..\Private\UI_Interactable.cpp">
       <Filter>02.GameObjects\UI\Interactable</Filter>
     </ClCompile>
-    <ClCompile Include="SimbaLaser.cpp">
+    <ClCompile Include="..\Private\SummonEffect.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Monster\SpawnEffect</Filter>
+	</ClCompile>
+    <ClCompile Include="..\Private\CrashParticle.cpp">
+      <Filter>02.GameObjects\Effect\CrashParticle</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\SimbaLaser.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
-    </ClCompile>
+	</ClCompile>
     <ClCompile Include="..\Private\DimensionClaw.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\DimensionClaw</Filter>
     </ClCompile>

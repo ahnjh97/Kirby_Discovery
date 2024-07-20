@@ -1368,7 +1368,7 @@ void CCollisionCenter::Hitbox_Collision()
 			CKirby* pKirby = static_cast<CKirby*>(Dst);
 			CAnimDeco* pAnimDeco = static_cast<CAnimDeco*>(Src);
 
-			if (pKirby->Get_KirbyInfo()->m_eBodyState != CKirby::BODY_SWORDDEFAULT)
+			if ((pKirby->Get_KirbyInfo()->m_eBodyState == CKirby::BODY_SWORDDEFAULT || pKirby->Get_KirbyInfo()->m_eBodyState == CKirby::BODY_CRASHDEFAULT) == false)
 				return;
 
 			if (true == pAnimDeco->IsHidden())
@@ -1569,7 +1569,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
-		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 	}
@@ -1583,7 +1583,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
-		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 
@@ -1600,7 +1600,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
-		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 
@@ -1617,7 +1617,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
-		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 
@@ -1632,7 +1632,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
-		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 
@@ -1741,7 +1741,7 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
-		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 	}
@@ -1753,7 +1753,7 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
-		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 
@@ -1769,7 +1769,7 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
 		FXDesc.vInitPos.y += 0.5f;
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
-		FXDesc.vInitScale = { 3.5f, 3.5f, 3.5f };
+		FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 	}
@@ -1783,7 +1783,7 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
-		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 
@@ -1797,7 +1797,7 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(vEffectRandomPos);
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(GAMEINSTANCE Get_CamLook());
-		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 

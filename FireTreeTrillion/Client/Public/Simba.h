@@ -159,6 +159,9 @@ private:
 	_bool			m_bPhaseTwo = { false };
 	_bool			m_bDeathAnimPlayed = { false };
 	_bool			m_bRenderEyeLid = { false };
+	_bool			m_bSummon1 = { false };
+	_bool			m_bSummon2 = { false };
+	_float			m_fSummonTime = { 0.f };
 
 	_uint			m_iStarCount = {};
 	_bool			m_bDimensionClawUpAttack = { false };
@@ -189,6 +192,7 @@ private:
 	void		OnWave2Dead(CGameObject* pObj);
 
 	void		SpawnMonsters(_uint iTriggerIndex);
+	void		SpawnEffects(_uint iTriggerIndex);
 	void		DetermineSimbaRotation();
 	void		TurnSimba(_float fAngle);
 	void		ResetRotation();

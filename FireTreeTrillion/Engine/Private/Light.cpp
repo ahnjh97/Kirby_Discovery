@@ -23,7 +23,7 @@ HRESULT CLight::Initialize(const LIGHT_DESC & LightDesc)
 HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _bool bForTool)
 {
 	_uint		iPassIndex = { 0 };
-	_float		fTimeDelta = CGameInstance::Get_Instance()->Get_SecondTimer();
+	_float		fTimeDelta = CGameInstance::Get_Instance()->Get_OriginalTimer();
 
 	if (m_bInterpolate == true)
 	{

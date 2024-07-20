@@ -47,12 +47,6 @@ HRESULT CFood::Initialize(void* pArg)
 
 	Add_Effect("ItemBubble1", FXDesc, true);
 
-	//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemBubble1"), &FXDesc)))
-	//	return E_FAIL;
-
-	//Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
-
-
 	return S_OK;
 }
 

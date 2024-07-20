@@ -34,6 +34,11 @@ public:
 	void			Update_InstanceInfo(INSTANCE_DESC* _InstanceDesc = nullptr);
 	virtual void	Fill_SaveData(_Out_ PARTICLE_DATA* pFXData) override;
 
+	virtual void	Reset_Duration() override
+	{
+		m_fDuration.first = 0.f;
+		m_pVIBufferCom->Revive();
+	}
 
 	HRESULT Initialize_Prototype();
 	HRESULT Initialize_Prototype(PARTICLE_DESC FXDesc);

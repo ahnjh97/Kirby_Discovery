@@ -3,9 +3,10 @@
 
 #include "HitBox.h"
 #include "Kirby.h"
-#include "Kirby_Enums.h"
 
 #include "Bomber.h"
+#include "SummonEffect.h"
+#include "Effect.h"
 
 CGm_ParkSolarPanelOnce::CGm_ParkSolarPanelOnce(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -105,15 +106,31 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 			{
 				HRESULT hr;
 
-				_float4x4 matWorld = XMMatrixIdentity();
-				matWorld._41 = 35.5;
-				matWorld._42 = 73.;
-				matWorld._43 = 175.5f;
-				matWorld._44 = 1.f;
-				CMonster::MONSTER_DESC MonsterDesc = {};
-				MonsterDesc.matWorld = matWorld;
-				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Bomber"), &MonsterDesc);
+				CSummonEffect::SUMMONEFFECT_DESC SummonEffectDesc = {};
+
+				SummonEffectDesc.vPosition = XMVectorSet(35.5f, 75.f, 175.5f, 1.f);
+				SummonEffectDesc.fScale = 3.f;
+				SummonEffectDesc.fAlpha = 0.9f;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SummonEffect"), &SummonEffectDesc);
 				CHECK_FAILED(hr);
+
+				CEffect::FX_DESC FXDesc{};
+
+				FXDesc.vInitPos = XMVectorSet(35.5f, 75.f, 175.5f, 1.f);
+				//FXDesc.vInitRot = { CUtils::Make_RandomFloat(0.f, 90.f), 0.f, 0.f };
+				//FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+				//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+				Add_Effect("ParticleSummonJS", FXDesc);
+
+				//_float4x4 matWorld = XMMatrixIdentity();
+				//matWorld._41 = 35.5f;
+				//matWorld._42 = 73.f;
+				//matWorld._43 = 175.5f;
+				//matWorld._44 = 1.f;
+				//CMonster::MONSTER_DESC MonsterDesc = {};
+				//MonsterDesc.matWorld = matWorld;
+				//hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Bomber"), &MonsterDesc);
+				//CHECK_FAILED(hr);
 			}
 		}
 
