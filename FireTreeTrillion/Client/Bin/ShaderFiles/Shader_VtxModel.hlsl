@@ -516,6 +516,43 @@ PS_OUT_EFFECT PS_MAIN_WHITE_FX_LINEARDIFFUSE(PS_IN In)
     return Out;
 }
 
+
+PS_OUT_EFFECT PS_MAIN_WHITE_FX_LINEARDIFFUSE_LINEARMASK(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    if (g_fAlpha == 0)
+        discard;
+    
+    vector vMask = g_MaskTexture.Sample(LinearSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
+    //마스크 자르기
+    bool bMaskAlpha = false;
+    if (vMask.a < .1f)
+        bMaskAlpha = true;
+    
+    float fMaskValue = (bMaskAlpha) ? vMask.a : vMask.r;
+    
+    float fSmoothedAlpha = smoothstep(g_fMaskThreshold - 0.1, g_fMaskThreshold + 0.1, fMaskValue);
+    if (fSmoothedAlpha < 0.01)
+        discard;
+    
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    
+    //알파가 0일때, 혹은 검은색일때 자르기
+    AlphaTest(vDiffuse);
+    
+    
+    Out.vColor.rgb = g_vRColor;
+    Out.vColor.a = vDiffuse.a * fSmoothedAlpha * g_fAlpha;
+
+    //소프트 이펙트 보정
+    Out.vColor.a = SoftEffect(Out.vColor.a, In.vProjPos);
+    if (Out.vColor.a < .1)
+        discard;
+    
+    return Out;
+}
+
 PS_OUT_EFFECT PS_MAIN_WHITE_FX_CLAMPDIFFUSE(PS_IN In)
 {
     PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
@@ -552,6 +589,40 @@ PS_OUT_EFFECT PS_MAIN_WHITE_FX_CLAMPDIFFUSE(PS_IN In)
 }
 
 
+PS_OUT_EFFECT PS_MAIN_WHITE_FX_CLAMPDIFFUSE_LINEARMASK(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    if (g_fAlpha == 0)
+        discard;
+    
+    vector vMask = g_MaskTexture.Sample(LinearSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
+    //마스크 자르기
+    bool bMaskAlpha = false;
+    if (vMask.a < .1f)
+        bMaskAlpha = true;
+    
+    float fMaskValue = (bMaskAlpha) ? vMask.a : vMask.r;
+    
+    float fSmoothedAlpha = smoothstep(g_fMaskThreshold - 0.1, g_fMaskThreshold + 0.1, fMaskValue);
+    if (fSmoothedAlpha < 0.01)
+        discard;
+    
+    vector vDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord + g_vUVOffset);
+    
+    //알파가 0일때, 혹은 검은색일때 자르기
+    AlphaTest(vDiffuse);
+    
+    Out.vColor.rgb = g_vRColor;
+    Out.vColor.a = vDiffuse.a * fSmoothedAlpha * g_fAlpha;
+
+    //소프트 이펙트 보정
+    Out.vColor.a = SoftEffect(Out.vColor.a, In.vProjPos);
+    if (Out.vColor.a < .1)
+        discard;
+    
+    return Out;
+}
 
 PS_OUT_LIGHTDEPTH PS_MAIN_DEFERREDINFO(PS_IN In)
 {
@@ -1129,4 +1200,31 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_DISSOLVE();
     }
 
+    //화이트 이펙트. 알파 블렌딩 + 디퓨즈 리니어샘플 + 마스크 리니어샘플 + 소프트 이펙트( 22 )
+    pass WhiteFX_LinearDiffuse_LinearMask
+    {
+        SetRasterizerState(RS_NonCull);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX_LINEARDIFFUSE_LINEARMASK();
+    }
+
+    ////화이트 이펙트. 알파 블렌딩 + 디퓨즈 클램프샘플 + 마스크 리니어샘플 + 소프트 이펙트( 23 )
+    pass WhiteFX_ClampDiffuse_LinearMask
+    {
+        SetRasterizerState(RS_NonCull);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX_CLAMPDIFFUSE_LINEARMASK();
+    }
 }

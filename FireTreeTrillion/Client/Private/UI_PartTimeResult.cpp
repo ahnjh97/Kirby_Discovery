@@ -205,7 +205,7 @@ void CUI_PartTimeResult::Render_Digits()
 					for (_int i = 0; i < 80; ++i)
 					{
 						CEffect::FX_DESC FXDesc{};
-						FXDesc.vInitPos = vCamPos + _float3{ CUtils::Make_RandomFloat(-5.f, 5.f), 0.f, 5.f} + (_float3)CUtils::Make_Random_Vector(CUtils::Make_RandomFloat(2.f, 5.f));
+						FXDesc.vInitPos = vCamPos + _float3{ CUtils::Make_RandomFloat(-5.f, 5.f), 0.f, -5.f} + (_float3)CUtils::Make_Random_Vector(CUtils::Make_RandomFloat(2.f, 5.f));
 
 						//FXDesc.vInitRot =CUtils::Make_Degree_FromDir(CUtils::Make_Random_Vector(1.f));
 						FXDesc.fStartDelay = CUtils::Make_RandomFloat(0.f, 3.f);
