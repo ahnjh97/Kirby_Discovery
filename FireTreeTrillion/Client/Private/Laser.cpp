@@ -108,8 +108,8 @@ _int CLaser::Tick(_float fTimeDelta)
 			//충돌 시 튀는 파티클
 			CParticle::PARTICLE_DESC ParticleDesc{};
 			ParticleDesc.vInitPos = vCollidingPoint;
-			ParticleDesc.vInitScale = {50.f, 50.f, 50.f };
-			Add_Effect("start particle test A", ParticleDesc, false);
+			ParticleDesc.vInitScale = {3.f, 3.f, 3.f };
+			Add_Effect("HS_laser collide particle", ParticleDesc, false);
 
 		}
 	}
