@@ -177,7 +177,7 @@ void CLevel_Park::SummonEffectForMonster(_uint iTriggerIndex)
 			vRotatePos.z = vPos.z;
 			vRotatePos.w = 1.f;
 			tDesc.vPosition = vRotatePos;
-			tDesc.fScale = 2.f;
+			tDesc.fScale = 1.9f;
 			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
 			CHECK_FAILED(hr);
 		}
