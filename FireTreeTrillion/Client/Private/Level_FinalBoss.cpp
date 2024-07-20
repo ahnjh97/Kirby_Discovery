@@ -541,7 +541,7 @@ HRESULT CLevel_FinalBoss::Ready_Monsters()
 			FinalBossDesc.iShaderVars = iShaderVars;
 			FinalBossDesc.fRimWidth = fRimWidth;
 			FinalBossDesc.vecRallyPoints = vecRallyPoints;
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_FinalBoss"), &FinalBossDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_BossMonster"), TEXT("Prototype_GameObject_FinalBoss"), &FinalBossDesc)))
 				return E_FAIL;
 		}
 		else if (L"Kabu" == tempDesc.wstrModelName)

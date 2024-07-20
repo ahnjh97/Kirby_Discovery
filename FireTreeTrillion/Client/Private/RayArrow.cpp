@@ -44,7 +44,7 @@ HRESULT CRayArrow::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 	CTransform* pTransform = pFinalBoss->Get_TransformCom();
 	_vector vLookAt = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
 
@@ -93,7 +93,7 @@ _int CRayArrow::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 	if (CFinalBoss::FINALBOSS_RAYARROWEND == pFinalBoss->Get_State() || CFinalBoss::FINALBOSS_RAYARROWENDAIR == pFinalBoss->Get_State())
 	{
 		m_bActive = true;

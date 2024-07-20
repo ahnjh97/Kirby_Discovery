@@ -22,7 +22,7 @@
 #define BOSS_POS _float3(2548.f, 242.f, -136.f)
 
 #define ISDEFAULTCNT(intvalue) (intvalue == -1)
-#define FINALEBOSS (static_cast<CFinaleBoss*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Monster", L"Prototype_GameObject_FinaleBoss")))
+#define FINALEBOSS (static_cast<CFinaleBoss*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_BossMonster", L"Prototype_GameObject_FinaleBoss")))
 #define FINALEKIRBY (static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_FinaleKirby")))
 
 #define QTE1 6
@@ -693,7 +693,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 			{
 				m_SeqEventTriggers[1] = false;
 
-				CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
+				CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 				if (pFinalBoss != nullptr)
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMOAPPEARCUT5, 50.f, false, true);
 
@@ -738,7 +738,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 				CEventCenter::Get_Instance()->Notify(KEVENT_FINALBOSS_APPEAR, this);
 
 				//dof 세팅, state 변경
-				CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
+				CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 				if (pFinalBoss != nullptr)
 				{
 					Set_Target(pFinalBoss->Get_TransformCom(), TARGET_SECOND, FOCUS_BOTH, {0.f, -2.f, 0.f});
