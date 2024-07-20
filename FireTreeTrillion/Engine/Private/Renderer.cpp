@@ -895,6 +895,11 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	{
 		m_DestColorData = Find_ColorSet("PartTime");
 		Update_Option(OPTION_DOF, false);
+
+		m_fRimLightRatio.second = .2f;
+		m_fRimLightRadius.second = 1.f;
+		m_vRimColor.second = _float3(1.f, .5f, .3f);
+
 	}
 	break;
 	default:

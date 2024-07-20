@@ -2923,13 +2923,10 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 			}
 		}
 
-
 		EndPopup();
 	}
 
-
 	EndChild();
-
 
 	if (m_iSelectedMultiFXIdx != -1)
 	{
@@ -2994,6 +2991,7 @@ HRESULT CFXToolDirector::Ready_FXPrototypeVector()
 
 	Ready_Ingredient(strModelTag + L"SkySphere", &m_FXBufferList, pStaticProtoMap);
 	Ready_Ingredient(strModelTag + L"RayArrow", &m_FXBufferList, pStaticProtoMap);
+	Ready_Ingredient(strModelTag + L"Laser", &m_FXBufferList, pStaticProtoMap);
 
 	return S_OK;
 }
@@ -3130,6 +3128,11 @@ void CFXToolDirector::Free()
 		Safe_Release(pFX);
 
 	m_FXs.clear();
+
+	for (auto& pFX : m_Particles)
+		Safe_Release(pFX);
+
+	m_Particles.clear();
 
 	for (auto& pFX : m_MultiFXs)
 		Safe_Release(pFX);
