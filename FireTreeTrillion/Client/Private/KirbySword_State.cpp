@@ -905,7 +905,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		_float fRight = CUtils::Make_RandomFloat(-1.5f , -0.5f);
 		_float fUp = CUtils::Make_RandomFloat(0.5f, 1.f);
 		_float fLook = CUtils::Make_RandomFloat(0.f, 1.2f);
-		Fire_Maker(_float3(fRight, fUp, fLook), pTransformCom, 1.8f, 2.5f, _float4(0.3f, 0.8f, 1.f, 0.5f), _float4(1.f, 1.f, 1.f, 1.f));
+		Fire_Maker(_float3(fRight, fUp, fLook), pTransformCom, 1.8f, 2.5f, _float4(0.3f, 0.8f, 1.f, 0.5f), _float4(1.f, 1.f, 1.f, 1.f), 0.5f);
 
 
 		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
@@ -1014,7 +1014,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		_float fRight = CUtils::Make_RandomFloat(-1.5f, -0.5f);
 		_float fUp = CUtils::Make_RandomFloat(0.5f, 1.f);
 		_float fLook = CUtils::Make_RandomFloat(0.f, 1.2f);
-		Fire_Maker(_float3(fRight, fUp, fLook), pTransformCom, 1.8f, 2.5f, _float4(0.3f, 0.8f, 1.f, 0.5f), _float4(1.f, 1.f, 1.f, 1.f));
+		Fire_Maker(_float3(fRight, fUp, fLook), pTransformCom, 1.8f, 2.5f, _float4(0.3f, 0.8f, 1.f, 0.5f), _float4(1.f, 1.f, 1.f, 1.f), 0.5f);
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
 		{
@@ -1057,7 +1057,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		_float fRight = CUtils::Make_RandomFloat(-1.5f, -0.5f);
 		_float fUp = CUtils::Make_RandomFloat(0.5f, 1.f);
 		_float fLook = CUtils::Make_RandomFloat(0.f, 1.2f);
-		Fire_Maker(_float3(fRight, fUp, fLook), pTransformCom, 1.8f, 2.5f, _float4(0.3f, 0.8f, 1.f, 0.5f), _float4(1.f, 1.f, 1.f, 1.f));
+		Fire_Maker(_float3(fRight, fUp, fLook), pTransformCom, 1.8f, 2.5f, _float4(0.3f, 0.8f, 1.f, 0.5f), _float4(1.f, 1.f, 1.f, 1.f), 0.5f);
 
 		// Å¸°Ù±âÁØ
 		_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
@@ -1136,7 +1136,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		_float fRight = CUtils::Make_RandomFloat(-1.5f, -0.5f);
 		_float fUp = CUtils::Make_RandomFloat(0.5f, 1.f);
 		_float fLook = CUtils::Make_RandomFloat(0.f, 1.2f);
-		Fire_Maker(_float3(fRight, fUp, fLook), pTransformCom, 1.8f, 2.5f, _float4(0.3f, 0.8f, 1.f, 0.5f), _float4(1.f, 1.f, 1.f, 1.f));
+		Fire_Maker(_float3(fRight, fUp, fLook), pTransformCom, 1.8f, 2.5f, _float4(0.3f, 0.8f, 1.f, 0.5f), _float4(1.f, 1.f, 1.f, 1.f), 0.5f);
 
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS))
