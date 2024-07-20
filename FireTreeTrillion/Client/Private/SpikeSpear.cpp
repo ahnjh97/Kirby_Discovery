@@ -116,7 +116,7 @@ _int CSpikeSpear::Tick(_float fTimeDelta)
 
 					//FXDesc.fStartDelay = 1.f;
 
-					Add_Effect("HS_FB down spear circle", FXDesc);
+					Add_Effect("HS_FB down spear circle", FXDesc, false);
 
 				}
 			}

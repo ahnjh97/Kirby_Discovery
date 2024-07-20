@@ -92,7 +92,7 @@ void CBrontoBurt_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-			pBrontoBurt->Add_Effect("Flying", FXDesc);
+			pBrontoBurt->Add_Effect("Flying", FXDesc, false);
 		}
 
 		if (true == pBrontoBurt->IsAnimFinished())

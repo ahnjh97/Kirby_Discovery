@@ -1128,7 +1128,7 @@ void CSimba::SpawnMonsters(_uint iTriggerIndex)
 				FXDesc.vInitScale = { fDistance + 1.f, fDistance + 1.f, fDistance + 1.f };
 				//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-				Add_Effect("BbongJS", FXDesc);
+				Add_Effect("BbongJS", FXDesc, false);
 			}
 		}
 	}

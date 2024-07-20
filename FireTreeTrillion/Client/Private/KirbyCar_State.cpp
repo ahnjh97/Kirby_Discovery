@@ -154,8 +154,8 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		DESC(m_bBooster) = true;
 
 		//ºÎšÀ ÀÌÆåÆ®
-		ComeOn_Dash(pTransformCom);
-		pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+		ComeOn_Dash(pKirby);
+		//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
 		pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 		return;
@@ -258,8 +258,8 @@ void CKirbyCar_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			DESC(m_bBooster) = true;
 
 			//ºÎšÀ ÀÌÆåÆ®
-			ComeOn_Dash(pTransformCom);
-			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+			ComeOn_Dash(pKirby);
+			//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
 			pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			return;
@@ -385,8 +385,8 @@ void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			DESC(m_bBooster) = true;
 
 			//ºÎšÀ ÀÌÆåÆ®
-			ComeOn_Dash(pTransformCom);
-			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+			ComeOn_Dash(pKirby);
+			//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
 			pKirby->Change_State(CKirby::CARSTATE_BOOST, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			return;

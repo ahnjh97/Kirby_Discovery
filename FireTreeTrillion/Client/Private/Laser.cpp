@@ -53,7 +53,7 @@ HRESULT CLaser::Initialize(void* pArg)
 	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	FXDesc.vInitRot = { 180.f, 0.f, 0.f };
 	//FXDesc.vInitPos
-	Add_Effect("HS_FB dimension laser", FXDesc);
+	Add_Effect("HS_FB dimension laser", FXDesc, false);
 
 	m_fAttack = 5.f;
 	m_bNonDead = true;
@@ -94,7 +94,7 @@ _int CLaser::Tick(_float fTimeDelta)
 			CEffect::FX_DESC FXDesc{};
 			FXDesc.vInitPos = vCollidingPoint;
 			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
-			Add_Effect("HS_FB laser decal", FXDesc);
+			Add_Effect("HS_FB laser decal", FXDesc, false);
 
 			//for (_int i = 0; i < 10; ++i)
 			//{
@@ -109,7 +109,7 @@ _int CLaser::Tick(_float fTimeDelta)
 			CParticle::PARTICLE_DESC ParticleDesc{};
 			ParticleDesc.vInitPos = vCollidingPoint;
 			ParticleDesc.vInitScale = {50.f, 50.f, 50.f };
-			Add_Effect("start particle test A", ParticleDesc);
+			Add_Effect("start particle test A", ParticleDesc, false);
 
 		}
 	}

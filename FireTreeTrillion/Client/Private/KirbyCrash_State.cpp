@@ -554,9 +554,12 @@ void CKirbyCrash_Charge_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			MFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 			MFXDesc.vInitPos = _float3{ 0.f, 1.5f, 0.f };
 			MFXDesc.vInitScale = { 1.f, 1.f, 1.f };
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash Charge"), &MFXDesc)))
-				return;
-			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+			pKirby->Add_Effect("YW Crash Charge", MFXDesc, true);
+
+			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash Charge"), &MFXDesc)))
+			//	return;
+			//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 			m_bEffectTrigger = false;
 		}
 

@@ -22,7 +22,7 @@ void ThrustCharge(CFinalBoss* pBoss)
 
 	FXDesc.fStartDelay = 1.f;
 
-	pBoss->Add_Effect("HS_FB ground dash sparkle", FXDesc);
+	pBoss->Add_Effect("HS_FB ground dash sparkle", FXDesc, false);
 }
 
 void AirStep_Smoke(CFinalBoss* pBoss)
@@ -39,7 +39,7 @@ void LaserReady(CFinalBoss* pBoss)
 	CParticle::PARTICLE_DESC ParticleDesc{};
 	ParticleDesc.pSocketMatrix = pBoss->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
 	ParticleDesc.vInitScale = { 5.f, 5.f, 5.f };
-	pBoss->Add_Effect("HS_FB laser charge particle", ParticleDesc);
+	pBoss->Add_Effect("HS_FB laser charge particle", ParticleDesc, false);
 
 
 //	CMultiEffect::MULTI_FX_DESC FXDesc{};

@@ -114,7 +114,7 @@ _int CAwoofy::Tick(_float fTimeDelta)
 			FXDesc.vInitScale = { CUtils::Make_RandomFloat(1.f, 2.f), CUtils::Make_RandomFloat(1.f, 2.f), CUtils::Make_RandomFloat(1.f, 2.f) };
 			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-			Add_Effect("BBongBBongE", FXDesc);
+			Add_Effect("BBongBBongE", FXDesc, false);
 		}
 	}
 
