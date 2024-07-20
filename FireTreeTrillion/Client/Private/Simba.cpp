@@ -1112,23 +1112,20 @@ void CSimba::SpawnMonsters(_uint iTriggerIndex)
 				return;
 
 			CEffect::FX_DESC FXDesc{};
-			_float3 vMonPos = _float3(monsterDesc.matWorld._41, monsterDesc.matWorld._42 + 1.f, monsterDesc.matWorld._43);
+			_float3 vMonPos = _float3(monsterDesc.matWorld._41, monsterDesc.matWorld._42 + 1.5f, monsterDesc.matWorld._43);
 			_float3 vRight = _float3(monsterDesc.matWorld._11, monsterDesc.matWorld._12, monsterDesc.matWorld._13);
 			_float3 vUp = _float3(monsterDesc.matWorld._21, monsterDesc.matWorld._22, monsterDesc.matWorld._23);
 			_float3 vLook = _float3(monsterDesc.matWorld._31, monsterDesc.matWorld._32, monsterDesc.matWorld._33);
 			_float fAngle = { 0.f };
 			for (_uint i = 0; i < 3; ++i)
 			{
-				_float fDistance = CUtils::Make_RandomFloat(0.5f, 1.5f);
+				_float fDistance = CUtils::Make_RandomFloat(0.3f, 0.8f);
 				_float fRandAngle = CUtils::Make_RandomFloat(0.f, 90.f);
-				_float3 vRotatePos = {};
-				fAngle += 360.f / 3.f + i + CUtils::Make_RandomFloat(60.f, 70.f);
-				vRotatePos.x = vMonPos.x + (1.f * cos(fAngle) * vLook.x) - (1.f * sin(fAngle) * vLook.z);
-				vRotatePos.y = vMonPos.y + (1.f * sin(fAngle) * vLook.x) + (1.f * cos(fAngle) * vLook.y);
-				vRotatePos.z = vMonPos.z;
-				FXDesc.vInitPos = vRotatePos + vLook * 1.5f;
+				vRight.Normalize();
+				_float3 vRotateRight = CUtils::TurnDirectionVector(vRight, vLook, ((_float)i * 120.f) + fRandAngle);
+				FXDesc.vInitPos = vMonPos + fDistance * vRotateRight + vLook;
 				FXDesc.vInitRot = { fRandAngle, 0.f, fRandAngle };
-				FXDesc.vInitScale = { fDistance + 0.5f, fDistance + 0.5f, fDistance + 0.5f };
+				FXDesc.vInitScale = { fDistance + 1.f, fDistance + 1.f, fDistance + 1.f };
 				//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
 				Add_Effect("BbongJS", FXDesc);

@@ -2167,6 +2167,12 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM, 0.1f);
 		}
 
+		//vector<_uint> vecTunnelRocks = { 2, 4, 5, 7, 8, 9, 10, 12, 13, 16 };
+		//for (auto& rockIndex : vecTunnelRocks) {
+		//	string strTunnelRock = "TunnelRock" + to_string(rockIndex);
+		//	m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM);
+		//}
+
 		//보스전 필드에서만 생성하는 SUB_SKYSPHERE (BackGround 요소)
 		m_vecModelInfo.emplace_back("LbBuildingFrame", TYPE_NONANIM, 1.f, 0.f);
 		m_vecModelInfo.emplace_back("LbFarPiller", TYPE_NONANIM, 1.f, 76.117f);
