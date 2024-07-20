@@ -52,7 +52,7 @@ _int CSimbaRock::Tick(_float fTimeDelta)
 	if(false == m_bHide)
 		m_fTime += m_pGameInstance->Get_SecondTimer();
 
-	if (true == m_bHide && 2.5f < m_fTime) {
+	if (false == m_bHide && 2.5f < m_fTime) {
 		m_bHide = true;
 		m_fTime = 0.f;
 		MoveToOrigin();
@@ -65,6 +65,8 @@ void CSimbaRock::Late_Tick(_float fTimeDelta)
 {
 	if (true == m_bHide)
 		return;
+
+	Compute_ViewZ();
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
@@ -85,7 +87,7 @@ HRESULT CSimbaRock::Render()
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Begin(MAP_NONBLEND_NONDISCARD))) // SimbaRock용 패스 따로 필요할듯함
+		if (FAILED(m_pShaderCom->Begin(MAP_SIMBA_ROCK))) // SimbaRock용 패스 따로 필요할듯함
 			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render(i)))
@@ -97,16 +99,17 @@ HRESULT CSimbaRock::Render()
 
 void CSimbaRock::SetUpSimbaRock(_fvector vPos)
 {
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-	m_fScale = CUtils::Make_RandomFloat(0.4f, 0.6f);
+	m_fScale = CUtils::Make_RandomFloat(0.2f, 0.28f);
 	m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 	m_pTransformCom->Turn(CUtils::Make_Random_Vector(1.f), 1, CUtils::Make_RandomFloat(0, 360.f));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+	m_bHide = false;
 }
 
 void CSimbaRock::MoveToOrigin()
 {
-	/*m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0, -10.f, 0, 1));
-	m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));*/
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0, -10.f, 0, 1));
+	//m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));
 }
 
 HRESULT CSimbaRock::Add_Components(const wstring& _wstrModelName)
@@ -138,7 +141,7 @@ HRESULT CSimbaRock::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fSamplingFactor", &m_fSamplingFactor, sizeof(m_fSamplingFactor))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fZero, sizeof(_float))))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
 		return E_FAIL;
 
 	return S_OK;

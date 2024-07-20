@@ -116,8 +116,6 @@ private:
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
 
-	_bool m_bCountReset = { false };
-
 public:
 	static	CSimba_QuickClaw* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
 	{ return new CSimba_QuickClaw(pController, pTransform, pKirby, pKirbyTransform); }
@@ -145,7 +143,7 @@ private:
 	CTransform* m_pTransform = { nullptr };
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
-	_bool m_bStarSpawned = { false };
+
 public:
 	static	CSimba_FinalCrusher* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
 	{ return new CSimba_FinalCrusher(pController, pTransform, pKirby, pKirbyTransform); }
@@ -173,7 +171,7 @@ private:
 	CTransform* m_pTransform = { nullptr };
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
-	_bool m_bStarSpawned = { false };
+
 
 public:
 	static	CSimba_DoubleClaw* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
@@ -262,7 +260,6 @@ private:
 	CTransform* m_pKirbyTransform = { nullptr };
 
 	_float m_fJumpPower = {};
-	_bool m_bStarSpawned = { false };
 
 public:
 	static	CSimba_AttackJump* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
@@ -375,8 +372,6 @@ private:
 	CTransform* m_pTransform = { nullptr };
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
-	_bool m_bStarSpawned = { false };
-	_bool m_bStarSpawned2 = { false };
 	_bool m_bSetDimensionClawMatrix = { false };
 
 public:
@@ -408,7 +403,6 @@ private:
 	CTransform* m_pKirbyTransform = { nullptr };
 
 	_float m_fTime = { false };
-	_bool m_bStarSpawned = { false };
 
 public:
 	static	CSimba_BiteRush* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
@@ -437,7 +431,6 @@ private:
 	CTransform* m_pTransform = { nullptr };
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
-	_bool m_bStarSpawned = { false };
 	_bool m_bLaserActivated = { false };
 
 public:

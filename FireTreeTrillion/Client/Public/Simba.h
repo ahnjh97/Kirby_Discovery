@@ -102,10 +102,7 @@ public:
 	virtual void	Late_Tick(_float fTimeDelta)	override;
 	virtual HRESULT Render()						override;
 	virtual HRESULT Render_LightDepth()				override;
-#ifdef _DEBUG
-	virtual void	Render_IMGUI()					override;
-#endif
-	virtual void	Add_AnimEvent()					override;
+
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 public:
@@ -176,9 +173,13 @@ private:
 	_bool			m_bLaserActivated = { false };
 	_bool			m_bRenderDimensionClaw = { false };
 
+	_uint			m_iRockCount = {};
+	_uint			m_iDebrisCount = {};
 	vector<class CSimbaRock*>	m_vecSimbaRocks;
 	vector<class CDebris*>		m_vecDebris;
-	_uint			m_iRockCount = {};
+	list<_uint>		m_listUsedRocks;
+
+	unordered_set<SIMBA_ANIM>	m_setResetRequiredAnims;
 
 private:
 	HRESULT		Add_Components();
@@ -209,6 +210,7 @@ private:
 	void		LaserAttack();
 	void		CreateDimensionClawActor();
 	void		OnSimbaAttackTrigger();
+	void		RemoveDeadRocksFromList();
 
 public:
 	static CSimba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

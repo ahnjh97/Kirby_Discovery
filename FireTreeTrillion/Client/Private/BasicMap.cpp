@@ -329,6 +329,11 @@ HRESULT CBasicMap::Bind_ShaderResources()
     if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pNonAnimShaderCom, "g_ObjNearClipTexture")))
         return E_FAIL;
 
+    if (LEVEL_SIMBA == *m_pCurrentLevelID) {
+        if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_ObjNearClipTexture")))
+            return E_FAIL;
+    }
+
     return S_OK;
 }
 
