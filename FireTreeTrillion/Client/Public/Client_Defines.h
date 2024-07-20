@@ -141,6 +141,7 @@ enum COLLISION_TYPE
     BOSS_FINALBOSS,
     BOSS_SIMBA,
     OBJECT, // 돌멩이 등 사물이다.
+    BOXOBJECT, // 상자따위의 부숴지는 물체이다. (몬스터를 날리면 부딫히는애들)
     ITEM, // 일반 먹는 아이템이다.
     ABILITYITEM, // 흡수해야 먹을 수 있는 능력 아이템이다.
     DEFORMOBJECT, // 머금기 오브젝트들
