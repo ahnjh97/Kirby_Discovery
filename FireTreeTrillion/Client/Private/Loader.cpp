@@ -1581,6 +1581,7 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_Bubble", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_Updown", "Effects/Mask/Mask_UpDown.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_LeftRight", "Effects/Mask/Mask_LeftRight.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_Outline", "Effects/Mask/Mask_Outline.png");	CHECK_FAILED(hr);
 
 
 	// 주로 사용되는 텍스쳐들
