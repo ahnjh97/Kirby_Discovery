@@ -20,9 +20,12 @@ void CBomber_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 {
 	CBomber* pBomber = static_cast<CBomber*>(pGameObject);
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
+	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+
+	pController->FreeFall(pTransformCom, fTimeDelta);
 
 	_vector vPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 	vPos.m128_f32[1] = 0.f;

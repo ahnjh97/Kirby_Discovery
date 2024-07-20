@@ -9,6 +9,8 @@
 #include "Bone.h"
 #include "Camera_Main.h"
 #include "Ability.h"
+#include "SummonEffect.h"
+#include "Effect.h"
 #include "Kirby.h"
 #include "DimensionClaw.h"
 #include "CollisionCenter.h"
@@ -187,6 +189,27 @@ _int CSimba::Tick(_float fTimeDelta)
 		Reset_HitBoxTimingMap(SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex()));
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
+	if (true == m_bSummon1)
+	{
+		m_fSummonTime += m_fTimeDelta;
+		if (1.2f < m_fSummonTime)
+		{
+			m_bSummon1 = false;
+			m_fSummonTime = 0;
+			SpawnMonsters(11);
+		}
+	}
+	else if (true == m_bSummon2)
+	{
+		m_fSummonTime += m_fTimeDelta;
+		if (1.2f < m_fSummonTime)
+		{
+			m_bSummon2 = false;
+			m_fSummonTime = 0;
+			SpawnMonsters(12);
+		}
+	}
 
 	__super::Tick(m_fTimeDelta);
 
@@ -1040,12 +1063,12 @@ void CSimba::OnAppearEnd(CGameObject* pObj)
 {
 	Change_State(Simba_DemoAppear1Cut9, 50.f, false, true);
 	TransformToDefault(0);
-	SpawnMonsters(11);
+	SpawnEffects(11);
 }
 
 void CSimba::OnWave1Dead(CGameObject* pObj)
 {
-	SpawnMonsters(12);
+	SpawnEffects(12);
 }
 
 void CSimba::OnWave2Dead(CGameObject* pObj)
@@ -1069,9 +1092,9 @@ void CSimba::SpawnMonsters(_uint iTriggerIndex)
 	else if(12 == iTriggerIndex)
 		wstrLayerTag += TEXT("2");
 
-	list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_SIMBA, wstrLayerTag);
-	if (nullptr != pObjList && false == pObjList->empty())
-		return;
+	//list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_SIMBA, wstrLayerTag);
+	//if (nullptr != pObjList && false == pObjList->empty())
+	//	return;
 		
 	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
 
@@ -1087,6 +1110,73 @@ void CSimba::SpawnMonsters(_uint iTriggerIndex)
 
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SIMBA, wstrLayerTag, wstrTag, &monsterDesc)))
 				return;
+
+			CEffect::FX_DESC FXDesc{};
+			_float3 vMonPos = _float3(monsterDesc.matWorld._41, monsterDesc.matWorld._42 + 1.f, monsterDesc.matWorld._43);
+			_float3 vRight = _float3(monsterDesc.matWorld._11, monsterDesc.matWorld._12, monsterDesc.matWorld._13);
+			_float3 vUp = _float3(monsterDesc.matWorld._21, monsterDesc.matWorld._22, monsterDesc.matWorld._23);
+			_float3 vLook = _float3(monsterDesc.matWorld._31, monsterDesc.matWorld._32, monsterDesc.matWorld._33);
+			_float fAngle = { 0.f };
+			for (_uint i = 0; i < 3; ++i)
+			{
+				_float fDistance = CUtils::Make_RandomFloat(0.5f, 1.5f);
+				_float fRandAngle = CUtils::Make_RandomFloat(0.f, 90.f);
+				_float3 vRotatePos = {};
+				fAngle += 360.f / 3.f + i + CUtils::Make_RandomFloat(60.f, 70.f);
+				vRotatePos.x = vMonPos.x + (1.f * cos(fAngle) * vLook.x) - (1.f * sin(fAngle) * vLook.z);
+				vRotatePos.y = vMonPos.y + (1.f * sin(fAngle) * vLook.x) + (1.f * cos(fAngle) * vLook.y);
+				vRotatePos.z = vMonPos.z;
+				FXDesc.vInitPos = vRotatePos + vLook * 1.5f;
+				FXDesc.vInitRot = { fRandAngle, 0.f, fRandAngle };
+				FXDesc.vInitScale = { fDistance + 0.5f, fDistance + 0.5f, fDistance + 0.5f };
+				//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+				Add_Effect("BbongJS", FXDesc);
+			}
+		}
+	}
+}
+
+void CSimba::SpawnEffects(_uint iTriggerIndex)
+{
+	wstring wstrLayerTag = TEXT("Layer_Effect");
+	if (11 == iTriggerIndex)
+	{
+		m_bSummon1 = true;
+		wstrLayerTag += TEXT("1");
+	}
+	else if (12 == iTriggerIndex)
+	{
+		m_bSummon2 = true;
+		wstrLayerTag += TEXT("2");
+	}
+
+	list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_SIMBA, wstrLayerTag);
+	if (nullptr != pObjList && false == pObjList->empty())
+		return;
+
+	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
+
+
+	HRESULT hr;
+
+	CSummonEffect::SUMMONEFFECT_DESC SummonEffectDesc = {};
+	for (auto& monsterDesc : m_vecMonsterDescs)
+	{
+		if (iTriggerIndex == monsterDesc.eMonState)
+		{
+			_float fScale = { 0.f };
+			wstring wstrTag;
+			if (TEXT("Awoofy") == monsterDesc.wstrModelName || TEXT("AwoofyWild") == monsterDesc.wstrModelName)
+				fScale = 4.f;
+			else if (TEXT("Rabbit") == monsterDesc.wstrModelName || TEXT("RabbitBig") == monsterDesc.wstrModelName)
+				fScale = 7.f;
+
+			SummonEffectDesc.vPosition = _float4(monsterDesc.matWorld._41, monsterDesc.matWorld._42 + 1.f, monsterDesc.matWorld._43, monsterDesc.matWorld._44);
+			SummonEffectDesc.fScale = fScale;
+			SummonEffectDesc.fAlpha = 0.9f;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), wstrLayerTag, TEXT("Prototype_GameObject_SummonEffect"), &SummonEffectDesc);
+			CHECK_FAILED(hr);
 		}
 	}
 }

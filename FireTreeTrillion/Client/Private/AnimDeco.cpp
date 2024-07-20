@@ -51,7 +51,9 @@ HRESULT CAnimDeco::Initialize(void* pArg)
 		fRadius = 0.4f;
 		m_wstrNonAnimDecoName = TEXT("BushSRemainder");
 	}
-	else if ("PopFlower" == strModelName || "SmallBirds" == strModelName)
+	else if ("PopFlower" == strModelName || "SmallBirds" == strModelName
+		|| "ButterflySingle" == strModelName || "ButterflyTriple" == strModelName
+		|| "Lizard" == strModelName || "LizardWall" == strModelName || "SeaBird" == strModelName)
 		return S_OK;
 
 	if (m_wstrNonAnimDecoName != L"")

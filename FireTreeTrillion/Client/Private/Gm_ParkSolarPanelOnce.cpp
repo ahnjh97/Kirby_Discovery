@@ -3,8 +3,10 @@
 
 #include "HitBox.h"
 #include "Kirby.h"
+
 #include "Bomber.h"
-//#include "BreakableRockParticle.h"
+#include "SummonEffect.h"
+#include "Effect.h"
 
 CGm_ParkSolarPanelOnce::CGm_ParkSolarPanelOnce(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -56,6 +58,16 @@ HRESULT CGm_ParkSolarPanelOnce::Initialize(void* pArg)
 	//림라이트 OFF
 	//m_bRimLight = FALSE;
 
+#pragma region KIRBY_INFO
+
+	//커비의 현재상태 정보 저장
+	m_pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+	if (nullptr == m_pKirby)
+		return E_FAIL;
+	Safe_AddRef(m_pKirby);
+
+#pragma endregion
+
 	return S_OK;
 }
 
@@ -94,15 +106,31 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 			{
 				HRESULT hr;
 
-				_float4x4 matWorld = XMMatrixIdentity();
-				matWorld._41 = 35.5;
-				matWorld._42 = 73.;
-				matWorld._43 = 175.5f;
-				matWorld._44 = 1.f;
-				CMonster::MONSTER_DESC MonsterDesc = {};
-				MonsterDesc.matWorld = matWorld;
-				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Bomber"), &MonsterDesc);
+				CSummonEffect::SUMMONEFFECT_DESC SummonEffectDesc = {};
+
+				SummonEffectDesc.vPosition = XMVectorSet(35.5f, 75.f, 175.5f, 1.f);
+				SummonEffectDesc.fScale = 3.f;
+				SummonEffectDesc.fAlpha = 0.9f;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SummonEffect"), &SummonEffectDesc);
 				CHECK_FAILED(hr);
+
+				CEffect::FX_DESC FXDesc{};
+
+				FXDesc.vInitPos = XMVectorSet(35.5f, 75.f, 175.5f, 1.f);
+				//FXDesc.vInitRot = { CUtils::Make_RandomFloat(0.f, 90.f), 0.f, 0.f };
+				//FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+				//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+				Add_Effect("ParticleSummonJS", FXDesc);
+
+				//_float4x4 matWorld = XMMatrixIdentity();
+				//matWorld._41 = 35.5f;
+				//matWorld._42 = 73.f;
+				//matWorld._43 = 175.5f;
+				//matWorld._44 = 1.f;
+				//CMonster::MONSTER_DESC MonsterDesc = {};
+				//MonsterDesc.matWorld = matWorld;
+				//hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Bomber"), &MonsterDesc);
+				//CHECK_FAILED(hr);
 			}
 		}
 
@@ -212,8 +240,16 @@ void CGm_ParkSolarPanelOnce::Render_IMGUI()
 
 void CGm_ParkSolarPanelOnce::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {	
+	if (nullptr == m_pKirby)
+		return;
+
 	//충전 대기 상태에서 키입력 > 충전 시작
-	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) && STATE_OFFWAIT == m_eCurState)
+	//07.19) 전구 머금기 상태 조건을 검사
+	CKirby::BODYSTATE eKirbyState = m_pKirby->Get_KirbyInfo()->m_eBodyState;
+
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) 
+		&& STATE_OFFWAIT == m_eCurState
+		&& CKirby::BODYSTATE::BODY_BULBDEFAULT == eKirbyState)
 	{
 		m_IsInteraction = TRUE;
 		m_pModelCom->Set_Animation(STATE_CHARGE, 60.f, FALSE, TRUE);
@@ -351,4 +387,6 @@ void CGm_ParkSolarPanelOnce::Free()
 
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pTextureCom);
+
+	Safe_Release(m_pKirby);
 }
