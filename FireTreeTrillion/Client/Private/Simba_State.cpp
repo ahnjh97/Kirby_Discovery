@@ -143,7 +143,7 @@ void CSimba_QuickClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	s_fOffsetY = -0.58f;
-	m_bStarSpawned = false;
+	m_bCountReset = false;
 }
 
 void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -154,7 +154,14 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	_uint iState = pSimba->Get_State();
 	_float fAnimRatio = pSimba->Get_AnimRatio();
 	_vector vLook = m_pTransform->Get_State(CTransform::STATE_LOOK);
+	if (false == m_bCountReset) {
+		pSimba->ResetStarCount();
+		pSimba->ResetRockCount();
+	}
 
+	_uint iStarCount = pSimba->Get_StarCount();
+	_uint iRockCount = pSimba->Get_RockCount();
+	
 	if ((CSimba::Simba_QuickClawStartL == iState || CSimba::Simba_QuickClawStartR == iState) && fAnimRatio < 0.3f)
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 6.f);
 
@@ -173,21 +180,29 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 			m_pController->Move_Dir(m_pTransform, vDir, fTimeDelta, s_fOffsetY);
 		}
 
-		if (0.46f < fAnimRatio && false == m_bStarSpawned)
-		{
-			m_bStarSpawned = true;
+		if (0.46f < fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
-		}
+
+		if (0.44f < fAnimRatio && 0 == iRockCount)
+			pSimba->SpawnRocks(iState);
+		else if (0.54f < fAnimRatio && 1 == iRockCount)
+			pSimba->SpawnRocks(iState);
+		else if (0.64f < fAnimRatio && 2 == iRockCount)
+			pSimba->SpawnRocks(iState);
 	}
 	
 	else if ((CSimba::Simba_QuickClaw2L == iState || CSimba::Simba_QuickClaw2R == iState)) {
 		if(0.3f > fAnimRatio)
 			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
-		if (0.34f < fAnimRatio && false == m_bStarSpawned)
-		{
-			m_bStarSpawned = true;
+		if (0.34f < fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
-		}
+
+		if (0.32f < fAnimRatio && 0 == iRockCount)
+			pSimba->SpawnRocks(iState);
+		if (0.41f < fAnimRatio && 1 == iRockCount)
+			pSimba->SpawnRocks(iState);
+		if (0.5f < fAnimRatio && 2 == iRockCount)
+			pSimba->SpawnRocks(iState);
 
 		_float fStart = 0.27f;
 		_float fEnd = 0.3958f;

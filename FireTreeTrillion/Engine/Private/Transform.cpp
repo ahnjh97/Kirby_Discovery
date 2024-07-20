@@ -65,6 +65,21 @@ _float4x4 CTransform::ComputeBoneWorldMatrix(CBone* pBone, _float3 vOffset, _boo
 	return matResult;
 }
 
+_float4 CTransform::ComputeBoneWorldPos(CBone* pBone, _float3 vOffset)
+{
+	if (nullptr == pBone)
+		return _float4();
+
+	_float4 vResult{};
+	_float4x4 matBoneCombined = *pBone->Get_CombinedTransformationMatrix();
+	_float4 vBonePos{};
+	memcpy(&vBonePos, &(matBoneCombined.m[3]), sizeof(_float4));
+
+	vResult = XMVector3TransformCoord(vBonePos, m_WorldMatrix);
+
+	return vResult;
+}
+
 _float CTransform::RayCast(ACTOR eActorType, _float3 vDir, _float fRayCastDistance, _float3 vOffset)
 {
 	_float4 vPos = Get_State_Float4(STATE_POSITION);

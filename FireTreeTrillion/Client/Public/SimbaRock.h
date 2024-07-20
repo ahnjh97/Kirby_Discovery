@@ -27,7 +27,7 @@ public:
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
-	PxRigidDynamic* m_pDynamicActor = { nullptr };
+	//PxRigidDynamic* m_pDynamicActor = { nullptr };
 
 	_float m_fSamplingFactor = { 1.f };
 	_float m_fZero = {};

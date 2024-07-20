@@ -86,10 +86,14 @@ public:
 
 	void SetCamSequence(_uint iCamSeq);
 	void ResetStarCount() { m_iStarCount = 0; }
+	_uint Get_StarCount() { return m_iStarCount; }
+
 	void ChangeDimensionClawUpDown() { m_bDimensionClawUpAttack = !m_bDimensionClawUpAttack; }
 	void Set_StarPosToRightHand() { m_bBiteRushSpawnStarAtLeft = false; }
 	void Set_StarPosToLeftHand() { m_bBiteRushSpawnStarAtLeft = true; }
 	void Set_LaserActivation(_bool bLaserActivation) { m_bLaserActivated = bLaserActivation; HideDimensionLaserActor(); }
+	void ResetRockCount() { m_iRockCount = 0; }
+	_uint Get_RockCount() { return m_iRockCount; }
 
 public:
 	virtual HRESULT Initialize_Prototype()			override;
@@ -115,6 +119,8 @@ public:
 	void			MoveDimensionClaw(_float fTimeDelta);
 	void			HideDimensionClawActor();
 	void			HideDimensionLaserActor();
+	void			SpawnRocks(_uint iAnimIdx);
+	void			SpawnDebris(_uint iAnimIdx);
 
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
@@ -172,6 +178,7 @@ private:
 
 	vector<class CSimbaRock*>	m_vecSimbaRocks;
 	vector<class CDebris*>		m_vecDebris;
+	_uint			m_iRockCount = {};
 
 private:
 	HRESULT		Add_Components();

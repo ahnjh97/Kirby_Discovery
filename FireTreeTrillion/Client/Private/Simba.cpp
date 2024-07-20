@@ -582,7 +582,7 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 		else
 			AbilityItemDesc.fRotateDir = -1.f;
 		AbilityItemDesc.vDir = XMVectorZero();
-
+		
 		if (true == m_bDimensionClawUpAttack)
 		{
 			if (0 == m_iStarCount) {
@@ -757,6 +757,89 @@ void CSimba::HideDimensionLaserActor()
 {
 	if (nullptr != m_pSimbaLaser)
 		static_cast<CSimbaLaser*>(m_pSimbaLaser)->HideLaser();
+}
+
+void CSimba::SpawnRocks(_uint iAnimIdx)
+{
+	if (Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx)
+	{
+		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
+
+		if (0 == m_iRockCount)
+		{
+
+		}
+		else if (1 == m_iRockCount)
+		{
+
+		}
+		else if (2 == m_iRockCount)
+		{
+
+		}
+
+		m_iRockCount++;
+	}
+	else if (Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
+	{
+
+		if (0 == m_iRockCount)
+		{
+
+		}
+		else if (1 == m_iRockCount)
+		{
+
+		}
+		else if (2 == m_iRockCount)
+		{
+
+		}
+
+		m_iRockCount++;
+	}
+
+	else if (Simba_AttackJumpHit == iAnimIdx)
+	{
+
+	}
+
+	else if (Simba_FinalCrusher == iAnimIdx)
+	{
+		m_iRockCount++;
+	}
+}
+
+void CSimba::SpawnDebris(_uint iAnimIdx)
+{
+	if (Simba_QuickClawL == iAnimIdx)
+	{
+
+	}
+	else if (Simba_QuickClawR == iAnimIdx)
+	{
+
+	}
+	else if (Simba_QuickClaw2L == iAnimIdx)
+	{
+
+	}
+	else if (Simba_QuickClaw2R == iAnimIdx)
+	{
+
+	}
+	else if (Simba_AttackJumpHit == iAnimIdx)
+	{
+
+	}
+	else if (Simba_FinalCrusher == iAnimIdx)
+	{
+
+	}
+	else if (Simba_DimensionLaser == iAnimIdx)
+	{
+
+	}
 }
 
 HRESULT CSimba::Add_Components()

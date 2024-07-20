@@ -116,7 +116,8 @@ private:
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
 
-	_bool m_bStarSpawned = { false };
+	_bool m_bCountReset = { false };
+
 public:
 	static	CSimba_QuickClaw* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
 	{ return new CSimba_QuickClaw(pController, pTransform, pKirby, pKirbyTransform); }

@@ -38,8 +38,8 @@ HRESULT CSimbaRock::Initialize(void* pArg)
 	if (FAILED(Add_Components(tDesc.wstrModelName)))
 		return E_FAIL;
 
-	m_pDynamicActor = m_pModelCom->ReturnDynamicActor(tDesc.matWorld);
-	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+	/*m_pDynamicActor = m_pModelCom->ReturnDynamicActor(tDesc.matWorld);
+	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);*/
 
 	return S_OK;
 }
@@ -105,13 +105,13 @@ void CSimbaRock::SetUpSimbaRock(_fvector vPos)
 
 void CSimbaRock::MoveToOrigin()
 {
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0, -10.f, 0, 1));
-	m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));
+	/*m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0, -10.f, 0, 1));
+	m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));*/
 }
 
 HRESULT CSimbaRock::Add_Components(const wstring& _wstrModelName)
 {
-	HRESULT hr;
+	HRESULT hr{};
 	/* For.Com_Shader */
 	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxModel_Map"),
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
@@ -173,6 +173,8 @@ CGameObject* CSimbaRock::Clone(void* pArg)
 
 void CSimbaRock::Free()
 {
+	//m_pGameInstance->ReleaseActor(m_pDynamicActor);
+
 	__super::Free();
 
 	Safe_Release(m_pModelCom);
