@@ -47,7 +47,13 @@ HRESULT CLaser::Initialize(void* pArg)
 
 	//m_pTransformCom->Look_At(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 
-	m_fAttack = 20.f;
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
+	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+	//FXDesc.vInitPos
+	Add_Effect("HS_FB dimension laser", FXDesc);
+
+	m_fAttack = 5.f;
 	m_bNonDead = true;
 
 	return S_OK;
