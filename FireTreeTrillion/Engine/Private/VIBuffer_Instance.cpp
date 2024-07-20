@@ -771,8 +771,6 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 
 	_float fDestLifeTime = Compute_RandLifetime();
 
-	//if ( m_fRemainedDuration < fDestLifeTime)
-	//	return;
 
 	m_pLifeTimes[iInstanceIndex].x = 0.f;
 
