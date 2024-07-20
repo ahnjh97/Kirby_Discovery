@@ -15,6 +15,7 @@ void MakeFireHammer(CTransform* pTransformCom, _float Scale)
 	Firedesc.vFirstColor = { 1.f, 0.3f, 0.4f, 0.5f };
 	Firedesc.vTargetColor = { 1.f, 1.f, 1.f, 1.f };
 	Firedesc.fScale = { Scale * CUtils::Make_RandomFloat(0.8f, 1.2f)};
+	Firedesc.fTimeRatio = 0.5f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
 		return;
 }
