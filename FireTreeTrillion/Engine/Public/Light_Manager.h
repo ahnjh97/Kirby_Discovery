@@ -24,6 +24,11 @@ public:
 		return m_Lights.back();
 	}
 
+	class CLight* Get_DirectionLightAddress() {
+		return m_Lights.front();
+	}
+
+
 	// 빛을 초기화 한다.
 	void	Clear_Light();
 

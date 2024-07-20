@@ -39,7 +39,9 @@
 #include "Particle.h"
 #include "MultiEffect.h"
 
+// 기타 이펙트스러운거
 #include "Fire.h"
+#include "CrashParticle.h"
 
 //애님 툴
 #include "AnimToolHelper.h"
@@ -86,6 +88,7 @@
 #include "GhostGordo.h"
 #include "Bomber.h"
 #include "SpawnEffect.h"
+#include "SummonEffect.h"
 
 // 보스 몬스터
 #include "FinalBoss.h"
@@ -422,6 +425,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BulbFlare"), CBulbFlare);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Fire"), CFire);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CrashParticle"), CCrashParticle);
 
 	// Deform
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Car"), CCar);
@@ -447,6 +451,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("GhostGordo"), CGhostGordo);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Bomber"), CBomber);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SpawnEffect"), CSpawnEffect);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SummonEffect"), CSummonEffect);
 
 	// FinalBoss
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalBoss"), CFinalBoss);
@@ -1637,6 +1642,7 @@ HRESULT CLoader::Add_FXTexture()
 	// 파크 몬스터용
 	hr = Add_Texture(LEVEL_STATIC, "FX_ParkSmoke", "Effects/common_smoke08.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SmokeNormal", "Effects/indirect3_normal.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SpawnEffect", "Effects/SpawnEffect1.png");	CHECK_FAILED(hr);
 
 	//스카이스피어
 	hr = Add_Texture(LEVEL_STATIC, "FX_FinalBoss_SkySphere", "SkySphere/SkySphere_Lab_Diffuse_%d.dds", 3);	CHECK_FAILED(hr);
@@ -2256,7 +2262,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("Road", TYPE_NONANIM, 1.f, 0.f, 0);
 		m_vecModelInfo.emplace_back("RoadEnd", TYPE_NONANIM, 1.f, 0.f, 0);
-		m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 0.2f, 0.f, 0);
 
 		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.2f, 0.f, 0);
 
@@ -2747,6 +2752,10 @@ void CLoader::Load_KirbyBodyModels()
 
 	// Deform
 	m_vecModelInfo.emplace_back("Bulb", TYPE_ANIM, 1.f, 180.f);
+
+	// AbilityEffect
+	m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 0.2f, 0.f, 0);
+
 }
 
 void CLoader::Load_KirbyWeaponModels()

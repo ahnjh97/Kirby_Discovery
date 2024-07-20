@@ -30,7 +30,6 @@ public:
 	// ºû ÄÃ¸µ
 	_bool	Compute_RenderCull();
 
-
 private:
 	LIGHT_DESC			m_LightDesc = {};
 	_bool				m_bDead = { false };

@@ -12,6 +12,8 @@ float3 g_vRColor = { 1.f, 1.f, 1.f};
 float3 g_vGColor = { 1.f, 1.f, 1.f};
 float3 g_vBColor = { 1.f, 1.f, 1.f};
 
+vector g_vColor = { 1.f, 1.f, 1.f, 1.f };
+
 float g_fAlpha = { 1.f };
 float g_fMaskThreshold = { 0.f };
 
@@ -785,10 +787,20 @@ PS_OUT PS_SPAWNEFFECT(PS_IN In)
         discard;
     
     Out.vColor.a *= 0.6f * g_fAlpha;
-    
-    if (0.03f >= Out.vColor.a)
-        discard;
+     
+    return Out;
+}
 
+PS_OUT PS_SUMMONEFFECT(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord) + g_vColor;
+	
+    if (0.2f > Out.vColor.a)
+        discard;
+		
+    Out.vColor.a *= g_fAlpha;
     
     return Out;
 }
@@ -1138,5 +1150,19 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX_NOSOFTFX();
+    }
+
+    // SUMMON EEFFECT ( 25 )
+    pass SUMMONEFFECT
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_SUMMONEFFECT();
     }
 }
