@@ -43,7 +43,7 @@ HRESULT CKickableRock::Initialize(void* pArg)
 	m_mapPowers = {
 		{"SeShell", 7.5f},
 		{"GsPebble", 18.f},
-		{"WasteCanYellow", 50.f},
+		{"WasteCanYellow", 60.f},
 		{"GsRubbleA", 15.f},
 		{"GsRubbleB", 35.f},
 		{"GsRubbleC", 35.f},

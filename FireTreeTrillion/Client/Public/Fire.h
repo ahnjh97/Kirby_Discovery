@@ -19,6 +19,7 @@ public:
 		_float4 vTargetColor;
 		_float fUpRange;
 		_float fScale;
+		_float fTimeRatio = { 1.f };
 	};
 private:
 	CFire(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -52,6 +53,7 @@ private:
 	_float4 m_vOriginPos = { 0.f, 0.f, 0.f, 0.f };
 
 	_float m_fTimeDelta = { 0.f };
+	_float m_fTimeRatio = { 0.f };
 
 private:
 	HRESULT Add_Components();

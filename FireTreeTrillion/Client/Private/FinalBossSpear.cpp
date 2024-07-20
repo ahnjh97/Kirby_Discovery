@@ -158,6 +158,7 @@ _int CFinalBossSpear::Tick(_float fTimeDelta)
 			m_fSecondFireTime = 3.8f;
 		}
 	}
+	//spike ÁØºñ
 	else if (CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADY == pFinalBoss->Get_State())
 	{
 		if(0.65f < pFinalBoss->Get_AnimRatio())
@@ -165,6 +166,7 @@ _int CFinalBossSpear::Tick(_float fTimeDelta)
 			if (false == m_bGate)
 			{
 				m_bGate = true;
+
 
 				CDimensionGate::DIMENSIONGATE_DESC DimensionGateDesc = {};
 				_vector vPos = XMLoadFloat4x4(&m_WorldMatrix).r[3];

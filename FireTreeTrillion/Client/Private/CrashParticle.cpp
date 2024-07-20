@@ -68,7 +68,7 @@ _int CCrashParticle::Tick(_float fTimeDelta)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vDelta - vGravity);
 		m_pTransformCom->Turn(m_fTurnAxis, m_fTimeDelta, m_fTurn);
 
-		if (m_fRunTime > 1.5f)
+		if (m_fRunTime > 4.f)
 		{
 			m_fScale -= m_fTimeDelta * 4.f;
 

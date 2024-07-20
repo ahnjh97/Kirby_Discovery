@@ -1467,7 +1467,7 @@ static void SwordHit_Big(CTransform* pTransformCom)
 }
 
 
-static void Fire_Maker(_float3 vLocalPos, CTransform* pTransformCom, _float Scale, _float fUpRange, _float4 FColor, _float4 fLColor)
+static void Fire_Maker(_float3 vLocalPos, CTransform* pTransformCom, _float Scale, _float fUpRange, _float4 FColor, _float4 fLColor, _float fTimeRatio = 1.f)
 {
 	_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
 	_float4 vRight = pTransformCom->Get_State(CTransform::STATE_RIGHT);
@@ -1480,6 +1480,7 @@ static void Fire_Maker(_float3 vLocalPos, CTransform* pTransformCom, _float Scal
 	Firedesc.vFirstColor = { FColor };
 	Firedesc.vTargetColor = { fLColor };
 	Firedesc.fScale = { Scale };
+	Firedesc.fTimeRatio = { fTimeRatio };
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
 		return;
 }

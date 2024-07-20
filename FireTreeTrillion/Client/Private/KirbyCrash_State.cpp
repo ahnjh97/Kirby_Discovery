@@ -111,8 +111,6 @@ void CKirbyCrash_Attack_State::Free()
 
 #pragma endregion
 
-
-
 #pragma region Big Attack STATE
 
 CKirbyCrash_BigAttack_State::CKirbyCrash_BigAttack_State()
@@ -122,6 +120,7 @@ CKirbyCrash_BigAttack_State::CKirbyCrash_BigAttack_State()
 void CKirbyCrash_BigAttack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
 }
 
 void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -140,14 +139,15 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 
 		_float fTime = m_pGameInstance->Get_OriginalTimer();
 
-		m_fParticleTime += fTimeDelta;
-		m_fRange += fTime * 4.f;
+		m_fParticleTime += fTime;
+		m_fRange += fTime * 6.f;
+		m_fBoomTime += fTime;
 
 		if (m_fParticleTime > 0.2f)
 		{
 			for (_int i = 0; i < 10; ++i)
 			{
-				_float4 vTemp = { m_fRange, 0.f, 0.f, 0.f };
+				_float4 vTemp = { m_fRange * 2.f, 0.f, 0.f, 0.f };
 				_float4x4 RotMat = _float4x4::Identity;
 				CUtils::Turn_OtherMatrix(RotMat, XMVectorSet(0.f, 1.f, 0.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
 				vTemp = XMVectorSetW(XMVector3Transform(vTemp, RotMat), 0.f);
@@ -163,8 +163,42 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_CrashParticle"), TEXT("Prototype_GameObject_CrashParticle"), &Crashdesc)))
 					return;
 			}
+
 			m_fParticleTime = 0.f;
 		}
+
+		if (m_fBoomTime > 0.4f)
+		{
+			if (m_iBoomCount < 4)
+			{
+				CEffect::FX_DESC FXDesc{};
+				FXDesc.vInitPos = _float3(vMakingPos);
+				FXDesc.vInitRot = { 0.f, 0.f, 0.f };
+				FXDesc.vInitScale = { 1.f + ((_float)m_iBoomCount * 0.2f), 1.f + ((_float)m_iBoomCount * 0.2f), 1.f + ((_float)m_iBoomCount * 0.2f) };
+				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash Boom Smoke"), &FXDesc)))
+					return;
+
+				CMultiEffect::MULTI_FX_DESC FXMdesc{};
+				FXMdesc.vInitPos = _float3(vMakingPos) + _float3(0.f, 2.f, 0.f);
+				FXMdesc.vInitScale = { 1.f, 1.f, 1.f };
+				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash Booms"), &FXMdesc)))
+					return;
+
+				if (m_iBoomCount == 3)
+				{
+					FXDesc.vInitPos = { 0.f, 0.f, 0.f };
+					FXDesc.vInitRot = { 0.f, 0.f, 0.f };
+					FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+					if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash FIn"), &FXDesc)))
+						return;
+				}
+
+				m_iBoomCount++;
+
+			}
+			m_fBoomTime = 0.f;
+		}
+
 
 		DESC(m_fTimeRatio) += fTime * 0.3f;
 		if (DESC(m_fTimeRatio) > 1.f)
@@ -213,6 +247,14 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 			m_pGameInstance->Get_DirectionLightAddress()->Interpolate_Light(DESC(m_vPreDiffuseLight), 1.f, 2.f);
 			static_cast<CCamera_Main*>(pCamera)->Zoom(0.f);
 			m_bTerrainOn = true;
+
+			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+			CParticle::PARTICLE_DESC FXPDesc{};
+			FXPDesc.vInitPos = (_float3)vPos;
+			FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash Boom Fin Particle"), &FXPDesc)))
+				return;
+
 		}
 
 		if (m_bTerrainOn == true)
@@ -247,6 +289,7 @@ void CKirbyCrash_BigAttack_State::OnStateExit()
 
 	m_fParticleTime = 0.f;
 	m_fRange = 0.f;
+	m_iBoomCount = 0;
 }
 
 CKirbyCrash_BigAttack_State* CKirbyCrash_BigAttack_State::Create()
@@ -261,8 +304,6 @@ void CKirbyCrash_BigAttack_State::Free()
 }
 
 #pragma endregion
-
-
 
 #pragma region Charge STATE
 
@@ -309,10 +350,18 @@ void CKirbyCrash_Charge_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		// 1틱 발동
 		if (m_bTrigger == true)
 		{
+			CParticle::PARTICLE_DESC FXPDesc{};
+			FXPDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			FXPDesc.vInitPos = _float3{ 0.f, 2.f, 0.f };
+			FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash Start Particle2"), &FXPDesc)))
+				return;
+
 			m_pGameInstance->Set_FirstTimerRatio(0.f);
 			m_pGameInstance->Set_SecondTimerRatio(0.f);
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake(0.3f, 0.5f);
+			pKirby->Delete_Effect("YW Crash Charge");
 			m_bTrigger = false;
 		}
 
@@ -329,6 +378,18 @@ void CKirbyCrash_Charge_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	// 차지의 시작이다.
 	if (pKirby->Get_State() == CKirby::CRASHSTATE_ATTACKCHARGESTART)
 	{
+		if (m_bEffectTrigger == true)
+		{
+			CMultiEffect::MULTI_FX_DESC MFXDesc{};
+			MFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			MFXDesc.vInitPos = _float3{ 0.f, 1.5f, 0.f };
+			MFXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash Charge"), &MFXDesc)))
+				return;
+			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+			m_bEffectTrigger = false;
+		}
+
 		// 지속적인 쉐이킹
 		CamShake(m_fTime, fTimeDelta, 0.3f);
 		DESC(m_fCrashChargeTime) += fTimeDelta;
@@ -431,6 +492,7 @@ void CKirbyCrash_Charge_State::OnStateExit()
 	m_bNextState = false;
 	m_fNextStateTime = 0.f;
 	m_bTrigger = true;
+	m_bEffectTrigger = true;
 }
 
 CKirbyCrash_Charge_State* CKirbyCrash_Charge_State::Create()
@@ -501,6 +563,9 @@ void CKirbyCrash_BigCharge_State::OnStateUpdate(CGameObject* pGameObject, _float
 
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake(0.3f, 0.5f);
+
+			pKirby->Delete_Effect("YW Crash Charge");
+
 			m_bTrigger = false;
 		}
 

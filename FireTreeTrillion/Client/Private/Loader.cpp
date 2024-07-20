@@ -155,6 +155,7 @@
 #include "Simba.h"
 #include "SimbaLaser.h"
 #include "DimensionClaw.h"
+#include "SimbaRock.h"
 
 // 피날레 스테이지 기믹들
 #include "Baum.h"
@@ -571,6 +572,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Simba"), CSimba);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaLaser"), CSimbaLaser);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DimensionClaw"), CDimensionClaw);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaRock"), CSimbaRock);
 #pragma endregion
 
 #pragma endregion
@@ -1719,6 +1721,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		//이펙트 입히는 원기둥
 		m_vecModelInfo.emplace_back("CylinderA", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("CylinderB", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("CylinderC", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("CylinderD", TYPE_NONANIM);
 
 		m_vecModelInfo.emplace_back("Dash", TYPE_NONANIM);
 
@@ -1753,6 +1757,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FXThunderLine", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXMeteoDash", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXDonut", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("LaserNonAnim", TYPE_NONANIM);
 
 		//공통이펙트 - YW
 		m_vecModelInfo.emplace_back("Cube", TYPE_NONANIM);
@@ -2144,10 +2149,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Boss 
 		m_vecModelInfo.emplace_back("Simba", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("SimbaLaser", TYPE_NONANIM);
-
+		
 		for (_uint i = 0; i <= 16; i++) {
 			string strTunnelRock = "TunnelRock" + to_string(i);
-			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM, 0.1f);
+			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM);
 		}
 
 		// For Item

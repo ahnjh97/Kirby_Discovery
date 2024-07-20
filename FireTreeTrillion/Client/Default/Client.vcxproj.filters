@@ -705,8 +705,8 @@
 	</Filter>
     <Filter Include="02.GameObjects\Effect\CrashParticle">
       <UniqueIdentifier>{47d42697-331c-426e-bafd-b4400924c864}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="02.GameObjects\PhysXObject\Character\Simba\SimbaLaser">
+    </Filter>
+    <Filter Include="02.GameObjects\PhysXObject\Character\Simba\SimbaLaser">
       <UniqueIdentifier>{42035ce9-5d3d-45ba-b6f6-1ecbf083be9c}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Simba\SimbaRock">
@@ -1417,6 +1417,9 @@
     <ClInclude Include="..\Public\DimensionClaw.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\DimensionClaw</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SimbaRock.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaRock</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -2099,6 +2102,9 @@
 	</ClCompile>
     <ClCompile Include="..\Private\DimensionClaw.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\DimensionClaw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SimbaRock.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaRock</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

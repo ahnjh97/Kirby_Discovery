@@ -2613,6 +2613,12 @@ void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
 		}
 
 	}
+
+	if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR)
+	{
+
+		//m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+	}
 }
 
 void CCamera_Main::Control(_float fTimeDelta)
