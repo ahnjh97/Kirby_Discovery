@@ -122,6 +122,16 @@ CKirbyCrash_BigAttack_State::CKirbyCrash_BigAttack_State()
 void CKirbyCrash_BigAttack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
+	_float4 vPos = pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+
+	CMultiEffect::MULTI_FX_DESC FXMdesc{};
+	FXMdesc.vInitPos = (_float3)vPos;
+	FXMdesc.vInitScale = { 1.f, 1.f, 1.f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash Booms"), &FXMdesc)))
+		return;
 }
 
 void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -142,7 +152,7 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 
 		m_fParticleTime += fTimeDelta;
 		m_fRange += fTime * 6.f;
-		m_fBoomTime += fTime;
+		//m_fBoomTime += fTime;
 
 		if (m_fParticleTime > 0.2f)
 		{
@@ -167,22 +177,22 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 			m_fParticleTime = 0.f;
 		}
 
-		if (m_fBoomTime > 1.f)
-		{
-			if (m_iBoomCount < 3)
-			{
-				CEffect::FX_DESC FXDesc{};
-				FXDesc.vInitPos = { 0.f, 2.f, 0.f };
-				FXDesc.vInitRot = { 0.f, 0.f, 0.f };
-				FXDesc.vInitScale = { m_iBoomCount + 1.f, m_iBoomCount + 1.f, m_iBoomCount + 1.f };
-				FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash BoomA"), &FXDesc)))
-					return;
+		//if (m_fBoomTime > 1.f)
+		//{
+		//	if (m_iBoomCount < 3)
+		//	{
+		//		CEffect::FX_DESC FXDesc{};
+		//		FXDesc.vInitPos = { 0.f, 2.f, 0.f };
+		//		FXDesc.vInitRot = { 0.f, 0.f, 0.f };
+		//		FXDesc.vInitScale = { m_iBoomCount + 1.f, m_iBoomCount + 1.f, m_iBoomCount + 1.f };
+		//		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+		//		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash BoomA"), &FXDesc)))
+		//			return;
 
-				m_iBoomCount++;
-			}
-			m_fBoomTime = 0.f;
-		}
+		//		m_iBoomCount++;
+		//	}
+		//	m_fBoomTime = 0.f;
+		//}
 
 
 		DESC(m_fTimeRatio) += fTime * 0.3f;
