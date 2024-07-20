@@ -42,14 +42,14 @@ void LaserReady(CFinalBoss* pBoss)
 	pBoss->Add_Effect("HS_FB laser charge particle", ParticleDesc);
 
 
-	CMultiEffect::MULTI_FX_DESC FXDesc{};
-	FXDesc.pSocketMatrix = pBoss->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
-	FXDesc.vInitPos = { 0.f, 3.f, 2.f };
-	FXDesc.vInitScale = { 5.f, 5.f, 5.f };
-
-	FXDesc.fStartDelay = 1.f;
-
-	pBoss->Add_Effect("HS_FB charge light", FXDesc);
+//	CMultiEffect::MULTI_FX_DESC FXDesc{};
+//	FXDesc.pSocketMatrix = pBoss->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
+//	FXDesc.vInitPos = { 0.f, 3.f, 2.f };
+//	FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+//
+//	FXDesc.fStartDelay = 1.f;
+//
+//	pBoss->Add_Effect("HS_FB charge light", FXDesc);
 }
 #pragma region APPEAR STATE
 //*********************************

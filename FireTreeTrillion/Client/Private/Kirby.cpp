@@ -117,6 +117,7 @@ _int CKirby::Tick(_float fTimeDelta)
 		//RayCast_SurpriseBoards();
 	}
 		
+	m_bOverPower = true;
 	return OBJ_NOEVENT;
 }
 

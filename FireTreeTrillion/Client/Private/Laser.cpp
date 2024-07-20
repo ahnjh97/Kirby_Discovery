@@ -3,6 +3,8 @@
 #include "Kirby.h"
 #include "HitBox.h"
 
+
+
 CLaser::CLaser(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
 {
@@ -49,7 +51,7 @@ HRESULT CLaser::Initialize(void* pArg)
 
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
 	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-
+	FXDesc.vInitRot = { 180.f, 0.f, 0.f };
 	//FXDesc.vInitPos
 	Add_Effect("HS_FB dimension laser", FXDesc);
 
@@ -75,6 +77,44 @@ _int CLaser::Tick(_float fTimeDelta)
 	//m_pTransformCom->Look_At(-pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
 	Activate_FrustumCollider(0.f, 200.f, 5.f);
 
+	//레이저에 보스 건물 영역이 들어맞는지 판단, 그 영역에 자국을 남긴다.
+	static _float fDecalTime{ 0.f };
+	fDecalTime += m_fTimeDelta;
+	
+	if (.15f < fDecalTime)
+	{
+		fDecalTime = 0.f;
+
+		_float3 vCollidingPoint =
+			Compute_CollidingPoint(GET_POS, (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK), {0.f, -.5f, 0.f}, {21.f, .5f, 21.f});
+
+		if (!ISDEFAULTFLOAT3(vCollidingPoint))
+		{
+			//레이저와의 충돌 자국
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.vInitPos = vCollidingPoint;
+			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+			Add_Effect("HS_FB laser decal", FXDesc);
+
+			//for (_int i = 0; i < 10; ++i)
+			//{
+			//	FXDesc.vInitRot = { CUtils::Make_RandomFloat(-45.f, 45.f), CUtils::Make_RandomFloat(-45.f, 45.f), CUtils::Make_RandomFloat(-45.f, 45.f) };
+			//	_float fInitScale = CUtils::Make_RandomFloat(3.f, 5.f);
+			//	FXDesc.vInitScale = { fInitScale, fInitScale, fInitScale };
+			//	FXDesc.fStartDelay = CUtils::Make_RandomFloat(0.f, .15f);
+			//	Add_Effect("HS_billboard up line", FXDesc);
+			//}
+
+			//충돌 시 튀는 파티클
+			CParticle::PARTICLE_DESC ParticleDesc{};
+			ParticleDesc.vInitPos = vCollidingPoint;
+			ParticleDesc.vInitScale = {50.f, 50.f, 50.f };
+			Add_Effect("start particle test A", ParticleDesc);
+
+		}
+	}
+
+
 	if (true == m_bEnd)
 	{
 		m_bEnd = false;
@@ -95,12 +135,14 @@ void CLaser::Late_Tick(_float fTimeDelta)
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 100.0f))
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+		//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
 }
 
 HRESULT CLaser::Render()
 {
+	return S_OK;
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -165,6 +207,24 @@ void CLaser::Render_IMGUI()
 
 void CLaser::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+}
+
+_float3 CLaser::Compute_CollidingPoint(_float3 vLaserStart, _float3 vLaserDir, _float3 vLandCenter, _float3 vLandExtent)
+{
+	_float3 vResult{ -1.f, -1.f, -1.f };
+	vLaserDir.Normalize();
+
+	BoundingBox landBox;
+	landBox.Center = vLandCenter;
+	landBox.Extents = vLandExtent;
+
+	_float fDist;
+	if(landBox.Intersects(vLaserStart, vLaserDir, fDist))
+	{
+		vResult = vLaserStart + vLaserDir * fDist;
+	}
+
+	return vResult;
 }
 
 HRESULT CLaser::Add_Components()

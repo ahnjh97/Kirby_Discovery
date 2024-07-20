@@ -196,12 +196,24 @@ void CPhysXObject::Add_Effect(string strName, CEffect::FX_DESC fxDesc, _bool bAd
 		m_FXList.emplace_back(pEffect);
 		Safe_AddRef(pEffect);
 	}
-		//Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
 }
 
 void CPhysXObject::Add_Effect(string strName, CParticle::PARTICLE_DESC fxDesc, _bool bAddToList)
 {
+	wstring strProtoTag = TEXT("Prototype_GameObject_");
+	strProtoTag += CUtils::StrToWstr(strName);
+
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strProtoTag, &fxDesc)))
+		return;
+
+	if (bAddToList)
+	{
+		CEffect* pEffect = static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back());
+
+		m_FXList.emplace_back(pEffect);
+		Safe_AddRef(pEffect);
+	}
 }
 
 void CPhysXObject::Add_Effect(string strName, CMultiEffect::MULTI_FX_DESC fxDesc, _bool bAddToList)
@@ -219,7 +231,6 @@ void CPhysXObject::Add_Effect(string strName, CMultiEffect::MULTI_FX_DESC fxDesc
 		m_FXList.emplace_back(pEffect);
 		Safe_AddRef(pEffect);
 	}
-		//Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 }
 
 void CPhysXObject::Add_Effect(CEffect* pEffect)

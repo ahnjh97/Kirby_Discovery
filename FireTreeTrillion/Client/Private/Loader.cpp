@@ -1612,8 +1612,8 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordSlash", "Effects/Sword/slash_%d.png", 6);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordTail", "Effects/Sword/sword_tail.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordDecal", "Effects/Sword/sword_decal.dds");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_SwordLine", "Effects/Sword/line.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_SwordShockwave", "Effects/Sword/shockwave.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SwordLine", "Effects/Sword/line_%d.png", 2);	CHECK_FAILED(hr);
+	//hr = Add_Texture(LEVEL_STATIC, "FX_SwordShockwave", "Effects/Sword/shockwave.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordRingNoFrip", "Effects/Sword/ringnofrip.png");	CHECK_FAILED(hr);
 
 	//¿Ÿ
