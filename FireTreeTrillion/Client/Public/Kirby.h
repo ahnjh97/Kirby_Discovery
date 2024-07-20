@@ -238,6 +238,8 @@ public:
 	// 기타 세부적인 제어
 	void Set_ControllerPos(_float4 _vPosition);
 
+	//unordered_map<PxRigidActor*, CGameObject*>* Get_StarBoses() { return &m_mapStarBoxes; };
+	//unordered_map<PxRigidActor*, CGameObject*>* Get_Boses() { return &m_mapBoxes; };
 
 private:
 	// 커비의 움직임을 담은 구조체

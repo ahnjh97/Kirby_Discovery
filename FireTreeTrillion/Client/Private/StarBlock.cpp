@@ -239,7 +239,7 @@ HRESULT CStarBlock::Add_Components(wstring& wstrModelName)
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = OBJECT;
+	HitBox.pCollisionType = BOXOBJECT;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 
