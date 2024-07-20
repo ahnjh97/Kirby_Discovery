@@ -23,6 +23,7 @@
 #include "Gm_ParkSolarPanelOnce.h"
 #include "Gm_ParkSolarPanelCharge.h"
 
+#include "WaddleDee.h"
 #include "ItemObject.h"
 
 #define MONSTER_TRIGGER(index) (index - 11)
@@ -742,6 +743,35 @@ HRESULT CLevel_Park::Ready_Monsters()
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick"), TEXT("Prototype_GameObject_Crumble"), &CrumbleDesc)))
 				return E_FAIL;
 		}
+
+#pragma region WADDLE_DEE
+
+		/*
+		CWaddleDee::DEE_DESC ObjDesc{};
+		ObjDesc.fSpeedPerSec = 5.f;
+		ObjDesc.fRotationPerSec = ToRadian(90.f);
+		_float4x4 InitMat = _float4x4::Identity;
+		InitMat.Translation({ 10.2f, 24.7f, 26.f });
+		ObjDesc.matWorld = InitMat;
+
+		if (L"WaddleDee" == tempDesc.wstrModelName)
+		{
+			CWaddleDee::DEE_DESC DeeDesc = {};
+			DeeDesc.matWorld = matWorld;
+			DeeDesc.wstrModelName = CUtils::StrToWstr(strModelName);
+			DeeDesc.iShaderVars = iShaderVars;
+			DeeDesc.fRimWidth = fRimWidth;
+
+			//원래 인덱스를 넘어가면 맨 마지막 놈으로다가 매치
+			DeeDesc.eCharacter = DEECHARACTER_IDLE;
+
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_BattleDee"), &DeeDesc)))
+				return E_FAIL;
+		}
+		*/
+
+#pragma endregion
+
 	}
 	fileInput.close();
 

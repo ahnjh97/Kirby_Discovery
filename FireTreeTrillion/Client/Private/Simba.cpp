@@ -15,6 +15,8 @@
 #include "DimensionClaw.h"
 #include "CollisionCenter.h"
 #include "SimbaLaser.h"
+#include "SimbaRock.h"
+#include "Debris.h"
 
 CSimba::CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -140,7 +142,7 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_pRightHandBone = m_pModelCom->Get_BonePtr("R_HaveL");
 	Safe_AddRef(m_pRightHandBone);
 
-	m_setAppear1Anims = { Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait, Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait, 
+	m_setAppear1Anims = { Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait, Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait,
 		Simba_DemoAppear1Cut4, Simba_DemoAppear1Cut4Wait };
 
 	m_setUndamagableAnims = { Simba_Death, Simba_DemoDeadCut1, Simba_DemoDeadCut2 };
@@ -148,6 +150,24 @@ HRESULT CSimba::Initialize(void* pArg)
 	SetCamSequence(CCamera_Main::SEQ_SIMBA_START);
 
 	CreateDimensionClawActor();
+
+	vector<_uint> vecTunnelRocks = { 2, 4, 5, 7, 8, 9, 10, 12, 13, 16 };
+	GAMEOBJECT_DESC tDesc{};
+
+	for (_uint i = 0; i < 4; i++) {
+		for (auto& rockIdx : vecTunnelRocks) {
+
+			tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(rockIdx);
+			m_vecSimbaRocks.emplace_back(dynamic_cast<CSimbaRock*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_SimbaRock"), &tDesc)));
+		}
+	}
+	for (_uint i = 0; i < 6; i++) {
+		for (auto& rockIdx : vecTunnelRocks) {
+
+			tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(rockIdx);
+			m_vecDebris.emplace_back(dynamic_cast<CDebris*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Debris"), &tDesc)));
+		}
+	}
 
 	return S_OK;
 }
@@ -1338,6 +1358,11 @@ void CSimba::Free()
 	CEventCenter::Get_Instance()->Unsubscribe(this);
 
 	__super::Free();
+
+	for (auto& simbaRock : m_vecSimbaRocks)
+		Safe_Release(simbaRock);
+	for (auto& debris : m_vecDebris)
+		Safe_Release(debris);
 
 	Safe_Release(m_pLipBone);
 	Safe_Release(m_pLaserBone);
