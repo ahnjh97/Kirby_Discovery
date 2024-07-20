@@ -365,7 +365,7 @@ HRESULT CAwoofy::Add_Components(const wstring& wstrModelName)
 	m_vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = m_vPos;
-	desc.fOffset = 0.8f;
+	desc.fOffset = 0.6f;
 	desc.tCapsuleShape.fHeight = 0.5f;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID) {
 		desc.fOffset = 1.2f;
