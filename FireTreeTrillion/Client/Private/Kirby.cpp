@@ -1599,7 +1599,7 @@ void CKirby::RayCast_DynamicFields()
 			{
 				CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(pObj);
 				if (false == pDynamicField->IsActivated())
-					pDynamicField->Set_Interaction(true);
+					pDynamicField->Set_Interaction(TRUE);
 				return;
 			}
 
@@ -1616,7 +1616,7 @@ void CKirby::RayCast_DynamicFields()
 			{
 				CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(pObj);
 				if (false == pDynamicField->IsActivated())
-					pDynamicField->Set_Interaction(true);
+					pDynamicField->Set_Interaction(TRUE);
 				return;
 			}
 
@@ -1646,7 +1646,7 @@ void CKirby::RayCast_SurpriseBoards()
 				{
 					CGm_DynamicField* pDynamicField = dynamic_cast<CGm_DynamicField*>(pObj2);
 					if (false == pDynamicField->IsActivated())
-						pDynamicField->Set_Interaction(true);
+						pDynamicField->Set_Interaction(TRUE);
 					return;
 				}
 			}

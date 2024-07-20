@@ -142,9 +142,11 @@ void CSurprisedBoard_Return_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		{
 		case CSurprisedBoard::RETURN_L:
 			pSurprisedBoard->Change_State(CSurprisedBoard::WAIT_L, 50.f, true, true);
+			pSurprisedBoard->Set_Activated(FALSE);
 			break;
 		case CSurprisedBoard::RETURN_R:
 			pSurprisedBoard->Change_State(CSurprisedBoard::WAIT_R, 50.f, true, true);
+			pSurprisedBoard->Set_Activated(FALSE);
 			break;
 		}
 	}

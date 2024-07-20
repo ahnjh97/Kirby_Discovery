@@ -87,6 +87,7 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 	if (TEXT("Gimmick_PkFunHouseDarkness02") == wstrModelTag)
 	{
 		m_eDFieldType = DFMOVE_RIGHT;
+		m_eDFMoveState = DFIELD_WAIT;
 		m_eGimmickType = GIMMICK_SURPRISE;
 		m_vInitPos = GET_POS;
 	}
@@ -110,6 +111,7 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 	if (TEXT("Gimmick_PkFunHouseDarkness03") == wstrModelTag)
 	{
 		m_eDFieldType = DFMOVE_LEFT;
+		m_eDFMoveState = DFIELD_WAIT;
 		m_eGimmickType = GIMMICK_SURPRISE;
 		m_vInitPos = GET_POS;
 		m_pStaticActor = m_pModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
@@ -344,6 +346,8 @@ void CGm_DynamicField::Apply_Quake(_float _fTimeDelta, _float _fQuakeDuration, _
 _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 {
 	_float3 vCurPos = { 0.f, 0.f, 0.f };
+	_float fMaxPosX = { 0.f };
+
 	_float fMoveSpeed = { 0.f };
 	DFMOVEUP_TYPE eDFMoveUPType = { DFMOVEUP_END };
 	switch (m_eDFieldType)
@@ -407,59 +411,41 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 		break;
 
 	//깜놀보드 충돌거리 조건에 따라 DFMOVE_LEFT, DFMOVE_RIGHT를 체크
-	case DFMOVE_LEFT: //24.500 36.963 -67.289
+	case DFMOVE_LEFT: case DFMOVE_RIGHT: 
 		vCurPos = GET_POS;
-
 		if (m_bIsInteraction) //RayCast 상호작용 검사
 		{
 			switch (m_eDFMoveState)
 			{
-			case DFIELD_MOVE:
-				//깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
-				m_pTransformCom->Go_Left(_fTimeDelta * 0.3f); //원작의 속도는 약 0.25f 수준
-				MoveItems(_float3(-1, 0, 0), _fTimeDelta * 0.3f);
-				break;
-
-			case DFIELD_QUAKE:
-				Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
-				break;
-			}
-
-			_float fOffsetPosX = m_vInitPos.x - 6.f;
-			if (fOffsetPosX >= vCurPos.x)
-			{
-				vCurPos.x = fOffsetPosX;
-				m_fStartQuake += _fTimeDelta;
-
-				if (m_fStartQuake < 0.5f)
-					m_eDFMoveState = DFIELD_QUAKE;
-
-				else
-				{
-					m_fStartQuake = 0.f;
-					m_bIsInteraction = FALSE;
-				}
-			}
-			else
+			case DFIELD_WAIT:
 				m_eDFMoveState = DFIELD_MOVE;
-		}
-	
-		if (m_bIsReturnMove)
-		{
-			switch (m_eDFMoveState)
-			{
+				break;
+
 			case DFIELD_MOVE:
-				if (m_vInitPos.x <= vCurPos.x)
+				if (DFMOVE_RIGHT == m_eDFieldType)
 				{
-					vCurPos.x = m_vInitPos.x;
-					m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vInitPos);
+					m_pTransformCom->Go_Right(_fTimeDelta * 0.4f);
+					MoveItems(_float3(1, 0, 0), _fTimeDelta * 0.4f);
+
+					fMaxPosX = m_vInitPos.x + 6.f;
+					if (vCurPos.x >= fMaxPosX)
+					{
+						vCurPos.x = fMaxPosX;
+						m_eDFMoveState = DFIELD_QUAKE;
+					}
 				}
-				
-				else {
-					m_pTransformCom->Go_Right(_fTimeDelta * 2.f); //2.25 > 2.0
-					MoveItems(_float3(1, 0, 0), _fTimeDelta * 2.f);
+				else if (DFMOVE_LEFT == m_eDFieldType)
+				{
+					m_pTransformCom->Go_Left(_fTimeDelta * 0.4f);
+					MoveItems(_float3(-1, 0, 0), _fTimeDelta * 0.4f);
+
+					fMaxPosX = m_vInitPos.x - 6.f;
+					if (vCurPos.x <= fMaxPosX)
+					{
+						vCurPos.x = fMaxPosX;
+						m_eDFMoveState = DFIELD_QUAKE;
+					}
 				}
-					
 				break;
 
 			case DFIELD_QUAKE:
@@ -470,94 +456,56 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 
 				else
 				{
+					if (DFIELD_RETURN == m_eDFMovePreState)
+					{
+						m_eDFMoveState = DFIELD_IDLE; //리턴 상태 이후 지진을 체크
+						m_eDFMovePreState = DFIELD_QUAKE;
+					}
+
+					else
+						m_eDFMoveState = DFIELD_RETURN; 
+
 					m_fStartQuake = 0.f;
-					m_bIsReturnMove = FALSE;
-					return OBJ_NOEVENT;
 				}
 				break;
-			}
 
-			if (m_vInitPos.x <= vCurPos.x)
-				m_eDFMoveState = DFIELD_QUAKE;
-
-			else
-				m_eDFMoveState = DFIELD_MOVE;
-		}
-		break;
-
-	case DFMOVE_RIGHT: //24.350 36.963 -67.289
-		vCurPos = GET_POS;
-
-		if (m_bIsInteraction)
-		{
-			switch (m_eDFMoveState)
-			{
-			case DFIELD_MOVE:
-				m_pTransformCom->Go_Right(_fTimeDelta * 0.3f);
-				break;
-
-			case DFIELD_QUAKE:
-				Apply_Quake(_fTimeDelta, 0.25f, 0.2f); 
-				break;
-			}
-			
-			_float fOffsetPosX = m_vInitPos.x + 6.f;
-			if (fOffsetPosX <= vCurPos.x)
-			{
-				vCurPos.x = fOffsetPosX;
-				m_fStartQuake += _fTimeDelta;
-
-				if (m_fStartQuake < 0.5f)
-					m_eDFMoveState = DFIELD_QUAKE;
-
-				else
+			case DFIELD_RETURN:
+				if (m_bReturnMove)
 				{
-					m_fStartQuake = 0.f;
-					m_bIsInteraction = FALSE;
-				}
-			}
-			else
-				m_eDFMoveState = DFIELD_MOVE;
-		}
+					if (DFMOVE_RIGHT == m_eDFieldType)
+					{
+						m_pTransformCom->Go_Left(_fTimeDelta * 2.f); //2.25 > 2.0
+						MoveItems(_float3(-1, 0, 0), _fTimeDelta * 2.f);
 
-		if (m_bIsReturnMove)
-		{
-			switch (m_eDFMoveState)
-			{
-			case DFIELD_MOVE:
-				if (m_vInitPos.x >= vCurPos.x)
-				{
-					vCurPos.x = m_vInitPos.x; 
-					m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vInitPos);
-				}
+						if (vCurPos.x < m_vInitPos.x)
+						{
+							m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vInitPos);
+							m_eDFMoveState = DFIELD_QUAKE;
+							m_eDFMovePreState = DFIELD_RETURN;
+						}
+					} 
+					else if (DFMOVE_LEFT == m_eDFieldType)
+					{
+						m_pTransformCom->Go_Right(_fTimeDelta * 2.f);
+						MoveItems(_float3(1, 0, 0), _fTimeDelta * 2.f);
 
-				else {
-					m_pTransformCom->Go_Left(_fTimeDelta * 2.f); //2.25 > 2.0
-					MoveItems(_float3(-1, 0, 0), _fTimeDelta * 2.f);
-				}
-					
-				break;
-
-			case DFIELD_QUAKE:
-				m_fStartQuake += _fTimeDelta;
-
-				if (m_fStartQuake < 0.5f)
-					Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
-
-				else
-				{
-					m_fStartQuake = 0.f;
-					m_bIsReturnMove = FALSE;
-					return OBJ_NOEVENT;
+						if (vCurPos.x > m_vInitPos.x)
+						{
+							m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vInitPos);
+							m_eDFMoveState = DFIELD_QUAKE;
+							m_eDFMovePreState = DFIELD_RETURN;
+						}
+					}
 				}
 				break;
-			}
 
-			if (m_vInitPos.x >= vCurPos.x)
-				m_eDFMoveState = DFIELD_QUAKE;
+			case DFIELD_IDLE:
+				m_bIsInteraction = FALSE;
 
-			else
-				m_eDFMoveState = DFIELD_MOVE;
+				if (DFIELD_QUAKE == m_eDFMovePreState)
+					m_eDFMoveState = DFIELD_WAIT;
+				break;
+			}		
 		}
 		break;
 
@@ -569,7 +517,7 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 		{
 			switch (m_eDFMoveState)
 			{
-			case DFIELD_MOVE:
+			case DFIELD_MOVE: //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
 				m_pTransformCom->Go_Backward(_fTimeDelta * 2.f);
 				MoveItems(_float3(0, 0, -1), _fTimeDelta * 2.f);
 				break;

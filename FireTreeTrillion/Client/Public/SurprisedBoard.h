@@ -37,6 +37,8 @@ private:
 	virtual ~CSurprisedBoard() = default;
 
 public:
+	void Set_Activated(_bool _bActivated) { m_bActivated = _bActivated; m_bNotified = _bActivated; }
+
 	virtual HRESULT		Initialize_Prototype()			override;
 	virtual HRESULT		Initialize(void* pArg)			override;
 	virtual _int		Tick(_float fTimeDelta)			override;
@@ -78,6 +80,8 @@ private:
 
 	CGameObject*		m_pDynamicField = { nullptr };
 	_float				m_fTime = {};
+	_float				m_fResetTime = { 0.f };
+
 	_bool				m_bActivated = { false };
 	_bool				m_bNotified = { false };
 	_bool				m_bReturnMove = { FALSE };

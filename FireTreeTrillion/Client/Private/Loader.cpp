@@ -2070,6 +2070,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("SolarPanelOnce_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SolarPanelOnce_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		
+		//¿Íµéµð
+		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
 
 
 		// For Kirby Body
