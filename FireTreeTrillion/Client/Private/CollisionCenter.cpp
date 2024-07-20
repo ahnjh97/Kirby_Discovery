@@ -1487,16 +1487,19 @@ void CCollisionCenter::Hitbox_Collision()
 
 			if (pMonsterBullet->Get_PhyXState() == PO_NORMAL)
 			{
-				// 불릿이 PO_NORMAL (평범한 상태) 였을땐, 커비가 넉백되며 다친다. 또한, 폭탄은 터진다.
-				pthis->Player_Monster_Knock_back(pKirby, pMonsterBullet);
-				_float fAttack = pMonsterBullet->Get_Attack();
-				pKirby->Minus_Hp(fAttack);
+				if (pKirby->isOverPower() == false)
+				{
+					// 불릿이 PO_NORMAL (평범한 상태) 였을땐, 커비가 넉백되며 다친다. 또한, 폭탄은 터진다.
+					pthis->Player_Monster_Knock_back(pKirby, pMonsterBullet);
+					_float fAttack = pMonsterBullet->Get_Attack();
+					pKirby->Minus_Hp(fAttack);
 
-				if (pMonsterBullet->Get_NonDead() == false)
-					Dst->Set_Dead();
+					if (pMonsterBullet->Get_NonDead() == false)
+						Dst->Set_Dead();
 
-				DstHit->Set_Alive(false);
-				SrcHit->Set_Alive(false);
+					DstHit->Set_Alive(false);
+					SrcHit->Set_Alive(false);
+				}
 			}
 
 			// 커비의 충돌로직은 항상 발동한다. 만약, 폭탄이 PO_VACUUM일땐 서로 충돌은 나지만, 먹을 수 있는 상황이라면
