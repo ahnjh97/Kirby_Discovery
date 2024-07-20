@@ -122,8 +122,16 @@ HRESULT CPoppyBrosJr::Render()
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
-			return E_FAIL;
+		if (2 == i)
+		{
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
+				return E_FAIL;
+		}
+		else
+		{
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+				return E_FAIL;
+		}
 
 		m_pModelCom->Render(i);
 	}
