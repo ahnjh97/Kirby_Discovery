@@ -77,7 +77,7 @@ private:
 
 	_bool			m_bBomb = { false };
 
-	_uint				m_iEyeMeshIdx = { 2 };
+	_uint				m_iEyeMeshIdx = { 0, };
 
 	_float4x4		m_WorldMatrix = {};
 

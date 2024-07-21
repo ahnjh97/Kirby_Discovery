@@ -207,14 +207,13 @@ void CSurprisedBoard::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXO
 	if (true == m_bActivated)
 		return;
 
-
 	if (eContent == CCollisionCenter::CONTENT_TRIGGER)
 	{
 		_uint uState = __super::Get_State();
 		if (uState == WAIT_L)
 		{
 			Change_State(CSurprisedBoard::PREPOP_OUT_L, 60.f, false, false);
-			m_bActivated = true;
+			m_bActivated = true; //깜놀보드 기믹 1회성 > 재수행을 위해 로직 수정
 		}
 
 		else if (uState == WAIT_R)

@@ -15,6 +15,7 @@ void MakeFireHammer(CTransform* pTransformCom, _float Scale)
 	Firedesc.vFirstColor = { 1.f, 0.3f, 0.4f, 0.5f };
 	Firedesc.vTargetColor = { 1.f, 1.f, 1.f, 1.f };
 	Firedesc.fScale = { Scale * CUtils::Make_RandomFloat(0.8f, 1.2f)};
+	Firedesc.fTimeRatio = 0.5f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
 		return;
 }
@@ -223,10 +224,11 @@ void CKirbyHammer_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex,
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 
+		static_cast<CPhysXObject*>(pObject)->Add_Effect("YW KirbyHammerTrail", FXDesc, true);
 
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail"), &FXDesc)))
-			return;
-		static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail"), &FXDesc)))
+		//	return;
+		//static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 	}
 	else if (_iAnimIndex == CKirby::HAMMERSTATE_HAMMERATTACKFINALTOY)
 	{
@@ -236,9 +238,12 @@ void CKirbyHammer_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex,
 		FXDesc.fStartDelay = 0.5f;
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail"), &FXDesc)))
-			return;
-		static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+		static_cast<CPhysXObject*>(pObject)->Add_Effect("YW KirbyHammerTrail", FXDesc, true);
+
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail"), &FXDesc)))
+		//	return;
+		//static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 	}
 }
 
@@ -541,9 +546,12 @@ void CKirbyHammer_Onigorosi_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 		FXDesc.fStartDelay = 0.16f;
 		FXDesc.vInitScale = { 1.8f, 1.8f, 1.8f };
 		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail2"), &FXDesc)))
-			return;
-		static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+		static_cast<CPhysXObject*>(pObject)->Add_Effect("YW KirbyHammerTrail2", FXDesc, true);
+
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail2"), &FXDesc)))
+		//	return;
+		//static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 	}
 	// °­È­ Â÷Â¡
 	else if (_iAnimIndex == CKirby::HAMMERSTATE_ONIGOROSIHAMMEREND)
@@ -554,9 +562,13 @@ void CKirbyHammer_Onigorosi_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 		FXDesc.fStartDelay = 0.44f;
 		FXDesc.vInitScale = { 2.5f, 2.5f, 2.5f };
 		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail2"), &FXDesc)))
-			return;
-		static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+		static_cast<CPhysXObject*>(pObject)->Add_Effect("YW KirbyHammerTrail2", FXDesc, true);
+
+
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail2"), &FXDesc)))
+		//	return;
+		//static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 	}
 
 }
@@ -622,18 +634,25 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			MulFXDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
 			MulFXDesc.vInitScale = { 2.f, 2.f, 2.f };
 			MulFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Light Cluster"), &MulFXDesc)))
-				return;
-			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+			pKirby->Add_Effect("YW Light Cluster", MulFXDesc, true);
+
+			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Light Cluster"), &MulFXDesc)))
+			//	return;
+			//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 			DESC(m_bFirstChargeEffectTrigger) = false;
 
 
 			CParticle::PARTICLE_DESC PartDesc{};
 			PartDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
 			PartDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerChargeParticle"), &PartDesc)))
-				return;
-			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+			pKirby->Add_Effect("YW HammerChargeParticle", PartDesc, true);
+
+
+			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerChargeParticle"), &PartDesc)))
+			//	return;
+			//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 		}
 		else if (DESC(m_fHammerChargeTime) > 2.f && DESC(m_bSecondChargeEffectTrigger) == true)
 		{
@@ -646,9 +665,13 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			MulFXDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
 			MulFXDesc.vInitScale = { 3.f, 3.f, 3.f };
 			MulFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Light ClusterBig"), &MulFXDesc)))
-				return;
-			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+			pKirby->Add_Effect("YW Light ClusterBig", MulFXDesc, true);
+
+
+			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Light ClusterBig"), &MulFXDesc)))
+			//	return;
+			//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 			DESC(m_bSecondChargeEffectTrigger) = false;
 		}
 
@@ -722,16 +745,22 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			MulFXDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
 			MulFXDesc.vInitScale = { 2.f, 2.f, 2.f };
 			MulFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Light Cluster"), &MulFXDesc)))
-				return;
-			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+			pKirby->Add_Effect("YW Light Cluster", MulFXDesc, true);
+
+			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Light Cluster"), &MulFXDesc)))
+			//	return;
+			//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
 			CParticle::PARTICLE_DESC PartDesc{};
 			PartDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
 			PartDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerChargeParticle"), &PartDesc)))
-				return;
-			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+			pKirby->Add_Effect("YW HammerChargeParticle", MulFXDesc, true);
+
+			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerChargeParticle"), &PartDesc)))
+			//	return;
+			//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
 			DESC(m_bFirstChargeEffectTrigger) = false;
 		}
@@ -746,9 +775,12 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			MulFXDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
 			MulFXDesc.vInitScale = { 3.f, 3.f, 3.f };
 			MulFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Light ClusterBig"), &MulFXDesc)))
-				return;
-			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+			pKirby->Add_Effect("YW Light ClusterBig", MulFXDesc, true);
+
+			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Light ClusterBig"), &MulFXDesc)))
+			//	return;
+			//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 			DESC(m_bSecondChargeEffectTrigger) = false;
 		}
 
@@ -887,9 +919,12 @@ void CKirbyHammer_JumpAttack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIn
 		FXDesc.fStartDelay = 0.05f;
 		FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
 		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerWheel"), &FXDesc)))
-			return;
-		static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+		static_cast<CPhysXObject*>(pObject)->Add_Effect("YW HammerWheel", FXDesc, true);
+
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerWheel"), &FXDesc)))
+		//	return;
+		//static_cast<CPhysXObject*>(pObject)->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
 		
 	}

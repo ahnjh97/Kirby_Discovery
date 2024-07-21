@@ -95,7 +95,7 @@ void CDee_Sit_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	BASE_INFO baseInfo{};
 	Setup_BaseInfo(baseInfo, pGameObject);
 
-	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.2f);
 
 }
 
@@ -325,7 +325,7 @@ void CDee_Emotion_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	BASE_INFO baseInfo{};
 	Setup_BaseInfo(baseInfo, pGameObject);
 
-	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.2f);
 
 
 	if (baseInfo.pDee->Get_State() == DEEANIM_ANGER)
@@ -830,7 +830,7 @@ void CDee_Sleep_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	BASE_INFO baseInfo{};
 	Setup_BaseInfo(baseInfo, pGameObject);
 
-	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta);
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.2f);
 	baseInfo.pDee->Set_DeeEyeState(DEEEYE_CLOSE);
 
 }
@@ -909,7 +909,7 @@ void CDee_Interact_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		//baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, -0.25f);
 		break;
 	default:
-	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.25f);
+	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.2f);
 		break;
 	}
 

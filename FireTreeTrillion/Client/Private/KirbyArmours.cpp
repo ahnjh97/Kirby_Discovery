@@ -3,6 +3,8 @@
 #include "Bone.h"
 
 #include "Light.h"
+#include "SingleEffect.h"
+#include "MultiEffect.h"
 
 CKirbyArmours::CKirbyArmours(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPartObject{ pDevice, pContext }
@@ -61,6 +63,15 @@ _int CKirbyArmours::Tick(_float fTimeDelta)
             return OBJ_NOEVENT;
         m_pLight = CGameInstance::Get_Instance()->Get_LightLastAddress();
         Safe_AddRef(m_pLight);
+
+        CMultiEffect::MULTI_FX_DESC MFXDesc{};
+        MFXDesc.pSocketMatrix = &m_WorldMatrix;
+        MFXDesc.vInitPos = _float3{ 0.f, 1.f, 0.4f };
+        MFXDesc.vInitScale = { 1.f, 1.f, 1.f };
+        if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash Hat Lights"), &MFXDesc)))
+            return OBJ_NOEVENT;
+        m_pEffect = static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back());
+        Safe_AddRef(m_pEffect);
     }
 
     if (m_pLight != nullptr && *m_pAbilityType == ABILITY_CRASH)
@@ -73,6 +84,10 @@ _int CKirbyArmours::Tick(_float fTimeDelta)
         m_pLight->Set_DeadLight(true);
         Safe_Release(m_pLight);
         m_pLight = nullptr;
+
+        m_pEffect->Set_Dead();
+        Safe_Release(m_pEffect);
+        m_pEffect = nullptr;
     }
 
 
@@ -331,5 +346,8 @@ void CKirbyArmours::Free()
 
     if (m_pLight != nullptr)
         Safe_Release(m_pLight);
+
+    if (m_pEffect != nullptr)
+        Safe_Release(m_pEffect);
 
 }

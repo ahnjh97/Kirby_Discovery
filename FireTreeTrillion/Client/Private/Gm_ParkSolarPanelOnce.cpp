@@ -120,7 +120,7 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 				//FXDesc.vInitRot = { CUtils::Make_RandomFloat(0.f, 90.f), 0.f, 0.f };
 				//FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 				//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-				Add_Effect("ParticleSummonJS", FXDesc);
+				Add_Effect("ParticleSummonJS", FXDesc, false);
 
 				//_float4x4 matWorld = XMMatrixIdentity();
 				//matWorld._41 = 35.5f;
