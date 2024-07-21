@@ -117,14 +117,14 @@ _int CLaser::Tick(_float fTimeDelta)
 	}
 
 
-	//if (true == m_bEnd)
-	//{
-	//	m_bEnd = false;
-	//	m_pModelCom->Set_Animation(0, 60.f, false, true);
-	//}
+	if (true == m_bEnd)
+	{
+		m_bEnd = false;
+		m_pModelCom->Set_Animation(0, 60.f, false, true);
+	}
 
-	//if (m_pModelCom->IsFinished())
-	//	m_bDead = true;
+	if (m_pModelCom->IsFinished())
+		m_bDead = true;
 
 	return OBJ_NOEVENT;
 }
