@@ -2039,16 +2039,9 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		}
 	}
 
+	// 특정 불값에 의해 다른 애니메이션으로 넘어가게 한다.
 
-	if (INFO(m_bFinalBossDead) == true)
-	{
-		if (m_bFinalCutTrigger == true)
-		{
-			m_pControllerCom->Set_Position(m_pTransformCom, _float4(0.f, 0.f, 0.f, 1.f));
-			m_bFinalCutTrigger = false;
-			Change_State(FINALCUTSTATE_CUT1, 60.f, false, false, BODY_FINALCUT, OFFSET_FINALCUT);
-		}
-	}
+	Kirby_SpecialAnim();
 
 	// 빛 컨트롤
 	AssistLight_Control();
@@ -2206,6 +2199,28 @@ void CKirby::Kirby_StateInitialize()
 		m_pModelCom[BODY_DEFAULT]->Set_Animation(STATE_IDLE, 60.f, true, true);
 	}
 
+}
+
+void CKirby::Kirby_SpecialAnim()
+{
+	if (INFO(m_bFinalBossCutStart) == true)
+	{
+		if (m_bFinalCutStartTrigger == true)
+		{
+			Change_State(STATE_WALK, 40.f, true, false, BODY_DEFAULT);
+			m_bFinalCutStartTrigger = false;
+		}
+	}
+
+	if (INFO(m_bFinalBossDead) == true)
+	{
+		if (m_bFinalCutTrigger == true)
+		{
+			m_pControllerCom->Set_Position(m_pTransformCom, _float4(0.f, 0.f, 0.f, 1.f));
+			m_bFinalCutTrigger = false;
+			Change_State(FINALCUTSTATE_CUT1, 60.f, false, false, BODY_FINALCUT, OFFSET_FINALCUT);
+		}
+	}
 }
 
 CGameObject* CKirby::FindToppleableBridge(PxRigidActor* pActor)

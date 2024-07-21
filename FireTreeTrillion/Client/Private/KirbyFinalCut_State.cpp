@@ -24,7 +24,24 @@ void CKirbyFinalCut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	pController->FreeFall(pTransformCom, fTimeDelta);
 
-	if (pKirby->Get_State() == CKirby::FINALCUTSTATE_CUT1)
+	if (pKirby->Get_State() == CKirby::STATE_WALK)
+	{
+		m_fTime += fTimeDelta;
+
+		if (m_bCutStartPos == true)
+		{
+			pController->Set_Position(pTransformCom, _float4(0.f, 0.f, -20.f, 1.f));
+			DESC(m_vTargetDir) = DESC(m_vMoveDir) = _float4(0.f, 0.f, 1.f, 0.f);
+			m_bCutStartPos = false;
+		}
+
+
+		if (m_fTime >= 2.f)
+		{
+
+		}
+	}
+	else if (pKirby->Get_State() == CKirby::FINALCUTSTATE_CUT1)
 	{
 
 
@@ -50,6 +67,7 @@ void CKirbyFinalCut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 void CKirbyFinalCut_State::OnStateExit()
 {
+	m_bCutStartPos = true;
 }
 
 CKirbyFinalCut_State* CKirbyFinalCut_State::Create()

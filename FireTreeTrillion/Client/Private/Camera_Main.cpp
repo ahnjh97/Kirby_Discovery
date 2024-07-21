@@ -29,8 +29,6 @@
 #define QTE2 13
 #define QTE3 18
 
-
-
 _float3 vertices[] = {
 	// Front face
    { -1.0f, -1.0f, -1.0f },
