@@ -1484,6 +1484,23 @@ void CCollisionCenter::Hitbox_Collision()
 		});
 
 	// 완료.
+	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[BOXOBJECT], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			// 폭발물
+			CPhysXObject* pDst = static_cast<CPhysXObject*>(Dst);
+			// 오브젝트
+			CPhysXObject* pObject = static_cast<CPhysXObject*>(Src);
+			pObject->Collision(CONTENT_ATTACKBULLET, pDst);
+			Dst->Set_Dead();
+		});
+
+	// 완료.
 	Collision_Collider(m_GameObjects[HITBOX_MONSTER], m_GameObjects[PLAYER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -1554,7 +1571,6 @@ void CCollisionCenter::Hitbox_Collision()
 			Dst->Set_Dead();
 			Src->Set_Dead();
 		});
-
 
 	// 완료.
 	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[MONSTER], this,
@@ -1633,7 +1649,6 @@ void CCollisionCenter::Hitbox_Collision()
 			// 별도의 충돌로직이 발생할 것이다.
 			pKirby->Collision(CONTENT_ATTACK, pMonsterBullet);
 		});
-
 
 	// 풀 등과 플레이어
 	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[ANIMDECO], this,

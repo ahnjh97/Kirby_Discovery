@@ -48,6 +48,9 @@ void CKirbyHammer_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		// 자유낙하
 		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
+		if (DESC(m_bDialog) == true)
+			return;
+
 		// Idle일 때, 방향키를 눌렀을 때 RUN 으로 간다.
 		if (JoyStick_controller(Kirbydesc, pCamera))
 		{
