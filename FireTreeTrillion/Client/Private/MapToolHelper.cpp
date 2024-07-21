@@ -287,7 +287,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "LbBossCapsuleGlass01L", "LbBossCapsuleGlass02L", "LbBossCapsuleGlass03L" };
 
 	// Emissive가 입혀져 있지만, Emissive용 Pass로 하고 싶지 않은 모델들
-	m_setNonEmissiveModels = {};
+	m_setNonEmissiveModels = { "LbOutBuildingFenceL", "LbOutBuildingWallL"	};
 
 	// ParkGimmick
 	m_setParkGimmicks = { "SolarPanelOnce_NonAnim", "SolarPanelCharge_NonAnim", "Gimmick_PkFunHouseDarkness01", "Gimmick_PkFunHouseDarkness02",
