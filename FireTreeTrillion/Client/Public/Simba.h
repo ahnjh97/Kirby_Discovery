@@ -164,7 +164,10 @@ private:
 	_bool			m_bRenderEyeLid = { false };
 	_bool			m_bSummon1 = { false };
 	_bool			m_bSummon2 = { false };
-	_float			m_fSummonTime = { 0.f };
+	_float			m_fSpawnTime = {};
+	_float			m_fMonsterTime = {};
+	_uint			m_iEffectCount = {};
+	_uint			m_iMonsterCount = {};
 
 	_uint			m_iStarCount = {};
 	_bool			m_bDimensionClawUpAttack = { false };
@@ -178,12 +181,15 @@ private:
 	vector<class CSimbaRock*>	m_vecSimbaRocks;
 	vector<class CDebris*>		m_vecDebris;
 	list<_uint>		m_listUsedRocks;
+	list<_uint>		m_listUsedDebris;
 
 	unordered_set<SIMBA_ANIM>	m_setResetRequiredAnims;
 
 private:
 	HRESULT		Add_Components();
 	HRESULT		Bind_ShaderResources();
+
+	void		PlayPartialAnimation();
 
 	// FSM
 	void		SetUp_FSM();
@@ -202,8 +208,11 @@ private:
 	void		OnWave1Dead(CGameObject* pObj);
 	void		OnWave2Dead(CGameObject* pObj);
 
+	void		TriggerMonsterSpawning(_uint iTriggerIndex);
 	void		SpawnMonsters(_uint iTriggerIndex);
 	void		SpawnEffects(_uint iTriggerIndex);
+	void		CheckSpawning();
+
 	void		DetermineSimbaRotation();
 	void		TurnSimba(_float fAngle);
 	void		ResetRotation();

@@ -167,13 +167,6 @@ HRESULT CSpawnEffect::Bind_ShaderResources()
 	hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ));
 	CHECK_FAILED(hr);
 
-	_bool bStencil = true;
-	_bool bRimLight = false;
-	_bool bMotionBlur = false;
-	m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
-	m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
-	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
-
 	hr = m_pTextureCom[TYPE_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture");
 	CHECK_FAILED(hr);
 

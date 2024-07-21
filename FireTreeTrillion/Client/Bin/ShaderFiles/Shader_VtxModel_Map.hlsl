@@ -314,17 +314,17 @@ PS_OUT PS_SIMBA_ROCK(PS_IN In)
     if (0.3f >= vMtrlDiffuse.a)
         discard;
 
-    vector vViewPos = g_WorldMatrix._41_42_43_44;
-    vViewPos = mul(vViewPos, g_ViewMatrix);
-    
-    if (vViewPos.z < 8.0)
+    if (1.5f < g_fTime)
     {
         float2 vPixelTexcoord = (float2) 0.f;
         vPixelTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
         vPixelTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
         
-        vector vNearClipDesc = g_ObjNearClipTexture.Sample(LinearSampler, vPixelTexcoord * 100);
-        if (pow(saturate((vViewPos.z / 8) - .1), 3) < vNearClipDesc.r)  
+        vector vNearClipDesc = g_ObjNearClipTexture.Sample(LinearSampler, vPixelTexcoord * 90.f);
+        
+        float fTime = pow(saturate(1.0f / ((g_fTime - 1.5f) * 3.1f)), 3);
+        
+        if (fTime < vNearClipDesc.r)  
             discard;
     }
     

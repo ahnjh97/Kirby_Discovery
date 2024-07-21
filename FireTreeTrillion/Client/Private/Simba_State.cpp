@@ -124,12 +124,12 @@ void CSimba_Walk::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	_float fDis = m_pGameInstance->Compute_Distance(m_pKirby, pGameObject);
 	if (fDis < 6.5f)
 	{
-		//pSimba->Change_State(CSimba::Simba_DimensionClawStart, 60, false, true); // 디버깅용
+		pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 60, false, true); // 디버깅용
 		
-		if (0 == CUtils::Make_RandomInt(0, 1))
+		/*if (0 == CUtils::Make_RandomInt(0, 1))
 			pSimba->Change_State(CSimba::Simba_QuickClawStartL, 66.66f, false, true);
 		else
-			pSimba->Change_State(CSimba::Simba_QuickClawStartR, 66.66f, false, true);
+			pSimba->Change_State(CSimba::Simba_QuickClawStartR, 66.66f, false, true);*/
 	}
 	else
 	{
@@ -278,6 +278,7 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	_uint iState = pSimba->Get_State();
 	_float fAnimRatio = pSimba->Get_AnimRatio();
 	_uint iStarCount = pSimba->Get_StarCount();
+	_uint iRockCount = pSimba->Get_RockCount();
 
 	if(CSimba::Simba_FinalCrusherStart == iState && (0.3f > fAnimRatio || 0.93f < fAnimRatio ))
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
@@ -288,6 +289,13 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 
 		if (0.125f < fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
+
+		if (0.105f < fAnimRatio && 0 == iRockCount)
+			pSimba->SpawnRocks(iState);
+		if (0.12f < fAnimRatio && 1 == iRockCount)
+			pSimba->SpawnRocks(iState);
+		if(0.135f < fAnimRatio && 2 == iRockCount)
+			pSimba->SpawnRocks(iState);
 	}
 		
 	if (true == pSimba->IsAnimFinished())
@@ -333,6 +341,7 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	_uint iState = pSimba->Get_State();
 	_float fAnimRatio = pSimba->Get_AnimRatio();
 	_uint iStarCount = pSimba->Get_StarCount();
+	_uint iRockCount = pSimba->Get_RockCount();
 
 	if (CSimba::Simba_DoubleClawChargeStart == iState && fAnimRatio < 0.18f) {
 		_float fRatio = RATIO(fAnimRatio, 0, 0.18f);
@@ -356,6 +365,12 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 
 		if (0.224f < fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
+
+		for (_uint i = 0; i < 45; i++)
+		{
+			if (i * 0.006f < fAnimRatio && i == iRockCount)
+				pSimba->SpawnRocks(iState);
+		}
 	}
 		
 	if (true == pSimba->IsAnimFinished())
@@ -375,18 +390,20 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 			pSimba->Change_State(CSimba::Simba_DoubleClawEnd, 50.f, false, false);
 			break;
 		case CSimba::Simba_DoubleClawEnd:
-			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 15.f) {
-				pSimba->Set_PreState(iState);
-				pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, true); // 점프공격
-			}
-			else
-			{
-				_uint iRandNum = CUtils::Make_RandomInt(0, 1);
-				if(0 == iRandNum)
-					pSimba->Change_State(CSimba::Simba_QuickClawStartL, 66.f, false, true);
-				else
-					pSimba->Change_State(CSimba::Simba_QuickClawStartR, 66.f, false, true);
-			}
+			pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 60, false, true); // 디버깅용
+
+			//if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 15.f) {
+			//	pSimba->Set_PreState(iState);
+			//	pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, true); // 점프공격
+			//}
+			//else
+			//{
+			//	_uint iRandNum = CUtils::Make_RandomInt(0, 1);
+			//	if(0 == iRandNum)
+			//		pSimba->Change_State(CSimba::Simba_QuickClawStartL, 66.f, false, true);
+			//	else
+			//		pSimba->Change_State(CSimba::Simba_QuickClawStartR, 66.f, false, true);
+			//}
 			break;
 		}
 	}
@@ -558,6 +575,7 @@ void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	_uint iState = pSimba->Get_State();
 	_float fAnimRatio = pSimba->Get_AnimRatio();
 	_uint iStarCount = pSimba->Get_StarCount();
+	_uint iRockCount = pSimba->Get_RockCount();
 
 	if (CSimba::Simba_AttackJumpPre == iState && fAnimRatio < 0.4f)
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 5.f);
@@ -587,9 +605,16 @@ void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	else
 		m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
 
-	if (CSimba::Simba_AttackJumpHit == iState && 0.12f < fAnimRatio && 0 == iStarCount)
-		pSimba->SpawnStar(iState);
-
+	if (CSimba::Simba_AttackJumpHit == iState)
+	{
+		if(0.12f < fAnimRatio && 0 == iStarCount)
+			pSimba->SpawnStar(iState);
+		if (0.06f < fAnimRatio && 0 == iRockCount)
+			pSimba->SpawnRocks(iState);
+		if (0.1f < fAnimRatio && 1 == iRockCount)
+			pSimba->SpawnRocks(iState);
+	}
+		
 	if (pSimba->IsAnimFinished())
 	{
 		if (CSimba::Simba_AttackJumpPre == iState)

@@ -77,6 +77,13 @@ _float4 CTransform::ComputeBoneWorldPos(CBone* pBone, _float3 vOffset)
 
 	vResult = XMVector3TransformCoord(vBonePos, m_WorldMatrix);
 
+	_float4 vRight = XMVector3Normalize(XMLoadFloat3(reinterpret_cast<const _float3*>(&matBoneCombined._11)));
+	_float4 vUp = XMVector3Normalize(XMLoadFloat3(reinterpret_cast<const _float3*>(&matBoneCombined._21)));
+	_float4 vLook = XMVector3Normalize(XMLoadFloat3(reinterpret_cast<const _float3*>(&matBoneCombined._31)));
+
+	_float4 vOffsetVector = vRight * vOffset.x + vUp * vOffset.y + vLook * vOffset.z;
+	vResult += vOffsetVector;
+
 	return vResult;
 }
 

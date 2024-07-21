@@ -27,7 +27,6 @@ public:
 private:
 	CModel* m_pModelCom = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
-	//PxRigidDynamic* m_pDynamicActor = { nullptr };
 
 	_float m_fSamplingFactor = { 1.f };
 	_float m_fZero = {};
@@ -37,7 +36,6 @@ private:
 
 public:
 	void SetUpSimbaRock(_fvector vPos);
-	void MoveToOrigin();
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelName);

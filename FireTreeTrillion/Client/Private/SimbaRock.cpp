@@ -37,9 +37,8 @@ HRESULT CSimbaRock::Initialize(void* pArg)
 
 	if (FAILED(Add_Components(tDesc.wstrModelName)))
 		return E_FAIL;
-
-	/*m_pDynamicActor = m_pModelCom->ReturnDynamicActor(tDesc.matWorld);
-	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);*/
+		
+	m_bHide = true;
 
 	return S_OK;
 }
@@ -52,11 +51,8 @@ _int CSimbaRock::Tick(_float fTimeDelta)
 	if(false == m_bHide)
 		m_fTime += m_pGameInstance->Get_SecondTimer();
 
-	if (false == m_bHide && 2.5f < m_fTime) {
+	if (false == m_bHide && 3.5f < m_fTime)
 		m_bHide = true;
-		m_fTime = 0.f;
-		MoveToOrigin();
-	}
 		
 	return OBJ_NOEVENT;
 }
@@ -65,8 +61,6 @@ void CSimbaRock::Late_Tick(_float fTimeDelta)
 {
 	if (true == m_bHide)
 		return;
-
-	Compute_ViewZ();
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
@@ -87,9 +81,8 @@ HRESULT CSimbaRock::Render()
 		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Begin(MAP_SIMBA_ROCK))) // SimbaRock용 패스 따로 필요할듯함
+		if (FAILED(m_pShaderCom->Begin(MAP_SIMBA_ROCK))) // SimbaRock용 패스
 			return E_FAIL;
-
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
 	}
@@ -104,12 +97,7 @@ void CSimbaRock::SetUpSimbaRock(_fvector vPos)
 	m_pTransformCom->Turn(CUtils::Make_Random_Vector(1.f), 1, CUtils::Make_RandomFloat(0, 360.f));
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 	m_bHide = false;
-}
-
-void CSimbaRock::MoveToOrigin()
-{
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(0, -10.f, 0, 1));
-	//m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));
+	m_fTime = 0.f;
 }
 
 HRESULT CSimbaRock::Add_Components(const wstring& _wstrModelName)
@@ -176,8 +164,6 @@ CGameObject* CSimbaRock::Clone(void* pArg)
 
 void CSimbaRock::Free()
 {
-	//m_pGameInstance->ReleaseActor(m_pDynamicActor);
-
 	__super::Free();
 
 	Safe_Release(m_pModelCom);
