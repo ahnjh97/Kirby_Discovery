@@ -715,6 +715,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Simba\DimensionClaw">
       <UniqueIdentifier>{fd798ad1-1b75-4c18-956c-cab357105e85}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\LightBugEffect">
+      <UniqueIdentifier>{7630a4c0-5e08-41d0-bce2-e03c44b03906}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1417,6 +1420,10 @@
     <ClInclude Include="..\Public\SimbaRock.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaRock</Filter>
     </ClInclude>
+    <ClInclude Include="SimbaLaser.h" />
+    <ClInclude Include="..\Public\LightBugEffect.h">
+      <Filter>02.GameObjects\Map\LightBugEffect</Filter>
+    </ClInclude>
     <ClInclude Include="SimbaLaser.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
     </ClInclude>
@@ -2102,6 +2109,10 @@
     </ClCompile>
     <ClCompile Include="..\Private\SimbaRock.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaRock</Filter>
+    </ClCompile>
+    <ClCompile Include="SimbaLaser.cpp" />
+    <ClCompile Include="..\Private\LightBugEffect.cpp">
+      <Filter>02.GameObjects\Map\LightBugEffect</Filter>
     </ClCompile>
     <ClCompile Include="SimbaLaser.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>

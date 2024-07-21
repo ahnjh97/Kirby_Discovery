@@ -20,12 +20,6 @@ void CGm_DynamicField::Set_SolarPanelCharge(CGm_ParkSolarPanelCharge* _pSolarPan
 	Safe_AddRef(m_pSolarPanelCharge);
 }
 
-void CGm_DynamicField::Set_SurpriseBoard(CSurprisedBoard* _pSurpriseBoard)
-{
-	m_pSurpriseBoard = _pSurpriseBoard; 
-	Safe_AddRef(m_pSurpriseBoard);
-}
-
 void CGm_DynamicField::RegisterToActorToKirby()
 {
 	 CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
@@ -135,6 +129,9 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 	if (TRUE == m_bDead)
 		return OBJ_DEAD;
 
+	if (nullptr == m_pSolarPanelOnce && nullptr == m_pSolarPanelCharge)
+		return OBJ_NOEVENT;
+
 	switch (m_eGimmickType)
 	{
 	case GIMMICK_SPONCE:
@@ -152,7 +149,8 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 		break;
 	}
 
-	Movement_Field(fTimeDelta);
+	m_fSecondTime = m_pGameInstance->Get_SecondTimer();
+	Movement_Field(m_fSecondTime);
 
 	if (nullptr != m_pDynamicActor) // 트랜스폼 월드 행렬에 맞춰서 다이나믹 액터도 같이 움직이도록 
 		m_pDynamicActor->setGlobalPose(CUtils::TransformToPxTransform(m_pTransformCom));
@@ -638,5 +636,4 @@ void CGm_DynamicField::Free()
 
 	Safe_Release(m_pSolarPanelOnce);
 	Safe_Release(m_pSolarPanelCharge);
-	Safe_Release(m_pSurpriseBoard);
 }

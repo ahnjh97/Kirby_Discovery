@@ -571,11 +571,24 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
 			}
 			// 평범한 상태에서...
+			else if (INFO(m_eBodyState) == BODY_CARDEFAULT)
+			{
+				if (INFO(m_bBooster) == false)
+				{
+					INFO(m_bCarJump) = true;
+					Change_State(CARSTATE_DAMAGE, 60.f, false, false, BODY_CARDEFAULT, OFFSET_CAR);
+				}
+			}
+			else if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
+			{
+				Change_State(BULBSTATE_DAMAGE, 60.f, false, false, BODY_BULBDEFAULT, OFFSET_BULB);
+				INFO(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 3.f, 1.f);
+				INFO(m_bLightOn) = false;
+			}
 			else
 			{
 				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 			}
-
 			Delete_AllEffect();
 		}
 	}
@@ -1434,6 +1447,7 @@ void CKirby::SetUp_FSM()
 
 
 #pragma region final 컷씬
+	m_pFSM->Add_State(STATE_WALK, CKirbyFinalCut_State::Create());
 	m_pFSM->Add_State(FINALCUTSTATE_CUT1, CKirbyFinalCut_State::Create());
 	m_pFSM->Add_State(FINALCUTSTATE_CUT2, CKirbyFinalCut_State::Create());
 #pragma endregion
@@ -1719,6 +1733,43 @@ void CKirby::Set_ControllerPos(_float4 _vPosition)
 	m_pControllerCom->Set_Position(m_pTransformCom, _vPosition);
 }
 
+void CKirby::DialogOn(_float4 vDir)
+{
+	INFO(m_bDialog) = true;
+
+	if (vDir != _float4(0.f, 0.f, 0.f, 0.f))
+		INFO(m_vMoveDir) = INFO(m_vTargetDir) = vDir;
+
+	if (m_eAbilityType == ABILITY_SWORD)
+		Change_State(SWORDSTATE_WAIT, 60.f, true, true, BODY_SWORDDEFAULT, OFFSET_SWORD);
+	else if (m_eAbilityType == ABILITY_BOMB)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+	else if (m_eAbilityType == ABILITY_HAMMER)
+		Change_State(HAMMERSTATE_IDLE, 60.f, true, true, BODY_HAMMER, OFFSET_HAMMER);
+	else if (m_eAbilityType == ABILITY_CRASH)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+	else if (m_eAbilityType == ABILITY_DEFAULT)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+}
+
+void CKirby::DialogOff(_float4 vDir)
+{
+	INFO(m_bDialog) = false;
+	if (vDir != _float4(0.f, 0.f, 0.f, 0.f))
+		INFO(m_vMoveDir) = INFO(m_vTargetDir) = vDir;
+
+	if (m_eAbilityType == ABILITY_SWORD)
+		Change_State(SWORDSTATE_WAIT, 60.f, true, true, BODY_SWORDDEFAULT, OFFSET_SWORD);
+	else if (m_eAbilityType == ABILITY_BOMB)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+	else if (m_eAbilityType == ABILITY_HAMMER)
+		Change_State(HAMMERSTATE_IDLE, 60.f, true, true, BODY_HAMMER, OFFSET_HAMMER);
+	else if (m_eAbilityType == ABILITY_CRASH)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+	else if (m_eAbilityType == ABILITY_DEFAULT)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+}
+
 void CKirby::Large_Light(_float4 vDiffuse, _float fRange, _float fTime)
 {
 	if (m_pArmours == nullptr)
@@ -2002,16 +2053,9 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		}
 	}
 
+	// 특정 불값에 의해 다른 애니메이션으로 넘어가게 한다.
 
-	if (INFO(m_bFinalBossDead) == true)
-	{
-		if (m_bFinalCutTrigger == true)
-		{
-			m_pControllerCom->Set_Position(m_pTransformCom, _float4(0.f, 0.f, 0.f, 1.f));
-			m_bFinalCutTrigger = false;
-			Change_State(FINALCUTSTATE_CUT1, 60.f, false, false, BODY_FINALCUT, OFFSET_FINALCUT);
-		}
-	}
+	Kirby_SpecialAnim();
 
 	// 빛 컨트롤
 	AssistLight_Control();
@@ -2169,6 +2213,27 @@ void CKirby::Kirby_StateInitialize()
 		m_pModelCom[BODY_DEFAULT]->Set_Animation(STATE_IDLE, 60.f, true, true);
 	}
 
+}
+
+void CKirby::Kirby_SpecialAnim()
+{
+	if (INFO(m_bFinalBossCutStart) == true)
+	{
+		if (m_bFinalCutStartTrigger == true)
+		{
+			Change_State(STATE_WALK, 40.f, true, false, BODY_DEFAULT);
+			m_bFinalCutStartTrigger = false;
+		}
+	}
+
+	if (INFO(m_bFinalBossDead) == true)
+	{
+		if (m_bFinalCutTrigger == true)
+		{
+			m_bFinalCutTrigger = false;
+			Change_State(FINALCUTSTATE_CUT1, 60.f, false, false, BODY_FINALCUT, OFFSET_FINALCUT);
+		}
+	}
 }
 
 CGameObject* CKirby::FindToppleableBridge(PxRigidActor* pActor)
