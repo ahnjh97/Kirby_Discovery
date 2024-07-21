@@ -105,6 +105,7 @@ HRESULT CMeteor::Initialize(void* pArg)
 	FXDesc.pSocketMatrix = &m_EffectSocket;
 	FXDesc.vInitPos = { 0.f, 1.4f, -.5f };
 	FXDesc.vInitScale = { 20.f, 20.f, 20.f };
+	FXDesc.fStartDelay = 2.f;
 	//FXDesc.vInitRot = { 90.f, 0.f, 0.f };
 
 	Add_Effect("come on dash white", FXDesc, true);
@@ -479,6 +480,7 @@ void CMeteor::Free()
 {
 	__super::Free();
 
+	Delete_AllEffect();
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 
