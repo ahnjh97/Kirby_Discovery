@@ -66,7 +66,7 @@ HRESULT CLevel_Intro::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Monsters();
 	CHECK_FAILED(hr);
-	//hr = Ready_Items();
+	hr = Ready_Items();
 	CHECK_FAILED(hr);
 	hr = Ready_Kickables();
 	CHECK_FAILED(hr);

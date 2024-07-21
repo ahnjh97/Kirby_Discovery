@@ -80,6 +80,9 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DeeDeeDee"), TEXT("Prototype_GameObject_DeeDeeDee"), &ObjDesc)))
 		return E_FAIL;
 
+	// 안개 초기화
+	m_pGameInstance->Fog_Zero();
+
 
 	return S_OK;
 }
