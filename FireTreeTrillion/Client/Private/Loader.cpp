@@ -1660,6 +1660,8 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Blue", "Effects/Particle/Glow_Blue.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_BludParticle", "Effects/Particle/Glow_BludParticle.png");	CHECK_FAILED(hr);
 
+	//¹ø°³
+	hr = Add_Texture(LEVEL_STATIC, "FX_Thunder", "Effects/Thunder/Thunder_%d.png", 3);	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -1757,7 +1759,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FXHalfSphere", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXNoiseSphere", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXRecoveryRoot", TYPE_NONANIM);
+
 		m_vecModelInfo.emplace_back("FXThunderLine", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("FXThunderLine_Circular", TYPE_NONANIM);
+
 		m_vecModelInfo.emplace_back("FXMeteoDash", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXDonut", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("LaserNonAnim", TYPE_NONANIM);
