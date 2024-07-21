@@ -571,11 +571,24 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
 			}
 			// Æò¹üÇÑ »óÅÂ¿¡¼­...
+			else if (INFO(m_eBodyState) == BODY_CARDEFAULT)
+			{
+				if (INFO(m_bBooster) == false)
+				{
+					INFO(m_bCarJump) = true;
+					Change_State(CARSTATE_DAMAGE, 60.f, false, false, BODY_CARDEFAULT, OFFSET_CAR);
+				}
+			}
+			else if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
+			{
+				Change_State(BULBSTATE_DAMAGE, 60.f, false, false, BODY_BULBDEFAULT, OFFSET_BULB);
+				INFO(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 3.f, 1.f);
+				INFO(m_bLightOn) = false;
+			}
 			else
 			{
 				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 			}
-
 			Delete_AllEffect();
 		}
 	}
@@ -1434,6 +1447,7 @@ void CKirby::SetUp_FSM()
 
 
 #pragma region final ÄÆ¾À
+	m_pFSM->Add_State(STATE_WALK, CKirbyFinalCut_State::Create());
 	m_pFSM->Add_State(FINALCUTSTATE_CUT1, CKirbyFinalCut_State::Create());
 	m_pFSM->Add_State(FINALCUTSTATE_CUT2, CKirbyFinalCut_State::Create());
 #pragma endregion
@@ -2216,7 +2230,6 @@ void CKirby::Kirby_SpecialAnim()
 	{
 		if (m_bFinalCutTrigger == true)
 		{
-			m_pControllerCom->Set_Position(m_pTransformCom, _float4(0.f, 0.f, 0.f, 1.f));
 			m_bFinalCutTrigger = false;
 			Change_State(FINALCUTSTATE_CUT1, 60.f, false, false, BODY_FINALCUT, OFFSET_FINALCUT);
 		}

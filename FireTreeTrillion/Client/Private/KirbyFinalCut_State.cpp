@@ -35,14 +35,14 @@ void CKirbyFinalCut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			m_bCutStartPos = false;
 		}
 		Kirbydesc->m_fMoveSpeed += fTimeDelta * 70.f;
-		if (Kirbydesc->m_fMoveSpeed > 2.5f)
-			Kirbydesc->m_fMoveSpeed = 2.5f;
+		if (Kirbydesc->m_fMoveSpeed > 3.f)
+			Kirbydesc->m_fMoveSpeed = 3.f;
 
 		// Å¸°Ù±âÁØ
 		_vector vMoveDelta = Kirbydesc->m_vTargetDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
 		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 
-		if (m_fTime >= 1.6f)
+		if (m_fTime >= 2.6f)
 		{
 			Kirby_AbilityType_Assist(pKirby, CKirby::STATE_IDLE);
 			return;
@@ -50,6 +50,11 @@ void CKirbyFinalCut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	}
 	else if (pKirby->Get_State() == CKirby::FINALCUTSTATE_CUT1)
 	{
+		if (m_bCutStartPos == true)
+		{
+			pController->Set_Position(pTransformCom, _float4(0.f, 0.f, 0.f, 1.f));
+			m_bCutStartPos = false;
+		}
 
 
 
