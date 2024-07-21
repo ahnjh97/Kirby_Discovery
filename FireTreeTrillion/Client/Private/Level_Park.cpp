@@ -67,7 +67,6 @@ HRESULT CLevel_Park::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Objects();
 	CHECK_FAILED(hr);
-
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
 
@@ -1141,6 +1140,7 @@ HRESULT CLevel_Park::Ready_Objects()
 #pragma endregion
 
 #pragma region SetUpItemsToDynamicFields
+
 	list<CGameObject*>* pItemList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_NoVacuumItem"));
 	for (auto& item : *pItemList)
 	{
@@ -1149,6 +1149,7 @@ HRESULT CLevel_Park::Ready_Objects()
 	}
 
 #pragma endregion
+	
 	return S_OK;
 }
 
