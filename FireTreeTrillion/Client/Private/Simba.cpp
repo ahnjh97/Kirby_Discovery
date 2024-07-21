@@ -142,6 +142,22 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_pRightHandBone = m_pModelCom->Get_BonePtr("R_HaveL");
 	Safe_AddRef(m_pRightHandBone);
 
+	m_vecLeftNailBones.emplace_back(m_pModelCom->Get_BonePtr("L_indexNailJ"));
+	m_vecLeftNailBones.emplace_back(m_pModelCom->Get_BonePtr("L_middleNailJ"));
+	m_vecLeftNailBones.emplace_back(m_pModelCom->Get_BonePtr("L_pinkyNailJ"));
+	m_vecLeftNailBones.emplace_back(m_pModelCom->Get_BonePtr("L_ringNailJ"));
+	m_vecLeftNailBones.emplace_back(m_pModelCom->Get_BonePtr("L_thumbNailJ"));
+	for (auto& bone : m_vecLeftNailBones)
+		Safe_AddRef(bone);
+
+	m_vecRightNailBones.emplace_back(m_pModelCom->Get_BonePtr("R_indexNailJ"));
+	m_vecRightNailBones.emplace_back(m_pModelCom->Get_BonePtr("R_middleNailJ"));
+	m_vecRightNailBones.emplace_back(m_pModelCom->Get_BonePtr("R_pinkyNailJ"));
+	m_vecRightNailBones.emplace_back(m_pModelCom->Get_BonePtr("R_ringNailJ"));
+	m_vecRightNailBones.emplace_back(m_pModelCom->Get_BonePtr("R_thumbNailJ"));
+	for (auto& bone : m_vecRightNailBones)
+		Safe_AddRef(bone);
+
 	m_setAppear1Anims = { Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait, Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait,
 		Simba_DemoAppear1Cut4, Simba_DemoAppear1Cut4Wait };
 
@@ -174,7 +190,7 @@ _int CSimba::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return Ready_Dead();
 
-	m_fHpRatio =  m_fHp / m_fMaxHp;
+	m_fHpRatio = m_fHp / m_fMaxHp;
 
 	ResetRotation();
 	m_bRenderDimensionClaw = false;
@@ -197,42 +213,50 @@ _int CSimba::Tick(_float fTimeDelta)
 	if (true == m_pModelCom->IsPartialAnimFinished())
 		m_bPlayPartialAnim = false;
 
-	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+	if ((m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_D, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_F, KEY_DOWN))
+		|| (0.6f > m_fHpRatio && 0.f < m_fHpRatio && m_bPhaseTwo == false))
 	{
-		if (m_pGameInstance->Get_KeyState(DIK_SPACE, KEY_DOWN))
-		{
-			_uint iCurAnimIndex = m_pModelCom->Get_CurAnimIndex();
-			_uint iNewAnimIndex = iCurAnimIndex + 1;
-			_uint iNumAnimations = m_pModelCom->Get_AnimCnt();
-			if (iNumAnimations == iNewAnimIndex)
-				iNewAnimIndex = 0;
-			m_pModelCom->Set_Animation(iNewAnimIndex, 40.f, true, false);
-		}
-		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD1, KEY_DOWN)) {
-			m_bPhaseTwo = true;
-			Change_State(Simba_Damage, 50.f, false, true);
-		}
+		m_bPhaseTwo = true;
+		Change_State(Simba_Damage, 50.f, false, true);
+	}
+
+	if (m_pGameInstance->Get_KeyState(DIK_CAPSLOCK, KEY_PRESS))
+	{
+		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
+			Change_State(Simba_QuickClawStartL, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
+			Change_State(Simba_FinalCrusherStart, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_3, KEY_DOWN))
+			Change_State(Simba_DoubleClawChargeStart, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_4, KEY_DOWN))
+			Change_State(Simba_AttackJumpPre, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_5, KEY_DOWN))
+			Change_State(Simba_DimensionClawStart, 50.f, false, true);
+		else if(m_pGameInstance->Get_KeyState(DIK_6, KEY_DOWN))
+			Change_State(Simba_BiteRushStart, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_7, KEY_DOWN))
+			Change_State(Simba_DimensionLaserStart, 50.f, false, true);
+		else if(m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN))
+			Change_State(Simba_Wait2, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_9, KEY_DOWN))
+			Change_State(Simba_BiteRushJumpStartL, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_0, KEY_DOWN))
+			Change_State(Simba_BiteRushJumpStartR, 50.f, false, true);
+
+		SetUpSecondTarget();
+		HideDimensionClawActor();
+		HideDimensionLaserActor();
 	}
 
 	Check_HitBoxActivation();
 
-	if (m_setAppear1Anims.end() != m_setAppear1Anims.find(SIMBA_ANIM(Get_State())) && m_pGameInstance->Get_KeyState(DIK_A, KEY_DOWN)) {
-		if (false == m_bPlayPartialAnim) {
-			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSub, 50.f, false, false);
-			m_bPlayPartialAnim = true;
-		}
-	}
+	PlayLipSinc();
 
 	if (m_fHp <= 0.f && false == m_bDeathAnimPlayed)
 	{
 		m_bDeathAnimPlayed = true;
 		TransformToDefault(0.f);
 		Change_State(Simba_Death, 2.f, false, true);
-	}
-
-	if (0.6f > m_fHpRatio && 0.f < m_fHpRatio && m_bPhaseTwo == false) {
-		m_bPhaseTwo = true;
-		Change_State(Simba_Damage, 50.f, false, true);
 	}
 
 	DetermineSimbaRotation();
@@ -242,6 +266,9 @@ _int CSimba::Tick(_float fTimeDelta)
 
 	for (auto& index : m_listUsedRocks)
 		m_vecSimbaRocks[index]->Tick(m_fTimeDelta);
+
+	for (auto& index : m_listUsedDebris)
+		m_vecDebris[index]->Tick(m_fTimeDelta);
 
 	RemoveDeadRocksFromList();
 
@@ -806,6 +833,66 @@ void CSimba::SpawnDebris(_uint iAnimIdx)
 	m_iDebrisCount++;
 }
 
+void CSimba::SetUpSecondTarget()
+{
+	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+	if (pCamera != nullptr)
+		pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_BOTH);
+}
+
+void CSimba::QuickClawNailFlash(_uint eSimbaAnim)
+{
+	if (Simba_QuickClawStartL == eSimbaAnim) // YW : Effect 영우형 여기임 왼쪽 검지손톱 번쩍
+	{
+		_float3 vOffset = _float3(); // Right Up Look 오프셋 계수
+		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_vecLeftNailBones[INDEX], vOffset);
+
+	}
+	else if (Simba_QuickClawStartR == eSimbaAnim) // YW : Effect 영우형 여기임 오른쪽 검지손톱 번쩍
+	{
+		_float3 vOffset = _float3(); // Right Up Look 오프셋 계수
+		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_vecRightNailBones[INDEX], vOffset);
+
+	}
+}
+
+void CSimba::QuickClawNailTrail() // YW : Effect 영우형 여기임 왼쪽 검지손톱 번쩍
+{
+}
+
+void CSimba::FinalCrusherSwing() // YW : Effect 영우형 여기임 양주먹 내려치기시작
+{
+}
+
+void CSimba::FinalCrusherSmash() // YW : Effect 영우형 여기임 양주먹 바닥에 찍는 타이밍
+{
+	
+}
+
+void CSimba::JumpStartSmoke() // YW : Effect 영우형 여기임 점프 시작할때 회색방구
+{
+}
+
+void CSimba::LandingSmoke() // YW : Effect 영우형 여기임 점프 후 착지 회색방구
+{
+}
+
+void CSimba::AttackJumpWind() // YW : Effect 영우형 여기임 점프 공격할때 주위 바람 
+{
+}
+
+void CSimba::DoubleClawDashGround() // YW : Effect 영우형 여기임 양손으로 바닥 계속 긁을때 튀기는 작은 불씨들 (아직은 이 함수 호출 안함)
+{
+}
+
+void CSimba::DoubleClawGround() // YW : Effect 영우형 여기임 양슨으로 바닥 긁다가 공격이펙트 직전 튀기는 큰 불씨들 (아직은 이 함수 호출 안함)
+{
+}
+
+void CSimba::DoubleClawSweep()// YW : Effect 영우형 여기임 바닥 긁다가 순간적으로 공격 이펙트 (트레일, 불꽃)
+{
+}
+
 HRESULT CSimba::Add_Components()
 {
 	HRESULT hr;
@@ -1078,6 +1165,16 @@ void CSimba::Reset_HitBoxTimingMap(SIMBA_ANIM eAnimIdx)
 		auto& vecHitBoxTiming = pair->second;
 		for (auto& tuple : vecHitBoxTiming)
 			get<1>(tuple) = false;
+	}
+}
+
+void CSimba::PlayLipSinc()
+{
+	if (m_setAppear1Anims.end() != m_setAppear1Anims.find(SIMBA_ANIM(Get_State())) && m_pGameInstance->Get_KeyState(DIK_A, KEY_DOWN)) {
+		if (false == m_bPlayPartialAnim) {
+			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSub, 50.f, false, false);
+			m_bPlayPartialAnim = true;
+		}
 	}
 }
 
@@ -1542,6 +1639,11 @@ void CSimba::Free()
 		Safe_Release(simbaRock);
 	for (auto& debris : m_vecDebris)
 		Safe_Release(debris);
+
+	for (auto& bone : m_vecLeftNailBones)
+		Safe_Release(bone);
+	for (auto& bone : m_vecRightNailBones)
+		Safe_Release(bone);
 
 	Safe_Release(m_pLipBone);
 	Safe_Release(m_pLaserBone);

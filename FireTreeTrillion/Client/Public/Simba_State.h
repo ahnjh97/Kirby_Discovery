@@ -143,6 +143,8 @@ private:
 	CTransform* m_pTransform = { nullptr };
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
+	_bool m_bSwingEffect = { false };
+	_bool m_bSmashEffect = { false };
 
 public:
 	static	CSimba_FinalCrusher* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
@@ -200,6 +202,7 @@ private:
 	CTransform* m_pTransform = { nullptr };
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
+	_bool m_bSmokeEffect = { nullptr };
 
 public:
 	static	CSimba_Jump* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform) 
@@ -260,6 +263,7 @@ private:
 	CTransform* m_pKirbyTransform = { nullptr };
 
 	_float m_fJumpPower = {};
+	_bool m_bWindEffect = { false };
 
 public:
 	static	CSimba_AttackJump* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)

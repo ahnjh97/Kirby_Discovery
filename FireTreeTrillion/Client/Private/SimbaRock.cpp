@@ -51,7 +51,7 @@ _int CSimbaRock::Tick(_float fTimeDelta)
 	if(false == m_bHide)
 		m_fTime += m_pGameInstance->Get_SecondTimer();
 
-	if (false == m_bHide && 3.5f < m_fTime)
+	if (false == m_bHide && 2.35f < m_fTime)
 		m_bHide = true;
 		
 	return OBJ_NOEVENT;
