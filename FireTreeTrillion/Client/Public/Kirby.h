@@ -127,7 +127,8 @@ public:
 		// 자동차 부스터 타임
 		_bool			m_bBooster = { false };
 		_float			m_fBoosterTime = { 0.f };
-
+		// 자동차 디디디 컷씬 전용 불 값. 이 불 값으로 같은 애니메이션이지만 다르게 작동할 것이다. 필요한것은 이동과 멈춤 애니메이션이다.
+		_bool			m_bDeeDeeDeeInitializeCut = { false };
 
 		// 해머 폼
 		_int			m_iHammerHit = { 0 };

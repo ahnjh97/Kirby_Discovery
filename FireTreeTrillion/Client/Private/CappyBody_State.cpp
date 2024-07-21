@@ -241,7 +241,7 @@ void CCappyBody_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-			pCappyBody->Add_Effect("BBongBBongE", FXDesc);
+			pCappyBody->Add_Effect("BBongBBongE", FXDesc, false);
 		}
 
 		_uint iRand = rand() % 3;
@@ -363,7 +363,7 @@ void CCappyBody_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-			pCappy->Add_Effect("Flying", FXDesc);
+			pCappy->Add_Effect("Flying", FXDesc, false);
 		}
 
 		if (pController->Is_Terrain())

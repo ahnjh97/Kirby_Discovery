@@ -2077,11 +2077,37 @@ void CFXToolDirector::Render_FXProperty()
 
 	SameLine();
 
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TURN];
+	if (Checkbox(u8"자전", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TURN] = bCommand;
+		bEdited = true;
+	}
+
+	SameLine();
+
 	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_CUSTOMORBITAXIS];
 	if (Checkbox(u8"회전축 고정", &bCommand))
 	{
 		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_CUSTOMORBITAXIS] = bCommand;
 		bEdited = true;
+	}
+
+	SameLine();
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TURNMOVEDIR];
+	if (Checkbox(u8"투영공간 이동 방향 회전", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TURNMOVEDIR] = bCommand;
+		bEdited = true;
+	}
+
+	if (IsItemHovered())
+	{
+		BeginTooltip();
+		Text(u8"이전 포지션과 현재 포지션의 투영공간 상의 각도가 계산되어 회전합니다. 길쭉한 파티클에 어울립니다.");
+		EndTooltip();
 	}
 
 	SeparatorText(u8"크기");

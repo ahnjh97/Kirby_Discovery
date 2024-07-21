@@ -222,7 +222,7 @@ void CBomber_Explosion_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-			pBomber->Add_Effect("Flying", FXDesc);
+			pBomber->Add_Effect("Flying", FXDesc, false);
 		}
 
 		if (true == pBomber->IsAnimFinished() || pController->Is_Terrain())

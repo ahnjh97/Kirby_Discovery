@@ -412,7 +412,7 @@ void CVIBuffer_Instance::OrbitDecelerate(_float fTimeDelta, VTXMATRIX* pVertices
 	}
 }
 
-void CVIBuffer_Instance::Color_Interpolate(_float fTImeDelta, VTXMATRIX* pVertices)
+void CVIBuffer_Instance::Color_Interpolate(_float fTimeDelta, VTXMATRIX* pVertices)
 {
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
@@ -425,6 +425,42 @@ void CVIBuffer_Instance::Color_Interpolate(_float fTImeDelta, VTXMATRIX* pVertic
 
 		if (m_pLifeTimes[i].x >= m_pLifeTimes[i].y)
 			pVertices[i].vColor = XMVectorSetW(m_pTargetColors[i], 0.f);
+	}
+}
+
+void CVIBuffer_Instance::Turn(_float fTimeDelta, VTXMATRIX* pVertices)
+{
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		if (!pVertices[i].bAlive)
+			continue;
+
+		pVertices[i].fAngleZ += fTimeDelta * 360.f;
+	}
+}
+
+void CVIBuffer_Instance::Turn_MoveDirection(_float fTimeDelta, VTXMATRIX* pVertices)
+{
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		if (!pVertices[i].bAlive)
+			continue;
+
+		_vector vPos = pVertices[i].vPosition;
+		_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ);
+		_vector ScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
+		_vector ScreenPrePos = XMVector3TransformCoord(m_pPrePositions[i], ViewProjectionMatrix);
+
+		_float fCenterX = XMVectorGetX(ScreenPos);
+		_float fCenterY = XMVectorGetY(ScreenPos);
+		_float fAfterX = XMVectorGetX(ScreenPrePos);
+		_float fAfterY = XMVectorGetY(ScreenPrePos);
+
+		_float fAngle = (atan2f(fAfterY - fCenterY, fAfterX - fCenterX)) * 180.f / 3.141592f;
+		if (fAngle < 0.f)
+			fAngle += 360.f;
+
+		pVertices[i].fAngleZ = ToRadian(fAngle);
 	}
 }
 
@@ -771,8 +807,6 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 
 	_float fDestLifeTime = Compute_RandLifetime();
 
-	//if ( m_fRemainedDuration < fDestLifeTime)
-	//	return;
 
 	m_pLifeTimes[iInstanceIndex].x = 0.f;
 

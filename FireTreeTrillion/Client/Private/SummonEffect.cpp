@@ -51,7 +51,7 @@ HRESULT CSummonEffect::Initialize(void* pArg)
 	//FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 	//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-	Add_Effect("ParticleSummonJS", FXDesc);
+	Add_Effect("ParticleSummonJS", FXDesc, false);
 
 	m_vColor = XMVectorSet(1.f, 0.f, 0.f, 0.f);
 
