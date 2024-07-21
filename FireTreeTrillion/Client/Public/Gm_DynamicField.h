@@ -24,7 +24,6 @@ public:
 public:
 	void Set_SolarPanelOnce(class CGm_ParkSolarPanelOnce* _pSolarPanel);
 	void Set_SolarPanelCharge(class CGm_ParkSolarPanelCharge* _pSolarPanel);
-	void Set_SurpriseBoard(class CSurprisedBoard* _pSurpriseBoard); 
 
 	_uint Get_GimmickIndex() { return  m_iGimmickIndex; }
 	
@@ -76,7 +75,6 @@ private:
 	PxRigidDynamic*				m_pDynamicActor = { nullptr };
 	CGm_ParkSolarPanelOnce*		m_pSolarPanelOnce = { nullptr };
 	CGm_ParkSolarPanelCharge*	m_pSolarPanelCharge = { nullptr };
-	CSurprisedBoard*			m_pSurpriseBoard = { nullptr };
 
 	DYNAMICFILED_TYPE		m_eDFieldType = { DFMOVE_NONE };
 	GIMMICK_TYPE			m_eGimmickType = { GIMMICK_NONE };
@@ -92,6 +90,8 @@ private:
 	_float					m_fTime = { 0.f };
 	_float					m_fQuakeTime = { 0.f };
 	_float					m_fStartQuake = { 0.f };
+	_float					m_fSecondTime = { 0.f };
+
 	_float4					m_vInitPos = { 0.f, 0.f, 0.f, 1.f };
 	
 	_bool					m_bIsInteraction = { FALSE };
