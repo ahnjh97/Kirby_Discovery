@@ -184,6 +184,9 @@ HRESULT CVIBuffer_Instance::Initialize(void* pArg)
 	m_pPrePositions = new _float3[m_iNumInstance];
 	ZeroMemory(m_pPrePositions, sizeof(_float3) * m_iNumInstance);
 
+	m_pPreWorldPositions = new _float3[m_iNumInstance];
+	ZeroMemory(m_pPreWorldPositions, sizeof(_float3) * m_iNumInstance);
+
 
 	m_pColors = new _float3[m_iNumInstance];
 	ZeroMemory(m_pColors, sizeof(_float3) * m_iNumInstance);
@@ -470,17 +473,28 @@ void CVIBuffer_Instance::Turn(_float fTimeDelta, VTXMATRIX* pVertices)
 	}
 }
 
-void CVIBuffer_Instance::Turn_MoveDirection(_float fTimeDelta, VTXMATRIX* pVertices)
+void CVIBuffer_Instance::Turn_MoveDirection(_float fTimeDelta, VTXMATRIX* pVertices, const _float4x4* pSocketMatrix)
 {
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 		if (!pVertices[i].bAlive)
 			continue;
+		
+		_vector vPos = {0.f, 0.f, 0.f, 0.f};
 
-		_vector vPos = pVertices[i].vPosition;
+		// 월드상의 포지션으로 만드는 과정
+		if (pSocketMatrix == nullptr)
+			vPos = pVertices[i].vPosition;
+		else
+			vPos = _float4::Transform(pVertices[i].vPosition, *pSocketMatrix);
+
 		_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ);
 		_vector ScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
-		_vector ScreenPrePos = XMVector3TransformCoord(m_pPrePositions[i], ViewProjectionMatrix);
+		_vector ScreenPrePos = { 0.f, 0.f, 0.f, 0.f };
+		if (pSocketMatrix == nullptr)
+			ScreenPrePos = XMVector3TransformCoord(m_pPrePositions[i], ViewProjectionMatrix);
+		else
+			ScreenPrePos = XMVector3TransformCoord(m_pPreWorldPositions[i], ViewProjectionMatrix);
 
 		_float fCenterX = XMVectorGetX(ScreenPos);
 		_float fCenterY = XMVectorGetY(ScreenPos);
@@ -495,7 +509,7 @@ void CVIBuffer_Instance::Turn_MoveDirection(_float fTimeDelta, VTXMATRIX* pVerti
 	}
 }
 
-void CVIBuffer_Instance::Save_PrePos(VTXMATRIX* pVertices)
+void CVIBuffer_Instance::Save_PrePos(VTXMATRIX* pVertices, const _float4x4* pSocketMatrix)
 {
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
@@ -505,7 +519,13 @@ void CVIBuffer_Instance::Save_PrePos(VTXMATRIX* pVertices)
 		if (_float3::Distance(m_pPrePositions[i], F4toF3(pVertices[i].vPosition)) < .05f)
 			continue;
 
+
 		m_pPrePositions[i] = static_cast<_float3>(pVertices[i].vPosition);
+
+		if (pSocketMatrix != nullptr)
+		{
+			m_pPreWorldPositions[i] = (_float3)_float4::Transform(pVertices[i].vPosition, *pSocketMatrix);
+		}
 	}
 }
 
@@ -972,6 +992,7 @@ void CVIBuffer_Instance::Free()
 	Safe_Delete_Array(m_pInitialScales);
 
 	Safe_Delete_Array(m_pPrePositions);
+	Safe_Delete_Array(m_pPreWorldPositions);
 	Safe_Delete_Array(m_pVelocities);
 
 	Safe_Delete_Array(m_pPreAxis);

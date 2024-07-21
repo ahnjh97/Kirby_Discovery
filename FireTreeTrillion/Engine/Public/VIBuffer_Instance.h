@@ -83,10 +83,10 @@ public:
 	// 자전한다.
 	virtual void Turn(_float fTimeDelta, VTXMATRIX* pVertices);
 	// 이동 방향으로 회전한다.
-	virtual void Turn_MoveDirection(_float fTimeDelta, VTXMATRIX* pVertices);
+	virtual void Turn_MoveDirection(_float fTimeDelta, VTXMATRIX* pVertices, const _float4x4* pSocketMatrix);
 
 
-	virtual void Save_PrePos(VTXMATRIX* pVertices);
+	virtual void Save_PrePos(VTXMATRIX* pVertices, const _float4x4* pSocketMatrix);
 
 
 	void Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta);
@@ -148,7 +148,10 @@ protected:
 	_float3*					m_pInitialScales = { nullptr };
 	_float*						m_pInitialSpeeds = { nullptr };
 
+	// 로컬을 위한 위치
 	_float3*					m_pPrePositions = { nullptr };
+	_float3*					m_pPreWorldPositions = { nullptr };
+
 	_float3*					m_pVelocities = { nullptr };
 
 	_float3*					m_pPreAxis = { nullptr };

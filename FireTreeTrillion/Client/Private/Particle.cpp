@@ -336,10 +336,10 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 		m_pVIBufferCom->Turn(fMyTimeDelta, pVertices);
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_TURNMOVEDIR])
-		m_pVIBufferCom->Turn_MoveDirection(fMyTimeDelta, pVertices);
+		m_pVIBufferCom->Turn_MoveDirection(fMyTimeDelta, pVertices, m_pSoketMatrix);
 
 
-	m_pVIBufferCom->Save_PrePos(pVertices);
+	m_pVIBufferCom->Save_PrePos(pVertices, m_pSoketMatrix);
 
 
 	//m_pVIBufferCom->Apply_Velocity(fMyTimeDelta, pVertices);
