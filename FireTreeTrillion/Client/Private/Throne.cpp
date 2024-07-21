@@ -97,7 +97,7 @@ _int CThrone::Tick(_float fTimeDelta)
 void CThrone::Late_Tick(_float fTimeDelta)
 {
 	if(true == m_bPlayAnimation)
-		m_pModelCom->Play_Animation(fTimeDelta);
+		m_pModelCom->Play_Animation(m_pGameInstance->Get_SecondTimer());
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }

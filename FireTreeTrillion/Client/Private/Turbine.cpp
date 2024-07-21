@@ -50,7 +50,7 @@ _int CTurbine::Tick(_float fTimeDelta)
 
 void CTurbine::Late_Tick(_float fTimeDelta)
 {
-	m_pModelCom->Play_Animation(fTimeDelta);
+	m_pModelCom->Play_Animation(m_pGameInstance->Get_SecondTimer());
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }

@@ -109,7 +109,7 @@ _int CSpikeSpear::Tick(_float fTimeDelta)
 					CHECK_FAILED(hr);
 
 					//효선아 여기야
-					vPos.y -= 1.f;
+					vPos.y -= 1.f; 
 					CMultiEffect::MULTI_FX_DESC FXDesc{};
 					FXDesc.vInitPos = (_float3)vPos;
 					FXDesc.vInitScale = { 5.f, 5.f, 5.f };

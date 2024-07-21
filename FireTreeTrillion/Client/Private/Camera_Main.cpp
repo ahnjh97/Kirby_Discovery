@@ -29,8 +29,6 @@
 #define QTE2 13
 #define QTE3 18
 
-
-
 _float3 vertices[] = {
 	// Front face
    { -1.0f, -1.0f, -1.0f },
@@ -254,7 +252,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_CamTriggerUpOffsets.reserve(LEVEL_END);
 	m_CamTriggerUpOffsets.resize(LEVEL_END);
 
-	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f, 0.f, 0.1f , 0.1f };
+	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f, 0.f, 0.1f, 0.1f, 0.1f }; //9 == 11
 	//m_CamTriggerUpOffsets[LEVEL_PARK] = { 0.f, 0.f, 0.f, 100.f, .15f, 0.f, 0.f, 0.f, 0.f };
 	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .05f };
 	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f, .4f, .5f, 0.2f, 0.2f, 0.f };
@@ -608,6 +606,7 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 	// 임시입니다.
 	if (*m_pCurrentLevelID == LEVEL_RACING)
 		Change_LevelTrigger();
+
 	return OBJ_NOEVENT;
 }
 
@@ -706,7 +705,8 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 
 			switch (m_eSpecialSeq)
 			{
-			case SEQ_BREAKCARSHOP:
+			//case SEQ_BREAKCARSHOP:
+			case SEQ_BREAKRACINGMAP:
 			{
 				m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
 				m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"Welcome to the New World!.mp3");

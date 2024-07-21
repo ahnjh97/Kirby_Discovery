@@ -14,7 +14,7 @@ CSimbaLaser::CSimbaLaser(const CSimbaLaser& rhs)
 
 void CSimbaLaser::HideLaser()
 {
-	m_pDynamicActor->setKinematicTarget(PxTransform(0, 0, 0));
+	m_pDynamicActor->setGlobalPose(PxTransform(0, 0, 0));
 }
 
 HRESULT CSimbaLaser::Initialize_Prototype()
@@ -57,7 +57,6 @@ HRESULT CSimbaLaser::Initialize(void* pArg)
 
 	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 
-	m_pGameInstance->AddActor(*m_pDynamicActor);
 	m_pGameInstance->Register_Trigger(m_pDynamicActor, TRIGGER_SIMBA_ATTACK, 1);
 
 	return S_OK;

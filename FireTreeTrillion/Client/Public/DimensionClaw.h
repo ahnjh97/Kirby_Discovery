@@ -19,7 +19,9 @@ public:
 	virtual HRESULT Initialize_Prototype()			override;
 	virtual HRESULT Initialize(void* pArg)			override;
 	virtual _int	Tick(_float fTimeDelta)			override;
+#ifdef _DEBUG
 	virtual HRESULT Render()						override;
+#endif
 
 private:
 	_float m_fKirbyOffsetY = {};

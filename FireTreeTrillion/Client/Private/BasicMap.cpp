@@ -151,8 +151,11 @@ void CBasicMap::Late_Tick(_float fTimeDelta)
     if(true == m_bBlendMap)
         Compute_ViewZ();
 
-    if (nullptr != m_pBlendMap)
-        m_pBlendMap->Late_Tick(fTimeDelta);
+    if (LEVEL_INTRO != *m_pCurrentLevelID)
+    {
+        if (nullptr != m_pBlendMap)
+            m_pBlendMap->Late_Tick(fTimeDelta);
+    }
 
     for (auto& blendDeco : m_vecBlendObjects)
         blendDeco->Late_Tick(fTimeDelta);
@@ -328,6 +331,11 @@ HRESULT CBasicMap::Bind_ShaderResources()
         return E_FAIL;
     if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pNonAnimShaderCom, "g_ObjNearClipTexture")))
         return E_FAIL;
+
+    if (LEVEL_SIMBA == *m_pCurrentLevelID) {
+        if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_ObjNearClipTexture")))
+            return E_FAIL;
+    }
 
     return S_OK;
 }

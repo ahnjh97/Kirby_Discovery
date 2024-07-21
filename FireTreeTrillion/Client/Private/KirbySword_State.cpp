@@ -39,6 +39,8 @@ void CKirbySword_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 
 	if (DESC(m_bDialog) == true)
 		return;
+	if (DESC(m_bFinalBossCutStart) == true)
+		return;
 
 	if (JoyStick_controller(Kirbydesc, pCamera))
 	{

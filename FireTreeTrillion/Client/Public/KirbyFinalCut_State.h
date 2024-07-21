@@ -21,6 +21,8 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_bool	m_bCutStartPos = { true };
+	_float	m_fTime = { 0.f };
 	static	CKirbyFinalCut_State* Create();
 	virtual void				  Free() override;
 };

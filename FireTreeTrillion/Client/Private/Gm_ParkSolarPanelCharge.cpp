@@ -58,16 +58,6 @@ HRESULT CGm_ParkSolarPanelCharge::Initialize(void* pArg)
 	//림라이트 OFF
 	//m_bRimLight = FALSE;
 
-#pragma region KIRBY_INFO
-
-	//커비의 현재상태 정보 저장
-	m_pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
-	if (nullptr == m_pKirby)
-		return E_FAIL;
-	Safe_AddRef(m_pKirby);
-
-#pragma endregion
-
 	return S_OK;
 }
 
@@ -226,12 +216,13 @@ void CGm_ParkSolarPanelCharge::Render_IMGUI()
 
 void CGm_ParkSolarPanelCharge::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	if (nullptr == m_pKirby)
-		return;
-
 	//충전 대기 상태에서 키입력 > 충전 시작
 	//07.19) 전구 머금기 상태 조건을 검사
-	CKirby::BODYSTATE eKirbyState = m_pKirby->Get_KirbyInfo()->m_eBodyState;
+	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+	if (nullptr == pKirby)
+		return;
+
+	CKirby::BODYSTATE eKirbyState = pKirby->Get_KirbyInfo()->m_eBodyState;
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) 
 		&& STATE_OFFWAIT == m_eCurState
@@ -373,6 +364,4 @@ void CGm_ParkSolarPanelCharge::Free()
 
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pTextureCom);
-
-	Safe_Release(m_pKirby);
 }

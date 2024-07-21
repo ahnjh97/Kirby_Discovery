@@ -702,7 +702,7 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\SpawnEffect">
       <UniqueIdentifier>{4b97fb20-26cc-4d63-a220-15d7ce0851f4}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="02.GameObjects\Effect\CrashParticle">
       <UniqueIdentifier>{47d42697-331c-426e-bafd-b4400924c864}</UniqueIdentifier>
     </Filter>
@@ -714,6 +714,9 @@
     </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Simba\DimensionClaw">
       <UniqueIdentifier>{fd798ad1-1b75-4c18-956c-cab357105e85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\LightBugEffect">
+      <UniqueIdentifier>{7630a4c0-5e08-41d0-bce2-e03c44b03906}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1407,18 +1410,22 @@
     </ClInclude>
     <ClInclude Include="..\Public\SummonEffect.h">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\SpawnEffect</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\Public\CrashParticle.h">
       <Filter>02.GameObjects\Effect\CrashParticle</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\SimbaLaser.h">
-      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DimensionClaw.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\DimensionClaw</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SimbaRock.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaRock</Filter>
+    </ClInclude>
+    <ClInclude Include="SimbaLaser.h" />
+    <ClInclude Include="..\Public\LightBugEffect.h">
+      <Filter>02.GameObjects\Map\LightBugEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="SimbaLaser.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2093,18 +2100,22 @@
     </ClCompile>
     <ClCompile Include="..\Private\SummonEffect.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Monster\SpawnEffect</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\Private\CrashParticle.cpp">
       <Filter>02.GameObjects\Effect\CrashParticle</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\SimbaLaser.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\Private\DimensionClaw.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\DimensionClaw</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SimbaRock.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaRock</Filter>
+    </ClCompile>
+    <ClCompile Include="SimbaLaser.cpp" />
+    <ClCompile Include="..\Private\LightBugEffect.cpp">
+      <Filter>02.GameObjects\Map\LightBugEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="SimbaLaser.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
