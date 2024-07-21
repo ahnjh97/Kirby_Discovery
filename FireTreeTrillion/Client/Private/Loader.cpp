@@ -1579,7 +1579,13 @@ HRESULT CLoader::Add_FXTexture()
 
 	//마스크
 	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_Bubble", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_Updown", "Effects/Mask/UpDownMask.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_Updown", "Effects/Mask/Mask_UpDown.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_LeftRight", "Effects/Mask/Mask_LeftRight.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_Outline", "Effects/Mask/Mask_Outline.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_GunFire", "Effects/Mask/Mask_GunFire.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_PillarMask", "Effects/Mask/Mask_Pillar_%d.png", 2);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_RoundMask", "Effects/Mask/Mask_Round.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_UpMask", "Effects/Mask/Mask_Up.png");	CHECK_FAILED(hr);
 
 
 	// 주로 사용되는 텍스쳐들
@@ -1610,7 +1616,7 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordSlash", "Effects/Sword/slash_%d.png", 6);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordTail", "Effects/Sword/sword_tail.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordDecal", "Effects/Sword/sword_decal.dds");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_SwordLine", "Effects/Sword/line.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_SwordLine", "Effects/Sword/line_%d.png", 2);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordShockwave", "Effects/Sword/shockwave.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SwordRingNoFrip", "Effects/Sword/ringnofrip.png");	CHECK_FAILED(hr);
 
@@ -1630,6 +1636,15 @@ HRESULT CLoader::Add_FXTexture()
 
 	//파티클
 	hr = Add_Texture(LEVEL_STATIC, "FX_Rock", "Effects/Particle/rock_%d.png", 4);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Orange", "Effects/Particle/Glow_Orange.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Green", "Effects/Particle/Glow_Green.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Blue", "Effects/Particle/Glow_Blue.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Gold", "Effects/Particle/Glow_Gold.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_BludParticle", "Effects/Particle/Glow_BludParticle.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_BlueRules", "Effects/Particle/BlueRules.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_GreenRules", "Effects/Particle/GreenRules.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_RedRules", "Effects/Particle/RedRules.png");	CHECK_FAILED(hr);
+
 
 	//팝스타
 	hr = Add_Texture(LEVEL_STATIC, "FX_PopstarFallWind", "Effects/Popstar/PopStarFallEffectWind.dds");	CHECK_FAILED(hr);
@@ -1645,6 +1660,7 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_ParkSmoke", "Effects/common_smoke08.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SmokeNormal", "Effects/indirect3_normal.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_SpawnEffect", "Effects/SpawnEffect1.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Halo", "Effects/halo_01.png");	CHECK_FAILED(hr);
 
 	//스카이스피어
 	hr = Add_Texture(LEVEL_STATIC, "FX_FinalBoss_SkySphere", "SkySphere/SkySphere_Lab_Diffuse_%d.dds", 3);	CHECK_FAILED(hr);
@@ -1652,10 +1668,6 @@ HRESULT CLoader::Add_FXTexture()
 	//Dissolve
 	hr = Add_Texture(LEVEL_STATIC, "FX_FireDissolve", "Dissolve/FireDissolve.png");	CHECK_FAILED(hr);
 
-	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Orange", "Effects/Particle/Glow_Orange.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Green", "Effects/Particle/Glow_Green.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Blue", "Effects/Particle/Glow_Blue.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_BludParticle", "Effects/Particle/Glow_BludParticle.png");	CHECK_FAILED(hr);
 
 
 	return S_OK;
@@ -1877,10 +1889,15 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DeeDeeDee", TYPE_ANIM, 3.0f, 180.f);
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.3f);
 
+		// For Mab Interactive Object
+		m_vecModelInfo.emplace_back("Ladder", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
 		//기믹 오브젝트
 		m_vecModelInfo.emplace_back("FhEntranceAlien_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("FhEntranceAlien_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
+		// For Monster
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.2f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
 
@@ -2160,10 +2177,17 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_FINALBOSS)
 	{
-		for (_uint i = 0; i <= 17; i++) {
+		for (_uint i = 0; i <= 17; i++) 
+		{
 			string strTunnelRock = "TunnelRock" + to_string(i);
 			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM, 0.1f);
 		}
+
+		//vector<_uint> vecTunnelRocks = { 2, 4, 5, 7, 8, 9, 10, 12, 13, 16 };
+		//for (auto& rockIndex : vecTunnelRocks) {
+		//	string strTunnelRock = "TunnelRock" + to_string(rockIndex);
+		//	m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM);
+		//}
 
 		//보스전 필드에서만 생성하는 SUB_SKYSPHERE (BackGround 요소)
 		m_vecModelInfo.emplace_back("LbBuildingFrame", TYPE_NONANIM, 1.f, 0.f);

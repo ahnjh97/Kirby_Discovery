@@ -275,12 +275,13 @@ _float4 CVIBuffer_Instance_Point::Compute_RandRangePosition()
 
 
 	_float3 vCenter = m_InstanceDesc.vCenter;
-	_float4 vPos = vCenter + (_float3)CUtils::Make_Random_Vector(CUtils::Make_RandomFloat(m_InstanceDesc.fMinRange, m_InstanceDesc.fMaxRange));
+	_float4 vPos = vCenter + (_float3)CUtils::Make_Random_Vector(CUtils::Make_RandomFloat(m_InstanceDesc.fMinRange * m_InstanceDesc.vInitScale.x, m_InstanceDesc.fMaxRange * m_InstanceDesc.vInitScale.x));
 	
-	AdjustVertex(vPos, m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.z);
-	AdjustVertex(vPos, m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.z);
-	AdjustVertex(vPos, m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.z);
-	AdjustVertex(vPos, m_InstanceDesc.vRange.x, m_InstanceDesc.vRange.y, m_InstanceDesc.vRange.z);
+	AdjustVertex(vPos, m_InstanceDesc.vRange.x * m_InstanceDesc.vInitScale.x, m_InstanceDesc.vRange.y * m_InstanceDesc.vInitScale.x, m_InstanceDesc.vRange.z * m_InstanceDesc.vInitScale.z);
+	AdjustVertex(vPos, m_InstanceDesc.vRange.x * m_InstanceDesc.vInitScale.x, m_InstanceDesc.vRange.y * m_InstanceDesc.vInitScale.x, m_InstanceDesc.vRange.z * m_InstanceDesc.vInitScale.z);
+	AdjustVertex(vPos, m_InstanceDesc.vRange.x * m_InstanceDesc.vInitScale.x, m_InstanceDesc.vRange.y * m_InstanceDesc.vInitScale.x, m_InstanceDesc.vRange.z * m_InstanceDesc.vInitScale.z);
+	AdjustVertex(vPos, m_InstanceDesc.vRange.x * m_InstanceDesc.vInitScale.x, m_InstanceDesc.vRange.y * m_InstanceDesc.vInitScale.x, m_InstanceDesc.vRange.z * m_InstanceDesc.vInitScale.z);
+
 	/*
 
 	_float3 vDir = { CUtils::Make_RandomFloat(m_InstanceDesc.fMinRange, m_InstanceDesc.fMaxRange), 0.f, 0.f };

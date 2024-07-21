@@ -49,6 +49,7 @@ public:
 	_bool			IsAnimFinished();
 	_bool			IsAnimFinished(_uint iCurrentAnimIndex);
 	void			Compute_Angle(_vector vOrginLook, _vector vTargetLook);
+	_float4			Compute_BoneWorldMatrix();
 
 private:
 	CTexture*			m_pEyeTextureCom = { nullptr };
@@ -63,8 +64,11 @@ private:
 	_bool				m_bRenderEye = { true };
 	_bool				m_bRenderBody = { true };
 	_bool				m_bEffect = { false };
+	_bool				m_bSleep = { false };
 
 	_uint				m_iEyeMeshIdx = { 0 };
+
+	_float4x4			m_WorldMatrix = {};
 
 private:
 	HRESULT			Add_Components(const wstring& wstrModelName);

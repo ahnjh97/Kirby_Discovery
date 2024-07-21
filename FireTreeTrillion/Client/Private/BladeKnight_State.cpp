@@ -455,7 +455,7 @@ void CBladeKnight_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-			pBladeKnight->Add_Effect("Flying", FXDesc);
+			pBladeKnight->Add_Effect("Flying", FXDesc, false);
 		}
 
 		if (true == pBladeKnight->IsAnimFinished() || pController->Is_Terrain())

@@ -44,7 +44,7 @@ HRESULT CRayArrow::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 	CTransform* pTransform = pFinalBoss->Get_TransformCom();
 	_vector vLookAt = pTransform->Get_State_Vector(CTransform::STATE_LOOK);
 
@@ -70,8 +70,8 @@ HRESULT CRayArrow::Initialize(void* pArg)
 	Add_Effect("HS_RayArrow test", FXDesc, true);
 
 	FXDesc = {};
-	FXDesc.vInitPos = GET_POS;
-	FXDesc.vInitScale = { 1.2f, 1.2f, 1.2f };
+	//FXDesc.vInitPos = GET_POS;
+	FXDesc.vInitScale = { 3.f, 3.f, 3.f };
 	Add_Effect("HS_FB white pop arrow bubble");
 
 
@@ -99,7 +99,7 @@ _int CRayArrow::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 	if (CFinalBoss::FINALBOSS_RAYARROWEND == pFinalBoss->Get_State() || CFinalBoss::FINALBOSS_RAYARROWENDAIR == pFinalBoss->Get_State())
 	{
 		m_bActive = true;
@@ -139,7 +139,7 @@ _int CRayArrow::Tick(_float fTimeDelta)
 					{
 						CEffect::FX_DESC FXDesc{};
 						FXDesc.vInitPos = GET_POS;
-						Add_Effect("HS_FB_arrow trail dot", FXDesc);
+						Add_Effect("HS_FB_arrow trail dot", FXDesc, false);
 						m_fFlyingTime = 0.f;
 					}
 				}
@@ -149,8 +149,8 @@ _int CRayArrow::Tick(_float fTimeDelta)
 					{
 						CMultiEffect::MULTI_FX_DESC FXDesc{};
 						FXDesc.vInitPos = (_float3)GET_POS + _float3{0.f, -.5f, 0.f};
-						FXDesc.vInitScale = {5.f, 5.f, 5.f};
-						//Add_Effect("HS_ground arrow bomb", FXDesc);
+						FXDesc.vInitScale = {2.f, 2.f, 2.f};
+						Add_Effect("HS_FB arrow bomb", FXDesc, false);
 						m_bCollided = true;
 					}
 

@@ -508,6 +508,64 @@ void CRenderer::Color_Initialize()
 
 }
 
+// FOG 초기화
+void CRenderer::Fog_Zero()
+{
+	m_fFogYIntensity = 0.f;
+	m_fFogViewIntensity = 0.f;
+}
+
+// FOG 실행 - 시점을 int로 나누었읍니다. 
+void CRenderer::Fog_Intialize_ForIntroLevel(_int iPoint)
+{
+	if (iPoint == 0) // 맨 앞
+	{
+		// Y-FOG 초기화
+		m_fFogYIntensity = 0.f;
+
+		// View-FOG 실행
+		m_vFogViewColor.x = 0.26f;
+		m_vFogViewColor.y = 0.73f;
+		m_vFogViewColor.z = 0.78f;
+
+		m_fFogViewStart = 1.f;
+		m_fFogViewEnd = 124.9f;
+		//m_fFogViewIntensity = 1.f;
+	}
+	else if (iPoint == 1) // 정글 포그
+	{
+		m_vFogYColor.x = 1.f;
+		m_vFogYColor.y = 1.f;
+		m_vFogYColor.z = 1.f;
+
+		m_fFogYBottom = 0.8f;
+		m_fFogYTopY = 8.f;
+		//m_fFogYIntensity = 1.f;
+
+		m_vFogViewColor.x = 1.f;
+		m_vFogViewColor.y = 1.f;
+		m_vFogViewColor.z = 1.f;
+
+		m_fFogViewStart = 0.f;
+		m_fFogViewEnd = 117.f;
+		//m_fFogViewIntensity = 1.f;
+	}
+	else if(iPoint == 2) // 사다리 타고 건물 올라가서
+	{
+		// Y-FOG 실행
+		m_vFogYColor.x = 0.26f;
+		m_vFogYColor.y = 0.64f;
+		m_vFogYColor.z = 0.5f;
+
+		m_fFogYBottom = 0.f;
+		m_fFogYTopY = 20.f;
+		//m_fFogYIntensity = 1.f;
+
+		// View-FOG 초기화
+		m_fFogViewIntensity = 0.f;
+	}
+}
+
 HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pRenderObject)
 {
 	if (eRenderGroup >= RENDER_END)
@@ -611,7 +669,6 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 
 	return S_OK;
 }
-
 
 void CRenderer::Render_SystemTick(_float fTimeDelta)
 {
@@ -723,7 +780,7 @@ void CRenderer::Set_ColorSet(COLORSET eColorSet)
 	Set_ColorSet_ByIndex((_uint)eColorSet);
 }
 
-void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
+void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 {
 	switch (iSetIdx)
 	{
@@ -733,7 +790,6 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 		m_fRimLightRatio.second = .7f;
 		m_fRimLightRadius.second = 1.f;
 		m_vRimColor.second = _float3(1.f, .7f, 4.f);
-		
 
 		break;
 	case 1:
@@ -748,7 +804,7 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx)
 	case 3:
 	{
 		m_DestColorData = Find_ColorSet("Stage1");
-
+		
 		m_fRimLightRatio.second = 1.f;
 		m_fRimLightRadius.second = 1.f;
 		m_vRimColor.second = _float3(1.f, .5f, .3f);

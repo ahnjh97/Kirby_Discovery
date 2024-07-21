@@ -22,7 +22,7 @@ void ThrustCharge(CFinalBoss* pBoss)
 
 	FXDesc.fStartDelay = 1.f;
 
-	pBoss->Add_Effect("HS_FB ground dash sparkle", FXDesc);
+	pBoss->Add_Effect("HS_FB ground dash sparkle", FXDesc, false);
 }
 
 void AirStep_Smoke(CFinalBoss* pBoss)
@@ -34,6 +34,23 @@ void DimensionGateLight(CFinalBoss* pBoss)
 {                                                           
 }
 
+void LaserReady(CFinalBoss* pBoss)
+{
+	CParticle::PARTICLE_DESC ParticleDesc{};
+	ParticleDesc.pSocketMatrix = pBoss->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
+	ParticleDesc.vInitScale = { 5.f, 5.f, 5.f };
+	pBoss->Add_Effect("HS_FB laser charge particle", ParticleDesc, false);
+
+
+//	CMultiEffect::MULTI_FX_DESC FXDesc{};
+//	FXDesc.pSocketMatrix = pBoss->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
+//	FXDesc.vInitPos = { 0.f, 3.f, 2.f };
+//	FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+//
+//	FXDesc.fStartDelay = 1.f;
+//
+//	pBoss->Add_Effect("HS_FB charge light", FXDesc);
+}
 #pragma region APPEAR STATE
 //*********************************
 //			 APPEAR STATE
@@ -1285,6 +1302,9 @@ void CFinalBoss_Laser_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		{
 		case CFinalBoss::FINALBOSS_DIMENSIONLASEREADY:
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASERCHARGE, 50.f, false, true);
+
+			//효선아 여기야
+			LaserReady(pFinalBoss);
 			break;
 		case CFinalBoss::FINALBOSS_DIMENSIONLASERCHARGE:
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASERSTART, 50.f, false, true);

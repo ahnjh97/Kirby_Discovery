@@ -355,8 +355,8 @@ void CKirbySword_Guard_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _
 	{
 	case CKirby::SWORDSTATE_SWORDSLIDESTART:
 	{
-		SwordDash(pKirby->Get_TransformCom());
-		pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+		SwordDash(pKirby);
+		//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 	}
 	break;
 	default:

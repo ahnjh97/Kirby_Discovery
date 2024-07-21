@@ -18,6 +18,8 @@
 #include "SkySphere.h"
 //#include "Kirby.h"
 
+#include "UI_Fading.h"
+
 CLevel_FinalBoss::CLevel_FinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
@@ -66,6 +68,11 @@ HRESULT CLevel_FinalBoss::Initialize()
 
 	_bool bBloomSky{ true };
 	m_pGameInstance->Bind_DeferredRawValue("g_bBloomSky", &bBloomSky, sizeof(_bool));
+
+	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+	CHECK_NULLPTR(pUIObj);
+	CUI_Fading* pFadingUI = dynamic_cast<CUI_Fading*>(pUIObj);
+	pFadingUI->Set_IsRender(true);
 
 	return S_OK;
 }
@@ -541,7 +548,7 @@ HRESULT CLevel_FinalBoss::Ready_Monsters()
 			FinalBossDesc.iShaderVars = iShaderVars;
 			FinalBossDesc.fRimWidth = fRimWidth;
 			FinalBossDesc.vecRallyPoints = vecRallyPoints;
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_FinalBoss"), &FinalBossDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_BossMonster"), TEXT("Prototype_GameObject_FinalBoss"), &FinalBossDesc)))
 				return E_FAIL;
 		}
 		else if (L"Kabu" == tempDesc.wstrModelName)

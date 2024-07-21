@@ -48,6 +48,9 @@ private:
 	_bool		m_bEnd = { false };
 
 private:
+	_float3 Compute_CollidingPoint(_float3 vLaserStart, _float3 vLaserDir, _float3 vLandCenter, _float3 vLandExtent);
+
+
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 

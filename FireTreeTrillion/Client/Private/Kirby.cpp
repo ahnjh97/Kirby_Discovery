@@ -72,10 +72,14 @@ HRESULT CKirby::Initialize(void* pArg)
 	if (FAILED(Kirby_SystemInitialize()))
 		return E_FAIL;
 
-	// 디버깅 용
+	// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
 	m_eAbilityType = ABILITY_CRASH;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 		m_eAbilityType = ABILITY_SWORD;
+	m_fHp = 1000.f;
+	m_fMaxHp = 1000.f;
+	// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
+
 
 	// 커비의 상태에 따라, 애니메이션이 시작된다.
 	Kirby_StateInitialize();
@@ -117,6 +121,7 @@ _int CKirby::Tick(_float fTimeDelta)
 		//RayCast_SurpriseBoards();
 	}
 		
+	//m_bOverPower = true;
 	return OBJ_NOEVENT;
 }
 
@@ -622,9 +627,12 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				CMultiEffect::MULTI_FX_DESC FXDesc{};
 				FXDesc.vInitPos = { 0.f, .6f, .4f };
 				FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v3"), &FXDesc)))
-					return;
-				Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+				Add_Effect("Vacuum_v3", FXDesc, true);
+
+				//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v3"), &FXDesc)))
+				//	return;
+				//Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
 
 				_float4 vDeformPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
@@ -2024,7 +2032,8 @@ HRESULT CKirby::Kirby_SystemInitialize()
 	Kirby_LookInitialize();
 
 	m_fMaxHp = 100.f;
-	m_fAttack = 5.f; // 고정
+	m_fAttack = 5.f;
+
 
 	// 임시로 능력 디폴트 화
 	if (*m_pCurrentLevelID == LEVEL_INTRO)
@@ -2037,27 +2046,40 @@ HRESULT CKirby::Kirby_SystemInitialize()
 		CLevelChanger::LEVEL_DATA tLevelData = CLevelChanger::Get_Instance()->Load();
 		m_fHp	  = tLevelData.fKirbyHP;
 		m_uCoin	  = static_cast<_uint>(tLevelData.fKirbyCoin);
+		m_eAbilityType = static_cast<ABILITYTYPE>(tLevelData.iKirbyState);
 
-		//m_eAbilityType = static_cast<ABILITYTYPE>(tLevelData.iKirbyState);
 		LEVEL eLEVEL = static_cast<LEVEL>(tLevelData.iLatestLevel);
 
 		if (*m_pCurrentLevelID == LEVEL_RACING)
 		{
-			m_eAbilityType = ABILITY_DEFAULT;
 			m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, _float3{0.f, 0.f, 1.f}, 5.f);
+			INFO(m_eBodyState) = BODY_CARDEFAULT;
+		}
+		else if (*m_pCurrentLevelID == LEVEL_DEEDEEDEE)
+		{
+			INFO(m_eBodyState) = BODY_CARDEFAULT;
+			INFO(m_bDeeDeeDeeInitializeCut) = true;
 		}
 		else if (LEVEL_TOWN == eLEVEL && LEVEL_TOWN == *m_pCurrentLevelID)
 		{
 			_float3 vNewPos = tLevelData.vLastPos;
-			//m_pControllerCom->Set_Position(m_pTransformCom, _float4{ vNewPos.x, vNewPos.y, vNewPos.z, 1.f });
 		}
-		else
+		else if (*m_pCurrentLevelID == LEVEL_PARK)
 		{
-			m_fHp = 100.f; // 기존 사용하던 HP입니다.
-			m_fMaxHp = 100.f;
-			m_eAbilityType = ABILITY_DEFAULT;
+
+		}
+		else if (*m_pCurrentLevelID == LEVEL_SIMBA)
+		{
+
+		}
+		else if (*m_pCurrentLevelID == LEVEL_FINALBOSS)
+		{
+
 		}
 	}
+
+
+
 
 	// 폭탄 궤적을 만들어 놓는다.
 	Ready_BombOrbit();
@@ -2087,7 +2109,11 @@ void CKirby::Kirby_LookInitialize()
 	{
 		// 오른쪽을 보고 시작함.
 		INFO(m_vTargetDir) = INFO(m_vMoveDir) = fCameraRight;
-		INFO(m_eBodyState) = BODY_CARDEFAULT;
+	}
+	else if (uLevel == LEVEL_DEEDEEDEE)
+	{
+		_float4 vLook = XMVector3Normalize(_float4(1.f, 0.f, 1.f, 0.f));
+		INFO(m_vTargetDir) = INFO(m_vMoveDir) = vLook;
 	}
 	else
 	{
@@ -2101,8 +2127,21 @@ void CKirby::Kirby_StateInitialize()
 	// 차 폼일 경우
 	if (INFO(m_eBodyState) == BODY_CARDEFAULT)
 	{
-		Change_State(CARSTATE_IDLING, 60.f, true, true, BODY_CARDEFAULT, OFFSET_CAR);
-		m_pModelCom[BODY_CARDEFAULT]->Set_Animation(14, 60.f, true, true);
+		if (INFO(m_bDeeDeeDeeInitializeCut) == false)
+		{
+			Change_State(CARSTATE_IDLING, 60.f, true, true, BODY_CARDEFAULT, OFFSET_CAR);
+			m_pModelCom[BODY_CARDEFAULT]->Set_Animation(14, 60.f, true, true);
+		}
+		else if (INFO(m_bDeeDeeDeeInitializeCut) == true)
+		{
+			Change_State(CARSTATE_MOVING, 60.f, true, false, BODY_CARDEFAULT, OFFSET_CAR);
+			m_pModelCom[BODY_CARDEFAULT]->Set_Animation(19, 60.f, true, true);
+		}
+	}
+	else if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
+	{
+		Change_State(BULBSTATE_WAIT, 60.f, true, true, BODY_BULBDEFAULT, OFFSET_BULB);
+		m_pModelCom[BODY_BULBDEFAULT]->Set_Animation(20, 60.f, true, true);
 	}
 	else if (m_eAbilityType == ABILITY_SWORD)
 	{
@@ -2118,6 +2157,11 @@ void CKirby::Kirby_StateInitialize()
 	{
 		Change_State(HAMMERSTATE_IDLE, 60.f, true, true, BODY_HAMMER, OFFSET_HAMMER);
 		m_pModelCom[BODY_HAMMER]->Set_Animation(42, 60.f, true, true);
+	}
+	else if (m_eAbilityType == ABILITY_CRASH)
+	{
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+		m_pModelCom[BODY_DEFAULT]->Set_Animation(STATE_IDLE, 60.f, true, true);
 	}
 	else if (m_eAbilityType == ABILITY_DEFAULT)
 	{

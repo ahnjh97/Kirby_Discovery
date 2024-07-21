@@ -55,7 +55,7 @@ _int CSpikeSpear::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 
 	m_fSpikeTime += m_fTimeDelta;
 	m_fLifeTime += m_fTimeDelta;
@@ -93,8 +93,8 @@ _int CSpikeSpear::Tick(_float fTimeDelta)
 			{
 				m_bItem = true;
 
-				_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-				vPos.m128_f32[1] -= 10.f;
+				_float4 vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				vPos.y -= 10.f;
 				for (_uint i = 0; i < 3; ++i)
 				{
 					HRESULT hr;
@@ -111,12 +111,12 @@ _int CSpikeSpear::Tick(_float fTimeDelta)
 					//효선아 여기야
 					//vPos.y -= 1.f; //여기에서 컴파일 에러 발생해서 주석처리
 					CMultiEffect::MULTI_FX_DESC FXDesc{};
-					FXDesc.vInitPos = vPos;
+					FXDesc.vInitPos = (_float3)vPos;
 					FXDesc.vInitScale = { 5.f, 5.f, 5.f };
 
 					//FXDesc.fStartDelay = 1.f;
 
-					Add_Effect("HS_FB down spear circle", FXDesc);
+					Add_Effect("HS_FB down spear circle", FXDesc, false);
 
 				}
 			}

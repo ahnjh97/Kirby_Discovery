@@ -24,6 +24,11 @@
 #define BEACH_TO_JUNGLE			-66.f
 #define JUNGLE_TO_NOWHERE		57.f
 #define NOWHERE_TO_BUILDING		80.f
+#define BUILDING_TO_FLOOR		260.f
+#define FLOOR_TO_CARCENTER_Z	283.f
+#define FLOOR_TO_CARCENTER_X	42.f
+
+#define FOG_TRIGGER_VALUE_Y		26.f
 
 #define VOLUME_BGM				0.5f
 #define VOLUME_JUNGLE_BGM		0.4f
@@ -71,6 +76,7 @@ HRESULT CLevel_Intro::Initialize()
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
 
+
 	// 셰이더 트리거
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_BEACH);
@@ -96,6 +102,86 @@ void CLevel_Intro::Change_Levels()
 	pTransingStar->Set_SmallColor(_float3(160.f / 255.f, 212.f / 255.f, 104.f / 255.f));
 	pTransingStar->Set_LargeColor(_float3(91.f / 255.f, 121.f / 255.f, 59.f / 255.f));
 	pTransingStar->Activate(CTransingStar::CLOSE);
+}
+
+void CLevel_Intro::Tick(_float fTimeDelta)
+{
+	__super::Tick(fTimeDelta);
+	m_fAccDelta += fTimeDelta;
+
+	Check_KirbyPosState();
+
+	Sound_Tick(fTimeDelta);
+	Fog_Tick(fTimeDelta);
+}
+
+void CLevel_Intro::Check_KirbyPosState()
+{
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(m_iLevel, TEXT("Layer_Player")));
+	_float4 vPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+
+	// 커비 위치값에 따른 state가 변경될때 이전 state를 저장하는 부분을 업데이트합니다.
+	if (m_ePreKirbyPosState != m_eKirbyPosState)
+		m_ePreKirbyPosState = m_eKirbyPosState;
+
+	if (vPos.z < BEACH_TO_JUNGLE) // 바다 소리
+		m_eKirbyPosState = BEACH;
+
+	else if (vPos.z < JUNGLE_TO_NOWHERE && vPos.z >= BEACH_TO_JUNGLE) // 정글 소리
+		m_eKirbyPosState = JUNGLE;
+
+	else if (vPos.z < NOWHERE_TO_BUILDING && vPos.z >= JUNGLE_TO_NOWHERE) // 정글 소리가 거의 안들리는 NO-BGM 상태
+		m_eKirbyPosState = NOBGM;
+
+	else if (vPos.z < BUILDING_TO_FLOOR && vPos.z >= NOWHERE_TO_BUILDING) // 빌딩 나오는 곳
+		m_eKirbyPosState = BUILDING;
+
+	else if (vPos.z >= FLOOR_TO_CARCENTER_Z && vPos.x >= FLOOR_TO_CARCENTER_X)
+		m_eKirbyPosState = UPSTAIRS_NOFOG;
+
+	else if (vPos.z >= BUILDING_TO_FLOOR) // 새로운 포그를 위한 곳
+		m_eKirbyPosState = UPSTAIRS_FOG;
+}
+
+void CLevel_Intro::Sound_Tick(_float fTimeDelta)
+{
+	static KIRBY_POS_STATE eState = STATE_END;
+	if (m_ePreKirbyPosState != m_eKirbyPosState)
+	{
+		Manage_BGM();
+		eState = m_ePreKirbyPosState;
+	}
+
+	switch (m_eKirbyPosState)
+	{
+	case BEACH:
+	{
+		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM_SUB, VOLUME_BGM, fTimeDelta * 0.04f);
+		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.06f);
+	}
+	break;
+	case JUNGLE:
+	{
+		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_JUNGLE_BGM, fTimeDelta * 0.03f);
+		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM_SUB, 0.0f, fTimeDelta * 0.06f);
+	}
+	break;
+	case NOBGM:
+	{
+		if (eState == BUILDING)
+			m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_JUNGLE_BGM, fTimeDelta * 0.1f);
+
+		else if (eState == JUNGLE)
+			m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.1f);
+	}
+	break;
+	case BUILDING:
+	{
+		m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, VOLUME_BGM);
+	}
+	break;
+	}
+
 }
 
 void CLevel_Intro::Manage_BGM() // SOUND_WI
@@ -138,41 +224,97 @@ void CLevel_Intro::Manage_BGM() // SOUND_WI
 	}
 	break;
 	}
+
 }
 
-void CLevel_Intro::Check_KirbyPosState()
+void CLevel_Intro::Fog_Tick(_float fTimeDelta)
 {
-	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(m_iLevel, TEXT("Layer_Player")));
-	_float4 vPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
-
-	// 커비 위치값에 따른 state가 변경될때 이전 state를 저장하는 부분을 업데이트합니다.
+	static KIRBY_POS_STATE eState = STATE_END;
 	if (m_ePreKirbyPosState != m_eKirbyPosState)
-		m_ePreKirbyPosState = m_eKirbyPosState;
+	{
+		Manage_Fog();
+		eState = m_ePreKirbyPosState;
+	}
 
-	if (vPos.z < BEACH_TO_JUNGLE) // 바다 소리
-		m_eKirbyPosState = BEACH;
+	switch (m_eKirbyPosState)
+	{
+	case BEACH:
+	{
+		// 포그 초기화
+		m_pGameInstance->Fog_Intialize_ForIntroLevel(0);
+	}
+	break;
+	case JUNGLE:
+	{
+		m_pGameInstance->Increase_FogYValue(fTimeDelta);
+		m_pGameInstance->Increase_FogViewValue(fTimeDelta);
+	}
+	break;
+	case NOBGM:
+	{
+		if (eState == BUILDING)
+		{
+			m_pGameInstance->Increase_FogYValue(fTimeDelta);
+			m_pGameInstance->Increase_FogViewValue(fTimeDelta);
+		}
+		else if (eState == JUNGLE)
+		{
+			m_pGameInstance->Decrease_FogYValue(fTimeDelta);
+			m_pGameInstance->Decrease_FogViewValue(fTimeDelta);
+		}
+	}
+	break;
+	case BUILDING:
+	{
+			m_pGameInstance->Decrease_FogYValue(fTimeDelta);
+			m_pGameInstance->Decrease_FogViewValue(fTimeDelta);
+	}
+	break;
+	case UPSTAIRS_FOG:
+	{
+		m_pGameInstance->Increase_FogYValue(fTimeDelta);
+		m_pGameInstance->Increase_FogViewValue(fTimeDelta);
+	}
+	break;
 
-	else if (vPos.z < JUNGLE_TO_NOWHERE && vPos.z >= BEACH_TO_JUNGLE) // 정글 소리
-		m_eKirbyPosState = JUNGLE;
+	case UPSTAIRS_NOFOG:
+	{
+		m_pGameInstance->Decrease_FogYValue(fTimeDelta * 0.5f);
+		m_pGameInstance->Decrease_FogViewValue(fTimeDelta * 0.5f);
+	}
+	break;
+	}
 
-	else if (vPos.z < NOWHERE_TO_BUILDING && vPos.z >= JUNGLE_TO_NOWHERE) // 정글 소리가 거의 안들리는 NO-BGM 상태
-		m_eKirbyPosState = NOBGM;
-
-	else if (vPos.z >= NOWHERE_TO_BUILDING) // 빌딩 나오는 곳
-		m_eKirbyPosState = BUILDING;
 }
 
-void CLevel_Intro::Tick(_float fTimeDelta)
+void CLevel_Intro::Manage_Fog()
 {
-	__super::Tick(fTimeDelta);
-	m_fAccDelta += fTimeDelta;
-	Sound_Tick(fTimeDelta);
-
-	// 처음 시작할때 FADE-IN	
-	static _float fTimeAcc = 0.f;
-	fTimeAcc += fTimeDelta;
-	//if (fTimeAcc > 2.f) // 2초뒤 페이드인
-	//	Ready_FadeIn();
+	switch (m_eKirbyPosState)
+	{
+	case BEACH:
+	{
+		m_pGameInstance->Fog_Zero();
+	}
+	break;
+	case JUNGLE:
+	{
+		m_pGameInstance->Fog_Intialize_ForIntroLevel(1);
+	}
+	break;
+	case NOBGM:
+	{
+	}
+	break;
+	case BUILDING:
+	{
+	}
+	break;
+	case UPSTAIRS_FOG:
+	{
+		m_pGameInstance->Fog_Intialize_ForIntroLevel(2);
+	}
+	break;
+	}
 }
 
 HRESULT CLevel_Intro::Render()
@@ -222,47 +364,6 @@ void CLevel_Intro::Ready_FadeIn()
 			pFadingUI->Set_IsRender(false);
 			bOnceChanger = true;
 		}
-	}
-}
-
-void CLevel_Intro::Sound_Tick(_float fTimeDelta)
-{
-	static KIRBY_POS_STATE eState = STATE_END;
-	Check_KirbyPosState();
-	if (m_ePreKirbyPosState != m_eKirbyPosState)
-	{
-		Manage_BGM();
-		eState = m_ePreKirbyPosState;
-	}
-
-	switch (m_eKirbyPosState)
-	{
-	case BEACH:
-	{
-		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM_SUB, VOLUME_BGM, fTimeDelta * 0.04f);
-		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.06f);
-	}
-	break;
-	case JUNGLE:
-	{
-		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_JUNGLE_BGM, fTimeDelta * 0.03f);
-		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM_SUB, 0.0f, fTimeDelta * 0.06f);
-	}
-	break;
-	case NOBGM:
-	{
-		if (eState == BUILDING)
-			m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_JUNGLE_BGM, fTimeDelta * 0.1f);
-
-		else if (eState == JUNGLE)
-			m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.1f);
-	}
-	break;
-	case BUILDING:
-	{
-		m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, VOLUME_BGM);
-	}
-	break;
 	}
 }
 

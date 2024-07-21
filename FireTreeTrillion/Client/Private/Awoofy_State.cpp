@@ -494,7 +494,7 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-			pAwoofy->Add_Effect("Flying", FXDesc);
+			pAwoofy->Add_Effect("Flying", FXDesc, false);
 		}
 
 
@@ -521,6 +521,16 @@ void CAwoofy_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		if (1.f > pController->Compute_Wall(vDamegeDir))
 		{
+			CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+			CGameObject* pObj = pKirby->FindStarBox(pController->Get_MostRecentActor());
+			if (nullptr != pObj) {
+				return;
+			}
+			pObj = pKirby->FindBox(pController->Get_MostRecentActor());
+			if (nullptr != pObj) {
+				return;
+			}
+
 			pAwoofy->Set_PhyXState(PO_FLYDEADAWAY);
 			pAwoofy->Set_DamageMoving(-1.f * vDamegeDir, 10.f);
 		}

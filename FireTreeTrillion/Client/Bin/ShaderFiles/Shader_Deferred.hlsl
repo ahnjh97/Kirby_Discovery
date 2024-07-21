@@ -1230,12 +1230,13 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
         Out.vColor *= g_fBlackBackGround;
     }
     
+    
     // For Fog
-    //float4 vFogBeforeColor = saturate(Out.vColor);
+    float4 vFogBeforeColor = saturate(Out.vColor);
     //vFogBeforeColor.rgb = Ocean(vWorldPos.y, vFogBeforeColor.rgb, g_vOceanTopColor, g_vOceanBottomColor, g_fOceanTopY, g_fOceanBottomY, g_fOceanIntensity);
-    //float3 vFogY = FOGY(vWorldPos.y, vFogBeforeColor, g_vFogYColor, g_fFogYBottom, g_fFogYTopY, g_fFogYIntensity);
-    //float3 vFogView = FOGViewZ(fViewZ, vFogBeforeColor, g_vFogViewColor, g_fFogViewStart, g_fFogViewEnd, g_fFogViewIntensity);
-    //Out.vColor.rgb = saturate((vFogY + vFogView) / 2);
+    float3 vFogY = FOGY(vWorldPos.y, vFogBeforeColor, g_vFogYColor, g_fFogYBottom, g_fFogYTopY, g_fFogYIntensity);
+    float3 vFogView = FOGViewZ(fViewZ, vFogBeforeColor, g_vFogViewColor, g_fFogViewStart, g_fFogViewEnd, g_fFogViewIntensity);
+    Out.vColor.rgb = saturate((vFogY + vFogView) / 2);
     
     return Out;
 }
