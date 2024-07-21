@@ -1808,7 +1808,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BG0", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		// 자동차 관련 (자동차와 부수는 돌멩이들)
-		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockB", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);
@@ -1944,7 +1943,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.f, 180.f);
 
 		// 자동차 관련 (자동차와 부수는 돌멩이들)
-		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockB", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);
@@ -2346,7 +2344,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		Load_KirbyArmourModels();
 
 		// 자동차 관련 (자동차와 부수는 돌멩이들) :: 디버깅용으로 추가
-		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockB", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);
@@ -2785,8 +2782,10 @@ void CLoader::Load_KirbyBodyModels()
 	m_vecModelInfo.emplace_back("KirbyDumpCut", TYPE_ANIM, 0.8f);
 	m_vecModelInfo.emplace_back("KirbyFinalCut", TYPE_ANIM, 1.f);
 
+
 	// Deform
 	m_vecModelInfo.emplace_back("Bulb", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
 
 	// AbilityEffect
 	m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 0.2f, 0.f, 0);
