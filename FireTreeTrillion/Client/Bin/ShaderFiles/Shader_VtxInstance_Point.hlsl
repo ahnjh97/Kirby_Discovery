@@ -65,6 +65,7 @@ matrix CreateZRotationMatrix(float fAngle)
 
 matrix CreateRotationMatrix(float3 axis, float angle)
 {
+    angle = radians(angle);
     float cosTheta = cos(angle);
     float sinTheta = sin(angle);
     float oneMinusCosTheta = 1.0 - cosTheta;

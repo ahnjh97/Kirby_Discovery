@@ -23,10 +23,15 @@ CFinalBoss::CFinalBoss(const CFinalBoss& rhs)
 
 void CFinalBoss::Appear_Event(CGameObject* pObj)
 {
-	//Change_State(CFinalBoss::FINALBOSS_DEMOAPPEARCUT5, 50.f, false, true);
-	//m_pGameInstance->Set_ObjectBlack(.7f, 1.f);
+	Change_State(CFinalBoss::FINALBOSS_DEMOAPPEARCUT5, 50.f, false, false);
 
-	Add_Effect("HS_bidm A");
+	CParticle::PARTICLE_DESC FXDesc{};
+	FXDesc.pSocketMatrix = &m_EffectSocket;
+	FXDesc.vInitPos = { 0.f, 2.f, 0.f };
+	Add_Effect("HS_bidm B", FXDesc);
+
+	FXDesc.fStartDelay = 3.f;
+	Add_Effect("HS_bidm A", FXDesc);
 }
 
 HRESULT CFinalBoss::Initialize_Prototype()
@@ -69,11 +74,13 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 
 	m_pModelCom->Set_Animation(FINALBOSS_RECOVERYWAIT, 70.f, true, true);
 
-	//Make_TargetToCams();
+
 	Add_AnimEvent();
 
+	//전역 이벤트 구독
 	function<void(CGameObject*)> func = bind(&CFinalBoss::Appear_Event, this, placeholders::_1);
 	CEventCenter::Get_Instance()->Subscribe(KEVENT_FINALBOSS_APPEAR, this, func);
+	m_bUpdate_FXSocketMatrix = false;
 
 	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
 	{
@@ -128,6 +135,13 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer() * m_fTimeDelay;
 
+	m_EffectSocket = _float4x4::Identity;
+
+	_float4x4 pRootBoneWorldMat = m_pTransformCom->ComputeBoneWorldMatrix(m_pModelCom->Get_BonePtr("TopL"));
+	_float3 vRootBonePos = pRootBoneWorldMat.Translation();
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, vRootBonePos);
+
+
 	//최초 보스전 시작 트리거
 	if (m_bStartOpeningTrigger)
 	{
@@ -160,7 +174,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
 	}
 	else if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
-		Change_State(FINALBOSS_DEMOAPPEARCUT5, 50.f, false, true);
+		Change_State(FINALBOSS_DEMOAPPEARCUT5, 50.f, false, false);
 	else if (m_pGameInstance->Get_KeyState(DIK_O, KEY_DOWN))
 	{
 		Change_State(FINALBOSS_LASTDAMAGESTART, 50.f, false, true);
@@ -204,23 +218,55 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		//{
 			//m_fGullyTime = 0.f;
 
+
+		_float3 vFXPosA, vFXPosB;
+
 		// 쟁기질
 		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
 		vPos.m128_f32[1] = 0.f;
 		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
 
-		CMultiEffect::MULTI_FX_DESC FXDesc{};
-		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
-		FXDesc.vInitPos = vPos;
-		Add_Effect("HS_FB rock slash", FXDesc, false);
+		vFXPosA = vPos;
+
 
 		++m_iGullyCnt;
 		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
 		vPos.m128_f32[1] = 0.f;
 		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
 
-		FXDesc.vInitPos = vPos;
-		Add_Effect("HS_FB rock slash", FXDesc, false);
+		vFXPosB = vPos;
+
+
+		//특정 순간에 rock slash 이펙트 생성하기
+		static _float fSlashFXTime{ 0.f };
+		fSlashFXTime += m_fTimeDelta;
+		if (.1f < fSlashFXTime)
+		{
+			fSlashFXTime = 0.f;
+
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+			FXDesc.vInitPos = vFXPosA;
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+
+			Add_Effect("HS_FB rock slash", FXDesc, false);
+
+
+			FXDesc.vInitPos = vFXPosB;
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+			Add_Effect("HS_FB rock slash", FXDesc, false);
+
+
+
+			CParticle::PARTICLE_DESC ParticleDesc{};
+			ParticleDesc.vInitPos = vFXPosA;
+			Add_Effect("HS_perfect laser collide particle", FXDesc);
+
+			ParticleDesc.vInitPos = vFXPosB;
+			Add_Effect("HS_perfect laser collide particle", FXDesc);
+		}
+
+
 
 		++m_iGullyCnt;
 		if (m_vecGully.size() <= m_iGullyCnt)
@@ -670,6 +716,7 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 {
 	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 
+	//효선아 여기야 swing
 	switch (eState)
 	{
 	case FINALBOSS_SWINGRIGHT:
@@ -687,7 +734,7 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+		ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
 		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
 		Add_Effect("HS_FinalBossSlash particle L", FXDesc, false);
 
@@ -708,7 +755,7 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+		ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
 		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
 		Add_Effect("HS_FinalBossSlash particle R", FXDesc, false);
 	}
@@ -728,7 +775,7 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+		ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
 		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
 		Add_Effect("HS_FinalBossSlash particle R", FXDesc, false);
 	}
