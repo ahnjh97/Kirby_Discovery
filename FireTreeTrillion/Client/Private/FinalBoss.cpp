@@ -25,7 +25,13 @@ void CFinalBoss::Appear_Event(CGameObject* pObj)
 	//Change_State(CFinalBoss::FINALBOSS_DEMOAPPEARCUT5, 50.f, false, true);
 	//m_pGameInstance->Set_ObjectBlack(.7f, 1.f);
 
-	Add_Effect("HS_bidm A");
+	Change_State(CFinalBoss::FINALBOSS_DEMOAPPEARCUT5, 50.f, false, false);
+
+	CParticle::PARTICLE_DESC FXDesc{};
+	FXDesc.pSocketMatrix = &m_EffectSocket;
+
+	Add_Effect("HS_bidm A", FXDesc);
+	Add_Effect("HS_bidm B", FXDesc);
 }
 
 HRESULT CFinalBoss::Initialize_Prototype()
@@ -68,11 +74,13 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 
 	m_pModelCom->Set_Animation(FINALBOSS_RECOVERYWAIT, 70.f, true, true);
 
-	//Make_TargetToCams();
+
 	Add_AnimEvent();
 
+	//전역 이벤트 구독
 	function<void(CGameObject*)> func = bind(&CFinalBoss::Appear_Event, this, placeholders::_1);
 	CEventCenter::Get_Instance()->Subscribe(KEVENT_FINALBOSS_APPEAR, this, func);
+	m_bUpdate_FXSocketMatrix = false;
 
 	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
 	{
@@ -127,6 +135,13 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer() * m_fTimeDelay;
 
+	m_EffectSocket = _float4x4::Identity;
+
+	_float4x4 pRootBoneWorldMat = m_pTransformCom->ComputeBoneWorldMatrix(m_pModelCom->Get_BonePtr("TopL"));
+	_float3 vRootBonePos = pRootBoneWorldMat.Translation();
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, vRootBonePos);
+
+
 	//최초 보스전 시작 트리거
 	if (m_bStartOpeningTrigger)
 	{
@@ -157,7 +172,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
 	}
 	else if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
-		Change_State(FINALBOSS_DEMOAPPEARCUT5, 50.f, false, true);
+		Change_State(FINALBOSS_DEMOAPPEARCUT5, 50.f, false, false);
 	else if (m_pGameInstance->Get_KeyState(DIK_O, KEY_DOWN))
 	{
 		Change_State(FINALBOSS_LASTDAMAGESTART, 50.f, false, true);

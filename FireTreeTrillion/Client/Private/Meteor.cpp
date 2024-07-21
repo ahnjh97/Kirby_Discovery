@@ -47,7 +47,7 @@ HRESULT CMeteor::Initialize(void* pArg)
 	m_vAxis = CUtils::Make_Random_Vector(1.f);
 	m_pTransformCom->Turn(m_vAxis, 1.f);
 
-	if(true == m_bBig)
+	if (true == m_bBig)
 	{
 		Set_BodyCollider(COLLIDER_SPHERE, 0.f, 1.5f, 18.f);
 		m_fTurnSpeed = 0.1f;
@@ -99,6 +99,21 @@ HRESULT CMeteor::Initialize(void* pArg)
 
 	m_bNonDead = true;
 
+	CEffect::FX_DESC FXDesc{};
+	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	FXDesc.vInitPos = { 0.f, 1.4f, -.5f };
+	FXDesc.vInitScale = { 20.f, 20.f, 20.f };
+	FXDesc.vInitRot = { 90.f, 0.f, 0.f };
+
+	Add_Effect("come on dash white", FXDesc, true);
+
+	//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_come on dash white"), &FXDesc)))
+	//	return E_FAIL;
+	//
+	//m_FXList.emplace_back(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+	//Safe_AddRef(m_FXList.back());
+
+
 	return S_OK;
 }
 
@@ -110,7 +125,7 @@ _int CMeteor::Tick(_float fTimeDelta)
 		{
 			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 			vPos.m128_f32[1] += 10.f;
-			for(_uint i = 0; i < 6; ++i)
+			for (_uint i = 0; i < 6; ++i)
 			{
 				HRESULT hr;
 				// 별 아이템 떨굼
@@ -153,7 +168,7 @@ _int CMeteor::Tick(_float fTimeDelta)
 
 	_float fRatio = m_fRunTime / m_fDelayTime * 0.7f;
 
-	if(true == m_bBig)
+	if (true == m_bBig)
 	{
 		if (1.f < fRatio)
 			fRatio = 1.f;
@@ -206,7 +221,7 @@ _int CMeteor::Tick(_float fTimeDelta)
 				// 파티클 살리기
 				m_fParticleDelayTime += m_fTimeDelta;
 				m_fOffsetTime += m_fTimeDelta;
-				if(0.1f < m_fParticleDelayTime)
+				if (0.1f < m_fParticleDelayTime)
 				{
 					if (m_vecDebris.size() > m_iDebrsiMaxCnt)
 						m_iDebrsiMaxCnt += DEBRISCNT;

@@ -80,17 +80,17 @@ HRESULT CDebris::Initialize(void* pArg)
 	m_fSamplingFactor = 0.1f;
 	m_fTotalTime = 1.f;
 
-	CEffect::FX_DESC FXDesc{};
-	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-	FXDesc.vInitPos = { 0.f, 1.4f, -.5f };
-	FXDesc.vInitScale = { 20.f, 20.f, 20.f };
-	FXDesc.vInitRot = { 90.f, 0.f, 0.f };
+	//CEffect::FX_DESC FXDesc{};
+	//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	//FXDesc.vInitPos = { 0.f, 1.4f, -.5f };
+	//FXDesc.vInitScale = { 20.f, 20.f, 20.f };
+	//FXDesc.vInitRot = { 90.f, 0.f, 0.f };
 
-	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_come on dash white"), &FXDesc)))
-		return E_FAIL;
+	//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_come on dash white"), &FXDesc)))
+	//	return E_FAIL;
 
-	m_FXList.emplace_back(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
-	Safe_AddRef(m_FXList.back());
+	//m_FXList.emplace_back(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+	//Safe_AddRef(m_FXList.back());
 
 	//Add_Effect("come on dash white", FXDesc, true);
 
