@@ -1891,10 +1891,10 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	vLightPos.m128_f32[2] -= 1.f;
 	m_pGameInstance->Update_LightShadow(vLightPos, vPos);
 
-	// Dof 초점을 커비에게 맞춘다.
-	_vector vDOFPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	vDOFPos.m128_f32[1] += 0.5f;
-	m_pGameInstance->Update_DofFocus(vDOFPos);
+	//// Dof 초점을 커비에게 맞춘다.
+	//_vector vDOFPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	//vDOFPos.m128_f32[1] += 0.5f;
+	//m_pGameInstance->Update_DofFocus(vDOFPos);
 
 	// 능력이 SWORD 일때, 평타 모션의 순서를 리셋시키는 로직이다.
 	if (m_eAbilityType == ABILITY_SWORD)
