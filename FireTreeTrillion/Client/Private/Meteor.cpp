@@ -99,19 +99,15 @@ HRESULT CMeteor::Initialize(void* pArg)
 
 	m_bNonDead = true;
 
+	m_bUpdate_FXSocketMatrix = false;
+
 	CEffect::FX_DESC FXDesc{};
-	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	FXDesc.pSocketMatrix = &m_EffectSocket;
 	FXDesc.vInitPos = { 0.f, 1.4f, -.5f };
 	FXDesc.vInitScale = { 20.f, 20.f, 20.f };
-	FXDesc.vInitRot = { 90.f, 0.f, 0.f };
+	//FXDesc.vInitRot = { 90.f, 0.f, 0.f };
 
 	Add_Effect("come on dash white", FXDesc, true);
-
-	//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_come on dash white"), &FXDesc)))
-	//	return E_FAIL;
-	//
-	//m_FXList.emplace_back(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
-	//Safe_AddRef(m_FXList.back());
 
 
 	return S_OK;
@@ -299,6 +295,15 @@ _int CMeteor::Tick(_float fTimeDelta)
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 		}
 	}
+
+	m_EffectSocket = _float4x4::Identity;
+	_float3 vDir = m_vTargetPos - GET_POS;
+	Quaternion vQuat = CUtils::Make_Quat_FromDir(vDir);
+	_float4x4 RotMat = _float4x4::CreateFromQuaternion(vQuat);
+
+	m_EffectSocket *= RotMat;
+
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, GET_POS);
 
 	return OBJ_NOEVENT;
 }

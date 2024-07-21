@@ -1591,12 +1591,10 @@ void CFXToolDirector::Render_FXHierarchy()
 				++szSuffix;
 			}
 
-
 			PARTICLE_DATA ParticleData{};
 			m_Particles[m_iSelectedParticleIdx]->Fill_SaveData(&ParticleData);
 			ParticleData.strName = strName;
 			Make_Effect(ParticleData);
-
 		}
 
 		if (MenuItem(u8"변수만 복사 생성"))
@@ -1678,6 +1676,10 @@ void CFXToolDirector::Render_FXProperty()
 
 	//이펙트 기본 변수 세팅
 	Begin(u8"속성 편집");
+
+	ImVec2 windowSize = GetContentRegionAvail();
+
+	BeginChild("ScrollingRegion", ImVec2(windowSize.x, windowSize.y), false, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_HorizontalScrollbar);
 
 	//현재 선택한 이펙트를 다르게 한다.
 	CEffect* pCurFX{ nullptr };
@@ -1869,7 +1871,9 @@ void CFXToolDirector::Render_FXProperty()
 	//복합 이펙트는 재생 시간까지만 보인다.
 	if (m_eSelected == SELECTED_MULTI_FX)
 	{
+		EndChild();
 		End();
+		
 		return;
 	}
 
@@ -1991,6 +1995,7 @@ void CFXToolDirector::Render_FXProperty()
 	//단일 이펙트는 여기까지만 보인다.
 	if (!bIsParticle)
 	{
+		EndChild();
 		End();
 		return;
 	}
@@ -2377,6 +2382,7 @@ void CFXToolDirector::Render_FXProperty()
 
 
 #pragma endregion
+	EndChild();
 
 	End();
 

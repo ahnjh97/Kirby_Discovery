@@ -908,6 +908,7 @@ void CDee_Interact_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta, fTimeDelta);
 		//baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, -0.25f);
 		break;
+
 	default:
 	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.2f);
 		break;

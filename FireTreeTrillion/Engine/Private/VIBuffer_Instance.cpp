@@ -491,7 +491,7 @@ void CVIBuffer_Instance::Turn_MoveDirection(_float fTimeDelta, VTXMATRIX* pVerti
 		if (fAngle < 0.f)
 			fAngle += 360.f;
 
-		pVertices[i].fAngleZ = ToRadian(fAngle);
+		pVertices[i].fAngleZ = (fAngle);
 	}
 }
 
@@ -500,6 +500,9 @@ void CVIBuffer_Instance::Save_PrePos(VTXMATRIX* pVertices)
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 		if (!pVertices[i].bAlive)
+			continue;
+
+		if (_float3::Distance(m_pPrePositions[i], F4toF3(pVertices[i].vPosition)) < .05f)
 			continue;
 
 		m_pPrePositions[i] = static_cast<_float3>(pVertices[i].vPosition);
