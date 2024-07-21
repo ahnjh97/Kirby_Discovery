@@ -86,7 +86,7 @@ _int CLaser::Tick(_float fTimeDelta)
 		fDecalTime = 0.f;
 
 		_float3 vCollidingPoint =
-			Compute_CollidingPoint(GET_POS, (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK), {0.f, -.5f, 0.f}, {21.f, .5f, 21.f});
+			Compute_CollidingPoint(GET_POS, (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK), {0.f, 0.f, 0.f}, {21.f, .6f, 21.f});
 
 		if (!ISDEFAULTFLOAT3(vCollidingPoint))
 		{
@@ -109,8 +109,10 @@ _int CLaser::Tick(_float fTimeDelta)
 			CParticle::PARTICLE_DESC ParticleDesc{};
 			ParticleDesc.vInitPos = vCollidingPoint;
 			ParticleDesc.vInitScale = {3.f, 3.f, 3.f };
-			Add_Effect("HS_laser collide particle", ParticleDesc, false);
 
+			//Add_Effect("HS_laser collide particle", ParticleDesc);
+
+			Add_Effect("HS_perfect laser collide particle", ParticleDesc);
 		}
 	}
 

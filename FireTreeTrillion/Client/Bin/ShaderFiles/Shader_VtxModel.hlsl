@@ -901,6 +901,45 @@ PS_OUT_EFFECT PS_DISSOLVE(PS_IN In)
     return Out;
 }
 
+PS_OUT_EFFECT PS_MAIN_FOR_FINALBOSS_LASER(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    //0 이하로는 잘라버리기
+    if(In.vWorldPos.y < 0)
+        discard;
+    
+    if (g_fAlpha == 0)
+        discard;
+    
+    vector vMask = g_MaskTexture.Sample(LinearSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
+    //마스크 자르기
+    bool bMaskAlpha = false;
+    if (vMask.a < .1f)
+        bMaskAlpha = true;
+    
+    float fMaskValue = (bMaskAlpha) ? vMask.a : vMask.r;
+    
+    float fSmoothedAlpha = smoothstep(g_fMaskThreshold - 0.1, g_fMaskThreshold + 0.1, fMaskValue);
+    if (fSmoothedAlpha < 0.01)
+        discard;
+    
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    
+    //알파가 0일때, 혹은 검은색일때 자르기
+    AlphaTest(vDiffuse);
+    
+    
+    Out.vColor.rgb = g_vRColor;
+    Out.vColor.a = vDiffuse.a * fSmoothedAlpha * g_fAlpha;
+
+    //소프트 이펙트 보정
+    Out.vColor.a = SoftEffect(Out.vColor.a, In.vProjPos);
+    if (Out.vColor.a < .1)
+        discard;
+    
+    return Out;
+}
 
 technique11 DefaultTechnique
 {
@@ -1228,5 +1267,18 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_WHITE_FX_CLAMPDIFFUSE_LINEARMASK();
+    }
+
+    pass For_Laser
+    {
+        SetRasterizerState(RS_NonCull);
+        SetDepthStencilState(DSS_NO_TEST_WRITE, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_FOR_FINALBOSS_LASER();
     }
 }

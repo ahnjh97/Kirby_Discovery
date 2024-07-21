@@ -5,6 +5,7 @@
 BEGIN(Engine)
 class CShader;
 class CModel;
+class CEffect;
 END
 
 BEGIN(Client)
@@ -52,6 +53,8 @@ private:
 
 	_bool m_bSwap = { false };
 	_bool m_bDrain = { false };
+
+	list<CEffect*>	m_FXList;
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelTag);

@@ -1123,7 +1123,8 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 			(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 0) ||
 			(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 4) ||
 			(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 0) ||
-			(_eBodyState == BODY_HAMMER && _iMeshIndex == 0))
+			(_eBodyState == BODY_HAMMER && _iMeshIndex == 0) ||
+			(_eBodyState == BODY_FINALCUT && _iMeshIndex == 0))
 		{
 			m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -1149,7 +1150,8 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 			(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 3) ||
 			(_eBodyState == BODY_CARDEFAULT && _iMeshIndex == 3) ||
 			(_eBodyState == BODY_HAMMER && _iMeshIndex == 3) ||
-			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 4))
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 4) ||
+			(_eBodyState == BODY_FINALCUT && _iMeshIndex == 3))
 		{
 			m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -1709,8 +1711,6 @@ void CKirby::Bone_Rotation(_float fTimeDelta)
 		BoneMatrix = pBone->Get_EditMatrixPtr();
 		CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
 	}
-
-
 }
 
 void CKirby::Set_WeaponAnim(_uint index)
@@ -1891,10 +1891,10 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	vLightPos.m128_f32[2] -= 1.f;
 	m_pGameInstance->Update_LightShadow(vLightPos, vPos);
 
-	// Dof 초점을 커비에게 맞춘다.
-	_vector vDOFPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	vDOFPos.m128_f32[1] += 0.5f;
-	m_pGameInstance->Update_DofFocus(vDOFPos);
+	//// Dof 초점을 커비에게 맞춘다.
+	//_vector vDOFPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	//vDOFPos.m128_f32[1] += 0.5f;
+	//m_pGameInstance->Update_DofFocus(vDOFPos);
 
 	// 능력이 SWORD 일때, 평타 모션의 순서를 리셋시키는 로직이다.
 	if (m_eAbilityType == ABILITY_SWORD)
@@ -2228,11 +2228,8 @@ void CKirby::Kirby_SpecialAnim()
 
 	if (INFO(m_bFinalBossDead) == true)
 	{
-		if (m_bFinalCutTrigger == true)
-		{
-			m_bFinalCutTrigger = false;
-			Change_State(FINALCUTSTATE_CUT1, 60.f, false, false, BODY_FINALCUT, OFFSET_FINALCUT);
-		}
+		Change_State(FINALCUTSTATE_CUT1, 60.f, false, false, BODY_FINALCUT, OFFSET_FINALCUT);
+		INFO(m_bFinalBossDead) = false;
 	}
 }
 

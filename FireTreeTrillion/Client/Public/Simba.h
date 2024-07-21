@@ -62,6 +62,7 @@ public:
 	enum SIMBA_EYETEX { EYETEX_DIFFUSE, EYETEX_NORMAL, EYETEX_MRA, EYETEX_END };
 	enum SIMBA_EYESTATE { SIMBAEYE_LONG, SIMBAEYE_SMALL, SIMBAEYE_BIG, SIMBAEYE_END };
 	enum SIMBA_ROTATION { ATTACKJUMP, BITERUSH, BITERUSHJUMP, ROTATION_END };
+	enum SIMBA_FINGER { INDEX, MIDDLE, PINKY, RING, THUMB, FINGER_END };
 
 private:
 	CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -119,6 +120,20 @@ public:
 	void			SpawnRocks(_uint iAnimIdx);
 	void			SpawnDebris(_uint iAnimIdx);
 
+	void			SetUpSecondTarget();
+
+	// Simba Effects
+	void			QuickClawNailFlash(_uint eSimbaAnim);
+	void			QuickClawNailTrail();
+	void			FinalCrusherSwing();
+	void			FinalCrusherSmash();
+	void			JumpStartSmoke();
+	void			LandingSmoke();
+	void			AttackJumpWind();
+	void			DoubleClawDashGround();
+	void			DoubleClawGround();
+	void			DoubleClawSweep();
+
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
 	CGameObject*	m_pKirby = { nullptr };
@@ -130,6 +145,9 @@ private:
 	CGameObject*	m_pSimbaLaser = { nullptr };
 	CTransform*		m_pSimbaLaserTransform = { nullptr };
 	PxRigidDynamic* m_pDimensionClawActor = { nullptr };
+
+	vector<class CBone*> m_vecLeftNailBones;
+	vector<class CBone*> m_vecRightNailBones;
 
 	SIMBA_ANIM		m_eCurrentState = { SIMBA_END };
 	SIMBA_ANIM		m_ePreState = { SIMBA_END };
@@ -197,6 +215,7 @@ private:
 
 	void		Check_HitBoxActivation();
 	void		Reset_HitBoxTimingMap(SIMBA_ANIM eAnimIdx);
+	void		PlayLipSinc();
 
 	void		TransformToDefault(_float fOffsetY);
 
@@ -216,6 +235,7 @@ private:
 	void		DetermineSimbaRotation();
 	void		TurnSimba(_float fAngle);
 	void		ResetRotation();
+
 	void		LaserAttack();
 	void		CreateDimensionClawActor();
 	void		OnSimbaAttackTrigger();

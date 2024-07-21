@@ -157,6 +157,8 @@ public:
 		// 어시스트 라이트
 		class CLight* m_pKirbyAssistLight1 = { nullptr };
 		class CLight* m_pKirbyAssistLight2 = { nullptr };
+
+
 	}KIRBY_INFODESC;
 
 

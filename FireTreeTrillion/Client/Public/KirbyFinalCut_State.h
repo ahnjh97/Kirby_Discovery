@@ -23,6 +23,9 @@ public:
 public:
 	_bool	m_bCutStartPos = { true };
 	_float	m_fTime = { 0.f };
+	_uint	m_uDropCount = { 0 };
+	_bool	m_bJump = { false };
+	_bool	m_bJumpTrigger = { true };
 	static	CKirbyFinalCut_State* Create();
 	virtual void				  Free() override;
 };
