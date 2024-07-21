@@ -150,6 +150,8 @@ public:
 		// FinalCut 폼
 		_bool			m_bFinalBossDead = { false };
 
+		// Dialog
+		_bool			m_bDialog = { false };
 
 		// 어시스트 라이트
 		class CLight* m_pKirbyAssistLight1 = { nullptr };
@@ -239,8 +241,8 @@ public:
 	// 기타 세부적인 제어
 	void Set_ControllerPos(_float4 _vPosition);
 
-	//unordered_map<PxRigidActor*, CGameObject*>* Get_StarBoses() { return &m_mapStarBoxes; };
-	//unordered_map<PxRigidActor*, CGameObject*>* Get_Boses() { return &m_mapBoxes; };
+	void DialogOn(_float4 vDir = _float4(0.f, 0.f, 0.f, 0.f ));
+	void DialogOff(_float4 vDir = _float4(0.f, 0.f, 0.f, 0.f));
 
 private:
 	// 커비의 움직임을 담은 구조체

@@ -1719,6 +1719,43 @@ void CKirby::Set_ControllerPos(_float4 _vPosition)
 	m_pControllerCom->Set_Position(m_pTransformCom, _vPosition);
 }
 
+void CKirby::DialogOn(_float4 vDir)
+{
+	INFO(m_bDialog) = true;
+
+	if (vDir != _float4(0.f, 0.f, 0.f, 0.f))
+		INFO(m_vMoveDir) = INFO(m_vTargetDir) = vDir;
+
+	if (m_eAbilityType == ABILITY_SWORD)
+		Change_State(SWORDSTATE_WAIT, 60.f, true, true, BODY_SWORDDEFAULT, OFFSET_SWORD);
+	else if (m_eAbilityType == ABILITY_BOMB)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+	else if (m_eAbilityType == ABILITY_HAMMER)
+		Change_State(HAMMERSTATE_IDLE, 60.f, true, true, BODY_HAMMER, OFFSET_HAMMER);
+	else if (m_eAbilityType == ABILITY_CRASH)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+	else if (m_eAbilityType == ABILITY_DEFAULT)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+}
+
+void CKirby::DialogOff(_float4 vDir)
+{
+	INFO(m_bDialog) = false;
+	if (vDir != _float4(0.f, 0.f, 0.f, 0.f))
+		INFO(m_vMoveDir) = INFO(m_vTargetDir) = vDir;
+
+	if (m_eAbilityType == ABILITY_SWORD)
+		Change_State(SWORDSTATE_WAIT, 60.f, true, true, BODY_SWORDDEFAULT, OFFSET_SWORD);
+	else if (m_eAbilityType == ABILITY_BOMB)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+	else if (m_eAbilityType == ABILITY_HAMMER)
+		Change_State(HAMMERSTATE_IDLE, 60.f, true, true, BODY_HAMMER, OFFSET_HAMMER);
+	else if (m_eAbilityType == ABILITY_CRASH)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+	else if (m_eAbilityType == ABILITY_DEFAULT)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+}
+
 void CKirby::Large_Light(_float4 vDiffuse, _float fRange, _float fTime)
 {
 	if (m_pArmours == nullptr)
