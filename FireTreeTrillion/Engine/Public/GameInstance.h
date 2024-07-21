@@ -67,6 +67,14 @@ public: /* For.Renderer */
 	void Set_ObjectBlack(_float fObjectBlackTarget, _float fBlackTime = 0.f, _bool RealBlack = false);
 	void Set_Brown(_float fTime, _bool bOnOff);
 
+	void Fog_Zero();
+	void Fog_Intialize_ForIntroLevel(_int iPoint);
+	void Increase_FogYValue(_float fTimeDelta);
+	void Decrease_FogYValue(_float fTimeDelta);
+	void Increase_FogViewValue(_float fTimeDelta);
+	void Decrease_FogViewValue(_float fTimeDelta);
+
+
 #ifdef _DEBUG
 public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderComponent);
