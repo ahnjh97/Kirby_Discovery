@@ -12,6 +12,8 @@ float3 g_vRColor = { 1.f, 1.f, 1.f};
 float3 g_vGColor = { 1.f, 1.f, 1.f};
 float3 g_vBColor = { 1.f, 1.f, 1.f};
 
+vector g_vColor = { 1.f, 1.f, 1.f, 1.f };
+
 float g_fAlpha = { 1.f };
 float g_fMaskThreshold = { 0.f };
 
@@ -35,6 +37,20 @@ float g_fRedRatio = { 0.f };
 bool g_bInitializeQTE;
 
 float g_fTimeDelta = { 0.f };
+
+static const float2 dither[4] =
+{
+    float2(0.0, 0.5),
+    float2(0.75, 0.25),
+    float2(0.25, 0.75),
+    float2(0.5, 0.0)
+};
+
+float DitherValue(int x, int y)
+{
+    int index = (x % 2) + 2 * (y % 2);
+    return dither[index].x;
+}
 
 // 회전된 UV를 계산
 float2 RotateUV(float2 vCoord, float fAngle)
@@ -223,12 +239,21 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN_ALPHABLEND In)
 {
     PS_OUT Out = (PS_OUT) 0;
 	
-    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
+    //vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
     
-    if (vMask.a < g_fMaskThreshold)
+    //float alpha = vMask.a;
+    //if (alpha < g_fMaskThreshold)
+    //    discard;
+    //else
+    //    alpha = (alpha - g_fMaskThreshold) / (1.0f - g_fMaskThreshold); // 경계를 부드럽게 처리
+
+    
+    vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
+    float smoothedAlpha = smoothstep(g_fMaskThreshold - 0.1, g_fMaskThreshold + 0.1, vMask.a);
+
+    if (smoothedAlpha < 0.1)
         discard;
-    else if (vMask.r < g_fMaskThreshold)
-        discard;
+    
     
 
     vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
@@ -236,7 +261,7 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN_ALPHABLEND In)
         discard;
 
     Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
-    Out.vColor.a = vDiffuse.a * g_fAlpha;
+    Out.vColor.a = vDiffuse.a * g_fAlpha * smoothedAlpha;
 	
 	 //소프트 이펙트 보정
     float2 vTexcoord = (float2) 0.f;
@@ -264,7 +289,10 @@ PS_OUT PS_MAIN_BLEND_FX_NOSOFTFX(PS_IN_ALPHABLEND In)
     PS_OUT Out = (PS_OUT) 0;
 	
     vector vMask = g_MaskTexture.Sample(ClampSampler, RotateUV(In.vTexcoord + g_vMaskUVOffset, g_fMaskUVAngle));
-    MaskTest(vMask);
+    
+    float smoothedAlpha = smoothstep(g_fMaskThreshold - 0.1, g_fMaskThreshold + 0.1, vMask.a);
+    if (smoothedAlpha < 0.1)
+        discard;
     
 
     vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
@@ -272,7 +300,7 @@ PS_OUT PS_MAIN_BLEND_FX_NOSOFTFX(PS_IN_ALPHABLEND In)
     
     
     Out.vColor.rgb = vDiffuse.rgb * g_vRColor;
-    Out.vColor.a = vDiffuse.a * g_fAlpha;
+    Out.vColor.a = vDiffuse.a * g_fAlpha * smoothedAlpha;
     
     if (0.03f >= Out.vColor.a)
         discard;
@@ -372,10 +400,11 @@ PS_OUT PS_MAIN_WHITEFX(PS_IN_ALPHABLEND In)
     if (vMask.a < .1f)
         bMaskAlpha = true;
     
-    //if (vMask.a < g_fMaskThreshold)
-    //    discard;
-    //else if (vMask.r < g_fMaskThreshold)
-    //    discard;
+    float fMaskValue = (bMaskAlpha) ? vMask.a : vMask.r;
+    
+    float fSmoothedAlpha = smoothstep(g_fMaskThreshold - 0.1, g_fMaskThreshold + 0.1, fMaskValue);
+    if (fSmoothedAlpha < 0.1)
+        discard;
     
     
     //diffuse 알파 테스팅
@@ -384,8 +413,7 @@ PS_OUT PS_MAIN_WHITEFX(PS_IN_ALPHABLEND In)
         discard;
     
     Out.vColor.rgb = g_vRColor;
-    Out.vColor.a = vDiffuse.a * g_fAlpha
-    * (bMaskAlpha) ? clamp(vMask.a - g_fMaskThreshold, 0.f, vMask.a - g_fMaskThreshold) : clamp(vMask.r - g_fMaskThreshold, 0.f, vMask.r - g_fMaskThreshold);
+    Out.vColor.a = vDiffuse.a * g_fAlpha * saturate(fMaskValue);
 	
     
     if (0.03f >= Out.vColor.a)
@@ -759,10 +787,20 @@ PS_OUT PS_SPAWNEFFECT(PS_IN In)
         discard;
     
     Out.vColor.a *= 0.6f * g_fAlpha;
-    
-    if (0.03f >= Out.vColor.a)
-        discard;
+     
+    return Out;
+}
 
+PS_OUT PS_SUMMONEFFECT(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord) + g_vColor;
+	
+    if (0.2f > Out.vColor.a)
+        discard;
+		
+    Out.vColor.a *= g_fAlpha;
     
     return Out;
 }
@@ -1112,5 +1150,19 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_MAIN_BLEND_FX_NOSOFTFX();
+    }
+
+    // SUMMON EEFFECT ( 25 )
+    pass SUMMONEFFECT
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_SUMMONEFFECT();
     }
 }

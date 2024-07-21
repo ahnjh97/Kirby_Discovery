@@ -22,6 +22,13 @@ public:
 	_bool	m_bTimeCrashTrigger = { true };
 	_float	m_fTime = { 0.f };
 
+	_float m_fLightRange = { 0.f };
+	_bool  m_bLightRangeInv = { false };
+	_float m_fParticleTime = { 0.f };
+	_float m_fRange = { 0.f };
+	_float m_fBoomTime = { 0.f };
+	_int   m_iBoomCount = { 0 };
+
 	static	CKirbyCrash_Attack_State*		Create();
 	virtual void								Free() override;
 };
@@ -52,6 +59,9 @@ public:
 	_float m_fParticleTime = { 0.f };
 	_float m_fRange = { 0.f };
 
+	_float m_fBoomTime = { 0.f };
+	_int   m_iBoomCount = { 0 };
+
 	static	CKirbyCrash_BigAttack_State* Create();
 	virtual void								Free() override;
 };
@@ -79,6 +89,7 @@ public:
 	_bool	m_bNextState = { false };
 	_float	m_fNextStateTime = { 0.f };
 	_bool	m_bTrigger = { true };
+	_bool	m_bEffectTrigger = { true };
 	static	CKirbyCrash_Charge_State* Create();
 	virtual void								Free() override;
 };

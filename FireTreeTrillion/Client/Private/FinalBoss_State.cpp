@@ -11,6 +11,46 @@
 #include "Gully.h"
 //#include "SpikeSpear.h"
 
+
+//이펙트 생성 함수
+void ThrustCharge(CFinalBoss* pBoss)
+{
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
+	FXDesc.pSocketMatrix = pBoss->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
+	FXDesc.vInitPos = { 0.f, 1.f, 6.f };
+	FXDesc.vInitScale = { 5.f, 5.f, 5.f };
+
+	FXDesc.fStartDelay = 1.f;
+
+	pBoss->Add_Effect("HS_FB ground dash sparkle", FXDesc, false);
+}
+
+void AirStep_Smoke(CFinalBoss* pBoss)
+{
+
+}
+
+void DimensionGateLight(CFinalBoss* pBoss)
+{                                                           
+}
+
+void LaserReady(CFinalBoss* pBoss)
+{
+	CParticle::PARTICLE_DESC ParticleDesc{};
+	ParticleDesc.pSocketMatrix = pBoss->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
+	ParticleDesc.vInitScale = { 5.f, 5.f, 5.f };
+	pBoss->Add_Effect("HS_FB laser charge particle", ParticleDesc, false);
+
+
+//	CMultiEffect::MULTI_FX_DESC FXDesc{};
+//	FXDesc.pSocketMatrix = pBoss->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
+//	FXDesc.vInitPos = { 0.f, 3.f, 2.f };
+//	FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+//
+//	FXDesc.fStartDelay = 1.f;
+//
+//	pBoss->Add_Effect("HS_FB charge light", FXDesc);
+}
 #pragma region APPEAR STATE
 //*********************************
 //			 APPEAR STATE
@@ -262,6 +302,10 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		else if (true == pFinalBoss->Get_Thrust())
 		{
 			pFinalBoss->Set_Thrust(false);
+
+			//효선아 Thrust
+			ThrustCharge(pFinalBoss);
+
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
 		}
 		else if (true == pFinalBoss->Get_Spike())
@@ -1176,7 +1220,12 @@ void CFinalBoss_Thrust_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			if (rand() % 2 == 0)
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAIT, 50.f, false, true);
 			else
+			{
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
+
+				//효선아 Thrust
+				ThrustCharge(pFinalBoss);
+			}
 			break;
 		}
 	}
@@ -1253,6 +1302,9 @@ void CFinalBoss_Laser_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		{
 		case CFinalBoss::FINALBOSS_DIMENSIONLASEREADY:
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASERCHARGE, 50.f, false, true);
+
+			//효선아 여기야
+			LaserReady(pFinalBoss);
 			break;
 		case CFinalBoss::FINALBOSS_DIMENSIONLASERCHARGE:
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASERSTART, 50.f, false, true);
@@ -1322,13 +1374,28 @@ void CFinalBoss_Spike_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 
 				HRESULT hr;
 
+				_float3 vInitPos = _float3{};
+
 				CDimensionGate::DIMENSIONGATE_DESC DimensionGateDesc = {};
-				DimensionGateDesc.vPosition = vPos + (vLook * m_arrLook[m_iCnt] * 1.5f) + (vRight * m_arrRight[m_iCnt] * 1.5f);
+				vInitPos = DimensionGateDesc.vPosition = vPos + (vLook * m_arrLook[m_iCnt] * 1.5f) + (vRight * m_arrRight[m_iCnt] * 1.5f);
 				DimensionGateDesc.fScale = 0.05f;
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gate"), TEXT("Prototype_GameObject_DimensionGate"), &DimensionGateDesc);
 				CHECK_FAILED(hr);
 
 				++m_iCnt;
+
+				//효선아 여기야
+
+				CMultiEffect::MULTI_FX_DESC FXDesc{};
+				vInitPos.y -= 1.f;
+				FXDesc.vInitPos = vInitPos;
+				FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+				FXDesc.vInitRot = { 180.f, 0.f, 0.f };
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"),
+					TEXT("Prototype_GameObject_HS_FB downward light"), &FXDesc);
+				CHECK_FAILED(hr);
+				
+
 			}
 		}
 
@@ -1865,7 +1932,7 @@ void CFinalBoss_LastDamage_State::OnStateUpdate(CGameObject* pGameObject, _float
 			break;
 		case CFinalBoss::FINALBOSS_DEMODISAPPEARCUT2:
 			CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
-			pKirby->Get_KirbyInfo()->m_bFinalBossDead = true;
+			//pKirby->Get_KirbyInfo()->m_bFinalBossDead = true;
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMODISAPPEARCUT3, 50.f, false, true);
 			break;
 		}

@@ -37,7 +37,7 @@ HRESULT CStarBlock::Initialize(void* pArg)
 		Add_Components(desc->wstrModelName);
 
 	m_eAbilityType = ABILITY_DEFAULT;
-	m_bMotionBlur = true;
+	m_bMotionBlur = false;
 	m_bRimLight = true;
 	m_bStencil = true;
 
@@ -63,7 +63,8 @@ _int CStarBlock::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	Compute_MotionBlur();
+	if(true == m_bMotionBlur)
+		Compute_MotionBlur();
 
 	if (m_ePhyXState == PO_VACUUMING && m_bStaticOffTrigger == true)
 	{
@@ -71,9 +72,20 @@ _int CStarBlock::Tick(_float fTimeDelta)
 		m_bStaticOffTrigger = false;
 	}
 
+	return OBJ_NOEVENT;
+}
+
+void CStarBlock::Late_Tick(_float fTimeDelta)
+{
+	__super::Late_Tick(fTimeDelta);
+
+	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
+	if (m_ePhyXState == PO_KIRBYMOUTH)
+		return;
 	// 날아가는 도중이다.  1초에 360도 회전하며, 30의 거리로 날아간다.
 	if (m_ePhyXState == PO_FLYAWAY)
 	{
+		m_bMotionBlur = true;
 		_float3 vDamegeDir = m_vDamegeDir;
 		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + vDamegeDir * m_fTimeDelta * 30.f);
@@ -90,17 +102,6 @@ _int CStarBlock::Tick(_float fTimeDelta)
 	{
 		m_bDead = true;
 	}
-
-	return OBJ_NOEVENT;
-}
-
-void CStarBlock::Late_Tick(_float fTimeDelta)
-{
-	__super::Late_Tick(fTimeDelta);
-
-	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
-	if (m_ePhyXState == PO_KIRBYMOUTH)
-		return;
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
@@ -238,7 +239,7 @@ HRESULT CStarBlock::Add_Components(wstring& wstrModelName)
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = OBJECT;
+	HitBox.pCollisionType = BOXOBJECT;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 

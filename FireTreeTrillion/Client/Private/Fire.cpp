@@ -46,6 +46,8 @@ HRESULT CFire::Initialize(void* pArg)
 	m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), 1.f, CUtils::Make_RandomFloat(0.f, 360.f));
 
 
+	m_fTimeRatio = desc.fTimeRatio;
+
 	return S_OK;
 }
 
@@ -54,7 +56,7 @@ _int CFire::Tick(_float fTimeDelta)
 	if (m_bDead)
 		return OBJ_DEAD;
 
-	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer() * m_fTimeRatio;
 
 	m_fSpeed += m_fTimeDelta * 0.5f;
 

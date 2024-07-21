@@ -182,6 +182,16 @@ void CBox::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObj
 		m_pModelCom->Set_Animation(0, 50.f, false, false);
 		m_bPlayAnim = true;
 	}
+	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
+	{
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+		if (pCamera != nullptr)
+			pCamera->Make_Shake(0.5f);
+
+		m_pGameInstance->DisableActor(m_pDynamicActor);
+		m_pModelCom->Set_Animation(0, 50.f, false, false);
+		m_bPlayAnim = true;
+	}
 }
 
 void CBox::Break_From_Car()
@@ -213,7 +223,7 @@ HRESULT CBox::Add_Components(wstring& wstrModelName)
 	CHitBox::HITBOX_DESC HitBox{};
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = OBJECT;
+	HitBox.pCollisionType = BOXOBJECT;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 
@@ -229,7 +239,7 @@ HRESULT CBox::Add_Components(wstring& wstrModelName)
 		CHECK_FAILED(hr);
 	}
 	
-	Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 1.f);
+	Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 1.6f);
 
 	return S_OK;
 }

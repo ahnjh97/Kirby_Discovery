@@ -209,7 +209,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
 		FXDesc.vInitPos = vPos;
-		Add_Effect("HS_FB rock slash", FXDesc);
+		Add_Effect("HS_FB rock slash", FXDesc, false);
 
 		++m_iGullyCnt;
 		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
@@ -217,7 +217,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
 
 		FXDesc.vInitPos = vPos;
-		Add_Effect("HS_FB rock slash", FXDesc);
+		Add_Effect("HS_FB rock slash", FXDesc, false);
 
 		++m_iGullyCnt;
 		if (m_vecGully.size() <= m_iGullyCnt)
@@ -676,17 +676,17 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
 
-		CEffect::FX_DESC FXDesc{};
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
-		Add_Effect("HS_FB slash R", FXDesc);
+		Add_Effect("HS_FB Slash R Multi", FXDesc, false);
 
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
 		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
-		Add_Effect("HS_FinalBossSlash particle L", FXDesc);
+		Add_Effect("HS_FinalBossSlash particle L", FXDesc, false);
 
 	}
 	break;
@@ -697,17 +697,17 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
 
-		CEffect::FX_DESC FXDesc{};
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
-		Add_Effect("HS_FB slash L", FXDesc);
+		Add_Effect("HS_FB Slash L Multi", FXDesc, false);
 
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
 		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
-		Add_Effect("HS_FinalBossSlash particle R", FXDesc);
+		Add_Effect("HS_FinalBossSlash particle R", FXDesc, false);
 	}
 	break;
 	case FINALBOSS_SWINGFINISHLEFT:
@@ -717,17 +717,17 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
 
-		CEffect::FX_DESC FXDesc{};
+		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
-		Add_Effect("HS_FB slash L", FXDesc, true);
+		Add_Effect("HS_FB Slash L Multi", FXDesc, true);
 
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
 		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
-		Add_Effect("HS_FinalBossSlash particle R", FXDesc);
+		Add_Effect("HS_FinalBossSlash particle R", FXDesc, false);
 	}
 	break;
 	default:

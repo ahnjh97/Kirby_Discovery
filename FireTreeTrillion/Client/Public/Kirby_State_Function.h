@@ -1199,15 +1199,18 @@ static void BombSmoke(CTransform* pTransformCom, _float3 vPos, _float3 vScale)
 		return;
 }
 
-static void ComeOn_Dash(CTransform* pTransformCom)
+static void ComeOn_Dash(CKirby* pKirby)
 {
 
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
-	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+	FXDesc.pSocketMatrix = pKirby->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
 	FXDesc.vInitPos = { 0.f, 1.4f, 0.3f };
 	FXDesc.vInitScale = { 8.f, 8.f, 8.f };
-	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Real Dash"), &FXDesc)))
-		return;
+
+	pKirby->Add_Effect("YW Real Dash", FXDesc, true);
+
+	//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Real Dash"), &FXDesc)))
+	//	return;
 }
 
 static void ComeOn_Dash_For_Dump(CTransform* pTransformCom)
@@ -1249,16 +1252,18 @@ static void Copy_Star(CTransform* pTransformCom)
 
 	_float3 vCamDir = CGameInstance::Get_Instance()->Get_CamLook();
 	FXDesc.vInitPos =  (_float3)pTransformCom->Get_State(CTransform::STATE_POSITION) + vCamDir + _float3{0.f, 1.f, 0.f} ;
+	FXDesc.vInitScale = { 2.5f, 2.5f, 2.5f };
 	FXDesc.vInitRot = CUtils::Make_Degree_FromDir(vCamDir);
 
+	FXDesc.fStartDelay = 0.7f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_bloom"), &FXDesc)))
 		return;
 
-	FXDesc.fStartDelay = .15f;
+	FXDesc.fStartDelay = 0.775f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
 		return;
 
-	FXDesc.fStartDelay = .3f;
+	FXDesc.fStartDelay = 0.85f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
 		return;
 
@@ -1357,28 +1362,34 @@ static void SwordSpin(CTransform* pTransformCom)
 		return;
 }
 
-static void SwordDash(CTransform* pTransformCom)
+static void SwordDash(CKirby* pKirby)
 {
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
-	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+	FXDesc.pSocketMatrix = pKirby->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
 
 	FXDesc.vInitPos = _float3{ 0.3f, 0.3f, 4.f };
 	FXDesc.vInitScale = { 3.f, 3.f, 3.f };
 	FXDesc.fStartDelay = .1f;
-	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword Dash Test A"), &FXDesc)))
-		return;
+
+	pKirby->Add_Effect("Sword Dash Test A", FXDesc, true);
+	//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword Dash Test A"), &FXDesc)))
+	//	return;
 }
 
-static void BodySlide(CTransform* pTransformCom)
+static void BodySlide(CKirby* pKirby)
 {
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
-	FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+	FXDesc.pSocketMatrix = pKirby->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
 
 	FXDesc.vInitPos = _float3{ 0.1f, 0.f, 2.1f };
 	FXDesc.vInitScale = { 3.f, 3.f, 3.f };
 	FXDesc.fStartDelay = 0.f;
-	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword Dash Test A"), &FXDesc)))
-		return;
+
+	pKirby->Add_Effect("Sword Dash Test A", FXDesc, true);
+
+
+	//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Sword Dash Test A"), &FXDesc)))
+	//	return;
 }
 
 static void SwordSpinCharge(CTransform* pTransformCom, CKirby* pKirby)
@@ -1396,9 +1407,12 @@ static void SwordSpinCharge(CTransform* pTransformCom, CKirby* pKirby)
 	FXPDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 	FXPDesc.vInitPos = _float3{ 0.f, 0.f, 0.f };
 	FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
-	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW SwordParticle"), &FXPDesc)))
-		return;
-	pKirby->Add_Effect(static_cast<CEffect*>(CGameInstance::Get_Instance()->Get_List(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+	pKirby->Add_Effect("YW SwordParticle", FXPDesc, true);
+
+	//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW SwordParticle"), &FXPDesc)))
+	//	return;
+	//pKirby->Add_Effect(static_cast<CEffect*>(CGameInstance::Get_Instance()->Get_List(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
 	//FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 	//FXDesc.vInitPos = _float3{ 0.f, -.1f, 0.f };
@@ -1467,7 +1481,7 @@ static void SwordHit_Big(CTransform* pTransformCom)
 }
 
 
-static void Fire_Maker(_float3 vLocalPos, CTransform* pTransformCom, _float Scale, _float fUpRange, _float4 FColor, _float4 fLColor)
+static void Fire_Maker(_float3 vLocalPos, CTransform* pTransformCom, _float Scale, _float fUpRange, _float4 FColor, _float4 fLColor, _float fTimeRatio = 1.f)
 {
 	_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
 	_float4 vRight = pTransformCom->Get_State(CTransform::STATE_RIGHT);
@@ -1480,6 +1494,7 @@ static void Fire_Maker(_float3 vLocalPos, CTransform* pTransformCom, _float Scal
 	Firedesc.vFirstColor = { FColor };
 	Firedesc.vTargetColor = { fLColor };
 	Firedesc.fScale = { Scale };
+	Firedesc.fTimeRatio = { fTimeRatio };
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
 		return;
 }

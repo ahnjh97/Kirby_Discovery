@@ -57,7 +57,7 @@ _int CFinalBossSpear::Tick(_float fTimeDelta)
 	if (*m_pCurrentLevelID == LEVEL_TOOL_ANIM)
 		return OBJ_NOEVENT;
 
-	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
+	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 	if (CFinalBoss::FINALBOSS_RAYARROWSTART == pFinalBoss->Get_State() || CFinalBoss::FINALBOSS_RAYARROWSTARTAIR == pFinalBoss->Get_State())
 	{
 		if (0.0f < pFinalBoss->Get_AnimRatio() && 0.25f > pFinalBoss->Get_AnimRatio())
@@ -158,6 +158,7 @@ _int CFinalBossSpear::Tick(_float fTimeDelta)
 			m_fSecondFireTime = 3.8f;
 		}
 	}
+	//spike ÁØºñ
 	else if (CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADY == pFinalBoss->Get_State())
 	{
 		if(0.65f < pFinalBoss->Get_AnimRatio())
@@ -165,6 +166,7 @@ _int CFinalBossSpear::Tick(_float fTimeDelta)
 			if (false == m_bGate)
 			{
 				m_bGate = true;
+
 
 				CDimensionGate::DIMENSIONGATE_DESC DimensionGateDesc = {};
 				_vector vPos = XMLoadFloat4x4(&m_WorldMatrix).r[3];
@@ -199,7 +201,7 @@ HRESULT CFinalBossSpear::Render()
 {
 	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
 	{
-		CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Monster")));
+		CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 		if (CFinalBoss::FINALBOSS_RECOVERYSTART == pFinalBoss->Get_State() ||
 			CFinalBoss::FINALBOSS_RECOVERYWAIT == pFinalBoss->Get_State() ||
 			CFinalBoss::FINALBOSS_RECOVERYEND == pFinalBoss->Get_State())

@@ -9,10 +9,14 @@
 #include "Bone.h"
 #include "Camera_Main.h"
 #include "Ability.h"
+#include "SummonEffect.h"
+#include "Effect.h"
 #include "Kirby.h"
 #include "DimensionClaw.h"
 #include "CollisionCenter.h"
 #include "SimbaLaser.h"
+#include "SimbaRock.h"
+#include "Debris.h"
 
 CSimba::CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -138,7 +142,7 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_pRightHandBone = m_pModelCom->Get_BonePtr("R_HaveL");
 	Safe_AddRef(m_pRightHandBone);
 
-	m_setAppear1Anims = { Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait, Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait, 
+	m_setAppear1Anims = { Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait, Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait,
 		Simba_DemoAppear1Cut4, Simba_DemoAppear1Cut4Wait };
 
 	m_setUndamagableAnims = { Simba_Death, Simba_DemoDeadCut1, Simba_DemoDeadCut2 };
@@ -146,6 +150,24 @@ HRESULT CSimba::Initialize(void* pArg)
 	SetCamSequence(CCamera_Main::SEQ_SIMBA_START);
 
 	CreateDimensionClawActor();
+
+	vector<_uint> vecTunnelRocks = { 2, 4, 5, 7, 8, 9, 10, 12, 13, 16 };
+	GAMEOBJECT_DESC tDesc{};
+
+	for (_uint i = 0; i < 4; i++) {
+		for (auto& rockIdx : vecTunnelRocks) {
+
+			tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(rockIdx);
+			m_vecSimbaRocks.emplace_back(dynamic_cast<CSimbaRock*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_SimbaRock"), &tDesc)));
+		}
+	}
+	for (_uint i = 0; i < 6; i++) {
+		for (auto& rockIdx : vecTunnelRocks) {
+
+			tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(rockIdx);
+			m_vecDebris.emplace_back(dynamic_cast<CDebris*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Debris"), &tDesc)));
+		}
+	}
 
 	return S_OK;
 }
@@ -167,6 +189,27 @@ _int CSimba::Tick(_float fTimeDelta)
 		Reset_HitBoxTimingMap(SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex()));
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
+	if (true == m_bSummon1)
+	{
+		m_fSummonTime += m_fTimeDelta;
+		if (1.2f < m_fSummonTime)
+		{
+			m_bSummon1 = false;
+			m_fSummonTime = 0;
+			SpawnMonsters(11);
+		}
+	}
+	else if (true == m_bSummon2)
+	{
+		m_fSummonTime += m_fTimeDelta;
+		if (1.2f < m_fSummonTime)
+		{
+			m_bSummon2 = false;
+			m_fSummonTime = 0;
+			SpawnMonsters(12);
+		}
+	}
 
 	__super::Tick(m_fTimeDelta);
 
@@ -1020,12 +1063,12 @@ void CSimba::OnAppearEnd(CGameObject* pObj)
 {
 	Change_State(Simba_DemoAppear1Cut9, 50.f, false, true);
 	TransformToDefault(0);
-	SpawnMonsters(11);
+	SpawnEffects(11);
 }
 
 void CSimba::OnWave1Dead(CGameObject* pObj)
 {
-	SpawnMonsters(12);
+	SpawnEffects(12);
 }
 
 void CSimba::OnWave2Dead(CGameObject* pObj)
@@ -1049,9 +1092,9 @@ void CSimba::SpawnMonsters(_uint iTriggerIndex)
 	else if(12 == iTriggerIndex)
 		wstrLayerTag += TEXT("2");
 
-	list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_SIMBA, wstrLayerTag);
-	if (nullptr != pObjList && false == pObjList->empty())
-		return;
+	//list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_SIMBA, wstrLayerTag);
+	//if (nullptr != pObjList && false == pObjList->empty())
+	//	return;
 		
 	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
 
@@ -1067,6 +1110,70 @@ void CSimba::SpawnMonsters(_uint iTriggerIndex)
 
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SIMBA, wstrLayerTag, wstrTag, &monsterDesc)))
 				return;
+
+			CEffect::FX_DESC FXDesc{};
+			_float3 vMonPos = _float3(monsterDesc.matWorld._41, monsterDesc.matWorld._42 + 1.5f, monsterDesc.matWorld._43);
+			_float3 vRight = _float3(monsterDesc.matWorld._11, monsterDesc.matWorld._12, monsterDesc.matWorld._13);
+			_float3 vUp = _float3(monsterDesc.matWorld._21, monsterDesc.matWorld._22, monsterDesc.matWorld._23);
+			_float3 vLook = _float3(monsterDesc.matWorld._31, monsterDesc.matWorld._32, monsterDesc.matWorld._33);
+			_float fAngle = { 0.f };
+			for (_uint i = 0; i < 3; ++i)
+			{
+				_float fDistance = CUtils::Make_RandomFloat(0.3f, 0.8f);
+				_float fRandAngle = CUtils::Make_RandomFloat(0.f, 90.f);
+				vRight.Normalize();
+				_float3 vRotateRight = CUtils::TurnDirectionVector(vRight, vLook, ((_float)i * 120.f) + fRandAngle);
+				FXDesc.vInitPos = vMonPos + fDistance * vRotateRight + vLook;
+				FXDesc.vInitRot = { fRandAngle, 0.f, fRandAngle };
+				FXDesc.vInitScale = { fDistance + 1.f, fDistance + 1.f, fDistance + 1.f };
+				//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+				Add_Effect("BbongJS", FXDesc, false);
+			}
+		}
+	}
+}
+
+void CSimba::SpawnEffects(_uint iTriggerIndex)
+{
+	wstring wstrLayerTag = TEXT("Layer_Effect");
+	if (11 == iTriggerIndex)
+	{
+		m_bSummon1 = true;
+		wstrLayerTag += TEXT("1");
+	}
+	else if (12 == iTriggerIndex)
+	{
+		m_bSummon2 = true;
+		wstrLayerTag += TEXT("2");
+	}
+
+	list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_SIMBA, wstrLayerTag);
+	if (nullptr != pObjList && false == pObjList->empty())
+		return;
+
+	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
+
+
+	HRESULT hr;
+
+	CSummonEffect::SUMMONEFFECT_DESC SummonEffectDesc = {};
+	for (auto& monsterDesc : m_vecMonsterDescs)
+	{
+		if (iTriggerIndex == monsterDesc.eMonState)
+		{
+			_float fScale = { 0.f };
+			wstring wstrTag;
+			if (TEXT("Awoofy") == monsterDesc.wstrModelName || TEXT("AwoofyWild") == monsterDesc.wstrModelName)
+				fScale = 4.f;
+			else if (TEXT("Rabbit") == monsterDesc.wstrModelName || TEXT("RabbitBig") == monsterDesc.wstrModelName)
+				fScale = 7.f;
+
+			SummonEffectDesc.vPosition = _float4(monsterDesc.matWorld._41, monsterDesc.matWorld._42 + 1.f, monsterDesc.matWorld._43, monsterDesc.matWorld._44);
+			SummonEffectDesc.fScale = fScale;
+			SummonEffectDesc.fAlpha = 0.9f;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), wstrLayerTag, TEXT("Prototype_GameObject_SummonEffect"), &SummonEffectDesc);
+			CHECK_FAILED(hr);
 		}
 	}
 }
@@ -1248,6 +1355,11 @@ void CSimba::Free()
 	CEventCenter::Get_Instance()->Unsubscribe(this);
 
 	__super::Free();
+
+	for (auto& simbaRock : m_vecSimbaRocks)
+		Safe_Release(simbaRock);
+	for (auto& debris : m_vecDebris)
+		Safe_Release(debris);
 
 	Safe_Release(m_pLipBone);
 	Safe_Release(m_pLaserBone);

@@ -25,7 +25,7 @@
 static const vector<char*> s_ModelPasses = { "0 | NORMAL_0", "1 | NORMAL_X", "2 | SHADOW", "3 | SKY", "4 | BLOOM", "5 | NONBLUR"
 	,"6 | TRIGGER", "7 | ALPHABLEND", "8 | DEFERREDINFO", "9 | NEARCLIP", "10 | KIRBYPART WHITEFX", "11 | MONSTERPART",
 	"12 | DEFAULTFX","13 | BLENDFX_LINEARDIFFUSE", "14 | BLENDFX_CLAMPDIFFUSE",	"15 | WHITEFX_LINEARDIFFUSE", "16 | WHITEFX_CLAMPDIFFUSE"
-	,"17 | MODEL_EMISSIVE_NORMAL_O", "18 | MODEL_EMISSIVE_NORMAL_X", "19 | MODEL_STAR",	"20 | MODEL_COIN"
+	,"17 |EMISSIVE_NORMAL_O", "18 | EMISSIVE_NORMAL_X", "19 | STAR", "20 | COIN" ,"21 | DISSOLVE", "22 | WHITEFX_LINEARDIFFUSE_LINEARMASK",	"23 | WHITEFX_CLAMPDIFFUSE_LINEARMASK"
 };
 
 static const vector<char*> s_PosTexPasses = { "0 | DEFAULT", "1 | SOLIDBLEND", "2 | BLENDFX", "3 | BLOOM", "4 | DEFAULTFX",
@@ -1882,28 +1882,55 @@ void CFXToolDirector::Render_FXProperty()
 	{
 		if (static_cast<CSingleEffect*>(pCurFX)->IsModelBuffer())
 		{
-			if (Combo(u8"렌더 패스", &m_iCurFXPassIdx, s_ModelPasses.data(), (_int)s_ModelPasses.size()))
+
+			if (BeginCombo(u8"렌더 패스", s_ModelPasses[m_iCurFXPassIdx], ImGuiComboFlags_PopupAlignLeft))
 			{
-				if (m_iCurFXPassIdx < 0)
-					m_iCurFXPassIdx = 0;
+				for (size_t i = 0; i < (_int)s_ModelPasses.size(); i++)
+				{
 
-				if (pCurFX->m_iMaxPassIdx < m_iCurFXPassIdx)
-					m_iCurFXPassIdx = pCurFX->m_iMaxPassIdx;
+					if (i == MODEL_ALPHABLEND || i == MODEL_DEFAULTFX || i == MODEL_BLENDFX_LINEARDIFFUSE || i == MODEL_BLENDFX_CLAMPDIFFUSE
+						|| i == MODEL_WHITEFX_LINEARDIFFUSE || i == MODEL_WHITEFX_CLAMPDIFFUSE || i == MODEL_WHITE_FX_LINEARDIFFUSE_LINEARMASK || i == MODEL_WHITE_FX_CLAMPDIFFUSE_LINEARMASK)
+					{
+						bool isSelected = (m_iCurFXPassIdx == i);
+						if (Selectable(s_ModelPasses[i], isSelected))
+						{
+							m_iCurFXPassIdx = i;
+							pCurFX->m_iPassIdx = m_iCurFXPassIdx;
+						}
 
-				pCurFX->m_iPassIdx = m_iCurFXPassIdx;
+						// 선택된 항목에 포커스 설정
+						if (isSelected)
+							SetItemDefaultFocus();
+					}
+
+				}
+				EndCombo();
 			}
 		}
 		else
 		{
-			if (Combo(u8"렌더 패스", &m_iCurFXPassIdx, s_PosTexPasses.data(), (_int)s_PosTexPasses.size()))
+			if (BeginCombo(u8"렌더 패스", s_PosTexPasses[m_iCurFXPassIdx], ImGuiComboFlags_PopupAlignLeft))
 			{
-				if (m_iCurFXPassIdx < 0)
-					m_iCurFXPassIdx = 0;
+				for (size_t i = 0; i < (_int)s_PosTexPasses.size(); i++)
+				{
 
-				if (pCurFX->m_iMaxPassIdx < m_iCurFXPassIdx)
-					m_iCurFXPassIdx = pCurFX->m_iMaxPassIdx;
+					if (i == POSTEX_DEFAULT || i == POSTEX_SOLIDBLEND || i == POSTEX_BLENDFX || i == POSTEX_DEFAULTFX
+						|| i == POSTEX_SOLIDBLEND_NOZTEST || i == POSTEX_WHITEFX || i == POSTEX_UI_MASK || i == POSTEX_UI_MASK2
+						|| i == POSTEX_ALPHABLEND_NOTEST || i == POSTEX_BLENDFX_SOFTEFFECT_X )
+					{
+						bool isSelected = (m_iCurFXPassIdx == i);
+						if (Selectable(s_PosTexPasses[i], isSelected))
+						{
+							m_iCurFXPassIdx = i;
+							pCurFX->m_iPassIdx = m_iCurFXPassIdx;
+						}
 
-				pCurFX->m_iPassIdx = m_iCurFXPassIdx;
+						// 선택된 항목에 포커스 설정
+						if (isSelected)
+							SetItemDefaultFocus();
+					}
+				}
+				EndCombo();
 			}
 		}
 	}
@@ -1920,9 +1947,6 @@ void CFXToolDirector::Render_FXProperty()
 			pCurFX->m_iPassIdx = m_iCurFXPassIdx;
 		}
 	}
-
-
-
 
 	if (InputInt(u8"디퓨즈 인덱스", &m_iCurFXTexIdx, 1, pCurFX->m_iMaxTexIdx))
 	{
@@ -2053,11 +2077,37 @@ void CFXToolDirector::Render_FXProperty()
 
 	SameLine();
 
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TURN];
+	if (Checkbox(u8"자전", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TURN] = bCommand;
+		bEdited = true;
+	}
+
+	SameLine();
+
 	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_CUSTOMORBITAXIS];
 	if (Checkbox(u8"회전축 고정", &bCommand))
 	{
 		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_CUSTOMORBITAXIS] = bCommand;
 		bEdited = true;
+	}
+
+	SameLine();
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TURNMOVEDIR];
+	if (Checkbox(u8"투영공간 이동 방향 회전", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TURNMOVEDIR] = bCommand;
+		bEdited = true;
+	}
+
+	if (IsItemHovered())
+	{
+		BeginTooltip();
+		Text(u8"이전 포지션과 현재 포지션의 투영공간 상의 각도가 계산되어 회전합니다. 길쭉한 파티클에 어울립니다.");
+		EndTooltip();
 	}
 
 	SeparatorText(u8"크기");
@@ -2923,13 +2973,10 @@ void CFXToolDirector::Render_MultiFXHierarchy()
 			}
 		}
 
-
 		EndPopup();
 	}
 
-
 	EndChild();
-
 
 	if (m_iSelectedMultiFXIdx != -1)
 	{
@@ -2994,6 +3041,7 @@ HRESULT CFXToolDirector::Ready_FXPrototypeVector()
 
 	Ready_Ingredient(strModelTag + L"SkySphere", &m_FXBufferList, pStaticProtoMap);
 	Ready_Ingredient(strModelTag + L"RayArrow", &m_FXBufferList, pStaticProtoMap);
+	Ready_Ingredient(strModelTag + L"Laser", &m_FXBufferList, pStaticProtoMap);
 
 	return S_OK;
 }
@@ -3130,6 +3178,11 @@ void CFXToolDirector::Free()
 		Safe_Release(pFX);
 
 	m_FXs.clear();
+
+	for (auto& pFX : m_Particles)
+		Safe_Release(pFX);
+
+	m_Particles.clear();
 
 	for (auto& pFX : m_MultiFXs)
 		Safe_Release(pFX);

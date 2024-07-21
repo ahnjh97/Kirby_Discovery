@@ -379,6 +379,7 @@
     <ClInclude Include="..\Public\RayArrow.h" />
     <ClInclude Include="..\Public\RigidObject.h" />
     <ClInclude Include="..\Public\Simba.h" />
+    <ClInclude Include="..\Public\SimbaRock.h" />
     <ClInclude Include="..\Public\SimbaRoomGlass.h" />
     <ClInclude Include="..\Public\Simba_State.h" />
     <ClInclude Include="..\Public\SingleEffect.h" />
@@ -390,6 +391,7 @@
     <ClInclude Include="..\Public\SpookStep_State.h" />
     <ClInclude Include="..\Public\StarBlock.h" />
     <ClInclude Include="..\Public\StarBlockPiece.h" />
+    <ClInclude Include="..\Public\SummonEffect.h" />
     <ClInclude Include="..\Public\SurprisedBoard.h" />
     <ClInclude Include="..\Public\SurprisedBoard_State.h" />
     <ClInclude Include="..\Public\TerrainFog.h" />
@@ -634,6 +636,7 @@
     <ClCompile Include="..\Private\RayArrow.cpp" />
     <ClCompile Include="..\Private\RigidObject.cpp" />
     <ClCompile Include="..\Private\Simba.cpp" />
+    <ClCompile Include="..\Private\SimbaRock.cpp" />
     <ClCompile Include="..\Private\SimbaRoomGlass.cpp" />
     <ClCompile Include="..\Private\Simba_State.cpp" />
     <ClCompile Include="..\Private\SingleEffect.cpp" />
@@ -645,6 +648,7 @@
     <ClCompile Include="..\Private\SpookStep_State.cpp" />
     <ClCompile Include="..\Private\StarBlock.cpp" />
     <ClCompile Include="..\Private\StarBlockPiece.cpp" />
+    <ClCompile Include="..\Private\SummonEffect.cpp" />
     <ClCompile Include="..\Private\SurprisedBoard.cpp" />
     <ClCompile Include="..\Private\SurprisedBoard_State.cpp" />
     <ClCompile Include="..\Private\TerrainFog.cpp" />

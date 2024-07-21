@@ -311,7 +311,7 @@ void CSpookStep::SpawnEffect(CEffect::FX_DESC FXDesc, _fvector vRight, _fvector 
 	//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
 	//Add_Effect("SpawnBbong1", FXDesc);
-	Add_Effect(strName, FXDesc);
+	Add_Effect(strName, FXDesc, false);
 }
 
 CSpookStep* CSpookStep::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

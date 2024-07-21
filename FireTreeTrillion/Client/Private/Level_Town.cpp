@@ -53,7 +53,8 @@ HRESULT CLevel_Town::Initialize()
 	
 	hr = Ready_Dees();
 	CHECK_FAILED(hr);
-	
+	hr = Ready_Monsters();
+	CHECK_FAILED(hr);
 	hr = Ready_Items();
 	CHECK_FAILED(hr);
 	hr = Ready_Objects();
@@ -635,6 +636,7 @@ HRESULT CLevel_Town::Ready_Monsters()
 
 	//일단 마을에는 몬스터가 없어요
 	//하지만 넣어 봤어요
+	// 제가 진짜 넣어 드렸습니다! -괴도루팡-
 	string strFileName = "../../../objects_txt/Town_Monsters.txt";
 
 	ifstream fileInput(strFileName, ios::binary);

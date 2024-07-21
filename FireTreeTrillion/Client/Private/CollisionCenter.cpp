@@ -220,9 +220,41 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 		}
 		else if (pSrcDesc->eHitbox == COLLIDER_TUBE)
 		{
+			_float4 vDstPos = pDstTransform->Get_State(CTransform::STATE_POSITION);
+			_float4 vSrcPos = pSrcTransform->Get_State(CTransform::STATE_POSITION);
 
+			// 실린더 형태의 X,Z
+			_float2 vDstXZ = { vDstPos.x, vDstPos.z };
+			// 튜브 형태의 X,Z
+			_float2 vSrcXZ = { vSrcPos.x, vSrcPos.z };
+
+			// 위로 보았을 때, 서로의 거리를 구한다.
+			_float vXZDistance = (vDstXZ - vSrcXZ).Length();
+
+			// 각자의 최대 Radius 값을 합산했는데, 실제 거리가 클 경우 false (충돌 안 함)
+			if (vXZDistance > pSrcDesc->fMaxRadius + pDstDesc->fRadius)
+				return false;
+
+			// 둘의 범위가 튜브의 최소 범위에 최소 범위를 뺐는데도 불구하고 작을 경우에도 충돌이 아니다.
+			// 안쪽에 있는 것이다.
+			if (vXZDistance < pSrcDesc->fMinRadius - pDstDesc->fRadius)
+				return false;
+
+			// 이건 원기둥의 높이
+			_float vDstMaxY = vDstPos.y + (pDstDesc->fHeight * 0.5f);
+			_float vDstMinY = vDstPos.y - (pDstDesc->fHeight * 0.5f);
+
+			// 이건 튜브의 높이
+			_float vSrcMaxY = vSrcPos.y + (pSrcDesc->fHeight * 0.5f);
+			_float vSrcMinY = vSrcPos.y - (pSrcDesc->fHeight * 0.5f);
+
+			// 높이가 서로 겹쳤는가?
+			if (vDstMinY <= vSrcMaxY && vDstMaxY >= vSrcMinY) {
+				return true;
+			}
+
+			return false;
 		}
-
 	}
 	else if (pDstDesc->eHitbox == COLLIDER_SPHERE)
 	{
@@ -302,7 +334,40 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 		}
 		else if (pSrcDesc->eHitbox == COLLIDER_TUBE)
 		{
+			_float4 vDstPos = pDstTransform->Get_State(CTransform::STATE_POSITION);
+			_float4 vSrcPos = pSrcTransform->Get_State(CTransform::STATE_POSITION);
 
+			// 실린더 형태의 X,Z
+			_float2 vDstXZ = { vDstPos.x, vDstPos.z };
+			// 튜브 형태의 X,Z
+			_float2 vSrcXZ = { vSrcPos.x, vSrcPos.z };
+
+			// 위로 보았을 때, 서로의 거리를 구한다.
+			_float vXZDistance = (vDstXZ - vSrcXZ).Length();
+
+			// 각자의 최대 Radius 값을 합산했는데, 실제 거리가 클 경우 false (충돌 안 함)
+			if (vXZDistance > pSrcDesc->fMaxRadius + pDstDesc->fRadius)
+				return false;
+
+			// 둘의 범위가 튜브의 최소 범위에 최소 범위를 뺐는데도 불구하고 작을 경우에도 충돌이 아니다.
+			// 안쪽에 있는 것이다.
+			if (vXZDistance < pSrcDesc->fMinRadius - pDstDesc->fRadius)
+				return false;
+
+			// 이건 원기둥의 높이
+			_float vDstMaxY = vDstPos.y + (pDstDesc->fHeight * 0.5f);
+			_float vDstMinY = vDstPos.y - (pDstDesc->fHeight * 0.5f);
+
+			// 이건 튜브의 높이
+			_float vSrcMaxY = vSrcPos.y + (pSrcDesc->fHeight * 0.5f);
+			_float vSrcMinY = vSrcPos.y - (pSrcDesc->fHeight * 0.5f);
+
+			// 높이가 서로 겹쳤는가?
+			if (vDstMinY <= vSrcMaxY && vDstMaxY >= vSrcMinY) {
+				return true;
+			}
+
+			return false;
 		}
 	}
 	else if (pDstDesc->eHitbox == COLLIDER_FRUSTUM)
@@ -383,11 +448,77 @@ _bool CCollisionCenter::Intersect(CHitBox* Dst, CHitBox* Src)
 	{
 		if (pSrcDesc->eHitbox == COLLIDER_CYLINDER)
 		{
+			_float4 vDstPos = pDstTransform->Get_State(CTransform::STATE_POSITION);
+			_float4 vSrcPos = pSrcTransform->Get_State(CTransform::STATE_POSITION);
 
+			// 튜브 형태의 X,Z
+			_float2 vDstXZ = { vDstPos.x, vDstPos.z };
+			// 실린더 형태의 X,Z
+			_float2 vSrcXZ = { vSrcPos.x, vSrcPos.z };
+
+			// 위로 보았을 때, 서로의 거리를 구한다.
+			_float vXZDistance = (vDstXZ - vSrcXZ).Length();
+
+			// 각자의 최대 Radius 값을 합산했는데, 실제 거리가 클 경우 false (충돌 안 함)
+			if (vXZDistance > pDstDesc->fMaxRadius + pSrcDesc->fRadius)
+				return false;
+
+			// 둘의 범위가 튜브의 최소 범위에 최소 범위를 뺐는데도 불구하고 작을 경우에도 충돌이 아니다.
+			// 안쪽에 있는 것이다.
+			if (vXZDistance < pDstDesc->fMinRadius - pSrcDesc->fRadius)
+				return false;
+
+			// 이건 튜브의 높이
+			_float vDstMaxY = vDstPos.y + (pDstDesc->fHeight * 0.5f);
+			_float vDstMinY = vDstPos.y - (pDstDesc->fHeight * 0.5f);
+
+			// 이건 원기둥의 높이
+			_float vSrcMaxY = vSrcPos.y + (pSrcDesc->fHeight * 0.5f);
+			_float vSrcMinY = vSrcPos.y - (pSrcDesc->fHeight * 0.5f);
+
+			// 높이가 서로 겹쳤는가?
+			if (vDstMinY <= vSrcMaxY && vDstMaxY >= vSrcMinY) {
+				return true;
+			}
+			
+			return false;
 		}
 		else if (pSrcDesc->eHitbox == COLLIDER_SPHERE)
 		{
+			_float4 vDstPos = pDstTransform->Get_State(CTransform::STATE_POSITION);
+			_float4 vSrcPos = pSrcTransform->Get_State(CTransform::STATE_POSITION);
 
+			// 튜브 형태의 X,Z
+			_float2 vDstXZ = { vDstPos.x, vDstPos.z };
+			// 실린더 형태의 X,Z
+			_float2 vSrcXZ = { vSrcPos.x, vSrcPos.z };
+
+			// 위로 보았을 때, 서로의 거리를 구한다.
+			_float vXZDistance = (vDstXZ - vSrcXZ).Length();
+
+			// 각자의 최대 Radius 값을 합산했는데, 실제 거리가 클 경우 false (충돌 안 함)
+			if (vXZDistance > pDstDesc->fMaxRadius + pSrcDesc->fRadius)
+				return false;
+
+			// 둘의 범위가 튜브의 최소 범위에 최소 범위를 뺐는데도 불구하고 작을 경우에도 충돌이 아니다.
+			// 안쪽에 있는 것이다.
+			if (vXZDistance < pDstDesc->fMinRadius - pSrcDesc->fRadius)
+				return false;
+
+			// 이건 튜브의 높이
+			_float vDstMaxY = vDstPos.y + (pDstDesc->fHeight * 0.5f);
+			_float vDstMinY = vDstPos.y - (pDstDesc->fHeight * 0.5f);
+
+			// 이건 원기둥의 높이
+			_float vSrcMaxY = vSrcPos.y + (pSrcDesc->fHeight * 0.5f);
+			_float vSrcMinY = vSrcPos.y - (pSrcDesc->fHeight * 0.5f);
+
+			// 높이가 서로 겹쳤는가?
+			if (vDstMinY <= vSrcMaxY && vDstMaxY >= vSrcMinY) {
+				return true;
+			}
+
+			return false;
 		}
 		else if (pSrcDesc->eHitbox == COLLIDER_FRUSTUM)
 		{
@@ -869,8 +1000,6 @@ void CCollisionCenter::RealFinaleStage_Battle()
 			pBreakable->Collision(CONTENT_BODY, pKirby);
 
 		});
-
-
 }
 
 void CCollisionCenter::Body_To_Body_Collision()
@@ -969,7 +1098,7 @@ void CCollisionCenter::Body_To_Body_Collision()
 			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
 				return;
 
-			CPhysXObject* pDstObject = static_cast<CMonster*>(Dst);
+			CPhysXObject* pDstObject = static_cast<CPhysXObject*>(Dst);
 			CMonster* pSrcMonster = static_cast<CMonster*>(Src);
 
 			// 반드시, 오브젝트가 날아가는 상황이여야 한다.
@@ -988,6 +1117,115 @@ void CCollisionCenter::Body_To_Body_Collision()
 				DstHit->Set_Alive(false);
 				SrcHit->Set_Alive(false);
 			}
+		});
+
+	// 깔끔하게 완료되었음 : 박스 오브젝트 X 몬스터 (커비가 날릴때의 충돌)
+	Collision_Collider(m_GameObjects[BOXOBJECT], m_GameObjects[MONSTER], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pDstObject = static_cast<CPhysXObject*>(Dst);
+			CMonster* pSrcMonster = static_cast<CMonster*>(Src);
+
+			// 둘중 하나가 날아가는 상태
+			if (pDstObject->Get_PhyXState() == PO_FLYAWAY || pSrcMonster->Get_PhyXState() == PO_FLYAWAY)
+			{
+				// 세부적인건 해당 CONTENT에서 한다.
+				pDstObject->Collision(CONTENT_VACUUMOBJECT, pSrcMonster);
+				pSrcMonster->Collision(CONTENT_VACUUMOBJECT, pDstObject);
+
+				// 각자의 상태를 PO_FLYDEADAWAY 로 바꿔줌과 동시에 죽는 방향과 힘을 정해준다.
+				pthis->Fly_DeadAway(pDstObject, pSrcMonster);
+				// 카메라 쉐이킹을 해준다.
+				pthis->Camera_Shaking(1.2f);
+
+				// 0.1초의 콜라이더 딜레이를 넣어준다.
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+			}
+		});
+
+	// 깔끔하게 완료되었음 : 오브젝트 오브젝트
+	Collision_Collider(m_GameObjects[BOXOBJECT], m_GameObjects[BOXOBJECT], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pDst = static_cast<CPhysXObject*>(Dst);
+			CPhysXObject* pSrc = static_cast<CPhysXObject*>(Src);
+
+			if (pDst->Get_PhyXState() == PO_FLYAWAY ||
+				pSrc->Get_PhyXState() == PO_FLYAWAY)
+			{
+				pDst->Collision(CONTENT_VACUUMOBJECT, pSrc);
+				pSrc->Collision(CONTENT_VACUUMOBJECT, pDst);
+				// 각자의 상태를 PO_FLYDEADAWAY 로 바꿔줌과 동시에 죽는 방향과 힘을 정해준다.
+				pthis->Fly_DeadAway(pDst, pSrc);
+				// 카메라 쉐이킹을 해준다.
+				pthis->Camera_Shaking(1.2f);
+
+				// 0.1초의 콜라이더 딜레이를 넣어준다.
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+			}
+		});
+
+	// 깔끔하게 완료되었음 : 오브젝트 오브젝트
+	Collision_Collider(m_GameObjects[BOXOBJECT], m_GameObjects[OBJECT], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pDst = static_cast<CPhysXObject*>(Dst);
+			CPhysXObject* pSrc = static_cast<CPhysXObject*>(Src);
+
+			if (pSrc->Get_CollisionType() == 99)
+				return;
+
+			if (pDst->Get_PhyXState() == PO_FLYAWAY ||
+				pSrc->Get_PhyXState() == PO_FLYAWAY)
+			{
+				pDst->Collision(CONTENT_VACUUMOBJECT, pSrc);
+
+				// 각자의 상태를 PO_FLYDEADAWAY 로 바꿔줌과 동시에 죽는 방향과 힘을 정해준다.
+				pthis->Fly_DeadAway(pDst, pSrc);
+				// 카메라 쉐이킹을 해준다.
+				pthis->Camera_Shaking(1.2f);
+
+				// 0.1초의 콜라이더 딜레이를 넣어준다.
+				DstHit->Set_Alive(false);
+				SrcHit->Set_Alive(false);
+			}
+		});
+
+	// 깔끔하게 완료되었음 : 오브젝트 오브젝트
+	Collision_Collider(m_GameObjects[BOXOBJECT], m_GameObjects[PLAYER], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pObject = static_cast<CPhysXObject*>(Dst);
+			CKirby* pKirby = static_cast<CKirby*>(Src);
+
+			// 돌덩이에게 물리적인 힘을 주는 것이 구현되어있을 것이다.
+			// 또는 내가 흡수했을때도 먹는 로직이 되어있을듯 함.
+			pObject->Collision(CONTENT_KICK, pKirby);
+			pKirby->Collision(CONTENT_KICK, pObject);
+			// 0.1초의 충돌 딜레이를 주기위함.
+			SrcHit->Set_Alive(false);
 		});
 
 	// 깔끔하게 완료되었음 : 플레이어 X 아이템
@@ -1094,7 +1332,7 @@ void CCollisionCenter::Body_To_Body_Collision()
 
 		});
 
-	// 깔끔하게 완료되었음 : 플레이어 X 오브젝트류 (발로 차기 및 흡수 로직)
+	// 깔끔하게 완료되었음 : 오브젝트 오브젝트
 	Collision_Collider(m_GameObjects[OBJECT], m_GameObjects[OBJECT], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -1209,6 +1447,26 @@ void CCollisionCenter::Hitbox_Collision()
 		});
 
 	// 완료.
+	Collision_Collider(m_GameObjects[HITBOX_PLYAER], m_GameObjects[BOXOBJECT], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CPhysXObject* pObject = static_cast<CPhysXObject*>(Src);
+
+			pthis->Effect(pKirby, pObject);
+
+			// 몬스터의 CONTENT_ATTACK타입의 Collision함수를 발동시킨다. 정말 세부적인건 이쪽에서 처리된다.
+			pObject->Collision(CONTENT_ATTACK, pKirby);
+			DstHit->Set_Alive(false);
+		});
+
+
+	// 완료.
 	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[OBJECT], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -1281,6 +1539,24 @@ void CCollisionCenter::Hitbox_Collision()
 		});
 
 	// 완료.
+	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[MONSTERBULLET], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			if (static_cast<CPhysXObject*>(Src)->Get_AbilityType() != ABILITY_BOMB)
+				return;
+
+			pthis->Camera_Shaking(1.2f);
+			Dst->Set_Dead();
+			Src->Set_Dead();
+		});
+
+
+	// 완료.
 	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[MONSTER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -1338,16 +1614,19 @@ void CCollisionCenter::Hitbox_Collision()
 
 			if (pMonsterBullet->Get_PhyXState() == PO_NORMAL)
 			{
-				// 불릿이 PO_NORMAL (평범한 상태) 였을땐, 커비가 넉백되며 다친다. 또한, 폭탄은 터진다.
-				pthis->Player_Monster_Knock_back(pKirby, pMonsterBullet);
-				_float fAttack = pMonsterBullet->Get_Attack();
-				pKirby->Minus_Hp(fAttack);
+				if (pKirby->isOverPower() == false)
+				{
+					// 불릿이 PO_NORMAL (평범한 상태) 였을땐, 커비가 넉백되며 다친다. 또한, 폭탄은 터진다.
+					pthis->Player_Monster_Knock_back(pKirby, pMonsterBullet);
+					_float fAttack = pMonsterBullet->Get_Attack();
+					pKirby->Minus_Hp(fAttack);
 
-				if (pMonsterBullet->Get_NonDead() == false)
-					Dst->Set_Dead();
+					if (pMonsterBullet->Get_NonDead() == false)
+						Dst->Set_Dead();
 
-				DstHit->Set_Alive(false);
-				SrcHit->Set_Alive(false);
+					DstHit->Set_Alive(false);
+					SrcHit->Set_Alive(false);
+				}
 			}
 
 			// 커비의 충돌로직은 항상 발동한다. 만약, 폭탄이 PO_VACUUM일땐 서로 충돌은 나지만, 먹을 수 있는 상황이라면
@@ -1412,7 +1691,7 @@ void CCollisionCenter::Hitbox_Collision()
 				return;
 
 			CPhysXObject* pPlayer = static_cast<CPhysXObject*>(Dst);
-			CPhysXObject* pMonster = static_cast<CDeeDeeDee*>(Src);
+			CPhysXObject* pMonster = static_cast<CPhysXObject*>(Src);
 
 			//if (pNpc->Get_PhyXState() != PO_NORMAL)
 			//	return;

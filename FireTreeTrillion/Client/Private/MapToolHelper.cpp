@@ -153,7 +153,9 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setRallyingMonsters = { "NonAnim_Kabu", "NonAnim_BrontoBurt", "NonAnim_FinalBoss" };
 
 	// 트리거로 작동하는 애님 데코
-	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower", "SmallBirds" };
+	m_setAnimDecos = { "BushL", "BushM", "BushS", "PopFlower", "SmallBirds"
+		, "ButterflySingle", "ButterflyTriple", "Lizard", "LizardWall", "SeaBird"
+	};
 
 	//아래는 피직스 처리가 필요한 오브젝트들. (지형 충돌 필요)
 	m_setActorDecos = {  "CMBillBoardC", "CmBuilding1stRoof", "CMBuildingParts", "CMGuardrailAL", "CMGuardrailBL"
@@ -203,7 +205,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "TwArena", "TwArenaA", "TwArenaB", "TwArenaClerk", "TwDeliveryService", "TwFoodStore", "TwFoodStoreChair", "TwFoodStoreTable"
 		, "TwKirbyHouse", "TwPharmacy", "TwPlanterA", "TwPlanterB", "TwRollingBallBooth", "TwSideHouseA", "TwSideHouseC", "TwSideHouseD"
 		, "TwSignboardStreetLive", "TwSlope", "TwBenchA", "TwBenchB", "TwBenchC", "TwBenchD", "TwFishingPartsA", "TwFishingPartsB", "TwFishingPartsC"
-		,"TwCentralSquare","TwStreetLiveSetC", "TwSideBridge", "TwConstructionAreaStepway", "TwConstructionAreaPond"
+		,"TwCentralSquare","TwStreetLiveSetC", "TwSideBridge", "TwConstructionAreaStepway", "TwConstructionAreaPond", "TwLookOutTower", "TwStreetLiveSetA"
 #pragma endregion
 
 #pragma region SIMBA OBJECTS
