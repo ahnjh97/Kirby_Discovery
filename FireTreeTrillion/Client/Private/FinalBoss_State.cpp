@@ -1927,15 +1927,15 @@ void CFinalBoss_LastDamage_State::OnStateUpdate(CGameObject* pGameObject, _float
 		switch (pFinalBoss->Get_State())
 		{
 		case CFinalBoss::FINALBOSS_LASTDAMAGESTART:
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_LASTDAMAGEWAIT, 50.f, false, true);
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_LASTDAMAGEWAIT, 50.f, false, false);
 			break;
 		case CFinalBoss::FINALBOSS_LASTDAMAGEWAIT:
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMODISAPPEARCUT2, 50.f, false, true);
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMODISAPPEARCUT2, 50.f, false, false);
 			break;
 		case CFinalBoss::FINALBOSS_DEMODISAPPEARCUT2:
 			CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
-			//pKirby->Get_KirbyInfo()->m_bFinalBossDead = true;
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMODISAPPEARCUT3, 50.f, false, true);
+			pKirby->Get_KirbyInfo()->m_bFinalBossDead = true;
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMODISAPPEARCUT3, 50.f, false, false);
 			break;
 		}
 	}

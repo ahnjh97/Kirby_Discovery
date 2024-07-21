@@ -625,7 +625,7 @@ void CVIBuffer_Instance::Gravity(_float fTimeDelta, VTXMATRIX* pVertices)
 		m_fGravity[i] += GRAVITY * .14f * m_InstanceDesc.vInitScale.y * fTimeDelta;
 		if (m_fGravity[i] > 13.f)
 			m_fGravity[i] = 13.f;
-		vPos.y -= m_fGravity[i] * (60.f * fTimeDelta);
+		vPos.y -= m_fGravity[i];
 		pVertices[i].vPosition = vPos;
 
 		//m_pVelocities[i].y -= GRAVITY * 2.5f * m_InstanceDesc.vInitScale.y * fTimeDelta;

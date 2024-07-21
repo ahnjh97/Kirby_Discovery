@@ -718,6 +718,15 @@
     <Filter Include="02.GameObjects\Map\LightBugEffect">
       <UniqueIdentifier>{7630a4c0-5e08-41d0-bce2-e03c44b03906}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\FinalCutObject">
+      <UniqueIdentifier>{d15b8844-2cdf-4702-ab5d-73cb89f3c9a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\FinalCutObject\FinalStone">
+      <UniqueIdentifier>{62c0868b-5656-4824-9075-947eb5a75d0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\FinalCutObject\FinalDump">
+      <UniqueIdentifier>{e060bfbd-f0d5-40b4-b9bd-5dd24e26ac90}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1424,6 +1433,12 @@
     <ClInclude Include="..\Public\LightBugEffect.h">
       <Filter>02.GameObjects\Map\LightBugEffect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\FinalStone.h">
+      <Filter>02.GameObjects\Map\FinalCutObject\FinalStone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinalDump.h">
+      <Filter>02.GameObjects\Map\FinalCutObject\FinalDump</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -2110,6 +2125,12 @@
     <ClCompile Include="SimbaLaser.cpp" />
     <ClCompile Include="..\Private\LightBugEffect.cpp">
       <Filter>02.GameObjects\Map\LightBugEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinalStone.cpp">
+      <Filter>02.GameObjects\Map\FinalCutObject\FinalStone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinalDump.cpp">
+      <Filter>02.GameObjects\Map\FinalCutObject\FinalDump</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

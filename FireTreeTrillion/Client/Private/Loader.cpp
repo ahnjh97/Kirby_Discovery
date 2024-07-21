@@ -128,6 +128,8 @@
 #include "Bulb.h"
 #include "BlendMapObject.h"
 #include "PortalSoftEffect.h"
+#include "FinalStone.h"
+#include "FinalDump.h"
 
 // Racing Gimmick Objects
 #include "CarShopWall.h"
@@ -466,6 +468,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gully"), CGully);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleBoss"), CFinaleBoss);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalDump"), CFinalDump);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalStone"), CFinalStone);
 
 	// Finale
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Baum"), CBaum);
@@ -2102,9 +2107,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Kirby Armour
 		Load_KirbyArmourModels();
 
-		// Deform
-		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
-
 		// Monster
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.2f, 180.f);
@@ -2215,6 +2217,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		Load_ItemModels();
 		Load_KickableModels();
 
+		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);
+
 		// ¾×Ã¼±«¹° :: Fecto_Forgo
 		//m_vecModelInfo.emplace_back("", TYPE_ANIM, 1.f, 180.f);
 
@@ -2309,9 +2313,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		Load_KirbyWeaponModels();
 		// For Kirby Armour
 		Load_KirbyArmourModels();
-
-		// Deform
-		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
 
 		// For Boss 
 		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f);
@@ -2781,6 +2782,8 @@ void CLoader::Load_KirbyBodyModels()
 	// Deform
 	m_vecModelInfo.emplace_back("Bulb", TYPE_ANIM, 1.f, 180.f);
 	m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
+
 
 	// AbilityEffect
 	m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 0.2f, 0.f, 0);
