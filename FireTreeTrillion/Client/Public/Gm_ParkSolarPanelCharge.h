@@ -54,7 +54,6 @@ private:
 	CTexture*				m_pTextureCom = { nullptr };
 
 	PxRigidStatic*			m_pStaticActor = { nullptr };
-	CKirby*					m_pKirby = { nullptr };
 
 	PANELCHARGE_STATE		m_eCurState = { STATE_NONE };
 

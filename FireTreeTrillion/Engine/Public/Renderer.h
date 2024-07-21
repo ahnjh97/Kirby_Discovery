@@ -57,6 +57,39 @@ public:
 	HRESULT Initialize();
 	void Color_Initialize();
 
+	// fog를 바깥에서 조절할 수 있는 함수들
+	void Fog_Zero();
+	
+	// for LEVEL_INTRO
+	void Fog_Intialize_ForIntroLevel(_int iPoint);
+	void Increase_FogYValue(_float fTimeDelta)
+	{ 
+		m_fFogYIntensity += fTimeDelta;
+		if (m_fFogYIntensity >= 1.f)
+			m_fFogYIntensity = 1.f;
+	}
+
+	void Decrease_FogYValue(_float fTimeDelta) 
+	{ 
+		m_fFogYIntensity -= fTimeDelta; 
+		if (m_fFogYIntensity <= 0.f)
+			m_fFogYIntensity = 0.f;
+	}
+
+	void Increase_FogViewValue(_float fTimeDelta) 
+	{ 
+		m_fFogViewIntensity += fTimeDelta; 
+		if (m_fFogViewIntensity >= 1.f)
+			m_fFogViewIntensity = 1.f;
+	}
+
+	void Decrease_FogViewValue(_float fTimeDelta) 
+	{ 
+		m_fFogViewIntensity -= fTimeDelta;
+		if (m_fFogViewIntensity <= 0.f)
+			m_fFogViewIntensity = 0.f;
+	}
+
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
 	HRESULT Add_BlendModel(class CModel* pBlendModel);
 	HRESULT Render(_float fTimeDelta);

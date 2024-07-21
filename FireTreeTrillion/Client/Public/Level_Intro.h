@@ -17,6 +17,7 @@ public:
 
 	void	Ready_FadeIn();
 	void	Sound_Tick(_float fTimeDelta);
+	void	Fog_Tick(_float fTimeDelta);
 
 private:
 	HRESULT Ready_Lights();
@@ -33,13 +34,14 @@ private:
 
 	void	Change_Levels();
 	void	Manage_BGM();
+	void	Manage_Fog();
 	void	Check_KirbyPosState();
 
 	HRESULT Add_EnvMap();
 	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };
 	CTexture* m_pEnvTexture[TYPE_END] = { nullptr, nullptr, nullptr };
 
-	enum KIRBY_POS_STATE { BEACH, JUNGLE, NOBGM, BUILDING, STATE_END };
+	enum KIRBY_POS_STATE { BEACH, JUNGLE, NOBGM, BUILDING, UPSTAIRS_FOG, UPSTAIRS_NOFOG, STATE_END };
 	KIRBY_POS_STATE m_eKirbyPosState = STATE_END;
 	KIRBY_POS_STATE m_ePreKirbyPosState = STATE_END;
 

@@ -295,12 +295,12 @@ void CPartTimerKirby_Grab_State::OnStateUpdate(CGameObject* pGameObject, _float 
 
 						_float3 vAngle = { 0.f, fAngleDiff, 0.f };
 						FXDesc.vInitRot = vAngle;
-						pAlbaKirby->Add_Effect("FoodGame_IncorrectBbong", FXDesc);
+						pAlbaKirby->Add_Effect("FoodGame_IncorrectBbong", FXDesc, false);
 
 						vPos = pTransformFood->Get_State(CTransform::STATE_POSITION);
 						vPos += XMVector3Normalize(vLook) * 0.9f - pTransform->Get_State_Vector(CTransform::STATE_RIGHT) * 0.2f;
 						FXDesc.vInitPos = _float3(vPos.x, vPos.y + 0.3f, vPos.z);
-						pAlbaKirby->Add_Effect("FoodGame_IncorrectBbong", FXDesc);
+						pAlbaKirby->Add_Effect("FoodGame_IncorrectBbong", FXDesc, false);
 					}
 				}
 			}

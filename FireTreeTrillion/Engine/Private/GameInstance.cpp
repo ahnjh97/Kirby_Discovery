@@ -460,6 +460,42 @@ void CGameInstance::Set_Brown(_float fTime, _bool bOnOff)
 	m_pRenderer->Set_Brown(fTime, bOnOff);
 }
 
+void CGameInstance::Fog_Zero()
+{
+	CHECK_NULLPTR(m_pRenderer);
+	m_pRenderer->Fog_Zero();
+}
+
+void CGameInstance::Fog_Intialize_ForIntroLevel(_int iPoint)
+{
+	CHECK_NULLPTR(m_pRenderer);
+	m_pRenderer->Fog_Intialize_ForIntroLevel(iPoint);
+}
+
+void CGameInstance::Increase_FogYValue(_float fTimeDelta)
+{
+	CHECK_NULLPTR(m_pRenderer);
+	m_pRenderer->Increase_FogYValue(fTimeDelta);
+}
+
+void CGameInstance::Decrease_FogYValue(_float fTimeDelta)
+{
+	CHECK_NULLPTR(m_pRenderer);
+	m_pRenderer->Decrease_FogYValue(fTimeDelta);
+}
+
+void CGameInstance::Increase_FogViewValue(_float fTimeDelta)
+{
+	CHECK_NULLPTR(m_pRenderer);
+	m_pRenderer->Increase_FogViewValue(fTimeDelta);
+}
+
+void CGameInstance::Decrease_FogViewValue(_float fTimeDelta)
+{
+	CHECK_NULLPTR(m_pRenderer);
+	m_pRenderer->Decrease_FogViewValue(fTimeDelta);
+}
+
 #ifdef _DEBUG
 
 HRESULT CGameInstance::Add_DebugComponents(CComponent* pRenderComponent)

@@ -94,7 +94,7 @@ _int CKabu::Tick(_float fTimeDelta)
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-		Add_Effect("BBongBBongE", FXDesc);
+		Add_Effect("BBongBBongE", FXDesc, false);
 	}
 
 	m_bbongTime2 += m_fTimeDelta;
@@ -111,7 +111,7 @@ _int CKabu::Tick(_float fTimeDelta)
 		FXDesc.vInitScale = { CUtils::Make_RandomFloat(1.f, 1.5f), CUtils::Make_RandomFloat(1.f, 1.5f), CUtils::Make_RandomFloat(1.f, 1.5f) };
 		//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-		Add_Effect("BBongBBongE2", FXDesc);
+		Add_Effect("BBongBBongE2", FXDesc, false);
 	}
 
 	m_bbongTime3 += m_fTimeDelta;
@@ -128,7 +128,7 @@ _int CKabu::Tick(_float fTimeDelta)
 		FXDesc.vInitScale = { 2.5f, 2.5f, 2.5f };
 		//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-		Add_Effect("BBongBBongE", FXDesc);
+		Add_Effect("BBongBBongE", FXDesc, false);
 	}
 
 	// ¸¸¾à, ¹âÈ÷¸é ±× ¼ø°£ ±×³É Âð»§µÇ°í Á×´Â´Ù.

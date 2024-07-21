@@ -417,7 +417,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 			_float fScale = CUtils::Make_RandomFloat(1.5f, 3.f);
 			fxDesc.vInitScale = { fScale, fScale, fScale };
-			pKirby->Add_Effect("dump dash smoke", fxDesc);
+			pKirby->Add_Effect("dump dash smoke", fxDesc, false);
 			//pKirby->Add_Effect("real dump smoke test", fxDesc);
 			fxDesc.vInitPos = vCenterPos;
 			fxDesc.vInitPos -= (_float3)pTransformCom->Get_State(CTransform::STATE_RIGHT) * (2.3f + CUtils::Make_RandomFloat(-.2f, .2f));
@@ -425,7 +425,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 			fScale = CUtils::Make_RandomFloat(1.5f, 3.f);
 			fxDesc.vInitScale = { fScale, fScale, fScale };
-			pKirby->Add_Effect("dump dash smoke", fxDesc);
+			pKirby->Add_Effect("dump dash smoke", fxDesc, false);
 			//pKirby->Add_Effect("real dump smoke test", fxDesc);
 			fBoostTime = 0.f;
 		}
@@ -669,9 +669,12 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			CMultiEffect::MULTI_FX_DESC FXDesc{};
 			FXDesc.vInitPos = { 0.f, .6f, .4f };
 			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-			if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v3"), &FXDesc)))
-				return;
-			pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
+
+			pKirby->Add_Effect("Vacuum_v3", FXDesc, true);
+
+			//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v3"), &FXDesc)))
+			//	return;
+			//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake(0.3f, 100.f);
@@ -759,7 +762,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			MultiFXDesc.vInitPos = vMyPos;
 			MultiFXDesc.vInitScale = { 4.f, 4.f, 4.f };
 			//pKirby->Add_Effect("real dump smoke test", MultiFXDesc);
-			pKirby->Add_Effect("dump smoke", MultiFXDesc);
+			pKirby->Add_Effect("dump smoke", MultiFXDesc, false);
 
 			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_dump smoke"), &MultiFXDesc)))
 			//	return;

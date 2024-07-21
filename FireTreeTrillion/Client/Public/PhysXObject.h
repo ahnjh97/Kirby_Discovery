@@ -62,12 +62,35 @@ public:
 	//void	Add_Effect(CEffect* pEffect);
 	_float4x4* Get_EffectSocket() { return &m_EffectSocket; }
 
-	void	Add_Effect(CEffect* pEffects);
+
+	template <typename FX_DESC>
+	void Add_Effect(const string& strName, const FX_DESC& fxDesc, bool bAddToList = false)
+	{
+		wstring strProtoTag = TEXT("Prototype_GameObject_");
+		strProtoTag += CUtils::StrToWstr(strName);
+
+		void* fxDescVoidPtr = static_cast<void*>(const_cast<FX_DESC*>(&fxDesc));
+
+		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strProtoTag, fxDescVoidPtr)))
+			return;
+
+		if (bAddToList)
+		{
+			CEffect* pEffect = static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back());
+
+			m_FXList.emplace_back(pEffect);
+			Safe_AddRef(pEffect);
+		}
+	}
 
 	void	Add_Effect(string strName, _bool bAddToList = false);
+	/*
+	void	Add_Effect(CEffect* pEffects);
 	void	Add_Effect(string strName, CEffect::FX_DESC fxDesc, _bool bAddToList = false);
 	void	Add_Effect(string strName, CParticle::PARTICLE_DESC fxDesc, _bool bAddToList = false);
 	void	Add_Effect(string strName, CMultiEffect::MULTI_FX_DESC fxDesc, _bool bAddToList = false);
+	void	Add_Effect(string strName, void* pFXDesc, _bool bAddToList = false);
+	*/
 
 	void	Delete_AllEffect();
 	void	Delete_Effect(string strTag);
@@ -96,7 +119,7 @@ protected:
 
 	// 충돌 시, 공중으로 뜨는 힘을 정의한다.
 	_float	m_fDamageJumpPower = { 0.f };
-	
+
 	// 모든 객체들이 가지는 시간값
 	_float	m_fTimeDelta = { 0.f };
 
@@ -115,3 +138,4 @@ protected:
 };
 
 END
+

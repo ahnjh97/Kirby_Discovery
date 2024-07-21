@@ -226,7 +226,7 @@ void CPoppyBrosJr_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-			pPoppyJr->Add_Effect("Flying", FXDesc);
+			pPoppyJr->Add_Effect("Flying", FXDesc, false);
 		}
 
 		if (true == pPoppyJr->IsAnimFinished() || pController->Is_Terrain())

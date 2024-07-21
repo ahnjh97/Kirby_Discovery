@@ -3,7 +3,7 @@
 #include "FSM.h"
 #include "Awoofy_State.h"
 #include "MultiEffect.h"
-
+#include "Bone.h"
 #include "HitBox.h"
 
 CAwoofy::CAwoofy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -114,8 +114,28 @@ _int CAwoofy::Tick(_float fTimeDelta)
 			FXDesc.vInitScale = { CUtils::Make_RandomFloat(1.f, 2.f), CUtils::Make_RandomFloat(1.f, 2.f), CUtils::Make_RandomFloat(1.f, 2.f) };
 			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-			Add_Effect("BBongBBongE", FXDesc);
+			Add_Effect("BBongBBongE", FXDesc, false);
 		}
+	}
+	else if (AWOOFY_SLEEP == Get_State())
+	{
+		if(false == m_bSleep)
+		{
+			m_bSleep = true;
+			CEffect::FX_DESC FXDesc{};
+
+			FXDesc.vInitPos = (_float3)Compute_BoneWorldMatrix() + m_pTransformCom->Get_State_Float4(CTransform::STATE_LOOK) * 1.5f;
+			//FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 90.f), 0.f };
+			FXDesc.vInitScale = { 0.4f, 0.4f, 0.4f };
+			//FXDesc.pSocketMatrix = &m_WorldMatrix;
+
+			Add_Effect("AwoofySleepJS", FXDesc, true);
+		}
+	}
+	else
+	{
+		if (true == m_bSleep)
+			Delete_Effect("AwoofySleepJS");
 	}
 
 	__super::Tick(m_fTimeDelta);
@@ -258,24 +278,27 @@ void CAwoofy::Render_IMGUI()
 
 void CAwoofy::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	if (eContent == CCollisionCenter::CONTENT_BODY)
+	if(LEVEL_TOWN != *m_pGameInstance->Get_CurrentLevelID())
 	{
-		if (m_ePhyXState == PO_NORMAL)
+		if (eContent == CCollisionCenter::CONTENT_BODY)
 		{
-			Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
-			m_eEyeState = AWOOFYEYE_HAPPY;
+			if (m_ePhyXState == PO_NORMAL)
+			{
+				Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
+				m_eEyeState = AWOOFYEYE_HAPPY;
+			}
 		}
-	}
-	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
-	{
-
-	}
-	else if (eContent == CCollisionCenter::CONTENT_ATTACK)
-	{
-		if (m_ePhyXState == PO_NORMAL)
+		else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
 		{
-			Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
-			m_eEyeState = AWOOFYEYE_HAPPY;
+
+		}
+		else if (eContent == CCollisionCenter::CONTENT_ATTACK)
+		{
+			if (m_ePhyXState == PO_NORMAL)
+			{
+				Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
+				m_eEyeState = AWOOFYEYE_HAPPY;
+			}
 		}
 	}
 }
@@ -308,6 +331,17 @@ void CAwoofy::Compute_Angle(_vector vOrginLook, _vector vTargetLook)
 	_float fY = ::XMVectorGetY(::XMVector3Cross(vOriginLookNormalized, vTargetLookNormalized));
 	if (fY < 0)
 		m_fAngle = -m_fAngle;
+}
+
+_float4 CAwoofy::Compute_BoneWorldMatrix()
+{
+	CBone* pBone = m_pModelCom->Get_BonePtr("C_Nose2");
+
+	_float4x4 WorldMatrix = m_pTransformCom->Get_WorldFloat4x4();
+
+	XMStoreFloat4x4(&m_WorldMatrix, XMLoadFloat4x4(pBone->Get_CombinedTransformationMatrix()) * XMLoadFloat4x4(&WorldMatrix));
+
+	return _float4(m_WorldMatrix._41, m_WorldMatrix._42 + 0.1f, m_WorldMatrix._43, m_WorldMatrix._44);
 }
 
 _bool CAwoofy::Custom_Face(_uint iMeshIndex)
@@ -365,7 +399,7 @@ HRESULT CAwoofy::Add_Components(const wstring& wstrModelName)
 	m_vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
 	desc.vInitialPos = m_vPos;
-	desc.fOffset = 0.8f;
+	desc.fOffset = 0.6f;
 	desc.tCapsuleShape.fHeight = 0.5f;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID) {
 		desc.fOffset = 1.2f;
@@ -419,8 +453,11 @@ HRESULT CAwoofy::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
-		return E_FAIL;
+	if (LEVEL_TOWN != *m_pGameInstance->Get_CurrentLevelID())
+	{
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+			return E_FAIL;
+	}
 	
 	return S_OK;
 }

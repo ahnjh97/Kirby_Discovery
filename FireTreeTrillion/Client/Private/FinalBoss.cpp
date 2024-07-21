@@ -9,6 +9,7 @@
 #include "HitBox.h"
 #include "Debris.h"
 #include "EventCenter.h"
+#include "Kirby.h"
 
 CFinalBoss::CFinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -130,6 +131,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	//최초 보스전 시작 트리거
 	if (m_bStartOpeningTrigger)
 	{
+		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 		CTransform* pKirbyTransform = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"))->Get_TransformCom();
 
 		_float fKirbyZ = pKirbyTransform->Get_State(CTransform::STATE_POSITION).z;
@@ -141,6 +143,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 			if (pCamera != nullptr)
 				pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_APPEAR);
 			m_bStartOpeningTrigger = false;
+			pKirby->Get_KirbyInfo()->m_bFinalBossCutStart = true;
 		}
 	}
 
@@ -209,7 +212,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
 		FXDesc.vInitPos = vPos;
-		Add_Effect("HS_FB rock slash", FXDesc);
+		Add_Effect("HS_FB rock slash", FXDesc, false);
 
 		++m_iGullyCnt;
 		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
@@ -217,7 +220,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
 
 		FXDesc.vInitPos = vPos;
-		Add_Effect("HS_FB rock slash", FXDesc);
+		Add_Effect("HS_FB rock slash", FXDesc, false);
 
 		++m_iGullyCnt;
 		if (m_vecGully.size() <= m_iGullyCnt)
@@ -680,13 +683,13 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
-		Add_Effect("HS_FB Slash R Multi", FXDesc);
+		Add_Effect("HS_FB Slash R Multi", FXDesc, false);
 
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
 		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
-		Add_Effect("HS_FinalBossSlash particle L", FXDesc);
+		Add_Effect("HS_FinalBossSlash particle L", FXDesc, false);
 
 	}
 	break;
@@ -701,13 +704,13 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
-		Add_Effect("HS_FB Slash L Multi", FXDesc);
+		Add_Effect("HS_FB Slash L Multi", FXDesc, false);
 
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
 		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
-		Add_Effect("HS_FinalBossSlash particle R", FXDesc);
+		Add_Effect("HS_FinalBossSlash particle R", FXDesc, false);
 	}
 	break;
 	case FINALBOSS_SWINGFINISHLEFT:
@@ -727,7 +730,7 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
 		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
-		Add_Effect("HS_FinalBossSlash particle R", FXDesc);
+		Add_Effect("HS_FinalBossSlash particle R", FXDesc, false);
 	}
 	break;
 	default:

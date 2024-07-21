@@ -315,7 +315,7 @@ void CPhanta::SpawnEffect(CEffect::FX_DESC FXDesc, _fvector vRight, _fvector vUp
 	//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
 	//Add_Effect("SpawnBbong1", FXDesc);
-	Add_Effect(strName, FXDesc);
+	Add_Effect(strName, FXDesc, false);
 }
 
 CPhanta* CPhanta::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -239,7 +239,7 @@ HRESULT CBox::Add_Components(wstring& wstrModelName)
 		CHECK_FAILED(hr);
 	}
 	
-	Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 1.6f);
+	Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 2.f);
 
 	return S_OK;
 }

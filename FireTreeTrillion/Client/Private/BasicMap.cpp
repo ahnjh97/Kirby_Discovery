@@ -151,8 +151,11 @@ void CBasicMap::Late_Tick(_float fTimeDelta)
     if(true == m_bBlendMap)
         Compute_ViewZ();
 
-    if (nullptr != m_pBlendMap)
-        m_pBlendMap->Late_Tick(fTimeDelta);
+    if (LEVEL_INTRO != *m_pCurrentLevelID)
+    {
+        if (nullptr != m_pBlendMap)
+            m_pBlendMap->Late_Tick(fTimeDelta);
+    }
 
     for (auto& blendDeco : m_vecBlendObjects)
         blendDeco->Late_Tick(fTimeDelta);
