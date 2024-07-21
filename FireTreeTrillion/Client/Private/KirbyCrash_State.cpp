@@ -529,6 +529,7 @@ void CKirbyCrash_Charge_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 
 			m_pGameInstance->Set_FirstTimerRatio(0.f);
 			m_pGameInstance->Set_SecondTimerRatio(0.f);
+			DESC(m_vPreDiffuseLight) = m_pGameInstance->Get_DirectionLightAddress()->Get_LightDesc()->vDiffuse;
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake(0.3f, 0.5f);
 			pKirby->Delete_Effect("YW Crash Charge");
@@ -733,7 +734,6 @@ void CKirbyCrash_BigCharge_State::OnStateUpdate(CGameObject* pGameObject, _float
 			m_pGameInstance->Set_FirstTimerRatio(0.f);
 			m_pGameInstance->Set_SecondTimerRatio(0.f);
 			DESC(m_vPreDiffuseLight) = m_pGameInstance->Get_DirectionLightAddress()->Get_LightDesc()->vDiffuse;
-
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake(0.3f, 0.5f);
 

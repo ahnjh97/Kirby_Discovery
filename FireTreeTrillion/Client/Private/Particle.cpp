@@ -322,6 +322,12 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_COLORINTERPOLATE])
 		m_pVIBufferCom->Color_Interpolate(fMyTimeDelta, pVertices);
 
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_TURN])
+		m_pVIBufferCom->Turn(fMyTimeDelta, pVertices);
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_TURNMOVEDIR])
+		m_pVIBufferCom->Turn_MoveDirection(fMyTimeDelta, pVertices);
+
 
 	m_pVIBufferCom->Save_PrePos(pVertices);
 

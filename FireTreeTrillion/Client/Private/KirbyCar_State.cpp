@@ -205,6 +205,28 @@ void CKirbyCar_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
+	if (DESC(m_bDeeDeeDeeInitializeCut) == true)
+	{
+		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta, 3.f);
+		pController->FreeFall(pTransformCom, fTimeDelta);
+		Kirbydesc->m_fMoveSpeed = 12;
+		m_fCutTime += fTimeDelta;
+		_vector vMoveDelta = Kirbydesc->m_vMoveDir * fTimeDelta * Kirbydesc->m_fMoveSpeed;
+		pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
+
+		if (m_fCutTime > 1.2f && m_fCutTime <= 2.f)
+		{
+			DESC(m_vTargetDir) = XMVector3Normalize(_float4(0.2f, 0.f, 1.f, 0.f));
+		}
+		else if (m_fCutTime > 2.f)
+		{
+			pKirby->Change_State(CKirby::CARSTATE_BOOSTEND, 60.f, false, true, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			return;
+		}
+		return;
+	}
+
+
 	if (DESC(m_bCarJump) == true)
 	{
 		DESC(m_fJumpVelocity) -= GRAVITY * fTimeDelta * DESC(m_fGravityOffset);
@@ -276,6 +298,7 @@ void CKirbyCar_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 
 void CKirbyCar_Run_State::OnStateExit()
 {
+	m_fCutTime = 0.f;
 }
 
 CKirbyCar_Run_State* CKirbyCar_Run_State::Create()
@@ -760,6 +783,18 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	else if (pKirby->Get_State() == CKirby::CARSTATE_BOOSTEND)
 	{
 		Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
+
+		if (DESC(m_bDeeDeeDeeInitializeCut) == true)
+		{
+			if (pKirby->isAnimFinish())
+			{
+				pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+				DESC(m_eEyeState) = CKirby::EYE_IDLE;
+				DESC(m_bDeeDeeDeeInitializeCut) = false;
+				return;
+			}
+			return;
+		}
 
 		if (JoyStick_On() == true)
 		{

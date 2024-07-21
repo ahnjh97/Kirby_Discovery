@@ -72,7 +72,13 @@ public:
 	virtual void OrbitDecelerate(_float fTimeDelta, VTXMATRIX* pVertices);
 
 	// 색상이 보간된다
-	virtual void Color_Interpolate(_float fTImeDelta, VTXMATRIX* pVertices);
+	virtual void Color_Interpolate(_float fTimeDelta, VTXMATRIX* pVertices);
+
+	// 자전한다.
+	virtual void Turn(_float fTimeDelta, VTXMATRIX* pVertices);
+	// 이동 방향으로 회전한다.
+	virtual void Turn_MoveDirection(_float fTimeDelta, VTXMATRIX* pVertices);
+
 
 	virtual void Save_PrePos(VTXMATRIX* pVertices);
 

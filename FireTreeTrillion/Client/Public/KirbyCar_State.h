@@ -39,6 +39,7 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_float m_fCutTime = { 0.f };
 	static	CKirbyCar_Run_State* Create();
 	virtual void				  Free() override;
 };
