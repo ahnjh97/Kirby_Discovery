@@ -33,6 +33,8 @@ void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		pKirby->Change_State(CKirby::STATE_FALL, 50.f, false, true, CKirby::BODY_DEFAULT);
 		return;
 	}*/
+	if (DESC(m_bFinalBossCutStart) == true)
+		return;
 
 	if (DESC(m_bDialog) == false)
 	{

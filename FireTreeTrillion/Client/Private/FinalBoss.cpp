@@ -9,6 +9,7 @@
 #include "HitBox.h"
 #include "Debris.h"
 #include "EventCenter.h"
+#include "Kirby.h"
 
 CFinalBoss::CFinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -130,6 +131,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	//최초 보스전 시작 트리거
 	if (m_bStartOpeningTrigger)
 	{
+		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 		CTransform* pKirbyTransform = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"))->Get_TransformCom();
 
 		_float fKirbyZ = pKirbyTransform->Get_State(CTransform::STATE_POSITION).z;
@@ -141,6 +143,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 			if (pCamera != nullptr)
 				pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_APPEAR);
 			m_bStartOpeningTrigger = false;
+			pKirby->Get_KirbyInfo()->m_bFinalBossCutStart = true;
 		}
 	}
 

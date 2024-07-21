@@ -98,6 +98,7 @@ _int CDimensionClaw::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
+#ifdef _DEBUG
 HRESULT CDimensionClaw::Render()
 {
 	if (m_pGameInstance->Get_HitBoxRender() == false)
@@ -159,6 +160,7 @@ HRESULT CDimensionClaw::Render()
 
 	return S_OK;
 }
+#endif
 
 CDimensionClaw* CDimensionClaw::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

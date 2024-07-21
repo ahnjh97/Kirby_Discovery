@@ -148,6 +148,7 @@ public:
 		_float4			m_vPreDiffuseLight = { 0.f, 0.f, 0.f, 0.f };
 
 		// FinalCut Æû
+		_bool			m_bFinalBossCutStart = { false };
 		_bool			m_bFinalBossDead = { false };
 
 		// Dialog
@@ -253,6 +254,7 @@ private:
 	HRESULT			Kirby_SystemInitialize();
 	void			Kirby_LookInitialize();
 	void			Kirby_StateInitialize();
+	void			Kirby_SpecialAnim();
 
 private:
 	HRESULT			Make_TargetToCams();
@@ -330,6 +332,7 @@ private:
 
 	// For FinalCut
 	_bool				  m_bFinalCutTrigger = { true };
+	_bool				  m_bFinalCutStartTrigger = { true };
 
 	unordered_map<PxRigidActor*, CGameObject*> m_mapToppleableBridges;
 	unordered_map<PxRigidActor*, CGameObject*> m_mapStarBoxes;
