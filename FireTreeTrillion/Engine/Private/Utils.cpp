@@ -573,7 +573,11 @@ HRESULT CUtils::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeed), sizeof(_float));
 	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeedRandomOffset), sizeof(_float));
 
+	InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSpeed), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSpeedRandomOffset), sizeof(_float));
+
 	InputFile.read(reinterpret_cast<char*>(&_pData->fAccSupplyAmount), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSupplyAmount), sizeof(_float));
 	InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSupplyAmount), sizeof(_float));
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->vColor), sizeof(_float3));

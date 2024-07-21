@@ -370,7 +370,11 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		InstanceDesc.fOrbitSpeed = FXData.fOrbitSpeed;
 		InstanceDesc.fOrbitSpeedRandomOffset = FXData.fOrbitSpeedRandomOffset;
 
+		InstanceDesc.fTurnSpeed = FXData.fTurnSpeed;
+		InstanceDesc.fTurnSpeedRandomOffset = FXData.fTurnSpeedRandomOffset;
+
 		InstanceDesc.fAccSupplyAmount = FXData.fAccSupplyAmount;
+		InstanceDesc.fOrbitSupplyAmount = FXData.fOrbitSupplyAmount;
 		InstanceDesc.fTurnSupplyAmount = FXData.fTurnSupplyAmount;
 
 		InstanceDesc.vColor = FXData.vColor;

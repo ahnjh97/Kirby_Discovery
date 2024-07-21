@@ -202,12 +202,17 @@ HRESULT CVIBuffer_Instance::Initialize(void* pArg)
 	m_pOrbitSpeed = new _float[m_iNumInstance];
 	ZeroMemory(m_pOrbitSpeed, sizeof(_float) * m_iNumInstance);
 
+	m_pTurnSpeed = new _float[m_iNumInstance];
+	ZeroMemory(m_pTurnSpeed, sizeof(_float) * m_iNumInstance);
+
 	m_pAccSupplyAmount = new _float[m_iNumInstance];
 	ZeroMemory(m_pAccSupplyAmount, sizeof(_float) * m_iNumInstance);
 
+	m_pOrbitSupplyAmount = new _float[m_iNumInstance];
+	ZeroMemory(m_pOrbitSupplyAmount, sizeof(_float) * m_iNumInstance);
+
 	m_pTurnSupplyAmount = new _float[m_iNumInstance];
 	ZeroMemory(m_pTurnSupplyAmount, sizeof(_float) * m_iNumInstance);
-
 	// 개별적으로 작용하는 중력값
 	m_fGravity = new _float[m_iNumInstance];
 	ZeroMemory(m_fGravity, sizeof(_float) * m_iNumInstance);
@@ -393,7 +398,7 @@ void CVIBuffer_Instance::OrbitAcceleration(_float fTimeDelta, VTXMATRIX* pVertic
 		if (!pVertices[i].bAlive)
 			continue;
 
-		m_pOrbitSpeed[i] += fTimeDelta * m_pTurnSupplyAmount[i];
+		m_pOrbitSpeed[i] += fTimeDelta * m_pOrbitSupplyAmount[i];
 	}
 }
 
@@ -407,8 +412,34 @@ void CVIBuffer_Instance::OrbitDecelerate(_float fTimeDelta, VTXMATRIX* pVertices
 		if (m_pOrbitSpeed[i] == 0.f) 
 			continue;
 
-		m_pOrbitSpeed[i] -= fTimeDelta * m_pTurnSupplyAmount[i];
+		m_pOrbitSpeed[i] -= fTimeDelta * m_pOrbitSupplyAmount[i];
 		if (m_pOrbitSpeed[i] < 0.f) m_pOrbitSpeed[i] = 0.f;
+	}
+}
+
+void CVIBuffer_Instance::TurnAcceleration(_float fTimeDelta, VTXMATRIX* pVertices)
+{
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		if (!pVertices[i].bAlive)
+			continue;
+
+		m_pTurnSpeed[i] += fTimeDelta * m_pTurnSupplyAmount[i];
+	}
+}
+
+void CVIBuffer_Instance::TurnDecelerate(_float fTimeDelta, VTXMATRIX* pVertices)
+{
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		if (!pVertices[i].bAlive)
+			continue;
+
+		if (m_pTurnSpeed[i] == 0.f)
+			continue;
+
+		m_pTurnSpeed[i] -= fTimeDelta * m_pTurnSupplyAmount[i];
+		if (m_pTurnSpeed[i] < 0.f) m_pTurnSpeed[i] = 0.f;
 	}
 }
 
@@ -435,7 +466,7 @@ void CVIBuffer_Instance::Turn(_float fTimeDelta, VTXMATRIX* pVertices)
 		if (!pVertices[i].bAlive)
 			continue;
 
-		pVertices[i].fAngleZ += fTimeDelta * 360.f;
+		pVertices[i].fAngleZ += fTimeDelta * m_pTurnSpeed[i];
 	}
 }
 
@@ -861,6 +892,7 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 	m_pInitialSpeeds[iInstanceIndex] = m_pSpeeds[iInstanceIndex];
 
 	m_pAccSupplyAmount[iInstanceIndex] = m_InstanceDesc.fAccSupplyAmount;
+	m_pOrbitSupplyAmount[iInstanceIndex] = m_InstanceDesc.fOrbitSupplyAmount;
 	m_pTurnSupplyAmount[iInstanceIndex] = m_InstanceDesc.fTurnSupplyAmount;
 
 	//공전 시의 세팅
@@ -887,6 +919,11 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 		m_pOrbitSpeed[iInstanceIndex] = Compute_RandOrbitSpeed();
 	}
 
+	//자전 시의 세팅
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_TURN] == true)
+	{
+		m_pTurnSpeed[iInstanceIndex] = Compute_RandTurnSpeed();
+	}
 
 	_float4 vColor = Compute_RandColor();
 
@@ -920,10 +957,12 @@ void CVIBuffer_Instance::Free()
 	Safe_Delete_Array(m_pAlphas);
 
 	Safe_Delete_Array(m_pOrbitSpeed);
+	Safe_Delete_Array(m_pTurnSpeed);
 
 	Safe_Delete_Array(m_pStartDelays);
 
 	Safe_Delete_Array(m_pAccSupplyAmount);
+	Safe_Delete_Array(m_pOrbitSupplyAmount);
 	Safe_Delete_Array(m_pTurnSupplyAmount);
 
 	Safe_Delete_Array(m_pInitialSpeeds);

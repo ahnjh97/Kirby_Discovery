@@ -72,9 +72,10 @@ void CFXToolDirector::Make_Effect(SINGLE_FX_DATA& _FXData)
 	FXDesc.fRimLightThreshold = _FXData.fRimLightThreshold;
 	FXDesc.vContinuousRotation = _FXData.vContinuousRotation;
 	FXDesc.eRenderGroup = _FXData.eRenderGroup;
+
 	FXDesc.eTimer = _FXData.eTimer;
-	if (FXDesc.eTimer == TIMER_SECOND)
-		int a = 0;
+	//if (FXDesc.eTimer == TIMER_NONE)
+	//	FXDesc.eTimer = TIMER_SECOND;
 
 	for (_uint i = 0; i < _FXData.iPropertyMapNum; ++i)
 	{
@@ -120,6 +121,9 @@ void CFXToolDirector::Make_Effect(PARTICLE_DATA& _FXData)
 	ParticleDesc.eRenderGroup = _FXData.eRenderGroup;
 	ParticleDesc.eTimer = _FXData.eTimer;
 
+	//if (ParticleDesc.eTimer == TIMER_NONE)
+	//	ParticleDesc.eTimer = TIMER_SECOND;
+
 	ParticleDesc.bIsLoop = _FXData.bIsLoop;
 	ParticleDesc.bIsBillboard = _FXData.bIsBillboard;
 	ParticleDesc.bIsBloom = _FXData.bIsBloom;
@@ -156,7 +160,11 @@ void CFXToolDirector::Make_Effect(PARTICLE_DATA& _FXData)
 	InstanceDesc.fOrbitSpeed = _FXData.fOrbitSpeed;
 	InstanceDesc.fOrbitSpeedRandomOffset = _FXData.fOrbitSpeedRandomOffset;
 
+	InstanceDesc.fTurnSpeed = _FXData.fTurnSpeed;
+	InstanceDesc.fTurnSpeedRandomOffset = _FXData.fTurnSpeedRandomOffset;
+
 	InstanceDesc.fAccSupplyAmount = _FXData.fAccSupplyAmount;
+	InstanceDesc.fOrbitSupplyAmount = _FXData.fOrbitSupplyAmount;
 	InstanceDesc.fTurnSupplyAmount = _FXData.fTurnSupplyAmount;
 
 	InstanceDesc.vColor = _FXData.vColor;
@@ -379,7 +387,11 @@ HRESULT CFXToolDirector::Save_Particle(CEffect* pEffect, const wstring& strFileN
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fOrbitSpeed), sizeof(_float));
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fOrbitSpeedRandomOffset), sizeof(_float));
 
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.fTurnSpeed), sizeof(_float));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.fTurnSpeedRandomOffset), sizeof(_float));
+
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fAccSupplyAmount), sizeof(_float));
+	OutputFile.write(reinterpret_cast<const char*>(&FXData.fOrbitSupplyAmount), sizeof(_float));
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.fTurnSupplyAmount), sizeof(_float));
 
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.vColor), sizeof(_float3));
@@ -680,7 +692,11 @@ HRESULT CFXToolDirector::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeed), sizeof(_float));
 	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeedRandomOffset), sizeof(_float));
 
+	InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSpeed), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSpeedRandomOffset), sizeof(_float));
+
 	InputFile.read(reinterpret_cast<char*>(&_pData->fAccSupplyAmount), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSupplyAmount), sizeof(_float));
 	InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSupplyAmount), sizeof(_float));
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->vColor), sizeof(_float3));
@@ -2025,7 +2041,7 @@ void CFXToolDirector::Render_FXProperty()
 	SeparatorText(u8"가감속");
 
 	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ACCELERATION];
-	if (Checkbox(u8"Accelerate", &bCommand))
+	if (Checkbox(u8"이동 가속", &bCommand))
 	{
 		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ACCELERATION] = bCommand;
 		bEdited = true;
@@ -2033,15 +2049,31 @@ void CFXToolDirector::Render_FXProperty()
 	SameLine();
 
 	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE];
-	if (Checkbox(u8"Decelerate", &bCommand))
+	if (Checkbox(u8"이동 감속", &bCommand))
 	{
 		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE] = bCommand;
 		bEdited = true;
 	}
 	SameLine();
 
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TURNACCELERATION];
+	if (Checkbox(u8"자전 가속", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TURNACCELERATION] = bCommand;
+		bEdited = true;
+	}
+	SameLine();
+
+	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TURNDECELERATE];
+	if (Checkbox(u8"자전 감속", &bCommand))
+	{
+		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_TURNDECELERATE] = bCommand;
+		bEdited = true;
+	}
+
+	SameLine();
 	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITACCELERATION];
-	if (Checkbox(u8"Orbit Accelerate", &bCommand))
+	if (Checkbox(u8"공전 가속", &bCommand))
 	{
 		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITACCELERATION] = bCommand;
 		bEdited = true;
@@ -2049,7 +2081,7 @@ void CFXToolDirector::Render_FXProperty()
 	SameLine();
 
 	bCommand = pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITDECELERATE];
-	if (Checkbox(u8"Orbit Decelerate", &bCommand))
+	if (Checkbox(u8"공전 감속", &bCommand))
 	{
 		pCurParticle->m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITDECELERATE] = bCommand;
 		bEdited = true;
@@ -2290,14 +2322,25 @@ void CFXToolDirector::Render_FXProperty()
 
 	Dummy({ 0.f, 10.f });
 
+	if (DragFloat(u8"자전 속도", &(pCurParticle->m_InstanceDesc.fTurnSpeed), .01f, -10000.f, 10000.f, "%.2f"))
+		bEdited = true;
+	if (DragFloat(u8"자전 속도 랜덤", &pCurParticle->m_InstanceDesc.fTurnSpeedRandomOffset, .01f, -10000.f, 10000.f, "%.2f"))
+		bEdited = true;
+
+	Dummy({ 0.f, 10.f });
+
 	if (DragFloat(u8"이동 감가속 속력", &(pCurParticle->m_InstanceDesc.fAccSupplyAmount), .01f, 0.f, 10000.f, "%.2f"))
 		bEdited = true;
 
 	Dummy({ 0.f, 10.f });
 
-	if (DragFloat(u8"회전 감가속 속력", &(pCurParticle->m_InstanceDesc.fTurnSupplyAmount), .01f, 0.f, 10000.f, "%.2f"))
+	if (DragFloat(u8"공전 감가속 속력", &(pCurParticle->m_InstanceDesc.fOrbitSupplyAmount), .01f, 0.f, 10000.f, "%.2f"))
 		bEdited = true;
 
+	Dummy({ 0.f, 10.f });
+
+	if (DragFloat(u8"자전 감가속 속력", &(pCurParticle->m_InstanceDesc.fTurnSupplyAmount), .01f, 0.f, 10000.f, "%.2f"))
+		bEdited = true;
 
 	Dummy({ 0.f, 10.f });
 	Separator();

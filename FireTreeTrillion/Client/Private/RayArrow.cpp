@@ -69,11 +69,8 @@ HRESULT CRayArrow::Initialize(void* pArg)
 
 	Add_Effect("HS_RayArrow test", FXDesc, true);
 
-	FXDesc = {};
-	//FXDesc.vInitPos = GET_POS;
-	FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+	FXDesc.vInitScale = { 5.f, 5.f, 5.f };
 	Add_Effect("HS_FB white pop arrow bubble");
-
 
 
 	return S_OK;
