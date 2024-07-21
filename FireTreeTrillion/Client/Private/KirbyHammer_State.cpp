@@ -50,6 +50,8 @@ void CKirbyHammer_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 		if (DESC(m_bDialog) == true)
 			return;
+		if (DESC(m_bFinalBossCutStart) == true)
+			return;
 
 		// Idle일 때, 방향키를 눌렀을 때 RUN 으로 간다.
 		if (JoyStick_controller(Kirbydesc, pCamera))
