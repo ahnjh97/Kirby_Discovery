@@ -129,23 +129,16 @@ _int CGm_DynamicField::Tick(_float fTimeDelta)
 	if (TRUE == m_bDead)
 		return OBJ_DEAD;
 
-	if (nullptr == m_pSolarPanelOnce && nullptr == m_pSolarPanelCharge)
-		return OBJ_NOEVENT;
-
 	switch (m_eGimmickType)
 	{
 	case GIMMICK_SPONCE:
-		if (-1 == m_eSPOnceState)
-			return OBJ_NOEVENT;
-
-		m_eSPOnceState = m_pSolarPanelOnce->Get_CurState();
+		if (nullptr != m_pSolarPanelOnce)
+			m_eSPOnceState = m_pSolarPanelOnce->Get_CurState();
 		break;
 
 	case GIMMICK_SPCHARGE:
-		if (-1 == m_eSPChargeState)
-			return OBJ_NOEVENT;
-
-		m_eSPChargeState = m_pSolarPanelCharge->Get_CurState();
+		if (nullptr != m_pSolarPanelCharge)
+			m_eSPChargeState = m_pSolarPanelCharge->Get_CurState();
 		break;
 	}
 

@@ -45,7 +45,7 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 
 	m_fMaxHp = 200.f;
 	//m_fHp = 200.f;
-	m_fHp = 10.f;
+	m_fHp = 10.f; //디버그용 HP
 	m_fAttack = 15.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eAbilityType = ABILITY_DEFAULT;
@@ -220,9 +220,9 @@ void CDeeDeeDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 		CHECK_NULLPTR(pMWindow);
 		pMWindow->Show_DialogMessage();
 
-		CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
-		CHECK_NULLPTR(pCameraMain);
-		pCameraMain->Lock_All({ -5.f, 39.f, 30.f }, { -0.3f, -0.2f, 0.93f }, true);
+		//CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+		//CHECK_NULLPTR(pCameraMain);
+		//pCameraMain->Lock_All({ -5.f, 39.f, 30.f }, { -0.3f, -0.2f, 0.93f }, true);
 	}
 
 	m_pUI_Interactable->Set_IsRender(true);
