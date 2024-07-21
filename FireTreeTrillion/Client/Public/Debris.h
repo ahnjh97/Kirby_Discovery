@@ -23,7 +23,7 @@ private:
 	virtual ~CDebris() = default;
 
 public:
-	void Set_ParticleDebris(_fvector vPosition, _float fScale = 1.f, _float2 fRandY = _float2(10.f, 20.f), _float2 fRandXZ = _float2(5.f, 10.f));
+	void Set_ParticleDebris(_fvector vPosition, _float fScale = 1.f, _float2 fRandY = _float2(10.f, 20.f), _float2 fRandXZ = _float2(5.f, 10.f), _float fTotalTime = 1.f);
 	void Set_ParticleEffect(_fvector vPosition, _float fScale);
 
 public:

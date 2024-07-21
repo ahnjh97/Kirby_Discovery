@@ -79,7 +79,7 @@ void CRoomGlass::Late_Tick(_float fTimeDelta)
 	if (false == m_bHide) 
 	{
 		Compute_BoneViewZ(m_pBone);
-		m_pModelCom->Play_Animation(fTimeDelta);
+		m_pModelCom->Play_Animation(m_pGameInstance->Get_SecondTimer());
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
 	}
 }

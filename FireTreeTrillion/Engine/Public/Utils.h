@@ -81,6 +81,14 @@ public:
 	static PxTransform		TransformToPxTransform(class CTransform* pTransform);
 	static PxTransform		ToPxTransform(const _float4x4& mat);
 
+	static _float4			GetPxRight(const PxMat44& mat);
+	static _float4			GetPxUp(const PxMat44& mat);
+	static _float4			GetPxLook(const PxMat44& mat);
+	static _float4			GetPxPos(const PxMat44& mat);
+
+	// Right, Up, Look 벡터에 각각 vRightUpLook의 x, y, z를 곱한 값 만큼 Actor의 PxTransform를 이동시키는 함수
+	static void				MoveActor(PxRigidActor* pActor, _float3 vRightUpLook, _float fTimeDelta);
+
 
 	//이펙트 관련 함수
 	static HRESULT Load_Effect(path _FilePath, _Out_ SINGLE_FX_DATA* _pData);

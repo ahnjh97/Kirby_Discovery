@@ -53,6 +53,7 @@ private:
 	FX_DESC				m_FXDesc = {};
 
 	_bool				m_bNoRender = { false };
+	_bool				m_bBindShaderVars = { false };
 	HRESULT			Add_Components(FX_DESC& FXDesc);
 	HRESULT			Bind_ShaderResources(_int iTexIdx = 0, _int iMaskTexIdx = 0);
 

@@ -12,7 +12,7 @@ CDebris::CDebris(const CDebris& rhs)
 {
 }
 
-void CDebris::Set_ParticleDebris(_fvector vPosition, _float fScale, _float2 fRandY, _float2 fRandXZ)
+void CDebris::Set_ParticleDebris(_fvector vPosition, _float fScale, _float2 fRandY, _float2 fRandXZ, _float fTotalTime)
 {
     m_vRotationAxis = CUtils::Make_Random_Vector(1);
 
@@ -32,6 +32,7 @@ void CDebris::Set_ParticleDebris(_fvector vPosition, _float fScale, _float2 fRan
     m_pTransformCom->Set_Scaled(1.f * fScale, 1.f * fScale, 1.f * fScale);
 
     m_fTime = 0.f;
+    m_fTotalTime = fTotalTime;
     m_bDead = false;
     m_bSwap = false;
 }

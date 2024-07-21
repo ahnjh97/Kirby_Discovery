@@ -113,17 +113,22 @@ void CLevel_Simba::Tick(_float fTimeDelta)
 		}
 	}
 
-	if (false == m_bWave2DeadNotified)
+	if (false == m_bWave2Dead)
 	{
 		list<CGameObject*>* objListPtr = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Wave2"));
 		if (nullptr != objListPtr)
 		{
 			if (objListPtr->empty()) // Wave2 의 몬스터들이 모두 죽은 경우
-			{
-				m_bWave2DeadNotified = true;
-				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_WAVE2DEAD);
-			}
+				m_bWave2Dead = true;
 		}
+	}
+
+	if (true == m_bWave2Dead)
+		m_fWave2DeadTime += m_pGameInstance->Get_SecondTimer();
+
+	if (1.f < m_fWave2DeadTime && false == m_bWave2DeadNotified) {
+		m_bWave2DeadNotified = true;
+		CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_WAVE2DEAD);
 	}
 }
 		
