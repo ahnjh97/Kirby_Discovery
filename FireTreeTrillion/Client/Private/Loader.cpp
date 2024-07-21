@@ -1582,6 +1582,10 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_Updown", "Effects/Mask/Mask_UpDown.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_LeftRight", "Effects/Mask/Mask_LeftRight.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_Outline", "Effects/Mask/Mask_Outline.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_GunFire", "Effects/Mask/Mask_GunFire.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_PillarMask", "Effects/Mask/Mask_Pillar_%d.png", 2);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_RoundMask", "Effects/Mask/Mask_Round.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_UpMask", "Effects/Mask/Mask_Up.png");	CHECK_FAILED(hr);
 
 
 	// 주로 사용되는 텍스쳐들
@@ -1632,6 +1636,15 @@ HRESULT CLoader::Add_FXTexture()
 
 	//파티클
 	hr = Add_Texture(LEVEL_STATIC, "FX_Rock", "Effects/Particle/rock_%d.png", 4);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Orange", "Effects/Particle/Glow_Orange.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Green", "Effects/Particle/Glow_Green.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Blue", "Effects/Particle/Glow_Blue.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Gold", "Effects/Particle/Glow_Gold.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_BludParticle", "Effects/Particle/Glow_BludParticle.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_BlueRules", "Effects/Particle/BlueRules.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_GreenRules", "Effects/Particle/GreenRules.png");	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_RedRules", "Effects/Particle/RedRules.png");	CHECK_FAILED(hr);
+
 
 	//팝스타
 	hr = Add_Texture(LEVEL_STATIC, "FX_PopstarFallWind", "Effects/Popstar/PopStarFallEffectWind.dds");	CHECK_FAILED(hr);
@@ -1655,10 +1668,6 @@ HRESULT CLoader::Add_FXTexture()
 	//Dissolve
 	hr = Add_Texture(LEVEL_STATIC, "FX_FireDissolve", "Dissolve/FireDissolve.png");	CHECK_FAILED(hr);
 
-	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Orange", "Effects/Particle/Glow_Orange.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Green", "Effects/Particle/Glow_Green.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_Blue", "Effects/Particle/Glow_Blue.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Glow_BludParticle", "Effects/Particle/Glow_BludParticle.png");	CHECK_FAILED(hr);
 
 	//번개
 	hr = Add_Texture(LEVEL_STATIC, "FX_Thunder", "Effects/Thunder/Thunder_%d.png", 3);	CHECK_FAILED(hr);
@@ -2173,7 +2182,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	}
 	else if (eLevel == LEVEL_FINALBOSS)
 	{
-		for (_uint i = 0; i <= 17; i++) {
+		for (_uint i = 0; i <= 17; i++) 
+		{
 			string strTunnelRock = "TunnelRock" + to_string(i);
 			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM, 0.1f);
 		}

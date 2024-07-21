@@ -1252,16 +1252,18 @@ static void Copy_Star(CTransform* pTransformCom)
 
 	_float3 vCamDir = CGameInstance::Get_Instance()->Get_CamLook();
 	FXDesc.vInitPos =  (_float3)pTransformCom->Get_State(CTransform::STATE_POSITION) + vCamDir + _float3{0.f, 1.f, 0.f} ;
+	FXDesc.vInitScale = { 2.5f, 2.5f, 2.5f };
 	FXDesc.vInitRot = CUtils::Make_Degree_FromDir(vCamDir);
 
+	FXDesc.fStartDelay = 0.7f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_bloom"), &FXDesc)))
 		return;
 
-	FXDesc.fStartDelay = .15f;
+	FXDesc.fStartDelay = 0.775f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
 		return;
 
-	FXDesc.fStartDelay = .3f;
+	FXDesc.fStartDelay = 0.85f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
 		return;
 

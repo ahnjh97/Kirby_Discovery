@@ -648,14 +648,16 @@ PS_OUT PS_MAIN_NEARCLIP(PS_IN In)
     vector vViewPos = g_WorldMatrix._41_42_43_44;
     vViewPos = mul(vViewPos, g_ViewMatrix);
     
-    if (vViewPos.z < 8.0)
+    //if (vViewPos.z < 8.0)
+    float fCameraDistance = 15.0f;
+    if (vViewPos.z < fCameraDistance)
     {
         float2 vPixelTexcoord = (float2) 0.f;
         vPixelTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
         vPixelTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
         
         vector vNearClipDesc = g_ObjNearClipTexture.Sample(LinearSampler, vPixelTexcoord * 100);
-        if (pow(saturate((vViewPos.z / 8) - .1), 3) < vNearClipDesc.r)
+        if (pow(saturate((vViewPos.z / fCameraDistance) - .1), 3) < vNearClipDesc.r)
             discard;
     }
     

@@ -411,19 +411,21 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 
 		if (pKirby->isAnimFinish())
 		{
+			if (m_bTerrainOn == false)
+			{
+				_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+				vPos.y += 5.f;
+				CParticle::PARTICLE_DESC FXPDesc{};
+				FXPDesc.vInitPos = (_float3)vPos;
+				FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
+				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash Boom Fin Particle"), &FXPDesc)))
+					return;
+			}
+
 			m_pGameInstance->Set_Brown(0.5f, true);
 			m_pGameInstance->Get_DirectionLightAddress()->Interpolate_Light(DESC(m_vPreDiffuseLight), 1.f, 2.f);
 			static_cast<CCamera_Main*>(pCamera)->Zoom(0.f);
 			m_bTerrainOn = true;
-
-			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
-			vPos.y += 5.f;
-			CParticle::PARTICLE_DESC FXPDesc{};
-			FXPDesc.vInitPos = (_float3)vPos;
-			FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash Boom Fin Particle"), &FXPDesc)))
-				return;
-
 		}
 
 		if (m_bTerrainOn == true)
@@ -529,6 +531,7 @@ void CKirbyCrash_Charge_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 
 			m_pGameInstance->Set_FirstTimerRatio(0.f);
 			m_pGameInstance->Set_SecondTimerRatio(0.f);
+			DESC(m_vPreDiffuseLight) = m_pGameInstance->Get_DirectionLightAddress()->Get_LightDesc()->vDiffuse;
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake(0.3f, 0.5f);
 			pKirby->Delete_Effect("YW Crash Charge");
@@ -733,7 +736,6 @@ void CKirbyCrash_BigCharge_State::OnStateUpdate(CGameObject* pGameObject, _float
 			m_pGameInstance->Set_FirstTimerRatio(0.f);
 			m_pGameInstance->Set_SecondTimerRatio(0.f);
 			DESC(m_vPreDiffuseLight) = m_pGameInstance->Get_DirectionLightAddress()->Get_LightDesc()->vDiffuse;
-
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake(0.3f, 0.5f);
 
