@@ -365,10 +365,12 @@ void CTransingStar::On_Event()
         // 스타트 로딩화면 렌더 켜기
         m_bLoadingStart = true;
 
-        if(LEVEL_INTRO == m_eNextLevel)
+        if (LEVEL_INTRO == m_eNextLevel)
             m_pLoadingStart->Set_TexIndex(0);
-        else if(LEVEL_SIMBA == m_eNextLevel)
+        else if (LEVEL_SIMBA == m_eNextLevel)
             m_pLoadingStart->Set_TexIndex(2);
+        else if (LEVEL_PARK == m_eNextLevel)
+            m_bLoadingStart = false;
 
         m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, m_eNextLevel));
     }
