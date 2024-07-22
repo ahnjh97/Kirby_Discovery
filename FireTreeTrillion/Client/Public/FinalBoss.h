@@ -107,6 +107,9 @@ public:
 
 	void Set_BeforeHp(_float fBeforeHp) { m_fBeforeHp = fBeforeHp; }
 
+	void Set_Auto(_float bAuto) { m_bAuto = bAuto; }
+	_bool Get_Auto() { return m_bAuto; }
+
 	//이벤트 함수
 	void Appear_Event(CGameObject* pObj);
 
@@ -146,6 +149,7 @@ private:
 	_bool				m_bGully = { false };
 	_bool				m_bShake = { false };
 	_bool				m_bEffect = { false };
+	_bool				m_bAuto = { false };
 
 	// 임구이용
 	_bool				m_bStab = { false };

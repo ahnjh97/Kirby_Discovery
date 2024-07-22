@@ -162,7 +162,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	}
 
 
-	if ( m_bStart2PhaseTrigger
+	if (m_bStart2PhaseTrigger
 		&& (m_pGameInstance->Get_KeyState(DIK_K, KEY_DOWN) || m_fHp < m_fMaxHp * 0.45f))
 	{
 		Set_BossState(STATE_2PAZE);
@@ -183,6 +183,8 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		Change_State(FINALBOSS_LASTDAMAGESTART, 50.f, false, true);
 		m_pControllerCom->Set_Position(m_pTransformCom, XMVectorSet(0.f, 0.f, 0.f, 1.f));
 	}
+	else if (m_pGameInstance->Get_KeyState(DIK_I, KEY_DOWN))
+		m_bAuto = !m_bAuto;
 
 	if (FINALBOSS_RECOVERYWAIT == Get_State())
 	{
