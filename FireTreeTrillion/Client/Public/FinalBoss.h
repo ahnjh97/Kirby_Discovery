@@ -159,6 +159,8 @@ private:
 
 	//컷신 트리거
 	_bool				m_bStartOpeningTrigger = { true };
+	//2페이즈 트리거
+	_bool				m_bStart2PhaseTrigger = { true };
 
 	_float				m_fGlideTime = { 0.f };
 	//_float				m_fGullyTime = { 0.f };

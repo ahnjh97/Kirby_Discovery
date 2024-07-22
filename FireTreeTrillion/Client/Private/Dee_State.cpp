@@ -324,9 +324,11 @@ void CDee_Emotion_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 {
 	BASE_INFO baseInfo{};
 	Setup_BaseInfo(baseInfo, pGameObject);
-
-	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.2f);
-
+	
+	if(LEVEL_TOWN != *m_pGameInstance->Get_CurrentLevelID())
+		baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.2f);
+	else
+		baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.1f);
 
 	if (baseInfo.pDee->Get_State() == DEEANIM_ANGER)
 	{
@@ -877,7 +879,10 @@ void CDee_Interact_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		{
 			_float fSpeed = 15.f * (.5f - m_fDuration);
 			baseInfo.pDee->Set_DeeEyeState(DEEEYE_SMILE);
-			baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed, fTimeDelta);
+			if(LEVEL_TOWN == *m_pGameInstance->Get_CurrentLevelID())
+				baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed, fTimeDelta, 0.15f);
+			if(LEVEL_DEEDEEDEE == *m_pGameInstance->Get_CurrentLevelID())
+				baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta * fSpeed, fTimeDelta);
 		}
 
 		if (abs(m_fDuration - .6f) < fTimeDelta * 2.f)
@@ -904,12 +909,18 @@ void CDee_Interact_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		}
 	}
 	break;
+	case DEEANIM_CHOOSE_WAIT:
+	{
+		baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.f);
+	}
+	break;
 	case DEEANIM_LANDING:
 		baseInfo.pController->Move_Dir(baseInfo.pTransformCom, baseInfo.pTransformCom->Get_State(CTransform::STATE_LOOK) * fTimeDelta, fTimeDelta);
 		//baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, -0.25f);
 		break;
+
 	default:
-	baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.2f);
+		baseInfo.pController->FreeFall(baseInfo.pTransformCom, fTimeDelta, 6.f, 0.2f);
 		break;
 	}
 

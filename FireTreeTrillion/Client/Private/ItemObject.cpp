@@ -45,12 +45,16 @@ HRESULT CItemObject::Initialize(void* pArg)
     hr = __super::Initialize(pArg);
     CHECK_FAILED(hr);
 
+    m_bUpdate_FXSocketMatrix = false;
+
     return S_OK;
 }
 
 _int CItemObject::Tick(_float fTimeDelta)
 {
     __super::Tick(fTimeDelta);
+
+    
 
     return OBJ_NOEVENT;
 }

@@ -472,6 +472,30 @@ void CGameInstance::Fog_Intialize_ForIntroLevel(_int iPoint)
 	m_pRenderer->Fog_Intialize_ForIntroLevel(iPoint);
 }
 
+void CGameInstance::Fog_Intialize_ForRacing(_int iPoint)
+{
+	CHECK_NULLPTR(m_pRenderer);
+	m_pRenderer->Fog_Intialize_ForRacing(iPoint);
+}
+
+void CGameInstance::Fog_Intialize_ForDeeDeeDee(_int iPoint)
+{
+	CHECK_NULLPTR(m_pRenderer);
+	m_pRenderer->Fog_Intialize_ForDeeDeeDee(iPoint);
+}
+
+void CGameInstance::Fog_Intialize_ForPark(_int iPoint)
+{
+	CHECK_NULLPTR(m_pRenderer);
+	m_pRenderer->Fog_Intialize_ForPark(iPoint);
+}
+
+void CGameInstance::Fog_Intialize_ForFinalBoss(_int iPoint)
+{
+	CHECK_NULLPTR(m_pRenderer);
+	m_pRenderer->Fog_Intialize_ForFinalBoss(iPoint);
+}
+
 void CGameInstance::Increase_FogYValue(_float fTimeDelta)
 {
 	CHECK_NULLPTR(m_pRenderer);

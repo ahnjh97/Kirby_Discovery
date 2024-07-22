@@ -26,6 +26,8 @@ public:
 	virtual _float4 Compute_RandDirection() = 0;
 	//공전 스피드 계산
 	virtual _float Compute_RandOrbitSpeed() = 0;
+	//공전 스피드 계산
+	virtual _float Compute_RandTurnSpeed() = 0;
 	//Color + Alpha 계산
 	virtual _float4 Compute_RandColor() = 0;
 	virtual _float4 Compute_RandTargetColor() = 0;
@@ -71,16 +73,20 @@ public:
 	virtual void OrbitAcceleration(_float fTimeDelta, VTXMATRIX* pVertices);
 	virtual void OrbitDecelerate(_float fTimeDelta, VTXMATRIX* pVertices);
 
+	//자전 감속, 가속한다.
+	virtual void TurnAcceleration(_float fTimeDelta, VTXMATRIX* pVertices);
+	virtual void TurnDecelerate(_float fTimeDelta, VTXMATRIX* pVertices);
+
 	// 색상이 보간된다
 	virtual void Color_Interpolate(_float fTimeDelta, VTXMATRIX* pVertices);
 
 	// 자전한다.
 	virtual void Turn(_float fTimeDelta, VTXMATRIX* pVertices);
 	// 이동 방향으로 회전한다.
-	virtual void Turn_MoveDirection(_float fTimeDelta, VTXMATRIX* pVertices);
+	virtual void Turn_MoveDirection(_float fTimeDelta, VTXMATRIX* pVertices, const _float4x4* pSocketMatrix);
 
 
-	virtual void Save_PrePos(VTXMATRIX* pVertices);
+	virtual void Save_PrePos(VTXMATRIX* pVertices, const _float4x4* pSocketMatrix);
 
 
 	void Compute_LifeTime(VTXMATRIX* pVertices, _uint iInstanceIndex, _float fTimeDelta);
@@ -129,10 +135,12 @@ protected:
 
 	// Orbit 도는 속도 (Degree값) 랜덤 필요함
 	_float*						m_pOrbitSpeed = { nullptr };
+	_float*						m_pTurnSpeed = { nullptr };
 
 	_float*						m_pStartDelays = { nullptr };
 
 	_float*						m_pAccSupplyAmount = { nullptr };
+	_float*						m_pOrbitSupplyAmount = { nullptr };
 	_float*						m_pTurnSupplyAmount = { nullptr };
 
 
@@ -140,7 +148,10 @@ protected:
 	_float3*					m_pInitialScales = { nullptr };
 	_float*						m_pInitialSpeeds = { nullptr };
 
+	// 로컬을 위한 위치
 	_float3*					m_pPrePositions = { nullptr };
+	_float3*					m_pPreWorldPositions = { nullptr };
+
 	_float3*					m_pVelocities = { nullptr };
 
 	_float3*					m_pPreAxis = { nullptr };

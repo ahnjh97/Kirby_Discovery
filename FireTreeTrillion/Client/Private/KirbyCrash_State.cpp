@@ -347,6 +347,7 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 					FXDesc.vInitPos = { 0.f, 0.f, 0.f };
 					FXDesc.vInitRot = { 0.f, 0.f, 0.f };
 					FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+					m_pGameInstance->Set_Brown(0.5f, true);
 					if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash FIn"), &FXDesc)))
 						return;
 				}
@@ -422,7 +423,6 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 					return;
 			}
 
-			m_pGameInstance->Set_Brown(0.5f, true);
 			m_pGameInstance->Get_DirectionLightAddress()->Interpolate_Light(DESC(m_vPreDiffuseLight), 1.f, 2.f);
 			static_cast<CCamera_Main*>(pCamera)->Zoom(0.f);
 			m_bTerrainOn = true;
@@ -534,7 +534,7 @@ void CKirbyCrash_Charge_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			DESC(m_vPreDiffuseLight) = m_pGameInstance->Get_DirectionLightAddress()->Get_LightDesc()->vDiffuse;
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake(0.3f, 0.5f);
-			pKirby->Delete_Effect("YW Crash Charge");
+			pKirby->Delete_Effect("YW Crash Charge MAX");
 			m_bTrigger = false;
 		}
 
@@ -555,10 +555,10 @@ void CKirbyCrash_Charge_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		{
 			CMultiEffect::MULTI_FX_DESC MFXDesc{};
 			MFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-			MFXDesc.vInitPos = _float3{ 0.f, 1.5f, 0.f };
+			MFXDesc.vInitPos = _float3{ 0.f, 0.f, 0.f };
 			MFXDesc.vInitScale = { 1.f, 1.f, 1.f };
 
-			pKirby->Add_Effect("YW Crash Charge", MFXDesc, true);
+			pKirby->Add_Effect("YW Crash Charge MAX", MFXDesc, true);
 
 			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash Charge"), &MFXDesc)))
 			//	return;
@@ -739,7 +739,7 @@ void CKirbyCrash_BigCharge_State::OnStateUpdate(CGameObject* pGameObject, _float
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake(0.3f, 0.5f);
 
-			pKirby->Delete_Effect("YW Crash Charge");
+			pKirby->Delete_Effect("YW Crash Charge MAX");
 
 			m_bTrigger = false;
 		}
