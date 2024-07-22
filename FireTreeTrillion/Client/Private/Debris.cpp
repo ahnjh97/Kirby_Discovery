@@ -52,6 +52,22 @@ void CDebris::Set_ParticleEffect(_fvector vPosition, _float fScale)
 	m_bSwap = true;
 }
 
+void CDebris::Set_DebrisInfo(_float4 vPos, _float fScale, _float fY, _float3 vDir, _float fTotalTime, _float fFallSpeed)
+{
+	m_vRotationAxis = CUtils::Make_Random_Vector(1);
+	m_fScale = fScale;
+	m_fY = fY;
+	m_fX = vDir.x;
+	m_fZ = vDir.z;
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+	m_pTransformCom->Set_Scaled(fScale, fScale, fScale);
+	m_fTime = 0.f;
+	m_fTotalTime = fTotalTime;
+	m_fFallSpeed = fFallSpeed;
+	m_bDead = false;
+	m_bSwap = false;
+}
+
 HRESULT CDebris::Initialize_Prototype()
 {
 	return S_OK;
@@ -80,7 +96,7 @@ HRESULT CDebris::Initialize(void* pArg)
 
 	m_fSamplingFactor = 0.1f;
 	m_fTotalTime = 1.f;
-
+	m_fFallSpeed = 16.f;
 	//CEffect::FX_DESC FXDesc{};
 	//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	//FXDesc.vInitPos = { 0.f, 1.4f, -.5f };
@@ -124,7 +140,7 @@ _int CDebris::Tick(_float fTimeDelta)
 			m_pTransformCom->Turn(m_vRotationAxis, m_fTimeDelta * 8.f);
 
 			//m_fY = m_fY * cos(m_fTime * XM_PI / (m_fTotalTime * 2.f)) * fTimeDelta
-			m_fY -= m_fTime * GRAVITY * 0.3f;
+			m_fY -= m_fTime * GRAVITY * m_fTimeDelta * m_fFallSpeed;
 
 			_float4 vDir = _float4(m_fX * m_fTimeDelta, m_fY * m_fTimeDelta, m_fZ * m_fTimeDelta, 0);
 			m_pTransformCom->Move(vDir);

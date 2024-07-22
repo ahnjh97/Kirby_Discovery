@@ -26,6 +26,7 @@ private:
 public:
 	void Set_ParticleDebris(_fvector vPosition, _float fScale = 1.f, _float2 fRandY = _float2(10.f, 20.f), _float2 fRandXZ = _float2(5.f, 10.f), _float fTotalTime = 1.f);
 	void Set_ParticleEffect(_fvector vPosition, _float fScale);
+	void Set_DebrisInfo(_float4 vPos, _float fScale, _float fY, _float3 vDir, _float fTotalTime = 1.f, _float fFallSpeed = 16.f);
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -47,6 +48,7 @@ private:
 
 	_vector m_vRotationAxis = {};
 
+	_float m_fFallSpeed = {};
 	_float m_fTotalTime = { 0.f };
 	_float m_fTime = { 0.f };
 	_float m_fX{}, m_fY{}, m_fZ{};

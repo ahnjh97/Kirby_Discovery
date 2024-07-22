@@ -202,6 +202,7 @@ _int CSimba::Tick(_float fTimeDelta)
 	ResetRotation();
 	m_bRenderDimensionClaw = false;
 	m_bLaserActivated = false;
+	m_bStateChanged = false;
 
 	if (true == m_pModelCom->IsFinished() || m_pModelCom->Get_Trackposition() == 0.f) // IsAnimFinished
 		Reset_HitBoxTimingMap(SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex()));
@@ -212,10 +213,6 @@ _int CSimba::Tick(_float fTimeDelta)
 
 	if (m_pGameInstance->Get_KeyState(DIK_CAPSLOCK, KEY_PRESS))
 	{
-		SetUpSecondTarget();
-		HideDimensionClawActor();
-		HideDimensionLaserActor();
-
 		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
 			Change_State(Simba_QuickClawStartL, 50.f, false, true);
 		else if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
@@ -236,6 +233,16 @@ _int CSimba::Tick(_float fTimeDelta)
 			Change_State(Simba_BiteRushJumpStartL, 50.f, false, true);
 		else if (m_pGameInstance->Get_KeyState(DIK_0, KEY_DOWN))
 			Change_State(Simba_BiteRushJumpStartR, 50.f, false, true);
+
+		if (true == m_bStateChanged) {
+			SetUpSecondTarget();
+			SIMBA_ANIM eState = SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex());
+			Reset_HitBoxTimingMap(eState);
+			if (m_setDimensionClawAnims.end() == m_setDimensionClawAnims.find(eState))
+				HideDimensionClawActor();
+			if (m_setDimensionLaserAnims.end() == m_setDimensionLaserAnims.find(eState))
+				HideDimensionLaserActor();
+		}
 	}
 
 	__super::Tick(m_fTimeDelta);
@@ -410,7 +417,7 @@ void CSimba::Change_State(SIMBA_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _
 			HideDimensionLaserActor();
 	}
 
-	m_pFSM->ChangeState(eState, _fAnimSpeed, _bLoop, _bInterpolation);
+	m_bStateChanged = m_pFSM->ChangeState(eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
 void CSimba::CreateHpBar()
@@ -836,103 +843,204 @@ void CSimba::SpawnRocks(_uint iAnimIdx)
 
 void CSimba::SpawnDebris(_uint iAnimIdx)
 {
-	if (Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx) 
-	{
-		_uint iNumDebris = 2;
-		_uint iIndex = m_iLastDebrisIndex + 1;
-		if (iIndex >= m_vecDebris.size())
-			iIndex = 0;
+	_float4 vFloatLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	_float4 vFloatRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+	_uint iLastIndex{};
 
+	if (Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx || Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
+	{
+		if (Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
+			vFloatRight = -vFloatRight;
+
+		_uint iNumDebris = 50;
 		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
 		vPos.y = 0;
-		for (_uint i = iIndex; i < iIndex + iNumDebris; i++)
+		_float fOffsetDis = 3.f;
+		if (Simba_QuickClaw2L == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
+			fOffsetDis = 1.f;
+
+		for (_uint i = m_iNextDebrisIndex; i < m_iNextDebrisIndex + iNumDebris; i++)
 		{
-			m_vecDebris[iIndex]->Set_ParticleDebris(vPos);
-			m_listUsedDebris.push_back(iIndex);
+			_uint iCurIdx = i;
+			_uint iVecSize = m_vecDebris.size();
+			if (iCurIdx >= iVecSize)
+				iCurIdx -= iVecSize;
 
-			m_iLastDebrisIndex++;
-		}
-	}
-	else if (Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
-	{
-		_uint iNumDebris = 2;
-		_uint iIndex = m_iLastDebrisIndex + 1;
-		if (iIndex >= m_vecDebris.size())
-			iIndex = 0;
+			_float fScale = CUtils::Make_RandomFloat(0.08f, 0.2f);
+			_float fY = CUtils::Make_RandomFloat(18.f, 32.f);
 
-		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
-		vPos.y = 0;
-		for (_uint i = iIndex; i < iIndex + iNumDebris; i++)
-		{
-			m_vecDebris[iIndex]->Set_ParticleDebris(vPos);
-			m_listUsedDebris.push_back(iIndex);
+			_float3 vDir = CUtils::TurnDirectionVector(vFloatRight, _float3(0, 1, 0), CUtils::Make_RandomFloat(-80, 80));
+			_float fDis = CUtils::Make_RandomFloat(12.f, 16.f);
+			_float fFallSpeed = CUtils::Make_RandomFloat(9.f, 16.f);
 
-			m_iLastDebrisIndex++;
+			m_vecDebris[iCurIdx]->Set_DebrisInfo(vPos + vFloatRight * fOffsetDis, fScale, fY, vDir * fDis, 2.5f, fFallSpeed);
+			m_listUsedDebris.push_back(iCurIdx);
+
+			iLastIndex = iCurIdx + 1;
 		}
 	}
 	else if (Simba_FinalCrusher == iAnimIdx)
 	{
-		_uint iNumDebris = 2;
-		_uint iIndex = m_iLastDebrisIndex + 1;
-		if (iIndex >= m_vecDebris.size())
-			iIndex = 0;
-
-		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
+		_uint iNumDebris = 100;
+		
+		_float4 vPos = (m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone) + m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone)) * 0.5f;
 		vPos.y = 0;
-		for (_uint i = iIndex; i < iIndex + iNumDebris; i++)
-		{
-			m_vecDebris[iIndex]->Set_ParticleDebris(vPos);
-			m_listUsedDebris.push_back(iIndex);
 
-			m_iLastDebrisIndex++;
+		for (_uint i = m_iNextDebrisIndex; i < m_iNextDebrisIndex + iNumDebris; i++)
+		{
+			_uint iCurIdx = i;
+			_uint iVecSize = m_vecDebris.size();
+			if (iCurIdx >= iVecSize)
+				iCurIdx -= iVecSize;
+
+			_float fScale = CUtils::Make_RandomFloat(0.08f, 0.2f);
+			_float fY = CUtils::Make_RandomFloat(16.f, 28.f);
+			
+			_float3 vDir = CUtils::TurnDirectionVector(vFloatLook, _float3(0, 1, 0), CUtils::Make_RandomFloat(0, 360));
+			_float fDis = CUtils::Make_RandomFloat(7.f, 11.f);
+			_float fFallSpeed = CUtils::Make_RandomFloat(9.f, 16.f);
+
+			m_vecDebris[iCurIdx]->Set_DebrisInfo(vPos + vDir * 2.f, fScale, fY, vDir * fDis, 2.5f, fFallSpeed);
+			m_listUsedDebris.push_back(iCurIdx);
+
+			iLastIndex = iCurIdx + 1;
+		}
+	}
+	else if (Simba_DoubleClawDash == iAnimIdx || (Simba_DoubleClaw == iAnimIdx && 0.2f > Get_AnimRatio()))
+	{
+		_uint iNumDebris = 1;
+		_float4 vLeftHandPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
+		_float4 vRightHandPos = m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone);
+		vLeftHandPos.y = 0;
+		vRightHandPos.y = 0;
+
+		for (_uint i = m_iNextDebrisIndex; i < m_iNextDebrisIndex + iNumDebris; i++)
+		{
+			_uint iCurIdx = i;
+			_uint iVecSize = m_vecDebris.size();
+			if (iCurIdx >= iVecSize)
+				iCurIdx -= iVecSize;
+
+			_float fScale = CUtils::Make_RandomFloat(0.08f, 0.2f);
+			_float fY = CUtils::Make_RandomFloat(12.f, 28.f);
+
+			_float3 vDir = CUtils::TurnDirectionVector(vFloatLook, _float3(0, 1, 0), CUtils::Make_RandomFloat(-80, 80));
+			_float fDis = CUtils::Make_RandomFloat(12.f, 16.f);
+			_float fRightOffset = CUtils::Make_RandomFloat(-2.5f, 2.5f);
+			_float fFallSpeed = CUtils::Make_RandomFloat(9.f, 16.f);
+			m_vecDebris[iCurIdx]->Set_DebrisInfo(vLeftHandPos + (vFloatRight * fRightOffset) - vFloatLook * 3.3f, fScale, fY, vDir * fDis, 2.5f, fFallSpeed);
+			m_listUsedDebris.push_back(iCurIdx);
+
+			iCurIdx++;
+			if (iCurIdx >= iVecSize)
+				iCurIdx -= iVecSize;
+			fScale = CUtils::Make_RandomFloat(0.08f, 0.2f);
+			fY = CUtils::Make_RandomFloat(18.f, 32.f);
+			vDir = CUtils::TurnDirectionVector(vFloatLook, _float3(0, 1, 0), CUtils::Make_RandomFloat(-80, 80));
+			fDis = CUtils::Make_RandomFloat(12.f, 16.f);
+			fFallSpeed = CUtils::Make_RandomFloat(9.f, 16.f);
+
+			m_vecDebris[iCurIdx]->Set_DebrisInfo(vRightHandPos + (vFloatRight * fRightOffset) - vFloatLook * 3.3f, fScale, fY, vDir * fDis, 2.5f, fFallSpeed);
+			m_listUsedDebris.push_back(iCurIdx);
+
+			iLastIndex = iCurIdx + 1;
 		}
 	}
 	else if (Simba_DoubleClaw == iAnimIdx)
 	{
-		if (45 > m_iDebrisCount)
-		{
+		_uint iNumDebris = 100;
+		
+		_float4 vPos = (m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone) + m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone)) * 0.5f;
+		vPos.y = 0;
 
-		}
-		else if (45 == m_iDebrisCount)
+		for (_uint i = m_iNextDebrisIndex; i < m_iNextDebrisIndex + iNumDebris; i++)
 		{
+			_uint iCurIdx = i;
+			_uint iVecSize = m_vecDebris.size();
+			if (iCurIdx >= iVecSize)
+				iCurIdx -= iVecSize;
 
+			_float fScale = CUtils::Make_RandomFloat(0.12f, 0.24f);
+			_float fY = CUtils::Make_RandomFloat(26.f, 40.f);
+
+			_float3 vDir = CUtils::TurnDirectionVector(vFloatLook, _float3(0, 1, 0), CUtils::Make_RandomFloat(-80, 80));
+			_float fDis = CUtils::Make_RandomFloat(14.f, 19.f);
+			_float fRightOffset = CUtils::Make_RandomFloat(-4.8f, 4.8f);
+			_float fLookOffset = CUtils::Make_RandomFloat(-2.5f, 4.5f);
+			_float fFallSpeed = CUtils::Make_RandomFloat(9.f, 16.f);
+			m_vecDebris[iCurIdx]->Set_DebrisInfo(vPos + (vFloatRight * fRightOffset) + vFloatLook * fLookOffset, fScale, fY, vDir * fDis, 2.5f, fFallSpeed);
+			m_listUsedDebris.push_back(iCurIdx);
+
+			iLastIndex = iCurIdx + 1;
 		}
 	}
 	else if (Simba_AttackJumpHit == iAnimIdx)
 	{
-		_uint iNumDebris = 2;
-		_uint iIndex = m_iLastDebrisIndex + 1;
-		if (iIndex >= m_vecDebris.size())
-			iIndex = 0;
-
-		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
-		vPos.y = 0;
-		for (_uint i = iIndex; i < iIndex + iNumDebris; i++)
+		_uint iNumDebris = 40;
+		_float4 vPos{};
+		if (0 == m_iDebrisCount)
+			vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
+		else
+			vPos = m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone);
+		vPos.y = 0.f;
+		
+		for (_uint i = m_iNextDebrisIndex; i < m_iNextDebrisIndex + iNumDebris; i++)
 		{
-			m_vecDebris[iIndex]->Set_ParticleDebris(vPos);
-			m_listUsedDebris.push_back(iIndex);
+			_uint iCurIdx = i;
+			_uint iVecSize = m_vecDebris.size();
+			if (iCurIdx >= iVecSize)
+				iCurIdx -= iVecSize;
 
-			m_iLastDebrisIndex++;
+			_float fScale = CUtils::Make_RandomFloat(0.08f, 0.2f);
+			_float fY = CUtils::Make_RandomFloat(12.f, 24.f);
+
+			_float3 vDir = CUtils::TurnDirectionVector(vFloatLook, _float3(0, 1, 0), CUtils::Make_RandomFloat(-80, 80));
+			_float fDis = CUtils::Make_RandomFloat(6.f, 10.f);
+			_float fRightOffset =  CUtils::Make_RandomFloat(-2.f, 2.f);
+
+			_float fLookOffset = CUtils::Make_RandomFloat(0.5f, 3.5f);
+			_float fFallSpeed = CUtils::Make_RandomFloat(9.f, 16.f);
+
+			m_vecDebris[iCurIdx]->Set_DebrisInfo(vPos + (vFloatRight * fRightOffset) + vFloatLook * fLookOffset, fScale, fY, vDir * fDis, 2.5f, fFallSpeed);
+			m_listUsedDebris.push_back(iCurIdx);
+
+			iLastIndex = iCurIdx + 1;
 		}
 	}
 	else if (Simba_DimensionLaser == iAnimIdx)
 	{
-		_uint iNumDebris = 2;
-		_uint iIndex = m_iLastDebrisIndex + 1;
-		if (iIndex >= m_vecDebris.size())
-			iIndex = 0;
+		_uint iNumDebris = 4;
+		_float4 vLaserPos = m_pSimbaLaserTransform->Get_State(CTransform::STATE_POSITION);
+		_float3 vLaserLook = m_pSimbaLaserTransform->Get_State(CTransform::STATE_LOOK);
+		vLaserLook.Normalize();
 
-		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
-		vPos.y = 0;
-		for (_uint i = iIndex; i < iIndex + iNumDebris; i++)
+		_float fLaserDis = m_pSimbaLaserTransform->RayCast(CTransform::STATIC, vLaserLook, 40.f);
+		_float4 fResultPos = vLaserPos + (vLaserLook * fLaserDis);
+		fResultPos.y = 0.f;
+
+		for (_uint i = m_iNextDebrisIndex; i < m_iNextDebrisIndex + iNumDebris; i++)
 		{
-			m_vecDebris[iIndex]->Set_ParticleDebris(vPos);
-			m_listUsedDebris.push_back(iIndex);
+			_uint iCurIdx = i;
+			_uint iVecSize = m_vecDebris.size();
+			if (iCurIdx >= iVecSize)
+				iCurIdx -= iVecSize;
 
-			m_iLastDebrisIndex++;
+			_float fScale = CUtils::Make_RandomFloat(0.15f, 0.26f);
+			_float fY = CUtils::Make_RandomFloat(20.f, 34.f);
+
+			_float3 vDir = CUtils::TurnDirectionVector(vFloatLook, _float3(0, 1, 0), CUtils::Make_RandomFloat(0, 360));
+			_float fDis = CUtils::Make_RandomFloat(8.f, 13.f);
+			_float fRightOffset = CUtils::Make_RandomFloat(-4.f, 4.f);
+			_float fFallSpeed = CUtils::Make_RandomFloat(9.f, 16.f);
+			_float fLookOffset = CUtils::Make_RandomFloat(-0.3f, 0.7f);
+			m_vecDebris[iCurIdx]->Set_DebrisInfo(fResultPos + (vFloatLook * fLookOffset) + (vFloatRight * fRightOffset), fScale, fY, vDir * fDis, 3.f, fFallSpeed);
+			m_listUsedDebris.push_back(iCurIdx);
+
+			iLastIndex = iCurIdx + 1;
 		}
 	}
 
+	m_iNextDebrisIndex = iLastIndex;
 	m_iDebrisCount++;
 }
 
@@ -1359,12 +1467,6 @@ void CSimba::TriggerMonsterSpawning(_uint iTriggerIndex)
 
 void CSimba::SpawnMonsters(_uint iTriggerIndex)
 {
-	wstring wstrLayerTag = TEXT("Layer_Wave");
-	if (11 == iTriggerIndex)
-		wstrLayerTag += TEXT("1");
-	else if (12 == iTriggerIndex)
-		wstrLayerTag += TEXT("2");
-
 	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
 	wstring wstrMonsterName;
 
@@ -1396,6 +1498,7 @@ void CSimba::SpawnMonsters(_uint iTriggerIndex)
 	else if (TEXT("RabbitBig") == wstrMonsterName) {
 		fY = 2.4f;
 		fScaleOffset = 1.2f;
+		m_bWave2Summoned = true;
 	}
 		
 	for (auto& monsterDesc : m_vecMonsterDescs)
@@ -1415,7 +1518,7 @@ void CSimba::SpawnMonsters(_uint iTriggerIndex)
 				monsterDesc.matWorld._42 = 2.f;
 			}
 
-			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SIMBA, wstrLayerTag, wstrTag, &monsterDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SIMBA, g_strLayerMonster, wstrTag, &monsterDesc)))
 				return;
 
 			CEffect::FX_DESC FXDesc{};
@@ -1539,16 +1642,16 @@ void CSimba::CheckSpawning()
 
 		if (0.f < m_fSpawnTime && 0 == m_iEffectCount)
 			SpawnEffects(12);
-		else if (0.5f < m_fSpawnTime && 1 == m_iEffectCount)
+		else if (0.3f < m_fSpawnTime && 1 == m_iEffectCount)
 			SpawnEffects(12);
-		else if (1.1f < m_fSpawnTime && 2 == m_iEffectCount)
+		else if (0.7f < m_fSpawnTime && 2 == m_iEffectCount)
 			SpawnEffects(12);
 
 		if (1.2f < m_fSpawnTime && 0 == m_iMonsterCount)
 			SpawnMonsters(12);
-		else if (1.7f < m_fSpawnTime && 1 == m_iMonsterCount)
+		else if (1.5f < m_fSpawnTime && 1 == m_iMonsterCount)
 			SpawnMonsters(12);
-		else if (2.3f < m_fSpawnTime && 2 == m_iMonsterCount)
+		else if (1.9f < m_fSpawnTime && 2 == m_iMonsterCount)
 			SpawnMonsters(12);
 	}
 }

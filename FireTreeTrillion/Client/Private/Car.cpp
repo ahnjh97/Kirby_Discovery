@@ -36,6 +36,11 @@ HRESULT CCar::Initialize(void* pArg)
 
 	m_bMotionBlur = true;
 
+	CParticle::PARTICLE_DESC ParticleDesc{};
+	ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	ParticleDesc.vInitPos = _float3(0.f, 0.5f, 0.f);
+	Add_Effect("YW Deform Ora", ParticleDesc, true);
+
 	return S_OK;
 }
 
@@ -47,6 +52,7 @@ _int CCar::Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 	// 구현부
 	Compute_MotionBlur();
+	Compute_DeformRimLight(m_fTimeDelta);
 	Set_Animation();
 
 
@@ -99,7 +105,10 @@ void CCar::Late_Tick(_float fTimeDelta)
 			m_pModelCom->Play_Animation(m_fAccTime);
 
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+
+		m_iRenderCount = 1;
 	}
 }
 
@@ -110,36 +119,70 @@ HRESULT CCar::Render()
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
-	for (size_t i = 0; i < iNumMeshes; i++)
+	if (m_iRenderCount == 0)
 	{
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
-			return E_FAIL;
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vDeformRimColor", &m_vDeformRimColor, sizeof(_float3))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+				return E_FAIL;
+			if (FAILED(m_pMaskTextureCom->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture")))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveRatio", &m_fDissolveRatio, sizeof(_float))))
+				return E_FAIL;
+			_float2 vTEXUV = { m_fUVOffsetTime , m_fUVOffsetTime };
 
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
-			return E_FAIL;
-		_float fWhiteColorDiffuse = 0.f;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColorDiffuse, sizeof(_float))))
-			return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVOffset", &vTEXUV, sizeof(_float2))))
+				return E_FAIL;
 
-		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
-			return E_FAIL;
+			/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_DEFORMRIM)))
+				return E_FAIL;
 
-		m_pModelCom->Render(i);
+			m_pModelCom->Render(i);
+		}
+
+	}
+	else
+	{
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
+				return E_FAIL;
+			_float fWhiteColorDiffuse = 0.f;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fWhiteColorDiffuse, sizeof(_float))))
+				return E_FAIL;
+
+			/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+				return E_FAIL;
+
+			m_pModelCom->Render(i);
+		}
+
+		m_iRenderCount = 0;
 	}
 
 	return S_OK;
@@ -177,6 +220,11 @@ HRESULT CCar::Add_Components()
 	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Car"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
+
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_FX_FireDissolve"),
+		TEXT("Com_Texture_Mask"), (CComponent**)&m_pMaskTextureCom)))
+		return E_FAIL;
+
 
 	_float4 vPos = m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 	CCharacterController::CONTROLLER_DESC desc{};
@@ -268,6 +316,9 @@ CGameObject* CCar::Clone(void* pArg)
 
 void CCar::Free()
 {
+	Delete_AllEffect();
+
 	__super::Free();
 	Safe_Release(m_pModelCom);
+	Safe_Release(m_pMaskTextureCom);
 }

@@ -15,6 +15,8 @@ texture2D g_KirbyEyeTexture;
 
 texture2D g_ObjNearClipTexture;
 
+texture2D g_MaskTexture;
+
 bool g_bStencil;
 bool g_bRimLight;
 float m_fRimWidth;
@@ -29,6 +31,11 @@ bool g_bBulbOn;
 float4 g_BulbPosition;
 
 float4 g_vCamPosition;
+
+float3 g_vDeformRimColor;
+float2 g_vUVOffset;
+float g_fDissolveRatio;
+
 
 struct VS_IN
 {
@@ -760,6 +767,50 @@ PS_OUT PS_EMISSIVE(PS_IN In)
     return Out;
 }
 
+
+PS_OUT PS_FOR_DEFORMRIM(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+    float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
+    float3x3 WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+    float3 vWorldNormal = mul(vNormal, WorldMatrix);
+    vector vMask = g_MaskTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
+    
+    float4 vWorldPos = In.vWorldPos;
+    
+    Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
+        
+    float4 vLook = float4(g_vCamPosition.xyz, 1.f) - float4(vWorldPos.xyz, 1.f);
+    float vDot = dot(normalize(vLook), normalize(float4(vWorldNormal, 0.f)));
+    
+    vDot = 1.0f - saturate(vDot); // 내적 값이 0에 가까울수록 vDot이 1에 가까워지도록 변환
+    
+    vDot = 1 - pow(-2 * vDot + 2, 2) / 3;
+    //vDot = vDot < 0.5 ?
+    //2 * vDot * vDot :
+    //1 - pow(-2 * vDot + 2, 2) / 3;
+    //vDot = pow(vDot, 10.f);
+    
+    vector vRimLightColor = 0;
+    
+    if (vDot < 0.1f)
+        discard;
+    
+    if (vMask.r < g_fDissolveRatio)
+        discard;
+    
+    vRimLightColor.rgb = g_vDeformRimColor.rgb * vDot;
+    vRimLightColor.a = vDot;
+    
+    vRimLightColor += float4(0.4, 0.4, 0.4, 0);
+
+    Out.vDiffuse = saturate(vRimLightColor) * max(vMask, 0.2f);
+    return Out;
+}
+
+
 technique11 DefaultTechnique
 {
     // 기본적인 애니메이션 모델 ( 0 )
@@ -1049,4 +1100,19 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_EMISSIVE();
     }
+
+    // DeformRimEffect (21)
+    pass DeformRimEffect
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_FOR_DEFORMRIM();
+    }
+
 }
