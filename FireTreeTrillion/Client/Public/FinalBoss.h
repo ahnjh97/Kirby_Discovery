@@ -105,8 +105,11 @@ public:
 	void Set_Spike(_bool bSpike) { m_bSpike = bSpike; }
 	_bool Get_Spike() { return m_bSpike; }
 
+	void Set_BeforeHp(_float fBeforeHp) { m_fBeforeHp = fBeforeHp; }
+
 	//이벤트 함수
 	void Appear_Event(CGameObject* pObj);
+
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -165,6 +168,7 @@ private:
 	_float				m_fGlideTime = { 0.f };
 	//_float				m_fGullyTime = { 0.f };
 	_float				m_fTimeDelay = { 0.f };
+	_float				m_fBeforeHp = { 0.f };
 
 	_uint				m_iGullyCnt = { 0 };
 	_uint				m_iDebrisCnt = { 0 };
