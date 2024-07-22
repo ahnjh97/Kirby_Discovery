@@ -95,6 +95,9 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 
 void CSingleEffect::Late_Tick(_float _fTimeDelta)
 {
+	if (m_bDead)
+		return;
+
 	//현재 설정 값으로 적용할 타임델타 값을 바꾼다.
 	_float fMyTimeDelta = _fTimeDelta;
 	switch (m_eTimer)
@@ -130,6 +133,8 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 		}
 	}
 
+	if (m_fLifetime.second < m_fDuration.first && .9f < m_vCurScale.x)
+		_int a = 0;
 
 	//true 반환하면 lifetime 끝난 것.
 	if (Calculate_Lifetime(fMyTimeDelta))
