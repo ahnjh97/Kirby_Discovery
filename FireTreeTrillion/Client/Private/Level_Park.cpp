@@ -82,6 +82,7 @@ HRESULT CLevel_Park::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Deform"), TEXT("Prototype_GameObject_DumpCar"), &ObjDesc)))
 		return E_FAIL;
 	
+	// 셰이더 세팅
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_PARK);
 	m_pGameInstance->Set_ObjectBlack(1.f);
@@ -108,7 +109,6 @@ HRESULT CLevel_Park::Initialize()
 	// 검정 포그 설정
 	m_pGameInstance->Fog_Intialize_ForPark(0);
 
-
 	return S_OK;
 }
 
@@ -118,7 +118,7 @@ void CLevel_Park::Teleport_Player()
 	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
 	pTransingStar->Set_NextLevel(LEVEL_END);
 	pTransingStar->Activate(CTransingStar::CLOSE);
-	pTransingStar->Set_LargeColor(_float3(95.f / 255.f, 28.f / 255.f, 128.f / 255.f));
+	pTransingStar->Set_LargeColor(_float3(95.f  / 255.f, 28.f / 255.f, 128.f / 255.f));
 	pTransingStar->Set_SmallColor(_float3(167.f / 255.f, 42.f / 255.f, 168.f / 255.f));
 
 	//CLoadingStart* pLoadingStart = static_cast<CLoadingStart*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar")));
