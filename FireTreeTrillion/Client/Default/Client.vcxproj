@@ -106,6 +106,7 @@
       <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../EngineSDK/Inc/ImGui/;../Bin/core/inc/;../Default/;../../EngineSDK/Inc/physx/</AdditionalIncludeDirectories>
       <AdditionalOptions>/MP /Zm200 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -382,6 +383,7 @@
     <ClInclude Include="..\Public\RayArrow.h" />
     <ClInclude Include="..\Public\RigidObject.h" />
     <ClInclude Include="..\Public\Simba.h" />
+    <ClInclude Include="..\Public\SimbaLaser.h" />
     <ClInclude Include="..\Public\SimbaRock.h" />
     <ClInclude Include="..\Public\SimbaRoomGlass.h" />
     <ClInclude Include="..\Public\Simba_State.h" />
@@ -426,7 +428,6 @@
     <ClInclude Include="Box.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="SimbaLaser.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -642,6 +643,7 @@
     <ClCompile Include="..\Private\RayArrow.cpp" />
     <ClCompile Include="..\Private\RigidObject.cpp" />
     <ClCompile Include="..\Private\Simba.cpp" />
+    <ClCompile Include="..\Private\SimbaLaser.cpp" />
     <ClCompile Include="..\Private\SimbaRock.cpp" />
     <ClCompile Include="..\Private\SimbaRoomGlass.cpp" />
     <ClCompile Include="..\Private\Simba_State.cpp" />
@@ -684,7 +686,6 @@
     <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="..\Private\WasteCan.cpp" />
     <ClCompile Include="Client.cpp" />
-    <ClCompile Include="SimbaLaser.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
