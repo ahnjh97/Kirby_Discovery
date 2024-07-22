@@ -82,6 +82,7 @@ private:
 	_float4				m_vRotatePos = {};
 
 	// 와리가리 상태의 카부
+	_float				m_fRallyDistance = { 0.f };
 	_float4				m_vRally = {};
 	_uint				m_iCnt = { 0 };
 	_bool				m_bConvert = { false };
@@ -90,6 +91,8 @@ private:
 
 	_float				m_fMoveTime = { 0.f };
 	_float				m_fSpeed = { 0.f };
+	_float				m_fDelayTime = { 0.f };
+
 	_float				m_bbongTime1 = { 0.f };
 	_float				m_bbongTime2 = { 0.f };
 	_float				m_bbongTime3 = { 0.f };

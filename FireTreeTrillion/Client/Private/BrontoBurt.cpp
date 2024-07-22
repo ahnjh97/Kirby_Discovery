@@ -83,6 +83,10 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
+	m_fDelayTime += m_fTimeDelta;
+	if (10.f > m_fDelayTime)
+		m_fTimeDelta = 0.f;
+
 	// ¸¸¾à, ¹âÈ÷¸é ±× ¼ø°£ ±×³É Âð»§µÇ°í Á×´Â´Ù.
 	if (m_ePhyXState == PO_PRESSED)
 	{
@@ -100,7 +104,9 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 
 			_float4 vReturnLook = m_vLastPos - m_pTransformCom->Get_State_Float4(CTransform::STATE_POSITION);
 			if (0.1f < fDistance)
+			{
 				m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(vReturnLook) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+			}
 			else
 			{
 				m_bReturn = false;
@@ -144,8 +150,13 @@ _int CBrontoBurt::Tick(_float fTimeDelta)
 
 			fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), m_vecRallyPoint[m_iCnt + 1])));
 
-			if (0.1f < fDistance)
-				m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+			if (0.2f < fDistance)
+			{
+				_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				vPos += XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed;
+				vPos.m128_f32[1] += 1.f;
+				m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta);
+			}
 			else
 			{
 				if (m_iCnt < m_vecRallyPoint.size() - 2)

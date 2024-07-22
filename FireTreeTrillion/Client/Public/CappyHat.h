@@ -59,6 +59,7 @@ private:
 	
 	_float4					m_vPosition = {};
 
+	_float		m_fHeight = { 0.f };
 	_float		m_fFlyTime = { 0.f };
 	_float		m_fDeadTime = { 0.f };
 	_bool		m_bController = { false };
