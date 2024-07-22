@@ -490,8 +490,7 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 	m_fStandardTime += fTimeDelta;
 	if (m_fStandardTime - m_fBeforeTime >= 1.f)
 	{
-		m_fCurTime = 30.f - m_fStandardTime;
-		//m_fCurTime = 10.f - m_fStandardTime;
+		m_fCurTime = 50.f - m_fStandardTime;
 		if (m_fCurTime <= 0.f) m_fCurTime = 0.f;
 		Change_TimeTexures(m_fCurTime);
 

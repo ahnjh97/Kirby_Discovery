@@ -97,6 +97,9 @@ HRESULT CLevel_Town::Initialize()
 	m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"K15_TownNewWorld1.marker.wav"); // SOUND_WI
 	m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, 0.5f);
 
+	// 타운은 포그가 없습니다.
+	m_pGameInstance->Fog_Zero();
+
 	return S_OK;
 }
 
