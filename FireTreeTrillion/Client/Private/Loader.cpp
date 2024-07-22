@@ -128,6 +128,8 @@
 #include "Bulb.h"
 #include "BlendMapObject.h"
 #include "PortalSoftEffect.h"
+#include "FinalStone.h"
+#include "FinalDump.h"
 
 // Racing Gimmick Objects
 #include "CarShopWall.h"
@@ -469,6 +471,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gully"), CGully);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinaleBoss"), CFinaleBoss);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalDump"), CFinalDump);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FinalStone"), CFinalStone);
 
 	// Finale
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Baum"), CBaum);
@@ -1594,7 +1599,7 @@ HRESULT CLoader::Add_FXTexture()
 	// 주로 사용되는 텍스쳐들
 	hr = Add_Texture(LEVEL_STATIC, "FX_Star", "Effects/Basic/common_star.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Bubble", "Effects/Basic/common_bubble.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.png", 6);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Circles", "Effects/Basic/common_circle_%d.png", 8);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Grad", "Effects/Basic/common_gradation.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Hit", "Effects/Basic/common_ring_0.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Smoke", "Effects/Basic/common_smoke_%d.png", 2);	CHECK_FAILED(hr);
@@ -1672,6 +1677,11 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_FireDissolve", "Dissolve/FireDissolve.png");	CHECK_FAILED(hr);
 
 
+	//번개
+	hr = Add_Texture(LEVEL_STATIC, "FX_Thunder", "Effects/Thunder/Thunder_%d.png", 3);	CHECK_FAILED(hr);
+
+	//아우라
+	hr = Add_Texture(LEVEL_STATIC, "FX_Aura", "Effects/Basic/Aura.png");	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -1773,7 +1783,10 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FXHalfSphere", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXNoiseSphere", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXRecoveryRoot", TYPE_NONANIM);
+
 		m_vecModelInfo.emplace_back("FXThunderLine", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("FXThunderLine_Circular", TYPE_NONANIM);
+
 		m_vecModelInfo.emplace_back("FXMeteoDash", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXDonut", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("LaserNonAnim", TYPE_NONANIM);
@@ -1810,7 +1823,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BG0", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		// 자동차 관련 (자동차와 부수는 돌멩이들)
-		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockB", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);
@@ -1946,7 +1958,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.f, 180.f);
 
 		// 자동차 관련 (자동차와 부수는 돌멩이들)
-		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockB", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);
@@ -2111,9 +2122,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Kirby Armour
 		Load_KirbyArmourModels();
 
-		// Deform
-		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
-
 		// Monster
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.2f, 180.f);
@@ -2224,6 +2232,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		Load_ItemModels();
 		Load_KickableModels();
 
+		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);
+
 		// 액체괴물 :: Fecto_Forgo
 		//m_vecModelInfo.emplace_back("", TYPE_ANIM, 1.f, 180.f);
 
@@ -2319,9 +2329,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// For Kirby Armour
 		Load_KirbyArmourModels();
 
-		// Deform
-		m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
-
 		// For Boss 
 		m_vecModelInfo.emplace_back("FinaleBoss", TYPE_ANIM, 1.f);
 
@@ -2348,7 +2355,6 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		Load_KirbyArmourModels();
 
 		// 자동차 관련 (자동차와 부수는 돌멩이들) :: 디버깅용으로 추가
-		m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("RockA", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockB", TYPE_NONANIM, 1.f);
 		m_vecModelInfo.emplace_back("RockPartical", TYPE_NONANIM, 1.f);
@@ -2787,8 +2793,12 @@ void CLoader::Load_KirbyBodyModels()
 	m_vecModelInfo.emplace_back("KirbyDumpCut", TYPE_ANIM, 0.8f);
 	m_vecModelInfo.emplace_back("KirbyFinalCut", TYPE_ANIM, 1.f);
 
+
 	// Deform
 	m_vecModelInfo.emplace_back("Bulb", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("Car", TYPE_ANIM, 1.f, 180.f);
+	m_vecModelInfo.emplace_back("DumpCar", TYPE_ANIM, 0.8f, 90.f);
+
 
 	// AbilityEffect
 	m_vecModelInfo.emplace_back("RoadParticle", TYPE_NONANIM, 0.2f, 0.f, 0);

@@ -80,6 +80,8 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DeeDeeDee"), TEXT("Prototype_GameObject_DeeDeeDee"), &ObjDesc)))
 		return E_FAIL;
 
+	// 안개 초기화
+	m_pGameInstance->Fog_Intialize_ForDeeDeeDee(0);
 
 	return S_OK;
 }
@@ -93,6 +95,8 @@ void CLevel_DeeDeeDee::Tick(_float fTimeDelta)
 	fTimeAcc += fTimeDelta;
 	if (fTimeAcc > 2.f) // 2초뒤 페이드인
 		Ready_FadeIn();
+
+	Fog_Tick(fTimeDelta);
 }
 
 HRESULT CLevel_DeeDeeDee::Render()
@@ -116,6 +120,14 @@ HRESULT CLevel_DeeDeeDee::Render()
 	return S_OK;
 }
 
+// 디디디를 만나기전까지의 포그를, 디디디를 만나고 감소시키는 틱입니다.
+void CLevel_DeeDeeDee::Fog_Tick(_float fTimeDelta)
+{
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(m_iLevel, TEXT("Layer_Player")));
+	_float4 vPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+	if (vPos.z >= -20.f)
+		m_pGameInstance->Decrease_FogViewValue(fTimeDelta);
+}
 
 void CLevel_DeeDeeDee::Ready_FadeIn()
 {

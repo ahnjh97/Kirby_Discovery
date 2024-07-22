@@ -738,11 +738,23 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pKirby->Change_State(CFinaleKirby::DUMPTSTATE_CUT, 50.f, false, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
 			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
 			pController->Set_Position(pTransformCom, vPos + _float4(-4.f, 0.f, 0.f, 0.f));
+
 		}
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPTSTATE_CUT)
 	{
 		m_fRunTime += fTimeDelta;
+
+		if (m_bEffectTrigger == true && m_fRunTime > 0.2f)
+		{
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitPos = { 0.f, 0.f, 0.f };
+			FXDesc.vInitScale = { 1.8f, 1.8f, 1.8f };
+			pKirby->Add_Effect("YW Deform Effect2", FXDesc, false);
+			m_bEffectTrigger = false;
+		}
+
+
 		if (m_bShakeTrigger == true && m_fRunTime > 1.55f)
 		{
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
@@ -788,6 +800,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 void CKirbyDump_Cut_State::OnStateExit()
 {
+	m_bEffectTrigger = true;
 	m_fRunTime = 0.f;
 	m_bShakeTrigger = true;
 }

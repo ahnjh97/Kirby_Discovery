@@ -843,6 +843,15 @@ void CKirbyBulb_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
     }
     else if (pKirby->Get_State() == CKirby::BULBSTATE_DEMOENDFIRST)
     {
+        if (m_bLightReset == true)
+        {
+            CMultiEffect::MULTI_FX_DESC FXDesc{};
+            FXDesc.vInitPos = { 0.f, 0.f, 0.f };
+            FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+            pKirby->Add_Effect("YW Deform Effect2", FXDesc, false);
+            m_bLightReset = false;
+        }
+
         Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
         if (DESC(m_pLight) != nullptr)
             DESC(m_pLight)->Update_LightPos(pKirby->Get_BulbLightPos());

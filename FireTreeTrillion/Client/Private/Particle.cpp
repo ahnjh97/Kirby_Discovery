@@ -180,7 +180,11 @@ void CParticle::Fill_SaveData(PARTICLE_DATA* pFXData)
 	pFXData->fOrbitSpeed = m_InstanceDesc.fOrbitSpeed;
 	pFXData->fOrbitSpeedRandomOffset = m_InstanceDesc.fOrbitSpeedRandomOffset;
 
+	pFXData->fTurnSpeed = m_InstanceDesc.fTurnSpeed;
+	pFXData->fTurnSpeedRandomOffset = m_InstanceDesc.fTurnSpeedRandomOffset;
+
 	pFXData->fAccSupplyAmount = m_InstanceDesc.fAccSupplyAmount;
+	pFXData->fOrbitSupplyAmount = m_InstanceDesc.fOrbitSupplyAmount;
 	pFXData->fTurnSupplyAmount = m_InstanceDesc.fTurnSupplyAmount;
 
 	pFXData->vColor = m_InstanceDesc.vColor;
@@ -310,6 +314,12 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_DECELERATE])
 		m_pVIBufferCom->Decelerate(fMyTimeDelta, pVertices);
 
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_TURNACCELERATION])
+		m_pVIBufferCom->TurnAcceleration(fMyTimeDelta, pVertices);
+
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_TURNDECELERATE])
+		m_pVIBufferCom->TurnDecelerate(fMyTimeDelta, pVertices);
+
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_ORBITACCELERATION])
 		m_pVIBufferCom->OrbitAcceleration(fMyTimeDelta, pVertices);
 
@@ -326,10 +336,10 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 		m_pVIBufferCom->Turn(fMyTimeDelta, pVertices);
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_TURNMOVEDIR])
-		m_pVIBufferCom->Turn_MoveDirection(fMyTimeDelta, pVertices);
+		m_pVIBufferCom->Turn_MoveDirection(fMyTimeDelta, pVertices, m_pSoketMatrix);
 
 
-	m_pVIBufferCom->Save_PrePos(pVertices);
+	m_pVIBufferCom->Save_PrePos(pVertices, m_pSoketMatrix);
 
 
 	//m_pVIBufferCom->Apply_Velocity(fMyTimeDelta, pVertices);

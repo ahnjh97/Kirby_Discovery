@@ -49,6 +49,9 @@ private:
 	CShader*				m_pShaderCom = { nullptr };
 	vector<class CDebris*>	m_vecDebris = {};
 
+	//
+	_float m_fBbongTime = { 0.f };
+
 	_float	m_fTimeDelta = { 0.f };
 	_float	m_fRunTime = { 0.f };
 	_float	m_fDelayTime = { 0.f };

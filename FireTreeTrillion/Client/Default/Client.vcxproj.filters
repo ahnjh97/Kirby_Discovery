@@ -717,6 +717,18 @@
     </Filter>
     <Filter Include="02.GameObjects\UI\LoadingStart">
       <UniqueIdentifier>{072bd44b-22aa-4687-b4a8-8ee6d41a1e54}</UniqueIdentifier>
+	</Filter>
+    <Filter Include="02.GameObjects\Map\LightBugEffect">
+      <UniqueIdentifier>{7630a4c0-5e08-41d0-bce2-e03c44b03906}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\FinalCutObject">
+      <UniqueIdentifier>{d15b8844-2cdf-4702-ab5d-73cb89f3c9a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\FinalCutObject\FinalStone">
+      <UniqueIdentifier>{62c0868b-5656-4824-9075-947eb5a75d0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\FinalCutObject\FinalDump">
+      <UniqueIdentifier>{e060bfbd-f0d5-40b4-b9bd-5dd24e26ac90}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1423,7 +1435,16 @@
     <ClInclude Include="..\Public\LoadingStart.h">
       <Filter>02.GameObjects\UI\LoadingStart</Filter>
     </ClInclude>
-    <ClInclude Include="SimbaLaser.h">
+    <ClInclude Include="..\Public\LightBugEffect.h">
+      <Filter>02.GameObjects\Map\LightBugEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinalStone.h">
+      <Filter>02.GameObjects\Map\FinalCutObject\FinalStone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FinalDump.h">
+      <Filter>02.GameObjects\Map\FinalCutObject\FinalDump</Filter>
+	</ClInclude>
+	<ClInclude Include="SimbaLaser.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
     </ClInclude>
   </ItemGroup>
@@ -2112,7 +2133,16 @@
     <ClCompile Include="..\Private\LoadingStart.cpp">
       <Filter>02.GameObjects\UI\LoadingStart</Filter>
     </ClCompile>
-    <ClCompile Include="SimbaLaser.cpp">
+    <ClCompile Include="..\Private\LightBugEffect.cpp">
+      <Filter>02.GameObjects\Map\LightBugEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinalStone.cpp">
+      <Filter>02.GameObjects\Map\FinalCutObject\FinalStone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FinalDump.cpp">
+      <Filter>02.GameObjects\Map\FinalCutObject\FinalDump</Filter>
+	</ClCompile>
+	<ClCompile Include="SimbaLaser.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
     </ClCompile>
   </ItemGroup>

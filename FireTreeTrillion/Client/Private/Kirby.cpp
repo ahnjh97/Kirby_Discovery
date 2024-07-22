@@ -73,7 +73,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
-	m_eAbilityType = ABILITY_CRASH;
+	m_eAbilityType = ABILITY_BOMB;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 		m_eAbilityType = ABILITY_SWORD;
 	m_fHp = 1000.f;
@@ -430,10 +430,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if (m_bOverPower == true)
 				return;
 
-			// 초기화해줄놈들
-			INFO(m_bFirstChargeEffectTrigger) = true;
-			INFO(m_bSecondChargeEffectTrigger) = true;
-
+			Reset_If_Damage();
 
 			if (pObject->Get_Attack() > 10.f && m_eAbilityType != ABILITY_DEFAULT)
 			{
@@ -464,6 +461,15 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				{
 					INFO(m_bCarJump) = true;
 					Change_State(CARSTATE_DAMAGE, 60.f, false, false, BODY_CARDEFAULT, OFFSET_CAR);
+				}
+				// 부스터 상태로 받았을 때
+				else if (INFO(m_bBooster) == true)
+				{
+					CMultiEffect::MULTI_FX_DESC Effectdesc = {};
+					Effectdesc.vInitPos = (_float3)m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+					Effectdesc.vInitScale = { 2.f, 2.f, 2.f };
+					if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
+						return;
 				}
 			}
 			else if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
@@ -541,9 +547,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if (m_bOverPower == true)
 				return;
 
-			// 초기화해줄놈들
-			INFO(m_bFirstChargeEffectTrigger) = true;
-			INFO(m_bSecondChargeEffectTrigger) = true;
+			Reset_If_Damage();
 
 
 			if (pObject->Get_Attack() > 10.f && m_eAbilityType != ABILITY_DEFAULT)
@@ -571,11 +575,24 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				Change_State(STATE_FILGHTDAMAGE, 60.f, false, false, BODY_BALLOON);
 			}
 			// 평범한 상태에서...
+			else if (INFO(m_eBodyState) == BODY_CARDEFAULT)
+			{
+				if (INFO(m_bBooster) == false)
+				{
+					INFO(m_bCarJump) = true;
+					Change_State(CARSTATE_DAMAGE, 60.f, false, false, BODY_CARDEFAULT, OFFSET_CAR);
+				}
+			}
+			else if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
+			{
+				Change_State(BULBSTATE_DAMAGE, 60.f, false, false, BODY_BULBDEFAULT, OFFSET_BULB);
+				INFO(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 3.f, 1.f);
+				INFO(m_bLightOn) = false;
+			}
 			else
 			{
 				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 			}
-
 			Delete_AllEffect();
 		}
 	}
@@ -1110,7 +1127,8 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 			(_eBodyState == BODY_SWORDDEFAULT && _iMeshIndex == 0) ||
 			(_eBodyState == BODY_SWORDBALLOON && _iMeshIndex == 4) ||
 			(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 0) ||
-			(_eBodyState == BODY_HAMMER && _iMeshIndex == 0))
+			(_eBodyState == BODY_HAMMER && _iMeshIndex == 0) ||
+			(_eBodyState == BODY_FINALCUT && _iMeshIndex == 0))
 		{
 			m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -1136,7 +1154,8 @@ _bool CKirby::Kirby_FaceCustom(BODYSTATE _eBodyState, _uint _iMeshIndex)
 			(_eBodyState == BODY_BOOMDEFAULT && _iMeshIndex == 3) ||
 			(_eBodyState == BODY_CARDEFAULT && _iMeshIndex == 3) ||
 			(_eBodyState == BODY_HAMMER && _iMeshIndex == 3) ||
-			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 4))
+			(_eBodyState == BODY_BULBDEFAULT && _iMeshIndex == 4) ||
+			(_eBodyState == BODY_FINALCUT && _iMeshIndex == 3))
 		{
 			m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", _iMeshIndex, TextureType_DIFFUSE);
 			m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", _iMeshIndex);
@@ -1434,6 +1453,7 @@ void CKirby::SetUp_FSM()
 
 
 #pragma region final 컷씬
+	m_pFSM->Add_State(STATE_WALK, CKirbyFinalCut_State::Create());
 	m_pFSM->Add_State(FINALCUTSTATE_CUT1, CKirbyFinalCut_State::Create());
 	m_pFSM->Add_State(FINALCUTSTATE_CUT2, CKirbyFinalCut_State::Create());
 #pragma endregion
@@ -1695,8 +1715,6 @@ void CKirby::Bone_Rotation(_float fTimeDelta)
 		BoneMatrix = pBone->Get_EditMatrixPtr();
 		CUtils::Turn_OtherMatrix(*BoneMatrix, _float4(1.f, 0.f, 0.f, 0.f), fTimeDelta, fTurnAngle);
 	}
-
-
 }
 
 void CKirby::Set_WeaponAnim(_uint index)
@@ -1717,6 +1735,43 @@ _float4 CKirby::Get_BulbLightPos()
 void CKirby::Set_ControllerPos(_float4 _vPosition)
 {
 	m_pControllerCom->Set_Position(m_pTransformCom, _vPosition);
+}
+
+void CKirby::DialogOn(_float4 vDir)
+{
+	INFO(m_bDialog) = true;
+
+	if (vDir != _float4(0.f, 0.f, 0.f, 0.f))
+		INFO(m_vMoveDir) = INFO(m_vTargetDir) = vDir;
+
+	if (m_eAbilityType == ABILITY_SWORD)
+		Change_State(SWORDSTATE_WAIT, 60.f, true, true, BODY_SWORDDEFAULT, OFFSET_SWORD);
+	else if (m_eAbilityType == ABILITY_BOMB)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+	else if (m_eAbilityType == ABILITY_HAMMER)
+		Change_State(HAMMERSTATE_IDLE, 60.f, true, true, BODY_HAMMER, OFFSET_HAMMER);
+	else if (m_eAbilityType == ABILITY_CRASH)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+	else if (m_eAbilityType == ABILITY_DEFAULT)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+}
+
+void CKirby::DialogOff(_float4 vDir)
+{
+	INFO(m_bDialog) = false;
+	if (vDir != _float4(0.f, 0.f, 0.f, 0.f))
+		INFO(m_vMoveDir) = INFO(m_vTargetDir) = vDir;
+
+	if (m_eAbilityType == ABILITY_SWORD)
+		Change_State(SWORDSTATE_WAIT, 60.f, true, true, BODY_SWORDDEFAULT, OFFSET_SWORD);
+	else if (m_eAbilityType == ABILITY_BOMB)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+	else if (m_eAbilityType == ABILITY_HAMMER)
+		Change_State(HAMMERSTATE_IDLE, 60.f, true, true, BODY_HAMMER, OFFSET_HAMMER);
+	else if (m_eAbilityType == ABILITY_CRASH)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
+	else if (m_eAbilityType == ABILITY_DEFAULT)
+		Change_State(STATE_IDLE, 60.f, true, true, BODY_DEFAULT);
 }
 
 void CKirby::Large_Light(_float4 vDiffuse, _float fRange, _float fTime)
@@ -1840,10 +1895,10 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	vLightPos.m128_f32[2] -= 1.f;
 	m_pGameInstance->Update_LightShadow(vLightPos, vPos);
 
-	// Dof 초점을 커비에게 맞춘다.
-	_vector vDOFPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	vDOFPos.m128_f32[1] += 0.5f;
-	m_pGameInstance->Update_DofFocus(vDOFPos);
+	//// Dof 초점을 커비에게 맞춘다.
+	//_vector vDOFPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+	//vDOFPos.m128_f32[1] += 0.5f;
+	//m_pGameInstance->Update_DofFocus(vDOFPos);
 
 	// 능력이 SWORD 일때, 평타 모션의 순서를 리셋시키는 로직이다.
 	if (m_eAbilityType == ABILITY_SWORD)
@@ -2002,16 +2057,9 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 		}
 	}
 
+	// 특정 불값에 의해 다른 애니메이션으로 넘어가게 한다.
 
-	if (INFO(m_bFinalBossDead) == true)
-	{
-		if (m_bFinalCutTrigger == true)
-		{
-			m_pControllerCom->Set_Position(m_pTransformCom, _float4(0.f, 0.f, 0.f, 1.f));
-			m_bFinalCutTrigger = false;
-			Change_State(FINALCUTSTATE_CUT1, 60.f, false, false, BODY_FINALCUT, OFFSET_FINALCUT);
-		}
-	}
+	Kirby_SpecialAnim();
 
 	// 빛 컨트롤
 	AssistLight_Control();
@@ -2171,6 +2219,24 @@ void CKirby::Kirby_StateInitialize()
 
 }
 
+void CKirby::Kirby_SpecialAnim()
+{
+	if (INFO(m_bFinalBossCutStart) == true)
+	{
+		if (m_bFinalCutStartTrigger == true)
+		{
+			Change_State(STATE_WALK, 40.f, true, false, BODY_DEFAULT);
+			m_bFinalCutStartTrigger = false;
+		}
+	}
+
+	if (INFO(m_bFinalBossDead) == true)
+	{
+		Change_State(FINALCUTSTATE_CUT1, 60.f, false, false, BODY_FINALCUT, OFFSET_FINALCUT);
+		INFO(m_bFinalBossDead) = false;
+	}
+}
+
 CGameObject* CKirby::FindToppleableBridge(PxRigidActor* pActor)
 {
 	auto mapIter = m_mapToppleableBridges.find(pActor);
@@ -2291,6 +2357,33 @@ void CKirby::AssistLight_Control()
 
 
 	}
+}
+
+void CKirby::Reset_If_Damage()
+{
+
+	INFO(m_fVacuumTime) = 0.f;
+
+	INFO(m_ePreAttackState) = SWORDSTATE_DECISIVESLASH;
+	INFO(m_bWalkingCharge) = true;
+	INFO(m_bUpWardSlash) = false;
+	INFO(m_bSwordCharge1) = true;
+	INFO(m_bSwordCharge2) = true;
+
+	INFO(m_bBombHold) = false;
+	INFO(m_vBombThrowDir) = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	INFO(m_fBombPower) = 3.f;
+	INFO(m_bBombOrbit) = false;
+	INFO(m_bBombAimming) = false;
+	INFO(m_bisDeforming) = false;
+
+	INFO(m_bCarJump) = false;
+
+	INFO(m_bFirstChargeEffectTrigger) = true;
+	INFO(m_bSecondChargeEffectTrigger) = true;
+	INFO(m_bBulbJump) = false;
+
+	INFO(m_fTimeRatio) = 0.f;
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

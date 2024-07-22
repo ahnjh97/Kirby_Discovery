@@ -560,7 +560,7 @@ HRESULT CLevel_Finale::Ready_Monsters()
 		}
 		else if (L"FinaleBoss" == tempDesc.wstrModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_FinaleBoss"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_BossMonster"), TEXT("Prototype_GameObject_FinaleBoss"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (L"PoppyBrosJr" == tempDesc.wstrModelName)

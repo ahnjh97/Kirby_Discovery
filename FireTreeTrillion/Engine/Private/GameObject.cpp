@@ -210,8 +210,7 @@ HRESULT CGameObject::Compute_BoneViewZ(CBone* pBone, _float3 vOffset)
 	if (nullptr == pBone)
 		return E_FAIL;
 
-	_float4x4 matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(pBone, vOffset);
-	_vector vPosition = XMVectorSet(matBoneWorld._41, matBoneWorld._42, matBoneWorld._43, 1);
+	_vector vPosition = m_pTransformCom->ComputeBoneWorldPos(pBone, vOffset);
 
 	m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW);
 	vPosition = XMVector3TransformCoord(vPosition, m_pGameInstance->Get_Transform_Matrix(CPipeLine::D3DTS_VIEW));

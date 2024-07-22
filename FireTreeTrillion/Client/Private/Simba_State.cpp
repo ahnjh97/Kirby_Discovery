@@ -91,11 +91,8 @@ void CSimba_Appear2::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			if (m_fTime > 1.5f)
 			{
 				pSimba->Change_State(CSimba::Simba_Walk, 66.66f, true, false);
-				
 				//카메라에게 2번째 타겟으로 등록
-				CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
-				if(pCamera!= nullptr)
-					pCamera->Set_Target(pSimba->Get_TransformCom(), CCamera::TARGET_SECOND, CCamera::FOCUS_BOTH);
+				pSimba->SetUpSecondTarget();
 
 				_vector vPos = m_pTransform->Get_State(CTransform::STATE_POSITION);
 				_vector vLook = XMVector3Normalize(m_pTransform->Get_State(CTransform::STATE_LOOK));
@@ -124,12 +121,12 @@ void CSimba_Walk::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	_float fDis = m_pGameInstance->Compute_Distance(m_pKirby, pGameObject);
 	if (fDis < 6.5f)
 	{
-		pSimba->Change_State(CSimba::Simba_DimensionClawStart, 60, false, true); // 디버깅용
+		//pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 60, false, true); // 디버깅용
 		
-		/*if (0 == CUtils::Make_RandomInt(0, 1))
+		if (0 == CUtils::Make_RandomInt(0, 1))
 			pSimba->Change_State(CSimba::Simba_QuickClawStartL, 66.66f, false, true);
 		else
-			pSimba->Change_State(CSimba::Simba_QuickClawStartR, 66.66f, false, true);*/
+			pSimba->Change_State(CSimba::Simba_QuickClawStartR, 66.66f, false, true);
 	}
 	else
 	{
@@ -143,7 +140,6 @@ void CSimba_QuickClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	s_fOffsetY = -0.58f;
-	m_bStarSpawned = false;
 }
 
 void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -155,11 +151,16 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	_float fAnimRatio = pSimba->Get_AnimRatio();
 	_vector vLook = m_pTransform->Get_State(CTransform::STATE_LOOK);
 
+	_uint iStarCount = pSimba->Get_StarCount();
+	_uint iRockCount = pSimba->Get_RockCount();
+	
 	if ((CSimba::Simba_QuickClawStartL == iState || CSimba::Simba_QuickClawStartR == iState) && fAnimRatio < 0.3f)
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 6.f);
 
 	else if ((CSimba::Simba_QuickClawL == iState || CSimba::Simba_QuickClawR == iState))
 	{
+		pSimba->QuickClawNailTrail(); // YW Effect 클로 트레일(일단은 상시호출로 해놨음)
+
 		_float fStart = 0.42f;
 		_float fEnd = 0.64f;
 		_float fSpeed = 6.2f;
@@ -173,21 +174,32 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 			m_pController->Move_Dir(m_pTransform, vDir, fTimeDelta, s_fOffsetY);
 		}
 
-		if (0.46f < fAnimRatio && false == m_bStarSpawned)
-		{
-			m_bStarSpawned = true;
+		if (0.46f < fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
-		}
+
+		if (0.4f < fAnimRatio && 0 == iRockCount)
+			pSimba->SpawnRocks(iState);
+		else if (0.5f < fAnimRatio && 1 == iRockCount)
+			pSimba->SpawnRocks(iState);
+		else if (0.6f < fAnimRatio && 2 == iRockCount)
+			pSimba->SpawnRocks(iState);
 	}
 	
-	else if ((CSimba::Simba_QuickClaw2L == iState || CSimba::Simba_QuickClaw2R == iState)) {
+	else if ((CSimba::Simba_QuickClaw2L == iState || CSimba::Simba_QuickClaw2R == iState)) 
+	{
+		pSimba->QuickClawNailTrail(); // YW Effect 클로 트레일(일단은 상시호출로 해놨음)
+
 		if(0.3f > fAnimRatio)
 			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
-		if (0.34f < fAnimRatio && false == m_bStarSpawned)
-		{
-			m_bStarSpawned = true;
+		if (0.34f < fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
-		}
+
+		if (0.32f < fAnimRatio && 0 == iRockCount)
+			pSimba->SpawnRocks(iState);
+		if (0.41f < fAnimRatio && 1 == iRockCount)
+			pSimba->SpawnRocks(iState);
+		if (0.5f < fAnimRatio && 2 == iRockCount)
+			pSimba->SpawnRocks(iState);
 
 		_float fStart = 0.27f;
 		_float fEnd = 0.3958f;
@@ -208,9 +220,11 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 		switch (iState)
 		{
 		case CSimba::Simba_QuickClawStartL:
+			pSimba->QuickClawNailFlash(iState);
 			pSimba->Change_State(CSimba::Simba_QuickClawChargeL, 66.66f, false, false);
 			break;
 		case CSimba::Simba_QuickClawStartR:
+			pSimba->QuickClawNailFlash(iState);
 			pSimba->Change_State(CSimba::Simba_QuickClawChargeR, 66.66f, false, false);
 			break;
 
@@ -258,8 +272,8 @@ void CSimba_FinalCrusher::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _floa
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	s_fOffsetY = -0.7f;
-	if(CSimba::Simba_FinalCrusher == _iAnimIndex)
-		m_bStarSpawned = false;
+	m_bSmashEffect = false;
+	m_bSwingEffect = false;
 }
 
 void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -268,8 +282,10 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 
 	CSimba* pSimba = static_cast<CSimba*>(pGameObject);
 	_uint iState = pSimba->Get_State();
-
 	_float fAnimRatio = pSimba->Get_AnimRatio();
+	_uint iStarCount = pSimba->Get_StarCount();
+	_uint iRockCount = pSimba->Get_RockCount();
+
 	if(CSimba::Simba_FinalCrusherStart == iState && (0.3f > fAnimRatio || 0.93f < fAnimRatio ))
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
 	else if (CSimba::Simba_FinalCrusher == iState)
@@ -277,10 +293,23 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		if(0.07f > fAnimRatio)
 			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 9.f);
 
-		if (0.125f < fAnimRatio && false == m_bStarSpawned)
-		{
-			m_bStarSpawned = true;
+		if (0.125f < fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
+
+		if (0.105f < fAnimRatio && 0 == iRockCount)
+			pSimba->SpawnRocks(iState);
+		if (0.12f < fAnimRatio && 1 == iRockCount)
+			pSimba->SpawnRocks(iState);
+		if(0.135f < fAnimRatio && 2 == iRockCount)
+			pSimba->SpawnRocks(iState);
+
+		if (0.08f < fAnimRatio && false == m_bSwingEffect) {
+			m_bSwingEffect = true;
+			pSimba->FinalCrusherSwing();
+		}
+		else if (0.105f < fAnimRatio && false == m_bSmashEffect) {
+			m_bSmashEffect = true;
+			pSimba->FinalCrusherSmash();
 		}
 	}
 		
@@ -294,12 +323,14 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		case CSimba::Simba_FinalCrusherEnd:
 			//pSimba->Change_State(CSimba::Simba_FinalCrusherStart, 60, false, true); // 디버깅용
 
+			pSimba->Set_PreState(iState);
+
 			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 15.f) {
-				pSimba->Set_PreState(iState);
-				//if(0 == CUtils::Make_RandomInt(0, 1))
+				
+				if(0 == CUtils::Make_RandomInt(0, 1))
 					pSimba->Change_State(CSimba::Simba_Wait2, 40.f, false, true);
-				//else
-				//	pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, true); // 점프공격
+				else
+					pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, true); // 점프공격
 			}
 			else
 				pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 50.f, false, true);
@@ -317,8 +348,6 @@ void CSimba_DoubleClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float 
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	s_fOffsetY = -0.7f;
-	if(CSimba::Simba_DoubleClaw == _iAnimIndex)
-		m_bStarSpawned = false;
 }
 
 void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -328,6 +357,8 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	CSimba* pSimba = static_cast<CSimba*>(pGameObject);
 	_uint iState = pSimba->Get_State();
 	_float fAnimRatio = pSimba->Get_AnimRatio();
+	_uint iStarCount = pSimba->Get_StarCount();
+	_uint iRockCount = pSimba->Get_RockCount();
 
 	if (CSimba::Simba_DoubleClawChargeStart == iState && fAnimRatio < 0.18f) {
 		_float fRatio = RATIO(fAnimRatio, 0, 0.18f);
@@ -349,10 +380,15 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		if(0.2f > fAnimRatio)
 			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
 
-		if (0.224f < fAnimRatio && false == m_bStarSpawned)
-		{
-			m_bStarSpawned = true;
+		if (0.224f < fAnimRatio && 0 == iStarCount) {
 			pSimba->SpawnStar(iState);
+			pSimba->DoubleClawSweep();
+		}
+			
+		for (_uint i = 0; i < 45; i++)
+		{
+			if (i * 0.006f < fAnimRatio && i == iRockCount)
+				pSimba->SpawnRocks(iState);
 		}
 	}
 		
@@ -373,6 +409,8 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 			pSimba->Change_State(CSimba::Simba_DoubleClawEnd, 50.f, false, false);
 			break;
 		case CSimba::Simba_DoubleClawEnd:
+			//pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 60, false, true); // 디버깅용
+
 			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 15.f) {
 				pSimba->Set_PreState(iState);
 				pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, true); // 점프공격
@@ -397,6 +435,7 @@ void CSimba_Jump::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnim
 	s_fOffsetY = -0.7f;
 	if(CSimba::Simba_JumpStart == _iAnimIndex)
 		s_fJumpPower = 54.f;
+	m_bSmokeEffect = false;
 }
 
 void CSimba_Jump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -422,8 +461,11 @@ void CSimba_Jump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	{
 		m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
 	
-		if (true == pSimba->IsAnimFinished())
+		if (true == pSimba->IsAnimFinished()) {
 			pSimba->Change_State(CSimba::Simba_Jump, 40.f, false, false);
+			pSimba->JumpStartSmoke();
+		}
+			
 	}
 	else if (CSimba::Simba_Jump == iState)
 	{
@@ -461,6 +503,11 @@ void CSimba_Jump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	{
 		m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
 		
+		if (0.12f < fAnimRatio && false == m_bSmokeEffect) {
+			m_bSmokeEffect = true;
+			pSimba->LandingSmoke();
+		}
+
 		if (true == pSimba->IsAnimFinished())
 		{
 			//pSimba->Change_State(CSimba::Simba_JumpStart, 40.f, false, true); // 디버깅용
@@ -468,21 +515,23 @@ void CSimba_Jump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			_uint iPreState = pSimba->Get_PreState();
 
 			if (CSimba::Simba_DoubleClawEnd == iPreState)
-			{
-				// 거리 멀면 점프공격
-				pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, true);
-				// 아니면 백스탭
-			}
-				
+				pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, true);				
 			else
 			{
-				_int iRandNum = CUtils::Make_RandomInt(0, 1);
+				_int iRandNum = CUtils::Make_RandomInt(0, 2);
 				if (m_pGameInstance->Compute_Distance(m_pKirby, pGameObject) > 15.f)
 				{
 					if(0 == iRandNum)
 						pSimba->Change_State(CSimba::Simba_Wait2, 40.f, false, true);
-					else
+					else if(1 == iRandNum)
 						pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, true);
+					else if (2 == iRandNum) {
+						_uint iRandNum2 = CUtils::Make_RandomInt(0, 1);
+						if(0 == iRandNum2)
+							pSimba->Change_State(CSimba::Simba_QuickClawStartL, 66.66f, false, true);
+						else
+							pSimba->Change_State(CSimba::Simba_QuickClawStartR, 66.66f, false, true);
+					}
 				}
 				else
 				{
@@ -548,8 +597,7 @@ void CSimba_AttackJump::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float 
 	s_fOffsetY = -0.7f;
 	if (CSimba::Simba_AttackJump == _iAnimIndex)
 		s_fJumpPower = 15.f;
-	else if (CSimba::Simba_AttackJumpHit == _iAnimIndex)
-		m_bStarSpawned = false;
+	m_bWindEffect = false;
 }
 
 void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -557,11 +605,19 @@ void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	CSimba* pSimba = static_cast<CSimba*>(pGameObject);
 	_uint iState = pSimba->Get_State();
 	_float fAnimRatio = pSimba->Get_AnimRatio();
+	_uint iStarCount = pSimba->Get_StarCount();
+	_uint iRockCount = pSimba->Get_RockCount();
 
 	if (CSimba::Simba_AttackJumpPre == iState && fAnimRatio < 0.4f)
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 5.f);
 
 	if (CSimba::Simba_AttackJump == iState) {
+
+		if (0.22f < fAnimRatio && false == m_bWindEffect) {
+			m_bWindEffect = true;
+			pSimba->AttackJumpWind();
+		}
+
 		m_pController->Jump(m_pTransform, s_fJumpPower, fTimeDelta);
 		s_fJumpPower -= GRAVITY * fTimeDelta * 9.f;
 
@@ -586,12 +642,16 @@ void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	else
 		m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
 
-	if (CSimba::Simba_AttackJumpHit == iState && 0.12f < fAnimRatio && false == m_bStarSpawned)
+	if (CSimba::Simba_AttackJumpHit == iState)
 	{
-		m_bStarSpawned = true;
-		pSimba->SpawnStar(iState);
+		if(0.12f < fAnimRatio && 0 == iStarCount)
+			pSimba->SpawnStar(iState);
+		if (0.06f < fAnimRatio && 0 == iRockCount)
+			pSimba->SpawnRocks(iState);
+		if (0.1f < fAnimRatio && 1 == iRockCount)
+			pSimba->SpawnRocks(iState);
 	}
-
+		
 	if (pSimba->IsAnimFinished())
 	{
 		if (CSimba::Simba_AttackJumpPre == iState)
@@ -599,32 +659,45 @@ void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		else if (CSimba::Simba_AttackJumpStart == iState)
 			pSimba->Change_State(CSimba::Simba_AttackJump, 60.f, false, true);
 			
-		else if (CSimba::Simba_AttackJump == iState) {
-
-			// 거리 조건문 (근데 안해도 될거같음)
+		else if (CSimba::Simba_AttackJump == iState)
 			pSimba->Change_State(CSimba::Simba_AttackJumpHit, 60.f, false, false);
-			//pSimba->Change_State(CSimba::Simba_AttackJumpWait, 60.f, false, false);
-		}
 		else if (CSimba::Simba_AttackJumpWait == iState)
 			pSimba->Change_State(CSimba::Simba_AttackJumpHit, 60.f, false, false);
 		else if (CSimba::Simba_AttackJumpHit == iState)
 		{
 			//pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, false); // 디버깅용
 
-			_int iRandNum = CUtils::Make_RandomInt(0, 1);
+			_int iRandNum = CUtils::Make_RandomInt(0, 2);
 			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 15.f) {
 				pSimba->Set_PreState(iState);
 				if (0 == iRandNum)
 					pSimba->Change_State(CSimba::Simba_Wait2, 40.f, false, true);
-				else
+				else if(1 == iRandNum)
 					pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, false);
+				else {
+					_uint iRandNum2 = CUtils::Make_RandomInt(0, 1);
+					if (0 == iRandNum2)
+						pSimba->Change_State(CSimba::Simba_QuickClawStartL, 66.66f, false, true);
+					else
+						pSimba->Change_State(CSimba::Simba_QuickClawStartR, 66.66f, false, true);
+				}
 			}
 			else
 			{
-				if (0 == iRandNum)
-					pSimba->Change_State(CSimba::Simba_QuickClawStartL, 66.66f, false, true);
-				else
-					pSimba->Change_State(CSimba::Simba_QuickClawStartR, 66.66f, false, true);
+				_uint iPreState = pSimba->Get_PreState();
+				if (CSimba::Simba_QuickClawEndL == iPreState || CSimba::Simba_QuickClawEndR == iPreState)
+					pSimba->Change_State(CSimba::Simba_FinalCrusherStart, 66.66f, false, true);
+				else if (CSimba::Simba_FinalCrusherEnd == iPreState)
+					pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 50.f, false, true);
+				else if(CSimba::Simba_DoubleClaw == iPreState)
+					pSimba->Change_State(CSimba::Simba_AttackJumpPre, 50.f, false, true);
+				else if (CSimba::Simba_AttackJumpHit == iPreState)
+				{
+					if (0 == iRandNum)
+						pSimba->Change_State(CSimba::Simba_QuickClawStartL, 66.66f, false, true);
+					else
+						pSimba->Change_State(CSimba::Simba_QuickClawStartR, 66.66f, false, true);
+				}
 			}
 		}
 	}
@@ -743,11 +816,6 @@ void CSimba_BiteRushJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		else if (CSimba::Simba_BiteRushJumpR == iState)
 			pSimba->Change_State(CSimba::Simba_BiteRushFallR, 60.f, true, false);
 
-		//else if (CSimba::Simba_BiteRushFallL == iState)
-		//	pSimba->Change_State(CSimba::Simba_BiteRushLandingL, 60.f, false, false);
-		//else if (CSimba::Simba_BiteRushFallR == iState)
-		//	pSimba->Change_State(CSimba::Simba_BiteRushLandingR, 60.f, false, false);
-			
 		else if (CSimba::Simba_BiteRushLandingL == iState || CSimba::Simba_BiteRushLandingR == iState) {
 			//if (true == pSimba->IsKirbyOnMyLeft())
 			//	pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 50.f, false, false);// 디버깅용
@@ -759,28 +827,22 @@ void CSimba_BiteRushJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			if (CSimba::Simba_Roar2 == iPreState)
 				pSimba->Change_State(CSimba::Simba_DimensionClawStart, 60.f, false, true);
 			else if(CSimba::Simba_DimensionClawEnd == iPreState)
-			{
 				pSimba->Change_State(CSimba::Simba_BiteRushStart, 50.f, false, true);
-				//pSimba->Change_State(CSimba::Simba_BiteRushStartStraight, 50.f, false, true);	
-			}
 			else if (CSimba::Simba_DimensionLaserEnd == iPreState)
 				pSimba->Change_State(CSimba::Simba_DimensionClawStart, 60.f, false, true);
 		}
 	}
 }
 
-// *********************** DimensionClaw *********************** // 이펙트, 충돌 필요
+// *********************** DimensionClaw *********************** // 이펙트 필요
 void CSimba_DimensionClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	if (CSimba::Simba_DimensionClawStart == _iAnimIndex)
 		s_iAttackCount = 0;
 		
-	else if (CSimba::Simba_DimensionClaw == _iAnimIndex || CSimba::Simba_DimensionClawContinue == _iAnimIndex) {
-		m_bStarSpawned = false;
-		m_bStarSpawned2 = false;
+	else if (CSimba::Simba_DimensionClaw == _iAnimIndex || CSimba::Simba_DimensionClawContinue == _iAnimIndex)
 		m_bSetDimensionClawMatrix = false;
-	}
 }
 
 void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -789,6 +851,7 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	CSimba* pSimba = static_cast<CSimba*>(pGameObject);
 	_uint iState = pSimba->Get_State();
 	_float fAnimRatio = pSimba->Get_AnimRatio();
+	_uint iStarCount = pSimba->Get_StarCount();
 
 	if ((CSimba::Simba_DimensionClawStart == iState) && 0.87f < fAnimRatio) {
 		_float fRatio = RATIO(fAnimRatio, 0.87f, 1);
@@ -808,15 +871,10 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		pSimba->MoveDimensionClaw(fTimeDelta);
 
-		if (0.32f < fAnimRatio && false == m_bStarSpawned) {
-			m_bStarSpawned = true;
-			pSimba->ResetStarCount();
+		if (0.32f < fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
-		}
-		if (0.38f < fAnimRatio && false == m_bStarSpawned2)	{
-			m_bStarSpawned2 = true;
+		if (0.38f < fAnimRatio && 1 == iStarCount)
 			pSimba->SpawnStar(iState);
-		}
 	}
 
 	if (CSimba::Simba_DimensionClawContinue == iState)
@@ -829,15 +887,10 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		pSimba->MoveDimensionClaw(fTimeDelta);
 			
-		if (0.53f < fAnimRatio && false == m_bStarSpawned) {
-			m_bStarSpawned = true;
-			pSimba->ResetStarCount();
+		if (0.53f < fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
-		}
-		if (0.63f < fAnimRatio && false == m_bStarSpawned2) {
-			m_bStarSpawned2 = true;
+		if (0.63f < fAnimRatio && 1 == iStarCount)
 			pSimba->SpawnStar(iState);
-		}
 	}
 
 	if (pSimba->IsAnimFinished())
@@ -870,13 +923,13 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 		else if (CSimba::Simba_DimensionClawEnd == iState)
 		{
-			pSimba->Change_State(CSimba::Simba_DimensionClawStart, 50.f, false, true);
+			//pSimba->Change_State(CSimba::Simba_DimensionClawStart, 50.f, false, true); // 디버깅용
 			
-			/*pSimba->Set_PreState(iState);
+			pSimba->Set_PreState(iState);
 			if (true == pSimba->IsKirbyOnMyLeft())
 				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 50.f, false, true);
 			else
-				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);*/
+				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);
 		}	
 	}
 }
@@ -885,9 +938,7 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 void CSimba_BiteRush::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
-	if (CSimba::Simba_BiteRushStart == _iAnimIndex)
-		m_bStarSpawned = false;
-	else if (CSimba::Simba_BiteRush == _iAnimIndex)
+	if (CSimba::Simba_BiteRush == _iAnimIndex)
 		m_fTime = 0.f;
 }
 
@@ -897,6 +948,7 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	CSimba* pSimba = static_cast<CSimba*>(pGameObject);
 	_uint iState = pSimba->Get_State();
 	_float fAnimRatio = pSimba->Get_AnimRatio();
+	_uint iStarCount = pSimba->Get_StarCount();
 
 	if (CSimba::Simba_BiteRush == iState)
 	{
@@ -915,15 +967,12 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			|| fDis > m_pController->RayCastToStaticActor(vLook3) || 2.8f < m_fTime)
 			pSimba->Change_State(CSimba::Simba_BiteRushTiredStart, 50.f, false, false);
 
-		if (0.15f < fAnimRatio && 0.7f > fAnimRatio && false == m_bStarSpawned)
-		{
-			m_bStarSpawned = true;
+		if (0.15f < fAnimRatio && 0.7f > fAnimRatio && 0 == iStarCount) {
+			pSimba->ResetStarCount();
 			pSimba->Set_StarPosToLeftHand();
 			pSimba->SpawnStar(iState);
 		}
-		else if (0.7f < fAnimRatio && true == m_bStarSpawned) 
-		{
-			m_bStarSpawned = false;
+		else if (0.7f < fAnimRatio && 1 == iStarCount) {
 			pSimba->Set_StarPosToRightHand();
 			pSimba->SpawnStar(iState);
 		}
@@ -948,11 +997,10 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** DimensionLaser *********************** // 이펙트, 충돌 필요
+// *********************** DimensionLaser *********************** // 이펙트 필요
 void CSimba_DimensionLaser::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
-	m_bStarSpawned = false;
 	m_bLaserActivated = false;
 }
 
@@ -962,6 +1010,7 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CSimba* pSimba = static_cast<CSimba*>(pGameObject);
 	_uint iState = pSimba->Get_State();
 	_float fAnimRatio = pSimba->Get_AnimRatio();
+	_uint iStarCount = pSimba->Get_StarCount();
 
 	if (CSimba::Simba_DimensionLaserStart == iState)
 	{
@@ -986,23 +1035,15 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		else if(0.33f > fAnimRatio)
 			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 1.f);
 
-		if (0.185f < fAnimRatio && 0.225f > fAnimRatio && false == m_bStarSpawned) {
-			m_bStarSpawned = true;
-			pSimba->ResetStarCount();
+		if (0.185f < fAnimRatio && 0.225f > fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
-		}
-		else if (0.225f < fAnimRatio && 0.265f > fAnimRatio && true == m_bStarSpawned) {
-			m_bStarSpawned = false;
+
+		else if (0.225f < fAnimRatio && 0.265f > fAnimRatio && 1 == iStarCount)
 			pSimba->SpawnStar(iState);
-		}
-		else if (0.265f < fAnimRatio && 0.305f > fAnimRatio && false == m_bStarSpawned) {
-			m_bStarSpawned = true;
+		else if (0.265f < fAnimRatio && 0.305f > fAnimRatio && 2 == iStarCount)
 			pSimba->SpawnStar(iState);
-		}
-		else if (0.305f < fAnimRatio && true == m_bStarSpawned) {
-			m_bStarSpawned = false;
+		else if (0.305f < fAnimRatio && 3 == iStarCount)
 			pSimba->SpawnStar(iState);
-		}
 	}
 
 	if (pSimba->IsAnimFinished())
@@ -1013,13 +1054,13 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			pSimba->Change_State(CSimba::Simba_DimensionLaserEnd, 60.f, false, false);
 		else if (CSimba::Simba_DimensionLaserEnd == iState)
 		{
-			pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 60.f, false, false); // 디버깅용
+			//pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 60.f, false, false); // 디버깅용
 
-			/*pSimba->Set_PreState(iState);
+			pSimba->Set_PreState(iState);
 			if (true == pSimba->IsKirbyOnMyLeft())
 				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartL, 50.f, false, true);
 			else
-				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);*/
+				pSimba->Change_State(CSimba::Simba_BiteRushJumpStartR, 50.f, false, true);
 		}
 	}
 }

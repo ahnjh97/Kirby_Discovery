@@ -199,6 +199,12 @@ void CBox::Break_From_Car()
 	if (true == m_bPlayAnim)
 		return;
 
+	CMultiEffect::MULTI_FX_DESC Effectdesc = {};
+	Effectdesc.vInitPos = (_float3)m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	Effectdesc.vInitScale = { 2.f, 2.f, 2.f };
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
+		return;
+
 	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 	pCamera->Make_Shake(1.6f, 0.5f);
 	/*CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
@@ -239,7 +245,7 @@ HRESULT CBox::Add_Components(wstring& wstrModelName)
 		CHECK_FAILED(hr);
 	}
 	
-	Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 1.6f);
+	Set_BodyCollider(COLLIDER_SPHERE, 1.f, 0.f, 2.f);
 
 	return S_OK;
 }

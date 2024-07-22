@@ -231,9 +231,11 @@
     <ClInclude Include="..\Public\Debris.h" />
     <ClInclude Include="..\public\DecoObject.h" />
     <ClInclude Include="..\Public\DimensionClaw.h" />
+    <ClInclude Include="..\Public\FinalDump.h" />
     <ClInclude Include="..\public\Finale_SpecialDebris_A.h" />
     <ClInclude Include="..\Public\Finale_SpecialDebris_B.h" />
     <ClInclude Include="..\Public\Finale_SpecialDebris_C.h" />
+    <ClInclude Include="..\Public\FinalStone.h" />
     <ClInclude Include="..\Public\Fire.h" />
     <ClInclude Include="..\Public\GhostGordo.h" />
     <ClInclude Include="..\Public\GhostGordo_State.h" />
@@ -252,6 +254,7 @@
     <ClInclude Include="..\Public\Level_Park.h" />
     <ClInclude Include="..\Public\Disaster_Master.h" />
     <ClInclude Include="..\Public\LoadingStart.h" />
+    <ClInclude Include="..\Public\LightBugEffect.h" />
     <ClInclude Include="..\Public\Phanta.h" />
     <ClInclude Include="..\Public\Phanta_State.h" />
     <ClInclude Include="..\Public\FinaleBuildingPartical.h" />
@@ -491,9 +494,11 @@
     <ClCompile Include="..\Private\Debris.cpp" />
     <ClCompile Include="..\private\DecoObject.cpp" />
     <ClCompile Include="..\Private\DimensionClaw.cpp" />
+    <ClCompile Include="..\Private\FinalDump.cpp" />
     <ClCompile Include="..\private\Finale_SpecialDebris_A.cpp" />
     <ClCompile Include="..\Private\Finale_SpecialDebris_B.cpp" />
     <ClCompile Include="..\Private\Finale_SpecialDebris_C.cpp" />
+    <ClCompile Include="..\Private\FinalStone.cpp" />
     <ClCompile Include="..\Private\Fire.cpp" />
     <ClCompile Include="..\Private\GhostGordo.cpp" />
     <ClCompile Include="..\Private\GhostGordo_State.cpp" />
@@ -512,6 +517,7 @@
     <ClCompile Include="..\Private\Level_Park.cpp" />
     <ClCompile Include="..\Private\Disaster_Master.cpp" />
     <ClCompile Include="..\Private\LoadingStart.cpp" />
+    <ClCompile Include="..\Private\LightBugEffect.cpp" />
     <ClCompile Include="..\Private\Phanta.cpp" />
     <ClCompile Include="..\Private\Phanta_State.cpp" />
     <ClCompile Include="..\Private\FinaleBuildingPartical.cpp" />

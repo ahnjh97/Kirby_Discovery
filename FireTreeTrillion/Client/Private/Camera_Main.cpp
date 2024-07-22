@@ -29,8 +29,6 @@
 #define QTE2 13
 #define QTE3 18
 
-
-
 _float3 vertices[] = {
 	// Front face
    { -1.0f, -1.0f, -1.0f },
@@ -254,7 +252,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_CamTriggerUpOffsets.reserve(LEVEL_END);
 	m_CamTriggerUpOffsets.resize(LEVEL_END);
 
-	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f, 0.f, 0.1f , 0.1f };
+	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .2f, .15f, 0.f, 0.f, 0.f, 0.f, 0.1f, 0.1f, 0.1f }; //9 == 11
 	//m_CamTriggerUpOffsets[LEVEL_PARK] = { 0.f, 0.f, 0.f, 100.f, .15f, 0.f, 0.f, 0.f, 0.f };
 	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .05f };
 	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f, .4f, .5f, 0.2f, 0.2f, 0.f };
@@ -608,6 +606,7 @@ _int CCamera_Main::Tick(_float fTimeDelta)
 	// 임시입니다.
 	if (*m_pCurrentLevelID == LEVEL_RACING)
 		Change_LevelTrigger();
+
 	return OBJ_NOEVENT;
 }
 
@@ -693,10 +692,6 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 			{
 				m_SeqEventTriggers[1] = false;
 
-				CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
-				if (pFinalBoss != nullptr)
-					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMOAPPEARCUT5, 50.f, false, true);
-
 			}
 			break;
 		default:
@@ -710,7 +705,8 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 
 			switch (m_eSpecialSeq)
 			{
-			case SEQ_BREAKCARSHOP:
+			//case SEQ_BREAKCARSHOP:
+			case SEQ_BREAKRACINGMAP:
 			{
 				m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
 				m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"Welcome to the New World!.mp3");
@@ -737,7 +733,10 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 			{
 				CEventCenter::Get_Instance()->Notify(KEVENT_FINALBOSS_APPEAR, this);
 
-				//dof 세팅, state 변경
+				//갓레이 세팅, state 변경
+
+				m_pGameInstance->Setting_GodRay({ 0.f, 1550.f, 2000.f, 1.f });
+
 				CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 				if (pFinalBoss != nullptr)
 				{
@@ -1749,29 +1748,34 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.95f, .12f, .29f });
 		m_CamSeq.push_back(newAction);
 
+		_float fDuration{ 2.9f };
 		//
-		Fill_InterpolateCutSet(newAction, 6.f, EASE_INOUT, 3.f);
+		Fill_InterpolateCutSet(newAction, 6.f, EASE_INOUT, fDuration);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ 0.f, 0.f, 3.f });
 		m_CamSeq.push_back(newAction);
 
 
+
+		_float fLastSeqStartTime{ 6.f + fDuration };
+
 		//에피리스 애니메이션 교체, target set
-		m_fSeqEventTime = 9.f;
+		m_fSeqEventTime = fLastSeqStartTime;
 
 		//보스 정면으로
-		vStartPos = { 0.f, 30.f, -7.f };
-		Fill_HardCutSet(newAction, 9.f);
+		vStartPos = { 0.f, 35.f, -3.f };
+		Fill_HardCutSet(newAction, fLastSeqStartTime);
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos);
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .2f, 1.f });
 		m_CamSeq.push_back(newAction);
 
+
 		//
-		Fill_InterpolateCutSet(newAction, 9.f, EASE_INOUT, 5.f);
-		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ 0.f, 0.f, -5.f });
+		Fill_InterpolateCutSet(newAction, fLastSeqStartTime, EASE_INOUT, 5.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ 0.f, -5.f, -5.f });
 		m_CamSeq.push_back(newAction);
 
-		Fill_InterpolateCutSet(newAction, 13.f, EASE_INOUT, 5.f);
+		Fill_InterpolateCutSet(newAction, fLastSeqStartTime + 5.f, EASE_INOUT, 8.f);
 		m_CamSeq.push_back(newAction);
 
 	}
@@ -2608,16 +2612,18 @@ void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
 		if (m_eSpecialSeq != SEQ_SIMBA_START)
 		{
 			CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
-
-			m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+			if(nullptr != pSimba)
+				m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
 		}
 
 	}
 
-	if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR)
+	if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR && m_fSeqEventTime <= 0.f)
 	{
-
-		//m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+		CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, L"Layer_BossMonster");
+		
+		if(pBoss != nullptr)	
+			m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
 	}
 }
 

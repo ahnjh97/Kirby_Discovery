@@ -33,25 +33,30 @@ void CKirbyDefault_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		pKirby->Change_State(CKirby::STATE_FALL, 50.f, false, true, CKirby::BODY_DEFAULT);
 		return;
 	}*/
+	if (DESC(m_bFinalBossCutStart) == true)
+		return;
 
-	// Idle일 때, 방향키를 눌렀을 때 RUN 으로 간다.
-	if (JoyStick_controller(Kirbydesc, pCamera))
+	if (DESC(m_bDialog) == false)
 	{
-		DESC(m_eEyeState) = CKirby::EYE_IDLE;
-		pKirby->Change_State(CKirby::STATE_RUNSTART, 120.f, true, true, CKirby::BODY_DEFAULT);
-		return;
-	}
+		// Idle일 때, 방향키를 눌렀을 때 RUN 으로 간다.
+		if (JoyStick_controller(Kirbydesc, pCamera))
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			pKirby->Change_State(CKirby::STATE_RUNSTART, 120.f, true, true, CKirby::BODY_DEFAULT);
+			return;
+		}
 
-	if (Key_Z(pGameObject, fTimeDelta))
-		return;
-	if (Key_X(pGameObject, fTimeDelta))
-		return;
-	if (Key_C(pGameObject, fTimeDelta))
-		return;
-	if (Key_V(pGameObject, fTimeDelta))
-		return;
-	if (Key_Happy(pGameObject, fTimeDelta))
-		return;
+		if (Key_Z(pGameObject, fTimeDelta))
+			return;
+		if (Key_X(pGameObject, fTimeDelta))
+			return;
+		if (Key_C(pGameObject, fTimeDelta))
+			return;
+		if (Key_V(pGameObject, fTimeDelta))
+			return;
+		if (Key_Happy(pGameObject, fTimeDelta))
+			return;
+	}
 
 	// IDLE상태에서 통제될 것들.
 	if (pKirby->Get_State() == CKirby::STATE_IDLE)

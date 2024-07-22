@@ -79,7 +79,11 @@ namespace Engine
 		_float		fOrbitSpeed = { 1.f };
 		_float		fOrbitSpeedRandomOffset;
 
+		_float		fTurnSpeed = { 1.f };
+		_float		fTurnSpeedRandomOffset = { 0.f };
+
 		_float		fAccSupplyAmount = { 1.f };
+		_float		fOrbitSupplyAmount = { 1.f };
 		_float		fTurnSupplyAmount = { 1.f };
 
 		_float3		vColor = {1.f, 1.f, 1.f};
@@ -228,7 +232,11 @@ namespace Engine
 		_float		fOrbitSpeed = { 1.f };
 		_float		fOrbitSpeedRandomOffset = { 0.f };
 
+		_float		fTurnSpeed = { 1.f };
+		_float		fTurnSpeedRandomOffset = { 0.f };
+
 		_float		fAccSupplyAmount = { 1.f };
+		_float		fOrbitSupplyAmount = { 1.f };
 		_float		fTurnSupplyAmount = { 1.f };
 
 		_float3		vColor = { 1.f, 1.f, 1.f };

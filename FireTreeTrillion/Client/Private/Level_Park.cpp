@@ -68,7 +68,6 @@ HRESULT CLevel_Park::Initialize()
 	CHECK_FAILED(hr);
 	hr = Ready_Objects();
 	CHECK_FAILED(hr);
-
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
 
@@ -105,6 +104,10 @@ HRESULT CLevel_Park::Initialize()
 	// 몬스터 트리거
 	function<void(_int)> funcMonster = bind(&CLevel_Park::SummonEffectForMonster, this, placeholders::_1);
 	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_MONSTER, funcMonster);
+
+	// 검정 포그 설정
+	m_pGameInstance->Fog_Intialize_ForPark(0);
+
 
 	return S_OK;
 }
@@ -374,6 +377,41 @@ HRESULT CLevel_Park::Ready_Layer_BackGround(const wstring& strLayerTag)
 
 	//hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphereSub"), &LabSkySubDesc);
 	//CHECK_FAILED(hr);
+
+
+	/*
+	// 두 번째 랜드로 이동하는 포탈
+	CGameObject::GAMEOBJECT_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+
+	_float4x4 InitMat = _float4x4::Identity;
+
+	_float4x4 translationMatrix = XMMatrixTranslation(180.f, 23.23f, 99.f);
+	_float	  rotationY = XMConvertToRadians(85.f);
+	_float4x4 rotationMatrixY = XMMatrixRotationY(rotationY);
+
+	InitMat = rotationMatrixY * translationMatrix;
+	ObjDesc.matWorld = InitMat;
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Portal"), TEXT("Prototype_GameObject_PortalSoftEffect"), &ObjDesc)))
+		return E_FAIL;
+
+	// 세 번째 랜드로 이동하는 포탈
+	CGameObject::GAMEOBJECT_DESC ObjDesc{};
+	ObjDesc.fSpeedPerSec = 5.f;
+	ObjDesc.fRotationPerSec = ToRadian(90.f);
+
+	_float4x4 InitMat = _float4x4::Identity;
+
+	_float4x4 translationMatrix = XMMatrixTranslation(180.f, 23.23f, 99.f);
+	_float	  rotationY = XMConvertToRadians(85.f);
+	_float4x4 rotationMatrixY = XMMatrixRotationY(rotationY);
+
+	InitMat = rotationMatrixY * translationMatrix;
+	ObjDesc.matWorld = InitMat;
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Portal"), TEXT("Prototype_GameObject_PortalSoftEffect"), &ObjDesc)))
+		return E_FAIL;
+	*/
 
 	return S_OK;
 }
@@ -1148,6 +1186,7 @@ HRESULT CLevel_Park::Ready_Objects()
 #pragma endregion
 
 #pragma region SetUpItemsToDynamicFields
+
 	list<CGameObject*>* pItemList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_NoVacuumItem"));
 	for (auto& item : *pItemList)
 	{
@@ -1156,6 +1195,7 @@ HRESULT CLevel_Park::Ready_Objects()
 	}
 
 #pragma endregion
+	
 	return S_OK;
 }
 

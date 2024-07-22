@@ -148,12 +148,17 @@ public:
 		_float4			m_vPreDiffuseLight = { 0.f, 0.f, 0.f, 0.f };
 
 		// FinalCut 폼
+		_bool			m_bFinalBossCutStart = { false };
 		_bool			m_bFinalBossDead = { false };
 
+		// Dialog
+		_bool			m_bDialog = { false };
 
 		// 어시스트 라이트
 		class CLight* m_pKirbyAssistLight1 = { nullptr };
 		class CLight* m_pKirbyAssistLight2 = { nullptr };
+
+
 	}KIRBY_INFODESC;
 
 
@@ -239,8 +244,8 @@ public:
 	// 기타 세부적인 제어
 	void Set_ControllerPos(_float4 _vPosition);
 
-	//unordered_map<PxRigidActor*, CGameObject*>* Get_StarBoses() { return &m_mapStarBoxes; };
-	//unordered_map<PxRigidActor*, CGameObject*>* Get_Boses() { return &m_mapBoxes; };
+	void DialogOn(_float4 vDir = _float4(0.f, 0.f, 0.f, 0.f ));
+	void DialogOff(_float4 vDir = _float4(0.f, 0.f, 0.f, 0.f));
 
 private:
 	// 커비의 움직임을 담은 구조체
@@ -251,6 +256,7 @@ private:
 	HRESULT			Kirby_SystemInitialize();
 	void			Kirby_LookInitialize();
 	void			Kirby_StateInitialize();
+	void			Kirby_SpecialAnim();
 
 private:
 	HRESULT			Make_TargetToCams();
@@ -328,6 +334,7 @@ private:
 
 	// For FinalCut
 	_bool				  m_bFinalCutTrigger = { true };
+	_bool				  m_bFinalCutStartTrigger = { true };
 
 	unordered_map<PxRigidActor*, CGameObject*> m_mapToppleableBridges;
 	unordered_map<PxRigidActor*, CGameObject*> m_mapStarBoxes;
@@ -339,6 +346,7 @@ private:
 	void ReleaseAndClearMap(unordered_map<PxRigidActor*, CGameObject*> _map);
 
 	void				  AssistLight_Control();
+	void				  Reset_If_Damage();
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

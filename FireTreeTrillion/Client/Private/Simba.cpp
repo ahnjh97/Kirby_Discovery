@@ -142,10 +142,29 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_pRightHandBone = m_pModelCom->Get_BonePtr("R_HaveL");
 	Safe_AddRef(m_pRightHandBone);
 
+	m_vecLeftNailBones.emplace_back(m_pModelCom->Get_BonePtr("L_indexNailJ"));
+	m_vecLeftNailBones.emplace_back(m_pModelCom->Get_BonePtr("L_middleNailJ"));
+	m_vecLeftNailBones.emplace_back(m_pModelCom->Get_BonePtr("L_pinkyNailJ"));
+	m_vecLeftNailBones.emplace_back(m_pModelCom->Get_BonePtr("L_ringNailJ"));
+	m_vecLeftNailBones.emplace_back(m_pModelCom->Get_BonePtr("L_thumbNailJ"));
+	for (auto& bone : m_vecLeftNailBones)
+		Safe_AddRef(bone);
+
+	m_vecRightNailBones.emplace_back(m_pModelCom->Get_BonePtr("R_indexNailJ"));
+	m_vecRightNailBones.emplace_back(m_pModelCom->Get_BonePtr("R_middleNailJ"));
+	m_vecRightNailBones.emplace_back(m_pModelCom->Get_BonePtr("R_pinkyNailJ"));
+	m_vecRightNailBones.emplace_back(m_pModelCom->Get_BonePtr("R_ringNailJ"));
+	m_vecRightNailBones.emplace_back(m_pModelCom->Get_BonePtr("R_thumbNailJ"));
+	for (auto& bone : m_vecRightNailBones)
+		Safe_AddRef(bone);
+
 	m_setAppear1Anims = { Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait, Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait,
 		Simba_DemoAppear1Cut4, Simba_DemoAppear1Cut4Wait };
 
 	m_setUndamagableAnims = { Simba_Death, Simba_DemoDeadCut1, Simba_DemoDeadCut2 };
+
+	m_setResetRequiredAnims = { Simba_AttackJumpHit, Simba_BiteRush, Simba_DimensionClaw, Simba_DimensionClawContinue,
+		Simba_DimensionLaser, Simba_DoubleClaw, Simba_FinalCrusher, Simba_QuickClawL, Simba_QuickClawR, Simba_QuickClaw2L, Simba_QuickClaw2R };
 
 	SetCamSequence(CCamera_Main::SEQ_SIMBA_START);
 
@@ -154,17 +173,11 @@ HRESULT CSimba::Initialize(void* pArg)
 	vector<_uint> vecTunnelRocks = { 2, 4, 5, 7, 8, 9, 10, 12, 13, 16 };
 	GAMEOBJECT_DESC tDesc{};
 
-	for (_uint i = 0; i < 4; i++) {
+	for (_uint i = 0; i < 40; i++) {
 		for (auto& rockIdx : vecTunnelRocks) {
 
 			tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(rockIdx);
 			m_vecSimbaRocks.emplace_back(dynamic_cast<CSimbaRock*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_SimbaRock"), &tDesc)));
-		}
-	}
-	for (_uint i = 0; i < 6; i++) {
-		for (auto& rockIdx : vecTunnelRocks) {
-
-			tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(rockIdx);
 			m_vecDebris.emplace_back(dynamic_cast<CDebris*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Debris"), &tDesc)));
 		}
 	}
@@ -177,7 +190,7 @@ _int CSimba::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return Ready_Dead();
 
-	m_fHpRatio =  m_fHp / m_fMaxHp;
+	m_fHpRatio = m_fHp / m_fMaxHp;
 
 	ResetRotation();
 	m_bRenderDimensionClaw = false;
@@ -190,26 +203,7 @@ _int CSimba::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	if (true == m_bSummon1)
-	{
-		m_fSummonTime += m_fTimeDelta;
-		if (1.2f < m_fSummonTime)
-		{
-			m_bSummon1 = false;
-			m_fSummonTime = 0;
-			SpawnMonsters(11);
-		}
-	}
-	else if (true == m_bSummon2)
-	{
-		m_fSummonTime += m_fTimeDelta;
-		if (1.2f < m_fSummonTime)
-		{
-			m_bSummon2 = false;
-			m_fSummonTime = 0;
-			SpawnMonsters(12);
-		}
-	}
+	CheckSpawning();
 
 	__super::Tick(m_fTimeDelta);
 
@@ -219,31 +213,44 @@ _int CSimba::Tick(_float fTimeDelta)
 	if (true == m_pModelCom->IsPartialAnimFinished())
 		m_bPlayPartialAnim = false;
 
-	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+	if ((m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_D, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_F, KEY_DOWN))
+		|| (0.6f > m_fHpRatio && 0.f < m_fHpRatio && m_bPhaseTwo == false))
 	{
-		if (m_pGameInstance->Get_KeyState(DIK_SPACE, KEY_DOWN))
-		{
-			_uint iCurAnimIndex = m_pModelCom->Get_CurAnimIndex();
-			_uint iNewAnimIndex = iCurAnimIndex + 1;
-			_uint iNumAnimations = m_pModelCom->Get_AnimCnt();
-			if (iNumAnimations == iNewAnimIndex)
-				iNewAnimIndex = 0;
-			m_pModelCom->Set_Animation(iNewAnimIndex, 40.f, true, false);
-		}
-		if (m_pGameInstance->Get_KeyState(DIK_NUMPAD1, KEY_DOWN)) {
-			m_bPhaseTwo = true;
-			Change_State(Simba_Damage, 50.f, false, true);
-		}
+		m_bPhaseTwo = true;
+		Change_State(Simba_Damage, 50.f, false, true);
+	}
+
+	if (m_pGameInstance->Get_KeyState(DIK_CAPSLOCK, KEY_PRESS))
+	{
+		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
+			Change_State(Simba_QuickClawStartL, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
+			Change_State(Simba_FinalCrusherStart, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_3, KEY_DOWN))
+			Change_State(Simba_DoubleClawChargeStart, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_4, KEY_DOWN))
+			Change_State(Simba_AttackJumpPre, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_5, KEY_DOWN))
+			Change_State(Simba_DimensionClawStart, 50.f, false, true);
+		else if(m_pGameInstance->Get_KeyState(DIK_6, KEY_DOWN))
+			Change_State(Simba_BiteRushStart, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_7, KEY_DOWN))
+			Change_State(Simba_DimensionLaserStart, 50.f, false, true);
+		else if(m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN))
+			Change_State(Simba_Wait2, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_9, KEY_DOWN))
+			Change_State(Simba_BiteRushJumpStartL, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_0, KEY_DOWN))
+			Change_State(Simba_BiteRushJumpStartR, 50.f, false, true);
+
+		SetUpSecondTarget();
+		HideDimensionClawActor();
+		HideDimensionLaserActor();
 	}
 
 	Check_HitBoxActivation();
 
-	if (m_setAppear1Anims.end() != m_setAppear1Anims.find(SIMBA_ANIM(Get_State())) && m_pGameInstance->Get_KeyState(DIK_A, KEY_DOWN)) {
-		if (false == m_bPlayPartialAnim) {
-			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSub, 50.f, false, false);
-			m_bPlayPartialAnim = true;
-		}
-	}
+	PlayLipSinc();
 
 	if (m_fHp <= 0.f && false == m_bDeathAnimPlayed)
 	{
@@ -252,15 +259,18 @@ _int CSimba::Tick(_float fTimeDelta)
 		Change_State(Simba_Death, 2.f, false, true);
 	}
 
-	if (0.6f > m_fHpRatio && 0.f < m_fHpRatio && m_bPhaseTwo == false) {
-		m_bPhaseTwo = true;
-		Change_State(Simba_Damage, 50.f, false, true);
-	}
-
 	DetermineSimbaRotation();
 
 	if (m_pSimbaLaser != nullptr && true == m_bLaserActivated)
 		m_pSimbaLaser->Tick(m_fTimeDelta);
+
+	for (auto& index : m_listUsedRocks)
+		m_vecSimbaRocks[index]->Tick(m_fTimeDelta);
+
+	for (auto& index : m_listUsedDebris)
+		m_vecDebris[index]->Tick(m_fTimeDelta);
+
+	RemoveDeadRocksFromList();
 
 	return OBJ_NOEVENT;
 }
@@ -268,26 +278,22 @@ _int CSimba::Tick(_float fTimeDelta)
 void CSimba::Late_Tick(_float fTimeDelta)
 {
 	if (m_pSimbaLaser != nullptr && true == m_bLaserActivated)
-		m_pSimbaLaser->Late_Tick(fTimeDelta);
+		m_pSimbaLaser->Late_Tick(m_fTimeDelta);
+
+	for (auto& index : m_listUsedRocks)
+		m_vecSimbaRocks[index]->Late_Tick(m_fTimeDelta);
+
+	for (auto& index : m_listUsedDebris)
+		m_vecDebris[index]->Late_Tick(m_fTimeDelta);
 
 	_bool bIsFinished = m_pModelCom->IsFinished();
 	m_pModelCom->Play_Animation(m_fTimeDelta);
 
 	if (false == bIsFinished)
-	{
-		_uint iAnimIdx = m_pModelCom->Get_CurAnimIndex();
-		if (true == m_bPlayPartialAnim && m_setUndamagableAnims.end() == m_setUndamagableAnims.find(SIMBA_ANIM(iAnimIdx))) {
-
-			_float fPartialAnimRatio = m_pModelCom->Get_PartialAnimRatio();
-			_float4x4 matLipTransformMatrix = m_pLipBone->Get_TransformationMatrix();
-			if (0.6f < fPartialAnimRatio && (-0.05f > matLipTransformMatrix._42 && -0.08f < matLipTransformMatrix._42))
-				m_bPlayPartialAnim = false;
-			else
-				m_pModelCom->Play_PartialAnimation(m_fTimeDelta);
-		}
-	}
+		PlayPartialAnimation();
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 }
 
 HRESULT CSimba::Render()
@@ -379,42 +385,6 @@ HRESULT CSimba::Render_LightDepth()
 	return S_OK;
 }
 
-void CSimba::Add_AnimEvent()
-{
-	__super::Add_AnimEvent();
-
-	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
-	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
-	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
-}
-
-#ifdef _DEBUG
-void CSimba::Render_IMGUI()
-{
-	if (ImGui::TreeNode("Guizmo"))
-	{
-		_float4x4 matWorld = m_pTransformCom->Get_WorldFloat4x4();
-		m_pGameInstance->EditTransform(matWorld);
-		m_pTransformCom->Set_WorldMatrix(matWorld);
-		ImGui::Separator(); ImGui::NewLine();
-		ImGui::TreePop();
-	}
-
-	//ImGui::Text("RePress : %d", m_bRePressBlock);
-	//ImGui::Text("Land : %d", INFO(m_isLanding));
-
-	//ImGui::Text("JUMP : %d", INFO(m_isJump));
-	//ImGui::Text("Velocity : %.2f", INFO(m_fJumpVelocity));
-	//ImGui::Text("Input C? : %d", m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS));
-	//ImGui::Text("FSM : %d", m_pFSM->Get_State());
-	ImGui::Separator(); ImGui::NewLine();
-
-	//	ImGui::Text("MoveDir X : %.2f \tMoveDir Y : %.2f \tMoveDir Z : %.2f ", INFO(m_vMoveDir).x, INFO(m_vMoveDir).y, INFO(m_vMoveDir).z); ImGui::NewLine();
-	//	ImGui::Text("TargetDir X : %.2f \tTargetDir Y : %.2f \tTargetDir Z : %.2f ", INFO(m_vTargetDir).x, INFO(m_vTargetDir).y, INFO(m_vTargetDir).z);
-	__super::Render_IMGUI();
-}
-#endif
-
 void CSimba::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	if (true == m_bPlayPartialAnim)
@@ -426,6 +396,10 @@ void CSimba::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 
 void CSimba::Change_State(SIMBA_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation)
 {
+	m_iStarCount = 0;
+	m_iRockCount = 0;
+	m_iDebrisCount = 0;
+
 	m_pFSM->ChangeState(eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
 
@@ -441,113 +415,93 @@ void CSimba::CreateHpBar()
 
 void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 {
-	_float4x4 matBoneWorld{};
 	HRESULT hr{};
 	CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
 	AbilityItemDesc.fAngle = 0.f;
 	AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
 
+	_float fY = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+	_vector vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	_vector vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+	_float4 vFloatLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	_float4 vFloatRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+
 	if (Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx)
 	{
-		matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone);
-
 		AbilityItemDesc.fRotateDir = 1.f;
-		AbilityItemDesc.vDir = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * CUtils::Make_RandomFloat(0.7f, 1.4f);
-		AbilityItemDesc.vPosition = _float4(matBoneWorld._41, matBoneWorld._42, matBoneWorld._43, 1) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.5f;
-		AbilityItemDesc.vPosition.y = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+		AbilityItemDesc.vDir = vRight * CUtils::Make_RandomFloat(0.7f, 1.4f);
+		AbilityItemDesc.vPosition = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone) + vFloatLook * 2.5f;
+		AbilityItemDesc.vPosition.y = fY;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);
 	}
 	else if (Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx) {
-		matBoneWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone);
-		_float fOffsetY = 0.8f;
-
 		AbilityItemDesc.fRotateDir = -1.f;
-		AbilityItemDesc.vDir = -m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * CUtils::Make_RandomFloat(0.7f, 1.4f);
-		AbilityItemDesc.vPosition = _float4(matBoneWorld._41, matBoneWorld._42 + fOffsetY, matBoneWorld._43, 1) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 2.5f;
-		AbilityItemDesc.vPosition.y = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+		AbilityItemDesc.vDir = -vRight * CUtils::Make_RandomFloat(0.7f, 1.4f);
+		AbilityItemDesc.vPosition = m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone) + vFloatLook * 2.5f;
+		AbilityItemDesc.vPosition.y = fY;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);
 	}
 	else if (Simba_FinalCrusher == iAnimIdx)
 	{
-		_float4 vLeftHandPos{}, vRightHandPos{};
-		memcpy(&vLeftHandPos, m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone).m[3], sizeof(_float4));
-		memcpy(&vRightHandPos, m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone).m[3], sizeof(_float4));
-		_float4 vPos = (vLeftHandPos + vRightHandPos) * 0.5f;
-		_float fOffsetY = -1.f;
+		_float4 vPos = (m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone) + m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone)) * 0.5f;
 
 		AbilityItemDesc.fRotateDir = 1.f;
-		AbilityItemDesc.vDir = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * CUtils::Make_RandomFloat(0.2f, 0.7f);
-		AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) + m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * 3.3f;
-		AbilityItemDesc.vPosition.y = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+		AbilityItemDesc.vDir = vRight * CUtils::Make_RandomFloat(0.2f, 0.7f);
+		AbilityItemDesc.vPosition = vPos + vFloatRight * 3.3f;
+		AbilityItemDesc.vPosition.y = fY;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);
 
 		AbilityItemDesc.fRotateDir = 1.f;
-		AbilityItemDesc.vDir = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * CUtils::Make_RandomFloat(0.2f, 0.7f);
-		AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 3.5f;
-		AbilityItemDesc.vPosition.y = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+		AbilityItemDesc.vDir = vLook * CUtils::Make_RandomFloat(0.2f, 0.7f);
+		AbilityItemDesc.vPosition = vPos + vFloatLook * 3.5f;
+		AbilityItemDesc.vPosition.y = fY;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);
 
 		AbilityItemDesc.fRotateDir = -1.f;
-		AbilityItemDesc.vDir = -m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * CUtils::Make_RandomFloat(0.2f, 0.7f);
-		AbilityItemDesc.vPosition = vPos + _float4(0, fOffsetY, 0, 0) - m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * 3.3f;
-		AbilityItemDesc.vPosition.y = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+		AbilityItemDesc.vDir = -vRight * CUtils::Make_RandomFloat(0.2f, 0.7f);
+		AbilityItemDesc.vPosition = vPos - vFloatRight * 3.3f;
+		AbilityItemDesc.vPosition.y = fY;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);
 	}
 	else if (Simba_AttackJumpHit == iAnimIdx)
 	{
-		_float4 vLeftHandPos{}, vRightHandPos{};
-		memcpy(&vLeftHandPos, m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone).m[3], sizeof(_float4));
-		memcpy(&vRightHandPos, m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone).m[3], sizeof(_float4));
-		_float4 vPos = (vLeftHandPos + vRightHandPos) * 0.5f;
-
-		_vector vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		_vector vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
-		_float4 vFloatLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		_float4 vFloatRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+		_float4 vPos = (m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone) + m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone)) * 0.5f;
 
 		AbilityItemDesc.fRotateDir = 1.f;
 		AbilityItemDesc.vDir = vLook * CUtils::Make_RandomFloat(0.2f, 0.7f);
 		AbilityItemDesc.vPosition = vPos + vFloatRight * 4.5f + vFloatLook * 2.2f;
-		AbilityItemDesc.vPosition.y = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+		AbilityItemDesc.vPosition.y = fY;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);
 
 		AbilityItemDesc.vDir = vLook * CUtils::Make_RandomFloat(0.2f, 0.7f);
 		AbilityItemDesc.vPosition = vPos + vFloatLook * 2.7f;
-		AbilityItemDesc.vPosition.y = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+		AbilityItemDesc.vPosition.y = fY;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);
 
 		AbilityItemDesc.vDir = vLook * CUtils::Make_RandomFloat(0.2f, 0.7f);
 		AbilityItemDesc.vPosition = vPos - vFloatRight * 4.5f + vFloatLook * 2.2f;
-		AbilityItemDesc.vPosition.y = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+		AbilityItemDesc.vPosition.y = fY;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);
 	}
 	else if (Simba_DoubleClaw == iAnimIdx)
 	{
-		_float4 vLeftHandPos{}, vRightHandPos{};
-		memcpy(&vLeftHandPos, m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone).m[3], sizeof(_float4));
-		memcpy(&vRightHandPos, m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone).m[3], sizeof(_float4));
-		_float4 vPos = (vLeftHandPos + vRightHandPos) * 0.5f;
+		_float4 vPos = (m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone) + m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone)) * 0.5f;
 
-		_vector vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		_vector vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
-		_float4 vFloatLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		_float4 vFloatRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
-		
 		if(0 == CUtils::Make_RandomInt(0, 1))
 			AbilityItemDesc.fRotateDir = 1.f;
 		else
 			AbilityItemDesc.fRotateDir = -1.f;
 		AbilityItemDesc.vDir = vLook * CUtils::Make_RandomFloat(0.2f, 0.7f);
-		AbilityItemDesc.vPosition = vPos + vFloatRight * 2.f + vFloatLook * 3.5f;
-		AbilityItemDesc.vPosition.y = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+		AbilityItemDesc.vPosition = vPos + vFloatRight * 2.2f + vFloatLook * 3.5f;
+		AbilityItemDesc.vPosition.y = fY;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);
 
@@ -557,7 +511,7 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 			AbilityItemDesc.fRotateDir = -1.f;
 		AbilityItemDesc.vDir = vLook * CUtils::Make_RandomFloat(0.2f, 0.7f);
 		AbilityItemDesc.vPosition = vPos + vFloatLook * 4.2f;
-		AbilityItemDesc.vPosition.y = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+		AbilityItemDesc.vPosition.y = fY;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);
 
@@ -566,27 +520,26 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 		else
 			AbilityItemDesc.fRotateDir = -1.f;
 		AbilityItemDesc.vDir = vLook * CUtils::Make_RandomFloat(0.2f, 0.7f);
-		AbilityItemDesc.vPosition = vPos - vFloatRight * 2.f + vFloatLook * 3.5f;
-		AbilityItemDesc.vPosition.y = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+		AbilityItemDesc.vPosition = vPos - vFloatRight * 2.2f + vFloatLook * 3.5f;
+		AbilityItemDesc.vPosition.y = fY;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);
 	}
 	else if (Simba_DimensionClaw == iAnimIdx || Simba_DimensionClawContinue == iAnimIdx)
 	{
-		_vector vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		_float4 vFloatLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		_float4 vFloatRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
 		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
 		if (0 == CUtils::Make_RandomInt(0, 1))
 			AbilityItemDesc.fRotateDir = 1.f;
 		else
 			AbilityItemDesc.fRotateDir = -1.f;
 		AbilityItemDesc.vDir = XMVectorZero();
-
+		
 		if (true == m_bDimensionClawUpAttack)
 		{
 			if (0 == m_iStarCount) {
 				AbilityItemDesc.vPosition = vPos + vFloatLook * 8.f + vFloatRight * 8.f;
+				AbilityItemDesc.vPosition.y = fY;
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 				CHECK_FAILED(hr);
 
@@ -595,12 +548,14 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 				else
 					AbilityItemDesc.fRotateDir = -1.f;
 				AbilityItemDesc.vPosition = vPos + vFloatLook * 8.f - vFloatRight * 8.f;
+				AbilityItemDesc.vPosition.y = fY;
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 				CHECK_FAILED(hr);
 			}
 				
 			else if (1 == m_iStarCount) {
 				AbilityItemDesc.vPosition = vPos + vFloatLook * 18.f + vFloatRight * 8.f;
+				AbilityItemDesc.vPosition.y = fY;
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 				CHECK_FAILED(hr);
 
@@ -609,6 +564,7 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 				else
 					AbilityItemDesc.fRotateDir = -1.f;
 				AbilityItemDesc.vPosition = vPos + vFloatLook * 18.f - vFloatRight * 8.f;
+				AbilityItemDesc.vPosition.y = fY;
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 				CHECK_FAILED(hr);
 			}
@@ -624,39 +580,28 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 			CHECK_FAILED(hr);
 		}
-
-		m_iStarCount++;
 	}
 	else if (Simba_BiteRush == iAnimIdx)
 	{
-		_vector vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		_float4 vFloatLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		_float4 vFloatRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
-
 		if (true == m_bBiteRushSpawnStarAtLeft)
 		{
-			_float4 vLeftHandPos{};
-			memcpy(&vLeftHandPos, m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone).m[3], sizeof(_float4));
 			AbilityItemDesc.fRotateDir = -1.f;
 			AbilityItemDesc.vDir = -vFloatRight * CUtils::Make_RandomFloat(0.05f, 0.2f);
-			AbilityItemDesc.vPosition = vLeftHandPos - vFloatRight * 1.5f - vFloatLook * 2.2f;
+			AbilityItemDesc.vPosition = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone) - vFloatRight * 1.5f - vFloatLook * 2.2f;
 		}
 		else
 		{
-			_float4 vRightHandPos{};
-			memcpy(&vRightHandPos, m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone).m[3], sizeof(_float4));
 			AbilityItemDesc.fRotateDir = 1.f;
 			AbilityItemDesc.vDir = vFloatRight * CUtils::Make_RandomFloat(0.05f, 0.2f);
-			AbilityItemDesc.vPosition = vRightHandPos + vFloatRight * 1.5f - vFloatLook * 2.f;
+			AbilityItemDesc.vPosition = m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone) + vFloatRight * 1.5f - vFloatLook * 2.f;
 		}
 
-		AbilityItemDesc.vPosition.y = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y - 0.2f;
+		AbilityItemDesc.vPosition.y = fY - 0.2f;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);
 	}
 	else if (Simba_DimensionLaser)
 	{
-		_float4 vFloatLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 		if (0 == CUtils::Make_RandomInt(0, 1))
@@ -674,10 +619,12 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 		else if (3 == m_iStarCount)
 			AbilityItemDesc.vPosition = vPos + vFloatLook * 22.f;
 
+		AbilityItemDesc.vPosition.y = fY;
 		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 		CHECK_FAILED(hr);
-		m_iStarCount++;
 	}
+
+	m_iStarCount++;
 }
 
 _bool CSimba::IsKirbyOnMyLeft()
@@ -710,13 +657,7 @@ void CSimba::SetUpDimensionClawWorldMatrix()
 	if (nullptr == m_pDimensionClawActor)
 		return;
 
-	_float4x4 matLeftHandMatrix = m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone);
-	_float4x4 matRightHandMatrix = m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone);
-	_float4 vLeftHandPos{}, vRightHandPos{};
-	memcpy(&vLeftHandPos, &matLeftHandMatrix.m[3], sizeof(_float4));
-	memcpy(&vRightHandPos, &matRightHandMatrix.m[3], sizeof(_float4));
-	
-	_float4 vPos = (vLeftHandPos + vRightHandPos) * 0.5f;
+	_float4 vPos = (m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone) + m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone)) * 0.5f;
 	if (true == m_bDimensionClawUpAttack)
 		vPos.y = 6.5f;
 	else
@@ -729,34 +670,227 @@ void CSimba::SetUpDimensionClawWorldMatrix()
 
 void CSimba::MoveDimensionClaw(_float fTimeDelta)
 {
-	if (nullptr == m_pDimensionClawActor)
-		return;
-
-	PxTransform pxTransform = m_pDimensionClawActor->getGlobalPose();
-
-	_float4x4 matWorld = CUtils::To_Float4x4(pxTransform);
-	_float4 vLook{}, vPos{};
-	memcpy(&vLook, &(matWorld.m[2]), sizeof(_float4)); // Look 받아오기
-	memcpy(&vPos, &(matWorld.m[3]), sizeof(_float4)); // Pos 받아오기
-	vLook.Normalize();
-
-	vPos += vLook * 20.f * fTimeDelta;
-
-	memcpy(&(matWorld.m[3]), &vPos, sizeof(_float4)); // 새로운 위치 대입
-
-	m_pDimensionClawActor->setGlobalPose(CUtils::ToPxTransform(matWorld));
+	CUtils::MoveActor(m_pDimensionClawActor, _float3(0, 0, 20), m_fTimeDelta);
 }
 
 void CSimba::HideDimensionClawActor()
 {
 	if(nullptr != m_pDimensionClawActor)
-		m_pDimensionClawActor->setKinematicTarget(PxTransform(0, 0, 0));
+		m_pDimensionClawActor->setGlobalPose(PxTransform(0, 0, 0));
 }
 
 void CSimba::HideDimensionLaserActor()
 {
 	if (nullptr != m_pSimbaLaser)
 		static_cast<CSimbaLaser*>(m_pSimbaLaser)->HideLaser();
+}
+
+void CSimba::SpawnRocks(_uint iAnimIdx)
+{
+	_vector vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	_float4 vFloatLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	_float4 vFloatRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+
+	if (Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx || Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
+	{
+		_float4 vPos{};
+		if(Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx)
+			vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
+		else if(Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
+			vPos = m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone);
+
+		_uint iNumRocks = 25;
+		for (_uint i = 0; i < iNumRocks; i++)
+		{
+			_uint index = i + m_iRockCount * iNumRocks;
+			if (Simba_QuickClaw2L == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
+				index += 100;
+			_float4 vOffset = CUtils::TurnDirectionVector(vLook, _float3(0, 1, 0), CUtils::Make_RandomFloat(0, 360)) * CUtils::Make_RandomFloat(0.f, 3.6f);
+			_float4 vResultPos = vPos + vOffset + vFloatLook;
+			vResultPos.y = CUtils::Make_RandomFloat(1.9f, 2.4f);
+
+			m_vecSimbaRocks[index]->SetUpSimbaRock(vResultPos);
+			m_listUsedRocks.push_back(index);
+		}
+	}
+	else if (Simba_FinalCrusher == iAnimIdx)
+	{
+		_float4 vPos = (m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone) + m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone)) * 0.5f;
+		vPos.y = CUtils::Make_RandomFloat(1.9f, 2.4f);
+
+		_uint iNumRocks = 40;
+		for (_uint i = 0; i < iNumRocks; i++)
+		{
+			_uint index = i + m_iRockCount * iNumRocks;
+			_float fDis{};
+			if (0 == m_iRockCount)
+				fDis = CUtils::Make_RandomFloat(1.5f, 2.2f);
+			else if (1 == m_iRockCount)
+				fDis = CUtils::Make_RandomFloat(2.2f, 3.f);
+			else if (2 == m_iRockCount)
+				fDis = CUtils::Make_RandomFloat(3.f, 3.8f);
+			_float4 vOffset = CUtils::TurnDirectionVector(vLook, _float3(0, 1, 0), CUtils::Make_RandomFloat(0, 360)) * fDis;
+			m_vecSimbaRocks[index]->SetUpSimbaRock(vPos + vOffset + vFloatLook);
+			m_listUsedRocks.push_back(index);
+		}
+	}
+	else if (Simba_DoubleClaw == iAnimIdx)
+	{
+		_float4 vLeftHandPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
+		_float4 vRightHandPos = m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone);
+
+		_uint iNumRocks = 3;
+		for (_uint i = 0; i < iNumRocks; i++)
+		{
+			_uint index = i + m_iRockCount * iNumRocks;
+			_float4 vOffset = CUtils::TurnDirectionVector(vLook, _float3(0, 1, 0), CUtils::Make_RandomFloat(0, 360)) * CUtils::Make_RandomFloat(0.f, 1.2f);
+			_float4 vResultPos = vLeftHandPos + vOffset + vFloatLook;
+			vResultPos.y = CUtils::Make_RandomFloat(1.9f, 2.4f);
+
+			m_vecSimbaRocks[index]->SetUpSimbaRock(vResultPos);
+			m_listUsedRocks.push_back(index);
+
+			_float4 vOffset2 = CUtils::TurnDirectionVector(vLook, _float3(0, 1, 0), CUtils::Make_RandomFloat(0, 360)) * CUtils::Make_RandomFloat(0.f, 1.2f);
+			_float4 vResultPos2 = vRightHandPos + vOffset2 + vFloatLook;
+			vResultPos2.y = CUtils::Make_RandomFloat(1.9f, 2.4f);
+			index += 200;
+			m_vecSimbaRocks[index]->SetUpSimbaRock(vResultPos2);
+			m_listUsedRocks.push_back(index);
+		}
+	}
+	else if (Simba_AttackJumpHit == iAnimIdx)
+	{
+		_float4 vLeftHandPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
+		_float4 vRightHandPos = m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone);
+
+		_uint iNumRocks = 50;
+		for (_uint i = 0; i < iNumRocks; i++)
+		{
+			_uint index = i + m_iRockCount * iNumRocks;
+			_float fRightFactor = CUtils::Make_RandomFloat(-3.f, 3.f);
+			_float4 fRightOffset = vFloatRight * fRightFactor;
+			
+			_float4 vLookOffset = vFloatLook * CUtils::Make_RandomFloat(1.5f, 2.6f) * sqrt(3.f - abs(fRightFactor)) * 0.8f;
+			_float4 vOffset = vLookOffset + fRightOffset + vFloatLook * 1.2f;
+
+			if (0 == m_iRockCount) {
+				
+				_float4 vResultPos = vLeftHandPos + vOffset;
+				vResultPos.y = CUtils::Make_RandomFloat(1.9f, 2.4f);
+				m_vecSimbaRocks[index]->SetUpSimbaRock(vResultPos);
+				m_listUsedRocks.push_back(index);
+			}
+				
+			else if (1 == m_iRockCount) {
+				_float4 vResultPos = vRightHandPos + vOffset;
+				vResultPos.y = CUtils::Make_RandomFloat(1.9f, 2.4f);
+
+				_uint iNewIndex = index + 100;
+				m_vecSimbaRocks[iNewIndex]->SetUpSimbaRock(vResultPos);
+				m_listUsedRocks.push_back(iNewIndex);
+			}
+		}
+	}
+
+	m_iRockCount++;
+}
+
+void CSimba::SpawnDebris(_uint iAnimIdx)
+{
+	if (Simba_QuickClawL == iAnimIdx)
+	{
+
+	}
+	else if (Simba_QuickClawR == iAnimIdx)
+	{
+
+	}
+	else if (Simba_QuickClaw2L == iAnimIdx)
+	{
+
+	}
+	else if (Simba_QuickClaw2R == iAnimIdx)
+	{
+
+	}
+	else if (Simba_FinalCrusher == iAnimIdx)
+	{
+
+	}
+	else if (Simba_DoubleClaw == iAnimIdx)
+	{
+
+	}
+	else if (Simba_AttackJumpHit == iAnimIdx)
+	{
+
+	}
+	else if (Simba_DimensionLaser == iAnimIdx)
+	{
+
+	}
+
+	m_iDebrisCount++;
+}
+
+void CSimba::SetUpSecondTarget()
+{
+	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+	if (pCamera != nullptr)
+		pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_BOTH);
+}
+
+void CSimba::QuickClawNailFlash(_uint eSimbaAnim)
+{
+	if (Simba_QuickClawStartL == eSimbaAnim) // YW : Effect 영우형 여기임 왼쪽 검지손톱 번쩍
+	{
+		_float3 vOffset = _float3(); // Right Up Look 오프셋 계수
+		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_vecLeftNailBones[INDEX], vOffset);
+
+	}
+	else if (Simba_QuickClawStartR == eSimbaAnim) // YW : Effect 영우형 여기임 오른쪽 검지손톱 번쩍
+	{
+		_float3 vOffset = _float3(); // Right Up Look 오프셋 계수
+		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_vecRightNailBones[INDEX], vOffset);
+
+	}
+}
+
+void CSimba::QuickClawNailTrail() // YW : Effect 영우형 여기임 왼쪽 검지손톱 번쩍
+{
+}
+
+void CSimba::FinalCrusherSwing() // YW : Effect 영우형 여기임 양주먹 내려치기시작
+{
+}
+
+void CSimba::FinalCrusherSmash() // YW : Effect 영우형 여기임 양주먹 바닥에 찍는 타이밍
+{
+	
+}
+
+void CSimba::JumpStartSmoke() // YW : Effect 영우형 여기임 점프 시작할때 회색방구
+{
+}
+
+void CSimba::LandingSmoke() // YW : Effect 영우형 여기임 점프 후 착지 회색방구
+{
+}
+
+void CSimba::AttackJumpWind() // YW : Effect 영우형 여기임 점프 공격할때 주위 바람 
+{
+}
+
+void CSimba::DoubleClawDashGround() // YW : Effect 영우형 여기임 양손으로 바닥 계속 긁을때 튀기는 작은 불씨들 (아직은 이 함수 호출 안함)
+{
+}
+
+void CSimba::DoubleClawGround() // YW : Effect 영우형 여기임 양슨으로 바닥 긁다가 공격이펙트 직전 튀기는 큰 불씨들 (아직은 이 함수 호출 안함)
+{
+}
+
+void CSimba::DoubleClawSweep()// YW : Effect 영우형 여기임 바닥 긁다가 순간적으로 공격 이펙트 (트레일, 불꽃)
+{
 }
 
 HRESULT CSimba::Add_Components()
@@ -864,6 +998,20 @@ HRESULT CSimba::Bind_ShaderResources()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CSimba::PlayPartialAnimation()
+{
+	_uint iAnimIdx = m_pModelCom->Get_CurAnimIndex();
+	if (true == m_bPlayPartialAnim && m_setUndamagableAnims.end() == m_setUndamagableAnims.find(SIMBA_ANIM(iAnimIdx))) {
+
+		_float fPartialAnimRatio = m_pModelCom->Get_PartialAnimRatio();
+		_float4x4 matLipTransformMatrix = m_pLipBone->Get_TransformationMatrix();
+		if (0.6f < fPartialAnimRatio && (-0.05f > matLipTransformMatrix._42 && -0.08f < matLipTransformMatrix._42))
+			m_bPlayPartialAnim = false;
+		else
+			m_pModelCom->Play_PartialAnimation(m_fTimeDelta);
+	}
 }
 
 void CSimba::SetUp_FSM()
@@ -1020,6 +1168,16 @@ void CSimba::Reset_HitBoxTimingMap(SIMBA_ANIM eAnimIdx)
 	}
 }
 
+void CSimba::PlayLipSinc()
+{
+	if (m_setAppear1Anims.end() != m_setAppear1Anims.find(SIMBA_ANIM(Get_State())) && m_pGameInstance->Get_KeyState(DIK_A, KEY_DOWN)) {
+		if (false == m_bPlayPartialAnim) {
+			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSub, 50.f, false, false);
+			m_bPlayPartialAnim = true;
+		}
+	}
+}
+
 void CSimba::TransformToDefault(_float fOffsetY)
 {
 	_float4x4 matWorld = m_matDefault;
@@ -1027,7 +1185,7 @@ void CSimba::TransformToDefault(_float fOffsetY)
 	matWorld._42 = m_matDefault._42 - 1.97f;
 	m_pTransformCom->Set_WorldMatrix(matWorld);
 	m_pControllerCom->Set_Position(m_pTransformCom, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-	m_pControllerCom->FreeFall(m_pTransformCom, m_pGameInstance->Get_SecondTimer(), 6.f, fOffsetY);
+	m_pControllerCom->FreeFall(m_pTransformCom, m_fTimeDelta, 6.f, fOffsetY);
 	m_bPhaseTwo = false;
 }
 
@@ -1063,12 +1221,12 @@ void CSimba::OnAppearEnd(CGameObject* pObj)
 {
 	Change_State(Simba_DemoAppear1Cut9, 50.f, false, true);
 	TransformToDefault(0);
-	SpawnEffects(11);
+	TriggerMonsterSpawning(11);
 }
 
 void CSimba::OnWave1Dead(CGameObject* pObj)
 {
-	SpawnEffects(12);
+	TriggerMonsterSpawning(12);
 }
 
 void CSimba::OnWave2Dead(CGameObject* pObj)
@@ -1084,35 +1242,77 @@ void CSimba::OnWave2Dead(CGameObject* pObj)
 	TransformToDefault(-0.3f);
 }
 
+void CSimba::TriggerMonsterSpawning(_uint iTriggerIndex)
+{
+	if (11 == iTriggerIndex)
+		m_bSummon1 = true;
+	else if (12 == iTriggerIndex)
+		m_bSummon2 = true;
+}
+
 void CSimba::SpawnMonsters(_uint iTriggerIndex)
 {
 	wstring wstrLayerTag = TEXT("Layer_Wave");
 	if (11 == iTriggerIndex)
 		wstrLayerTag += TEXT("1");
-	else if(12 == iTriggerIndex)
+	else if (12 == iTriggerIndex)
 		wstrLayerTag += TEXT("2");
 
-	//list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_SIMBA, wstrLayerTag);
-	//if (nullptr != pObjList && false == pObjList->empty())
-	//	return;
-		
 	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
+	wstring wstrMonsterName;
 
+	if (11 == iTriggerIndex) {
+		if (0 == m_iMonsterCount)
+			wstrMonsterName = TEXT("Awoofy");
+		else if (1 == m_iMonsterCount)
+			wstrMonsterName = TEXT("AwoofyWild");
+	}
+	else if (12 == iTriggerIndex)
+	{
+		if (0 == m_iMonsterCount)
+			wstrMonsterName = TEXT("Awoofy"); // AwoofyWild로 바꿔야할수도 흠
+		else if (1 == m_iMonsterCount)
+			wstrMonsterName = TEXT("Rabbit");
+		else if (2 == m_iMonsterCount)
+			wstrMonsterName = TEXT("RabbitBig");
+	}
+
+	_float fY{}, fScaleOffset{};
+	if (TEXT("Awoofy") == wstrMonsterName || TEXT("Rabbit") == wstrMonsterName) {
+		fY = 2.4f;
+		fScaleOffset = 1.f;
+	}
+	else if (TEXT("AwoofyWild") == wstrMonsterName) {
+		fY = 2.7f;
+		fScaleOffset = 1.1f;
+	}
+	else if (TEXT("RabbitBig") == wstrMonsterName) {
+		fY = 2.4f;
+		fScaleOffset = 1.2f;
+	}
+		
 	for (auto& monsterDesc : m_vecMonsterDescs)
 	{
 		if (iTriggerIndex == monsterDesc.eMonState)
 		{
+			if (monsterDesc.wstrModelName != wstrMonsterName)
+				continue;
+
+			monsterDesc.matWorld._42 = fY;
+
 			wstring wstrTag;
 			if (TEXT("Awoofy") == monsterDesc.wstrModelName || TEXT("AwoofyWild") == monsterDesc.wstrModelName)
 				wstrTag = wstrPrototypeTag + TEXT("Awoofy");
-			else if(TEXT("Rabbit") == monsterDesc.wstrModelName || TEXT("RabbitBig") == monsterDesc.wstrModelName)
+			else if (TEXT("Rabbit") == monsterDesc.wstrModelName || TEXT("RabbitBig") == monsterDesc.wstrModelName) {
 				wstrTag = wstrPrototypeTag + TEXT("Rabbit");
+				monsterDesc.matWorld._42 = 2.f;
+			}
 
 			if (FAILED(m_pGameInstance->Add_Clone(LEVEL_SIMBA, wstrLayerTag, wstrTag, &monsterDesc)))
 				return;
 
 			CEffect::FX_DESC FXDesc{};
-			_float3 vMonPos = _float3(monsterDesc.matWorld._41, monsterDesc.matWorld._42 + 1.5f, monsterDesc.matWorld._43);
+			_float3 vMonPos = _float3(monsterDesc.matWorld._41, fY + 1.f, monsterDesc.matWorld._43);
 			_float3 vRight = _float3(monsterDesc.matWorld._11, monsterDesc.matWorld._12, monsterDesc.matWorld._13);
 			_float3 vUp = _float3(monsterDesc.matWorld._21, monsterDesc.matWorld._22, monsterDesc.matWorld._23);
 			_float3 vLook = _float3(monsterDesc.matWorld._31, monsterDesc.matWorld._32, monsterDesc.matWorld._33);
@@ -1125,12 +1325,27 @@ void CSimba::SpawnMonsters(_uint iTriggerIndex)
 				_float3 vRotateRight = CUtils::TurnDirectionVector(vRight, vLook, ((_float)i * 120.f) + fRandAngle);
 				FXDesc.vInitPos = vMonPos + fDistance * vRotateRight + vLook;
 				FXDesc.vInitRot = { fRandAngle, 0.f, fRandAngle };
-				FXDesc.vInitScale = { fDistance + 1.f, fDistance + 1.f, fDistance + 1.f };
+				FXDesc.vInitScale = { fDistance + fScaleOffset, fDistance + fScaleOffset, fDistance + fScaleOffset };
 				//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
 				Add_Effect("BbongJS", FXDesc, false);
 			}
 		}
+	}
+
+	m_iMonsterCount++;
+
+	if (11 == iTriggerIndex && 1 < m_iMonsterCount) {
+		m_bSummon1 = false;
+		m_fSpawnTime = 0.f;
+		m_iEffectCount = 0;
+		m_iMonsterCount = 0;
+	}
+	else if (12 == iTriggerIndex && 2 < m_iMonsterCount) {
+		m_bSummon2 = false;
+		m_fSpawnTime = 0.f;
+		m_iEffectCount = 0;
+		m_iMonsterCount = 0;
 	}
 }
 
@@ -1138,43 +1353,96 @@ void CSimba::SpawnEffects(_uint iTriggerIndex)
 {
 	wstring wstrLayerTag = TEXT("Layer_Effect");
 	if (11 == iTriggerIndex)
-	{
-		m_bSummon1 = true;
 		wstrLayerTag += TEXT("1");
+	else if (12 == iTriggerIndex)
+		wstrLayerTag += TEXT("2");
+
+	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
+	HRESULT hr{};
+	CSummonEffect::SUMMONEFFECT_DESC SummonEffectDesc = {};
+
+	wstring wstrMonsterName;
+
+	if (11 == iTriggerIndex) {
+		if (0 == m_iEffectCount)
+			wstrMonsterName = TEXT("Awoofy");
+		else if(1 == m_iEffectCount)
+			wstrMonsterName = TEXT("AwoofyWild");
 	}
 	else if (12 == iTriggerIndex)
 	{
-		m_bSummon2 = true;
-		wstrLayerTag += TEXT("2");
+		if (0 == m_iEffectCount)
+			wstrMonsterName = TEXT("Awoofy"); // AwoofyWild로 바꿔야할수도 흠
+		else if (1 == m_iEffectCount)
+			wstrMonsterName = TEXT("Rabbit");
+		else if(2 == m_iEffectCount)
+			wstrMonsterName = TEXT("RabbitBig");
 	}
 
-	list<CGameObject*>* pObjList = m_pGameInstance->Get_List(LEVEL_SIMBA, wstrLayerTag);
-	if (nullptr != pObjList && false == pObjList->empty())
-		return;
+	_float fY{};
+	if (TEXT("Awoofy") == wstrMonsterName || TEXT("Rabbit") == wstrMonsterName || TEXT("RabbitBig") == wstrMonsterName)
+		fY = 2.4f;
+	else if (TEXT("AwoofyWild") == wstrMonsterName )
+		fY = 2.7f;
 
-	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
-
-
-	HRESULT hr;
-
-	CSummonEffect::SUMMONEFFECT_DESC SummonEffectDesc = {};
 	for (auto& monsterDesc : m_vecMonsterDescs)
 	{
 		if (iTriggerIndex == monsterDesc.eMonState)
 		{
+			if (monsterDesc.wstrModelName != wstrMonsterName)
+				continue;
+
 			_float fScale = { 0.f };
 			wstring wstrTag;
-			if (TEXT("Awoofy") == monsterDesc.wstrModelName || TEXT("AwoofyWild") == monsterDesc.wstrModelName)
-				fScale = 4.f;
-			else if (TEXT("Rabbit") == monsterDesc.wstrModelName || TEXT("RabbitBig") == monsterDesc.wstrModelName)
-				fScale = 7.f;
+			if (TEXT("Awoofy") == monsterDesc.wstrModelName || TEXT("Rabbit") == monsterDesc.wstrModelName)
+				fScale = 3.6f;
+			else if (TEXT("AwoofyWild") == monsterDesc.wstrModelName || TEXT("RabbitBig") == monsterDesc.wstrModelName)
+				fScale = 5.8f;
 
-			SummonEffectDesc.vPosition = _float4(monsterDesc.matWorld._41, monsterDesc.matWorld._42 + 1.f, monsterDesc.matWorld._43, monsterDesc.matWorld._44);
+			SummonEffectDesc.vPosition = _float4(monsterDesc.matWorld._41, fY + 1.f, monsterDesc.matWorld._43, monsterDesc.matWorld._44);
 			SummonEffectDesc.fScale = fScale;
 			SummonEffectDesc.fAlpha = 0.9f;
 			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), wstrLayerTag, TEXT("Prototype_GameObject_SummonEffect"), &SummonEffectDesc);
 			CHECK_FAILED(hr);
 		}
+	}
+
+	m_iEffectCount++;
+}
+
+void CSimba::CheckSpawning()
+{
+	if (true == m_bSummon1)
+	{
+		m_fSpawnTime += m_fTimeDelta;
+
+		if (0.f < m_fSpawnTime && 0 == m_iEffectCount)
+			SpawnEffects(11);
+		else if(0.7f < m_fSpawnTime && 1 == m_iEffectCount)
+			SpawnEffects(11);
+
+		if (1.2f < m_fSpawnTime && 0 == m_iMonsterCount)
+			SpawnMonsters(11);
+		else if (1.9f < m_fSpawnTime && 1 == m_iMonsterCount)
+			SpawnMonsters(11);
+	}
+	else if (true == m_bSummon2)
+	{
+		m_fSpawnTime += m_fTimeDelta;
+
+		if (0.f < m_fSpawnTime && 0 == m_iEffectCount)
+			SpawnEffects(12);
+		else if (0.5f < m_fSpawnTime && 1 == m_iEffectCount)
+			SpawnEffects(12);
+		else if (1.1f < m_fSpawnTime && 2 == m_iEffectCount)
+			SpawnEffects(12);
+
+		if (1.2f < m_fSpawnTime && 0 == m_iMonsterCount)
+			SpawnMonsters(12);
+		else if (1.7f < m_fSpawnTime && 1 == m_iMonsterCount)
+			SpawnMonsters(12);
+		else if (2.3f < m_fSpawnTime && 2 == m_iMonsterCount)
+			SpawnMonsters(12);
 	}
 }
 
@@ -1322,6 +1590,17 @@ void CSimba::OnSimbaAttackTrigger()
 	}
 }
 
+void CSimba::RemoveDeadRocksFromList()
+{
+	for (auto& iter = m_listUsedRocks.begin(); iter != m_listUsedRocks.end();)
+	{
+		if (true == m_vecSimbaRocks[*iter]->Get_Hide())
+			iter = m_listUsedRocks.erase(iter);
+		else
+			iter++;
+	}
+}
+
 CSimba* CSimba::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CSimba* pInstance = new CSimba(pDevice, pContext);
@@ -1360,6 +1639,11 @@ void CSimba::Free()
 		Safe_Release(simbaRock);
 	for (auto& debris : m_vecDebris)
 		Safe_Release(debris);
+
+	for (auto& bone : m_vecLeftNailBones)
+		Safe_Release(bone);
+	for (auto& bone : m_vecRightNailBones)
+		Safe_Release(bone);
 
 	Safe_Release(m_pLipBone);
 	Safe_Release(m_pLaserBone);

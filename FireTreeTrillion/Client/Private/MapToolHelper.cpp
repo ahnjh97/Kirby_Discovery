@@ -1470,14 +1470,11 @@ void CMapToolHelper::Save_Level()
 	else
 		wstrSave += L"BlendDecoInfos X\n";
 
-	if ("Park" == strLevel
-		|| "FinalBoss" == strLevel)
-	{
-		if (true == Save_Lights(strLevel, vecLights))
-			wstrSave += L"Lights O\n";
-		else
-			wstrSave += L"Lights X\n";
-	}
+	if (true == Save_Lights(strLevel, vecLights))
+		wstrSave += L"Lights O\n";
+	else
+		wstrSave += L"Lights X\n";
+	
 
 	if (false == m_vecBaseEmissiveRequiredModels.empty())
 	{
@@ -2160,8 +2157,15 @@ _uint CMapToolHelper::Get_EmissivePassIndex(const string& _strModelName)
 
 _uint CMapToolHelper::DeterminePassIndex_ForEmissive(CModel* pModel)
 {
+	string strModelName = pModel->Get_ModelName();
 	_uint iEmmissiveCount{};
 	_uint iNumMeshes = pModel->Get_NumMeshes();
+
+	if (strModelName == "PkFerriswheel")
+	{
+		_int a = 0;
+	}
+
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
 		if (true == pModel->DoesTextureExist(TextureType_EMISSIVE, i))
@@ -2171,7 +2175,6 @@ _uint CMapToolHelper::DeterminePassIndex_ForEmissive(CModel* pModel)
 	if (0 == iEmmissiveCount)
 		return MODEL_NORMAL_O;
 
-	string strModelName = pModel->Get_ModelName();
 	_uint iPassIndex = Get_EmissivePassIndex(strModelName);
 
 	if (0 != iPassIndex)

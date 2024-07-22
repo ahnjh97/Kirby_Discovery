@@ -108,8 +108,11 @@ _int CSpikeSpear::Tick(_float fTimeDelta)
 					hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 					CHECK_FAILED(hr);
 
+
+				}
+
 					//효선아 여기야
-					vPos.y -= 1.f;
+					vPos.y -= 1.f; 
 					CMultiEffect::MULTI_FX_DESC FXDesc{};
 					FXDesc.vInitPos = (_float3)vPos;
 					FXDesc.vInitScale = { 5.f, 5.f, 5.f };
@@ -118,7 +121,6 @@ _int CSpikeSpear::Tick(_float fTimeDelta)
 
 					Add_Effect("HS_FB down spear circle", FXDesc, false);
 
-				}
 			}
 		}
 	}

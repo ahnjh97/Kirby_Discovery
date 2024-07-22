@@ -184,6 +184,9 @@ HRESULT CVIBuffer_Instance::Initialize(void* pArg)
 	m_pPrePositions = new _float3[m_iNumInstance];
 	ZeroMemory(m_pPrePositions, sizeof(_float3) * m_iNumInstance);
 
+	m_pPreWorldPositions = new _float3[m_iNumInstance];
+	ZeroMemory(m_pPreWorldPositions, sizeof(_float3) * m_iNumInstance);
+
 
 	m_pColors = new _float3[m_iNumInstance];
 	ZeroMemory(m_pColors, sizeof(_float3) * m_iNumInstance);
@@ -202,12 +205,17 @@ HRESULT CVIBuffer_Instance::Initialize(void* pArg)
 	m_pOrbitSpeed = new _float[m_iNumInstance];
 	ZeroMemory(m_pOrbitSpeed, sizeof(_float) * m_iNumInstance);
 
+	m_pTurnSpeed = new _float[m_iNumInstance];
+	ZeroMemory(m_pTurnSpeed, sizeof(_float) * m_iNumInstance);
+
 	m_pAccSupplyAmount = new _float[m_iNumInstance];
 	ZeroMemory(m_pAccSupplyAmount, sizeof(_float) * m_iNumInstance);
 
+	m_pOrbitSupplyAmount = new _float[m_iNumInstance];
+	ZeroMemory(m_pOrbitSupplyAmount, sizeof(_float) * m_iNumInstance);
+
 	m_pTurnSupplyAmount = new _float[m_iNumInstance];
 	ZeroMemory(m_pTurnSupplyAmount, sizeof(_float) * m_iNumInstance);
-
 	// 개별적으로 작용하는 중력값
 	m_fGravity = new _float[m_iNumInstance];
 	ZeroMemory(m_fGravity, sizeof(_float) * m_iNumInstance);
@@ -393,7 +401,7 @@ void CVIBuffer_Instance::OrbitAcceleration(_float fTimeDelta, VTXMATRIX* pVertic
 		if (!pVertices[i].bAlive)
 			continue;
 
-		m_pOrbitSpeed[i] += fTimeDelta * m_pTurnSupplyAmount[i];
+		m_pOrbitSpeed[i] += fTimeDelta * m_pOrbitSupplyAmount[i];
 	}
 }
 
@@ -407,8 +415,34 @@ void CVIBuffer_Instance::OrbitDecelerate(_float fTimeDelta, VTXMATRIX* pVertices
 		if (m_pOrbitSpeed[i] == 0.f) 
 			continue;
 
-		m_pOrbitSpeed[i] -= fTimeDelta * m_pTurnSupplyAmount[i];
+		m_pOrbitSpeed[i] -= fTimeDelta * m_pOrbitSupplyAmount[i];
 		if (m_pOrbitSpeed[i] < 0.f) m_pOrbitSpeed[i] = 0.f;
+	}
+}
+
+void CVIBuffer_Instance::TurnAcceleration(_float fTimeDelta, VTXMATRIX* pVertices)
+{
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		if (!pVertices[i].bAlive)
+			continue;
+
+		m_pTurnSpeed[i] += fTimeDelta * m_pTurnSupplyAmount[i];
+	}
+}
+
+void CVIBuffer_Instance::TurnDecelerate(_float fTimeDelta, VTXMATRIX* pVertices)
+{
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		if (!pVertices[i].bAlive)
+			continue;
+
+		if (m_pTurnSpeed[i] == 0.f)
+			continue;
+
+		m_pTurnSpeed[i] -= fTimeDelta * m_pTurnSupplyAmount[i];
+		if (m_pTurnSpeed[i] < 0.f) m_pTurnSpeed[i] = 0.f;
 	}
 }
 
@@ -435,21 +469,32 @@ void CVIBuffer_Instance::Turn(_float fTimeDelta, VTXMATRIX* pVertices)
 		if (!pVertices[i].bAlive)
 			continue;
 
-		pVertices[i].fAngleZ += fTimeDelta * 360.f;
+		pVertices[i].fAngleZ += fTimeDelta * m_pTurnSpeed[i];
 	}
 }
 
-void CVIBuffer_Instance::Turn_MoveDirection(_float fTimeDelta, VTXMATRIX* pVertices)
+void CVIBuffer_Instance::Turn_MoveDirection(_float fTimeDelta, VTXMATRIX* pVertices, const _float4x4* pSocketMatrix)
 {
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 		if (!pVertices[i].bAlive)
 			continue;
+		
+		_vector vPos = {0.f, 0.f, 0.f, 0.f};
 
-		_vector vPos = pVertices[i].vPosition;
+		// 월드상의 포지션으로 만드는 과정
+		if (pSocketMatrix == nullptr)
+			vPos = pVertices[i].vPosition;
+		else
+			vPos = _float4::Transform(pVertices[i].vPosition, *pSocketMatrix);
+
 		_matrix ViewProjectionMatrix = m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW) * m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ);
 		_vector ScreenPos = XMVector3TransformCoord(vPos, ViewProjectionMatrix);
-		_vector ScreenPrePos = XMVector3TransformCoord(m_pPrePositions[i], ViewProjectionMatrix);
+		_vector ScreenPrePos = { 0.f, 0.f, 0.f, 0.f };
+		if (pSocketMatrix == nullptr)
+			ScreenPrePos = XMVector3TransformCoord(m_pPrePositions[i], ViewProjectionMatrix);
+		else
+			ScreenPrePos = XMVector3TransformCoord(m_pPreWorldPositions[i], ViewProjectionMatrix);
 
 		_float fCenterX = XMVectorGetX(ScreenPos);
 		_float fCenterY = XMVectorGetY(ScreenPos);
@@ -460,18 +505,27 @@ void CVIBuffer_Instance::Turn_MoveDirection(_float fTimeDelta, VTXMATRIX* pVerti
 		if (fAngle < 0.f)
 			fAngle += 360.f;
 
-		pVertices[i].fAngleZ = ToRadian(fAngle);
+		pVertices[i].fAngleZ = (fAngle);
 	}
 }
 
-void CVIBuffer_Instance::Save_PrePos(VTXMATRIX* pVertices)
+void CVIBuffer_Instance::Save_PrePos(VTXMATRIX* pVertices, const _float4x4* pSocketMatrix)
 {
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 		if (!pVertices[i].bAlive)
 			continue;
 
+		if (_float3::Distance(m_pPrePositions[i], F4toF3(pVertices[i].vPosition)) < .05f)
+			continue;
+
+
 		m_pPrePositions[i] = static_cast<_float3>(pVertices[i].vPosition);
+
+		if (pSocketMatrix != nullptr)
+		{
+			m_pPreWorldPositions[i] = (_float3)_float4::Transform(pVertices[i].vPosition, *pSocketMatrix);
+		}
 	}
 }
 
@@ -625,7 +679,7 @@ void CVIBuffer_Instance::Gravity(_float fTimeDelta, VTXMATRIX* pVertices)
 		m_fGravity[i] += GRAVITY * .14f * m_InstanceDesc.vInitScale.y * fTimeDelta;
 		if (m_fGravity[i] > 13.f)
 			m_fGravity[i] = 13.f;
-		vPos.y -= m_fGravity[i] * (60.f * fTimeDelta);
+		vPos.y -= m_fGravity[i];
 		pVertices[i].vPosition = vPos;
 
 		//m_pVelocities[i].y -= GRAVITY * 2.5f * m_InstanceDesc.vInitScale.y * fTimeDelta;
@@ -861,6 +915,7 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 	m_pInitialSpeeds[iInstanceIndex] = m_pSpeeds[iInstanceIndex];
 
 	m_pAccSupplyAmount[iInstanceIndex] = m_InstanceDesc.fAccSupplyAmount;
+	m_pOrbitSupplyAmount[iInstanceIndex] = m_InstanceDesc.fOrbitSupplyAmount;
 	m_pTurnSupplyAmount[iInstanceIndex] = m_InstanceDesc.fTurnSupplyAmount;
 
 	//공전 시의 세팅
@@ -887,6 +942,11 @@ void CVIBuffer_Instance::Change_InstanceInfo(VTXMATRIX* pVertices, _uint iInstan
 		m_pOrbitSpeed[iInstanceIndex] = Compute_RandOrbitSpeed();
 	}
 
+	//자전 시의 세팅
+	if (m_InstanceDesc.vecMoveCommands[INSTANCE_TURN] == true)
+	{
+		m_pTurnSpeed[iInstanceIndex] = Compute_RandTurnSpeed();
+	}
 
 	_float4 vColor = Compute_RandColor();
 
@@ -920,16 +980,19 @@ void CVIBuffer_Instance::Free()
 	Safe_Delete_Array(m_pAlphas);
 
 	Safe_Delete_Array(m_pOrbitSpeed);
+	Safe_Delete_Array(m_pTurnSpeed);
 
 	Safe_Delete_Array(m_pStartDelays);
 
 	Safe_Delete_Array(m_pAccSupplyAmount);
+	Safe_Delete_Array(m_pOrbitSupplyAmount);
 	Safe_Delete_Array(m_pTurnSupplyAmount);
 
 	Safe_Delete_Array(m_pInitialSpeeds);
 	Safe_Delete_Array(m_pInitialScales);
 
 	Safe_Delete_Array(m_pPrePositions);
+	Safe_Delete_Array(m_pPreWorldPositions);
 	Safe_Delete_Array(m_pVelocities);
 
 	Safe_Delete_Array(m_pPreAxis);

@@ -580,6 +580,10 @@ void CKirbyCar_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		if (pKirby->isAnimFinish())
 		{
 			pKirby->Change_State(CKirby::CARSTATE_DEMOEND, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitPos = { 0.f, 0.f, 0.f };
+			FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+			pKirby->Add_Effect("YW Deform Effect2", FXDesc, false);
 			return;
 		}
 	}
@@ -775,6 +779,11 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			if (nullptr != pObj) {
 				CToppleableBridge* pToppleableBridge = static_cast<CToppleableBridge*>(pObj);
 				pToppleableBridge->OnCollision();
+				CMultiEffect::MULTI_FX_DESC Effectdesc = {};
+				Effectdesc.vInitPos = (_float3)pTransformCom->Get_State(CTransform::STATE_POSITION) + pTransformCom->Get_State(CTransform::STATE_LOOK);
+				Effectdesc.vInitScale = { 2.f, 2.f, 2.f };
+				if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
+					return;
 				return;
 			}
 			return;

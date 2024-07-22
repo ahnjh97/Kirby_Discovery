@@ -95,6 +95,9 @@ _int CSingleEffect::Tick(_float _fTimeDelta)
 
 void CSingleEffect::Late_Tick(_float _fTimeDelta)
 {
+	if (m_bDead)
+		return;
+
 	//현재 설정 값으로 적용할 타임델타 값을 바꾼다.
 	_float fMyTimeDelta = _fTimeDelta;
 	switch (m_eTimer)
@@ -130,6 +133,8 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 		}
 	}
 
+	if (m_fLifetime.second < m_fDuration.first && .9f < m_vCurScale.x)
+		_int a = 0;
 
 	//true 반환하면 lifetime 끝난 것.
 	if (Calculate_Lifetime(fMyTimeDelta))
@@ -289,6 +294,7 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 
 		//현재 VtxPosTex Shader Pass 6까지
 		m_iMaxPassIdx = POSTEX_END - 1;
+		m_bBindShaderVars = false;
 	}
 	else
 	{
@@ -303,6 +309,7 @@ HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 
 		//현재 VtxModel Shader Pass 10까지
 		m_iMaxPassIdx = MODEL_END - 1;
+		m_bBindShaderVars = true;
 	}
 
 	return S_OK;
@@ -316,13 +323,15 @@ HRESULT CSingleEffect::Bind_ShaderResources(_int iTexIdx, _int iMaskTexIdx)
 	HRESULT hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
 	CHECK_FAILED(hr);
 
-	_bool bStencil = true;
-	_bool bRimLight = false;
-	_bool bMotionBlur = false;
-	m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
-	m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
-	m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
-
+	if (true == m_bBindShaderVars) {
+		_bool bStencil = true;
+		_bool bRimLight = false;
+		_bool bMotionBlur = false;
+		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
+		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
+	}
+	
 	//직교일 경우, 직교 행렬 바인딩
 	if (!m_bIsOrthographic)
 	{

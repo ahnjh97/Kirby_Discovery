@@ -131,6 +131,11 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 			m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_HIDE);
 			OnEvent(); //모든 스크립트 재생 종료 시, 해당 이벤트를 수행
 			m_bEventCall = true;
+
+			//07.21) 커비의 상태를 홀드해제 (키입력 가능하게 처리)
+			CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+			CHECK_NULLPTR(pKirby);
+			pKirby->DialogOff();
 		}
 
 		if(LEVEL_SIMBA == *m_pCurrentLevelID)
@@ -296,6 +301,46 @@ void CUI_MessageWindow::Show_DialogMessage()
 	//Window UI 출력은 스크립트가 종료될때까지 유지
 	if (WINDOW_HIDE == m_eCurState) //단, idle 상태일 경우는 트리거 시점에 show해야하므로 hide만 처리
 		return;
+
+#pragma region SET_DIALOG KIRBY, CAMERA DIR & POS
+
+	//07.21) 커비의 상태를 홀드 (키입력하지 않게 처리)
+	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+	CHECK_NULLPTR(pKirby);
+
+	//07.21) 다이얼로그 활성화 상태의 카메라 상태 세팅
+	CCamera_Main* pDialogCam = static_cast<CCamera_Main*>(m_pGameInstance->
+		Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+	CHECK_NULLPTR(pDialogCam);
+
+	_float4 vDialogKirbyDir = { 0.f, 0.f, 0.f, 1.f };
+	_float4 vDialogKirbyPos = { 0.f, 0.f, 0.f, 1.f };
+
+	_float3 vDialogCamDir = { 0.f, 0.f, 0.f };
+	_float3 vDialogCamPos = { 0.f, 0.f, 0.f };
+	switch (*m_pCurrentLevelID)
+	{
+	case LEVEL_DEEDEEDEE:
+		vDialogKirbyDir = { 1.f, 1.f, 1.f, 1.f };
+		vDialogKirbyPos = { 10.f, 23.f, 1.f, 1.f };
+		break;
+
+	case LEVEL_TOWN:
+		vDialogKirbyDir = { 1.f, 1.f, 1.f, 1.f };
+		vDialogKirbyPos = { 10.f, 23.f, 1.f, 1.f };
+		vDialogCamDir = { -5.f, 39.f, 30.f };
+		vDialogCamPos = { -0.3f, -0.2f, 0.93f };
+		break;
+
+	default:
+		break;
+	}
+	pKirby->DialogOn(vDialogKirbyDir);
+	CTransform* pTransCom = pKirby->Get_TransformCom();
+	pTransCom->Set_State(CTransform::STATE_POSITION, vDialogKirbyPos);
+	pDialogCam->Lock_All(vDialogCamDir, vDialogCamPos, true);
+
+#pragma endregion
 	
 	m_eCurState = WINDOW_SHOW;
 	m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_BLINK);	//버튼 상태 동기화

@@ -62,6 +62,7 @@ public:
 	enum SIMBA_EYETEX { EYETEX_DIFFUSE, EYETEX_NORMAL, EYETEX_MRA, EYETEX_END };
 	enum SIMBA_EYESTATE { SIMBAEYE_LONG, SIMBAEYE_SMALL, SIMBAEYE_BIG, SIMBAEYE_END };
 	enum SIMBA_ROTATION { ATTACKJUMP, BITERUSH, BITERUSHJUMP, ROTATION_END };
+	enum SIMBA_FINGER { INDEX, MIDDLE, PINKY, RING, THUMB, FINGER_END };
 
 private:
 	CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -86,10 +87,14 @@ public:
 
 	void SetCamSequence(_uint iCamSeq);
 	void ResetStarCount() { m_iStarCount = 0; }
+	_uint Get_StarCount() { return m_iStarCount; }
+
 	void ChangeDimensionClawUpDown() { m_bDimensionClawUpAttack = !m_bDimensionClawUpAttack; }
 	void Set_StarPosToRightHand() { m_bBiteRushSpawnStarAtLeft = false; }
 	void Set_StarPosToLeftHand() { m_bBiteRushSpawnStarAtLeft = true; }
 	void Set_LaserActivation(_bool bLaserActivation) { m_bLaserActivated = bLaserActivation; HideDimensionLaserActor(); }
+	void ResetRockCount() { m_iRockCount = 0; }
+	_uint Get_RockCount() { return m_iRockCount; }
 
 public:
 	virtual HRESULT Initialize_Prototype()			override;
@@ -98,10 +103,7 @@ public:
 	virtual void	Late_Tick(_float fTimeDelta)	override;
 	virtual HRESULT Render()						override;
 	virtual HRESULT Render_LightDepth()				override;
-#ifdef _DEBUG
-	virtual void	Render_IMGUI()					override;
-#endif
-	virtual void	Add_AnimEvent()					override;
+
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
 public:
@@ -115,6 +117,22 @@ public:
 	void			MoveDimensionClaw(_float fTimeDelta);
 	void			HideDimensionClawActor();
 	void			HideDimensionLaserActor();
+	void			SpawnRocks(_uint iAnimIdx);
+	void			SpawnDebris(_uint iAnimIdx);
+
+	void			SetUpSecondTarget();
+
+	// Simba Effects
+	void			QuickClawNailFlash(_uint eSimbaAnim);
+	void			QuickClawNailTrail();
+	void			FinalCrusherSwing();
+	void			FinalCrusherSmash();
+	void			JumpStartSmoke();
+	void			LandingSmoke();
+	void			AttackJumpWind();
+	void			DoubleClawDashGround();
+	void			DoubleClawGround();
+	void			DoubleClawSweep();
 
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
@@ -127,6 +145,9 @@ private:
 	CGameObject*	m_pSimbaLaser = { nullptr };
 	CTransform*		m_pSimbaLaserTransform = { nullptr };
 	PxRigidDynamic* m_pDimensionClawActor = { nullptr };
+
+	vector<class CBone*> m_vecLeftNailBones;
+	vector<class CBone*> m_vecRightNailBones;
 
 	SIMBA_ANIM		m_eCurrentState = { SIMBA_END };
 	SIMBA_ANIM		m_ePreState = { SIMBA_END };
@@ -161,7 +182,10 @@ private:
 	_bool			m_bRenderEyeLid = { false };
 	_bool			m_bSummon1 = { false };
 	_bool			m_bSummon2 = { false };
-	_float			m_fSummonTime = { 0.f };
+	_float			m_fSpawnTime = {};
+	_float			m_fMonsterTime = {};
+	_uint			m_iEffectCount = {};
+	_uint			m_iMonsterCount = {};
 
 	_uint			m_iStarCount = {};
 	_bool			m_bDimensionClawUpAttack = { false };
@@ -170,12 +194,20 @@ private:
 	_bool			m_bLaserActivated = { false };
 	_bool			m_bRenderDimensionClaw = { false };
 
+	_uint			m_iRockCount = {};
+	_uint			m_iDebrisCount = {};
 	vector<class CSimbaRock*>	m_vecSimbaRocks;
 	vector<class CDebris*>		m_vecDebris;
+	list<_uint>		m_listUsedRocks;
+	list<_uint>		m_listUsedDebris;
+
+	unordered_set<SIMBA_ANIM>	m_setResetRequiredAnims;
 
 private:
 	HRESULT		Add_Components();
 	HRESULT		Bind_ShaderResources();
+
+	void		PlayPartialAnimation();
 
 	// FSM
 	void		SetUp_FSM();
@@ -183,6 +215,7 @@ private:
 
 	void		Check_HitBoxActivation();
 	void		Reset_HitBoxTimingMap(SIMBA_ANIM eAnimIdx);
+	void		PlayLipSinc();
 
 	void		TransformToDefault(_float fOffsetY);
 
@@ -194,14 +227,19 @@ private:
 	void		OnWave1Dead(CGameObject* pObj);
 	void		OnWave2Dead(CGameObject* pObj);
 
+	void		TriggerMonsterSpawning(_uint iTriggerIndex);
 	void		SpawnMonsters(_uint iTriggerIndex);
 	void		SpawnEffects(_uint iTriggerIndex);
+	void		CheckSpawning();
+
 	void		DetermineSimbaRotation();
 	void		TurnSimba(_float fAngle);
 	void		ResetRotation();
+
 	void		LaserAttack();
 	void		CreateDimensionClawActor();
 	void		OnSimbaAttackTrigger();
+	void		RemoveDeadRocksFromList();
 
 public:
 	static CSimba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

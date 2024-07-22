@@ -424,6 +424,54 @@ PxTransform CUtils::ToPxTransform(const _float4x4& mat)
 	return mat44ToTransform(To_Float4x4(mat));
 }
 
+_float4 CUtils::GetPxRight(const PxMat44& mat)
+{
+	_float4 vRight{};
+	memcpy(&vRight, &mat.column0, sizeof(_float4));
+	return vRight;
+}
+
+_float4 CUtils::GetPxUp(const PxMat44& mat)
+{
+	_float4 vRight{};
+	memcpy(&vRight, &mat.column1, sizeof(_float4));
+	return vRight;
+}
+
+_float4 CUtils::GetPxLook(const PxMat44& mat)
+{
+	_float4 vLook{};
+	memcpy(&vLook, &mat.column2, sizeof(_float4));
+	return vLook;
+}
+
+_float4 CUtils::GetPxPos(const PxMat44& mat)
+{
+	_float4 vPos{};
+	memcpy(&vPos, &mat.column3, sizeof(_float4));
+	return vPos;
+}
+
+void CUtils::MoveActor(PxRigidActor* pActor, _float3 vDir, _float fTimeDelta)
+{
+	if (nullptr == pActor)
+		return;
+
+	PxTransform pxTransform = pActor->getGlobalPose();
+	_float4 vRight = GetPxRight(pxTransform);
+	_float4 vUp = GetPxUp(pxTransform);
+	_float4 vLook = GetPxLook(pxTransform);
+	_float4 vPos = GetPxPos(pxTransform);
+	vRight.Normalize();
+	vUp.Normalize();
+	vLook.Normalize();
+
+	vPos += vRight * vDir.x + vUp * vDir.y * vLook * vDir.z;
+	pxTransform.p = To_PxVec3(vPos);
+
+	pActor->setGlobalPose(pxTransform);
+}
+
 HRESULT CUtils::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
 {
 	ifstream InputFile(_FilePath, ios::binary | ios::in);
@@ -573,7 +621,11 @@ HRESULT CUtils::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeed), sizeof(_float));
 	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeedRandomOffset), sizeof(_float));
 
+	InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSpeed), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSpeedRandomOffset), sizeof(_float));
+
 	InputFile.read(reinterpret_cast<char*>(&_pData->fAccSupplyAmount), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSupplyAmount), sizeof(_float));
 	InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSupplyAmount), sizeof(_float));
 
 	InputFile.read(reinterpret_cast<char*>(&_pData->vColor), sizeof(_float3));

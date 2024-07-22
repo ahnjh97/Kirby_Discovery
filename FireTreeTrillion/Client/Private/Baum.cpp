@@ -100,11 +100,12 @@ HRESULT CBaum::Initialize(void* pArg)
 
 	CEffect::FX_DESC FXDesc{};
 	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-	FXDesc.vInitPos = { 0.f, 1.4f, -.8f };
+	FXDesc.vInitPos = { 0.f, 1.4f, -.5f };
 	FXDesc.vInitScale = { 20.f, 20.f, 20.f };
 	FXDesc.vInitRot = { 90.f, 0.f, 0.f };
 
 	Add_Effect("come on dash white", FXDesc, true);
+
 	return S_OK;
 }
 
@@ -273,6 +274,13 @@ void CBaum::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pOb
 {
 	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
+		CMultiEffect::MULTI_FX_DESC Effectdesc = {};
+		Effectdesc.vInitPos = (_float3)m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		Effectdesc.vInitScale = { 5.f, 5.f, 5.f };
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
+			return;
+
+
 		m_bDead = true;
 	}
 }
@@ -542,6 +550,7 @@ void CBaum::Free()
 {
 	__super::Free();
 
+	Delete_AllEffect();
 	Safe_Release(m_pControllerCom);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
@@ -549,5 +558,6 @@ void CBaum::Free()
 
 	if (m_pLight != nullptr)
 		m_pLight->Set_DeadLight(true);
+
 	Safe_Release(m_pLight);
 }
