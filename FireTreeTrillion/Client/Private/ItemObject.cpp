@@ -45,6 +45,8 @@ HRESULT CItemObject::Initialize(void* pArg)
     hr = __super::Initialize(pArg);
     CHECK_FAILED(hr);
 
+    m_bUpdate_FXSocketMatrix = false;
+
     return S_OK;
 }
 

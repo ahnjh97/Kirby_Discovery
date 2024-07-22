@@ -566,6 +566,117 @@ void CRenderer::Fog_Intialize_ForIntroLevel(_int iPoint)
 	}
 }
 
+void CRenderer::Fog_Intialize_ForRacing(_int iPoint)
+{
+	if (0 == iPoint)
+	{
+		// Y-fog 초기화
+		m_vFogYColor.x = 0.34f;
+		m_vFogYColor.y = 0.82f;
+		m_vFogYColor.z = 0.86f;
+
+		m_fFogYBottom = 0.f;
+		m_fFogYTopY = 23.3f;
+		m_fFogYIntensity = 1.f;
+
+		// View-fog 초기화
+		m_vFogViewColor.x = 0.5f;
+		m_vFogViewColor.y = 0.87f;
+		m_vFogViewColor.z = 0.84f;
+
+		m_fFogViewStart = 0.f;
+		m_fFogViewEnd = 300.f;
+		m_fFogViewIntensity = 1.f;
+	}
+	else if (1 == iPoint)
+	{
+	}
+}
+
+void CRenderer::Fog_Intialize_ForDeeDeeDee(_int iPoint)
+{
+	if (0 == iPoint)
+	{
+		// Y-fog 초기화
+		m_vFogYColor.x = 0.65f;
+		m_vFogYColor.y = 0.93f;
+		m_vFogYColor.z = 0.94f;
+
+		m_fFogYBottom = 0.f;
+		m_fFogYTopY = 10.3f;
+		m_fFogYIntensity = 1.f;
+
+		// View-fog 초기화
+		m_vFogViewColor.x = 0.58f;
+		m_vFogViewColor.y = 0.93f;
+		m_vFogViewColor.z = 0.99f;
+
+		m_fFogViewStart = 0.f;
+		m_fFogViewEnd = 120.f;
+		m_fFogViewIntensity = 1.f;
+	}
+	if (1 == iPoint) // View Fog가 0으로 줄어듦.
+	{
+		// Y-fog 초기화
+		m_vFogYColor.x = 0.65f;
+		m_vFogYColor.y = 0.93f;
+		m_vFogYColor.z = 0.94f;
+
+		m_fFogYBottom = 0.f;
+		m_fFogYTopY = 22.3f;
+		m_fFogYIntensity = 1.f;
+
+		// View-fog 초기화
+		//m_fFogViewIntensity = 0.f;
+	}
+}
+
+void CRenderer::Fog_Intialize_ForPark(_int iPoint)
+{
+	if (0 == iPoint)
+	{
+		// Y-fog 초기화
+		m_vFogYColor.x = 0.f;
+		m_vFogYColor.y = 0.f;
+		m_vFogYColor.z = 0.f;
+
+		m_fFogYBottom = -20.f;
+		m_fFogYTopY = 0.f;
+		m_fFogYIntensity = 1.f;
+
+		// View-fog 초기화
+		m_vFogViewColor = m_vFogYColor;
+
+		m_fFogViewStart = 0.f;
+		m_fFogViewEnd = 200.f;
+		m_fFogViewIntensity = 1.f;
+	}
+}
+
+void CRenderer::Fog_Intialize_ForFinalBoss(_int iPoint)
+{
+	if (0 == iPoint)
+	{
+		// Y-fog 초기화
+		//m_vFogYColor.x = 0.65f;
+		//m_vFogYColor.y = 0.93f;
+		//m_vFogYColor.z = 0.94f;
+
+		//m_fFogYBottom = 0.f;
+		//m_fFogYTopY = 10.3f;
+		//m_fFogYIntensity = 1.f;
+
+		//// View-fog 초기화
+		//m_vFogViewColor.x = 0.58f;
+		//m_vFogViewColor.y = 0.93f;
+		//m_vFogViewColor.z = 0.99f;
+
+		//m_fFogViewStart = 0.f;
+		//m_fFogViewEnd = 120.f;
+		//m_fFogViewIntensity = 1.f;
+	}
+}
+
 HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pRenderObject)
 {
 	if (eRenderGroup >= RENDER_END)

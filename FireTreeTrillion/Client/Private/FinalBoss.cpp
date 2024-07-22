@@ -162,12 +162,15 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	}
 
 
-	if (m_pGameInstance->Get_KeyState(DIK_K, KEY_DOWN) || m_fHp < m_fMaxHp * 0.45f)
+	if ( m_bStart2PhaseTrigger
+		&& (m_pGameInstance->Get_KeyState(DIK_K, KEY_DOWN) || m_fHp < m_fMaxHp * 0.45f))
 	{
 		Set_BossState(STATE_2PAZE);
 		m_pControllerCom->Set_Position(m_pTransformCom, m_vecRallyPoint[1]);
 		m_pTransformCom->Look_At(m_vecRallyPoint[0]);
 		Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
+
+		m_bStart2PhaseTrigger = false;
 	}
 	else if (m_pGameInstance->Get_KeyState(DIK_L, KEY_DOWN))
 	{
@@ -213,11 +216,6 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 			if (pCamera != nullptr)
 				pCamera->Make_Shake(1.f, 1.f);
 		}
-
-		//if(0.1f < m_fGullyTime)
-		//{
-			//m_fGullyTime = 0.f;
-
 
 		_float3 vFXPosA, vFXPosB;
 
