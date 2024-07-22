@@ -131,6 +131,9 @@ private:
 	_bool						m_bSignalPostHightlight = false;
 
 	_bool						m_bEventCall = false;
+	_bool						m_bIsSetKirby = { FALSE };
+	_bool						m_bIsSkipScript = { FALSE };
+	_bool						m_bHighLightMsg = { FALSE };
 
 };
 END

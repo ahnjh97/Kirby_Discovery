@@ -18,6 +18,7 @@
 #include "BG.h"
 #include "HUD.h"
 #include "TransingStar.h"
+#include "LoadingStart.h"
 
 CLevel_Racing::CLevel_Racing(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }

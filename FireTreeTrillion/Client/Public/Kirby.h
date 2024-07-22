@@ -346,6 +346,7 @@ private:
 	void ReleaseAndClearMap(unordered_map<PxRigidActor*, CGameObject*> _map);
 
 	void				  AssistLight_Control();
+	void				  Reset_If_Damage();
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

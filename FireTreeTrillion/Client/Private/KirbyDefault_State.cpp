@@ -463,7 +463,6 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
-
 	if (pKirby->Get_State() == CKirby::STATE_LANDINGSMALL || pKirby->Get_State() == CKirby::STATE_LANDINGEND)
 		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 	else
@@ -539,6 +538,12 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	else if (pKirby->Get_State() == CKirby::STATE_JUMPL || pKirby->Get_State() == CKirby::STATE_JUMPR
 		|| pKirby->Get_State() == CKirby::STATE_JUMPEND)
 	{
+		if (m_bJumpEffectTrigger == true && (pKirby->Get_State() == CKirby::STATE_JUMPL || pKirby->Get_State() == CKirby::STATE_JUMPR))
+		{
+			Jump_FX(pTransformCom);
+			m_bJumpEffectTrigger = false;
+		}
+
 		// 0.3초 동안만 누적이 된다.
 		if (DESC(m_bRePressBlock) == false && m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS) && DESC(m_fJumpHoldTime) < 0.3f)
 		{
@@ -748,6 +753,7 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 void CKirbyDefault_Jump_State::OnStateExit()
 {
 	m_fChangeRunTime = 0.f;
+	m_bJumpEffectTrigger = true;
 }
 
 _bool CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)

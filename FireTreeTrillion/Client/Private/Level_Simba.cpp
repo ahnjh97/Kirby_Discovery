@@ -136,26 +136,38 @@ void CLevel_Simba::Tick(_float fTimeDelta)
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_THRONEBREAK);
 	}
 
-	if (false == m_bWave1DeadNotified)
+	if (m_iWaveCount == 0)
 	{
-		list<CGameObject*>* objListPtr = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Wave1"));
+		list<CGameObject*>* objListPtr = m_pGameInstance->Get_List(m_iLevel, g_strLayerMonster);
 		if (nullptr != objListPtr)
 		{
-			if (objListPtr->empty()) // Wave1 의 몬스터들이 모두 죽은 경우
+			if (objListPtr->empty() && 1 == m_iSummonCount) // Wave1 의 몬스터들이 모두 죽은 경우
 			{
-				m_bWave1DeadNotified = true;
+				m_iWaveCount++;
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_WAVE1DEAD);
 			}
+			else if (0 == m_iSummonCount)
+				m_iSummonCount++;
 		}
 	}
-
-	if (false == m_bWave2Dead)
+	else if (1 == m_iWaveCount)
 	{
-		list<CGameObject*>* objListPtr = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Wave2"));
-		if (nullptr != objListPtr)
+		CSimba* pSimba = dynamic_cast<CSimba*>(m_pGameInstance->Get_GameObject(m_iLevel, TEXT("Layer_Simba")));
+		if (nullptr != pSimba)
 		{
-			if (objListPtr->empty()) // Wave2 의 몬스터들이 모두 죽은 경우
-				m_bWave2Dead = true;
+			if (true == pSimba->Get_Wave2Summoned())
+			{
+				list<CGameObject*>* objListPtr = m_pGameInstance->Get_List(m_iLevel, g_strLayerMonster);
+				if (nullptr != objListPtr)
+				{
+					if (objListPtr->empty() && 2 == m_iSummonCount) { // Wave2 의 몬스터들이 모두 죽은 경우
+						m_bWave2Dead = true;
+						m_iWaveCount++;
+					}
+					else if (1 == m_iSummonCount)
+						m_iSummonCount++;
+				}
+			}
 		}
 	}
 

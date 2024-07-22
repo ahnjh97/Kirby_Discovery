@@ -177,8 +177,10 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 		if (0.46f < fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
 
-		if (0.4f < fAnimRatio && 0 == iRockCount)
+		if (0.4f < fAnimRatio && 0 == iRockCount) {
 			pSimba->SpawnRocks(iState);
+			pSimba->SpawnDebris(iState);
+		}
 		else if (0.5f < fAnimRatio && 1 == iRockCount)
 			pSimba->SpawnRocks(iState);
 		else if (0.6f < fAnimRatio && 2 == iRockCount)
@@ -194,11 +196,13 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 		if (0.34f < fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
 
-		if (0.32f < fAnimRatio && 0 == iRockCount)
+		if (0.32f < fAnimRatio && 0 == iRockCount) {
 			pSimba->SpawnRocks(iState);
-		if (0.41f < fAnimRatio && 1 == iRockCount)
+			pSimba->SpawnDebris(iState);
+		}
+		else if (0.41f < fAnimRatio && 1 == iRockCount)
 			pSimba->SpawnRocks(iState);
-		if (0.5f < fAnimRatio && 2 == iRockCount)
+		else if (0.5f < fAnimRatio && 2 == iRockCount)
 			pSimba->SpawnRocks(iState);
 
 		_float fStart = 0.27f;
@@ -285,6 +289,7 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	_float fAnimRatio = pSimba->Get_AnimRatio();
 	_uint iStarCount = pSimba->Get_StarCount();
 	_uint iRockCount = pSimba->Get_RockCount();
+	_uint iDebrisCount = pSimba->Get_DebrisCount();
 
 	if(CSimba::Simba_FinalCrusherStart == iState && (0.3f > fAnimRatio || 0.93f < fAnimRatio ))
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
@@ -296,11 +301,13 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		if (0.125f < fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
 
-		if (0.105f < fAnimRatio && 0 == iRockCount)
+		if (0.105f < fAnimRatio && 0 == iRockCount) {
 			pSimba->SpawnRocks(iState);
-		if (0.12f < fAnimRatio && 1 == iRockCount)
+			pSimba->SpawnDebris(iState);
+		}
+		else if (0.12f < fAnimRatio && 1 == iRockCount)
 			pSimba->SpawnRocks(iState);
-		if(0.135f < fAnimRatio && 2 == iRockCount)
+		else if(0.135f < fAnimRatio && 2 == iRockCount)
 			pSimba->SpawnRocks(iState);
 
 		if (0.08f < fAnimRatio && false == m_bSwingEffect) {
@@ -359,6 +366,7 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	_float fAnimRatio = pSimba->Get_AnimRatio();
 	_uint iStarCount = pSimba->Get_StarCount();
 	_uint iRockCount = pSimba->Get_RockCount();
+	_uint iDebrisCount = pSimba->Get_DebrisCount();
 
 	if (CSimba::Simba_DoubleClawChargeStart == iState && fAnimRatio < 0.18f) {
 		_float fRatio = RATIO(fAnimRatio, 0, 0.18f);
@@ -367,6 +375,14 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		
 	else if (CSimba::Simba_DoubleClawDash == iState)
 	{
+		if (0.f <= fAnimRatio && 5 <= pSimba->Get_DebrisCount())
+			pSimba->ResetDebrisCount();
+
+		for (_uint i = 0; i < 5; i++) {
+			if (i * 0.2f < fAnimRatio && i == iRockCount)
+				pSimba->SpawnDebris(iState);
+		}
+
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 1.8f);
 		_vector vLook = m_pTransform->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 13.5f;
 		m_pController->Move_Dir(m_pTransform, vLook, fTimeDelta, s_fOffsetY);
@@ -377,18 +393,27 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	}
 	else if (CSimba::Simba_DoubleClaw == iState)
 	{
-		if(0.2f > fAnimRatio)
+		if (0.2f > fAnimRatio) {
 			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
 
-		if (0.224f < fAnimRatio && 0 == iStarCount) {
-			pSimba->SpawnStar(iState);
-			pSimba->DoubleClawSweep();
+			for (_uint i = 0; i < 5; i++) {
+				if (i * 0.04f < fAnimRatio && i == iDebrisCount)
+					pSimba->SpawnDebris(iState);
+			}
 		}
 			
 		for (_uint i = 0; i < 45; i++)
 		{
 			if (i * 0.006f < fAnimRatio && i == iRockCount)
 				pSimba->SpawnRocks(iState);
+		}
+
+		if(0.2f < fAnimRatio && 5 == iDebrisCount)
+			pSimba->SpawnDebris(iState);
+
+		if (0.224f < fAnimRatio && 0 == iStarCount) {
+			pSimba->SpawnStar(iState);
+			pSimba->DoubleClawSweep();
 		}
 	}
 		
@@ -646,10 +671,15 @@ void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	{
 		if(0.12f < fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
-		if (0.06f < fAnimRatio && 0 == iRockCount)
+
+		if (0.06f < fAnimRatio && 0 == iRockCount) {
 			pSimba->SpawnRocks(iState);
-		if (0.1f < fAnimRatio && 1 == iRockCount)
+			pSimba->SpawnDebris(iState);
+		}
+		else if (0.1f < fAnimRatio && 1 == iRockCount) {
 			pSimba->SpawnRocks(iState);
+			pSimba->SpawnDebris(iState);
+		}
 	}
 		
 	if (pSimba->IsAnimFinished())
@@ -967,8 +997,9 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			|| fDis > m_pController->RayCastToStaticActor(vLook3) || 2.8f < m_fTime)
 			pSimba->Change_State(CSimba::Simba_BiteRushTiredStart, 50.f, false, false);
 
-		if (0.15f < fAnimRatio && 0.7f > fAnimRatio && 0 == iStarCount) {
+		if (0.f < fAnimRatio && 2 <= pSimba->Get_StarCount())
 			pSimba->ResetStarCount();
+		else if (0.15f < fAnimRatio && 0.7f > fAnimRatio && 0 == iStarCount) {
 			pSimba->Set_StarPosToLeftHand();
 			pSimba->SpawnStar(iState);
 		}
@@ -1020,16 +1051,16 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		
 	if (CSimba::Simba_DimensionLaser == iState)
 	{
-		if (0.23f < fAnimRatio && 0.55f > fAnimRatio && false == m_bLaserActivated) {
-			m_bLaserActivated = true;
-			pSimba->Set_LaserActivation(true);
+		if (0.1f < fAnimRatio && 0.55f > fAnimRatio)
+			pSimba->LaserAttack(fTimeDelta);
+
+		_uint iDebrisCount = pSimba->Get_DebrisCount();
+		for (_uint i = 0; i < 35; i++)
+		{
+			if (i * 0.006f + 0.1f < fAnimRatio && i == iDebrisCount)
+				pSimba->SpawnDebris(iState);
 		}
 
-		if (0.55f < fAnimRatio && true == m_bLaserActivated) {
-			m_bLaserActivated = false;
-			pSimba->Set_LaserActivation(false);
-		}
-		
 		if(0.05f > fAnimRatio)
 			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 5.f);
 		else if(0.33f > fAnimRatio)

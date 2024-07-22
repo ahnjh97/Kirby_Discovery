@@ -38,6 +38,7 @@ void LaserReady(CFinalBoss* pBoss)
 {
 	CParticle::PARTICLE_DESC ParticleDesc{};
 	ParticleDesc.pSocketMatrix = pBoss->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
+	ParticleDesc.vInitPos = { 0.f, 2.f, 0.f };
 	ParticleDesc.vInitScale = { 3.f, 3.f, 3.f };
 	pBoss->Add_Effect("HS_FB laser charge particle", ParticleDesc, false);
 
@@ -127,237 +128,348 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	// 플레이어를 향해 바라본다
 	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f, false);
 
-	if (CFinalBoss::STATE_2PAZE == pFinalBoss->Get_BossState())
+	if (true == pFinalBoss->Get_Auto())
 	{
-		//pFinalBoss->Set_BossState(CFinalBoss::STATE_FLYING);
-		if (CFinalBoss::FINALBOSS_WAITAIR == pFinalBoss->Get_State())
+		if (CFinalBoss::STATE_2PAZE == pFinalBoss->Get_BossState())
 		{
-			if (pFinalBoss->IsAnimFinished())
+			//pFinalBoss->Set_BossState(CFinalBoss::STATE_FLYING);
+			if (CFinalBoss::FINALBOSS_WAITAIR == pFinalBoss->Get_State())
 			{
-				if (0 == m_iCnt)
+				if (pFinalBoss->IsAnimFinished())
+				{
+					if (0 == m_iMeteor)
+					{
+						++m_iMeteor;
+						pFinalBoss->Change_State(CFinalBoss::FINALBOSS_ROAR, 50.f, false, true);
+					}
+					else if (1 == m_iMeteor)
+					{
+						++m_iMeteor;
+						pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
+					}
+					else
+					{
+						pFinalBoss->Set_Chain(true);
+						pFinalBoss->Set_BossState(CFinalBoss::STATE_FLYING);
+						m_iCnt = 20;
+						pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
+					}
+				}
+			}
+		}
+		else if (CFinalBoss::FINALBOSS_WAITAIR == pFinalBoss->Get_State())
+		{
+			if (0 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished()/*0.5f < pFinalBoss->Get_AnimRatio()*/)
 				{
 					++m_iCnt;
-					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_ROAR, 50.f, false, true);
+					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+					pFinalBoss->Set_Direction(m_vLook);
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 				}
-				else if (1 == m_iCnt)
+			}
+			else if (5 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
 				{
 					++m_iCnt;
-					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
 				}
-				else
+			}
+			else if (8 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
 				{
-					pFinalBoss->Set_Chain(true);
-					pFinalBoss->Set_BossState(CFinalBoss::STATE_FLYING);
-					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
+					++m_iCnt;
+					// 좌우 활공 패턴
+					_vector vBossPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+					_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+					pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, 45.f));
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNRIGHTAIRSTART, 50.f, false, true);
+				}
+			}
+			else if (9 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASEREADY, 50.f, false, true);
+				}
+			}
+			else if (10 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
+				}
+			}
+			else if (11 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+					pFinalBoss->Set_Direction(m_vLook);
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
+				}
+			}
+			else if (14 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
+				}
+			}
+			else if (18 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+					pFinalBoss->Set_Direction(m_vLook);
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
+				}
+			}
+			else if (20 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished()/*0.5f < pFinalBoss->Get_AnimRatio()*/)
+				{
+					++m_iCnt;
+					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+					pFinalBoss->Set_Direction(m_vLook);
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 				}
 			}
 		}
-	}
-	else if (CFinalBoss::FINALBOSS_WAITAIR == pFinalBoss->Get_State())
-	{
-		if (true == pFinalBoss->Get_Stab())
+		else
 		{
-			pFinalBoss->Set_Stab(false);
-			// Stab 패턴
-			m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
-			pFinalBoss->Set_Direction(m_vLook);
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
-		}
-		else if (true == pFinalBoss->Get_Slash())
-		{
-			pFinalBoss->Set_Slash(false);
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
-		}
-		else if (true == pFinalBoss->Get_Meteor())
-		{
-			pFinalBoss->Set_Meteor(false);
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
-		}
-		else if (true == pFinalBoss->Get_Laser())
-		{
-			pFinalBoss->Set_Laser(false);
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASEREADY, 50.f, false, true);
-		}
-		else if (true == pFinalBoss->Get_Side())
-		{
-			pFinalBoss->Set_Side(false);
-			// 좌우 활공 패턴
-			_vector vBossPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-			_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-
-			if (rand() % 2 == 0)
+			if (1 == m_iCnt)
 			{
-				pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, -45.f));
-				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNLEFTAIRSTART, 50.f, false, true);
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADY, 50.f, false, true);
+				}
 			}
-			else
+			else if (2 == m_iCnt)
 			{
-				pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, 45.f));
-				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNRIGHTAIRSTART, 50.f, false, true);
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADY, 50.f, false, true);
+				}
+			}
+			else if (3 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 40.f, false, true);
+				}
+			}
+			else if (4 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
+				}
+			}
+			else if (6 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 50.f, false, true);
+				}
+			}
+			else if (7 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
+				}
+			}
+			else if (12 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
+				}
+			}
+			else if (13 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
+				}
+			}
+			else if (15 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
+				}
+			}
+			else if (16 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 50.f, false, true);
+				}
+			}
+			else if (17 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
+				}
+			}
+			else if (19 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADY, 50.f, false, true);
+				}
+			}
+			else if (21 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished()/*0.5f < pFinalBoss->Get_AnimRatio()*/)
+				{
+					m_iCnt = 3;
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPREADY, 50.f, false, true);
+				}
 			}
 		}
-		else if (true == pFinalBoss->Get_AirArrow())
-		{
-			pFinalBoss->Set_AirArrow(false);
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
-		}
-
-		// ㄹㅇ랜덤으로 가면 딱일듯
-		/*
-		//if (pFinalBoss->IsAnimFinished()0.5f < pFinalBoss->Get_AnimRatio())
-		//{
-			// 메테오 패턴
-			//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
-			// 레이져 패턴
-			//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASEREADY, 50.f, false, true);
-			//if (m_iCnt == 0 || m_iCnt == 7)
-			//{
-			//	++m_iCnt;
-			//	 Stab 패턴
-				//m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
-				//pFinalBoss->Set_Direction(m_vLook);
-				//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
-			//}
-			//else if (m_iCnt == 4)
-			//{
-			//	++m_iCnt;
-			//	// Slash 패턴
-				//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
-			//}
-			//else if (m_iCnt == 6)
-			//{
-			//	++m_iCnt;
-
-			//	// 좌우 활공 패턴
-			//	_vector vBossPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-			//	_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-
-			//	if (rand() % 2 == 0)
-			//	{
-			//		pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, -45.f));
-			//		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNLEFTAIRSTART, 50.f, false, true);
-			//	}
-			//	else
-			//	{
-			//		pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, 45.f));
-			//		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNRIGHTAIRSTART, 50.f, false, true);
-			//	}
-			//}
-			//else if (m_iCnt == 13)
-			//{
-			//	++m_iCnt;
-				// 화살 패턴
-			//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
-			//}
-			//else if (m_iCnt == 14)
-			//{
-			//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASEREADY, 50.f, false, true);
-			//}
-			//	else if (rand() % 4 == 1)
-			//	{
-					//// Slash 패턴
-					//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
-			//	}
-			//	else if (rand() % 4 == 2)
-			//	{
-			//		// 화살 패턴
-					//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
-			//	}
-			//	else
-			//	{
-			//		// 좌우 활공 패턴
-			//		_vector vBossPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-			//		_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-
-			//		if (rand() % 2 == 0)
-			//		{
-			//			pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, -45.f));
-			//			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNLEFTAIRSTART, 50.f, false, true);
-			//		}
-			//		else
-			//		{
-			//			pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, 45.f));
-			//			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNRIGHTAIRSTART, 50.f, false, true);
-			//		}
-			//	}
-		//}
-	*/
 	}
 	else
 	{
-		if (true == pFinalBoss->Get_BackStep())
+		if (CFinalBoss::STATE_2PAZE == pFinalBoss->Get_BossState())
 		{
-			pFinalBoss->Set_BackStep(false);
-			pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
+			//pFinalBoss->Set_BossState(CFinalBoss::STATE_FLYING);
+			if (CFinalBoss::FINALBOSS_WAITAIR == pFinalBoss->Get_State())
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					if (0 == m_iCnt)
+					{
+						++m_iCnt;
+						pFinalBoss->Change_State(CFinalBoss::FINALBOSS_ROAR, 50.f, false, true);
+					}
+					else if (1 == m_iCnt)
+					{
+						++m_iCnt;
+						pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
+					}
+					else
+					{
+						pFinalBoss->Set_Chain(true);
+						pFinalBoss->Set_BossState(CFinalBoss::STATE_FLYING);
+						pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
+					}
+				}
+			}
 		}
-		else if (true == pFinalBoss->Get_Swing())
+		else if (CFinalBoss::FINALBOSS_WAITAIR == pFinalBoss->Get_State())
 		{
-			pFinalBoss->Set_Swing(false);
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 40.f, false, true);
+			if (true == pFinalBoss->Get_Stab())
+			{
+				pFinalBoss->Set_Stab(false);
+				// Stab 패턴
+				m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+				pFinalBoss->Set_Direction(m_vLook);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
+			}
+			else if (true == pFinalBoss->Get_Slash())
+			{
+				pFinalBoss->Set_Slash(false);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
+			}
+			else if (true == pFinalBoss->Get_Meteor())
+			{
+				pFinalBoss->Set_Meteor(false);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
+			}
+			else if (true == pFinalBoss->Get_Laser())
+			{
+				pFinalBoss->Set_Laser(false);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASEREADY, 50.f, false, true);
+			}
+			else if (true == pFinalBoss->Get_Side())
+			{
+				pFinalBoss->Set_Side(false);
+				// 좌우 활공 패턴
+				_vector vBossPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+				if (rand() % 2 == 0)
+				{
+					pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, -45.f));
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNLEFTAIRSTART, 50.f, false, true);
+				}
+				else
+				{
+					pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, 45.f));
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNRIGHTAIRSTART, 50.f, false, true);
+				}
+			}
+			else if (true == pFinalBoss->Get_AirArrow())
+			{
+				pFinalBoss->Set_AirArrow(false);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
+			}
 		}
-		else if (true == pFinalBoss->Get_GroundArrow())
+		else
 		{
-			pFinalBoss->Set_GroundArrow(false);
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADY, 50.f, false, true);
+			if (true == pFinalBoss->Get_BackStep())
+			{
+				pFinalBoss->Set_BackStep(false);
+				pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
+
+				CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+				MultiFXDesc.vInitPos = static_cast<_float3> (pTransformCom->Get_State(CTransform::STATE_POSITION));
+				MultiFXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f),0.f };
+				MultiFXDesc.vInitScale = { 2.f, 2.f, 2.f };
+				MultiFXDesc.fStartDelay = .5f;
+				pFinalBoss->Add_Effect("HS_FB fly smoke", MultiFXDesc);
+
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
+			}
+			else if (true == pFinalBoss->Get_Swing())
+			{
+				pFinalBoss->Set_Swing(false);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 40.f, false, true);
+			}
+			else if (true == pFinalBoss->Get_GroundArrow())
+			{
+				pFinalBoss->Set_GroundArrow(false);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADY, 50.f, false, true);
+			}
+			else if (true == pFinalBoss->Get_Thrust())
+			{
+				pFinalBoss->Set_Thrust(false);
+			}
+			else if (true == pFinalBoss->Get_Spike())
+			{
+				pFinalBoss->Set_Spike(false);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADY, 50.f, false, true);
+			}
 		}
-		else if (true == pFinalBoss->Get_Thrust())
-		{
-			pFinalBoss->Set_Thrust(false);
-
-			//효선아 Thrust
-			ThrustCharge(pFinalBoss);
-
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
-		}
-		else if (true == pFinalBoss->Get_Spike())
-		{
-			pFinalBoss->Set_Spike(false);
-			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADY, 50.f, false, true);
-		}
-		// 회복 패턴
-		//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPSTART, 50.f, false, true);
-
-		//// 백스텝 활공 패턴
-		//if (m_iCnt == 3 || m_iCnt == 5 || m_iCnt == 12)
-		//{
-		//	++m_iCnt;
-			//pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
-			//pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
-		//}
-
-		//// 스윙 패턴
-		////pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 40.f, false, true);
-
-		//// 화살 패턴
-		////if(pFinalBoss->IsAnimFinished())
-		////	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADY, 50.f, false, true);
-
-		//// 땅에서 돌진 패턴
-		//else if (m_iCnt == 1)
-		//{
-		//	++m_iCnt;
-		//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
-		//}
-
-		//// 대못박기 패턴
-		//else if (m_iCnt == 2)
-		//{
-		//	++m_iCnt;
-		//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADY, 50.f, false, true);
-		//}
-		//else if (m_iCnt == 8 || m_iCnt == 9 || m_iCnt == 10)
-		//{
-		//	++m_iCnt;
-		//	// 스윙 패턴
-		//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 40.f, false, true);
-		//}
-		//else if (m_iCnt == 11)
-		//{
-		//	++m_iCnt;
-		//	// 화살 패턴
-		//	pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADY, 50.f, false, true);
-		//}
 	}
 }
 
@@ -1207,12 +1319,18 @@ void CFinalBoss_Thrust_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		{
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTSTART, 50.f, false, true);
 			//효선아 여기야 thrust
-			CMultiEffect::MULTI_FX_DESC FXDesc{};
-			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-			FXDesc.vInitPos = { 1.f, 1.f, 7.f };
-			FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 
-			pFinalBoss->Add_Effect("HS_FB thrust dash arrow", FXDesc);
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			FXDesc.vInitScale = { 1.2f, 1.2f, 1.2f };
+			//pFinalBoss->Add_Effect("HS_RayArrow test", FXDesc, true);
+
+			CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+			MultiFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			MultiFXDesc.vInitPos = { .4f, 1.f, 11.f };
+			MultiFXDesc.vInitScale = { 2.5f, 2.5f, 2.5f };
+
+			pFinalBoss->Add_Effect("HS_FB thrust dash arrow", MultiFXDesc);
 
 		}
 		break;
@@ -1402,7 +1520,7 @@ void CFinalBoss_Spike_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 				vInitPos.y -= 1.f;
 				FXDesc.vInitPos = vInitPos;
 				FXDesc.vInitScale = { 3.f, 3.f, 3.f };
-				FXDesc.vInitRot = { 180.f, 0.f, 0.f };
+				FXDesc.vInitRot = { 0.f, 0.f, 0.f };
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"),
 					TEXT("Prototype_GameObject_HS_FB downward light"), &FXDesc);
 				CHECK_FAILED(hr);
@@ -1507,7 +1625,7 @@ void CFinalBoss_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			else
 			{
 				pController->Set_Position(pTransformCom, XMVectorSet(-0.115f, 40.f, -0.218f, 1.f));
-				pTransformCom->Look_At_Angle(pTransformCom->Get_State_Vector(CTransform::STATE_LOOK), XMVectorSet(0.f, 1.f, 0.f, 0.f), ToRadian(20.f));
+				pTransformCom->Look_At(XMVectorSet(0.f, 0.f, -1.f, 1.f));
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RECOVERYSTART, 50.f, false, true);
 			}
 			break;
@@ -1567,7 +1685,7 @@ void CFinalBoss_Meteor_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			if (true == pFinalBoss->Get_Chain())
 			{
 				pFinalBoss->Set_Chain(false);
-				MeteorDesc.vPosition = vPos + (vLook * (_float)CUtils::Make_RandomInt(-80, -70)) + (vRight * (_float)CUtils::Make_RandomInt(-5, 5)) + (vUp * (_float)CUtils::Make_RandomInt(30, 45));
+				MeteorDesc.vPosition = vPos + (vLook * (_float)CUtils::Make_RandomInt(-80, -70))/* + (vRight * (_float)CUtils::Make_RandomInt(-5, 5))*/ + (vUp * (_float)CUtils::Make_RandomInt(30, 45));
 				MeteorDesc.fDelayTime = 2.f;
 				MeteorDesc.strTag = TEXT("Prototype_Component_Model_BigDebris");
 				MeteorDesc.bBig = true;
@@ -1725,7 +1843,10 @@ void CFinalBoss_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 	if (pFinalBoss->IsAnimFinished())
 	{
-		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPREADY, 50.f, false, true);
+		if(CFinalBoss::STATE_2PAZE == pFinalBoss->Get_BossState())
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPREADY, 50.f, false, true);
+		else
+			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAIT, 50.f, false, true);
 	}
 }
 
@@ -1871,6 +1992,7 @@ void CFinalBoss_Recovery_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		switch (pFinalBoss->Get_State())
 		{
 		case CFinalBoss::FINALBOSS_RECOVERYSTART:
+			pFinalBoss->Set_BeforeHp(pFinalBoss->Get_Hp());
 			HRESULT hr;
 			pFinalBoss->Set_Position(pTransformCom->Get_State(CTransform::STATE_POSITION));
 			BossCloneDesc.vPosition = pTransformCom->Get_State(CTransform::STATE_POSITION);

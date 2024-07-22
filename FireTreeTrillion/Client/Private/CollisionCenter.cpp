@@ -823,6 +823,26 @@ void CCollisionCenter::Simba_Battle()
 
 		});
 
+	// 플레이어 공격에 대한 처리
+	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[BOSS_SIMBA], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CMonster* pMonster = static_cast<CMonster*>(Src);
+
+			_float fAttack = pKirby->Get_Attack();
+			pMonster->Minus_Hp(fAttack);
+			pthis->Camera_Shaking(1.2f);
+			DstHit->Set_Alive(false);
+			SrcHit->Set_Alive(false);
+			Dst->Set_Dead();
+		});
+
 	// Simba 공격히트박스와 커비 충돌
 	Collision_Collider(m_GameObjects[HITBOX_SIMBA], m_GameObjects[PLAYER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
@@ -961,6 +981,26 @@ void CCollisionCenter::FinalStage_Battle()
 			pObject->Set_PhyXState(PO_FLYDEADAWAY);
 		});
 
+	// 플레이어 공격에 대한 처리
+	Collision_Collider(m_GameObjects[PLAYERBULLET], m_GameObjects[BOSS_FINALBOSS], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CMonster* pMonster = static_cast<CMonster*>(Src);
+
+			_float fAttack = pKirby->Get_Attack();
+			pMonster->Minus_Hp(fAttack);
+			pthis->Camera_Shaking(1.2f);
+			DstHit->Set_Alive(false);
+			SrcHit->Set_Alive(false);
+			Dst->Set_Dead();
+		});
+
 
 }
 
@@ -1032,6 +1072,12 @@ void CCollisionCenter::Body_To_Body_Collision()
 				if (pKirby->Get_KirbyInfo()->m_bBooster == true)
 				{
 					pMonster->Set_PhyXState(PO_PRESSED);
+
+					CMultiEffect::MULTI_FX_DESC Effectdesc = {};
+					Effectdesc.vInitPos = (_float3)pMonster->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+					Effectdesc.vInitScale = { 2.f, 2.f, 2.f };
+					if (FAILED(GAMEINSTANCE Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
+						return;
 
 					pKirby->Set_HitStop();
 					pthis->Camera_Shaking(1.2f);
@@ -2251,11 +2297,19 @@ void CCollisionCenter::Compute_HitBoxDamage(CPhysXObject* pPlayer, CPhysXObject*
 
 void CCollisionCenter::Compute_Heal(CPhysXObject* pPlayer, CPhysXObject* pItem)
 {
-	CCharacter* pCPlayer = static_cast<CCharacter*>(pPlayer);
+	CKirby* pCPlayer = static_cast<CKirby*>(pPlayer);
 	CItemObject* pIItem = static_cast<CItemObject*>(pItem);
 
 	_float fItemPoint = (_float)pIItem->Get_ItemPoint();
 	pCPlayer->Plus_Hp(fItemPoint);
+
+	CMultiEffect::MULTI_FX_DESC Effectdesc = {};
+	Effectdesc.vInitPos = { 0.f, 0.5f, 0.f };
+	Effectdesc.vInitScale = { 1.f, 1.f, 1.f };
+	Effectdesc.pSocketMatrix = pCPlayer->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
+	//if (FAILED(GAMEINSTANCE Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Food Eat Effects"), &Effectdesc)))
+	//	return;
+	pCPlayer->Add_Effect("YW Food Eat Effects", Effectdesc, false);
 }
 
 void CCollisionCenter::Compute_Coin(CPhysXObject* pPlayer, CPhysXObject* pItem)

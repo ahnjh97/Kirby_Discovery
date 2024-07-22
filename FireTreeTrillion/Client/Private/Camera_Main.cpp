@@ -182,7 +182,7 @@ void CCamera_Main::Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS e
 		m_fInterpolateSpeed = fInterpolateSpeed;
 
 	m_eCamFocus = eFocus;
-	//m_vAnchorOffset = vAnchorOffset;
+
 
 	if ((eFocus == FOCUS_SECOND || eFocus == FOCUS_BOTH) && m_pSecondTarget == nullptr)
 		m_eCamFocus = FOCUS_FIRST;
@@ -252,7 +252,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_CamTriggerUpOffsets.reserve(LEVEL_END);
 	m_CamTriggerUpOffsets.resize(LEVEL_END);
 
-	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f, 0.f, 0.1f, 0.1f, 0.1f }; //9 == 11
+	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .2f, .15f, 0.f, 0.f, 0.f, 0.f, 0.1f, 0.1f, 0.1f }; //9 == 11
 	//m_CamTriggerUpOffsets[LEVEL_PARK] = { 0.f, 0.f, 0.f, 100.f, .15f, 0.f, 0.f, 0.f, 0.f };
 	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .05f, 0.05f, 0.1f, 0.f, 0.f }; // 0 : 보스 만나기전, 1 : 계단으로 들어가는 입구, 2 : 복도 마지막 트리거
 	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f, .4f, .5f, 0.2f, 0.2f, 0.f };
@@ -633,6 +633,8 @@ void CCamera_Main::Track_Anchor(_float fTimeDelta)
 		Compute_Set_BothFocus(fTimeDelta);
 	else if (m_eCamFocus == FOCUS_BATTLE)
 		Compute_Set_BattleFocus(fTimeDelta);
+	else if (m_eCamFocus == FOCUS_FINALBOSS)
+		Compute_Set_FinalBossFocus(fTimeDelta);
 	//트리거 안에 들어가 있을 경우 트리거 사이에서의 카메라 설정
 	else if (m_bLerpByTriggerInfo)
 		Compute_Set_Trigger(m_iMatrixIndex);
@@ -705,7 +707,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 
 			switch (m_eSpecialSeq)
 			{
-			//case SEQ_BREAKCARSHOP:
+				//case SEQ_BREAKCARSHOP:
 			case SEQ_BREAKRACINGMAP:
 			{
 				m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
@@ -740,7 +742,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 				CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 				if (pFinalBoss != nullptr)
 				{
-					Set_Target(pFinalBoss->Get_TransformCom(), TARGET_SECOND, FOCUS_BOTH, {0.f, -2.f, 0.f});
+					Set_Target(pFinalBoss->Get_TransformCom(), TARGET_SECOND, FOCUS_FINALBOSS, { 0.f,5.f, 0.f }, 10.f);
 				}
 			}
 			break;
@@ -771,6 +773,9 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	//예약 동작이 모두 끝나면 다시 기본 상태로 만든다.
 	if (m_CamSeq.empty() && abs(m_fSeqInterpolateTime.first - m_fSeqInterpolateTime.second) < .01f)
 	{
+
+		Set_DOFMode(true);
+
 		CAMSEQ eSeq = m_eSpecialSeq;
 
 		m_eSpecialSeq = SEQ_END;
@@ -1076,6 +1081,29 @@ void CCamera_Main::Compute_Set_BattleFocus(_float fTimeDelta)
 
 	m_fDestDistance = 30.f + (30.f * fDistRatio);
 
+}
+
+void CCamera_Main::Compute_Set_FinalBossFocus(_float fTimeDelta)
+{
+
+	_float3 vDir = _float3(m_pSecondTarget->Get_State(CTransform::STATE_POSITION) - m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
+	m_vDestCamDir = vDir;
+	m_vDestCamDir.Normalize();
+
+	//m_vDestCamDir.y = m_vOrigCamDir.y;
+	m_vDestCamDir.y = 0.f;
+	m_vDestCamDir.Normalize();
+
+	_float fDist = vDir.Length();
+	fDist = clamp(fDist, 20.f, 50.f);
+	fDist = MAPVALUE(fDist, 20.f, 50.f, 0.f, 1.f);
+	fDist = EASE_OUT(fDist);
+
+	//m_vDestCamDir.y += MAPVALUE(fDist, 0.f, 1.f, -.1f, .2f);
+	//m_vDestCamDir.Normalize();
+
+	m_fDestDistance = m_fOrigDistance /** .5f + (m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - m_pSecondTarget->Get_State(CTransform::STATE_POSITION)).Length() * 1.2f*/ /** .7f*/;
+	m_fDestDistance = 20.f;
 }
 
 void CCamera_Main::Compute_Set_CamLock(_float fTimeDelta)
@@ -1622,6 +1650,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//어깨 뷰
 	case SEQ_SIMBA_SHOULDER:
 	{
+		Set_DOFMode(false);
+
 		CAMACTION newAction{};
 		Fill_HardCutSet(newAction, 0.f);
 
@@ -1644,6 +1674,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//어깨 - 통
 	case SEQ_SIMBA_TONG:
 	{
+		Set_DOFMode(false);
+
 		CAMACTION newAction{};
 		Fill_HardCutSet(newAction, 0.f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { 12.f, 7.5f, -41.8f });
@@ -1664,6 +1696,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//얼굴뷰
 	case SEQ_SIMBA_FRONTVIEW:
 	{
+		Set_DOFMode(false);
+
 		CAMACTION newAction{};
 		Fill_HardCutSet(newAction, 0.f);
 
@@ -1685,6 +1719,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//로우 앵글
 	case SEQ_SIMBA_LOW:
 	{
+		Set_DOFMode(false);
+
 		CAMACTION newAction{};
 		Fill_HardCutSet(newAction, 0.f);
 
@@ -1709,6 +1745,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 #pragma region 에피리스
 	case SEQ_FINALBOSS_APPEAR:
 	{
+		Set_DOFMode(false);
 
 		CAMACTION newAction = {};
 
@@ -2532,9 +2569,6 @@ void CCamera_Main::Reset_DeferredCamSet()
 	//후보정 값을 초기화한다.
 	m_pTransformCom->Move(static_cast<_float4>(-m_vPreShakeDir));
 
-
-
-
 }
 
 void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
@@ -2553,7 +2587,6 @@ void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
 	if (.001f < abs(m_fCurZAngle - m_fDestZAngle))
 		m_fCurZAngle += (m_fDestZAngle - m_fCurZAngle) * fTimeDelta * m_fZAngleInterpolateSpeed;
 
-
 	//이동
 	m_pTransformCom->Move(Dir(m_vCurFinalOffset));
 	m_vPreFinalOffset = m_vCurFinalOffset;
@@ -2567,64 +2600,86 @@ void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
 	m_pTransformCom->Move(vDir);
 
 
-	//컷신용 dof 위치 갱신
-
+	//컷신용 dof 위치 갱신(자동)
+	if (m_bAutoDOF)
+	{
+		m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
+	}
+	//수동 dof
+	else
+	{
 		//피날레
-	if (0 < m_iCurSceneIdx)
-	{
-		//커비
-		if (m_iCurSceneIdx == 1
-			|| m_iCurSceneIdx == 6
-			|| m_iCurSceneIdx == 7
-			|| m_iCurSceneIdx == 8
-			|| m_iCurSceneIdx == 11
-			|| m_iCurSceneIdx == 12
-			|| m_iCurSceneIdx == 14
-			|| m_iCurSceneIdx == 15
-			|| m_iCurSceneIdx == 16
-			|| m_iCurSceneIdx == 17)
+		if (0 < m_iCurSceneIdx)
 		{
+			//커비
+			if (m_iCurSceneIdx == 1
+				|| m_iCurSceneIdx == 6
+				|| m_iCurSceneIdx == 7
+				|| m_iCurSceneIdx == 8
+				|| m_iCurSceneIdx == 11
+				|| m_iCurSceneIdx == 12
+				|| m_iCurSceneIdx == 14
+				|| m_iCurSceneIdx == 15
+				|| m_iCurSceneIdx == 16
+				|| m_iCurSceneIdx == 17)
+			{
 
-			m_pGameInstance->Update_DofFocus(FINALEKIRBY->m_vBonePos);
-		}
-		else if (m_iCurSceneIdx == 2)
-		{
-			(0.f < m_fSeqEventTime) ?
-				m_pGameInstance->Update_DofFocus(FINALEKIRBY->m_vBonePos) :
+				m_pGameInstance->Update_DofFocus(FINALEKIRBY->m_vBonePos);
+			}
+			else if (m_iCurSceneIdx == 2)
+			{
+				(0.f < m_fSeqEventTime) ?
+					m_pGameInstance->Update_DofFocus(FINALEKIRBY->m_vBonePos) :
+					m_pGameInstance->Update_DofFocus(FINALEBOSS->Get_RootPos());
+			}
+			//중간점
+			else if (m_iCurSceneIdx == 13
+				|| m_iCurSceneIdx == 18)
+			{
+				m_pGameInstance->Update_DofFocus(m_vAnchor);
+			}
+			//보스
+			else
+			{
 				m_pGameInstance->Update_DofFocus(FINALEBOSS->Get_RootPos());
+			}
 		}
-		//중간점
-		else if (m_iCurSceneIdx == 13
-			|| m_iCurSceneIdx == 18)
+
+		//사자 컷
+		if (SEQ_SIMBA_START <= m_eSpecialSeq && m_eSpecialSeq <= SEQ_SIMBA_LOW)
 		{
-			m_pGameInstance->Update_DofFocus(m_vAnchor);
+			//사자 포커스
+			if (m_eSpecialSeq != SEQ_SIMBA_START)
+			{
+				CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
+				if (nullptr != pSimba)
+					m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+			}
+			//커비
+			else
+			{
+				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
+			}
 		}
-		//보스
-		else
+
+		//파이널 보스 등장
+		if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR)
 		{
-			m_pGameInstance->Update_DofFocus(FINALEBOSS->Get_RootPos());
+			if (m_fSeqEventTime <= 0.f)
+			{
+				//CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, L"Layer_BossMonster");
+
+				//if (pBoss != nullptr)
+					m_pGameInstance->Update_DofFocus({0.f, -31.f, 13.f });
+			}
+			//커비
+			else
+			{
+				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
+			}
 		}
 	}
 
-	if (SEQ_SIMBA_START <= m_eSpecialSeq && m_eSpecialSeq <= SEQ_SIMBA_LOW)
-	{
-		//사자 포커스
-		if (m_eSpecialSeq != SEQ_SIMBA_START)
-		{
-			CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
-			if(nullptr != pSimba)
-				m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
-		}
-
-	}
-
-	if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR && m_fSeqEventTime <= 0.f)
-	{
-		CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, L"Layer_BossMonster");
-		
-		if(pBoss != nullptr)	
-			m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
-	}
 }
 
 void CCamera_Main::Control(_float fTimeDelta)
@@ -2784,14 +2839,24 @@ _float3 CCamera_Main::Make_TargetPos()
 	//두번째 타겟 포커스
 	else if (m_eCamFocus == FOCUS_SECOND)
 		vTargetPos = (_float3)m_pSecondTarget->Get_State(CTransform::STATE_POSITION);
-	//두 타겟 사이의 중심점.
+	//두 타겟 사이의 중심 포커스
 	else if (m_eCamFocus == FOCUS_BOTH)
 	{
 		vTargetPos =
 			(_float3)m_pFirstTarget->Get_State(CTransform::STATE_POSITION)
 			+ (m_pSecondTarget->Get_State(CTransform::STATE_POSITION) - m_pFirstTarget->Get_State(CTransform::STATE_POSITION)) * m_fBothFocusRatio;
 	}
+	//마지막 보스용 포커스
+	else if (m_eCamFocus == FOCUS_FINALBOSS)
+	{
+		vTargetPos = (_float3)m_pFirstTarget->Get_State(CTransform::STATE_POSITION);
 
+		//지형 위치를 구하여 같이 쓰기
+		_float4 vTerrainPos = static_cast<CCharacter*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
+
+		if (vTerrainPos.y != 0.f && m_eCamFocus != FOCUS_BOTH)
+			vTargetPos.y = vTargetPos.y * .2f + vTerrainPos.y * .8f;
+	}
 	//피날레 카메라 포커스
 	else if (m_eCamFocus == FOCUS_FINALE)
 	{
@@ -2837,6 +2902,9 @@ void CCamera_Main::Interpolate_CamSet(_float fTimeDelta)
 	fSlerpSpeed = (m_eCamFocus == FOCUS_BOTH || m_eCamFocus == FOCUS_BATTLE) ? 12.f : 4.f;
 	if (m_eCamFocus == FOCUS_BATTLE)
 		fSlerpSpeed = 10.f;
+	else if(m_eCamFocus == FOCUS_FINALBOSS)
+		fSlerpSpeed = 10.f;
+
 	m_vCurCamDir = CUtils::SlerpDirVec(m_vCurCamDir, m_vDestCamDir, clamp(fTimeDelta * fSlerpSpeed, 0.f, 1.f));
 
 
@@ -2962,6 +3030,10 @@ void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
 	fInterpolateSpeed = (m_eCamFocus == FOCUS_BOTH) ? 10.f : 1.f;
 
 	if (m_eCamFocus == FOCUS_BATTLE)
+	{
+		fInterpolateSpeed = 20.f;
+	}
+	if (m_eCamFocus == FOCUS_FINALBOSS)
 	{
 		fInterpolateSpeed = 20.f;
 	}

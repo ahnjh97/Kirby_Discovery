@@ -407,7 +407,8 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 	{
 		auto& filePath = entry.path();
 		string strname = filePath.stem().string();
-
+		if (strname == "HS_FB fly smoke")
+			_int a = 0;
 		if (filePath.extension() != ".bin")
 			continue;
 
@@ -428,8 +429,6 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		CHECK_FAILED(hr);
 
 	}
-
-	
 
 	return	S_OK;
 }

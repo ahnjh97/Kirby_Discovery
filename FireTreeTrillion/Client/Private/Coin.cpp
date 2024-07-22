@@ -64,6 +64,20 @@ _int CCoin::Tick(_float fTimeDelta)
 	// 충돌이 완료 되었다면
 	if (m_bCollisionComplete == true)
 	{
+		m_fEffectTime += m_fTimeDelta;
+
+		if (m_fEffectTime > 0.1f)
+		{
+			CEffect::FX_DESC Effectdesc = {};
+			Effectdesc.vInitPos = (_float3)(m_pTransformCom->Get_State(CTransform::STATE_POSITION) + (_float3)CUtils::Make_Random_Vector(0.2f));
+			_float fScale = CUtils::Make_RandomFloat(1.f, 1.5f);
+			Effectdesc.vInitScale = { fScale, fScale, fScale };
+			if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Coin UpSparkle"), &Effectdesc)))
+				return OBJ_NOEVENT;
+
+			m_fEffectTime = 0.f;
+		}
+
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), m_fTimeDelta, 960.f);
 
 		m_fCoinTime += m_fTimeDelta;
@@ -160,6 +174,12 @@ void CCoin::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pOb
 {
 	if (eContent == CCollisionCenter::CONTENT_ITEM)
 	{
+		CMultiEffect::MULTI_FX_DESC Effectdesc = {};
+		Effectdesc.vInitPos = (_float3)m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		Effectdesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Coin Blooms"), &Effectdesc)))
+			return;
+
 		m_bCollisionComplete = true;
 	}
 }

@@ -35,6 +35,7 @@
 #include "BulbFlare.h"
 #include "Gm_DynamicField.h"
 #include "SurprisedBoard.h"
+#include "UI_MessageWindow.h"
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCharacter{ pDevice, pContext }
@@ -73,7 +74,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
-	m_eAbilityType = ABILITY_BOMB;
+	m_eAbilityType = ABILITY_SWORD;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 		m_eAbilityType = ABILITY_SWORD;
 	m_fHp = 1000.f;
@@ -430,10 +431,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if (m_bOverPower == true)
 				return;
 
-			// 초기화해줄놈들
-			INFO(m_bFirstChargeEffectTrigger) = true;
-			INFO(m_bSecondChargeEffectTrigger) = true;
-
+			Reset_If_Damage();
 
 			if (pObject->Get_Attack() > 10.f && m_eAbilityType != ABILITY_DEFAULT)
 			{
@@ -464,6 +462,15 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				{
 					INFO(m_bCarJump) = true;
 					Change_State(CARSTATE_DAMAGE, 60.f, false, false, BODY_CARDEFAULT, OFFSET_CAR);
+				}
+				// 부스터 상태로 받았을 때
+				else if (INFO(m_bBooster) == true)
+				{
+					CMultiEffect::MULTI_FX_DESC Effectdesc = {};
+					Effectdesc.vInitPos = (_float3)m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+					Effectdesc.vInitScale = { 2.f, 2.f, 2.f };
+					if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
+						return;
 				}
 			}
 			else if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
@@ -541,9 +548,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if (m_bOverPower == true)
 				return;
 
-			// 초기화해줄놈들
-			INFO(m_bFirstChargeEffectTrigger) = true;
-			INFO(m_bSecondChargeEffectTrigger) = true;
+			Reset_If_Damage();
 
 
 			if (pObject->Get_Attack() > 10.f && m_eAbilityType != ABILITY_DEFAULT)
@@ -674,6 +679,21 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		}
 
 
+	}
+	
+	else if (eContent == CCollisionCenter::CONTENT_INTERACT)
+	{
+		//if (nullptr == pObject)
+		//	return;
+
+		//다이얼로그 출력 여부를 검사
+		//CUI_MessageWindow* pMWindow = dynamic_cast<CUI_MessageWindow*>
+		//	(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_DeeDeeDee")));
+		//CHECK_NULLPTR(pMWindow);
+		//if (CUI_MessageWindow::WINDOW_SHOW == pMWindow->Get_MWindowState())
+		//	return;
+
+		//pObject->Get_PrototypeTag();
 	}
 }
 
@@ -1739,6 +1759,7 @@ void CKirby::DialogOn(_float4 vDir)
 
 	if (vDir != _float4(0.f, 0.f, 0.f, 0.f))
 		INFO(m_vMoveDir) = INFO(m_vTargetDir) = vDir;
+		//INFO(m_vTargetDir) = vDir;
 
 	if (m_eAbilityType == ABILITY_SWORD)
 		Change_State(SWORDSTATE_WAIT, 60.f, true, true, BODY_SWORDDEFAULT, OFFSET_SWORD);
@@ -2353,6 +2374,33 @@ void CKirby::AssistLight_Control()
 
 
 	}
+}
+
+void CKirby::Reset_If_Damage()
+{
+
+	INFO(m_fVacuumTime) = 0.f;
+
+	INFO(m_ePreAttackState) = SWORDSTATE_DECISIVESLASH;
+	INFO(m_bWalkingCharge) = true;
+	INFO(m_bUpWardSlash) = false;
+	INFO(m_bSwordCharge1) = true;
+	INFO(m_bSwordCharge2) = true;
+
+	INFO(m_bBombHold) = false;
+	INFO(m_vBombThrowDir) = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	INFO(m_fBombPower) = 3.f;
+	INFO(m_bBombOrbit) = false;
+	INFO(m_bBombAimming) = false;
+	INFO(m_bisDeforming) = false;
+
+	INFO(m_bCarJump) = false;
+
+	INFO(m_bFirstChargeEffectTrigger) = true;
+	INFO(m_bSecondChargeEffectTrigger) = true;
+	INFO(m_bBulbJump) = false;
+
+	INFO(m_fTimeRatio) = 0.f;
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

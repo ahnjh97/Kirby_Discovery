@@ -805,6 +805,23 @@ PS_OUT PS_SUMMONEFFECT(PS_IN_ALPHABLEND In)
     return Out;
 }
 
+PS_OUT PS_ROUNDMASK(PS_IN_ALPHABLEND In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    //마스크 값으로 자르기
+    vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (Out.vColor.a < 0.1f)
+        discard;
+
+    if (vMask.r > g_fAlpha)
+        discard;
+   
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	// 기본 패스. 알파 테스팅 ( 0 )
@@ -1164,5 +1181,19 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_SUMMONEFFECT();
+    }
+
+    // ROUND MASK ( 26 )
+    pass ROUNDMASK
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_ALPHABLEND();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_ROUNDMASK();
     }
 }

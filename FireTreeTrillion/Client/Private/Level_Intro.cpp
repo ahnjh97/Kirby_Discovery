@@ -18,6 +18,7 @@
 #include "BG.h"
 #include "HUD.h"
 #include "TransingStar.h"
+#include "LoadingStart.h"
 
 #include "UI_Fading.h"
 
@@ -102,6 +103,12 @@ void CLevel_Intro::Change_Levels()
 	pTransingStar->Set_SmallColor(_float3(160.f / 255.f, 212.f / 255.f, 104.f / 255.f));
 	pTransingStar->Set_LargeColor(_float3(91.f / 255.f, 121.f / 255.f, 59.f / 255.f));
 	pTransingStar->Activate(CTransingStar::CLOSE);
+
+	//CLoadingStart* pLoadingStart = static_cast<CLoadingStart*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar")));
+	//if (nullptr != pLoadingStart)
+	//{
+	//	pLoadingStart->Set_TexIndex(0);
+	//}
 }
 
 void CLevel_Intro::Tick(_float fTimeDelta)
@@ -381,7 +388,7 @@ HRESULT CLevel_Intro::Ready_Lights()
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({-424.f, 373.f, 1165.f, 1.f});
+	CGameInstance::Get_Instance()->Setting_GodRay({-374.f, 230.f, 1165.f, 1.f});
 
 	return S_OK;
 }
