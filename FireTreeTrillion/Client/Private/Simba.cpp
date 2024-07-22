@@ -92,12 +92,24 @@ HRESULT CSimba::Initialize(void* pArg)
 		m_vecMeshes.push_back(i);
 	}
 
+#pragma region 애니메이션 관련
 	m_pModelCom->Set_Animation(Simba_DemoAppear1Cut2, 66.66f, false, false);
 
 	m_pModelCom->EmplaceBackPartialAnim(Simba_DamageFaceSub);
 	m_pModelCom->EmplaceBackPartialAnim(Simba_LipSyncSub);
 	m_pModelCom->EmplaceBackPartialAnim(Simba_LipSyncSubA);
 
+	m_setAppear1Anims = { Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait, Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait,
+		Simba_DemoAppear1Cut4, Simba_DemoAppear1Cut4Wait };
+
+	m_setUndamagableAnims = { Simba_Death, Simba_DemoDeadCut1, Simba_DemoDeadCut2 };
+
+	m_setResetRequiredAnims = { Simba_AttackJumpHit, Simba_BiteRush, Simba_DimensionClaw, Simba_DimensionClawContinue,
+		Simba_DimensionLaser, Simba_DoubleClaw, Simba_FinalCrusher, Simba_QuickClawL, Simba_QuickClawR, Simba_QuickClaw2L, Simba_QuickClaw2R };
+
+#pragma endregion
+
+#pragma region 이벤트 함수포인터 바인딩
 	CEventCenter* pEventCenter = CEventCenter::Get_Instance();
 
 	function<void(CGameObject*)> func{};
@@ -121,8 +133,7 @@ HRESULT CSimba::Initialize(void* pArg)
 
 	func = bind(&CSimba::OnWave2Dead, this, placeholders::_1);
 	pEventCenter->Subscribe(KEVENT_SIMBA_WAVE2DEAD, this, func);
-
-	Add_AnimEvent();
+#pragma endregion
 
 	SetUpHitBoxTimings();
 
@@ -130,6 +141,7 @@ HRESULT CSimba::Initialize(void* pArg)
 
 	m_matDefault = m_pTransformCom->Get_WorldFloat4x4();
 
+#pragma region 뼈 포인터
 	m_pLipBone = m_pModelCom->Get_BonePtr("T_LLip0J");
 	Safe_AddRef(m_pLipBone);
 
@@ -157,19 +169,13 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_vecRightNailBones.emplace_back(m_pModelCom->Get_BonePtr("R_thumbNailJ"));
 	for (auto& bone : m_vecRightNailBones)
 		Safe_AddRef(bone);
-
-	m_setAppear1Anims = { Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait, Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait,
-		Simba_DemoAppear1Cut4, Simba_DemoAppear1Cut4Wait };
-
-	m_setUndamagableAnims = { Simba_Death, Simba_DemoDeadCut1, Simba_DemoDeadCut2 };
-
-	m_setResetRequiredAnims = { Simba_AttackJumpHit, Simba_BiteRush, Simba_DimensionClaw, Simba_DimensionClawContinue,
-		Simba_DimensionLaser, Simba_DoubleClaw, Simba_FinalCrusher, Simba_QuickClawL, Simba_QuickClawR, Simba_QuickClaw2L, Simba_QuickClaw2R };
+#pragma endregion
 
 	SetCamSequence(CCamera_Main::SEQ_SIMBA_START);
 
 	CreateDimensionClawActor();
 
+#pragma region 돌, 파티클 풀링
 	vector<_uint> vecTunnelRocks = { 2, 4, 5, 7, 8, 9, 10, 12, 13, 16 };
 	GAMEOBJECT_DESC tDesc{};
 
@@ -181,6 +187,7 @@ HRESULT CSimba::Initialize(void* pArg)
 			m_vecDebris.emplace_back(dynamic_cast<CDebris*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Debris"), &tDesc)));
 		}
 	}
+#pragma endregion
 
 	return S_OK;
 }
@@ -194,9 +201,7 @@ _int CSimba::Tick(_float fTimeDelta)
 
 	ResetRotation();
 	m_bRenderDimensionClaw = false;
-
-	if (true == m_bLaserActivated)
-		LaserAttack();
+	m_bLaserActivated = false;
 
 	if (true == m_pModelCom->IsFinished() || m_pModelCom->Get_Trackposition() == 0.f) // IsAnimFinished
 		Reset_HitBoxTimingMap(SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex()));
@@ -204,6 +209,34 @@ _int CSimba::Tick(_float fTimeDelta)
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
 	CheckSpawning();
+
+	if (m_pGameInstance->Get_KeyState(DIK_CAPSLOCK, KEY_PRESS))
+	{
+		SetUpSecondTarget();
+		HideDimensionClawActor();
+		HideDimensionLaserActor();
+
+		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
+			Change_State(Simba_QuickClawStartL, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
+			Change_State(Simba_FinalCrusherStart, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_3, KEY_DOWN))
+			Change_State(Simba_DoubleClawChargeStart, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_4, KEY_DOWN))
+			Change_State(Simba_AttackJumpPre, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_5, KEY_DOWN))
+			Change_State(Simba_DimensionClawStart, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_6, KEY_DOWN))
+			Change_State(Simba_BiteRushStart, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_7, KEY_DOWN))
+			Change_State(Simba_DimensionLaserStart, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN))
+			Change_State(Simba_Wait2, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_9, KEY_DOWN))
+			Change_State(Simba_BiteRushJumpStartL, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_0, KEY_DOWN))
+			Change_State(Simba_BiteRushJumpStartR, 50.f, false, true);
+	}
 
 	__super::Tick(m_fTimeDelta);
 
@@ -220,34 +253,6 @@ _int CSimba::Tick(_float fTimeDelta)
 		Change_State(Simba_Damage, 50.f, false, true);
 	}
 
-	if (m_pGameInstance->Get_KeyState(DIK_CAPSLOCK, KEY_PRESS))
-	{
-		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
-			Change_State(Simba_QuickClawStartL, 50.f, false, true);
-		else if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
-			Change_State(Simba_FinalCrusherStart, 50.f, false, true);
-		else if (m_pGameInstance->Get_KeyState(DIK_3, KEY_DOWN))
-			Change_State(Simba_DoubleClawChargeStart, 50.f, false, true);
-		else if (m_pGameInstance->Get_KeyState(DIK_4, KEY_DOWN))
-			Change_State(Simba_AttackJumpPre, 50.f, false, true);
-		else if (m_pGameInstance->Get_KeyState(DIK_5, KEY_DOWN))
-			Change_State(Simba_DimensionClawStart, 50.f, false, true);
-		else if(m_pGameInstance->Get_KeyState(DIK_6, KEY_DOWN))
-			Change_State(Simba_BiteRushStart, 50.f, false, true);
-		else if (m_pGameInstance->Get_KeyState(DIK_7, KEY_DOWN))
-			Change_State(Simba_DimensionLaserStart, 50.f, false, true);
-		else if(m_pGameInstance->Get_KeyState(DIK_8, KEY_DOWN))
-			Change_State(Simba_Wait2, 50.f, false, true);
-		else if (m_pGameInstance->Get_KeyState(DIK_9, KEY_DOWN))
-			Change_State(Simba_BiteRushJumpStartL, 50.f, false, true);
-		else if (m_pGameInstance->Get_KeyState(DIK_0, KEY_DOWN))
-			Change_State(Simba_BiteRushJumpStartR, 50.f, false, true);
-
-		SetUpSecondTarget();
-		HideDimensionClawActor();
-		HideDimensionLaserActor();
-	}
-
 	Check_HitBoxActivation();
 
 	PlayLipSinc();
@@ -261,9 +266,6 @@ _int CSimba::Tick(_float fTimeDelta)
 
 	DetermineSimbaRotation();
 
-	if (m_pSimbaLaser != nullptr && true == m_bLaserActivated)
-		m_pSimbaLaser->Tick(m_fTimeDelta);
-
 	for (auto& index : m_listUsedRocks)
 		m_vecSimbaRocks[index]->Tick(m_fTimeDelta);
 
@@ -271,6 +273,7 @@ _int CSimba::Tick(_float fTimeDelta)
 		m_vecDebris[index]->Tick(m_fTimeDelta);
 
 	RemoveDeadRocksFromList();
+	RemoveDeadDebrisFromList();
 
 	return OBJ_NOEVENT;
 }
@@ -399,6 +402,13 @@ void CSimba::Change_State(SIMBA_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _
 	m_iStarCount = 0;
 	m_iRockCount = 0;
 	m_iDebrisCount = 0;
+	if (true == m_bPhaseTwo)
+	{
+		if (m_setDimensionClawAnims.end() == m_setDimensionClawAnims.find(eState))
+			HideDimensionClawActor();
+		if (m_setDimensionLaserAnims.end() == m_setDimensionLaserAnims.find(eState))
+			HideDimensionLaserActor();
+	}
 
 	m_pFSM->ChangeState(eState, _fAnimSpeed, _bLoop, _bInterpolation);
 }
@@ -420,7 +430,7 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 	AbilityItemDesc.fAngle = 0.f;
 	AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
 
-	_float fY = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+	_float fY = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y + 0.3f;
 	_vector vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	_vector vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
 	_float4 vFloatLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
@@ -670,7 +680,22 @@ void CSimba::SetUpDimensionClawWorldMatrix()
 
 void CSimba::MoveDimensionClaw(_float fTimeDelta)
 {
-	CUtils::MoveActor(m_pDimensionClawActor, _float3(0, 0, 20), m_fTimeDelta);
+	if (nullptr == m_pDimensionClawActor)
+		return;
+
+	PxTransform pxTransform = m_pDimensionClawActor->getGlobalPose();
+
+	_float4x4 matWorld = CUtils::To_Float4x4(pxTransform);
+	_float4 vLook{}, vPos{};
+	memcpy(&vLook, &(matWorld.m[2]), sizeof(_float4)); 
+	memcpy(&vPos, &(matWorld.m[3]), sizeof(_float4));
+	vLook.Normalize();
+
+	vPos += vLook * 20.f * fTimeDelta;
+
+	memcpy(&(matWorld.m[3]), &vPos, sizeof(_float4));
+
+	m_pDimensionClawActor->setGlobalPose(CUtils::ToPxTransform(matWorld));
 }
 
 void CSimba::HideDimensionClawActor()
@@ -683,6 +708,20 @@ void CSimba::HideDimensionLaserActor()
 {
 	if (nullptr != m_pSimbaLaser)
 		static_cast<CSimbaLaser*>(m_pSimbaLaser)->HideLaser();
+}
+
+void CSimba::LaserAttack(_float fTimeDelta)
+{
+	_float4x4 matWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pLaserBone);
+	_float fScale = 24.f;
+	CUtils::Set_Scaled_Matrix(matWorld, fScale, fScale, fScale);
+	_float4 vLook{};
+	memcpy(&vLook, &(matWorld.m[2]), sizeof(_float4));
+	vLook = _float4(-vLook.x, -vLook.y, -vLook.z, 0);
+	memcpy(&(matWorld.m[2]), &vLook, sizeof(_float4));
+	m_pSimbaLaserTransform->Set_WorldMatrix(matWorld);
+	m_pSimbaLaser->Tick(fTimeDelta);
+	m_bLaserActivated = true;
 }
 
 void CSimba::SpawnRocks(_uint iAnimIdx)
@@ -797,37 +836,101 @@ void CSimba::SpawnRocks(_uint iAnimIdx)
 
 void CSimba::SpawnDebris(_uint iAnimIdx)
 {
-	if (Simba_QuickClawL == iAnimIdx)
+	if (Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx) 
 	{
+		_uint iNumDebris = 2;
+		_uint iIndex = m_iLastDebrisIndex + 1;
+		if (iIndex >= m_vecDebris.size())
+			iIndex = 0;
 
+		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
+		vPos.y = 0;
+		for (_uint i = iIndex; i < iIndex + iNumDebris; i++)
+		{
+			m_vecDebris[iIndex]->Set_ParticleDebris(vPos);
+			m_listUsedDebris.push_back(iIndex);
+
+			m_iLastDebrisIndex++;
+		}
 	}
-	else if (Simba_QuickClawR == iAnimIdx)
+	else if (Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
 	{
+		_uint iNumDebris = 2;
+		_uint iIndex = m_iLastDebrisIndex + 1;
+		if (iIndex >= m_vecDebris.size())
+			iIndex = 0;
 
-	}
-	else if (Simba_QuickClaw2L == iAnimIdx)
-	{
+		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
+		vPos.y = 0;
+		for (_uint i = iIndex; i < iIndex + iNumDebris; i++)
+		{
+			m_vecDebris[iIndex]->Set_ParticleDebris(vPos);
+			m_listUsedDebris.push_back(iIndex);
 
-	}
-	else if (Simba_QuickClaw2R == iAnimIdx)
-	{
-
+			m_iLastDebrisIndex++;
+		}
 	}
 	else if (Simba_FinalCrusher == iAnimIdx)
 	{
+		_uint iNumDebris = 2;
+		_uint iIndex = m_iLastDebrisIndex + 1;
+		if (iIndex >= m_vecDebris.size())
+			iIndex = 0;
 
+		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
+		vPos.y = 0;
+		for (_uint i = iIndex; i < iIndex + iNumDebris; i++)
+		{
+			m_vecDebris[iIndex]->Set_ParticleDebris(vPos);
+			m_listUsedDebris.push_back(iIndex);
+
+			m_iLastDebrisIndex++;
+		}
 	}
 	else if (Simba_DoubleClaw == iAnimIdx)
 	{
+		if (45 > m_iDebrisCount)
+		{
 
+		}
+		else if (45 == m_iDebrisCount)
+		{
+
+		}
 	}
 	else if (Simba_AttackJumpHit == iAnimIdx)
 	{
+		_uint iNumDebris = 2;
+		_uint iIndex = m_iLastDebrisIndex + 1;
+		if (iIndex >= m_vecDebris.size())
+			iIndex = 0;
 
+		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
+		vPos.y = 0;
+		for (_uint i = iIndex; i < iIndex + iNumDebris; i++)
+		{
+			m_vecDebris[iIndex]->Set_ParticleDebris(vPos);
+			m_listUsedDebris.push_back(iIndex);
+
+			m_iLastDebrisIndex++;
+		}
 	}
 	else if (Simba_DimensionLaser == iAnimIdx)
 	{
+		_uint iNumDebris = 2;
+		_uint iIndex = m_iLastDebrisIndex + 1;
+		if (iIndex >= m_vecDebris.size())
+			iIndex = 0;
 
+		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
+		vPos.y = 0;
+		for (_uint i = iIndex; i < iIndex + iNumDebris; i++)
+		{
+			m_vecDebris[iIndex]->Set_ParticleDebris(vPos);
+			m_listUsedDebris.push_back(iIndex);
+
+			m_iLastDebrisIndex++;
+		}
 	}
 
 	m_iDebrisCount++;
@@ -1059,9 +1162,11 @@ void CSimba::SetUp_FSM()
 		m_mapRotation[BITERUSHJUMP].insert(SIMBA_ANIM(i));
 	}
 	
-	for(_uint i = Simba_DimensionClaw; i<= Simba_DimensionClawWait; i++)
+	for (_uint i = Simba_DimensionClaw; i <= Simba_DimensionClawWait; i++) {
 		m_pFSM->Add_State(i, CSimba_DimensionClaw::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
-
+		m_setDimensionClawAnims.insert(SIMBA_ANIM(i));
+	}
+		
 	for (_uint i = Simba_BiteRush; i <= Simba_BiteRushEnd; i++) {
 		m_pFSM->Add_State(i, CSimba_BiteRush::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 		m_mapRotation[BITERUSH].insert(SIMBA_ANIM(i));
@@ -1071,9 +1176,11 @@ void CSimba::SetUp_FSM()
 		m_mapRotation[BITERUSH].insert(SIMBA_ANIM(i));
 	}
 
-	for (_uint i = Simba_DimensionLaser; i <= Simba_DimensionLaserWait; i++)
+	for (_uint i = Simba_DimensionLaser; i <= Simba_DimensionLaserWait; i++) {
 		m_pFSM->Add_State(i, CSimba_DimensionLaser::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
-
+		m_setDimensionLaserAnims.insert(SIMBA_ANIM(i));
+	}
+		
 	m_pFSM->Add_State(Simba_Death, CSimba_Death::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 	m_pFSM->Add_State(Simba_DemoDeadCut1, CSimba_Death::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 	m_pFSM->Add_State(Simba_DemoDeadCut2, CSimba_Death::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
@@ -1500,19 +1607,6 @@ void CSimba::ResetRotation()
 	m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), -1, -m_fAngle);
 }
 
-void CSimba::LaserAttack()
-{
-	_float4x4 matWorld = m_pTransformCom->ComputeBoneWorldMatrix(m_pLaserBone);
-	_float fScale = 24.f;
-	CUtils::Set_Scaled_Matrix(matWorld, fScale, fScale, fScale);
-	_float4 vLook{};
-	memcpy(&vLook, &(matWorld.m[2]), sizeof(_float4));
-	vLook = _float4(-vLook.x, -vLook.y, -vLook.z, 0);
-	memcpy(&(matWorld.m[2]), &vLook, sizeof(_float4));
-	m_pSimbaLaserTransform->Set_WorldMatrix(matWorld);
-	m_pSimbaLaser->Activate_Attack();
-}
-
 void CSimba::CreateDimensionClawActor()
 {
 	auto pPhysics = m_pGameInstance->Get_Physics();
@@ -1596,6 +1690,17 @@ void CSimba::RemoveDeadRocksFromList()
 	{
 		if (true == m_vecSimbaRocks[*iter]->Get_Hide())
 			iter = m_listUsedRocks.erase(iter);
+		else
+			iter++;
+	}
+}
+
+void CSimba::RemoveDeadDebrisFromList()
+{
+	for (auto& iter = m_listUsedDebris.begin(); iter != m_listUsedDebris.end();)
+	{
+		if (true == m_vecDebris[*iter]->Get_Dead())
+			iter = m_listUsedDebris.erase(iter);
 		else
 			iter++;
 	}
