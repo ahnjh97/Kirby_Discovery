@@ -1,6 +1,6 @@
 #pragma once
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "Deform.h"
 
 BEGIN(Engine)
 class CModel;
@@ -9,7 +9,7 @@ END
 
 BEGIN(Client)
 
-class CFinalDump final : public CGameObject
+class CFinalDump final : public CDeform
 {
 public:
 	struct DUMPDESC : GAMEOBJECT_DESC
@@ -39,7 +39,7 @@ private:
 	HRESULT			Bind_ShaderResources();
 
 	CModel* m_pModelCom = { nullptr };
-	CShader* m_pShaderCom = { nullptr };
+	CTexture* m_pMaskTextureCom = { nullptr };
 
 	_float	m_fGravity = { 0.f };
 	_bool	m_bBound = { false };

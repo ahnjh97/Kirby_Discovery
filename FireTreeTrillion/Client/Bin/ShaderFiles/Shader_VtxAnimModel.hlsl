@@ -34,6 +34,7 @@ float4 g_vCamPosition;
 
 float3 g_vDeformRimColor;
 float2 g_vUVOffset;
+float g_fDissolveRatio;
 
 
 struct VS_IN
@@ -797,7 +798,7 @@ PS_OUT PS_FOR_DEFORMRIM(PS_IN In)
     if (vDot < 0.1f)
         discard;
     
-    if (vMask.r < 0.3f)
+    if (vMask.r < g_fDissolveRatio)
         discard;
     
     vRimLightColor.rgb = g_vDeformRimColor.rgb * vDot;
@@ -805,7 +806,7 @@ PS_OUT PS_FOR_DEFORMRIM(PS_IN In)
     
     vRimLightColor += float4(0.4, 0.4, 0.4, 0);
 
-    Out.vDiffuse = saturate(vRimLightColor) * vMask;
+    Out.vDiffuse = saturate(vRimLightColor) * max(vMask, 0.2f);
     return Out;
 }
 

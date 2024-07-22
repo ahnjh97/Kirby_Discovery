@@ -39,7 +39,6 @@ HRESULT CCar::Initialize(void* pArg)
 	CParticle::PARTICLE_DESC ParticleDesc{};
 	ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	ParticleDesc.vInitPos = _float3(0.f, 0.5f, 0.f);
-
 	Add_Effect("YW Deform Ora", ParticleDesc, true);
 
 	return S_OK;
@@ -134,7 +133,8 @@ HRESULT CCar::Render()
 				return E_FAIL;
 			if (FAILED(m_pMaskTextureCom->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture")))
 				return E_FAIL;
-
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveRatio", &m_fDissolveRatio, sizeof(_float))))
+				return E_FAIL;
 			_float2 vTEXUV = { m_fUVOffsetTime , m_fUVOffsetTime };
 
 			if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVOffset", &vTEXUV, sizeof(_float2))))

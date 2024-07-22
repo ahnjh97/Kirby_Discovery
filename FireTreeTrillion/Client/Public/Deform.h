@@ -45,6 +45,7 @@ protected:
 	_float3			m_vDeformRimColor = { 1.f, 0.f, 0.f };
 	_int			m_iRenderCount = { 0 };
 	_float			m_fUVOffsetTime = { 0.f };
+	_float			m_fDissolveRatio = { 0.f };
 
 	CCharacterController*	m_pControllerCom = { nullptr };
 	CShader*				m_pShaderCom = { nullptr };

@@ -85,6 +85,8 @@ void CDeform::Compute_DeformRimLight(_float fTimeDelta)
     m_fDeformTime += fTimeDelta * 3.f;
     m_fUVOffsetTime += fTimeDelta * 0.5f;
 
+    m_fDissolveRatio = (sin(m_fUVOffsetTime * 5.f) + 1.f) * 0.25f;
+
     if (m_iComputeMode == 0)
     {
         if (m_fDeformTime > 1.f)
