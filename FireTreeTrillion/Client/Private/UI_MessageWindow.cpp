@@ -61,7 +61,8 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 	switch (*m_pCurrentLevelID)
 	{
 	case LEVEL_TOWN: case LEVEL_DEEDEEDEE:
-		vBtnTrans = { 503.f, -394.f, 1.f, 1.f };
+		//vBtnTrans = { 503.f, -394.f, 1.f, 1.f };
+		vBtnTrans = { 502.f, -394.f, 1.f, 1.f };
 		break;
 
 	case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE: default:
@@ -120,8 +121,17 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && WINDOW_SHOW == m_eCurState)
 	{
 		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_SELECT); //버튼 상태 동기화
+		
+		m_bIsSkipScript = FALSE;
 
-		m_iCurMessageIndex += 1; //벡터의 다음 문단 줄로 넘김
+		//07.22) 글자 단위 출력 상태에서 한번 더 키입력 했을 경우, 전체 문단을 출력
+		wstring wstrMsg = m_tMessageDesc.vecMsg[m_iCurMessageIndex];
+		if (m_iCurCharIndex < wstrMsg.length())
+			m_bIsSkipScript = TRUE;
+		
+		else
+			m_iCurMessageIndex += 1; //벡터의 다음 문단 줄로 넘김
+
 		m_iCurCharIndex = m_iCurCharIndexHightlight = m_iCurCharIdxPostHightlight = 0; //글자 수는 초기화
 		m_bSignalHightlight = m_bSignalPostHightlight = false;
 		
@@ -133,12 +143,29 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 			m_bEventCall = true;
 
 			//07.21) 커비의 상태를 홀드해제 (키입력 가능하게 처리)
-			CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
-			CHECK_NULLPTR(pKirby);
-			pKirby->DialogOff();
+			if (m_bIsSetKirby)
+			{
+				CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+				CHECK_NULLPTR(pKirby);
+
+				CCharacterController* pKirbyController = dynamic_cast<CCharacterController*>(pKirby->Get_Component(TEXT("Com_Controller")));
+				CHECK_NULLPTR(pKirby);
+				CTransform* pKirbyTrans = pKirby->Get_TransformCom();
+
+				_float4 vDialogKirbyDir = {};
+				switch (*m_pCurrentLevelID)
+				{
+				case LEVEL_TOWN:
+					vDialogKirbyDir = { 1.f, 0.f, 0.f, 0.f }; //타운에서 디디디대왕과 대화 이후, 파크 맵 입구 진입 시점
+					break;
+				}
+
+				pKirby->DialogOff(vDialogKirbyDir);
+				m_bIsSetKirby = FALSE;
+			}
 		}
 
-		if(LEVEL_SIMBA == *m_pCurrentLevelID)
+		if(LEVEL_SIMBA == *m_pCurrentLevelID && !m_bIsSkipScript)
 		{ 
 			if (1 == m_iCurMessageIndex)
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_NEXT_DIALOG1);
@@ -150,8 +177,10 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 			}
 			if (8 == m_iCurMessageIndex)
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_NEXT_DIALOG2);
+
 			if (m_iCurMessageIndex == m_tMessageDesc.vecMsg.size() - 1)
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_LAST_DIALOG);
+
 			if (m_iCurMessageIndex == m_tMessageDesc.vecMsg.size())
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_APPEAR_END);
 		}
@@ -305,45 +334,48 @@ void CUI_MessageWindow::Show_DialogMessage()
 #pragma region SET_DIALOG KIRBY, CAMERA DIR & POS
 
 	//07.21) 커비의 상태를 홀드 (키입력하지 않게 처리)
+	m_eCurState = WINDOW_SHOW;
+	m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_BLINK);	//버튼 상태 동기화
+
+	//07.22) 특정 레벨의 경우, 커비 상태 홀드 예외처리
+	if (LEVEL_PARTTIME == *m_pCurrentLevelID || LEVEL_SIMBA == *m_pCurrentLevelID) 
+		return;
+
 	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 	CHECK_NULLPTR(pKirby);
+	CCharacterController* pKirbyController = dynamic_cast<CCharacterController*>(pKirby->Get_Component(TEXT("Com_Controller")));
+	CHECK_NULLPTR(pKirbyController);
 
-	//07.21) 다이얼로그 활성화 상태의 카메라 상태 세팅
-	CCamera_Main* pDialogCam = static_cast<CCamera_Main*>(m_pGameInstance->
-		Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
-	CHECK_NULLPTR(pDialogCam);
+	//07.21) 다이얼로그 활성화 상태의 커비 세팅
+	_float4 vDialogKirbyPos = { };
+	_float4 vDialogKirbyDir = { };
+	CTransform* pKirbyTrans = pKirby->Get_TransformCom();
+	//pKirbyTrans->Set_State(CTransform::STATE_POSITION, vDialogKirbyPos);
 
-	_float4 vDialogKirbyDir = { 0.f, 0.f, 0.f, 1.f };
-	_float4 vDialogKirbyPos = { 0.f, 0.f, 0.f, 1.f };
-
-	_float3 vDialogCamDir = { 0.f, 0.f, 0.f };
-	_float3 vDialogCamPos = { 0.f, 0.f, 0.f };
 	switch (*m_pCurrentLevelID)
 	{
 	case LEVEL_DEEDEEDEE:
+		//vDialogKirbyPos = { 2.73f, 23.11f, -11.54f, 1.f };
+		//pKirbyController->Set_Position(pKirbyTrans, vDialogKirbyPos);
+
 		vDialogKirbyDir = { 1.f, 1.f, 1.f, 1.f };
-		vDialogKirbyPos = { 10.f, 23.f, 1.f, 1.f };
 		break;
 
 	case LEVEL_TOWN:
+		//대화 대상에 따라 분기 처리 필요
+		//vDialogKirbyPos = { 10.f, 23.f, 1.f, 1.f };
 		vDialogKirbyDir = { 1.f, 1.f, 1.f, 1.f };
-		vDialogKirbyPos = { 10.f, 23.f, 1.f, 1.f };
-		vDialogCamDir = { -5.f, 39.f, 30.f };
-		vDialogCamPos = { -0.3f, -0.2f, 0.93f };
 		break;
 
 	default:
 		break;
 	}
+
 	pKirby->DialogOn(vDialogKirbyDir);
-	CTransform* pTransCom = pKirby->Get_TransformCom();
-	pTransCom->Set_State(CTransform::STATE_POSITION, vDialogKirbyPos);
-	pDialogCam->Lock_All(vDialogCamDir, vDialogCamPos, true);
+	m_bIsSetKirby = TRUE;
 
 #pragma endregion
 	
-	m_eCurState = WINDOW_SHOW;
-	m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_BLINK);	//버튼 상태 동기화
 }
 
 HRESULT CUI_MessageWindow::Add_Transform(void* _pArg)
@@ -434,7 +466,13 @@ HRESULT CUI_MessageWindow::Display_Message(_float _fTimeDelta)
 			wstring wstrMsg = m_tMessageDesc.vecMsg[m_iCurMessageIndex];
 
 			if (m_iCurCharIndex < wstrMsg.length()) //메시지 길이 체크
-				m_iCurCharIndex++;
+			{
+				if (m_bIsSkipScript)
+					m_iCurCharIndex = wstrMsg.length();
+
+				else
+					m_iCurCharIndex++;
+			}
 		}
 
 		// for hight-light
@@ -442,7 +480,13 @@ HRESULT CUI_MessageWindow::Display_Message(_float _fTimeDelta)
 		if (m_bSignalHightlight)
 		{
 			if (m_iCurCharIndexHightlight < wstrHighlightMsg.length()) //메시지 길이 체크
-				m_iCurCharIndexHightlight++;
+			{
+				if (m_bIsSkipScript)
+					m_iCurCharIndexHightlight = wstrHighlightMsg.length();
+
+				else
+					m_iCurCharIndexHightlight++;
+			}
 		}
 
 		// for post hight-light
@@ -450,7 +494,13 @@ HRESULT CUI_MessageWindow::Display_Message(_float _fTimeDelta)
 		if (m_bSignalPostHightlight)
 		{
 			if (m_iCurCharIdxPostHightlight < wstrPostHighlightMsg.length()) //메시지 길이 체크
-				m_iCurCharIdxPostHightlight++;
+			{
+				if (m_bIsSkipScript)
+					m_iCurCharIdxPostHightlight = wstrPostHighlightMsg.length();
+
+				else
+					m_iCurCharIdxPostHightlight++;
+			}
 		}
 	}
 

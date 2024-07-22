@@ -223,6 +223,13 @@ void CStarBlock::Break_From_Car()
 		pKirby->Set_HitStop();
 	m_pGameInstance->Setting_RadialBlur(10.f, 10.f);
 
+	CMultiEffect::MULTI_FX_DESC Effectdesc = {};
+	Effectdesc.vInitPos = (_float3)m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	Effectdesc.vInitScale = { 2.f, 2.f, 2.f };
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
+		return;
+
+
 	m_pGameInstance->DisableActor(m_pStaticActor);
 	m_bDead = true;
 }

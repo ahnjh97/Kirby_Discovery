@@ -120,6 +120,13 @@ void CBreakableRock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXOb
 	vDir.Normalize();
 	m_vDamegeDir = (_float3)vDir;
 	m_fHitPower = pKirby->Get_KirbyInfo()->m_fMoveSpeed;
+
+	CMultiEffect::MULTI_FX_DESC Effectdesc = {};
+	Effectdesc.vInitPos = (_float3)m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	Effectdesc.vInitScale = { 2.f, 2.f, 2.f};
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
+		return;
+
 }
 
 HRESULT CBreakableRock::Add_Components(wstring strPrototag)

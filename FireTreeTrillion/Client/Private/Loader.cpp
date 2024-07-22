@@ -216,6 +216,7 @@
 #include "UI_BtnIcon.h"
 #include "UI_Fading.h"
 #include "UI_Interactable.h"
+#include "LoadingStart.h"
 
 // æ∆¿Ã≈€
 #include "Food.h"
@@ -407,6 +408,8 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Fading"), CUI_Fading);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Interactable"), CUI_Interactable);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LoadingStart"), CLoadingStart);
 
 	//DIALOG
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Dialog"), CDialog);
@@ -1588,7 +1591,7 @@ HRESULT CLoader::Add_FXTexture()
 	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_LeftRight", "Effects/Mask/Mask_LeftRight.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_Outline", "Effects/Mask/Mask_Outline.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_GunFire", "Effects/Mask/Mask_GunFire.png");	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_PillarMask", "Effects/Mask/Mask_Pillar_%d.png", 2);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_PillarMask", "Effects/Mask/Mask_Pillar_%d.png", 3);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_RoundMask", "Effects/Mask/Mask_Round.png");	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "FX_Mask_UpMask", "Effects/Mask/Mask_Up.png");	CHECK_FAILED(hr);
 
@@ -1713,6 +1716,10 @@ HRESULT CLoader::Add_StaticUITexture()
 
 	//UI_Interacting
 	hr = Add_Texture(LEVEL_STATIC, "UI_Interacting", "UI/Quest/TalkIconBalloon.png");	CHECK_FAILED(hr);
+
+	//UI_LoadingStart
+	hr = Add_Texture(LEVEL_STATIC, "UI_LoadingStart", "UI/LoadingStart/WorldIconLevel%d.png", 3);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "UI_LoadingStartSide", "UI/LoadingStart/ComebackAreaCountBaseLv%d.png", 3);	CHECK_FAILED(hr);
 
 	return S_OK;
 }

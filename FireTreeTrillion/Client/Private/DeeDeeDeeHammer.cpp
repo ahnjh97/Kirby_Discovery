@@ -232,10 +232,18 @@ void CDeeDeeDeeHammer::Ready_FadeOut()
 		CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
 		CHECK_NULLPTR(pKirby);
 
-		CTransform* pTransCom = pKirby->Get_TransformCom();
-		_float4 vPos = pTransCom->Get_State_Float4(CTransform::STATE_POSITION);
-		_float4 vNormLook = XMVector4Normalize(pTransCom->Get_State_Float4(CTransform::STATE_LOOK));
-		pCameraMain->Lock_All({ vPos.x - 0.1f,  vPos.y + 3.f,  vPos.z - 0.1f }, { vNormLook.x, -0.2f, vNormLook.z }, true);
+		CCharacterController* pKirbyController = dynamic_cast<CCharacterController*>(pKirby->Get_Component(TEXT("Com_Controller")));
+		CHECK_NULLPTR(pKirbyController);
+
+		//커비 위치 세팅
+		CTransform* pKirbyTrans = pKirby->Get_TransformCom();
+		_float4 vDialogKirbyPos = { 2.73f, 23.11f, -11.54f, 1.f };
+		pKirbyController->Set_Position(pKirbyTrans, vDialogKirbyPos);
+		pCameraMain->Lock_All({ 4.85f,  27.19f,  -31.27f }, { -0.09f, -0.09f, 0.99f }, FALSE);
+
+		//_float4 vKirbyPos = pKirbyTrans->Get_State_Float4(CTransform::STATE_POSITION);
+		//_float4 vNormLook = XMVector4Normalize(pKirbyTrans->Get_State_Float4(CTransform::STATE_LOOK));
+		//pCameraMain->Lock_All({ vPos.x - 0.1f,  vPos.y + 3.f,  vPos.z - 0.1f }, { vNormLook.x, -0.2f, vNormLook.z }, true);
 
 #pragma endregion
 

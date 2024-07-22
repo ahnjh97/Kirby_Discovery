@@ -92,9 +92,9 @@ public:
 	void ChangeDimensionClawUpDown() { m_bDimensionClawUpAttack = !m_bDimensionClawUpAttack; }
 	void Set_StarPosToRightHand() { m_bBiteRushSpawnStarAtLeft = false; }
 	void Set_StarPosToLeftHand() { m_bBiteRushSpawnStarAtLeft = true; }
-	void Set_LaserActivation(_bool bLaserActivation) { m_bLaserActivated = bLaserActivation; HideDimensionLaserActor(); }
 	void ResetRockCount() { m_iRockCount = 0; }
 	_uint Get_RockCount() { return m_iRockCount; }
+	_uint Get_DebrisCount() { return m_iDebrisCount; }
 
 public:
 	virtual HRESULT Initialize_Prototype()			override;
@@ -113,10 +113,13 @@ public:
 	void			CreateHpBar();
 	void			SpawnStar(_uint iAnimIdx);
 	_bool			IsKirbyOnMyLeft();
+
 	void			SetUpDimensionClawWorldMatrix();
 	void			MoveDimensionClaw(_float fTimeDelta);
 	void			HideDimensionClawActor();
 	void			HideDimensionLaserActor();
+	void			LaserAttack(_float fTimeDelta);
+
 	void			SpawnRocks(_uint iAnimIdx);
 	void			SpawnDebris(_uint iAnimIdx);
 
@@ -171,6 +174,8 @@ private:
 
 	unordered_set<SIMBA_ANIM> m_setAppear1Anims;
 	unordered_set<SIMBA_ANIM> m_setUndamagableAnims;
+	unordered_set<SIMBA_ANIM> m_setDimensionClawAnims;
+	unordered_set<SIMBA_ANIM> m_setDimensionLaserAnims;
 
 	unordered_set<SIMBA_ANIM> m_mapRotation[ROTATION_END];			
 
@@ -202,6 +207,7 @@ private:
 	list<_uint>		m_listUsedDebris;
 
 	unordered_set<SIMBA_ANIM>	m_setResetRequiredAnims;
+	_uint			m_iLastDebrisIndex = {};
 
 private:
 	HRESULT		Add_Components();
@@ -236,10 +242,10 @@ private:
 	void		TurnSimba(_float fAngle);
 	void		ResetRotation();
 
-	void		LaserAttack();
 	void		CreateDimensionClawActor();
 	void		OnSimbaAttackTrigger();
 	void		RemoveDeadRocksFromList();
+	void		RemoveDeadDebrisFromList();
 
 public:
 	static CSimba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
