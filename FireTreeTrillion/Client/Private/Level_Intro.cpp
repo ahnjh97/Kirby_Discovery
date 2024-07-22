@@ -272,8 +272,8 @@ void CLevel_Intro::Fog_Tick(_float fTimeDelta)
 	break;
 	case UPSTAIRS_FOG:
 	{
-		m_pGameInstance->Increase_FogYValue(fTimeDelta);
-		m_pGameInstance->Increase_FogViewValue(fTimeDelta);
+		m_pGameInstance->Increase_FogYValue(fTimeDelta * 0.5f);
+		m_pGameInstance->Increase_FogViewValue(fTimeDelta * 0.5f);
 	}
 	break;
 

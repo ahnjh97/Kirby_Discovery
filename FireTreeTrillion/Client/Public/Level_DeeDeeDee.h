@@ -14,9 +14,11 @@ private:
 	virtual ~CLevel_DeeDeeDee() = default;
 
 public:
-	virtual HRESULT Initialize() override;
-	virtual void Tick(_float fTimeDelta) override;
-	virtual HRESULT Render() override;
+	virtual HRESULT Initialize()			override;
+	virtual void	Tick(_float fTimeDelta) override;
+	virtual HRESULT Render()				override;
+
+	void			Fog_Tick(_float fTimeDelta);
 
 private:
 	void	Ready_FadeIn();
