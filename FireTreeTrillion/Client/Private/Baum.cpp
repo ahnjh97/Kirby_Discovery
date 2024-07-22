@@ -274,6 +274,13 @@ void CBaum::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pOb
 {
 	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
+		CMultiEffect::MULTI_FX_DESC Effectdesc = {};
+		Effectdesc.vInitPos = (_float3)m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		Effectdesc.vInitScale = { 5.f, 5.f, 5.f };
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
+			return;
+
+
 		m_bDead = true;
 	}
 }

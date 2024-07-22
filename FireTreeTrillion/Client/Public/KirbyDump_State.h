@@ -60,6 +60,7 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_bool	m_bEffectTrigger = { true };
 	_float	m_fRunTime = { 0.f };
 	_bool	m_bShakeTrigger = { true };
 	static	CKirbyDump_Cut_State* Create();

@@ -1033,6 +1033,12 @@ void CCollisionCenter::Body_To_Body_Collision()
 				{
 					pMonster->Set_PhyXState(PO_PRESSED);
 
+					CMultiEffect::MULTI_FX_DESC Effectdesc = {};
+					Effectdesc.vInitPos = (_float3)pMonster->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
+					Effectdesc.vInitScale = { 2.f, 2.f, 2.f };
+					if (FAILED(GAMEINSTANCE Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
+						return;
+
 					pKirby->Set_HitStop();
 					pthis->Camera_Shaking(1.2f);
 					return;
