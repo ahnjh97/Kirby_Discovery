@@ -152,6 +152,7 @@
 #include "RoomGlass.h"
 #include "Throne.h"
 #include "OriginCage.h"
+#include "BossOrigin.h"
 
 // Simba
 #include "Simba.h"
@@ -576,6 +577,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("RoomGlass"), CRoomGlass);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Throne"), CThrone);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OriginCage"), COriginCage);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossOrigin"), CBossOrigin);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Simba"), CSimba);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaLaser"), CSimbaLaser);
@@ -2163,7 +2165,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("RoomGlass_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Throne_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("OriginCage_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
-
+		m_vecModelInfo.emplace_back("BossOrigin_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		// For Kirby Body
 		Load_KirbyBodyModels();

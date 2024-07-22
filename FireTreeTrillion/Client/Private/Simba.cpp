@@ -102,7 +102,7 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_setAppear1Anims = { Simba_DemoAppear1Cut2, Simba_DemoAppear1Cut2Wait, Simba_DemoAppear1Cut3, Simba_DemoAppear1Cut3Wait,
 		Simba_DemoAppear1Cut4, Simba_DemoAppear1Cut4Wait };
 
-	m_setUndamagableAnims = { Simba_Death, Simba_DemoDeadCut1, Simba_DemoDeadCut2 };
+	m_setUndamagableAnims = { Simba_Death, Simba_DemoDeadCut1, Simba_DemoDeadCut2, Simba_Roar2, Simba_Damage };
 
 	m_setResetRequiredAnims = { Simba_AttackJumpHit, Simba_BiteRush, Simba_DimensionClaw, Simba_DimensionClawContinue,
 		Simba_DimensionLaser, Simba_DoubleClaw, Simba_FinalCrusher, Simba_QuickClawL, Simba_QuickClawR, Simba_QuickClaw2L, Simba_QuickClaw2R };
@@ -669,6 +669,14 @@ _bool CSimba::IsKirbyOnMyLeft()
 		return false;
 }
 
+_bool CSimba::IsDamagable()
+{
+	if(m_setUndamagableAnims.end() != m_setUndamagableAnims.find(SIMBA_ANIM(Get_State())))
+		return false;
+
+	return true;
+}
+
 void CSimba::SetUpDimensionClawWorldMatrix()
 {
 	if (nullptr == m_pDimensionClawActor)
@@ -1051,15 +1059,15 @@ void CSimba::SetUpSecondTarget()
 		pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_BOTH);
 }
 
-void CSimba::QuickClawNailFlash(_uint eSimbaAnim)
+void CSimba::QuickClawNailFlash(_uint eSimbaAnim) // YW : Effect 영우형 여기임 검지손톱 번쩍
 {
-	if (Simba_QuickClawStartL == eSimbaAnim) // YW : Effect 영우형 여기임 왼쪽 검지손톱 번쩍
+	if (Simba_QuickClawStartL == eSimbaAnim) // 왼손
 	{
 		_float3 vOffset = _float3(); // Right Up Look 오프셋 계수
 		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_vecLeftNailBones[INDEX], vOffset);
 
 	}
-	else if (Simba_QuickClawStartR == eSimbaAnim) // YW : Effect 영우형 여기임 오른쪽 검지손톱 번쩍
+	else if (Simba_QuickClawStartR == eSimbaAnim) // 오른손
 	{
 		_float3 vOffset = _float3(); // Right Up Look 오프셋 계수
 		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_vecRightNailBones[INDEX], vOffset);
@@ -1479,7 +1487,7 @@ void CSimba::SpawnMonsters(_uint iTriggerIndex)
 	else if (12 == iTriggerIndex)
 	{
 		if (0 == m_iMonsterCount)
-			wstrMonsterName = TEXT("Awoofy"); // AwoofyWild로 바꿔야할수도 흠
+			wstrMonsterName = TEXT("AwoofyWild"); // AwoofyWild로 바꿔야할수도 흠
 		else if (1 == m_iMonsterCount)
 			wstrMonsterName = TEXT("Rabbit");
 		else if (2 == m_iMonsterCount)

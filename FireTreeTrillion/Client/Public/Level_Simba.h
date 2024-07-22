@@ -32,6 +32,7 @@ private:
 	CTexture* m_pEnvTexture[TYPE_END] = { nullptr, nullptr, nullptr };
 
 private:
+	_bool m_bSimbaApperaNotified = { false };
 	_bool m_bWave1DeadNotified = { false };
 	_bool m_bWave2DeadNotified = { false };
 	_bool m_bWave2Dead = { false };

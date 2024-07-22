@@ -100,8 +100,12 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 	{
-		func = bind(&CUI_MessageWindow::Start_Message, this, placeholders::_1);
-		pEventCenter->Subscribe(KEVENT_SIMBA_APPEAR_START, this, func);
+		//func = bind(&CUI_MessageWindow::Start_Message, this, placeholders::_1);
+		//pEventCenter->Subscribe(KEVENT_SIMBA_APPEAR_START, this, func);
+
+		// 피직스 트리거 함수 바인딩 및 등록
+		function<void(_int)> func2 = bind(&CUI_MessageWindow::StartSimbaDialog, this);
+		m_pGameInstance->Emplace_TriggerFunc(TRIGGER_EVENT, func2);
 	}
 
 	m_bEventCall = false;
@@ -776,6 +780,17 @@ void CUI_MessageWindow::Ready_FadeOut()
 	}
 }
 
+void CUI_MessageWindow::StartSimbaDialog()
+{
+	if (true == m_bSimbaApperaNotified)
+		return;
+
+	m_bSimbaApperaNotified = true;
+	Reset_MessageIndex(nullptr);
+	m_eCurState = WINDOW_SHOW;
+	Show_DialogMessage();
+}
+
 CUI_MessageWindow* CUI_MessageWindow::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CUI_MessageWindow* pInstance = new CUI_MessageWindow(pDevice, pContext);
@@ -804,7 +819,7 @@ CGameObject* CUI_MessageWindow::Clone(void* pArg)
 
 void CUI_MessageWindow::Free()
 {
-	CEventCenter::Get_Instance()->Unsubscribe(this);
+	//CEventCenter::Get_Instance()->Unsubscribe(this);
 
 	__super::Free();
 

@@ -19,7 +19,7 @@ static _int s_iParkDecoIdx = -1;
 static _int s_iLevelIndex = 0;
 static _int s_iTempLevelIdx = -1;
 
-static const _char* s_triggerTypes[] = {"Camera", "Shader", "Star", "LevelChanger", "Monster"};
+static const _char* s_triggerTypes[] = {"Camera", "Shader", "Star", "LevelChanger", "Monster", "SimbaAttack", "Event" };
 static _int s_iTriggerType = -1;
 static const _char* s_triggerIndices[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10",
 									"11", "12", "13", "14", "15", "16", "17", "18", "19", "20" };

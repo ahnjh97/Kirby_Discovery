@@ -379,8 +379,12 @@ PS_OUT TRIGGER(PS_IN In)
         Out.vDiffuse = vector(0, 0, 1, 1);
     else if (g_iTriggerType == 3)
         Out.vDiffuse = vector(0, 0.45f, 0.45f, 1);
-    else if (g_iTriggerType == 4)
+    else if (g_iTriggerType == 4) // Monster
         Out.vDiffuse = vector(1, 0, 0, 1);
+    else if (g_iTriggerType == 5) // Simba Attqck
+        Out.vDiffuse = vector(0, 0, 0, 1);
+    else if (g_iTriggerType == 6) // Event
+        Out.vDiffuse = vector(0, 1, 0, 1);
     else
         Out.vDiffuse = vector(1, 1, 1, 1);
     
