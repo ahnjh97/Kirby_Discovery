@@ -732,11 +732,7 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
 		Add_Effect("HS_FB Slash R Multi", FXDesc, false);
 
-		CParticle::PARTICLE_DESC ParticleDesc{};
-		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
-		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
-		Add_Effect("HS_FinalBossSlash particle L", FXDesc, false);
+
 
 	}
 	break;
@@ -753,11 +749,6 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
 		Add_Effect("HS_FB Slash L Multi", FXDesc, false);
 
-		CParticle::PARTICLE_DESC ParticleDesc{};
-		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
-		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
-		Add_Effect("HS_FinalBossSlash particle R", FXDesc, false);
 	}
 	break;
 	case FINALBOSS_SWINGFINISHLEFT:
@@ -773,11 +764,7 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
 		Add_Effect("HS_FB Slash L Multi", FXDesc, true);
 
-		CParticle::PARTICLE_DESC ParticleDesc{};
-		ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
-		ParticleDesc.vInitPos = { 0.f,7.f, 0.f };
-		Add_Effect("HS_FinalBossSlash particle R", FXDesc, false);
+
 	}
 	break;
 	default:

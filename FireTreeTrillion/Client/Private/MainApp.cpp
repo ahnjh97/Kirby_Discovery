@@ -430,8 +430,6 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 	}
 
-	
-
 	return	S_OK;
 }
 
