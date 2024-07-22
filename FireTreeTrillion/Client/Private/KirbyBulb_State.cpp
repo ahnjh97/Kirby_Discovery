@@ -142,6 +142,8 @@ void CKirbyBulb_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
     CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
     Kirby_EyeState_Assist(Kirbydesc);
 
+    Bbong_FX(fTimeDelta, pTransformCom);
+
     if (DESC(m_pLight) != nullptr)
         DESC(m_pLight)->Update_LightPos(pKirby->Get_BulbLightPos());
 
@@ -380,6 +382,12 @@ void CKirbyBulb_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
     if (pKirby->Get_State() == CKirby::BULBSTATE_JUMP || pKirby->Get_State() == CKirby::BULBSTATE_LIGHTONAIR)
     {
+        if (m_bJumpEffectTrigger == true && (pKirby->Get_State() == CKirby::BULBSTATE_JUMP))
+        {
+            Jump_FX(pTransformCom);
+            m_bJumpEffectTrigger = false;
+        }
+
         // 0.3초 동안만 누적이 된다.
         if (DESC(m_bRePressBlock) == false && m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS) && DESC(m_fJumpHoldTime) < 0.3f)
         {
@@ -610,6 +618,7 @@ void CKirbyBulb_Jump_State::OnStateExit()
 {
     m_fFallTime = 0.f;
     m_fChangeRunTime = 0.f;
+    m_bJumpEffectTrigger = true;
 }
 
 CKirbyBulb_Jump_State* CKirbyBulb_Jump_State::Create()

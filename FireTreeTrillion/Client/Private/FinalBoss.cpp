@@ -178,10 +178,20 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	}
 	else if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
 		Change_State(FINALBOSS_DEMOAPPEARCUT5, 50.f, false, false);
-	else if (m_pGameInstance->Get_KeyState(DIK_O, KEY_DOWN))
+	else if (m_pGameInstance->Get_KeyState(DIK_O, KEY_DOWN) || m_fHp < 0.f)
 	{
 		Change_State(FINALBOSS_LASTDAMAGESTART, 50.f, false, true);
 		m_pControllerCom->Set_Position(m_pTransformCom, XMVectorSet(0.f, 0.f, 0.f, 1.f));
+	}
+	else if (m_pGameInstance->Get_KeyState(DIK_I, KEY_DOWN))
+		m_bAuto = !m_bAuto;
+
+	if (FINALBOSS_RECOVERYWAIT == Get_State())
+	{
+		if (m_fHp < (m_fBeforeHp - m_fMaxHp * 0.1f))
+		{
+			Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
+		}
 	}
 
 	if (true == m_bGlide)

@@ -289,6 +289,7 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	_float fAnimRatio = pSimba->Get_AnimRatio();
 	_uint iStarCount = pSimba->Get_StarCount();
 	_uint iRockCount = pSimba->Get_RockCount();
+	_uint iDebrisCount = pSimba->Get_DebrisCount();
 
 	if(CSimba::Simba_FinalCrusherStart == iState && (0.3f > fAnimRatio || 0.93f < fAnimRatio ))
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
@@ -365,6 +366,7 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	_float fAnimRatio = pSimba->Get_AnimRatio();
 	_uint iStarCount = pSimba->Get_StarCount();
 	_uint iRockCount = pSimba->Get_RockCount();
+	_uint iDebrisCount = pSimba->Get_DebrisCount();
 
 	if (CSimba::Simba_DoubleClawChargeStart == iState && fAnimRatio < 0.18f) {
 		_float fRatio = RATIO(fAnimRatio, 0, 0.18f);
@@ -373,6 +375,14 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		
 	else if (CSimba::Simba_DoubleClawDash == iState)
 	{
+		if (0.f <= fAnimRatio && 5 <= pSimba->Get_DebrisCount())
+			pSimba->ResetDebrisCount();
+
+		for (_uint i = 0; i < 5; i++) {
+			if (i * 0.2f < fAnimRatio && i == iRockCount)
+				pSimba->SpawnDebris(iState);
+		}
+
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 1.8f);
 		_vector vLook = m_pTransform->Get_State_Vector(CTransform::STATE_LOOK) * fTimeDelta * 13.5f;
 		m_pController->Move_Dir(m_pTransform, vLook, fTimeDelta, s_fOffsetY);
@@ -383,21 +393,27 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	}
 	else if (CSimba::Simba_DoubleClaw == iState)
 	{
-		if(0.2f > fAnimRatio)
+		if (0.2f > fAnimRatio) {
 			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
 
-		for (_uint i = 0; i < 45; i++)
-		{
-			if (i * 0.006f < fAnimRatio && i == iRockCount) {
-				pSimba->SpawnRocks(iState);
-				pSimba->SpawnDebris(iState);
+			for (_uint i = 0; i < 5; i++) {
+				if (i * 0.04f < fAnimRatio && i == iDebrisCount)
+					pSimba->SpawnDebris(iState);
 			}
 		}
+			
+		for (_uint i = 0; i < 45; i++)
+		{
+			if (i * 0.006f < fAnimRatio && i == iRockCount)
+				pSimba->SpawnRocks(iState);
+		}
+
+		if(0.2f < fAnimRatio && 5 == iDebrisCount)
+			pSimba->SpawnDebris(iState);
 
 		if (0.224f < fAnimRatio && 0 == iStarCount) {
 			pSimba->SpawnStar(iState);
 			pSimba->DoubleClawSweep();
-			pSimba->SpawnDebris(iState);
 		}
 	}
 		
@@ -660,8 +676,10 @@ void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 			pSimba->SpawnRocks(iState);
 			pSimba->SpawnDebris(iState);
 		}
-		else if (0.1f < fAnimRatio && 1 == iRockCount)
+		else if (0.1f < fAnimRatio && 1 == iRockCount) {
 			pSimba->SpawnRocks(iState);
+			pSimba->SpawnDebris(iState);
+		}
 	}
 		
 	if (pSimba->IsAnimFinished())
@@ -979,8 +997,9 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			|| fDis > m_pController->RayCastToStaticActor(vLook3) || 2.8f < m_fTime)
 			pSimba->Change_State(CSimba::Simba_BiteRushTiredStart, 50.f, false, false);
 
-		if (0.15f < fAnimRatio && 0.7f > fAnimRatio && 0 == iStarCount) {
+		if (0.f < fAnimRatio && 2 <= pSimba->Get_StarCount())
 			pSimba->ResetStarCount();
+		else if (0.15f < fAnimRatio && 0.7f > fAnimRatio && 0 == iStarCount) {
 			pSimba->Set_StarPosToLeftHand();
 			pSimba->SpawnStar(iState);
 		}

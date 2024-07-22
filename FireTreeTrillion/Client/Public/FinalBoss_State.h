@@ -4,6 +4,8 @@
 
 BEGIN(Client)
 
+static _uint m_iCnt = { 0 };
+
 //*********************************
 //			APPEAR STATE
 //*********************************
@@ -25,7 +27,6 @@ public:
 	virtual void Free() override;
 };
 
-static _uint m_iCnt = { 0 };
 //*********************************
 //			IDLE STATE
 //*********************************
@@ -47,8 +48,8 @@ private:
 	_vector m_vReturnPos = {};
 
 	_float	m_fDelayTime = { 0.f };
-	_uint	m_iCnt = { 0 };
 
+	_uint	m_iMeteor = { 0 };
 	//_vector	m_ShortestPos = {};
 
 public:

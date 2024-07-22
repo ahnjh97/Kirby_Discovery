@@ -413,18 +413,18 @@ HRESULT CAwoofy::Add_Components(const wstring& wstrModelName)
 	/* FSM */
 	SetUp_FSM();
 
-	if (LEVEL_TOWN != *m_pGameInstance->Get_CurrentLevelID())
-	{
-		CHitBox::HITBOX_DESC HitBox{};
-		HitBox.pOwner = this;
-		HitBox.pDesc = &m_tColliderDesc[BODY];
-		HitBox.pCollisionType = MONSTER;
-		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
-			return E_FAIL;
-		Set_BodyCollider(COLLIDER_CYLINDER, 1.f, 1.5f, 0.85f);
-		if (LEVEL_SIMBA == *m_pCurrentLevelID)
-			Set_BodyCollider(COLLIDER_CYLINDER, 1.5f, 2.15f, 0.85f);
-	}
+
+	CHitBox::HITBOX_DESC HitBox{};
+	HitBox.pOwner = this;
+	HitBox.pDesc = &m_tColliderDesc[BODY];
+	HitBox.pCollisionType = MONSTER;
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+		return E_FAIL;
+
+	if(m_pModelCom->Get_ModelName() != "Awoofy")
+		Set_BodyCollider(COLLIDER_SPHERE, 1.f, 1.5f, 1.2f);
+	else
+		Set_BodyCollider(COLLIDER_SPHERE, 1.f, 1.5f, 1.5f);
 
 	return S_OK;
 }

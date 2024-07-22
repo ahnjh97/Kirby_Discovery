@@ -94,7 +94,10 @@ public:
 	void Set_StarPosToLeftHand() { m_bBiteRushSpawnStarAtLeft = true; }
 	void ResetRockCount() { m_iRockCount = 0; }
 	_uint Get_RockCount() { return m_iRockCount; }
+	void ResetDebrisCount() { m_iDebrisCount = 0; }
 	_uint Get_DebrisCount() { return m_iDebrisCount; }
+
+	_bool Get_Wave2Summoned() { return m_bWave2Summoned; }
 
 public:
 	virtual HRESULT Initialize_Prototype()			override;
@@ -207,7 +210,9 @@ private:
 	list<_uint>		m_listUsedDebris;
 
 	unordered_set<SIMBA_ANIM>	m_setResetRequiredAnims;
-	_uint			m_iLastDebrisIndex = {};
+	_uint			m_iNextDebrisIndex = {};
+	_bool			m_bStateChanged = { false };
+	_bool			m_bWave2Summoned = { false };
 
 private:
 	HRESULT		Add_Components();
