@@ -104,9 +104,7 @@ HRESULT CMeteor::Initialize(void* pArg)
 	CEffect::FX_DESC FXDesc{};
 	FXDesc.pSocketMatrix = &m_EffectSocket;
 	FXDesc.vInitPos = { 0.f, 1.4f, -.5f };
-	//FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 	FXDesc.fStartDelay = 2.f;
-	//FXDesc.vInitRot = { 90.f, 0.f, 0.f };
 
 	Add_Effect("HS_meteo dash line", FXDesc, true);
 
@@ -123,6 +121,7 @@ _int CMeteor::Tick(_float fTimeDelta)
 		{
 			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 			vPos.m128_f32[1] += 10.f;
+
 			for (_uint i = 0; i < 6; ++i)
 			{
 				HRESULT hr;
@@ -149,6 +148,17 @@ _int CMeteor::Tick(_float fTimeDelta)
 			AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
 			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 			CHECK_FAILED(hr);
+
+			
+			//이펙트
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.vInitPos = static_cast<_float3>(GET_POS) + (_float3)CUtils::Make_Random_Vector(2.f);
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+			_float fScale = CUtils::Make_RandomFloat(20.f, 30.f);
+			FXDesc.vInitScale = { fScale, fScale, fScale };
+
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
+				return E_FAIL;
 
 			// 파티클 살리기
 			for (_uint i = 0; i < DEBRISCNT; ++i)
@@ -201,17 +211,6 @@ _int CMeteor::Tick(_float fTimeDelta)
 						pCamera->Make_Shake(1.f, 2.5f);
 				}
 
-				//이펙트
-				CEffect::FX_DESC FXDesc{};
-				FXDesc.vInitPos = static_cast<_float3>(GET_POS) + (_float3)CUtils::Make_Random_Vector(2.f);
-				FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
-				_float fScale = CUtils::Make_RandomFloat(20.f, 30.f);
-				FXDesc.vInitScale = { fScale, fScale, fScale };
-
-				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
-					return E_FAIL;
-
-
 
 				// 브레이크 : 제곱 감속
 				_float fDeceleration = m_fDecreSpeed * m_fDecreSpeed;
@@ -241,6 +240,17 @@ _int CMeteor::Tick(_float fTimeDelta)
 						m_iDebrsiMaxCnt = DEBRISCNT;
 						m_iDebrisCnt = 0;
 					}
+
+
+					//이펙트
+					CEffect::FX_DESC FXDesc{};
+					FXDesc.vInitPos = static_cast<_float3>(GET_POS) + (_float3)CUtils::Make_Random_Vector(2.f);
+					FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+					_float fScale = CUtils::Make_RandomFloat(20.f, 30.f);
+					FXDesc.vInitScale = { fScale, fScale, fScale };
+
+					if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
+						return E_FAIL;
 
 					m_fParticleDelayTime = 0.f;
 					_float fAngle = { 0.f };
@@ -322,7 +332,7 @@ _int CMeteor::Tick(_float fTimeDelta)
 		FXDesc.vInitPos = static_cast<_float3>(GET_POS) + (_float3)CUtils::Make_Random_Vector(2.f);
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
 
-		_float fScale = CUtils::Make_RandomFloat(7.f, 14.f);
+		_float fScale = CUtils::Make_RandomFloat(6.f, 8.f);
 		fScale *= m_bBig ? 2.f : 1.f;
 		
 		FXDesc.vInitScale = { fScale, fScale, fScale };

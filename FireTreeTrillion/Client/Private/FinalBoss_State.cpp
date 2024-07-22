@@ -294,6 +294,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			MultiFXDesc.vInitPos = static_cast<_float3> (pTransformCom->Get_State(CTransform::STATE_POSITION));
 			MultiFXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f),0.f };
 			MultiFXDesc.vInitScale = { 2.f, 2.f, 2.f };
+			MultiFXDesc.fStartDelay = .5f;
 			pFinalBoss->Add_Effect("HS_FB fly smoke", MultiFXDesc);
 
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
