@@ -1443,8 +1443,11 @@
     </ClInclude>
     <ClInclude Include="..\Public\FinalDump.h">
       <Filter>02.GameObjects\Map\FinalCutObject\FinalDump</Filter>
-	</ClInclude>
-	<ClInclude Include="SimbaLaser.h">
+    </ClInclude>
+    <ClInclude Include="SimbaLaser.h">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SimbaLaser.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
     </ClInclude>
   </ItemGroup>
@@ -2141,8 +2144,11 @@
     </ClCompile>
     <ClCompile Include="..\Private\FinalDump.cpp">
       <Filter>02.GameObjects\Map\FinalCutObject\FinalDump</Filter>
-	</ClCompile>
-	<ClCompile Include="SimbaLaser.cpp">
+    </ClCompile>
+    <ClCompile Include="SimbaLaser.cpp">
+      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SimbaLaser.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
     </ClCompile>
   </ItemGroup>

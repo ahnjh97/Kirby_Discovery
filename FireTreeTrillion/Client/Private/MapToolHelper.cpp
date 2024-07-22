@@ -168,16 +168,22 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "GsSteelFenceB", "GsStone", "GsStreetWallA", "GsStreetWallB", "GsTelephonePoleA", "GsTelephonePoleB"
 		, "GsTrafficSignalAL", "GsTrafficSignalBL", "GsTreeA", "GsTreeB", "GsTreeC", "GsWallRockA", "GsWallRockB"
 		, "GsWoodBridgeA", "GsWoodBridgeB", "GsRockCL", "GsRockDL", "GsRockEL", "GsRockFL", "GsRockGL"
-		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD", "JgGrassO"
 		, "SeDriftWoodAL", "SeDriftWoodBL", "SeDriftWoodCL"
 		, "VpFactoryPart", "VpFactoryParts", "VpFactoryPartsBlend", "WoodBox"
+		, "JgGrassB", "JgGrassL", "JgGrasslongB", "JgGrassN", "JgWoodD", "JgGrassO"
+		
+		//07.21) 잔디 오브젝트 추가
+		, "JgGrassA", "JgGrassD", "JgGrassE", "JgGrassH", "JgGrassI", "JgGrassJ", "JgGrassK", "JgGrassM"
 
 
 #pragma region DEEDEEDEE OBJ
+
 		, "TwGougeGround01", "TwGougeGround02"
+
 #pragma endregion
 
 #pragma region LEVEL_RACING OBJECT
+
 		, "CMBuildingFenceA01","CMBuildingFenceA02", "CmFillerObjectD", "CmFillerObjectG", "CmFillerObjectH"
 		, "CmFillerObjectH02", "CmFillerObjectI"
 
@@ -199,19 +205,24 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "JgGuardrailAL", "JgGuardrailBL"
 
 		, "MlFlowerPot01L"
+
 #pragma endregion
 
 #pragma region TOWN OBJECT
+
 		, "TwArena", "TwArenaA", "TwArenaB", "TwArenaClerk", "TwDeliveryService", "TwFoodStore", "TwFoodStoreChair", "TwFoodStoreTable"
 		, "TwKirbyHouse", "TwPharmacy", "TwPlanterA", "TwPlanterB", "TwRollingBallBooth", "TwSideHouseA", "TwSideHouseC", "TwSideHouseD"
 		, "TwSignboardStreetLive", "TwSlope", "TwBenchA", "TwBenchB", "TwBenchC", "TwBenchD", "TwFishingPartsA", "TwFishingPartsB", "TwFishingPartsC"
 		,"TwCentralSquare","TwStreetLiveSetC", "TwSideBridge", "TwConstructionAreaStepway", "TwConstructionAreaPond", "TwLookOutTower", "TwStreetLiveSetA"
+
 #pragma endregion
 
 #pragma region SIMBA OBJECTS
+
 		, "LbBossCapsule01L", "LbBossCapsule02L", "LbBossField01L", "LbBossSmallRoom01L"
 		, "VpControlBoxChairL", "VpControlBoxEL", "VpStairsAL"
-		#pragma endregion
+
+#pragma endregion
 
 #pragma region LEVEL_PARK (WONDARIA REMAINS) OBJECT
 
@@ -287,7 +298,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "LbBossCapsuleGlass01L", "LbBossCapsuleGlass02L", "LbBossCapsuleGlass03L" };
 
 	// Emissive가 입혀져 있지만, Emissive용 Pass로 하고 싶지 않은 모델들
-	m_setNonEmissiveModels = {};
+	m_setNonEmissiveModels = { "LbOutBuildingFenceL", "LbOutBuildingWallL"	};
 
 	// ParkGimmick
 	m_setParkGimmicks = { "SolarPanelOnce_NonAnim", "SolarPanelCharge_NonAnim", "Gimmick_PkFunHouseDarkness01", "Gimmick_PkFunHouseDarkness02",
