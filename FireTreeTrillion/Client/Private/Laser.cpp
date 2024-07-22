@@ -93,7 +93,7 @@ _int CLaser::Tick(_float fTimeDelta)
 			CEffect::FX_DESC FXDesc{};
 			FXDesc.vInitPos = vCollidingPoint;
 			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
-			FXDesc.vInitPos = { 0.f, 0.f, 8.f };
+			FXDesc.vInitPos = { 0.f, 0.f, 0.f };
 			Add_Effect("HS_FB laser decal", FXDesc, false);
 
 			//for (_int i = 0; i < 10; ++i)

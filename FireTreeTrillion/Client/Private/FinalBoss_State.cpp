@@ -289,6 +289,13 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			pFinalBoss->Set_BackStep(false);
 			pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
+
+			CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+			MultiFXDesc.vInitPos = static_cast<_float3> (pTransformCom->Get_State(CTransform::STATE_POSITION));
+			MultiFXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f),0.f };
+			MultiFXDesc.vInitScale = { 2.f, 2.f, 2.f };
+			pFinalBoss->Add_Effect("HS_FB fly smoke", MultiFXDesc);
+
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
 		}
 		else if (true == pFinalBoss->Get_Swing())
@@ -1207,12 +1214,18 @@ void CFinalBoss_Thrust_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		{
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTSTART, 50.f, false, true);
 			//효선아 여기야 thrust
-			CMultiEffect::MULTI_FX_DESC FXDesc{};
-			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-			FXDesc.vInitPos = { 1.f, 1.f, 7.f };
-			FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 
-			pFinalBoss->Add_Effect("HS_FB thrust dash arrow", FXDesc);
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			FXDesc.vInitScale = { 1.2f, 1.2f, 1.2f };
+			//pFinalBoss->Add_Effect("HS_RayArrow test", FXDesc, true);
+
+			CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+			MultiFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
+			MultiFXDesc.vInitPos = { .4f, 1.f, 11.f };
+			MultiFXDesc.vInitScale = { 2.5f, 2.5f, 2.5f };
+
+			pFinalBoss->Add_Effect("HS_FB thrust dash arrow", MultiFXDesc);
 
 		}
 		break;

@@ -3,6 +3,7 @@
 #include "FinalBoss.h"
 #include "HitBox.h"
 #include "Ability.h"
+#include "Camera.h"
 
 CSpikeSpear::CSpikeSpear(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -118,7 +119,7 @@ _int CSpikeSpear::Tick(_float fTimeDelta)
 					FXDesc.vInitScale = { 5.f, 5.f, 5.f };
 
 					//FXDesc.fStartDelay = 1.f;
-
+					m_pGameInstance->Get_CurCameraPtr()->Make_Shake(.2f, .5f);
 					Add_Effect("HS_FB down spear circle", FXDesc, false);
 
 			}

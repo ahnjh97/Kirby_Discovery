@@ -30,7 +30,7 @@ void CFinalBoss::Appear_Event(CGameObject* pObj)
 	FXDesc.vInitPos = { 0.f, 2.f, 0.f };
 	Add_Effect("HS_orbit bidm", FXDesc);
 
-	FXDesc.fStartDelay = 2.f;
+	FXDesc.fStartDelay = 1.f;
 	Add_Effect("HS_bidm C", FXDesc);
 }
 
@@ -162,7 +162,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	}
 
 
-	if ( m_bStart2PhaseTrigger
+	if (m_bStart2PhaseTrigger
 		&& (m_pGameInstance->Get_KeyState(DIK_K, KEY_DOWN) || m_fHp < m_fMaxHp * 0.45f))
 	{
 		Set_BossState(STATE_2PAZE);
@@ -262,6 +262,8 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 
 			ParticleDesc.vInitPos = vFXPosB;
 			Add_Effect("HS_perfect laser collide particle", FXDesc);
+
+			m_pGameInstance->Get_CurCameraPtr()->Make_Shake(0.3f, 0.5f);
 		}
 
 

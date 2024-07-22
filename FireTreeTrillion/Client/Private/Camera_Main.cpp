@@ -182,7 +182,7 @@ void CCamera_Main::Set_Target(CTransform* pTarget, CAMTARGET eTarget, CAMFOCUS e
 		m_fInterpolateSpeed = fInterpolateSpeed;
 
 	m_eCamFocus = eFocus;
-	//m_vAnchorOffset = vAnchorOffset;
+
 
 	if ((eFocus == FOCUS_SECOND || eFocus == FOCUS_BOTH) && m_pSecondTarget == nullptr)
 		m_eCamFocus = FOCUS_FIRST;
@@ -633,6 +633,8 @@ void CCamera_Main::Track_Anchor(_float fTimeDelta)
 		Compute_Set_BothFocus(fTimeDelta);
 	else if (m_eCamFocus == FOCUS_BATTLE)
 		Compute_Set_BattleFocus(fTimeDelta);
+	else if (m_eCamFocus == FOCUS_FINALBOSS)
+		Compute_Set_FinalBossFocus(fTimeDelta);
 	//트리거 안에 들어가 있을 경우 트리거 사이에서의 카메라 설정
 	else if (m_bLerpByTriggerInfo)
 		Compute_Set_Trigger(m_iMatrixIndex);
@@ -740,7 +742,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 				CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 				if (pFinalBoss != nullptr)
 				{
-					Set_Target(pFinalBoss->Get_TransformCom(), TARGET_SECOND, FOCUS_BOTH, { 0.f, -2.f, 0.f });
+					Set_Target(pFinalBoss->Get_TransformCom(), TARGET_SECOND, FOCUS_FINALBOSS, { 0.f,5.f, 0.f }, 10.f);
 				}
 			}
 			break;
@@ -772,7 +774,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	if (m_CamSeq.empty() && abs(m_fSeqInterpolateTime.first - m_fSeqInterpolateTime.second) < .01f)
 	{
 
-		Set_DOFMode(false);
+		Set_DOFMode(true);
 
 		CAMSEQ eSeq = m_eSpecialSeq;
 
@@ -1079,6 +1081,29 @@ void CCamera_Main::Compute_Set_BattleFocus(_float fTimeDelta)
 
 	m_fDestDistance = 30.f + (30.f * fDistRatio);
 
+}
+
+void CCamera_Main::Compute_Set_FinalBossFocus(_float fTimeDelta)
+{
+
+	_float3 vDir = _float3(m_pSecondTarget->Get_State(CTransform::STATE_POSITION) - m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
+	m_vDestCamDir = vDir;
+	m_vDestCamDir.Normalize();
+
+	//m_vDestCamDir.y = m_vOrigCamDir.y;
+	m_vDestCamDir.y = 0.f;
+	m_vDestCamDir.Normalize();
+
+	_float fDist = vDir.Length();
+	fDist = clamp(fDist, 20.f, 50.f);
+	fDist = MAPVALUE(fDist, 20.f, 50.f, 0.f, 1.f);
+	fDist = EASE_OUT(fDist);
+
+	//m_vDestCamDir.y += MAPVALUE(fDist, 0.f, 1.f, -.1f, .2f);
+	//m_vDestCamDir.Normalize();
+
+	m_fDestDistance = m_fOrigDistance /** .5f + (m_pFirstTarget->Get_State(CTransform::STATE_POSITION) - m_pSecondTarget->Get_State(CTransform::STATE_POSITION)).Length() * 1.2f*/ /** .7f*/;
+	m_fDestDistance = 20.f;
 }
 
 void CCamera_Main::Compute_Set_CamLock(_float fTimeDelta)
@@ -2642,10 +2667,10 @@ void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
 		{
 			if (m_fSeqEventTime <= 0.f)
 			{
-				CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, L"Layer_BossMonster");
+				//CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, L"Layer_BossMonster");
 
-				if (pBoss != nullptr)
-					m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+				//if (pBoss != nullptr)
+					m_pGameInstance->Update_DofFocus({0.f, -31.f, 13.f });
 			}
 			//커비
 			else
@@ -2797,14 +2822,24 @@ _float3 CCamera_Main::Make_TargetPos()
 	//두번째 타겟 포커스
 	else if (m_eCamFocus == FOCUS_SECOND)
 		vTargetPos = (_float3)m_pSecondTarget->Get_State(CTransform::STATE_POSITION);
-	//두 타겟 사이의 중심점.
+	//두 타겟 사이의 중심 포커스
 	else if (m_eCamFocus == FOCUS_BOTH)
 	{
 		vTargetPos =
 			(_float3)m_pFirstTarget->Get_State(CTransform::STATE_POSITION)
 			+ (m_pSecondTarget->Get_State(CTransform::STATE_POSITION) - m_pFirstTarget->Get_State(CTransform::STATE_POSITION)) * m_fBothFocusRatio;
 	}
+	//마지막 보스용 포커스
+	else if (m_eCamFocus == FOCUS_FINALBOSS)
+	{
+		vTargetPos = (_float3)m_pFirstTarget->Get_State(CTransform::STATE_POSITION);
 
+		//지형 위치를 구하여 같이 쓰기
+		_float4 vTerrainPos = static_cast<CCharacter*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
+
+		if (vTerrainPos.y != 0.f && m_eCamFocus != FOCUS_BOTH)
+			vTargetPos.y = vTargetPos.y * .2f + vTerrainPos.y * .8f;
+	}
 	//피날레 카메라 포커스
 	else if (m_eCamFocus == FOCUS_FINALE)
 	{
@@ -2850,6 +2885,9 @@ void CCamera_Main::Interpolate_CamSet(_float fTimeDelta)
 	fSlerpSpeed = (m_eCamFocus == FOCUS_BOTH || m_eCamFocus == FOCUS_BATTLE) ? 12.f : 4.f;
 	if (m_eCamFocus == FOCUS_BATTLE)
 		fSlerpSpeed = 10.f;
+	else if(m_eCamFocus == FOCUS_FINALBOSS)
+		fSlerpSpeed = 10.f;
+
 	m_vCurCamDir = CUtils::SlerpDirVec(m_vCurCamDir, m_vDestCamDir, clamp(fTimeDelta * fSlerpSpeed, 0.f, 1.f));
 
 
@@ -2975,6 +3013,10 @@ void CCamera_Main::MoveTo_CurCamPos_Interpolate(_float fTimeDelta)
 	fInterpolateSpeed = (m_eCamFocus == FOCUS_BOTH) ? 10.f : 1.f;
 
 	if (m_eCamFocus == FOCUS_BATTLE)
+	{
+		fInterpolateSpeed = 20.f;
+	}
+	if (m_eCamFocus == FOCUS_FINALBOSS)
 	{
 		fInterpolateSpeed = 20.f;
 	}

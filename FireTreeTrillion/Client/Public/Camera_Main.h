@@ -192,6 +192,7 @@ public:
 	//카메라 목표 수치 계산
 	void Compute_Set_BothFocus(_float fTimeDelta);
 	void Compute_Set_BattleFocus(_float fTimeDelta);
+	void Compute_Set_FinalBossFocus(_float fTimeDelta);
 	void Compute_Set_CamLock(_float fTimeDelta);
 	void Compute_Set_Trigger(_int iTriggerIndex);
 

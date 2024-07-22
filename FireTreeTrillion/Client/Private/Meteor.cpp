@@ -192,6 +192,7 @@ _int CMeteor::Tick(_float fTimeDelta)
 			}
 			else if (1.5f < fDistance)
 			{
+				//카메라 쉐이크
 				if (false == m_bShake)
 				{
 					m_bShake = true;
@@ -199,6 +200,18 @@ _int CMeteor::Tick(_float fTimeDelta)
 					if (pCamera != nullptr)
 						pCamera->Make_Shake(1.f, 2.5f);
 				}
+
+				//이펙트
+				CEffect::FX_DESC FXDesc{};
+				FXDesc.vInitPos = static_cast<_float3>(GET_POS) + (_float3)CUtils::Make_Random_Vector(2.f);
+				FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+				_float fScale = CUtils::Make_RandomFloat(20.f, 30.f);
+				FXDesc.vInitScale = { fScale, fScale, fScale };
+
+				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
+					return E_FAIL;
+
+
 
 				// 브레이크 : 제곱 감속
 				_float fDeceleration = m_fDecreSpeed * m_fDecreSpeed;
