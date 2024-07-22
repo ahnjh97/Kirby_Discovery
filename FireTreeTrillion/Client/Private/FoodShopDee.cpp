@@ -91,7 +91,7 @@ _int CFoodShopDee::Tick(_float fTimeDelta)
 		
 		pKirbyTrans->Look_At_Interpolate(pNPCDeeTrans->Get_State_Vector(CTransform::STATE_POSITION), m_fTimeDelta);
 		pKirby->DialogOn(pKirbyTrans->Get_State_Float4(CTransform::STATE_LOOK));
-		m_bIsInteractKirby = FALSE;
+		//m_bIsInteractKirby = FALSE;
 	}
 
 

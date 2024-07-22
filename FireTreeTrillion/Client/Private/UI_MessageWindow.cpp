@@ -160,7 +160,7 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 				switch (*m_pCurrentLevelID)
 				{
 				case LEVEL_TOWN:
-					vDialogKirbyDir = { 1.f, 0.f, 0.f, 0.f }; //타운에서 디디디대왕과 대화 이후, 파크 맵 입구 진입 시점
+					vDialogKirbyDir = { 1.f, 0.f, 0.f, 1.f }; //타운에서 디디디대왕과 대화 이후, 파크 맵 입구 진입 시점
 					break;
 				}
 
@@ -169,6 +169,7 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 			}
 		}
 		CCamera_Main* pCamera = { nullptr };
+		m_bHighLightMsg = FALSE;
 		if (LEVEL_SIMBA == *m_pCurrentLevelID && !m_bIsSkipScript)
 		{ 
 			switch (m_iCurMessageIndex)
@@ -187,6 +188,10 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_NEXT_DIALOG2);
 				break;
 
+			case 9:
+				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_LAST_DIALOG);
+				break;
+
 			case 10:
 				m_bHighLightMsg = TRUE;
 				break;
@@ -194,6 +199,9 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 			default:
 				break;
 			}
+
+			if (m_iCurMessageIndex == m_tMessageDesc.vecMsg.size())
+				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_APPEAR_END);
 
 			/*
 			if (1 == m_iCurMessageIndex)
@@ -206,13 +214,10 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 			}
 			if (8 == m_iCurMessageIndex)
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_NEXT_DIALOG2);
-			*/
 
 			if (m_iCurMessageIndex == m_tMessageDesc.vecMsg.size() - 1)
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_LAST_DIALOG);
-
-			if (m_iCurMessageIndex == m_tMessageDesc.vecMsg.size())
-				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_APPEAR_END);
+			*/
 		}
 	}
 
@@ -376,6 +381,21 @@ void CUI_MessageWindow::Show_DialogMessage()
 
 	m_bIsSetKirby = TRUE;
 
+	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
+	CHECK_NULLPTR(pKirby);
+
+	CTransform* pKirbyTrans = pKirby->Get_TransformCom();
+	//CTransform* pNPCDeeTrans = this->Get_TransformCom();
+	switch (*m_pCurrentLevelID)
+	{
+	case LEVEL_TOWN:
+		pKirby->DialogOn(pKirbyTrans->Get_State_Float4(CTransform::STATE_LOOK));
+		break;
+
+	default:
+		break;
+	}
+
 #pragma endregion
 	
 }
@@ -532,10 +552,12 @@ HRESULT CUI_MessageWindow::Render_Message()
 		if (LEVEL_DEEDEEDEE == *m_pCurrentLevelID || LEVEL_TOWN == *m_pCurrentLevelID)
 			vMessageShadowScale = { 1.2f, 1.2f };
 
-		if (m_bHighLightMsg) //07.22) LEVEL_SIMBA의 특정 하이라이트 메시지 문단 강조 처리 :: 스케일 키우니깐 못생겼음..
+		if (m_bHighLightMsg) //07.22) LEVEL_SIMBA의 특정 하이라이트 메시지 문단 강조 처리
 		{
 			vFontScale = { 1.5f, 1.5f };
 			vMessageShadowScale = { 1.5f, 1.5f };
+
+			vFontPos = { 390.f, 745.f };
 		}
 
 		// 스크립트 그림자
