@@ -251,6 +251,7 @@
     <ClInclude Include="..\Public\KirbyFinalCut_State.h" />
     <ClInclude Include="..\Public\Level_Park.h" />
     <ClInclude Include="..\Public\Disaster_Master.h" />
+    <ClInclude Include="..\Public\LoadingStart.h" />
     <ClInclude Include="..\Public\Phanta.h" />
     <ClInclude Include="..\Public\Phanta_State.h" />
     <ClInclude Include="..\Public\FinaleBuildingPartical.h" />
@@ -510,6 +511,7 @@
     <ClCompile Include="..\Private\KirbyFinalCut_State.cpp" />
     <ClCompile Include="..\Private\Level_Park.cpp" />
     <ClCompile Include="..\Private\Disaster_Master.cpp" />
+    <ClCompile Include="..\Private\LoadingStart.cpp" />
     <ClCompile Include="..\Private\Phanta.cpp" />
     <ClCompile Include="..\Private\Phanta_State.cpp" />
     <ClCompile Include="..\Private\FinaleBuildingPartical.cpp" />

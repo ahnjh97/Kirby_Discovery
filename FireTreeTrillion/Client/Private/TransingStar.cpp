@@ -5,6 +5,7 @@
 #include "Kirby.h"
 #include "Camera_Main.h"
 #include "Utils.h"
+#include "LoadingStart.h"
 
 const _float	g_fPosOffset        = 18.f;
 const _float	g_fTurnOffset       = 72.f;
@@ -41,6 +42,13 @@ HRESULT CTransingStar::Initialize(void* pArg)
    
     m_vSmallColor = _float3(160.f / 255.f, 212.f / 255.f, 104.f / 255.f);
     m_vLargeColor = _float3(91.f / 255.f,  121.f / 255.f, 59.f / 255.f);
+
+    m_pLoadingStart = static_cast<CLoadingStart*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_LoadingStart")));
+    if (nullptr == m_pLoadingStart)
+    {
+        MSG_BOX(TEXT("Failed to CloneObject to TransingStar"));
+        return E_FAIL;
+    }
 
     return S_OK;
 }
@@ -87,6 +95,8 @@ _int CTransingStar::Tick(_float fTimeDelta)
 
 void CTransingStar::Late_Tick(_float fTimeDelta)
 {
+    //m_pLoadingStart->Late_Tick(m_fTimeDelta);
+
     m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SUPERUI, this);
 }
 
@@ -107,9 +117,16 @@ HRESULT CTransingStar::Render()
     m_pShaderCom->Bind_RawValue("g_vLargeStarColor", &m_vLargeColor, sizeof(_float3));
 
     if (m_eActivateType == CLOSE)
+    {
         RenderClose();
+    }
     else if (m_eActivateType == OPEN)
         RenderOpen();
+
+    if (true == m_bLoadingStart)
+        m_pLoadingStart->Render(m_fTimeDelta);
+    else
+        m_pLoadingStart->Set_Alpha(0.f);
 
     return S_OK;
 }
@@ -187,6 +204,9 @@ void CTransingStar::Deactivate()
 
     // 연두별의 셰이더처리에 대한 초기화
     m_bDeadYeonDoo = false;
+
+    // 준수 
+    m_bLoadingStart = false;
 }
 
 void CTransingStar::Tick_AlphaStar(_float fTimeDelta)
@@ -341,11 +361,24 @@ void CTransingStar::RenderOpen()
 void CTransingStar::On_Event()
 {
     if(m_eNextLevel != LEVEL_END)
+    {
+        // 스타트 로딩화면 렌더 켜기
+        m_bLoadingStart = true;
+
+        if(LEVEL_INTRO == m_eNextLevel)
+            m_pLoadingStart->Set_TexIndex(0);
+        else if(LEVEL_SIMBA == m_eNextLevel)
+            m_pLoadingStart->Set_TexIndex(2);
+
         m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, m_eNextLevel));
+    }
     else
     {
         if (*CGameInstance::Get_Instance()->Get_CurrentLevelID() == LEVEL_PARK)
         {
+            // 스타트 로딩화면 렌더 끄기
+            m_bLoadingStart = false;
+
             CGameObject* pPlayer = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
             CKirby* pKirby = dynamic_cast<CKirby*>(pPlayer);
            // pKirby->Set_ControllerPos(_float4(0.5f, 68.f, 165.f, 1.f)); //for test : 심바맵으로 이동하기 위한
@@ -356,6 +389,10 @@ void CTransingStar::On_Event()
         }
         else if (*m_pCurrentLevelID == LEVEL_TOWN)
         {
+            // 스타트 로딩화면 렌더 켜기
+            m_bLoadingStart = true;
+            m_pLoadingStart->Set_TexIndex(1);
+
             CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
             pCameraMain->Unlock();
             pCameraMain->Set_FOVY(38);
@@ -426,11 +463,11 @@ CGameObject* CTransingStar::Clone(void* pArg)
 
 void CTransingStar::Free()
 {
-
     for (auto& texure : m_arrTextures)
         Safe_Release(texure);
+
+    Safe_Release(m_pLoadingStart);
     
     __super::Free();
-
 }
 

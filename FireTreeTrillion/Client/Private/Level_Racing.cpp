@@ -18,6 +18,7 @@
 #include "BG.h"
 #include "HUD.h"
 #include "TransingStar.h"
+#include "LoadingStart.h"
 
 CLevel_Racing::CLevel_Racing(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -75,6 +76,12 @@ HRESULT CLevel_Racing::Initialize()
 	pTransingStar->Set_SmallColor(_float3(160.f / 255.f, 212.f / 255.f, 104.f / 255.f));
 	pTransingStar->Set_LargeColor(_float3(91.f / 255.f, 121.f / 255.f, 59.f / 255.f));
 	pTransingStar->Activate(CTransingStar::OPEN);
+
+	//CLoadingStart* pLoadingStart = static_cast<CLoadingStart*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar")));
+	//if (nullptr != pLoadingStart)
+	//{
+	//	pLoadingStart->Set_TexIndex(1);
+	//}
 
 	return S_OK;
 }
