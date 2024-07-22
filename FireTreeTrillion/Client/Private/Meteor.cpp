@@ -104,11 +104,11 @@ HRESULT CMeteor::Initialize(void* pArg)
 	CEffect::FX_DESC FXDesc{};
 	FXDesc.pSocketMatrix = &m_EffectSocket;
 	FXDesc.vInitPos = { 0.f, 1.4f, -.5f };
-	FXDesc.vInitScale = { 20.f, 20.f, 20.f };
+	//FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 	FXDesc.fStartDelay = 2.f;
 	//FXDesc.vInitRot = { 90.f, 0.f, 0.f };
 
-	Add_Effect("come on dash white", FXDesc, true);
+	Add_Effect("HS_meteo dash line", FXDesc, true);
 
 
 	return S_OK;
@@ -296,25 +296,28 @@ _int CMeteor::Tick(_float fTimeDelta)
 			vPos += XMVector3Normalize(m_vTargetPos - vPos) * m_fTimeDelta * EaseInQuart(m_fIncreSpeed) * m_fMeteorSpeed;
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 		}
+
+
 	}
 
 
-	//이펙트 업데이트
-	// 
 	//smoke
-	m_fBbongTime += m_fTimeDelta;
-	if (.05f < m_fBbongTime)
+	m_fBbongTime -= m_fTimeDelta;
+	if (m_fBbongTime < 0.f)
 	{
 		CEffect::FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(GET_POS) + (_float3)CUtils::Make_Random_Vector(2.f);
 		FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
 
-		_float fScale = CUtils::Make_RandomFloat(10.f, 20.f);
+		_float fScale = CUtils::Make_RandomFloat(7.f, 14.f);
+		fScale *= m_bBig ? 2.f : 1.f;
+		
 		FXDesc.vInitScale = { fScale, fScale, fScale };
 		Add_Effect("debris smoke", FXDesc);
 
-		m_fBbongTime = 0.f;
+		m_fBbongTime = 0.05f;
 	}
+
 
 	m_EffectSocket = _float4x4::Identity;
 	_float3 vDir = m_vTargetPos - GET_POS;

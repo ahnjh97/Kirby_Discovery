@@ -28,10 +28,10 @@ void CFinalBoss::Appear_Event(CGameObject* pObj)
 	CParticle::PARTICLE_DESC FXDesc{};
 	FXDesc.pSocketMatrix = &m_EffectSocket;
 	FXDesc.vInitPos = { 0.f, 2.f, 0.f };
-	Add_Effect("HS_bidm B", FXDesc);
+	Add_Effect("HS_orbit bidm", FXDesc);
 
-	FXDesc.fStartDelay = 3.f;
-	Add_Effect("HS_bidm A", FXDesc);
+	FXDesc.fStartDelay = 2.f;
+	Add_Effect("HS_bidm C", FXDesc);
 }
 
 HRESULT CFinalBoss::Initialize_Prototype()
