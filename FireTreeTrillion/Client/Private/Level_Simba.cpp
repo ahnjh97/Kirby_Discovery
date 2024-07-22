@@ -23,6 +23,9 @@
 #include "GameObject.h"
 #include "Simba.h"
 
+#include "Level_Loading.h"
+#include "UI_Fading.h"
+
 CLevel_Simba::CLevel_Simba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
@@ -78,6 +81,9 @@ HRESULT CLevel_Simba::Initialize()
 
 	//m_pGameInstance->ShowAllAnimations("OriginCage_Anim");
 
+	// 포그 설정
+	m_pGameInstance->Fog_Zero();
+
 	return S_OK;
 }
 
@@ -85,6 +91,36 @@ void CLevel_Simba::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
+
+	static _bool bOpenLevel = false;
+	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+		if (m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS))
+			if (m_pGameInstance->Get_KeyState(DIK_SPACE, KEY_PRESS))
+				if (m_pGameInstance->Get_KeyState(DIK_A, KEY_DOWN))
+					bOpenLevel = true;
+
+
+	static _bool bOnceFade = false;
+	static _bool bOnceChangeLevel = false;
+	if (bOpenLevel)
+	{
+		CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+		CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
+		if (bOnceFade == false)
+		{
+			pFadingUI->Set_InOutState(CUI_Fading::FADEOUT);
+			pFadingUI->Set_IsRender(true);
+			bOnceFade = true;
+		}
+		else if (pFadingUI->Get_FadeRatio() <= 0.f)
+		{
+			if (bOnceChangeLevel == false)
+			{
+				m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_FINALBOSS));
+				bOnceChangeLevel = true;
+			}
+		}
+	}
 
 	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{

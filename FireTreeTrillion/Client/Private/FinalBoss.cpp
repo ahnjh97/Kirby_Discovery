@@ -148,9 +148,10 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 		CTransform* pKirbyTransform = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"))->Get_TransformCom();
 
+		_float fKirbyY = pKirbyTransform->Get_State(CTransform::STATE_POSITION).y;
 		_float fKirbyZ = pKirbyTransform->Get_State(CTransform::STATE_POSITION).z;
-
-		if (-20.f < fKirbyZ)
+		if ((fKirbyY < 1.f) && (fKirbyY > -4.f) &&
+			(fKirbyZ < -20.f) && (fKirbyZ > -25.f)) // QZR
 		{
 			//CEventCenter::Get_Instance()->Notify(KEVENT_FINALBOSS_APPEAR);
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
@@ -160,7 +161,6 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 			pKirby->Get_KirbyInfo()->m_bFinalBossCutStart = true;
 		}
 	}
-
 
 	if ( m_bStart2PhaseTrigger
 		&& (m_pGameInstance->Get_KeyState(DIK_K, KEY_DOWN) || m_fHp < m_fMaxHp * 0.45f))

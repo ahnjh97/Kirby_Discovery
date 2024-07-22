@@ -254,7 +254,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 
 	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f, 0.f, 0.1f, 0.1f, 0.1f }; //9 == 11
 	//m_CamTriggerUpOffsets[LEVEL_PARK] = { 0.f, 0.f, 0.f, 100.f, .15f, 0.f, 0.f, 0.f, 0.f };
-	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .05f };
+	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .05f, 0.05f, 0.1f, 0.f, 0.f }; // 0 : 보스 만나기전, 1 : 계단으로 들어가는 입구, 2 : 복도 마지막 트리거
 	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f, .4f, .5f, 0.2f, 0.2f, 0.f };
 
 
@@ -2717,7 +2717,24 @@ void CCamera_Main::Move_ForTrigger(_float fTimeDelta, _float3 vPos, _float3 vDir
 		Set_TargetAnchor({ 0.f, 5.f, 0.f });
 
 	}
-	//else if()
+	else if (LEVEL_FINALBOSS == *m_pCurrentLevelID)
+	{
+		vPos = { 0.f, 2.f, -66.f };
+		vDir = { 0.01f, -.1f, 1.f };
+
+		CAMACTION newAct = {};
+		newAct.fTime = 0.f;
+		newAct.eCamCut = CUT_HARD;
+
+		newAct.eCamPos = POS_ABSOLUTE;
+		newAct.vPos = vPos;
+
+		newAct.eCamDir = DIR_ABSOLUTE;
+		newAct.vDir = vDir;
+
+		Make_One_Sequence(newAct);
+		Set_TargetAnchor({ 0.f, 5.f, 0.f });
+	}
 }
 
 void CCamera_Main::Update_Anchor(_float fTimeDelta)
