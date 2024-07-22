@@ -1280,7 +1280,7 @@ static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
 		vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
 
 		FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
-		FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
+		FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y + CUtils::Make_RandomFloat(-20.f, 20.f), 0.f};
 		FXDesc.vInitScale = { 1.3f, 1.3f, 1.3f };
 
 		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
@@ -1294,6 +1294,17 @@ static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
 
 		fBbongTime = 0.f;
 	}
+}
+
+static void Jump_FX(CTransform* pTransformCom)
+{
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
+	_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	FXDesc.vInitPos = { vMyPos.x, vMyPos.y, vMyPos.z };
+	FXDesc.vInitScale = { 1.2f, 1.2f, 1.2f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Kirby Jump Effects"), &FXDesc)))
+		return;
 }
 
 static void SwordSlash_One(CTransform* pTransformCom)
