@@ -69,6 +69,11 @@ public: /* For.Renderer */
 
 	void Fog_Zero();
 	void Fog_Intialize_ForIntroLevel(_int iPoint);
+	void Fog_Intialize_ForRacing(_int iPoint);
+	void Fog_Intialize_ForDeeDeeDee(_int iPoint);
+	void Fog_Intialize_ForPark(_int iPoint);
+	void Fog_Intialize_ForFinalBoss(_int iPoint);
+
 	void Increase_FogYValue(_float fTimeDelta);
 	void Decrease_FogYValue(_float fTimeDelta);
 	void Increase_FogViewValue(_float fTimeDelta);

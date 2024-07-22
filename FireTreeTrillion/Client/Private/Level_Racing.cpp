@@ -76,8 +76,8 @@ HRESULT CLevel_Racing::Initialize()
 	pTransingStar->Set_LargeColor(_float3(91.f / 255.f, 121.f / 255.f, 59.f / 255.f));
 	pTransingStar->Activate(CTransingStar::OPEN);
 
-	// 안개 초기화
-	m_pGameInstance->Fog_Zero();
+	// 안개 설정
+	m_pGameInstance->Fog_Intialize_ForRacing(0);
 
 	return S_OK;
 }

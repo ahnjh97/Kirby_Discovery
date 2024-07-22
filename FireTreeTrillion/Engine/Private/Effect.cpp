@@ -208,7 +208,7 @@ _bool CEffect::Calculate_Lifetime(_float _fTimeDelta)
 	if (m_fLifeRatio <= .01f)
 		int a = 0;
 
-	if (m_fLifetime.second <= m_fDuration.first)
+	if (m_fLifetime.second< m_fDuration.first)
 	{
 		if (m_bIsLoop/* || m_fDuration.second == FX_MAXDURATION*/)
 		{
@@ -218,8 +218,8 @@ _bool CEffect::Calculate_Lifetime(_float _fTimeDelta)
 		}
 		else
 		{
-			//m_fLifetime.first = m_fLifetime.second;
 			m_fLifeRatio = 1.f;
+			//m_fLifetime.first = m_fLifetime.second;
 			return true;
 		}
 	}
@@ -265,7 +265,10 @@ _float3 CEffect::Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY ePropert
 
 	//마지막 키프레임이면 하지마!!
 	if (curKeyframes.size() - 1 <= m_iCurKeyframeIdxs[eProperty])
+	{
+		vResultValue = curKeyframes[m_iCurKeyframeIdxs[eProperty]].vValue;
 		return vResultValue;
+	}
 
 
 	//진~짜 보간합니다 레츠고

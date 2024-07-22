@@ -105,6 +105,7 @@ HRESULT CMeteor::Initialize(void* pArg)
 	FXDesc.pSocketMatrix = &m_EffectSocket;
 	FXDesc.vInitPos = { 0.f, 1.4f, -.5f };
 	FXDesc.vInitScale = { 20.f, 20.f, 20.f };
+	FXDesc.fStartDelay = 2.f;
 	//FXDesc.vInitRot = { 90.f, 0.f, 0.f };
 
 	Add_Effect("come on dash white", FXDesc, true);
@@ -117,6 +118,7 @@ _int CMeteor::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 	{
+		//별 아이템 생성
 		if (true == m_bBig)
 		{
 			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
@@ -296,12 +298,28 @@ _int CMeteor::Tick(_float fTimeDelta)
 		}
 	}
 
+
+	//이펙트 업데이트
+	// 
+	//smoke
+	m_fBbongTime += m_fTimeDelta;
+	if (.05f < m_fBbongTime)
+	{
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.vInitPos = static_cast<_float3>(GET_POS) + (_float3)CUtils::Make_Random_Vector(2.f);
+		FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+
+		_float fScale = CUtils::Make_RandomFloat(10.f, 20.f);
+		FXDesc.vInitScale = { fScale, fScale, fScale };
+		Add_Effect("debris smoke", FXDesc);
+
+		m_fBbongTime = 0.f;
+	}
+
 	m_EffectSocket = _float4x4::Identity;
 	_float3 vDir = m_vTargetPos - GET_POS;
 	Quaternion vQuat = CUtils::Make_Quat_FromDir(vDir);
-	_float4x4 RotMat = _float4x4::CreateFromQuaternion(vQuat);
-
-	m_EffectSocket *= RotMat;
+	m_EffectSocket *= _float4x4::CreateFromQuaternion(vQuat);
 
 	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, GET_POS);
 
@@ -479,6 +497,7 @@ void CMeteor::Free()
 {
 	__super::Free();
 
+	Delete_AllEffect();
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 

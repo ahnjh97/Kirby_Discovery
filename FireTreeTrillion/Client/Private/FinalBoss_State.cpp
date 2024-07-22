@@ -22,7 +22,7 @@ void ThrustCharge(CFinalBoss* pBoss)
 
 	FXDesc.fStartDelay = 1.f;
 
-	pBoss->Add_Effect("HS_FB ground dash sparkle", FXDesc, false);
+	pBoss->Add_Effect("HS_FB thrust ready", FXDesc, false);
 }
 
 void AirStep_Smoke(CFinalBoss* pBoss)
@@ -1212,7 +1212,7 @@ void CFinalBoss_Thrust_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			FXDesc.vInitPos = { 1.f, 1.f, 7.f };
 			FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 
-			pFinalBoss->Add_Effect("HS_FB thrust ready", FXDesc);
+			pFinalBoss->Add_Effect("HS_FB thrust dash arrow", FXDesc);
 
 		}
 		break;
