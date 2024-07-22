@@ -106,6 +106,7 @@
       <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../EngineSDK/Inc/ImGui/;../Bin/core/inc/;../Default/;../../EngineSDK/Inc/physx/</AdditionalIncludeDirectories>
       <AdditionalOptions>/MP /Zm200 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

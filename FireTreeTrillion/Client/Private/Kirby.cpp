@@ -35,6 +35,7 @@
 #include "BulbFlare.h"
 #include "Gm_DynamicField.h"
 #include "SurprisedBoard.h"
+#include "UI_MessageWindow.h"
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCharacter{ pDevice, pContext }
@@ -678,6 +679,21 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		}
 
 
+	}
+	
+	else if (eContent == CCollisionCenter::CONTENT_INTERACT)
+	{
+		//if (nullptr == pObject)
+		//	return;
+
+		//다이얼로그 출력 여부를 검사
+		//CUI_MessageWindow* pMWindow = dynamic_cast<CUI_MessageWindow*>
+		//	(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_DeeDeeDee")));
+		//CHECK_NULLPTR(pMWindow);
+		//if (CUI_MessageWindow::WINDOW_SHOW == pMWindow->Get_MWindowState())
+		//	return;
+
+		//pObject->Get_PrototypeTag();
 	}
 }
 
