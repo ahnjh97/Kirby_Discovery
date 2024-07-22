@@ -88,6 +88,10 @@ private:
 	// time
 	_float						m_fMovingTime = _float();
 
+	// 스테이지 이름 
+	class CLoadingStart*		m_pLoadingStart = { nullptr };
+	_bool						m_bLoadingStart = { false };
+
 public:
 	static CTransingStar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*  Clone(void* pArg) override;

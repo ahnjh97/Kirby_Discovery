@@ -6,6 +6,7 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CTexture;
 class CCharacterController;
 END
 
@@ -40,6 +41,7 @@ private:
 	HRESULT			Bind_ShaderResources();
 
 	CModel*						m_pModelCom = { nullptr };
+	CTexture*					m_pMaskTextureCom = { nullptr };
 
 	ANIMINDEX					m_eAnimIndex = { CAR_END };
 	ANIMINDEX					m_ePreAnimIndex = { CAR_END };

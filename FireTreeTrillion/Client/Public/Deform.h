@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "PhysXObject.h"
+#include "Effect.h"
 
 
 BEGIN(Engine)
@@ -37,6 +38,14 @@ protected:
 	void			Compute_MotionBlur();
 	_float2			m_vPreScreenPos = { 0.f, 0.f };
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
+
+	void			Compute_DeformRimLight(_float fTimeDelta);
+	_int			m_iComputeMode = { 0 };
+	_float			m_fDeformTime = { 0.f };
+	_float3			m_vDeformRimColor = { 1.f, 0.f, 0.f };
+	_int			m_iRenderCount = { 0 };
+	_float			m_fUVOffsetTime = { 0.f };
+	_float			m_fDissolveRatio = { 0.f };
 
 	CCharacterController*	m_pControllerCom = { nullptr };
 	CShader*				m_pShaderCom = { nullptr };

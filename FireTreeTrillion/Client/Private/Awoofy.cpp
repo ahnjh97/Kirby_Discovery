@@ -278,27 +278,24 @@ void CAwoofy::Render_IMGUI()
 
 void CAwoofy::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	if(LEVEL_TOWN != *m_pGameInstance->Get_CurrentLevelID())
+	if (eContent == CCollisionCenter::CONTENT_BODY)
 	{
-		if (eContent == CCollisionCenter::CONTENT_BODY)
+		if (m_ePhyXState == PO_NORMAL)
 		{
-			if (m_ePhyXState == PO_NORMAL)
-			{
-				Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
-				m_eEyeState = AWOOFYEYE_HAPPY;
-			}
+			Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
+			m_eEyeState = AWOOFYEYE_HAPPY;
 		}
-		else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
-		{
+	}
+	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)
+	{
 
-		}
-		else if (eContent == CCollisionCenter::CONTENT_ATTACK)
+	}
+	else if (eContent == CCollisionCenter::CONTENT_ATTACK)
+	{
+		if (m_ePhyXState == PO_NORMAL)
 		{
-			if (m_ePhyXState == PO_NORMAL)
-			{
-				Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
-				m_eEyeState = AWOOFYEYE_HAPPY;
-			}
+			Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
+			m_eEyeState = AWOOFYEYE_HAPPY;
 		}
 	}
 }
@@ -456,11 +453,8 @@ HRESULT CAwoofy::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
 		return E_FAIL;
-	if (LEVEL_TOWN != *m_pGameInstance->Get_CurrentLevelID())
-	{
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
-			return E_FAIL;
-	}
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+		return E_FAIL;
 	
 	return S_OK;
 }

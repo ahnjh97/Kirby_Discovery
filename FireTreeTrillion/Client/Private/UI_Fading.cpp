@@ -86,7 +86,7 @@ HRESULT CUI_Fading::Render()
 	hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
 	CHECK_FAILED(hr);
 
-	hr = m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
+	hr = m_pMaskTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
 	CHECK_FAILED(hr);
 	
 	hr = m_pShaderCom->Begin(POSTEX_FADEINOUT);
@@ -146,7 +146,7 @@ HRESULT CUI_Fading::Add_Components()
 
 	// 마스킹 텍스쳐
 	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_Fade"),
-											  TEXT("Com_Texture_Mask"), (CComponent**)&m_pTextureCom);
+											  TEXT("Com_Texture_Mask"), (CComponent**)&m_pMaskTextureCom);
 	CHECK_FAILED(hr);
 
 	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
@@ -200,6 +200,6 @@ void CUI_Fading::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pTextureCom);
+	Safe_Release(m_pMaskTextureCom);
 }
 

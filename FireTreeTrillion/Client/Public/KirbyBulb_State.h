@@ -51,6 +51,7 @@ public:
 public:
 	_float m_fFallTime = { 0.f };
 	_float m_fChangeRunTime = { 0.f };
+	_float m_bJumpEffectTrigger = { true };
 	static	CKirbyBulb_Jump_State* Create();
 	virtual void				   Free() override;
 };

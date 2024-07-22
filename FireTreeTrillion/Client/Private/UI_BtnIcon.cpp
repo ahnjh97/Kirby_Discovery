@@ -39,7 +39,8 @@ HRESULT CUI_BtnIcon::Initialize(void* _pArg)
 	switch (*m_pCurrentLevelID)
 	{
 	case LEVEL_TOWN: case LEVEL_DEEDEEDEE:
-		vTrans = { 502.f, -393.f, 1.f, 1.f };
+		//vTrans = { 502.f, -393.f, 1.f, 1.f };
+		vTrans = { 501.f, -393.f, 1.f, 1.f };
 		break;
 
 	case LEVEL_SIMBA: case LEVEL_FINALBOSS: case LEVEL_FINALE: default:

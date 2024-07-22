@@ -92,6 +92,8 @@ public:
 
 	_float	m_fChangeRunTime = { 0.f };
 	_float	m_fFallTime = { 0.f };
+
+	_bool	m_bJumpEffectTrigger = { true };
 };
 
 

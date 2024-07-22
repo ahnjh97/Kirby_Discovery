@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "PhysXObject.h"
+#include "Deform.h"
 
 BEGIN(Engine)
 class CModel;
@@ -11,8 +11,7 @@ END
 
 BEGIN(Client)
 
-class CDump :
-    public CPhysXObject
+class CDump final : public CDeform
 {
 private:
 	CDump(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -40,8 +39,7 @@ private:
 	HRESULT			Bind_ShaderResources();
 
 	CModel*			m_pModelCom = { nullptr };
-	CShader*		m_pShaderCom = { nullptr };
-
+	CTexture*		m_pMaskTextureCom = { nullptr };
 	ANIMINDEX		m_eCurAnim = { DUMP_END };
 
 public:

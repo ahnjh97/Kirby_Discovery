@@ -33,7 +33,8 @@ private:
 	HRESULT			Add_Components();
 	HRESULT			Bind_ShaderResources();
 
-	CModel* m_pModelCom = { nullptr };
+	CModel*			m_pModelCom = { nullptr };
+	CTexture*		m_pMaskTextureCom = { nullptr };
 
 	ANIMINDEX					m_eAnimIndex = { BULB_END };
 	ANIMINDEX					m_ePreAnimIndex = { BULB_END };

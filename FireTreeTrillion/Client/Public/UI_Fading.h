@@ -43,7 +43,7 @@ private:
 	HRESULT					Bind_ShaderResources();
 							
 private:					
-	CTexture*				m_pTextureCom = { nullptr }; // 마스킹을 위한 텍스쳐
+	CTexture*				m_pMaskTextureCom = { nullptr }; // 마스킹을 위한 텍스쳐
 							
 	_float					m_fTimeDelta = _float();
 	_float					m_fFadeOutRatio = 0.f;

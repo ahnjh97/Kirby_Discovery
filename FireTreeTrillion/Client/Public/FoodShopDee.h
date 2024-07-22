@@ -1,4 +1,4 @@
-#pragma once
+//커비와의 상호작용 여부 체크#pragma once
 #include "Client_Defines.h"
 #include "WaddleDee.h"
 
@@ -49,6 +49,7 @@ private:
 
 	_bool	bOpenEffect = false;
 	_bool	m_bCheckCollision = false;
+	_bool	m_bIsInteractKirby = { FALSE }; //커비와의 상호작용 여부 체크
 
 public:
 	static CFoodShopDee* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
