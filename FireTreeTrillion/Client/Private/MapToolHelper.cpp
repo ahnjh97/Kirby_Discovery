@@ -175,7 +175,6 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		//07.21) 잔디 오브젝트 추가
 		, "JgGrassA", "JgGrassD", "JgGrassE", "JgGrassH", "JgGrassI", "JgGrassJ", "JgGrassK", "JgGrassM"
 
-
 #pragma region DEEDEEDEE OBJ
 
 		, "TwGougeGround01", "TwGougeGround02"

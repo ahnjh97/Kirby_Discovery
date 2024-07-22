@@ -7,6 +7,7 @@
 #include "Bomber.h"
 #include "SummonEffect.h"
 #include "Effect.h"
+#include "Gm_ParkShutter.h"
 
 CGm_ParkSolarPanelOnce::CGm_ParkSolarPanelOnce(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -94,8 +95,11 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 			m_bSpawn = true;
 			if (4 == m_iGimmickIndex) //크래시 능력 몬스터를 생성
 			{
-				HRESULT hr;
+				//셔터의 애니메이션 설정
+				CGm_ParkShutter* pShutter = 
 
+
+				HRESULT hr;
 				CSummonEffect::SUMMONEFFECT_DESC SummonEffectDesc = {};
 
 				SummonEffectDesc.vPosition = XMVectorSet(35.5f, 75.f, 175.5f, 1.f);

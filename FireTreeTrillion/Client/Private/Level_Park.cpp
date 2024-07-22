@@ -23,6 +23,7 @@
 #include "Gm_DynamicField.h"
 #include "Gm_ParkSolarPanelOnce.h"
 #include "Gm_ParkSolarPanelCharge.h"
+#include "Gm_ParkShutter.h"
 
 #include "WaddleDee.h"
 #include "ItemObject.h"
@@ -1118,6 +1119,14 @@ HRESULT CLevel_Park::Ready_Objects()
 				TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce"), &tDesc)))
 				continue;
 		}
+
+		//¼ÅÅÍ
+		if ("Shutter_NonAnim" == strModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Gimmick_Shutter"), 
+				TEXT("Prototype_GameObject_Gm_ParkShutter"), &tDesc)))
+				continue;
+		}
 	}
 	fileInput.close();
 
@@ -1125,6 +1134,24 @@ HRESULT CLevel_Park::Ready_Objects()
 
 	list<CGameObject*>* GimmickList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_Gimmick_SolarPanel"));
 	list<CGameObject*>* DFieldList = m_pGameInstance->Get_List(m_iLevel, TEXT("Layer_DynamicField"));
+
+	for (auto& gimmick : *GimmickList)
+	{
+		if (TEXT("Prototype_GameObject_Gm_ParkSolarPanelOnce") == gimmick->Get_PrototypeTag())
+		{
+			CGm_ParkSolarPanelOnce* pGimmick = dynamic_cast<CGm_ParkSolarPanelOnce*>(gimmick);
+			_uint iGimmickIx = pGimmick->Get_GimmickIndex();
+
+			//¼ÅÅÍ¿Í ¿¬µ¿
+			CGm_ParkShutter* pShutter = { nullptr };
+			if (4 == iGimmickIx)
+			{
+				pShutter = dynamic_cast<CGm_ParkShutter*>(m_pGameInstance->Get_GameObject(LEVEL_PARK, TEXT("Layer_Gimmick_Shutter")));
+				pShutter->Set_ParkShutter(pGimmick);
+				break;
+			}
+		}
+	}
 
 	for (auto& field : *DFieldList)
 	{

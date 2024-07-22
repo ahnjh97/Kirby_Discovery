@@ -367,9 +367,7 @@ void CUI_MessageWindow::Show_DialogMessage()
 	if (WINDOW_HIDE == m_eCurState) //단, idle 상태일 경우는 트리거 시점에 show해야하므로 hide만 처리
 		return;
 
-	//07.21) 커비의 상태를 홀드 (키입력하지 않게 처리)
 	m_eCurState = WINDOW_SHOW;
-
 	if (nullptr != m_pUIBtn)
 		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_BLINK);	//버튼 상태 동기화
 
@@ -377,6 +375,7 @@ void CUI_MessageWindow::Show_DialogMessage()
 	if (LEVEL_PARTTIME == *m_pCurrentLevelID || LEVEL_SIMBA == *m_pCurrentLevelID) 
 		return;
 
+	//07.21) 커비의 상태를 홀드 (키입력하지 않게 처리)
 	m_bIsSetKirby = TRUE;
 
 	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));

@@ -245,6 +245,7 @@
     <ClInclude Include="..\Public\FinaleBoss_State.h" />
     <ClInclude Include="..\Public\FinaleCut_ControlCenter.h" />
     <ClInclude Include="..\Public\Gm_ParkFhEntranceAlien.h" />
+    <ClInclude Include="..\Public\Gm_ParkShutter.h" />
     <ClInclude Include="..\Public\Gm_ParkSolarPanelCharge.h" />
     <ClInclude Include="..\Public\Gm_ParkSolarPanelOnce.h" />
     <ClInclude Include="..\Public\Gm_DynamicField.h" />
@@ -508,6 +509,7 @@
     <ClCompile Include="..\Private\FinaleBoss_State.cpp" />
     <ClCompile Include="..\Private\FinaleCut_ControlCenter.cpp" />
     <ClCompile Include="..\Private\Gm_ParkFhEntranceAlien.cpp" />
+    <ClCompile Include="..\Private\Gm_ParkShutter.cpp" />
     <ClCompile Include="..\Private\Gm_ParkSolarPanelCharge.cpp" />
     <ClCompile Include="..\Private\Gm_ParkSolarPanelOnce.cpp" />
     <ClCompile Include="..\Private\Gm_DynamicField.cpp" />
