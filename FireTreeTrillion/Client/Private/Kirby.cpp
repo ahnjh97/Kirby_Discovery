@@ -2371,6 +2371,8 @@ void CKirby::Reset_If_Damage()
 	INFO(m_bSwordCharge2) = true;
 
 	INFO(m_bBombHold) = false;
+	INFO(m_vBombThrowDir) = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	INFO(m_fBombPower) = 3.f;
 	INFO(m_bBombOrbit) = false;
 	INFO(m_bBombAimming) = false;
 	INFO(m_bisDeforming) = false;
