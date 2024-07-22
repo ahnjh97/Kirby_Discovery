@@ -36,6 +36,8 @@ private:
 	_bool m_bWave2DeadNotified = { false };
 	_bool m_bWave2Dead = { false };
 	_float m_fWave2DeadTime = {};
+	_uint m_iSummonCount = {};
+	_uint m_iWaveCount = {};
 
 public:
 	static CLevel_Simba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
