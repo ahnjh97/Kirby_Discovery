@@ -119,7 +119,11 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 _int CMultiEffect::Tick(_float fTimeDelta)
 {
 	if (m_bDead)
+	{
+		for (auto& pEffect : m_FXs)
+			pEffect->Set_Dead();
 		return OBJ_DEAD;
+	}
 
 	for (auto& pEffect : m_FXs)
 		pEffect->Tick(fTimeDelta);
@@ -129,6 +133,9 @@ _int CMultiEffect::Tick(_float fTimeDelta)
 
 void CMultiEffect::Late_Tick(_float fTimeDelta)
 {
+	if (m_bDead)
+		return;
+
 	if (0.f < m_fStartDelay)
 	{
 		m_fStartDelay -= fTimeDelta;

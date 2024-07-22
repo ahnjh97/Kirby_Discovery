@@ -88,6 +88,7 @@ public:
 	virtual void	Fill_SaveData(PARTICLE_DATA* pFXData) {}
 	virtual void	Fill_SaveData(MULTI_FX_DATA* pFXData) {}
 
+	virtual void	Set_NoRender() { m_bRender = false; }
 
 	//키프레임 추가(단일 이펙트 용)
 	void			Add_Keyframe(FX_KEYFRAME& newKeyframe, KF_PROPERTY eProperty);

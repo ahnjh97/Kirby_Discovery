@@ -50,7 +50,8 @@ private:
 	vector<class CDebris*>	m_vecDebris = {};
 
 	//
-	_float m_fBbongTime = { 0.f };
+	//_float m_fBbongStartTime = { 0.f };
+	_float m_fBbongTime = { 2.f };
 
 	_float	m_fTimeDelta = { 0.f };
 	_float	m_fRunTime = { 0.f };

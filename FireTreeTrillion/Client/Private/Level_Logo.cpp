@@ -74,6 +74,9 @@ HRESULT CLevel_Logo::Ready_StaticObject()
 	
 	hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
 	CHECK_FAILED(hr);
+
+	//hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_Loading"), TEXT("Prototype_GameObject_LoadingStart"));
+	//CHECK_FAILED(hr);
 	
 	hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
 	CHECK_FAILED(hr);

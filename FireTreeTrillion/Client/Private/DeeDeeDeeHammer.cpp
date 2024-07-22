@@ -239,11 +239,11 @@ void CDeeDeeDeeHammer::Ready_FadeOut()
 		CTransform* pKirbyTrans = pKirby->Get_TransformCom();
 		_float4 vDialogKirbyPos = { 2.73f, 23.11f, -11.54f, 1.f };
 		pKirbyController->Set_Position(pKirbyTrans, vDialogKirbyPos);
-		pCameraMain->Lock_All({ 4.85f,  27.19f,  -31.27f }, { -0.09f, -0.09f, 0.99f }, FALSE);
 
-		//_float4 vKirbyPos = pKirbyTrans->Get_State_Float4(CTransform::STATE_POSITION);
-		//_float4 vNormLook = XMVector4Normalize(pKirbyTrans->Get_State_Float4(CTransform::STATE_LOOK));
-		//pCameraMain->Lock_All({ vPos.x - 0.1f,  vPos.y + 3.f,  vPos.z - 0.1f }, { vNormLook.x, -0.2f, vNormLook.z }, true);
+		_float4 vDialogKirbyDir = { 1.f, 1.f, 1.f, 1.f };
+		pKirby->DialogOn(vDialogKirbyDir);
+
+		pCameraMain->Lock_All({ 4.85f,  27.19f,  -31.27f }, { -0.09f, -0.09f, 0.99f }, FALSE);
 
 #pragma endregion
 

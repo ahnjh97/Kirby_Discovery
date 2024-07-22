@@ -43,6 +43,8 @@ public:
 	}
 	virtual void Fill_SaveData(_Out_ MULTI_FX_DATA* pFXData) override;
 
+	virtual void Set_NoRender() override { m_bRender = false; }
+
 	HRESULT Initialize_Prototype();
 	HRESULT Initialize_Prototype(MULTI_FX_DESC FXDesc);
 	virtual HRESULT Initialize(void* pArg) override;

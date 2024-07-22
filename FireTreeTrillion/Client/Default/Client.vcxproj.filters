@@ -715,6 +715,9 @@
     <Filter Include="02.GameObjects\PhysXObject\Character\Simba\DimensionClaw">
       <UniqueIdentifier>{fd798ad1-1b75-4c18-956c-cab357105e85}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\LoadingStart">
+      <UniqueIdentifier>{072bd44b-22aa-4687-b4a8-8ee6d41a1e54}</UniqueIdentifier>
+	</Filter>
     <Filter Include="02.GameObjects\Map\LightBugEffect">
       <UniqueIdentifier>{7630a4c0-5e08-41d0-bce2-e03c44b03906}</UniqueIdentifier>
     </Filter>
@@ -1429,7 +1432,9 @@
     <ClInclude Include="..\Public\SimbaRock.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaRock</Filter>
     </ClInclude>
-    <ClInclude Include="SimbaLaser.h" />
+    <ClInclude Include="..\Public\LoadingStart.h">
+      <Filter>02.GameObjects\UI\LoadingStart</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\LightBugEffect.h">
       <Filter>02.GameObjects\Map\LightBugEffect</Filter>
     </ClInclude>
@@ -2128,7 +2133,9 @@
     <ClCompile Include="..\Private\SimbaRock.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaRock</Filter>
     </ClCompile>
-    <ClCompile Include="SimbaLaser.cpp" />
+    <ClCompile Include="..\Private\LoadingStart.cpp">
+      <Filter>02.GameObjects\UI\LoadingStart</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\LightBugEffect.cpp">
       <Filter>02.GameObjects\Map\LightBugEffect</Filter>
     </ClCompile>
@@ -2159,9 +2166,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
-      <Filter>97.ShaderFiles</Filter>
-    </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
@@ -2181,6 +2185,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel_Map.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

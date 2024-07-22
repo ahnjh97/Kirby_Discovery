@@ -1,9 +1,13 @@
 #include "stdafx.h"
+#include "GameInstance.h"
+
 #include "RayArrow.h"
 #include "FinalBoss.h"
 #include "Kirby.h"
 #include "HitBox.h"
 #include "Ability.h"
+
+#include "Camera.h"
 
 CRayArrow::CRayArrow(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -69,8 +73,8 @@ HRESULT CRayArrow::Initialize(void* pArg)
 
 	Add_Effect("HS_RayArrow test", FXDesc, true);
 
-	FXDesc.vInitScale = { 5.f, 5.f, 5.f };
-	Add_Effect("HS_FB white pop arrow bubble", FXDesc);
+	FXDesc.vInitScale = {6.f, 6.f, 6.f };
+	Add_Effect("HS_ground arrow bubble B", FXDesc);
 
 
 	return S_OK;
@@ -145,9 +149,12 @@ _int CRayArrow::Tick(_float fTimeDelta)
 					if (!m_bCollided)
 					{
 						CMultiEffect::MULTI_FX_DESC FXDesc{};
-						FXDesc.vInitPos = (_float3)GET_POS + _float3{0.f, -.5f, 0.f};
+						FXDesc.vInitPos = (_float3)GET_POS;
+						FXDesc.vInitPos.y = .1f;
 						FXDesc.vInitScale = {2.f, 2.f, 2.f};
 						Add_Effect("HS_FB arrow bomb", FXDesc, false);
+						m_pGameInstance->Get_CurCameraPtr()->Make_Shake(.2f, .5f);
+
 						m_bCollided = true;
 					}
 

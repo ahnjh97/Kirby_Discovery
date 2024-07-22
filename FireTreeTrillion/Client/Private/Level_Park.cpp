@@ -19,6 +19,7 @@
 #include "HUD.h"
 #include "SkySphere.h"
 #include "TransingStar.h"
+#include "LoadingStart.h"
 #include "Gm_DynamicField.h"
 #include "Gm_ParkSolarPanelOnce.h"
 #include "Gm_ParkSolarPanelCharge.h"
@@ -119,6 +120,12 @@ void CLevel_Park::Teleport_Player()
 	pTransingStar->Activate(CTransingStar::CLOSE);
 	pTransingStar->Set_LargeColor(_float3(95.f / 255.f, 28.f / 255.f, 128.f / 255.f));
 	pTransingStar->Set_SmallColor(_float3(167.f / 255.f, 42.f / 255.f, 168.f / 255.f));
+
+	//CLoadingStart* pLoadingStart = static_cast<CLoadingStart*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar")));
+	//if (nullptr != pLoadingStart)
+	//{
+	//	pLoadingStart->Set_TexureIndex(1);
+	//}
 }
 
 void CLevel_Park::Change_Levels()
