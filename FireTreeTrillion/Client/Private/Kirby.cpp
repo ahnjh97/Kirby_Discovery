@@ -74,7 +74,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ�
-	m_eAbilityType = ABILITY_BOMB;
+	m_eAbilityType = ABILITY_SWORD;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 		m_eAbilityType = ABILITY_SWORD;
 	m_fHp = 1000.f;
@@ -1759,6 +1759,7 @@ void CKirby::DialogOn(_float4 vDir)
 
 	if (vDir != _float4(0.f, 0.f, 0.f, 0.f))
 		INFO(m_vMoveDir) = INFO(m_vTargetDir) = vDir;
+		//INFO(m_vTargetDir) = vDir;
 
 	if (m_eAbilityType == ABILITY_SWORD)
 		Change_State(SWORDSTATE_WAIT, 60.f, true, true, BODY_SWORDDEFAULT, OFFSET_SWORD);

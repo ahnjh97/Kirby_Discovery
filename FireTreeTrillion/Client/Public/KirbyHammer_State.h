@@ -115,6 +115,7 @@ public:
 	_bool Key_C(class CGameObject* pGameObject, _float fTimeDelta);
 
 	_float	m_fChangeRunTime = { 0.f };
+	_bool	m_bJumpEffectTrigger = { true };
 
 public:
 	static	CKirbyHammer_Jump_State* Create();

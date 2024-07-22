@@ -1103,6 +1103,12 @@ void CKirbyHammer_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	if (pKirby->Get_State() == CKirby::HAMMERSTATE_JUMPL || pKirby->Get_State() == CKirby::HAMMERSTATE_JUMPR
 		|| pKirby->Get_State() == CKirby::HAMMERSTATE_JUMPEND)
 	{
+		if (m_bJumpEffectTrigger == true && (pKirby->Get_State() == CKirby::HAMMERSTATE_JUMPL || pKirby->Get_State() == CKirby::HAMMERSTATE_JUMPR))
+		{
+			Jump_FX(pTransformCom);
+			m_bJumpEffectTrigger = false;
+		}
+
 		// 0.3초 동안만 누적이 된다.
 		if (DESC(m_bRePressBlock) == false && m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS) && DESC(m_fJumpHoldTime) < 0.3f)
 		{
@@ -1298,6 +1304,7 @@ void CKirbyHammer_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 void CKirbyHammer_Jump_State::OnStateExit()
 {
 	m_fChangeRunTime = 0.f;
+	m_bJumpEffectTrigger = true;
 }
 
 _bool CKirbyHammer_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)

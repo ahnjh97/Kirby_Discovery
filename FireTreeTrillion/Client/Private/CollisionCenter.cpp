@@ -2297,11 +2297,19 @@ void CCollisionCenter::Compute_HitBoxDamage(CPhysXObject* pPlayer, CPhysXObject*
 
 void CCollisionCenter::Compute_Heal(CPhysXObject* pPlayer, CPhysXObject* pItem)
 {
-	CCharacter* pCPlayer = static_cast<CCharacter*>(pPlayer);
+	CKirby* pCPlayer = static_cast<CKirby*>(pPlayer);
 	CItemObject* pIItem = static_cast<CItemObject*>(pItem);
 
 	_float fItemPoint = (_float)pIItem->Get_ItemPoint();
 	pCPlayer->Plus_Hp(fItemPoint);
+
+	CMultiEffect::MULTI_FX_DESC Effectdesc = {};
+	Effectdesc.vInitPos = { 0.f, 0.5f, 0.f };
+	Effectdesc.vInitScale = { 1.f, 1.f, 1.f };
+	Effectdesc.pSocketMatrix = pCPlayer->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
+	//if (FAILED(GAMEINSTANCE Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Food Eat Effects"), &Effectdesc)))
+	//	return;
+	pCPlayer->Add_Effect("YW Food Eat Effects", Effectdesc, false);
 }
 
 void CCollisionCenter::Compute_Coin(CPhysXObject* pPlayer, CPhysXObject* pItem)

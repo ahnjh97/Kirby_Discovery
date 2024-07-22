@@ -52,8 +52,6 @@ public:
 		// 플레이어가 범위 안에 있다면
 		_bool			m_bInRangePlayer = { false };
 
-
-
 		_float4			m_vOriginPos = { 0.f, 0.f, 0.f, 0.f };
 		_bool			m_bJumpTarget = { false };
 		_float4			m_vJumpTargetDir = { 0.f, 0.f, 0.f, 0.f };
@@ -103,7 +101,7 @@ private:
 	_bool				  m_isDead = { false };
 	_float				  m_fDeadTime = { 0.f };
 	_bool				  m_bRestoreTrigger = { true };
-
+	_bool				  m_bIsInteractKirby = { FALSE }; //커비와의 상호작용 여부 체크
 
 	HRESULT	Make_TargetToCams();
 

@@ -160,6 +160,8 @@ public:
 	//카메라에게 특정 동작들을 시퀀스로 선예약한다.
 	void Make_Sequence(CAMSEQ eSeq);
 
+	void Set_DOFMode(_bool bAuto) { m_bAutoDOF = bAuto; }
+
 	_bool IsSequencePlaying() { return m_eSpecialSeq == SEQ_END; }
 
 	//카메라에게 동작을 수행시킨다.
@@ -190,6 +192,7 @@ public:
 	//카메라 목표 수치 계산
 	void Compute_Set_BothFocus(_float fTimeDelta);
 	void Compute_Set_BattleFocus(_float fTimeDelta);
+	void Compute_Set_FinalBossFocus(_float fTimeDelta);
 	void Compute_Set_CamLock(_float fTimeDelta);
 	void Compute_Set_Trigger(_int iTriggerIndex);
 
@@ -271,6 +274,7 @@ private:
 	//현재 트래킹 설정
 	CAMFOCUS m_eCamFocus = { FOCUS_END };
 	
+	_bool	m_bAutoDOF = { true };
 
 	//카메라가 포커징할 기준점 
 	_float3 m_vAnchor = { 0.f, 0.f, 0.f };
