@@ -424,8 +424,9 @@ HRESULT CAwoofy::Add_Components(const wstring& wstrModelName)
 		Set_BodyCollider(COLLIDER_CYLINDER, 1.f, 1.5f, 0.85f);
 		if (LEVEL_SIMBA == *m_pCurrentLevelID)
 			Set_BodyCollider(COLLIDER_CYLINDER, 1.5f, 2.15f, 0.85f);
-		return S_OK;
 	}
+
+	return S_OK;
 }
 
 HRESULT CAwoofy::Bind_ShaderResources()
