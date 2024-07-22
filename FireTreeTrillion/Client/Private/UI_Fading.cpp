@@ -79,7 +79,9 @@ HRESULT CUI_Fading::Render()
 
 		if (m_fFadeOutRatio >= 1.f)
 			m_fFadeOutRatio = 1.f;
+
 	}
+	//return S_OK;
 
 	hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
 	CHECK_FAILED(hr);

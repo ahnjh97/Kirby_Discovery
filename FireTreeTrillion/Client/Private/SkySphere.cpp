@@ -71,54 +71,67 @@ HRESULT CSkySphere::Render()
 		return E_FAIL;
 
 	HRESULT hr;
-
-	for (_uint i = 0; i < m_pModelCom->Get_NumMeshes(); ++i)
+	
+	if (LEVEL_FINALBOSS > *m_pCurrentLevelID)
 	{
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
-		CHECK_FAILED(hr);
+		for (_uint i = 0; i < m_pModelCom->Get_NumMeshes(); ++i)
+		{
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
+			CHECK_FAILED(hr);
 
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
-		CHECK_FAILED(hr);
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
+			CHECK_FAILED(hr);
 
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
-		CHECK_FAILED(hr);
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
+			CHECK_FAILED(hr);
 
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DepthTexture", i, TextureType_HEIGHT);
-		CHECK_FAILED(hr);
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DepthTexture", i, TextureType_HEIGHT);
+			CHECK_FAILED(hr);
+
+			hr = m_pShaderCom->Begin(MODEL_SKY);
+			CHECK_FAILED(hr);
+
+			hr = m_pModelCom->Render(i);
+			CHECK_FAILED(hr);
+		}
+	}
 
 #pragma region LEVEL_FINALBOSS & LEVEL_FINALE ::TEXTURE SWAP 
 
-		//1) 현재 해당 레벨 진입 시에 임시로 설정. 추후 FIELD/1PASE/2PASE 시점에 스왑하는 방식으로 변경 필요
-		// ex) 에피리스 HP 45% 일 경우, 2페이즈 시작 (SKY_LAB_2PASE)
-		//2) 추후 일렁일렁 움직이는 효과 셰이더로 세팅 필요
-		SKY_TYPE eSkyType = { SKY_LAB_1PASE };
-		if (LEVEL_FINALBOSS <= *m_pCurrentLevelID)
-		{
-			if (LEVEL_FINALE == *m_pCurrentLevelID) //피날레 레벨에서는 스피어 텍스처 교체
-				eSkyType = SKY_LAB_2PASE;
+	//1) 현재 해당 레벨 진입 시에 임시로 설정. 추후 FIELD/1PASE/2PASE 시점에 스왑하는 방식으로 변경 필요
+	// ex) 에피리스 HP 45% 일 경우, 2페이즈 시작 (SKY_LAB_2PASE)
+	//2) 추후 일렁일렁 움직이는 효과 셰이더로 세팅 필요
+	SKY_TYPE eSkyType = { SKY_LAB_1PASE };
+	if (LEVEL_FINALBOSS <= *m_pCurrentLevelID)
+	{
+		if (LEVEL_FINALE == *m_pCurrentLevelID) //피날레 레벨에서는 스피어 텍스처 교체
+			eSkyType = SKY_LAB_2PASE;
 
+		for (_uint i = 0; i < m_pModelCom->Get_NumMeshes(); ++i)
+		{
 			hr = m_pTextureCom[TEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", eSkyType);
 			CHECK_FAILED(hr);
 
-			hr = m_pTextureCom[TEX_NORMAL]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", SKY_LAB_2PASE);
+			//hr = m_pTextureCom[TEX_NORMAL]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", SKY_LAB_2PASE);
+			//CHECK_FAILED(hr);
+
+			////TEX_EMISSIVE :: 방출 옵션
+			//hr = m_pTextureCom[TEX_EMISSIVE]->Bind_ShaderResource(m_pShaderCom, "g_EmissiveTexture", SKY_LAB_2PASE);
+			//CHECK_FAILED(hr);
+
+			//hr = m_pTextureCom[TEX_HEIGHT]->Bind_ShaderResource(m_pShaderCom, "g_DepthTexture", SKY_LAB_2PASE);
+			//CHECK_FAILED(hr);
+
+			hr = m_pShaderCom->Begin(MODEL_SKY);
 			CHECK_FAILED(hr);
 
-			//TEX_EMISSIVE :: 방출 옵션
-			hr = m_pTextureCom[TEX_EMISSIVE]->Bind_ShaderResource(m_pShaderCom, "g_EmissiveTexture", SKY_LAB_2PASE);
-			CHECK_FAILED(hr);
-
-			hr = m_pTextureCom[TEX_HEIGHT]->Bind_ShaderResource(m_pShaderCom, "g_DepthTexture", SKY_LAB_2PASE);
+			hr = m_pModelCom->Render(i);
 			CHECK_FAILED(hr);
 		}
+	}
 
 #pragma endregion
 
-		hr = m_pShaderCom->Begin(MODEL_SKY);
-		CHECK_FAILED(hr);
-
-		hr = m_pModelCom->Render(i);
-		CHECK_FAILED(hr);
-	}
 
 	return S_OK;
 }
