@@ -7,6 +7,7 @@
 #include "UI_MessageWindow.h"
 #include "Camera_Main.h"
 #include "UI_Interactable.h"
+#include "Kirby.h"
 
 CFoodShopDee::CFoodShopDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CWaddleDee{ pDevice, pContext }
@@ -77,6 +78,22 @@ _int CFoodShopDee::Tick(_float fTimeDelta)
 		bOpenEffect = false;
 		fAccTime = 0.f;
 	}
+
+	if (m_bIsInteractKirby) //07.22) 상호작용 할 경우, 커비를 바라보게 세팅
+	{
+		CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
+		CHECK_NULLPTR(pKirby);
+
+		CTransform* pKirbyTrans = pKirby->Get_TransformCom();
+		CTransform* pNPCDeeTrans = this->Get_TransformCom();
+
+		pNPCDeeTrans->Look_At_Interpolate(pKirbyTrans->Get_State_Vector(CTransform::STATE_POSITION), m_fTimeDelta);
+		
+		pKirbyTrans->Look_At_Interpolate(pNPCDeeTrans->Get_State_Vector(CTransform::STATE_POSITION), m_fTimeDelta);
+		pKirby->DialogOn(pKirbyTrans->Get_State_Float4(CTransform::STATE_LOOK));
+		m_bIsInteractKirby = FALSE;
+	}
+
 
 	m_bCheckCollision = false;
 	return OBJ_NOEVENT;
@@ -169,6 +186,7 @@ void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
 	{
 		m_pUI_Interactable->Set_IsRender(false);
+		m_bIsInteractKirby = TRUE;
 
 		// 07.14) 크래시 버그 수정 (Layer 명확하게 검색)
 		CUI_MessageWindow* pMWindow =  dynamic_cast<CUI_MessageWindow*>
@@ -176,7 +194,7 @@ void CFoodShopDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 		CHECK_NULLPTR(pMWindow);
 		pMWindow->Show_DialogMessage();
 
-		CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+		CCamera_Main* pCameraMain = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 		CHECK_NULLPTR(pCameraMain);
 		pCameraMain->Lock_All({ 12.f, 30.f, 1.9f }, { 0.09f, -0.18f, 0.98f }, true);
 	}
