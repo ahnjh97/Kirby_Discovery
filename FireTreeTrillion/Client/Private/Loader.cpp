@@ -1221,6 +1221,12 @@ HRESULT CLoader::Loading_For_FinalBoss()
 	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Emissive", "SkySphere/SkySphere_LabBoss_2Pase_Emissive.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Height", "SkySphere/SkySphere_LabBoss_2Pase_Height.dds");	CHECK_FAILED(hr);
 
+
+	// 디멘션 게이트 리소스
+	hr = Add_Texture(eLevel, "GateDiffuse", "DimensionGateTexture/GateDiffuse.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "GateMask", "DimensionGateTexture/GateMask.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "GateMask2", "DimensionGateTexture/280.dds");	CHECK_FAILED(hr);
+
 #pragma endregion
 
 	// 커비 얼굴 텍스쳐 로드
