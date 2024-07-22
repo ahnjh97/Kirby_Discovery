@@ -272,8 +272,8 @@ void CLevel_Intro::Fog_Tick(_float fTimeDelta)
 	break;
 	case UPSTAIRS_FOG:
 	{
-		m_pGameInstance->Increase_FogYValue(fTimeDelta);
-		m_pGameInstance->Increase_FogViewValue(fTimeDelta);
+		m_pGameInstance->Increase_FogYValue(fTimeDelta * 0.5f);
+		m_pGameInstance->Increase_FogViewValue(fTimeDelta * 0.5f);
 	}
 	break;
 
@@ -381,7 +381,7 @@ HRESULT CLevel_Intro::Ready_Lights()
 	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	CGameInstance::Get_Instance()->Setting_GodRay({-424.f, 373.f, 1165.f, 1.f});
+	CGameInstance::Get_Instance()->Setting_GodRay({-374.f, 230.f, 1165.f, 1.f});
 
 	return S_OK;
 }

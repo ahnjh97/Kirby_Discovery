@@ -45,12 +45,19 @@ HRESULT CItemObject::Initialize(void* pArg)
     hr = __super::Initialize(pArg);
     CHECK_FAILED(hr);
 
+    m_bUpdate_FXSocketMatrix = false;
+
     return S_OK;
 }
 
 _int CItemObject::Tick(_float fTimeDelta)
 {
     __super::Tick(fTimeDelta);
+
+    m_EffectSocket = _float4x4::Identity;
+    _float3 vScale = m_pTransformCom->Get_Scaled();
+    CUtils::Set_Scaled_Matrix(m_EffectSocket, vScale.x, vScale.y, vScale.z);
+    CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, GET_POS);
 
     return OBJ_NOEVENT;
 }

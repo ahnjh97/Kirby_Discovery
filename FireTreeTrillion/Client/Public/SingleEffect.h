@@ -22,7 +22,7 @@ private:
 	virtual ~CSingleEffect() = default;
 
 public:
-	_bool	IsModelBuffer() {	return m_pModelCom != nullptr;	}
+	_bool	IsModelBuffer() { return m_pModelCom != nullptr; }
 	virtual void	Reset_Duration() override
 	{
 		m_fDuration.first = 0.f;
@@ -32,8 +32,11 @@ public:
 			m_iCurKeyframeIdxs[i] = 0;
 		}
 
-		m_fLifetime.second -= m_fLifetime.first;
-		m_fLifetime.first -= m_fLifetime.first;
+		if (m_bIsLoop)
+		{
+			m_fLifetime.second -= m_fLifetime.first;
+			m_fLifetime.first -= m_fLifetime.first;
+		}
 	}
 
 	HRESULT Initialize_Prototype();
@@ -46,10 +49,10 @@ public:
 
 private:
 
-	CVIBuffer_Rect*		m_pVIBufferCom = { nullptr };
-	CModel*				m_pModelCom = { nullptr };
-	CTexture*			m_pTextureCom[TEX_END] = { nullptr };
-	CShader*			m_pShaderCom = { nullptr };
+	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
+	CModel* m_pModelCom = { nullptr };
+	CTexture* m_pTextureCom[TEX_END] = { nullptr };
+	CShader* m_pShaderCom = { nullptr };
 	FX_DESC				m_FXDesc = {};
 
 	_bool				m_bNoRender = { false };

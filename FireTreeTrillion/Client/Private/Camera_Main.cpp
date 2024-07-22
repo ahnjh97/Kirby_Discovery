@@ -252,7 +252,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_CamTriggerUpOffsets.reserve(LEVEL_END);
 	m_CamTriggerUpOffsets.resize(LEVEL_END);
 
-	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f, 0.f, 0.1f, 0.1f, 0.1f }; //9 == 11
+	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .2f, .15f, 0.f, 0.f, 0.f, 0.f, 0.1f, 0.1f, 0.1f }; //9 == 11
 	//m_CamTriggerUpOffsets[LEVEL_PARK] = { 0.f, 0.f, 0.f, 100.f, .15f, 0.f, 0.f, 0.f, 0.f };
 	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .05f };
 	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f, .4f, .5f, 0.2f, 0.2f, 0.f };

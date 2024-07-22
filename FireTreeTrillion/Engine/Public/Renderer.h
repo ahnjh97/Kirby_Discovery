@@ -60,8 +60,13 @@ public:
 	// fog를 바깥에서 조절할 수 있는 함수들
 	void Fog_Zero();
 	
-	// for LEVEL_INTRO
+	// LEVEL별 Fog 세팅을 돕습니다.
 	void Fog_Intialize_ForIntroLevel(_int iPoint);
+	void Fog_Intialize_ForRacing(_int iPoint);
+	void Fog_Intialize_ForDeeDeeDee(_int iPoint);
+	void Fog_Intialize_ForPark(_int iPoint);
+	void Fog_Intialize_ForFinalBoss(_int iPoint);
+
 	void Increase_FogYValue(_float fTimeDelta)
 	{ 
 		m_fFogYIntensity += fTimeDelta;

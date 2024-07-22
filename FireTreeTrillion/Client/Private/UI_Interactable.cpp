@@ -45,7 +45,7 @@ _int CUI_Interactable::Tick(_float fTimeDelta)
 	// 위치 UPDATE
 	CTransform* pTransform = m_pOwner->Get_TransformCom();
 	_float4 vPos = pTransform->Get_State_Float4(CTransform::STATE_POSITION);
-	Update_Pos(_float3(vPos.x, vPos.y + m_fOffset, vPos.z));
+	Update_Pos(_float3(vPos.x, vPos.y + m_fOffset, vPos.z - 1.f));
 	
 	// 사이즈 UPDATE
 	static _float fAccTime = 0.f;
