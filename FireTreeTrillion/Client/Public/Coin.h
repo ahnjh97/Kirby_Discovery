@@ -33,6 +33,7 @@ private:
 private:
 	CModel*			m_pModelCom = { nullptr };
 	_float			m_fCoinTime = { 0.f };
+	_float			m_fEffectTime = { 0.f };
 
 	_float4			m_vTargetPos = { 0.f, 0.f, 0.f, 0.f };
 
