@@ -20,6 +20,8 @@
 #include "Dialog.h"
 #include "TransingStar.h"
 
+#include "UnKnownFireMan.h"
+
 CLevel_Town::CLevel_Town(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
@@ -168,6 +170,33 @@ HRESULT CLevel_Town::Ready_Lights()
 		return E_FAIL;
 
 	CGameInstance::Get_Instance()->Setting_GodRay({ 450.f, 400.f, 1200.f, 1.f });
+
+
+
+	LightDesc.eType = LIGHT_DESC::TYPE_HORONG;
+	LightDesc.vDiffuse = _float4(1.f, 0.8f, 0.6f, 1.f);
+	LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
+	LightDesc.vPosition = _float4(52.85f, 24.f, 9.6f, 1.f);
+	LightDesc.fRange = 12.f;
+	if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
+		return E_FAIL;
+
+
+	CUnKnownFireMan::UNKNOWNFIREDESC desc = {};
+	desc.iFireCount = 40;
+	desc.vFirePos = { 52.85f, 23.1f, 9.6f, 1.f};
+	desc.vFireColor = { 1.f, 0.8f, 0.7f, 1.f };
+	desc.vTargetColor = { 1.f, 0.2f, 0.2f, 1.f };
+	desc.fUpRange = 5.f;
+	desc.fScale = 4.f;
+	desc.fTimeRatio = 0.6f;
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UnKnownFire"), TEXT("Prototype_GameObject_UnKnownFireMan"), &desc)))
+		return E_FAIL;
+
+	desc.vFirePos = { 52.85f, 23.5f, 9.6f, 1.f };
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UnKnownFire"), TEXT("Prototype_GameObject_UnKnownFireMan"), &desc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }

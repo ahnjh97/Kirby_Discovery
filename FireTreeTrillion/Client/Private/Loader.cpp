@@ -42,6 +42,7 @@
 // 기타 이펙트스러운거
 #include "Fire.h"
 #include "CrashParticle.h"
+#include "UnKnownFireMan.h"
 
 //애님 툴
 #include "AnimToolHelper.h"
@@ -432,6 +433,7 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Fire"), CFire);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CrashParticle"), CCrashParticle);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UnKnownFireMan"), CUnKnownFireMan);
 
 	// Deform
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Car"), CCar);

@@ -717,7 +717,7 @@
     </Filter>
     <Filter Include="02.GameObjects\UI\LoadingStart">
       <UniqueIdentifier>{072bd44b-22aa-4687-b4a8-8ee6d41a1e54}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="02.GameObjects\Map\LightBugEffect">
       <UniqueIdentifier>{7630a4c0-5e08-41d0-bce2-e03c44b03906}</UniqueIdentifier>
     </Filter>
@@ -1444,11 +1444,11 @@
     <ClInclude Include="..\Public\FinalDump.h">
       <Filter>02.GameObjects\Map\FinalCutObject\FinalDump</Filter>
     </ClInclude>
-    <ClInclude Include="SimbaLaser.h">
-      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\SimbaLaser.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UnKnownFireMan.h">
+      <Filter>02.GameObjects\Effect\Fire</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2145,11 +2145,11 @@
     <ClCompile Include="..\Private\FinalDump.cpp">
       <Filter>02.GameObjects\Map\FinalCutObject\FinalDump</Filter>
     </ClCompile>
-    <ClCompile Include="SimbaLaser.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\SimbaLaser.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UnKnownFireMan.cpp">
+      <Filter>02.GameObjects\Effect\Fire</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
