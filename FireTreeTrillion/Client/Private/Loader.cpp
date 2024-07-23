@@ -219,6 +219,7 @@
 #include "UI_Fading.h"
 #include "UI_Interactable.h"
 #include "LoadingStart.h"
+#include "HUD_KirbyNameTag.h"
 
 // æ∆¿Ã≈€
 #include "Food.h"
@@ -393,11 +394,12 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	// For HitBox
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HitBox"), CHitBox);
-#pragma region UI
 
 	// UI
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD"), CHUD);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_KirbyStatus"), CHUD_KirbyStatus);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_KirbyNameTag"), CHUD_KirbyNameTag);
+
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_StarPoint"), CHUD_StarPoint);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_AbilityDiscard"), CHUD_AbilityDiscard);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HUD_BossHpBar"), CHUD_BossHpBar);
@@ -417,9 +419,6 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Dialog"), CDialog);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_MessageWindow"), CUI_MessageWindow);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_BtnIcon"), CUI_BtnIcon);
-
-#pragma endregion
-
 
 #pragma region FOR CLIENT
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Kirby"), CKirby);
@@ -590,6 +589,7 @@ HRESULT CLoader::Loading_ObjectAll()
 #pragma endregion
 
 #pragma endregion
+
 	return S_OK;
 }
 
@@ -1700,6 +1700,8 @@ HRESULT CLoader::Add_StaticUITexture()
 	//KirbyHP
 	hr = Add_Texture(LEVEL_STATIC, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");	CHECK_FAILED(hr);
+
+	//KirbyNameTag
 	hr = Add_Texture(LEVEL_STATIC, "HUD_StatusBar_NameTag", "UI/HUD/Kirby/NameTag_%d.png", 7);	CHECK_FAILED(hr);
 	
 	//StarPoint

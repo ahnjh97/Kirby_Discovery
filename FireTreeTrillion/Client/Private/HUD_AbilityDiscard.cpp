@@ -44,13 +44,13 @@ HRESULT CHUD_AbilityDiscard::Initialize(void* _pArg)
 
 	if (LEVEL_FINALE != *m_pCurrentLevelID)
 	{
-		m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(eLevel, TEXT("Layer_Player")));
+		m_pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(eLevel, TEXT("Layer_Player")));
 		Safe_AddRef(m_pKirby);
 	}
 	
 	if (LEVEL_FINALE == *m_pCurrentLevelID) //피날레 레벨에 대한 처리. 다만 현재 피날레 레벨은 어빌 덤프타임 정보가 없는 상태
 	{
-		m_pKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(eLevel, TEXT("Layer_Player")));
+		m_pKirby = dynamic_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(eLevel, TEXT("Layer_Player")));
 		Safe_AddRef(m_pKirby);
 	}
 	
@@ -177,7 +177,7 @@ void CHUD_AbilityDiscard::Render_IMGUI()
 void CHUD_AbilityDiscard::ChaseUI_To_Player()
 {
 	//커비 위치정보
-	CTransform* pKirbyTrans = static_cast<CTransform*>(m_pKirby->Get_Component(g_strTransformTag));
+	CTransform* pKirbyTrans = dynamic_cast<CTransform*>(m_pKirby->Get_Component(g_strTransformTag));
 	_float4 vKirbyPos = pKirbyTrans->Get_State(CTransform::STATE_POSITION);
 
 	//뷰포트 공간 상의 X, Y를 정보를 구함

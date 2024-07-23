@@ -1452,9 +1452,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\BossOrigin.h">
       <Filter>02.GameObjects\Map\SimbaObjects\BossOrigin</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\Public\Gm_ParkShutter.h">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HUD_KirbyNameTag.h">
+      <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2159,6 +2162,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BossOrigin.cpp">
       <Filter>02.GameObjects\Map\SimbaObjects\BossOrigin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD_KirbyNameTag.cpp">
+      <Filter>02.GameObjects\UI\HUD</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

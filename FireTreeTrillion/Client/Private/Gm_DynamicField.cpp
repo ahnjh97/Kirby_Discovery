@@ -465,8 +465,8 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				{
 					if (DFMOVE_RIGHT == m_eDFieldType)
 					{
-						m_pTransformCom->Go_Left(_fTimeDelta * 2.f); //2.25 > 2.0
-						MoveItems(_float3(-1, 0, 0), _fTimeDelta * 2.f);
+						m_pTransformCom->Go_Left(_fTimeDelta * 1.5f); //2.25 > 2.0 > 1.5
+						MoveItems(_float3(-1, 0, 0), _fTimeDelta * 1.5f);
 
 						if (vCurPos.x < m_vInitPos.x)
 						{
@@ -509,8 +509,8 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			switch (m_eDFMoveState)
 			{
 			case DFIELD_MOVE: //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
-				m_pTransformCom->Go_Backward(_fTimeDelta * 2.f);
-				MoveItems(_float3(0, 0, -1), _fTimeDelta * 2.f);
+				m_pTransformCom->Go_Backward(_fTimeDelta * 0.75f); //2.0 > 1.5
+				MoveItems(_float3(0, 0, -1), _fTimeDelta * 0.75f);
 				break;
 
 			case DFIELD_QUAKE:
