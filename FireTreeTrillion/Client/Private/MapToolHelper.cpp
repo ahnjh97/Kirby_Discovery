@@ -290,7 +290,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC", "DsPalmABottomL", "DsPalmAMiddleL", "DsPalmATopL", "DsPalmBL", "DsPalmCL"
 		, "GsFlowerBedTreeAL", "GsFlowerBedTreeBL", "GsIvyGroundMiddlePlus", "GsIvyB", "JgGrasslongB"
-		, "GsCarSteelPartsAL", "GsScrappedCar", "GsCarHoistCrane01L", "CvSteelPartsDL" };
+		, "GsCarSteelPartsAL", "GsScrappedCar", "GsCarHoistCrane01L", "CvSteelPartsDL", "GsFlowerlongTreeAL", "GsFlowerlongTreeBL" };
 
 	//블렌드 적용이 필요한 데코오브젝트
 	m_setBlendDecos = { "LbOutBuildingWallL", "LbOutBuildingFenceL", "GsCarFloor", "LbBossCapsule02L"

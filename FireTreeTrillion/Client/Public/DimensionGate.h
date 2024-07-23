@@ -6,6 +6,7 @@
 BEGIN(Engine)
 class CModel;
 class CShader;
+class CTexture;
 END
 
 BEGIN(Client)
@@ -52,10 +53,22 @@ private:
 
 	_vector		m_vPosition = {};
 
+	enum TEXTURETYPE { TYPE_DIFFUSE, TYPE_MASK, TYPE_MASK2, TYPE_END };
+	CTexture*	m_pTextureCom[TYPE_END] = { nullptr, nullptr, nullptr };
+
+	_float		m_fDimensionTime = { 0.f };
+	_float		m_fDimensionMin = { 0.f };
+	_float		m_fDimensionMax = { 0.f };
+	_float2		m_vUVOffset = { 1.f, 0.f };
+
+	_float		m_gtest = { 0.f };
+
+
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
-
+	
+	void	Compute_DimensionGateMaskRatio(_float fTimeDelta);
 	void	Compute_MotionBlur();
 
 public:

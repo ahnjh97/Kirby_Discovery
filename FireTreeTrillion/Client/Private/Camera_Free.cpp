@@ -41,10 +41,10 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 	m_vDestCamDir = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 
-	if (*m_pCurrentLevelID == LEVEL_PARTTIME)
-	{
-		__super::Lock_Camera({ 16.4f, 25.7f, 35.75f }, { .16f, -.08f, -1.f }, 38.f);
-	}
+	//if (*m_pCurrentLevelID == LEVEL_PARTTIME)
+	//{
+	//	__super::Lock_Camera({ 16.4f, 25.7f, 35.75f }, { .16f, -.08f, -1.f }, 38.f);
+	//}
 
 	//// 파트타임헬퍼에 옵저버로 카메라를 알게하고 있습니다. JYWI's ps : 카메라 클래스 하나 더 팔걸~~
 	//if(LEVEL_PARTTIME == *m_pGameInstance->Get_CurrentLevelID())

@@ -84,6 +84,8 @@ public:
 		class CLight* m_pLight1 = { nullptr };
 		class CLight* m_pLight2 = { nullptr };
 
+		_bool			m_bRimOnOff = { false };
+
 	}FINALEKIRBY_INFODESC;
 
 private:
@@ -127,6 +129,14 @@ public:
 	_float4					Compute_RootPos();
 
 	_float					Get_AnimTrackPos();
+	_float4					Get_BoneWorldPos(const _char* pBoneName);
+	void					Compute_RimLight(_float fTimeDelta);
+	_float4x4				m_BoneFrontLMatrix;
+	_float4x4				m_BoneFrontRMatrix;
+	_float4x4				m_BoneBackLMatrix;
+	_float4x4				m_BoneBackRMatrix;
+
+
 private:
 	// 커비의 움직임을 담은 구조체
 	FINALEKIRBY_INFODESC	m_tKirbyInfo;
@@ -146,10 +156,21 @@ private:
 	// 구독서비스
 	void			SetUp_Event();
 
+	_int			m_iComputeMode = { 0 };
+	_float			m_fDeformTime = { 0.f };
+	_float3			m_vDeformRimColor = { 1.f, 0.f, 0.f };
+	_int			m_iRenderCount = { 0 };
+	_float			m_fUVOffsetTime = { 0.f };
+	_float			m_fDissolveRatio = { 0.f };
+
+
+
 private:
 	CModel* m_pModelCom[BODY_END] = { nullptr };
 	CTexture* m_pEyeTexture[EYE_END] = { nullptr };
 	CTexture* m_pMouthTexture[MOUTH_END] = { nullptr };
+
+	CTexture* m_pMaskTextureCom = { nullptr };
 	class CCamera* m_pCamera = { nullptr };
 
 	void				  OverPower();

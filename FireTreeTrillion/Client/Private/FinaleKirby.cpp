@@ -185,6 +185,12 @@ void CFinaleKirby::Late_Tick(_float fTimeDelta)
     m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
     m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_DEFERREDINFO, this);
 
+    if (INFO(m_bRimOnOff) == true)
+    {
+        m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+        m_iRenderCount = 1;
+    }
+
 }
 
 HRESULT CFinaleKirby::Render()
@@ -194,52 +200,141 @@ HRESULT CFinaleKirby::Render()
 
     _uint iNumMeshes = m_pModelCom[INFO(m_eBodyState)]->Get_NumMeshes();
 
-    for (size_t i = 0; i < iNumMeshes; i++)
+    if (INFO(m_bRimOnOff) == false)
     {
-        if (Kirby_FaceCustom(INFO(m_eBodyState), i) == true)
-            continue;
-
-        if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
-            return E_FAIL;
-
-        if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
-            return E_FAIL;
-
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
-            return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
-            return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
-            return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
-            return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
-            return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
-            return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fOverPowerColor", &m_fOverPowerColor, sizeof(_float))))
-            return E_FAIL;
-
-        _bool   bBulb = false;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_isBulb", &bBulb, sizeof(_bool))))
-            return E_FAIL;
-
-
-        /* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-
-        if (INFO(m_eBodyState) == BODY_DUMPDEFAULT || Get_State() == DUMPTSTATE_CUT)
+        for (size_t i = 0; i < iNumMeshes; i++)
         {
-            if (FAILED(m_pShaderCom->Begin(/*ANIMMODEL_KIRBY*//*14*/ANIMMODEL_FINALEKIRBY_WEAPONS)))
+            if (Kirby_FaceCustom(INFO(m_eBodyState), i) == true)
+                continue;
+
+            if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
                 return E_FAIL;
+
+            if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+                return E_FAIL;
+
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+                return E_FAIL;
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+                return E_FAIL;
+            if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
+                return E_FAIL;
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+                return E_FAIL;
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
+                return E_FAIL;
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+                return E_FAIL;
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_fOverPowerColor", &m_fOverPowerColor, sizeof(_float))))
+                return E_FAIL;
+
+            _bool   bBulb = false;
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_isBulb", &bBulb, sizeof(_bool))))
+                return E_FAIL;
+
+
+            /* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+
+            if (INFO(m_eBodyState) == BODY_DUMPDEFAULT || Get_State() == DUMPTSTATE_CUT)
+            {
+                if (FAILED(m_pShaderCom->Begin(/*ANIMMODEL_KIRBY*//*14*/ANIMMODEL_FINALEKIRBY_WEAPONS)))
+                    return E_FAIL;
+            }
+            else
+            {
+
+                if (FAILED(m_pShaderCom->Begin(ANIMMODEL_KIRBY)))
+                    return E_FAIL;
+            }
+
+            m_pModelCom[INFO(m_eBodyState)]->Render(i);
         }
-        else
+    }
+    else if (INFO(m_bRimOnOff) == true)
+    {
+        if (m_iRenderCount == 1)
         {
+            for (size_t i = 0; i < iNumMeshes; i++)
+            {
+                if (Kirby_FaceCustom(INFO(m_eBodyState), i) == true)
+                    continue;
 
-            if (FAILED(m_pShaderCom->Begin(ANIMMODEL_KIRBY)))
-                return E_FAIL;
+                if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+                    return E_FAIL;
+
+                if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+                    return E_FAIL;
+
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
+                    return E_FAIL;
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
+                    return E_FAIL;
+                if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
+                    return E_FAIL;
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
+                    return E_FAIL;
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_vMotionVelocity", &m_vMotionVelocity, sizeof(_float4))))
+                    return E_FAIL;
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+                    return E_FAIL;
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_fOverPowerColor", &m_fOverPowerColor, sizeof(_float))))
+                    return E_FAIL;
+
+                _bool   bBulb = false;
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_isBulb", &bBulb, sizeof(_bool))))
+                    return E_FAIL;
+
+
+                /* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+
+                if (INFO(m_eBodyState) == BODY_DUMPDEFAULT || Get_State() == DUMPTSTATE_CUT)
+                {
+                    if (FAILED(m_pShaderCom->Begin(/*ANIMMODEL_KIRBY*//*14*/ANIMMODEL_FINALEKIRBY_WEAPONS)))
+                        return E_FAIL;
+                }
+                else
+                {
+
+                    if (FAILED(m_pShaderCom->Begin(ANIMMODEL_KIRBY)))
+                        return E_FAIL;
+                }
+
+                m_pModelCom[INFO(m_eBodyState)]->Render(i);
+            }
+
+            m_iRenderCount = 0;
         }
+        else if (m_iRenderCount == 0)
+        {
+            for (size_t i = 0; i < iNumMeshes; i++)
+            {
+                if (i == 7)
+                    continue;
 
-        m_pModelCom[INFO(m_eBodyState)]->Render(i);
+                if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
+                    return E_FAIL;
+                if (FAILED(m_pModelCom[INFO(m_eBodyState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+                    return E_FAIL;
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_vDeformRimColor", &m_vDeformRimColor, sizeof(_float3))))
+                    return E_FAIL;
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", &m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+                    return E_FAIL;
+                if (FAILED(m_pMaskTextureCom->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture")))
+                    return E_FAIL;
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveRatio", &m_fDissolveRatio, sizeof(_float))))
+                    return E_FAIL;
+                _float2 vTEXUV = { m_fUVOffsetTime , m_fUVOffsetTime };
+
+                if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVOffset", &vTEXUV, sizeof(_float2))))
+                    return E_FAIL;
+
+                /* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
+                if (FAILED(m_pShaderCom->Begin(ANIMMODEL_DEFORMRIM)))
+                    return E_FAIL;
+
+                m_pModelCom[INFO(m_eBodyState)]->Render(i);
+            }
+        }
     }
 
     return S_OK;
@@ -576,6 +671,10 @@ HRESULT CFinaleKirby::Add_Components()
         TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
     CHECK_FAILED(hr);
 
+    hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_FX_FireDissolve"),
+        TEXT("Com_Texture_Mask"), (CComponent**)&m_pMaskTextureCom);
+    CHECK_FAILED(hr);
+
 #pragma region Kirby Model
     // 커비의 기본 상태 모델
     hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDefault"),
@@ -815,6 +914,92 @@ void CFinaleKirby::SetUp_Event()
 {
 }
 
+void CFinaleKirby::Compute_RimLight(_float fTimeDelta)
+{
+    m_fDeformTime += fTimeDelta * 3.f;
+    m_fUVOffsetTime += fTimeDelta * 0.5f;
+
+    m_fDissolveRatio = (sin(m_fUVOffsetTime * 5.f) + 1.f) * 0.25f;
+
+    if (m_iComputeMode == 0)
+    {
+        if (m_fDeformTime > 1.f)
+        {
+            m_vDeformRimColor = { 1.f, 1.f, 0.f };
+            m_iComputeMode = 1;
+            m_fDeformTime = 0.f;
+        }
+        else
+            m_vDeformRimColor = { 1.f, m_fDeformTime, 0.f };
+    }
+    else if (m_iComputeMode == 1)
+    {
+        if (m_fDeformTime > 1.f)
+        {
+            m_vDeformRimColor = { 0.f, 1.f, 0.f };
+            m_iComputeMode = 2;
+            m_fDeformTime = 0.f;
+        }
+        else
+            m_vDeformRimColor = { 1.f - m_fDeformTime, 1.f, 0.f };
+    }
+    else if (m_iComputeMode == 2)
+    {
+        if (m_fDeformTime > 1.f)
+        {
+            m_vDeformRimColor = { 0.f, 1.f, 1.f };
+            m_iComputeMode = 3;
+            m_fDeformTime = 0.f;
+        }
+        else
+            m_vDeformRimColor = { 0.f, 1.f, m_fDeformTime };
+    }
+    else if (m_iComputeMode == 3)
+    {
+        if (m_fDeformTime > 1.f)
+        {
+            m_vDeformRimColor = { 0.f, 0.f, 1.f };
+            m_iComputeMode = 4;
+            m_fDeformTime = 0.f;
+        }
+        else
+            m_vDeformRimColor = { 0.f, 1.f - m_fDeformTime, m_fDeformTime };
+    }
+    else if (m_iComputeMode == 4)
+    {
+        if (m_fDeformTime > 1.f)
+        {
+            m_vDeformRimColor = { 1.f, 0.f, 1.f };
+            m_iComputeMode = 5;
+            m_fDeformTime = 0.f;
+        }
+        else
+            m_vDeformRimColor = { m_fDeformTime, 0.f, 1.f };
+    }
+    else if (m_iComputeMode == 5)
+    {
+        if (m_fDeformTime > 1.f)
+        {
+            m_vDeformRimColor = { 1.f, 0.f, 0.f };
+            m_iComputeMode = 0;
+            m_fDeformTime = 0.f;
+        }
+        else
+            m_vDeformRimColor = { 1.f, 0.f, m_fDeformTime };
+    }
+
+    
+}
+
+_float4 CFinaleKirby::Get_BoneWorldPos(const _char* pBoneName)
+{
+    //CBone* pBone = m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr(pBoneName);
+    _float4x4 BoneWorldMatrix = m_pTransformCom->ComputeBoneWorldMatrix(m_pModelCom[INFO(m_eBodyState)]->Get_BonePtr(pBoneName));
+    _float4 vBoneWorldPos = CUtils::Get_State_Vector_Matrix(BoneWorldMatrix, CUtils::STATE_POSITION);
+
+    return vBoneWorldPos;
+}
+
 void CFinaleKirby::OverPower()
 {
     if (m_fPreHp > m_fHp)
@@ -902,6 +1087,7 @@ void CFinaleKirby::Free()
         Safe_Release(pMouthTexture);
 
     Safe_Release(m_pCamera);
+    Safe_Release(m_pMaskTextureCom);
 
     if (INFO(m_pLight1) != nullptr)
         Safe_Release(INFO(m_pLight1));

@@ -39,7 +39,6 @@ void CKirbyHammer_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
-
 	if (pKirby->Get_State() == CKirby::HAMMERSTATE_IDLE)
 	{
 		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);

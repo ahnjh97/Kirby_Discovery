@@ -490,7 +490,7 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 	m_fStandardTime += fTimeDelta;
 	if (m_fStandardTime - m_fBeforeTime >= 1.f)
 	{
-		m_fCurTime = 50.f - m_fStandardTime;
+		m_fCurTime = 22.f - m_fStandardTime;
 		if (m_fCurTime <= 0.f) m_fCurTime = 0.f;
 		Change_TimeTexures(m_fCurTime);
 
@@ -531,9 +531,9 @@ void CUI_PartTime::Compute_TimerBar(_float fTimeDelta)
 {
 	_float fSpeed(0.f);
 	if (m_fCurTime < 20.f)
-		fSpeed = g_fTimeSpeed * 20.f;
+		fSpeed = g_fTimeSpeed * 45.f;
 	else
-		fSpeed = g_fTimeSpeed * 12.f;
+		fSpeed = g_fTimeSpeed * 25.f;
 
 	m_fRatioBarSub += fTimeDelta * fSpeed;
 	if (m_fRatioBarSub >= m_fGoalTimeBar)
@@ -781,13 +781,16 @@ void CUI_PartTime::Render_Fade()
 
 	if (fFadeOutRatio < -0.99f)
 		CPartTimeHelper::Get_Instance()->Handle_UI(CPartTimeHelper::OVER);
+
 	if (fFadeOutRatio < -0.f)
 	{
 		if (!m_bOnce)
 		{
+			m_bOnce = true;
+
 			CPartTimeHelper::Get_Instance()->Handle_GameOver();
 			m_pGameInstance->Restore_SecondTimer();
-			m_bOnce = true;
+
 		}
 	}
 	m_pTransformCom->Set_Scaled(m_arrSize[iNum].x, m_arrSize[iNum].y, 1.f);

@@ -143,11 +143,11 @@ void CAwoofy_Walk_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 	pController->FreeFall(pTransformCom, fTimeDelta, 6.f);
 
 	m_fAngle += fTimeDelta * 50.f;
-	m_fDistance = 3.f;
+	m_fDistance = 3.5f;
 	m_vOriginPos = pAwoofy->Get_Pos();
 
 	m_vRotatePos.x = m_vOriginPos.x + (m_fDistance * sin(XMConvertToRadians(m_fAngle)));
-	m_vRotatePos.y = m_vOriginPos.y;
+	//m_vRotatePos.y = m_vOriginPos.y;
 	m_vRotatePos.z = m_vOriginPos.z - (m_fDistance * cos(XMConvertToRadians(m_fAngle)));
 
 	pController->Move(pTransformCom, m_vRotatePos, fTimeDelta);

@@ -129,11 +129,15 @@ public:
 
 	void			SetUpSecondTarget();
 
+	void			CheckFinalCrusherRingCollision(_float fTimeDelta);
+
 	// Simba Effects
 	void			QuickClawNailFlash(_uint eSimbaAnim);
-	void			QuickClawNailTrail();
+	void			QuickClawSlash();
+	void			FinalCrusherCharge();
 	void			FinalCrusherSwing();
 	void			FinalCrusherSmash();
+	void			FinalCrusherRing();
 	void			JumpStartSmoke();
 	void			LandingSmoke();
 	void			AttackJumpWind();
@@ -215,6 +219,12 @@ private:
 	_bool			m_bStateChanged = { false };
 	_bool			m_bWave2Summoned = { false };
 
+	_float3			m_vRingPos = { };
+	_float			m_fRingInnerRadius = {};
+	_float			m_fRingOuterRadius = {};
+
+	_bool			m_bRenderRing;
+
 private:
 	HRESULT		Add_Components();
 	HRESULT		Bind_ShaderResources();
@@ -252,6 +262,9 @@ private:
 	void		OnSimbaAttackTrigger();
 	void		RemoveDeadRocksFromList();
 	void		RemoveDeadDebrisFromList();
+
+	void		RenderRing();
+	void		RenderPolygon(vector<_vector>& worldPoints);
 
 public:
 	static CSimba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

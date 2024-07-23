@@ -112,9 +112,41 @@ HRESULT CHUD_AbilityDiscard::Render()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
+	//07.23) 카피 능력 버리기와 머금기 변형의 뱉기 상태에 대한 텍스처 세분화
+	if (nullptr == m_pKirby)
+		return E_FAIL;
+	CKirby::BODYSTATE eKirbyState = dynamic_cast<CKirby*>(m_pKirby)->Get_KirbyInfo()->m_eBodyState;
+
 	PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
 	for (_uint iTexIndex = 0; iTexIndex < TEXDC_NONE; ++iTexIndex)
 	{
+		switch (eKirbyState)
+		{
+		//카피 능력 상태
+		case CKirby::BODY_SWORDDEFAULT:
+		case CKirby::BODY_SWORDBALLOON:
+		case CKirby::BODY_BOOMDEFAULT:
+		case CKirby::BODY_HAMMER:
+		case CKirby::BODY_CRASHDEFAULT:
+			if (TEXDC_DEFORMBASE == iTexIndex)
+				continue;
+			break;
+
+		//머금기 변형 상태
+		case CKirby::BODY_CARDEFAULT:
+		case CKirby::BODY_CARVACUUM:
+		case CKirby::BODY_BULBDEFAULT:
+		case CKirby::BODY_BULBVACUUM:
+			if (TEXDC_ABILITYBASE == iTexIndex)
+				continue;
+			break;
+
+		//피날레 컷씬, 일반 커비 폼은 렌더x (능력 및 머금기 해제 시에 잠깐의 틱 동안 UI를 렌더하므로 처리)
+		default:
+			return S_OK;
+			break;
+		}
+
 		if (TEXDC_GAUGE == iTexIndex)
 			ePassType = POSTEX_BOSS_BARPASS_DEFAULT;  
 
@@ -164,7 +196,7 @@ void CHUD_AbilityDiscard::Compute_PlayerDumpAbiliyTime()
 {
 	//m_fGaugeRatio = m_fDumpAbilityTime / 1.f; //게이지 비율
 	if (LEVEL_FINALE != *m_pCurrentLevelID)
-		m_fDumpAbilityTime = static_cast<CKirby*>(m_pKirby)->Get_KirbyInfo()->m_fDumpAbilityTime; //덤프타임 정보 저장
+		m_fDumpAbilityTime = dynamic_cast<CKirby*>(m_pKirby)->Get_KirbyInfo()->m_fDumpAbilityTime; //덤프타임 정보 저장
 
 	//if (LEVEL_FINALE == *m_pCurrentLevelID)
 	//	m_fDumpAbilityTime = static_cast<CFinaleKirby*>(m_pKirby)->Get_KirbyInfo()->m_fDumpAbilityTime; //피날레 커비는 해당 정보가 없음.

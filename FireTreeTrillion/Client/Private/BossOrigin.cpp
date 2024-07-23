@@ -74,20 +74,20 @@ _int CBossOrigin::Tick(_float fTimeDelta)
 	if (true == m_bStartTimer)
 		m_fTime += m_pGameInstance->Get_SecondTimer();
 
-	if (4.f < m_fTime && false == m_bNotify)
+	if (2.9f < m_fTime && false == m_bNotify)
 	{
 		m_bNotify = true;
 		CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_CAGEBREAK);
 	}
 
-	if (1.f < m_fTime && false == m_bActivated) {
-		m_pModelCom->Set_Animation(BO_GETOUT, 30.f, false, true);
+	if (0.7f < m_fTime && false == m_bActivated) {
+		m_pModelCom->Set_Animation(BO_GETOUT, 18.f, false, true);
 		m_bActivated = true;
 	}
 
-	if (2.2f < m_fTime)
+	if (1.5f < m_fTime)
 	{
-		_float fRatio = RATIO(m_fTime, 2.2f, 4.f);
+		_float fRatio = RATIO(m_fTime, 1.5f, 2.9f);
 		m_fWhiteColorDiffuse = EASE_IN(fRatio);
 	}
 
@@ -96,24 +96,19 @@ _int CBossOrigin::Tick(_float fTimeDelta)
 
 	static _bool bOnFadeOut = false;
 	if (BO_GETOUT == m_pModelCom->Get_CurAnimIndex() && true == m_pModelCom->IsFinished())
-	{
 		m_pModelCom->Set_Animation(BO_WAIT_EYEOPEN, 60.f, false, false);
-
-		//MB(L"페이드아웃 부탁해요", L"Hey JiYoung");
-		CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
-		CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
-		pFadingUI->Set_InOutState(CUI_Fading::FADEOUT);
-		pFadingUI->Set_IsRender(true);
-		bOnFadeOut = true;
-	}
 
 	_float fFadeOutTiming = 0.2f;
 	if (BO_WAIT_EYEOPEN == m_pModelCom->Get_CurAnimIndex() && m_pModelCom->Get_AnimRatio() < fFadeOutTiming && false == m_bFadeOut) // 지영누나 여기야 페이드아웃 부탁
 	{
 		m_bFadeOut = true;
+		CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+		CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
+		pFadingUI->Set_InOutState(CUI_Fading::FADEOUT);
+		pFadingUI->Set_IsRender(true);
 	}
 
-	if(bOnFadeOut)
+	if(m_bFadeOut)
 		Ready_FadeOut();
 
 	return OBJ_NOEVENT;

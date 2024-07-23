@@ -98,7 +98,6 @@ public:
 	static void Make_Effect(MULTI_FX_DATA& _FXData);
 	static void Make_Effect(PARTICLE_DATA& _FXData);
 
-
 };
 
 template <typename T, std::size_t N>
