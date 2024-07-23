@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "SimbaLaser.h"
 #include "HitBox.h"
+#include "MultiEffect.h"
 
 CSimbaLaser::CSimbaLaser(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -15,6 +16,23 @@ CSimbaLaser::CSimbaLaser(const CSimbaLaser& rhs)
 void CSimbaLaser::HideLaser()
 {
 	m_pDynamicActor->setGlobalPose(PxTransform(0, 0, 0));
+}
+
+void CSimbaLaser::MakeLaser()
+{
+	_float3 vPos = GET_POS;
+	_float3 vScale = { 3.f, 3.f, 3.f };
+	wstring strName = { L"HS_lion laser" };
+
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+	MultiFXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	MultiFXDesc.vInitScale = vScale;
+
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_DDD land smoke"), &MultiFXDesc)))
+		return;
+
+
+	//Add_Effect("HS_lion laser", MultiFXDesc);
 }
 
 HRESULT CSimbaLaser::Initialize_Prototype()
@@ -156,6 +174,8 @@ HRESULT CSimbaLaser::Bind_ShaderResources()
 
 	return S_OK;
 }
+
+
 
 CSimbaLaser* CSimbaLaser::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

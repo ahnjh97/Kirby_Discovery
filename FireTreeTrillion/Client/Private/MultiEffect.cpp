@@ -145,7 +145,21 @@ void CMultiEffect::Late_Tick(_float fTimeDelta)
 		return;
 	}
 
-	m_fDuration.first += fTimeDelta;
+	//m_fDuration.first += fTimeDelta;
+	if (IsEnded())
+	{
+		//99초(영구) 아닐 때
+		if ( m_fDuration.second != FX_MAXDURATION && (*m_pCurrentLevelID) != LEVEL_TOOL_FX )
+		{
+			m_bDead = true;
+		}
+		else if (m_fDuration.second == FX_MAXDURATION)
+		{
+			m_fDuration.first = 0.f;
+			for (auto& pEffect : m_FXs)
+				pEffect->Reset_Duration();
+		}
+	}
 
 	if (m_fDuration.second - .05f <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX && m_fDuration.second != FX_MAXDURATION)
 	{
@@ -171,6 +185,16 @@ void CMultiEffect::Add_RenderGroup()
 	{
 		pEffect->Add_RenderGroup();
 	}
+}
+
+_bool CMultiEffect::IsEnded()
+{
+	for (auto& fx : m_FXs)
+	{
+		if (fx->IsEnded() == false)
+			return false;
+	}
+	return true;
 }
 
 HRESULT CMultiEffect::Render()

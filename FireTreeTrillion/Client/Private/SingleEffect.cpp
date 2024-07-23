@@ -129,7 +129,8 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 		//툴에서는 다시 시작하기
 		if (*m_pCurrentLevelID != LEVEL_TOOL_FX && m_fDuration.second != FX_MAXDURATION)
 		{
-			m_bDead = true;
+			//m_bDead = true;
+			m_bDone = true;
 		}
 	}
 
@@ -139,8 +140,8 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 	//true 반환하면 lifetime 끝난 것.
 	if (Calculate_Lifetime(fMyTimeDelta))
 	{
-		if (*m_pCurrentLevelID != LEVEL_TOOL_FX)
-			m_bNoRender = true;
+		//if (*m_pCurrentLevelID != LEVEL_TOOL_FX)
+			//m_bNoRender = true;
 	}
 
 	Compute_ViewZ();

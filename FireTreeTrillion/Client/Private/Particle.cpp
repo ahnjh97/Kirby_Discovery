@@ -244,7 +244,8 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 		}
 		else
 		{
-			m_bDead = true;
+			m_bDone = true;
+			//m_bDead = true;
 		}
 	}
 

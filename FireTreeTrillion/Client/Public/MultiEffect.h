@@ -33,6 +33,8 @@ public:
 	}
 	virtual void Add_RenderGroup() override;
 
+	virtual _bool IsEnded() override;
+
 	virtual _int Get_Size() { return m_FXs.size(); }
 	virtual void Reset_Duration() override
 	{

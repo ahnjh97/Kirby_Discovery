@@ -141,6 +141,9 @@ public:
 	void			DoubleClawGround();
 	void			DoubleClawSweep();
 
+	//크로스 공격 나오는 타이밍
+	void			DimensionClaw();
+
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
 	CGameObject*	m_pKirby = { nullptr };
@@ -152,6 +155,7 @@ private:
 	CGameObject*	m_pSimbaLaser = { nullptr };
 	CTransform*		m_pSimbaLaserTransform = { nullptr };
 	PxRigidDynamic* m_pDimensionClawActor = { nullptr };
+	_float4x4		m_DimensionClawMat = { _float4x4::Identity };
 
 	vector<class CBone*> m_vecLeftNailBones;
 	vector<class CBone*> m_vecRightNailBones;

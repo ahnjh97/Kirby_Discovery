@@ -49,6 +49,12 @@ HRESULT CFinale_SpecialDebris_A::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_UP, NewUp);
 	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, NewRight);
 
+	//CEffect::FX_DESC FXDesc{};
+	//FXDesc.pSocketMatrix = &m_EffectSocket;
+	//FXDesc.vInitPos = { 0.f, 1.4f, -.5f };
+	//FXDesc.fStartDelay = 2.f;
+
+	//Add_Effect("HS_meteo dash line", FXDesc, true);
 
 	return S_OK;
 }

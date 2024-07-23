@@ -80,6 +80,9 @@ public:
 		return m_fDuration.second;
 	}
 
+	virtual _bool	IsEnded() { return m_bDone; }
+
+
 	virtual _int	Get_Size() { return 1; }
 	string			Get_Name() { return m_strFXName; }
 
@@ -99,6 +102,8 @@ public:
 	virtual HRESULT Initialize(void* pArg) override;
 
 protected:
+	//재생 시간이 다 되었는가?
+	_bool			m_bDone = { false };
 
 	/*이펙트 시작 세팅*/
 

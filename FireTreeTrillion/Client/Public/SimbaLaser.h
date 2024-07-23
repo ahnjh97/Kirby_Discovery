@@ -39,6 +39,8 @@ private:
 
 	_float		m_fWhiteColorDiffuse = {};
 
+	void		MakeLaser();
+
 public:
 	static CSimbaLaser* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

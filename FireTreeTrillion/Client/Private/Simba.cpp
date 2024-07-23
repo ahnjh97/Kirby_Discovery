@@ -692,6 +692,9 @@ void CSimba::SetUpDimensionClawWorldMatrix()
 	_float4x4 matWorld = m_pTransformCom->Get_WorldMatrix();
 	memcpy(&matWorld.m[3], &vPos, sizeof(_float4));
 
+	//이펙트
+	DimensionClaw();
+
 	m_pDimensionClawActor->setKinematicTarget(CUtils::ToPxTransform(matWorld));
 }
 
@@ -713,6 +716,8 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 	memcpy(&(matWorld.m[3]), &vPos, sizeof(_float4));
 
 	m_pDimensionClawActor->setGlobalPose(CUtils::ToPxTransform(matWorld));
+	//이펙트 다는 매트릭스 동기화
+	m_DimensionClawMat = matWorld;
 }
 
 void CSimba::HideDimensionClawActor()
@@ -1079,39 +1084,115 @@ void CSimba::QuickClawNailFlash(_uint eSimbaAnim) // YW : Effect 영우형 여기임 �
 
 void CSimba::QuickClawNailTrail() // YW : Effect 영우형 여기임 왼쪽 검지손톱 번쩍
 {
+
 }
 
 void CSimba::FinalCrusherSwing() // YW : Effect 영우형 여기임 양주먹 내려치기시작
 {
+	_float3 vPos = GET_POS;
+	_float3 vLookDegree = CUtils::Make_Degree_FromDir(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+	_float3 vScale = { 2.f, 2.f, 2.f };
+
+	//팔 궤적
+	CEffect::FX_DESC SingleFXDesc{};
+	SingleFXDesc.vInitPos = vPos;
+	SingleFXDesc.vInitRot = vLookDegree;
+	SingleFXDesc.vInitScale = vScale;
+	Add_Effect("HS_lion hammer stomp trail", SingleFXDesc);
 }
 
 void CSimba::FinalCrusherSmash() // YW : Effect 영우형 여기임 양주먹 바닥에 찍는 타이밍
 {
-	
+	//_float3 vPos = GET_POS;
+	//_float3 vLookDegree = CUtils::Make_Degree_FromDir(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+	_float3 vScale = { 2.5f, 2.5f, 2.5f };
+
+	//찍기 효과
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+	MultiFXDesc.vInitPos = _float3(0.f, 0.f, -1.5f);
+	//MultiFXDesc.vInitRot = vLookDegree;
+	MultiFXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	MultiFXDesc.vInitScale = vScale;
+	Add_Effect("HS_lion stomp floor", MultiFXDesc);
+
 }
 
 void CSimba::JumpStartSmoke() // YW : Effect 영우형 여기임 점프 시작할때 회색방구
 {
+	_float3 vPos = GET_POS;
+	_float3 vScale = { 3.f, 3.f, 3.f };
+
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+	MultiFXDesc.vInitPos = vPos + _float3(0.f, 2.f, 0.f);
+	MultiFXDesc.vInitScale = vScale;
+
+	Add_Effect("HS_FB fly smoke", MultiFXDesc);
 }
 
 void CSimba::LandingSmoke() // YW : Effect 영우형 여기임 점프 후 착지 회색방구
 {
+	_float3 vPos = GET_POS;
+	_float3 vScale = { 2.f, 2.f, 2.f };
+
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+	MultiFXDesc.vInitPos = vPos + _float3( 0.f, .3f, 0.f );
+
+	Add_Effect("DDD land smoke", MultiFXDesc);
 }
 
+//대쉬
 void CSimba::AttackJumpWind() // YW : Effect 영우형 여기임 점프 공격할때 주위 바람 
 {
+	_float3 vPos = GET_POS;
+	_float3 vScale = { 2.f, 2.f, 2.f };
+	_float3 vLookDegree = CUtils::Make_Degree_FromDir(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+
+	CEffect::FX_DESC SingleFXDesc{};
+
+	SingleFXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	SingleFXDesc.vInitScale = vScale;
+	SingleFXDesc.vInitRot = vLookDegree;
+	Add_Effect("HS_lion dash", SingleFXDesc);
 }
 
+//파티클
 void CSimba::DoubleClawDashGround() // YW : Effect 영우형 여기임 양손으로 바닥 계속 긁을때 튀기는 작은 불씨들 (아직은 이 함수 호출 안함)
 {
+
 }
 
+//파티클
 void CSimba::DoubleClawGround() // YW : Effect 영우형 여기임 양슨으로 바닥 긁다가 공격이펙트 직전 튀기는 큰 불씨들 (아직은 이 함수 호출 안함)
 {
+
 }
 
+//양손 발톱 + 불꽃
 void CSimba::DoubleClawSweep()// YW : Effect 영우형 여기임 바닥 긁다가 순간적으로 공격 이펙트 (트레일, 불꽃)
 {
+	_float3 vPos = GET_POS;
+	_float3 vScale = { 2.f, 2.f, 2.f };
+	_float3 vLookDegree = CUtils::Make_Degree_FromDir(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+
+	CEffect::FX_DESC SingleFXDesc{};
+	//SingleFXDesc.vInitPos = vPos;
+	SingleFXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	SingleFXDesc.vInitRot = vLookDegree;
+	SingleFXDesc.vInitScale = vScale;
+	Add_Effect("HS_lion claw L", SingleFXDesc);
+}
+
+//크로스 발톱 공격
+void CSimba::DimensionClaw()
+{
+	_float3 vPos = GET_POS;
+	_float3 vScale = { 2.f, 2.f, 2.f };
+
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+	MultiFXDesc.vInitPos = vPos + _float3(0.f, .3f, 0.f);
+	MultiFXDesc.pSocketMatrix = &m_DimensionClawMat;
+	Add_Effect("HS_lion L cross", MultiFXDesc);
+	Add_Effect("HS_lion R cross", MultiFXDesc);
 }
 
 HRESULT CSimba::Add_Components()
