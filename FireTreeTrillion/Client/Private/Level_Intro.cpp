@@ -19,6 +19,7 @@
 #include "HUD.h"
 #include "TransingStar.h"
 #include "LoadingStart.h"
+#include "LoadingFont.h"
 
 #include "UI_Fading.h"
 
@@ -452,6 +453,14 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 
 HRESULT CLevel_Intro::Ready_UI()
 {
+	//CLoadingFont::LOADINGFONT_DESC LoadingFont_Desc{};
+	//LoadingFont_Desc.fPosX = 0.f;
+	//LoadingFont_Desc.iTexIndex = 0.f;
+	//LoadingFont_Desc.strTag = TEXT("Prototype_Component_Texture_UI_Forest_Font");
+	//HRESULT hr;
+	//hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+	//CHECK_FAILED(hr);
+
 	HRESULT hr = S_OK;
 
 #pragma region PARSING HUD_KIRBYHP, STARPOINT

@@ -256,6 +256,7 @@
     <ClInclude Include="..\Public\KirbyFinalCut_State.h" />
     <ClInclude Include="..\Public\Level_Park.h" />
     <ClInclude Include="..\Public\Disaster_Master.h" />
+    <ClInclude Include="..\Public\LoadingFont.h" />
     <ClInclude Include="..\Public\LoadingStart.h" />
     <ClInclude Include="..\Public\LightBugEffect.h" />
     <ClInclude Include="..\Public\Phanta.h" />
@@ -521,6 +522,7 @@
     <ClCompile Include="..\Private\KirbyFinalCut_State.cpp" />
     <ClCompile Include="..\Private\Level_Park.cpp" />
     <ClCompile Include="..\Private\Disaster_Master.cpp" />
+    <ClCompile Include="..\Private\LoadingFont.cpp" />
     <ClCompile Include="..\Private\LoadingStart.cpp" />
     <ClCompile Include="..\Private\LightBugEffect.cpp" />
     <ClCompile Include="..\Private\Phanta.cpp" />

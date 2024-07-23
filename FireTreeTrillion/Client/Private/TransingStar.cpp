@@ -6,6 +6,7 @@
 #include "Camera_Main.h"
 #include "Utils.h"
 #include "LoadingStart.h"
+#include "LoadingFont.h"
 
 const _float	g_fPosOffset        = 18.f;
 const _float	g_fTurnOffset       = 72.f;
@@ -366,8 +367,19 @@ void CTransingStar::On_Event()
         // 스타트 로딩화면 렌더 켜기
         m_bLoadingStart = true;
 
-        if (LEVEL_INTRO == m_eNextLevel)
+        if (LEVEL_RACING == m_eNextLevel)
+        {
             m_pLoadingStart->Set_TexIndex(0);
+
+            CLoadingFont::LOADINGFONT_DESC LoadingFont_Desc{};
+            LoadingFont_Desc.fPosX = 0.f;
+            LoadingFont_Desc.iTexIndex = 0.f;
+            LoadingFont_Desc.strTag = TEXT("Prototype_Component_Texture_UI_Forest_Font");
+            HRESULT hr;
+            hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+            CHECK_FAILED(hr);
+
+        }
         else if (LEVEL_SIMBA == m_eNextLevel)
             m_pLoadingStart->Set_TexIndex(2);
         else if (LEVEL_PARK == m_eNextLevel)

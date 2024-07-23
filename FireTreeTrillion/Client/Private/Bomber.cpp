@@ -44,8 +44,8 @@ HRESULT CBomber::Initialize(void* pArg)
 	m_pModelCom->Set_Animation(BOMBER_WAIT, 50.f, true, true);
 
 
-	m_fMaxHp = 5.f;
-	m_fHp = 5.f;
+	m_fMaxHp = 28.f;
+	m_fHp = 28.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_CRASH;
