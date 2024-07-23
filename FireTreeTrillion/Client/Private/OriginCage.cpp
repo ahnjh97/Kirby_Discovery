@@ -18,6 +18,7 @@ void COriginCage::Activate(CGameObject* pObj)
 	m_bActivacted = true;
 	m_eState = CAGE_STATE_CRACK;
 	m_fTime = 0.f;
+	m_fWhiteColorDiffuse = 0.f;
 }
 
 HRESULT COriginCage::Initialize_Prototype()
@@ -66,7 +67,7 @@ _int COriginCage::Tick(_float fTimeDelta)
 	if (true == m_bActivacted && CAGE_STATE_CRACK == m_eState)
 		m_fTime += m_pGameInstance->Get_SecondTimer();
 
-	if (m_fTime > 1.45f && CAGE_STATE_CRACK == m_eState)
+	if (m_fTime > 0.8f && CAGE_STATE_CRACK == m_eState)
 	{
 		m_eState = CAGE_STATE_AFTER;
 		m_pModelCom->Set_Animation(CAGE_BREAK, 40.f, false);
@@ -75,6 +76,12 @@ _int COriginCage::Tick(_float fTimeDelta)
 	if (true == m_pModelCom->IsFinished() && CAGE_BREAK == m_pModelCom->Get_CurAnimIndex()) {
 		m_eState = CAGE_STATE_AFTER_END;
 		m_pModelCom->Set_Animation(CAGE_BREAKAFTER, 1.f, true, false);
+	}
+
+	if (CAGE_STATE_CRACK == m_eState)
+	{
+		_float fRatio = RATIO(m_fTime, 0, 0.8f);
+		m_fWhiteColorDiffuse = EASE_IN(fRatio) * 1.2f;
 	}
 		
 	return OBJ_NOEVENT;
@@ -96,21 +103,21 @@ HRESULT COriginCage::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	RenderMeshes(m_vecDefaultMeshes);
+	RenderMeshes(m_vecDefaultMeshes, ANIMMODEL_ALPHABLEND);
 
 	if(CAGE_STATE_BEFORE == m_eState)
-		RenderMeshes(m_vecBeforeMeshes);
+		RenderMeshes(m_vecBeforeMeshes, ANIMMODEL_ALPHABLEND);
 	if (CAGE_STATE_CRACK == m_eState)
 	{
-		RenderMeshes(m_vecBeforeMeshes);
-		RenderMesh(m_iGlassCrackMesh);
+		RenderMeshes(m_vecBeforeMeshes, ANIMMODEL_ALPHABLEND);
+		RenderMesh(m_iGlassCrackMesh, ANIMMODEL_ALPHABLEND);
 	}
 	else if (CAGE_STATE_AFTER == m_eState) {
-		RenderMeshes(m_vecAfterMeshes);
-		RenderMesh(m_iGlassBreakMesh);
+		RenderMeshes(m_vecAfterMeshes, ANIMMODEL_ALPHABLEND);
+		RenderMesh(m_iGlassBreakMesh, ANIMMODEL_GLASSCRACK);
 	}
 	else if(CAGE_STATE_AFTER_END == m_eState)
-		RenderMeshes(m_vecAfterMeshes);
+		RenderMeshes(m_vecAfterMeshes, ANIMMODEL_ALPHABLEND);
 
 	return S_OK;
 }
@@ -174,7 +181,7 @@ void COriginCage::SetUpMeshIndices()
 	}
 }
 
-void COriginCage::RenderMesh(_uint iMeshIdex)
+void COriginCage::RenderMesh(_uint iMeshIdex, _uint iPassIndex)
 {
 	HRESULT hr{};
 	hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", iMeshIdex, TextureType_DIFFUSE);
@@ -186,13 +193,13 @@ void COriginCage::RenderMesh(_uint iMeshIdex)
 	hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", iMeshIdex);
 	CHECK_FAILED(hr);
 
-	hr = m_pShaderCom->Begin(ANIMMODEL_ALPHABLEND);
+	hr = m_pShaderCom->Begin(iPassIndex);
 	CHECK_FAILED(hr);
 	hr = m_pModelCom->Render(iMeshIdex);
 	CHECK_FAILED(hr);
 }
 
-void COriginCage::RenderMeshes(const vector<_uint>& _vecMeshIndices)
+void COriginCage::RenderMeshes(const vector<_uint>& _vecMeshIndices, _uint iPassIndex)
 {
 	HRESULT hr{};
 
@@ -207,7 +214,7 @@ void COriginCage::RenderMeshes(const vector<_uint>& _vecMeshIndices)
 		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
 		CHECK_FAILED(hr);
 
-		hr = m_pShaderCom->Begin(ANIMMODEL_ALPHABLEND);
+		hr = m_pShaderCom->Begin(iPassIndex);
 		CHECK_FAILED(hr);
 		hr = m_pModelCom->Render(i);
 		CHECK_FAILED(hr);

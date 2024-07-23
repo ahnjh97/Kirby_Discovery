@@ -234,7 +234,7 @@ _int CSimba::Tick(_float fTimeDelta)
 		else if (m_pGameInstance->Get_KeyState(DIK_0, KEY_DOWN))
 			Change_State(Simba_BiteRushJumpStartR, 50.f, false, true);
 		else if (m_pGameInstance->Get_KeyState(DIK_GRAVE, KEY_DOWN))
-			Change_State(Simba_DemoDeadCut2, 50.f, false, true);
+			Change_State(Simba_Death, 50.f, false, true);
 			
 		if (true == m_bStateChanged) {
 			SetUpSecondTarget();
