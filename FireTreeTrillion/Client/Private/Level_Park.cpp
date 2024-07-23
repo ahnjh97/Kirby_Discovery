@@ -1142,7 +1142,7 @@ HRESULT CLevel_Park::Ready_Objects()
 			CGm_ParkSolarPanelOnce* pGimmick = dynamic_cast<CGm_ParkSolarPanelOnce*>(gimmick);
 			_uint iGimmickIx = pGimmick->Get_GimmickIndex();
 
-			//╪еем©м ©╛╣©
+			//╪еем ╠Б╧м╟З ©╛╣©
 			CGm_ParkShutter* pShutter = { nullptr };
 			if (4 == iGimmickIx)
 			{

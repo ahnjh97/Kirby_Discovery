@@ -13,7 +13,8 @@ BEGIN(Client)
 class CGm_ParkShutter final : public CPhysXObject
 {
 public:
-	enum ANIM_STATE { STATE_OPENIDLE, STATE_CLOSEIDLE, STATE_TOCLOSE, STATE_TOOPEN, STATE_NONE };
+	enum SHUTTER_STATE { STATE_CLOSEIDLE, STATE_OPENIDLE, STATE_TOCLOSE, STATE_TOOPEN, STATE_NONE };
+
 private:
 	CGm_ParkShutter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CGm_ParkShutter(const CGm_ParkShutter& rhs);
@@ -24,7 +25,6 @@ public:
 		m_pGimmickSPOnce = _pSPOnce;
 		Safe_AddRef(m_pGimmickSPOnce);
 	}
-	void Set_Interaction(_bool _bIsInteraction) { m_bIsInteraction = _bIsInteraction; }
 
 public:
 	virtual HRESULT		Initialize_Prototype()						override;
@@ -52,7 +52,7 @@ private:
 	PxRigidStatic*			m_pStaticActor = { nullptr };
 	CGm_ParkSolarPanelOnce* m_pGimmickSPOnce = { nullptr };
 
-	ANIM_STATE				m_eAnimState = { STATE_NONE };
+	SHUTTER_STATE				m_eCurState = { STATE_NONE };
 
 	_float					m_fWhiteColorDiffuse = { 0.f };
 	_float4					m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };

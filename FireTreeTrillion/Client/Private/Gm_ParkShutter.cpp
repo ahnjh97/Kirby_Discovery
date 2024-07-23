@@ -32,8 +32,8 @@ HRESULT CGm_ParkShutter::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_eAnimState = STATE_OPENIDLE;
-	m_pModelCom->Set_Animation(STATE_OPENIDLE, 60.f, TRUE /*_bool bInterpolation = false, _float fLerpTime = 0.1f*/);
+	m_eCurState = STATE_CLOSEIDLE;
+	m_pModelCom->Set_Animation(STATE_CLOSEIDLE, 60.f, TRUE /*_bool bInterpolation = false, _float fLerpTime = 0.1f*/);
 
 	//피직스 추가
 	m_pStaticActor = m_pNonAnimModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
@@ -49,6 +49,19 @@ _int CGm_ParkShutter::Tick(_float fTimeDelta)
 	if (TRUE == m_bDead)
 		return OBJ_DEAD;
 
+	if (nullptr == m_pGimmickSPOnce)
+		return OBJ_NOEVENT;
+
+	//태양전자판 기믹 활성화 애님일 경우, 셔터 애님 변경
+	
+	CGm_ParkSolarPanelOnce::PANELONCE_STATE eSPOnceState = m_pGimmickSPOnce->Get_CurState();
+	if (CGm_ParkSolarPanelOnce::PANELONCE_STATE::STATE_ONWAIT == eSPOnceState
+		&& 4 == m_pGimmickSPOnce->Get_GimmickIndex()
+		&& STATE_CLOSEIDLE == m_eCurState)
+	{
+		m_pModelCom->Set_Animation(STATE_TOOPEN, 60.f, FALSE, TRUE);
+		m_eCurState = STATE_TOOPEN;
+	}
 
 	return OBJ_NOEVENT;
 }
@@ -116,11 +129,14 @@ HRESULT CGm_ParkShutter::Render_LightDepth()
 #ifdef _DEBUG
 void CGm_ParkShutter::Render_IMGUI()
 {
-	//switch (m_eAnimState)
-	//{
-	//case STATE_LOOP:	ImGui::Text(u8"STATE_LOOP"); break;
-	//case STATE_NONE:	default: ImGui::Text(u8"STATE_NONE"); break;
-	//}
+	switch (m_eCurState)
+	{
+	case STATE_CLOSEIDLE:	ImGui::Text(u8"STATE_CLOSEIDLE"); break;
+	case STATE_OPENIDLE:	ImGui::Text(u8"STATE_OPENIDLE"); break;
+	case STATE_TOCLOSE:		ImGui::Text(u8"STATE_TOCLOSE"); break;
+	case STATE_TOOPEN:		ImGui::Text(u8"STATE_TOOPEN"); break;
+	case STATE_NONE:	default: ImGui::Text(u8"STATE_NONE"); break;
+	}
 }
 #endif
 

@@ -104,7 +104,14 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 		pEventCenter->Subscribe(KEVENT_SIMBA_APPEAR_START, this, func);
 	}
 
+	m_bSignalHightlight = FALSE;
+	m_bSignalPostHightlight = FALSE;
+
 	m_bEventCall = false;
+	m_bIsSetKirby = FALSE;
+	m_bIsSkipScript = FALSE;
+	m_bHighLightMsg = FALSE;
+
 	return S_OK;
 }
 
@@ -169,7 +176,6 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 			}
 		}
 		CCamera_Main* pCamera = { nullptr };
-		m_bHighLightMsg = FALSE;
 		if (LEVEL_SIMBA == *m_pCurrentLevelID && !m_bIsSkipScript)
 		{ 
 			switch (m_iCurMessageIndex)
