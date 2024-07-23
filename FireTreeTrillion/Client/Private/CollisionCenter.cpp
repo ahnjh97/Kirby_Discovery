@@ -1366,8 +1366,8 @@ void CCollisionCenter::Body_To_Body_Collision()
 			CKirby* pKirby = static_cast<CKirby*>(Dst);
 			CPhysXObject* pDeform = static_cast<CPhysXObject*>(Src);
 
-			pKirby->Collision(CONTENT_DEFORM, pDeform);
 			pKirby->Get_KirbyInfo()->m_bBlockOtherVacuum = true;
+			pKirby->Collision(CONTENT_DEFORM, pDeform);
 		});
 
 	// 디벨롭중
