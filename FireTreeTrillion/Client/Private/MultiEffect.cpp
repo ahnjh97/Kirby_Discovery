@@ -112,6 +112,7 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 				CHECK_NULLPTR(pFX);
 
 				m_FXs.emplace_back(pFX);
+				pFX->Set_Multi();
 				m_fDuration.second = pFX->Get_BiggerDuration(m_fDuration.second);
 			}
 		}
@@ -128,6 +129,7 @@ _int CMultiEffect::Tick(_float fTimeDelta)
 	{
 		for (auto& pEffect : m_FXs)
 			pEffect->Set_Dead();
+
 		return OBJ_DEAD;
 	}
 
@@ -157,6 +159,8 @@ void CMultiEffect::Late_Tick(_float fTimeDelta)
 		//99초(영구) 아닐 때
 		if (m_fDuration.second != FX_MAXDURATION && (*m_pCurrentLevelID) != LEVEL_TOOL_FX)
 		{
+			for (auto& pEffect : m_FXs)
+				pEffect->Set_Dead();
 			m_bDead = true;
 		}
 		else if (m_fDuration.second == FX_MAXDURATION)
@@ -167,16 +171,16 @@ void CMultiEffect::Late_Tick(_float fTimeDelta)
 		}
 	}
 
-	if (m_fDuration.second - .05f <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX && m_fDuration.second != FX_MAXDURATION)
-	{
-		m_bDead = true;
-	}
-	else if (m_fDuration.second - .05f <= m_fDuration.first && (m_bIsLoop || m_fDuration.second == FX_MAXDURATION))
-	{
-		m_fDuration.first = 0.f;
-		for (auto& pEffect : m_FXs)
-			pEffect->Reset_Duration();
-	}
+	//if (m_fDuration.second - .05f <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX && m_fDuration.second != FX_MAXDURATION)
+	//{
+	//	m_bDead = true;
+	//}
+	//else if (m_fDuration.second - .05f <= m_fDuration.first && (m_bIsLoop || m_fDuration.second == FX_MAXDURATION))
+	//{
+	//	m_fDuration.first = 0.f;
+	//	for (auto& pEffect : m_FXs)
+	//		pEffect->Reset_Duration();
+	//}
 
 
 	for (auto& pEffect : m_FXs)
@@ -210,6 +214,18 @@ HRESULT CMultiEffect::Render()
 	return S_OK;
 }
 
+#ifdef _DEBUG
+void CMultiEffect::Render_IMGUI()
+{
+	for (auto& fx : m_FXs)
+	{
+		
+		ImGui::Text(fx->IsEnded() ? "END : " : "PLAYING : ");
+		ImGui::SameLine();
+		ImGui::Text(fx->Get_Name().c_str());
+	}
+}
+#endif
 CMultiEffect* CMultiEffect::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CMultiEffect* pInstance = new CMultiEffect(pDevice, pContext);

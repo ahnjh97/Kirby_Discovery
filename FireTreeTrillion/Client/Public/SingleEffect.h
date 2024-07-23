@@ -22,7 +22,7 @@ private:
 	virtual ~CSingleEffect() = default;
 
 public:
-	//virtual _bool	IsEnded() override;
+	virtual _bool	IsEnded() override;
 
 	_bool	IsModelBuffer() { return m_pModelCom != nullptr; }
 	virtual void	Reset_Duration() override

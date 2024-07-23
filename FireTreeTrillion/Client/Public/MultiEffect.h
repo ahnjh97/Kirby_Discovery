@@ -55,6 +55,10 @@ public:
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+#ifdef _DEBUG
+	virtual void	Render_IMGUI() override;
+#endif
+
 protected:
 	vector<CEffect*> m_FXs;
 	MULTI_FX_DESC m_FXDesc = {};

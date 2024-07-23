@@ -1175,11 +1175,12 @@ void CSimba::DoubleClawSweep()// YW : Effect 영우형 여기임 바닥 긁다가 순간적으�
 	_float3 vLookDegree = CUtils::Make_Degree_FromDir(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 
 	CEffect::FX_DESC SingleFXDesc{};
-	//SingleFXDesc.vInitPos = vPos;
+
 	SingleFXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	SingleFXDesc.vInitRot = vLookDegree;
 	SingleFXDesc.vInitScale = vScale;
 	Add_Effect("HS_lion claw L", SingleFXDesc);
+	Add_Effect("HS_lion claw R", SingleFXDesc);
 }
 
 //크로스 발톱 공격
@@ -1189,10 +1190,14 @@ void CSimba::DimensionClaw()
 	_float3 vScale = { 2.f, 2.f, 2.f };
 
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
-	MultiFXDesc.vInitPos = vPos + _float3(0.f, .3f, 0.f);
+	//MultiFXDesc.vInitPos = vPos + _float3(0.f, .3f, 0.f);
 	MultiFXDesc.pSocketMatrix = &m_DimensionClawMat;
 	Add_Effect("HS_lion L cross", MultiFXDesc);
 	Add_Effect("HS_lion R cross", MultiFXDesc);
+}
+
+void CSimba::TeethBite()
+{
 }
 
 HRESULT CSimba::Add_Components()
