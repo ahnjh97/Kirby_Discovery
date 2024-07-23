@@ -90,10 +90,21 @@ void CHUD_AbilityDiscard::Late_Tick(_float fTimeDelta)
 
 HRESULT CHUD_AbilityDiscard::Render()
 {
+	if (nullptr == m_pKirby)
+		return S_OK;
+
 	if (DISCARD_HIDE == m_eCurState && 0.f == m_UIObjDesc.fAlpha)
 		return S_OK;
 
+	if (1 <= m_fKeyInputTime)
+		return S_OK;
+
 	HRESULT hr;
+	PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
+	TEX_DISCARD eTexIndex = Check_TexIndex();
+	ABILITYTYPE eAbilityType = dynamic_cast<CKirby*>(m_pKirby)->Get_AbilityType(); //카피 능력 정보		
+	if (TEXDC_ABILITYBASE == eTexIndex && ABILITY_DEFAULT == eAbilityType)
+		return S_OK;
 
 	//For.Mask
 	if (FAILED(m_pTexCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0)))
@@ -113,49 +124,15 @@ HRESULT CHUD_AbilityDiscard::Render()
 		return E_FAIL;
 
 	//07.23) 카피 능력 버리기와 머금기 변형의 뱉기 상태에 대한 텍스처 세분화
-	if (nullptr == m_pKirby)
-		return E_FAIL;
-	CKirby::BODYSTATE eKirbyState = dynamic_cast<CKirby*>(m_pKirby)->Get_KirbyInfo()->m_eBodyState;
 
-	PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
-	for (_uint iTexIndex = 0; iTexIndex < TEXDC_NONE; ++iTexIndex)
-	{
-		switch (eKirbyState)
-		{
-		//카피 능력 상태
-		case CKirby::BODY_SWORDDEFAULT:
-		case CKirby::BODY_SWORDBALLOON:
-		case CKirby::BODY_BOOMDEFAULT:
-		case CKirby::BODY_HAMMER:
-		case CKirby::BODY_CRASHDEFAULT:
-			if (TEXDC_DEFORMBASE == iTexIndex)
-				continue;
-			break;
+	hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTexCom[TEX_DIFFUSE], eTexIndex);
+	CHECK_FAILED(hr);
 
-		//머금기 변형 상태
-		case CKirby::BODY_CARDEFAULT:
-		case CKirby::BODY_CARVACUUM:
-		case CKirby::BODY_BULBDEFAULT:
-		case CKirby::BODY_BULBVACUUM:
-			if (TEXDC_ABILITYBASE == iTexIndex)
-				continue;
-			break;
+	hr = Bind_ShaderResources(m_pShaderCom, POSTEX_UIWHITEALPHA, m_pTexCom[TEX_DIFFUSE], TEXDC_BTN);
+	CHECK_FAILED(hr);
 
-		//피날레 컷씬, 일반 커비 폼은 렌더x (능력 및 머금기 해제 시에 잠깐의 틱 동안 UI를 렌더하므로 처리)
-		default:
-			return S_OK;
-			break;
-		}
-
-		if (TEXDC_GAUGE == iTexIndex)
-			ePassType = POSTEX_BOSS_BARPASS_DEFAULT;  
-
-		if (TEXDC_BTN == iTexIndex)
-			ePassType = POSTEX_UIWHITEALPHA;
-
-		hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTexCom[TEX_DIFFUSE], iTexIndex);
-		CHECK_FAILED(hr);
-	}
+	hr = Bind_ShaderResources(m_pShaderCom, POSTEX_BOSS_BARPASS_DEFAULT, m_pTexCom[TEX_DIFFUSE], TEXDC_GAUGE);
+	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -229,7 +206,24 @@ _bool CHUD_AbilityDiscard::Key_InputSystem(_float fTimeDelta)
 			m_UIObjDesc.fAlpha = 0.f;
 	}
 
+	if (m_pGameInstance->Get_DIKeyState(DIK_V, KEY_PRESS))
+		m_fKeyInputTime += fTimeDelta;
+
+	else
+		m_fKeyInputTime = 0;
+
 	return true;
+}
+
+CHUD_AbilityDiscard::TEX_DISCARD CHUD_AbilityDiscard::Check_TexIndex()
+{
+	//07.24) 카피 능력 / 머금기 변경 정보 분리
+	CKirby::BODYSTATE eVacuumState = dynamic_cast<CKirby*>(m_pKirby)->Get_KirbyInfo()->m_eBodyState; //머금기 변형 정보
+
+	if (CKirby::BODY_BULBDEFAULT == eVacuumState || CKirby::BODY_CARDEFAULT == eVacuumState)
+		return TEXDC_DEFORMBASE;
+
+	 return TEXDC_ABILITYBASE;
 }
 
 HRESULT CHUD_AbilityDiscard::Add_Components()
@@ -314,8 +308,8 @@ void CHUD_AbilityDiscard::Free()
 {
 	__super::Free();
 
-	for (auto& iTex : m_pTexCom)
-		Safe_Release(iTex);
+	for (auto& Texture : m_pTexCom)
+		Safe_Release(Texture);
 
 	Safe_Release(m_pKirby);
 }

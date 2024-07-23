@@ -37,6 +37,7 @@ public:
 #ifdef _DEBUG
 	virtual void				Render_IMGUI()								override;
 #endif
+	TEX_NAMETAG					Check_TexIndex();
 
 private:
 	HRESULT						Add_Components();
@@ -44,7 +45,7 @@ private:
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
 
 public:
-	static CHUD_KirbyNameTag*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CHUD_KirbyNameTag*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*		Clone(void* pArg) override;
 	virtual void				Free() override;
 

@@ -63,11 +63,20 @@ _int CHUD_KirbyNameTag::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	_float3 vScale = { 300.f * 0.75f, 50.f * 0.75f, 1.f };
-	m_pTransformCom->Set_Scaled(vScale);
+	//_float3 vScale = { 300.f * 0.5f, 50.f * 0.5f, 1.f };
+	//m_pTransformCom->Set_Scaled(vScale);
 
-	_float4	vTrans = { -700.f, 400.f, 1.f, 1.f };
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTrans);
+	//_float4	vTrans = { -700.f, 400.f, 1.f, 1.f };
+	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTrans);
+
+	if (m_UIObjDesc.fAlpha >= 1.f)
+		m_UIObjDesc.fAlpha = 1.f;
+
+	if (m_UIObjDesc.fAlpha <= 0.f) //알파 값 보정 및 업데이트 중지
+	{
+		m_UIObjDesc.fAlpha = 0.f;
+		return OBJ_NOEVENT;
+	}
 
 
 	return OBJ_NOEVENT;
@@ -81,51 +90,19 @@ void CHUD_KirbyNameTag::Late_Tick(_float fTimeDelta)
 HRESULT CHUD_KirbyNameTag::Render()
 {
 	HRESULT hr = S_OK;
+	if (nullptr == m_pKirby)
+		return E_FAIL;
 
 #pragma region RENDER_BINDSET
 
 	//렌더 OFF
-	//if (BTN_HIDE == m_eCurState && 0.f == m_fBlinkAlpha && 0.f == m_fBtnAlpha)
-	//	return S_OK;
+	if (0.f == m_UIObjDesc.fAlpha)
+		return S_OK;
 
 #pragma region KIRBY_NAMETAG
 
-	if (nullptr == m_pKirby)
-		return E_FAIL;
-
-	CKirby::BODYSTATE eKirbyState = dynamic_cast<CKirby*>(m_pKirby)->Get_KirbyInfo()->m_eBodyState;
-
-	_uint iTexIndex = { TEXNT_NONE };
-	switch (eKirbyState)
-	{
-		//카피 능력 상태
-	case CKirby::BODY_SWORDDEFAULT:
-	case CKirby::BODY_SWORDBALLOON:
-		iTexIndex = TEXNT_SWORD;
-		break;
-
-	case CKirby::BODY_BOOMDEFAULT:	iTexIndex = TEXNT_BOMB;	break;
-	case CKirby::BODY_HAMMER:		iTexIndex = TEXNT_TOYHAMMER;	break;
-	case CKirby::BODY_CRASHDEFAULT:	iTexIndex = TEXNT_CRASH;	break;
-
-		//머금기 변형 상태
-	case CKirby::BODY_CARDEFAULT:
-	case CKirby::BODY_CARVACUUM:
-		iTexIndex = TEXNT_DEFORMCAR;
-		break;
-
-	case CKirby::BODY_BULBDEFAULT:
-	case CKirby::BODY_BULBVACUUM:
-		iTexIndex = TEXNT_DEFORMBULB;
-		break;
-
-	case CKirby::BODY_FINALCUT:
-		break;
-
-	default:
-		iTexIndex = TEXNT_KIRBY;
-		break;
-	}
+	CKirby::BODYSTATE eVacuumState = dynamic_cast<CKirby*>(m_pKirby)->Get_KirbyInfo()->m_eBodyState; //머금기 변형 정보
+	TEX_NAMETAG eTexIndex = Check_TexIndex();
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
@@ -137,7 +114,7 @@ HRESULT CHUD_KirbyNameTag::Render()
 		return E_FAIL;
 
 	//POSTEX_SOLIDBLEND_NOZTEST, POSTEX_ALPHABLEND_NOTEST
-	hr = Bind_ShaderResources(m_pShaderCom, POSTEX_ALPHABLEND_NOTEST, m_pTextureCom, iTexIndex);
+	hr = Bind_ShaderResources(m_pShaderCom, POSTEX_ALPHABLEND_NOTEST, m_pTextureCom, eTexIndex);
 	CHECK_FAILED(hr);
 
 	return S_OK;
@@ -148,6 +125,32 @@ void CHUD_KirbyNameTag::Render_IMGUI()
 {
 }
 #endif
+
+CHUD_KirbyNameTag::TEX_NAMETAG CHUD_KirbyNameTag::Check_TexIndex()
+{
+	//07.24) 카피 능력 / 머금기 변경 정보 분리
+	CKirby::BODYSTATE eVacuumState = dynamic_cast<CKirby*>(m_pKirby)->Get_KirbyInfo()->m_eBodyState; //머금기 변형 정보
+
+	if (CKirby::BODY_CARDEFAULT == eVacuumState)
+		return TEXNT_DEFORMCAR;
+
+	if (CKirby::BODY_BULBDEFAULT == eVacuumState)
+		return TEXNT_DEFORMBULB;
+
+	ABILITYTYPE eAbilityType = dynamic_cast<CKirby*>(m_pKirby)->Get_AbilityType(); //카피 능력 정보
+	switch (eAbilityType)
+	{
+	case ABILITY_DEFAULT:	return TEXNT_KIRBY;		break;
+	case ABILITY_SWORD:		return TEXNT_SWORD;		break;
+	case ABILITY_HAMMER:	return TEXNT_TOYHAMMER;	break;
+	case ABILITY_BOMB:		return TEXNT_BOMB;	break;
+	case ABILITY_CRASH:		return TEXNT_CRASH;	break;
+	case ABILITY_END:	default:
+		break;
+	}
+
+	return TEXNT_KIRBY;
+}
 
 HRESULT CHUD_KirbyNameTag::Add_Components()
 {
@@ -173,6 +176,8 @@ HRESULT CHUD_KirbyNameTag::Bind_ShaderResources(CShader* _pShaderCom, _uint _iPa
 
 	//셰이더의 원시데이터 가져와 저장
 	_pShaderCom->Bind_RawValue("g_vRColor", &m_UIObjDesc.vColorRGB, sizeof(_float3));
+
+	_pShaderCom->Bind_RawValue("g_fAlpha", &m_UIObjDesc.fAlpha, sizeof(_float));
 
 	//Begin() > Apply() 함수 호출 전 셰이더 전역 데이터를 저장해야함
 	if (FAILED(_pShaderCom->Begin(_iPassIndex)))
@@ -223,7 +228,8 @@ CGameObject* CHUD_KirbyNameTag::Clone(void* pArg)
 
 void CHUD_KirbyNameTag::Free()
 {
-	__super::Free();	
+	__super::Free();
+
 	Safe_Release(m_pKirby);
 }
 

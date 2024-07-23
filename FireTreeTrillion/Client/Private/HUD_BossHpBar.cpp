@@ -201,8 +201,11 @@ HRESULT CHUD_BossHpBar::Render()
 		return E_FAIL;
 	if (FAILED(m_pTextureNameCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture")))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Begin(POSTEX_ALPHABLEND_NOTEST))) //07.23) PASS값 수정 POSTEX_QTEEFFECT > 
+
+	//07.23) PASS값 수정 POSTEX_QTEEFFECT > POSTEX_ALPHABLEND_NOTEST
+	if (FAILED(m_pShaderCom->Begin(POSTEX_ALPHABLEND_NOTEST))) 
 		return E_FAIL;
+
 	if (FAILED(m_pVIBufferCom->Bind_Buffers()))
 		return E_FAIL;
 	if (FAILED(m_pVIBufferCom->Render()))

@@ -192,6 +192,7 @@ HRESULT CHUD_KirbyStatus::Render()
 	}
 
 	//추후 폰트가 아닌 이미지폰트로 렌더할 예정
+	/*
 	if (UI_FONT == m_UIObjDesc.eUIType)
 	{
 		_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha * m_fAlpha };
@@ -202,6 +203,7 @@ HRESULT CHUD_KirbyStatus::Render()
 		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, m_vFontPos, vFontRGBA,
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
 	}
+	*/
 
 	return S_OK;
 }
