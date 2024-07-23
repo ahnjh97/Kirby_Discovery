@@ -15,6 +15,7 @@ public:
 	struct LOADINGFONT_DESC : public CGameObject::GAMEOBJECT_DESC {
 		_uint	iTexIndex = { 0 };
 		_float	fPosX = { 0.f };
+		_float	fEndPos = { 0.f };
 		wstring	strTag = { L"" };
 	};
 private:
@@ -37,13 +38,12 @@ private:
 	CTexture*	m_pTextureCom = { nullptr };
 
 	_float		m_fPosX = { 0.f };
+	_float		m_fEndPos = { 0.f };
 	wstring		m_strTag = { L"" };
 
 private:
-	HRESULT					Add_Components();
-	HRESULT					Bind_ShaderResources();
-
-	HRESULT					Render_Again(_float fSizeX, _float fSizeY, _float fPosX, _float fPosY);
+	HRESULT		Add_Components();
+	HRESULT		Bind_ShaderResources();
 
 public:
 	static CLoadingFont* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

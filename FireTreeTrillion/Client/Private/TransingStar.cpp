@@ -372,10 +372,41 @@ void CTransingStar::On_Event()
             m_pLoadingStart->Set_TexIndex(0);
 
             CLoadingFont::LOADINGFONT_DESC LoadingFont_Desc{};
-            LoadingFont_Desc.fPosX = 0.f;
-            LoadingFont_Desc.iTexIndex = 0.f;
-            LoadingFont_Desc.strTag = TEXT("Prototype_Component_Texture_UI_Forest_Font");
             HRESULT hr;
+            LoadingFont_Desc.strTag = TEXT("Prototype_Component_Texture_UI_Forest_Font");
+            //_float fPosX = -40.f;
+            //for(_uint i = 0; i < 5; ++i)
+            //{
+            //    LoadingFont_Desc.fPosX = fPosX;
+            //    LoadingFont_Desc.iTexIndex = i;
+            //    hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+            //    CHECK_FAILED(hr);
+
+            //    fPosX += 20.f;
+            //}
+
+            LoadingFont_Desc.fPosX = -105;
+            LoadingFont_Desc.iTexIndex = 0;
+            hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+            CHECK_FAILED(hr);
+
+            LoadingFont_Desc.fPosX = -55;
+            LoadingFont_Desc.iTexIndex = 1;
+            hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+            CHECK_FAILED(hr);
+
+            LoadingFont_Desc.fPosX = -5;
+            LoadingFont_Desc.iTexIndex = 2;
+            hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+            CHECK_FAILED(hr);
+
+            LoadingFont_Desc.fPosX = 65;
+            LoadingFont_Desc.iTexIndex = 3;
+            hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+            CHECK_FAILED(hr);
+
+            LoadingFont_Desc.fPosX = 115;
+            LoadingFont_Desc.iTexIndex = 4;
             hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
             CHECK_FAILED(hr);
 

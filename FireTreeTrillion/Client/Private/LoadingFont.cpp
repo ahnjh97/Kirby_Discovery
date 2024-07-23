@@ -38,8 +38,8 @@ HRESULT CLoadingFont::Initialize(void* pArg)
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
-	m_pTransformCom->Set_Scaled(128.f, 128.f, 1.f);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_fPosX, 0.f, 0.f, 1.f));
+	m_pTransformCom->Set_Scaled(128.f * 0.5f, 128.f * 0.5f, 1.f);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(m_fPosX, -50.f, 0.f, 1.f));
 
 	m_fAlpha = 0.f;
 
@@ -70,7 +70,7 @@ HRESULT CLoadingFont::Render()
 	hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
 	CHECK_FAILED(hr);
 
-	hr = m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture");
+	hr = m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_iTexIndex);
 	CHECK_FAILED(hr);
 
 	hr = m_pShaderCom->Begin(0);
@@ -133,33 +133,6 @@ HRESULT CLoadingFont::Bind_ShaderResources()
 
 	//hr = m_pShaderCom->Bind_RawValue("g_fAlpha", &fAlpha, sizeof(_float));
 	//CHECK_FAILED(hr);
-
-	return S_OK;
-}
-
-HRESULT CLoadingFont::Render_Again(_float fSizeX, _float fSizeY, _float fPosX, _float fPosY)
-{
-	m_pTransformCom->Set_Scaled(fSizeX * 3.f, fSizeY * 2.f, 1.f);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, -50.f, 0.1f, 1.f));
-
-	HRESULT hr;
-	hr = Bind_ShaderResources();
-	CHECK_FAILED(hr);
-
-	hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
-	CHECK_FAILED(hr);
-
-	hr = m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_iTexIndex);
-	CHECK_FAILED(hr);
-
-	hr = m_pShaderCom->Begin(0);
-	CHECK_FAILED(hr);
-
-	hr = m_pVIBufferCom->Bind_Buffers();
-	CHECK_FAILED(hr);
-
-	hr = m_pVIBufferCom->Render();
-	CHECK_FAILED(hr);
 
 	return S_OK;
 }
