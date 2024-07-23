@@ -65,6 +65,7 @@ private:
 	_int						m_iDeeWaitingNum = { 0 };
 	_float3						m_vEffectPos = _float3();
 	_bool						m_bTimeAttack = _bool();
+	_bool						m_bGameOver = false;
 
 public:
 	virtual void Free() override;

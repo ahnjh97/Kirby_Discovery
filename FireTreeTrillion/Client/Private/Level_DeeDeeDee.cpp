@@ -91,10 +91,10 @@ void CLevel_DeeDeeDee::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
 
-	static _float fTimeAcc = 0.f;
-	fTimeAcc += fTimeDelta;
-	if (fTimeAcc > 2.f) // 2초뒤 페이드인
-		Ready_FadeIn();
+	//static _float fTimeAcc = 0.f;
+	//fTimeAcc += fTimeDelta;
+	//if (fTimeAcc > 2.f) // 2초뒤 페이드인
+	Ready_FadeIn();
 
 	Fog_Tick(fTimeDelta);
 }
