@@ -2,6 +2,7 @@
 #include "BossOrigin.h"
 #include "EventCenter.h"
 #include "Level_Loading.h"
+#include "UI_Fading.h"
 
 CBossOrigin::CBossOrigin(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -92,11 +93,21 @@ _int CBossOrigin::Tick(_float fTimeDelta)
 		m_bNotify = false;
 	}
 
-	if (BO_GETOUT == m_pModelCom->Get_CurAnimIndex() && true == m_pModelCom->IsFinished()) { // Áö¿µ´©³ª ¿©±â¾ß ÆäÀÌµå¾Æ¿ô ºÎÅ¹
+	static _bool bOnFadeOut = false;
+	if (BO_GETOUT == m_pModelCom->Get_CurAnimIndex() && true == m_pModelCom->IsFinished()) 
+	{
 		m_pModelCom->Set_Animation(BO_WAIT_EYEOPEN, 60.f, false, false);
 
-		MB(L"ÆäÀÌµå¾Æ¿ô ºÎÅ¹ÇØ¿ä", L"Hey JiYoung");
+		//MB(L"ÆäÀÌµå¾Æ¿ô ºÎÅ¹ÇØ¿ä", L"Hey JiYoung");
+		CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+		CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
+		pFadingUI->Set_InOutState(CUI_Fading::FADEOUT);
+		pFadingUI->Set_IsRender(true);
+		bOnFadeOut = true;
 	}
+
+	if(bOnFadeOut)
+		Ready_FadeOut();
 
 	return OBJ_NOEVENT;
 }
@@ -199,6 +210,18 @@ HRESULT CBossOrigin::Bind_ShaderResources()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CBossOrigin::Ready_FadeOut()
+{
+	static _bool bOnceChangeLevel = false;
+	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+	CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
+	if (pFadingUI->Get_FadeRatio() <= 0.f && bOnceChangeLevel == false)
+	{
+		m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_FINALBOSS));
+		bOnceChangeLevel = true;
+	}
 }
 
 CBossOrigin* CBossOrigin::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

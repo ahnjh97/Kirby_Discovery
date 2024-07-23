@@ -31,6 +31,8 @@ private:
 	HRESULT				Add_Components(wstring& wstrModelName);
 	HRESULT				Bind_ShaderResources();
 
+	void				Ready_FadeOut();
+
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
