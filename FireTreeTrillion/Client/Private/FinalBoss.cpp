@@ -148,9 +148,10 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 		CTransform* pKirbyTransform = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"))->Get_TransformCom();
 
+		_float fKirbyY = pKirbyTransform->Get_State(CTransform::STATE_POSITION).y;
 		_float fKirbyZ = pKirbyTransform->Get_State(CTransform::STATE_POSITION).z;
-
-		if (-20.f < fKirbyZ)
+		if ((fKirbyY < 1.f) && (fKirbyY > -4.f) &&
+			(fKirbyZ < -20.f) && (fKirbyZ > -25.f)) // QZR
 		{
 			//CEventCenter::Get_Instance()->Notify(KEVENT_FINALBOSS_APPEAR);
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
@@ -161,8 +162,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		}
 	}
 
-
-	if (m_bStart2PhaseTrigger
+	if ( m_bStart2PhaseTrigger
 		&& (m_pGameInstance->Get_KeyState(DIK_K, KEY_DOWN) || m_fHp < m_fMaxHp * 0.45f))
 	{
 		Set_BossState(STATE_2PAZE);
@@ -178,10 +178,20 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	}
 	else if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
 		Change_State(FINALBOSS_DEMOAPPEARCUT5, 50.f, false, false);
-	else if (m_pGameInstance->Get_KeyState(DIK_O, KEY_DOWN))
+	else if (m_pGameInstance->Get_KeyState(DIK_O, KEY_DOWN) || m_fHp < 0.f)
 	{
 		Change_State(FINALBOSS_LASTDAMAGESTART, 50.f, false, true);
 		m_pControllerCom->Set_Position(m_pTransformCom, XMVectorSet(0.f, 0.f, 0.f, 1.f));
+	}
+	else if (m_pGameInstance->Get_KeyState(DIK_I, KEY_DOWN))
+		m_bAuto = !m_bAuto;
+
+	if (FINALBOSS_RECOVERYWAIT == Get_State())
+	{
+		if (m_fHp < (m_fBeforeHp - m_fMaxHp * 0.1f))
+		{
+			Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
+		}
 	}
 
 	if (true == m_bGlide)

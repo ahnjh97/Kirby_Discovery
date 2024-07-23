@@ -70,6 +70,9 @@ HRESULT CLevel_PartTime::Initialize()
 	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_PARTTIME);
 	m_pGameInstance->Set_ObjectBlack(1.f);
 
+	// 포그 리셋
+	m_pGameInstance->Fog_Zero();
+
 	return S_OK;
 }
 

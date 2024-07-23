@@ -137,7 +137,7 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 		
 		else
 		{
-			m_iCurMessageIndex += 1; //벡터의 다음 문단 줄로 넘김
+			m_iCurMessageIndex += 1; //다음 문단 줄로 넘김
 			m_iCurCharIndex = m_iCurCharIndexHightlight = m_iCurCharIdxPostHightlight = 0; //글자 수는 초기화
 			m_bSignalHightlight = m_bSignalPostHightlight = false;
 		}
@@ -150,7 +150,7 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 			OnEvent(); //모든 스크립트 재생 종료 시, 해당 이벤트를 수행
 			m_bEventCall = true;
 
-			//07.21) 커비의 상태를 홀드해제 (키입력 가능하게 처리)
+			//07.21) 커비의 상태를 홀드 해제 (키입력 가능하게 처리)
 			if (m_bIsSetKirby)
 			{
 				CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
@@ -177,7 +177,7 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 		if (LEVEL_SIMBA == *m_pCurrentLevelID && !m_bIsSkipScript)
 		{ 
 			switch (m_iCurMessageIndex)
-			{
+			{	
 			case 1:
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_NEXT_DIALOG1);
 				break;
@@ -371,8 +371,6 @@ void CUI_MessageWindow::Show_DialogMessage()
 	if (WINDOW_HIDE == m_eCurState) //단, idle 상태일 경우는 트리거 시점에 show해야하므로 hide만 처리
 		return;
 
-#pragma region SET_DIALOG KIRBY, CAMERA DIR & POS
-
 	//07.21) 커비의 상태를 홀드 (키입력하지 않게 처리)
 	m_eCurState = WINDOW_SHOW;
 
@@ -387,9 +385,9 @@ void CUI_MessageWindow::Show_DialogMessage()
 
 	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
 	CHECK_NULLPTR(pKirby);
-
 	CTransform* pKirbyTrans = pKirby->Get_TransformCom();
-	//CTransform* pNPCDeeTrans = this->Get_TransformCom();
+
+	//다른 레벨의 경우, 해당하는 대상에게 충돌 시 카메라, 커비 위치 세팅 완료
 	switch (*m_pCurrentLevelID)
 	{
 	case LEVEL_TOWN:
@@ -398,10 +396,7 @@ void CUI_MessageWindow::Show_DialogMessage()
 
 	default:
 		break;
-	}
-
-#pragma endregion
-	
+	}	
 }
 
 HRESULT CUI_MessageWindow::Add_Transform(void* _pArg)
@@ -522,7 +517,7 @@ HRESULT CUI_MessageWindow::Display_Message(_float _fTimeDelta)
 
 	return S_OK;
 }
-
+	
 // 다이얼로그 메시지 렌더
 HRESULT CUI_MessageWindow::Render_Message()
 {
