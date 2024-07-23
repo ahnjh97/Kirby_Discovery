@@ -140,6 +140,11 @@ void CSimba_QuickClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	s_fOffsetY = -0.58f;
+	if (CSimba::Simba_QuickClawL == _iAnimIndex || CSimba::Simba_QuickClawR == _iAnimIndex
+		|| CSimba::Simba_QuickClaw2L == _iAnimIndex || CSimba::Simba_QuickClaw2R == _iAnimIndex)
+		m_bSlashEffect = false;
+	else if (CSimba::Simba_QuickClawLFromStart == _iAnimIndex || CSimba::Simba_QuickClawRFromStart == _iAnimIndex)
+		m_bChargeEffect = false;
 }
 
 void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -159,8 +164,11 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 
 	else if ((CSimba::Simba_QuickClawL == iState || CSimba::Simba_QuickClawR == iState))
 	{
-		pSimba->QuickClawNailTrail(); // YW Effect 클로 트레일(일단은 상시호출로 해놨음)
-
+		if (0.4f < fAnimRatio && false == m_bSlashEffect) {
+			m_bSlashEffect = true;
+			pSimba->QuickClawSlash();
+		}
+			
 		_float fStart = 0.42f;
 		_float fEnd = 0.64f;
 		_float fSpeed = 6.2f;
@@ -189,7 +197,7 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	
 	else if ((CSimba::Simba_QuickClaw2L == iState || CSimba::Simba_QuickClaw2R == iState)) 
 	{
-		pSimba->QuickClawNailTrail(); // YW Effect 클로 트레일(일단은 상시호출로 해놨음)
+		pSimba->QuickClawSlash(); // YW Effect 클로 트레일(일단은 상시호출로 해놨음)
 
 		if(0.3f > fAnimRatio)
 			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
@@ -216,9 +224,17 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 		}
 	}
 		
-	else if((CSimba::Simba_QuickClawLFromStart == iState || CSimba::Simba_QuickClawRFromStart == iState) && fAnimRatio < 0.8f)
-		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 12.f);
-	
+	else if (CSimba::Simba_QuickClawLFromStart == iState || CSimba::Simba_QuickClawRFromStart == iState)
+	{
+		if(0.8f > fAnimRatio)
+			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 12.f);
+
+		if (0.48f < fAnimRatio && false == m_bChargeEffect) {
+			m_bChargeEffect = true;
+			pSimba->FinalCrusherCharge();
+		}
+	}
+		
 	if (true == pSimba->IsAnimFinished())
 	{
 		switch (iState)
@@ -271,13 +287,15 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	}
 }
 
-// *********************** FinalCrusher *********************** // 이펙트 및 퍼지는 원 충돌로직 필요'
+// *********************** FinalCrusher *********************** // 스윙 이펙트 필요
 void CSimba_FinalCrusher::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	s_fOffsetY = -0.7f;
 	m_bSmashEffect = false;
 	m_bSwingEffect = false;
+	if(CSimba::Simba_FinalCrusherStart == _iAnimIndex)
+		m_bChargeEffect = false;
 }
 
 void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -291,8 +309,17 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	_uint iRockCount = pSimba->Get_RockCount();
 	_uint iDebrisCount = pSimba->Get_DebrisCount();
 
-	if(CSimba::Simba_FinalCrusherStart == iState && (0.3f > fAnimRatio || 0.93f < fAnimRatio ))
-		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
+	if (CSimba::Simba_FinalCrusherStart == iState)
+	{
+		if(0.3f > fAnimRatio || 0.93f < fAnimRatio)
+			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
+
+		if (0.48f < fAnimRatio && false == m_bChargeEffect) {
+			m_bChargeEffect = true;
+			pSimba->FinalCrusherCharge();
+		}
+	}
+		
 	else if (CSimba::Simba_FinalCrusher == iState)
 	{
 		if(0.07f > fAnimRatio)
@@ -304,6 +331,7 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		if (0.105f < fAnimRatio && 0 == iRockCount) {
 			pSimba->SpawnRocks(iState);
 			pSimba->SpawnDebris(iState);
+			pSimba->FinalCrusherRing();
 		}
 		else if (0.12f < fAnimRatio && 1 == iRockCount)
 			pSimba->SpawnRocks(iState);
@@ -318,6 +346,9 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			m_bSmashEffect = true;
 			pSimba->FinalCrusherSmash();
 		}
+
+		if(0.12f < fAnimRatio)
+			pSimba->CheckFinalCrusherRingCollision(fTimeDelta);
 	}
 		
 	if (true == pSimba->IsAnimFinished())

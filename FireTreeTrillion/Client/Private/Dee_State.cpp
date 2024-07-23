@@ -1091,6 +1091,11 @@ void CDee_Hungry_State::Free()
 
 #pragma endregion
 
+CDee_ResultWin_State::CDee_ResultWin_State()
+{
+}
+
+
 void CDee_ResultWin_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
@@ -1110,7 +1115,7 @@ void CDee_ResultWin_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	case DEESHOPANIM_RESULTWINSTART:
 		if (baseInfo.pDee->IsAnimFinished())
 		{
-			baseInfo.pDee->Change_State((DEE_ANIM)DEESHOPANIM_RESULTWIN, 60.f, true, true);
+			baseInfo.pDee->Change_State((DEE_ANIM)DEESHOPANIM_RESULTWIN, CUtils::Make_RandomFloat(60.f, 100.f), true, true);
 		}
 		break;
 	}
@@ -1118,13 +1123,16 @@ void CDee_ResultWin_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 void CDee_ResultWin_State::OnStateExit()
 {
+	m_fDuration = 0.f;
 }
 
 CDee_ResultWin_State* CDee_ResultWin_State::Create()
 {
-	return nullptr;
+	CDee_ResultWin_State* pInstance = new CDee_ResultWin_State();
+	return pInstance;
 }
 
 void CDee_ResultWin_State::Free()
 {
+	__super::Free();
 }

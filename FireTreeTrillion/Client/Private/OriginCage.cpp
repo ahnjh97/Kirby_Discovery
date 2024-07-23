@@ -67,7 +67,7 @@ _int COriginCage::Tick(_float fTimeDelta)
 	if (true == m_bActivacted && CAGE_STATE_CRACK == m_eState)
 		m_fTime += m_pGameInstance->Get_SecondTimer();
 
-	if (m_fTime > 0.8f && CAGE_STATE_CRACK == m_eState)
+	if (m_fTime > 2.0f && CAGE_STATE_CRACK == m_eState)
 	{
 		m_eState = CAGE_STATE_AFTER;
 		m_pModelCom->Set_Animation(CAGE_BREAK, 40.f, false);
@@ -80,8 +80,8 @@ _int COriginCage::Tick(_float fTimeDelta)
 
 	if (CAGE_STATE_CRACK == m_eState)
 	{
-		_float fRatio = RATIO(m_fTime, 0, 0.8f);
-		m_fWhiteColorDiffuse = EASE_IN(fRatio) * 1.2f;
+		_float fRatio = RATIO(m_fTime, 0, 2.0f);
+		m_fWhiteColorDiffuse = EASE_IN(fRatio);
 	}
 		
 	return OBJ_NOEVENT;
@@ -110,11 +110,12 @@ HRESULT COriginCage::Render()
 	if (CAGE_STATE_CRACK == m_eState)
 	{
 		RenderMeshes(m_vecBeforeMeshes, ANIMMODEL_ALPHABLEND);
-		RenderMesh(m_iGlassCrackMesh, ANIMMODEL_ALPHABLEND);
+		if (0.2f < m_fTime)
+			RenderMesh(m_iGlassCrackMesh, ANIMMODEL_GLASSCRACK);
 	}
 	else if (CAGE_STATE_AFTER == m_eState) {
 		RenderMeshes(m_vecAfterMeshes, ANIMMODEL_ALPHABLEND);
-		RenderMesh(m_iGlassBreakMesh, ANIMMODEL_GLASSCRACK);
+		RenderMesh(m_iGlassBreakMesh, ANIMMODEL_ALPHABLEND);
 	}
 	else if(CAGE_STATE_AFTER_END == m_eState)
 		RenderMeshes(m_vecAfterMeshes, ANIMMODEL_ALPHABLEND);
