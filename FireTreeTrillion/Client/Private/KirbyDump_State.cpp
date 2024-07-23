@@ -1058,6 +1058,18 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				pCameraMain->Set_FOVY(45.f - m_fQTERatio * .5f);
 				pCameraMain->Set_FinalOffset({ 0.f, -3.f - (m_fQTERatio * .2f), 0.f }, 1.f);
 
+
+				if (m_bEffectTrigger[0] == true)
+				{
+					pKirby->Delete_Effect("YW Real Dash");
+					CMultiEffect::MULTI_FX_DESC FXDesc{};
+					FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+					FXDesc.vInitPos = { 0.f, -4.f, 3.f };
+					FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+					pKirby->Add_Effect("HS_finale dump dash multi", FXDesc, true);
+					m_bEffectTrigger[0] = false;
+				}
+
 			}
 
 			if (15.f <= m_fQTERatio)
@@ -1073,6 +1085,14 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 				m_iQTECnt++;
 				QTE_End();
+
+				pKirby->Delete_Effect("HS_finale dump dash multi");
+				CMultiEffect::MULTI_FX_DESC FXDesc{};
+				FXDesc.vInitPos = { 0.f, -.5f, -1.f };
+				FXDesc.vInitScale = { 15.f, 15.f, 30.f };
+				FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+				pKirby->Add_Effect("YW Real Dash", FXDesc, true);
+
 				m_pGameInstance->Set_ObjectBlack(0.6f, 0.4f);
 			}
 		}
@@ -1183,6 +1203,20 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT10)
 	{
+		if (m_bEffectTrigger[0] == true)
+		{
+			pKirby->Delete_AllEffect();
+
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitPos = { 0.9f, -.5f, -1.f };
+			FXDesc.vInitScale = { 17.f, 17.f, 30.f };
+			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+			pKirby->Add_Effect("YW Real Dash", FXDesc, true);
+			m_bEffectTrigger[0] = false;
+		}
+
+
+
 
 		m_fTime += fTimeDelta;
 		if (m_fTime > 0.2f && m_bShakeTrigger1 == true)
@@ -1412,8 +1446,12 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if (m_bEffectTrigger[2] == true)
 			{
-				//// 바퀴에 단다!!! 기를 모으면서 출발함.
+				// 장전 시작
 				CMultiEffect::MULTI_FX_DESC FXWheelDesc{};
+				FXWheelDesc.vInitPos = { 0.f, 0.f, 0.f };
+				pKirby->Add_Effect("YW Finale Charge Finish Effects", FXWheelDesc, false);
+
+				//// 바퀴에 단다!!! 기를 모으면서 출발함.
 				FXWheelDesc.vInitPos = { 0.f, 0.f, 0.f };
 				FXWheelDesc.pSocketMatrix = &pKirby->m_BoneBackLMatrix;
 				pKirby->Add_Effect("YW Dump Wheel Effects", FXWheelDesc, true);
@@ -1628,11 +1666,34 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		_float fTrackPosition = pKirby->Get_AnimTrackPosition();
 		pKirby->Compute_RimLight(fTimeDelta);
 
+		if (m_bEffectTrigger[0] == true)
+		{
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitPos = { 0.f, 0.f, +10.f };
+			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+			pKirby->Add_Effect("YW Finale Debris Cols", FXDesc, false);
+
+			FXDesc.vInitPos = { 0.f, 0.f, +10.f };
+			FXDesc.vInitScale = { 1.f, 2.f, 1.f };
+			FXDesc.fStartDelay = 0.1f;
+			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+			pKirby->Add_Effect("YW Finale Debris Cols", FXDesc, false);
+
+			m_bEffectTrigger[0] = false;
+		}
 
 		if (pKirby->isAnimFinish())
 		{
+			pKirby->Delete_AllEffect();
 			pCenter->Set_CutScene(20);
 			m_pGameInstance->Set_ObjectBlack(1.f);
+
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+			FXDesc.vInitPos = { 0.f, -4.f, 3.f };
+			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			pKirby->Add_Effect("YW Real Finale White Effects", FXDesc, true);
 
 			//CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 			//CHECK_NULLPTR(pCamera);
@@ -1652,6 +1713,12 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake(4.f, 0.5f);
 
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			_float4 vEffectPos = CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_POSITION) + (CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK) * 26.f);
+			FXDesc.vInitPos = (_float3)vEffectPos;
+			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir(-1.f * (_float4)CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK));
+			pKirby->Add_Effect("YW Real Finale White Effects", FXDesc, false);
 			m_bShakeTrigger2 = false;
 		}
 

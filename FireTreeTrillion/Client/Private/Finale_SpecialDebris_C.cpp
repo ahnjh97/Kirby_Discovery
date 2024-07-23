@@ -73,8 +73,8 @@ _int CFinale_SpecialDebris_C::Tick(_float fTimeDelta)
 		if (m_bEffectOn == true)
 		{
 			CMultiEffect::MULTI_FX_DESC desc;
-			desc.vInitPos = { 0.f, 1.4f, -0.5f };
-			desc.vInitScale = { 9.f, 9.f, 9.f };
+			desc.vInitPos = { 0.f, 1.4f, -1.5f };
+			desc.vInitScale = { 3.5f, 3.5f, 3.5f };
 			desc.pSocketMatrix = &m_EffectSocket;
 
 			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_HS_meteo dash line"), &desc)))
@@ -92,6 +92,26 @@ _int CFinale_SpecialDebris_C::Tick(_float fTimeDelta)
 	}
 	else if (iCutIndex == 11)
 	{
+		if (m_bEffectOn == false)
+		{
+			m_pEffect->Set_Dead();
+			Safe_Release(m_pEffect);
+			m_pEffect = nullptr;
+
+			CMultiEffect::MULTI_FX_DESC desc;
+			desc.vInitPos = { 0.f, 1.4f, -1.5f };
+			desc.vInitScale = { 2.7f, 2.7f, 2.7f };
+			desc.pSocketMatrix = &m_EffectSocket;
+
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_HS_meteo dash line"), &desc)))
+				return OBJ_NOEVENT;
+			CEffect* pEffect = static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back());
+			m_pEffect = pEffect;
+			Safe_AddRef(m_pEffect);
+
+			m_bEffectOn = true;
+		}
+
 		m_bRender = true;
 		m_eCurCut = CUT11;
 	}
@@ -117,11 +137,32 @@ _int CFinale_SpecialDebris_C::Tick(_float fTimeDelta)
 	}
 	else if (iCutIndex == 16)
 	{
+		if (m_pEffect != nullptr)
+		{
+			m_pEffect->Set_Dead();
+			Safe_Release(m_pEffect);
+			m_pEffect = nullptr;
+		}
+
 		m_bRender = false;
 		//m_eCurCut = CUT16;
 	}
 	else if (iCutIndex == 17)
 	{
+		if (m_pEffect == nullptr)
+		{
+			CMultiEffect::MULTI_FX_DESC desc;
+			desc.vInitPos = { 0.f, 1.4f, -1.5f };
+			desc.vInitScale = { 2.7f, 2.7f, 2.7f };
+			desc.pSocketMatrix = &m_EffectSocket;
+
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_HS_meteo dash line"), &desc)))
+				return OBJ_NOEVENT;
+			CEffect* pEffect = static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back());
+			m_pEffect = pEffect;
+			Safe_AddRef(m_pEffect);
+		}
+			
 		m_bRender = true;
 		m_eCurCut = CUT17;
 	}
@@ -346,11 +387,11 @@ void CFinale_SpecialDebris_C::Compute_My_Look(_int iIndex)
 	}
 
 	_float4 vNewLook;
-	if (iIndex < 11)
-	{
-		vNewLook = m_vCurPos - m_vPrePos;
-	}
-	else
+	//if (iIndex < 11)
+	//{
+	//	vNewLook = m_vCurPos - m_vPrePos;
+	//}
+	//else
 	{
 		CFinaleKirby* pKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 		vNewLook = -1.f * CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK);

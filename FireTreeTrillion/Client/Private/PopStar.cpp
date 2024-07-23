@@ -52,9 +52,9 @@ HRESULT CPopStar::Initialize(void* pArg)
 	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_StarRiver"), &FXDesc)))
 		return E_FAIL;
 
-	FXDesc.vInitScale = { 4.f, 4.f, 4.f };
-	if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_star dash test 3"), &FXDesc)))
-		return E_FAIL;
+	//FXDesc.vInitScale = { 4.f, 4.f, 4.f };
+	//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_star dash test 3"), &FXDesc)))
+	//	return E_FAIL;
 
 	GAMEOBJECT_DESC Smalldesc = {};
 	Smalldesc.matWorld = m_pTransformCom->Get_WorldFloat4x4();
@@ -193,7 +193,7 @@ void CPopStar::Late_Tick(_float fTimeDelta)
 	Compute_ViewZ();
 	m_pModelCom->Play_Animation(fTimeDelta);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SPECIALBLEND, this);
 	m_RenderCount = 1;
 }
 
