@@ -121,6 +121,7 @@ _bool CPartTimeHelper::Handle_GameOver()
 
 	// Dee들 세팅
 	// 효선아 여기야
+	// 효선이 완료
 
 	// UI 세팅
 	m_pHungryDee->Set_RenderDialog(false);
@@ -130,6 +131,7 @@ _bool CPartTimeHelper::Handle_GameOver()
 	{
 		CHungryDee* pDee = static_cast<CHungryDee*>(pGameObj);
 		pDee->Set_RenderDialog(false);
+		pDee->Set_Dead();
 	}
 
 	m_pUI_PartTime->Set_RenderState(CUI_PartTime::BASIC, false);

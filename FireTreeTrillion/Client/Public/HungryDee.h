@@ -9,16 +9,15 @@ class CShader;
 class CTexture;
 END
 
-
 BEGIN(Client)
 
-//enum class PARTTIME_ITEM;
 class CHungryDee final : public CWaddleDee
 {
 public:
 	struct HUNGRYDEE_DESC : public CGameObject::GAMEOBJECT_DESC
 	{
 		_int iIdx;
+		DEE_SHOPANIM eAnim = { DEESHOPANIM_RUN };
 	};
 
 private:
@@ -50,6 +49,10 @@ public:
 	void			Swap_WatingPosition();
 
 	void			Ready_OrderUI(CUI_PartTimeDee::TYPE eType = CUI_PartTimeDee::ORDER);
+
+	void			Win();
+
+
 
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -84,7 +87,7 @@ private:
 	HRESULT Add_PartObjects();
 	HRESULT Bind_ShaderResources();
 
-	void	SetUp_FSM();
+	void	SetUp_FSM(DEE_SHOPANIM eAnim);
 	_bool	Custom_Face(_uint iMeshIndex);
 
 public:

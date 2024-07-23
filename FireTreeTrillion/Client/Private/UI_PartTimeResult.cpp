@@ -8,6 +8,7 @@
 #include "Level_Loading.h"
 #include "PartTimeHelper.h"
 #include "PartTimerKirby.h"
+#include "HungryDee.h"
 #include <UI_MessageWindow.h>
 
 CUI_PartTimeResult::CUI_PartTimeResult(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
@@ -62,7 +63,7 @@ HRESULT CUI_PartTimeResult::Initialize(void* _pArg)
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 
 	CPartTimeHelper::Get_Instance()->Register_PartTimeResult(this);
-	
+
 	Initialize_TexturePos();
 	m_bIsRender = false;
 
@@ -97,9 +98,9 @@ HRESULT CUI_PartTimeResult::Render()
 		m_pTransformCom->Set_Scaled(m_arrSize[i].x, m_arrSize[i].y, 1.f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 			XMVectorSet(m_arrPosition[i].x - g_iWinSizeX * 0.5f,
-						- m_arrPosition[i].y + g_iWinSizeY * 0.5f,
-						0.f,
-						1.f));
+				-m_arrPosition[i].y + g_iWinSizeY * 0.5f,
+				0.f,
+				1.f));
 
 		hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
 		CHECK_FAILED(hr);
@@ -116,7 +117,7 @@ HRESULT CUI_PartTimeResult::Render()
 		hr = m_pVIBufferCom->Bind_Buffers();
 		CHECK_FAILED(hr);
 
-		hr = m_pVIBufferCom->Render(); 
+		hr = m_pVIBufferCom->Render();
 		CHECK_FAILED(hr);
 	}
 
@@ -169,12 +170,9 @@ void CUI_PartTimeResult::Render_Digits()
 		if (fTimeAcc >= 0.1f)
 		{
 			_int iAddNum = 1;
-			//iAddNum만큼 와들디 등장 // 효선아 여기야
-			//_int iAddNum = CUtils::Make_RandomInt(1, 3);
 
-
-
-			if (m_fScore < Change_ScoreTextures(iAddNum)) // 30만큼 점수판 += 점수
+			_float fRealTotalScore = Change_ScoreTextures(iAddNum);
+			if (m_fScore < fRealTotalScore) // 30만큼 점수판 += 점수
 			{
 				m_bRenderTotalScore = true;
 				if (fTimeAcc >= 2.f)
@@ -192,47 +190,6 @@ void CUI_PartTimeResult::Render_Digits()
 					}
 				}
 
-
-				/*
-				if (fTimeAcc >= 2.5f && !bTwice)
-				{
-
-					//결과 UI
-					if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_FoodGame success UI"))))
-						return;
-
-						
-					//콘페티
-					_float4x4 CamWorld = m_pGameInstance->Get_Transform_Inv(CPipeLine::D3DTS_VIEW);
-					_float3 vCamPos = CamWorld.Translation();
-					
-					for (_int i = 0; i < 80; ++i)
-					{
-						CEffect::FX_DESC FXDesc{};
-						FXDesc.vInitPos = vCamPos + _float3{ CUtils::Make_RandomFloat(-5.f, 5.f), 0.f, -5.f} + (_float3)CUtils::Make_Random_Vector(CUtils::Make_RandomFloat(2.f, 5.f));
-
-						//FXDesc.vInitRot =CUtils::Make_Degree_FromDir(CUtils::Make_Random_Vector(1.f));
-						FXDesc.fStartDelay = CUtils::Make_RandomFloat(0.f, 3.f);
-
-						wstring strPrototypeTag = TEXT("Prototype_GameObject_foodgame clear confetti ");
-						switch (CUtils::Make_RandomInt(1, 4))
-						{
-						case 1: strPrototypeTag += L"A"; break;
-						case 2: strPrototypeTag += L"B"; break;
-						case 3: strPrototypeTag += L"C"; break;
-						case 4: strPrototypeTag += L"D"; break;
-						default:
-							break;
-						}
-						if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strPrototypeTag, &FXDesc)))
-							return;
-					}
-
-					bTwice = true;
-				}
-				*/
-
-
 				// 다이얼로그 생성
 				if (fTimeAcc >= 4.f)
 				{
@@ -242,12 +199,25 @@ void CUI_PartTimeResult::Render_Digits()
 					pMWindow->Show_DialogMessage();
 				}
 			}
+			else
+			{
+				//헝그리 디 결과 창에 만듭니다~
+				CHungryDee::HUNGRYDEE_DESC HungryDeeDesc{};
+				HungryDeeDesc.fSpeedPerSec = 5.f;
+				HungryDeeDesc.fRotationPerSec = ToRadian(90.f);
+				HungryDeeDesc.eAnim = DEESHOPANIM_WAIT;
+				HungryDeeDesc.iIdx = ((_int)fRealTotalScore / 30) - 1;
 
+				m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc);
+			}
 			if (false == m_bRenderTotalScore)
 			{
 				fTimeAcc = 0.f;
 				m_fMoveRatio = 0.f;
 			}
+
+
+
 		}
 	}
 
@@ -258,9 +228,9 @@ void CUI_PartTimeResult::Render_Digits()
 		m_fMovePosition2D = _float2(m_arrPosition[i].x, m_arrPosition[i].y - fPosRatio * 30.f);
 		m_pTransformCom->Set_Scaled(m_arrSize[i].x, m_arrSize[i].y, 1.f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-								   XMVectorSet(m_fMovePosition2D.x - g_iWinSizeX * 0.5f,
-								   			   - m_fMovePosition2D.y + g_iWinSizeY * 0.5f,
-								   			   0.f, 1.f));
+			XMVectorSet(m_fMovePosition2D.x - g_iWinSizeX * 0.5f,
+				-m_fMovePosition2D.y + g_iWinSizeY * 0.5f,
+				0.f, 1.f));
 
 		hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
 		CHECK_FAILED(hr);
@@ -291,36 +261,56 @@ void CUI_PartTimeResult::Render_TotalScore()
 		fTimeAcc += m_fTimeDelta;
 		if (fTimeAcc >= 1.f)
 		{
-			// 효선아 여기야 >> 게임 점수 다 뜨고 이펙트 나오는 구간
-			//결과 UI
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_FoodGame success UI"))))
-				return;
-
-
-			//콘페티
-			_float4x4 CamWorld = m_pGameInstance->Get_Transform_Inv(CPipeLine::D3DTS_VIEW);
-			_float3 vCamPos = CamWorld.Translation();
-
-			for (_int i = 0; i < 80; ++i)
+			static _bool bOnce{ false };
+			if (!bOnce)
 			{
-				CEffect::FX_DESC FXDesc{};
-				FXDesc.vInitPos = vCamPos + _float3{ CUtils::Make_RandomFloat(-5.f, 5.f), 0.f, -5.f } + (_float3)CUtils::Make_Random_Vector(CUtils::Make_RandomFloat(2.f, 5.f));
+				// 효선아 여기야 >> 게임 점수 다 뜨고 이펙트 나오는 구간
+				// 감사합니다
 
-				//FXDesc.vInitRot =CUtils::Make_Degree_FromDir(CUtils::Make_Random_Vector(1.f));
-				FXDesc.fStartDelay = CUtils::Make_RandomFloat(0.f, 3.f);
+				bOnce = true;
 
-				wstring strPrototypeTag = TEXT("Prototype_GameObject_foodgame clear confetti ");
-				switch (CUtils::Make_RandomInt(1, 4))
+				_int iLevel = *CGameInstance::Get_Instance()->Get_CurrentLevelID();
+				auto layerList = CGameInstance::Get_Instance()->Get_List(iLevel, TEXT("Layer_Dee"));
+				if (!layerList->empty())
 				{
-				case 1: strPrototypeTag += L"A"; break;
-				case 2: strPrototypeTag += L"B"; break;
-				case 3: strPrototypeTag += L"C"; break;
-				case 4: strPrototypeTag += L"D"; break;
-				default:
-					break;
+					for (auto pGameObj : *layerList)
+					{
+						CHungryDee* pDee = static_cast<CHungryDee*>(pGameObj);
+						pDee->Win();
+					}
 				}
-				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strPrototypeTag, &FXDesc)))
+
+				//결과 UI
+				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_FoodGame success UI"))))
 					return;
+
+
+				//콘페티
+				//_float4x4 CamWorld = m_pGameInstance->Get_Transform_Inv(CPipeLine::D3DTS_VIEW);
+				//_float3 vCamPos = CamWorld.Translation();
+
+				//for (_int i = 0; i < 80; ++i)
+				//{
+				//	CEffect::FX_DESC FXDesc{};
+				//	FXDesc.vInitPos = vCamPos + _float3{ CUtils::Make_RandomFloat(-5.f, 5.f), 0.f, 8.f } + (_float3)CUtils::Make_Random_Vector(CUtils::Make_RandomFloat(2.f, 5.f));
+
+				//	//FXDesc.vInitRot =CUtils::Make_Degree_FromDir(CUtils::Make_Random_Vector(1.f));
+				//	FXDesc.fStartDelay = CUtils::Make_RandomFloat(0.f, 3.f);
+
+				//	wstring strPrototypeTag = TEXT("Prototype_GameObject_foodgame clear confetti ");
+				//	switch (CUtils::Make_RandomInt(1, 4))
+				//	{
+				//	case 1: strPrototypeTag += L"A"; break;
+				//	case 2: strPrototypeTag += L"B"; break;
+				//	case 3: strPrototypeTag += L"C"; break;
+				//	case 4: strPrototypeTag += L"D"; break;
+				//	default:
+				//		break;
+				//	}
+				//	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strPrototypeTag, &FXDesc)))
+				//		return;
+				//}
+
 			}
 		}
 	}
@@ -332,9 +322,9 @@ void CUI_PartTimeResult::Render_TotalScore()
 		m_fSize2D = _float2(m_arrSize[i].x + fSizeRatio * 10.f, m_arrSize[i].y + fSizeRatio * 10.f);
 		m_pTransformCom->Set_Scaled(m_fSize2D.x, m_fSize2D.y, 1.f);
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION,
-								   XMVectorSet(m_arrPosition[i].x - g_iWinSizeX * 0.5f,
-								   			   - m_arrPosition[i].y + g_iWinSizeY * 0.5f,
-								   			   0.f, 1.f));
+			XMVectorSet(m_arrPosition[i].x - g_iWinSizeX * 0.5f,
+				-m_arrPosition[i].y + g_iWinSizeY * 0.5f,
+				0.f, 1.f));
 
 		hr = m_arrTexures[i]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_arrScoreDigits[i - 1]);
 		CHECK_FAILED(hr);
@@ -368,14 +358,14 @@ void CUI_PartTimeResult::Render_Font()
 
 void CUI_PartTimeResult::Initialize_TexturePos()
 {
-	m_arrPosition[0] = _float2(800.f,  222.f);
-									   
+	m_arrPosition[0] = _float2(800.f, 222.f);
+
 	m_arrPosition[1] = _float2(760.f, 220.f);
 	m_arrPosition[2] = _float2(800.f, 220.f);
 	m_arrPosition[3] = _float2(840.f, 220.f);
-									   
-	m_arrPosition[4] = _float2(800.f,  490.f);
-									   
+
+	m_arrPosition[4] = _float2(800.f, 490.f);
+
 	m_arrPosition[5] = _float2(1000.f, 490.f);
 	m_arrPosition[6] = _float2(1035.f, 490.f);
 	m_arrPosition[7] = _float2(1070.f, 490.f);
@@ -411,7 +401,7 @@ HRESULT CUI_PartTimeResult::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	#pragma region 텍스쳐 컴포넌트
+#pragma region 텍스쳐 컴포넌트
 	// 점수판 배경
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_GameFoodUI_ScoreBar"),
 		TEXT("Com_Texture_ScoreBar"), (CComponent**)&m_arrTexures[0]);
@@ -453,7 +443,7 @@ HRESULT CUI_PartTimeResult::Add_Components()
 	hr = __super::Add_Component(*m_pCurrentLevelID, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby_Mask"),
 		TEXT("Com_Texture_Mask"), (CComponent**)&m_pTexMask);
 	CHECK_FAILED(hr);
-	#pragma endregion
+#pragma endregion
 
 	hr = __super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
 		TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom);
@@ -507,7 +497,7 @@ void CUI_PartTimeResult::Repose_ScoreTextures()
 	m_arrPosition[5] = _float2(-100.f, -100.f);
 	m_arrPosition[6] = _float2(-100.f, -100.f);
 	m_arrPosition[7] = _float2(-100.f, -100.f);
-	
+
 	_float fScore = m_arrScoreDigits[0] * 100 + m_arrScoreDigits[1] * 10 + m_arrScoreDigits[2];
 	if (fScore <= 0.f)			// 0일 때
 		m_arrPosition[7] = _float2(1035.f, 490.f);
