@@ -1452,6 +1452,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\BossOrigin.h">
       <Filter>02.GameObjects\Map\SimbaObjects\BossOrigin</Filter>
+	</ClInclude>
     <ClInclude Include="..\Public\Gm_ParkShutter.h">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
     </ClInclude>
