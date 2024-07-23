@@ -198,16 +198,17 @@ HRESULT CHUD_KirbyStatus::Render()
 	}
 
 	//추후 폰트가 아닌 이미지폰트로 렌더할 예정
-	//if (UI_FONT == m_UIObjDesc.eUIType)
-	//{
-	//	_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha * m_fAlpha };
-	//	_float2 vFontOrig = { 1.f, 1.f };
-	//	_float2 vFontScale = { 1.2f, 1.2f };
-	//	wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
+	if (UI_FONT == m_UIObjDesc.eUIType)
+	{
+		_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha * m_fAlpha };
+		_float2 vFontOrig = { 1.f, 1.f };
+		_float2 vFontScale = { 1.2f, 1.2f };
+		wstring wstrFontTag = { TEXT("Font_HUDSub_KR15") };
 
-	//	m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, m_vFontPos, vFontRGBA,
-	//		XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
-	//}
+		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, m_vFontPos, vFontRGBA,
+			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
+	}
+
 #pragma region KIRBY_NAMETAG
 
 	if (nullptr == m_pKirby)
