@@ -979,8 +979,6 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pSimba->SetUpDimensionClawWorldMatrix();
 		}
 
-		pSimba->MoveDimensionClaw(fTimeDelta);
-
 		if (0.32f < fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
 		if (0.38f < fAnimRatio && 1 == iStarCount)
@@ -995,13 +993,15 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pSimba->SetUpDimensionClawWorldMatrix();
 		}
 
-		pSimba->MoveDimensionClaw(fTimeDelta);
-			
 		if (0.53f < fAnimRatio && 0 == iStarCount)
 			pSimba->SpawnStar(iState);
 		if (0.63f < fAnimRatio && 1 == iStarCount)
 			pSimba->SpawnStar(iState);
 	}
+
+	if (CSimba::Simba_DimensionClaw == iState || CSimba::Simba_DimensionClawContinue == iState ||
+		CSimba::Simba_DimensionClawEnd == iState || CSimba::Simba_DimensionClawStartContinue == iState)
+		pSimba->Set_DimensionGateActivation(true);
 
 	if (pSimba->IsAnimFinished())
 	{
@@ -1012,7 +1012,7 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pSimba->Change_State(CSimba::Simba_DimensionClawStartContinue, 60.f, false, false);
 			s_iAttackCount++;
 			pSimba->ChangeDimensionClawUpDown();
-			pSimba->HideDimensionClawActor();
+			//pSimba->HideDimensionClawActor();
 		}
 
 		else if (CSimba::Simba_DimensionClawStartContinue == iState)
@@ -1021,7 +1021,7 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		else if (CSimba::Simba_DimensionClawContinue == iState)
 		{
 			pSimba->ChangeDimensionClawUpDown();
-			pSimba->HideDimensionClawActor();
+			//pSimba->HideDimensionClawActor();
 
 			if (2 > s_iAttackCount) {
 				pSimba->Change_State(CSimba::Simba_DimensionClawStartContinue, 60.f, false, false);
@@ -1190,9 +1190,9 @@ void CSimba_Death::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	CSimba* pSimba = static_cast<CSimba*>(pGameObject);
 	_uint iState = pSimba->Get_State();
 	_float fAnimRatio = pSimba->Get_AnimRatio();
-	if (CSimba::Simba_DemoDeadCut2 == iState && 0.83f < fAnimRatio)
+	if (CSimba::Simba_DemoDeadCut2 == iState)
 	{
-		if (0.185f < fAnimRatio && true == pSimba->Get_EyeBloom())
+		if (0.185f < fAnimRatio)
 			pSimba->Set_EyeBloom(false);
 			
 		if (0.83f < fAnimRatio && false == pSimba->Get_RenderEyeLid())
@@ -1203,6 +1203,7 @@ void CSimba_Death::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	{
 		if (CSimba::Simba_Death == iState) {
 			pSimba->Change_State(CSimba::Simba_DemoDeadCut1, 50.f, false, true);
+			pSimba->Set_SimbaEye(CSimba::SIMBAEYE_NONE);
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_THRONEBREAK);
 		}
 		else if (CSimba::Simba_DemoDeadCut1 == iState)

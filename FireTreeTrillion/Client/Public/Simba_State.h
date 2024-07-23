@@ -206,7 +206,7 @@ private:
 	CTransform* m_pTransform = { nullptr };
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
-	_bool m_bSmokeEffect = { nullptr };
+	_bool m_bSmokeEffect = { false };
 
 public:
 	static	CSimba_Jump* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform) 

@@ -284,6 +284,12 @@ _int CSimba::Tick(_float fTimeDelta)
 
 	DetermineSimbaRotation();
 
+	if (false == m_bDimensionClawActivated)
+		m_fDeactiveTime += m_fTimeDelta;
+
+	if (true == m_bDimensionClawActivated || (0.f < m_fDeactiveTime && 3.f > m_fDeactiveTime))
+		MoveDimensionClaw(m_fTimeDelta);
+
 	for (auto& index : m_listUsedRocks)
 		m_vecSimbaRocks[index]->Tick(m_fTimeDelta);
 
@@ -383,30 +389,25 @@ HRESULT CSimba::Render()
 				return E_FAIL;
 		}
 
-		if (true == m_bRenderRing)
-			RenderRing();
+		// Render Eye Mesh
+		if (FAILED(m_pEyeTextureCom[EYETEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_eEyeState)))
+			return E_FAIL;
+		if (FAILED(m_pEyeTextureCom[EYETEX_NORMAL]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", m_eEyeState)))
+			return E_FAIL;
+		if (FAILED(m_pEyeTextureCom[EYETEX_MRA]->Bind_ShaderResource(m_pShaderCom, "g_MRATexture")))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", m_iEyeMesh)))
+			return E_FAIL;
 
-		if (m_bEyeBloom == false)
-		{
-			// Render Eye Mesh
-			if (FAILED(m_pEyeTextureCom[EYETEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_eEyeState)))
-				return E_FAIL;
-			if (FAILED(m_pEyeTextureCom[EYETEX_NORMAL]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", m_eEyeState)))
-				return E_FAIL;
-			if (FAILED(m_pEyeTextureCom[EYETEX_MRA]->Bind_ShaderResource(m_pShaderCom, "g_MRATexture")))
-				return E_FAIL;
-			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", m_iEyeMesh)))
-				return E_FAIL;
-
-			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_SIMBAEYE_DEFAULT)))
-				return E_FAIL;
-			if (FAILED(m_pModelCom->Render(m_iEyeMesh)))
-				return E_FAIL;
-		}
-
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_SIMBAEYE_DEFAULT)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render(m_iEyeMesh)))
+			return E_FAIL;
+		
 		m_iEyeRenderCount--;
 	}
-	else
+
+	else if (true == m_bEyeBloom)
 	{
 		// Render Eye Mesh
 		if (FAILED(m_pEyeTextureCom[EYETEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_eEyeState)))
@@ -423,7 +424,7 @@ HRESULT CSimba::Render()
 		if (FAILED(m_pModelCom->Render(m_iEyeMesh)))
 			return E_FAIL;
 	}
-	
+
 	return S_OK;
 }
 
@@ -751,7 +752,7 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 	memcpy(&vPos, &(matWorld.m[3]), sizeof(_float4));
 	vLook.Normalize();
 
-	vPos += vLook * 20.f * fTimeDelta;
+	vPos += vLook * 26.f * fTimeDelta;
 
 	memcpy(&(matWorld.m[3]), &vPos, sizeof(_float4));
 
@@ -762,6 +763,8 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 
 void CSimba::HideDimensionClawActor()
 {
+	m_bDimensionClawActivated = false;
+	m_fDeactiveTime = 0.f;
 	if(nullptr != m_pDimensionClawActor)
 		m_pDimensionClawActor->setGlobalPose(PxTransform(0, 0, 0));
 }
@@ -1441,14 +1444,6 @@ void CSimba::DimensionLaser() // ÁøÂ¥ DimensionLaser
 }
 
 void CSimba::DimensionLaserParticles()
-{
-}
-
-void CSimba::DimensionClaw()
-{
-}
-
-void CSimba::TeethBite()
 {
 }
 

@@ -104,6 +104,8 @@ public:
 	_bool Get_EyeBloom() { return m_bEyeBloom; }
 	void Set_EyeBloom(_bool bEyeBloom) { m_bEyeBloom = bEyeBloom; }
 
+	void Set_DimensionGateActivation(_bool bActivation) { m_bDimensionClawActivated = bActivation; }
+
 public:
 	virtual HRESULT Initialize_Prototype()			override;
 	virtual HRESULT Initialize(void* pArg)			override;
@@ -254,6 +256,9 @@ private:
 	_bool			m_bEyeBloom = { false };
 
 	_uint			m_iEyeRenderCount = {};
+	
+	_bool			m_bDimensionClawActivated = { false };
+	_float			m_fDeactiveTime = {};
 
 private:
 	HRESULT		Add_Components();
