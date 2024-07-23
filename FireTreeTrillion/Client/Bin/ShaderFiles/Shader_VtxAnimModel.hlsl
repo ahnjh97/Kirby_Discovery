@@ -819,7 +819,7 @@ PS_OUT PS_FOR_DEFORMRIM(PS_IN In)
     if (vDot < 0.03f)
         discard;
     
-    if (vMask.r < g_fDissolveRatio)
+    if (vMask.r < 0.4f)
         discard;
     
     vRimLightColor.rgb = g_vDeformRimColor.rgb * vDot;

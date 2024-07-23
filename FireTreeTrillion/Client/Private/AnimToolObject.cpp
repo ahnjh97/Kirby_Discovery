@@ -44,7 +44,7 @@ HRESULT CAnimToolObject::Initialize(void* pArg)
 
 	m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST);
 	m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(180.f));
-	m_pModelCom->Set_Animation(0);
+	m_pModelCom->Set_Animation(0, 60.f, false, false);
 
 	return S_OK;
 }

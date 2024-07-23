@@ -74,7 +74,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
-	m_eAbilityType = ABILITY_SWORD;
+	m_eAbilityType = ABILITY_CRASH;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 		m_eAbilityType = ABILITY_SWORD;
 	m_fHp = 1000.f;
@@ -1998,7 +1998,7 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 
 
 	// 모션블러가 들어가면 어색한 곳을 해소한다.
-	if (m_pFSM->Get_State() == CARSTATE_CUT2)
+	if (m_pFSM->Get_State() == CARSTATE_CUT2 || m_pFSM->Get_State() == FINALCUTSTATE_CUT1 || m_pFSM->Get_State() == FINALCUTSTATE_CUT2)
 		m_bMotionBlur = false;
 	else
 		m_bMotionBlur = true;
@@ -2345,7 +2345,6 @@ void CKirby::AssistLight_Control()
 			return;
 		INFO(m_pKirbyAssistLight2) = CGameInstance::Get_Instance()->Get_LightLastAddress();
 		Safe_AddRef(INFO(m_pKirbyAssistLight2));
-
 	}
 
 
