@@ -55,7 +55,7 @@ HRESULT CTransingStar::Initialize(void* pArg)
 
 _int CTransingStar::Tick(_float fTimeDelta)
 {
-    m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+    m_fTimeDelta = m_pGameInstance->Get_SecondTimer() * 1.5f;
 
     // FOR TEST
     if (m_pGameInstance->Get_DIKeyState(DIK_LALT, KEY_PRESS))

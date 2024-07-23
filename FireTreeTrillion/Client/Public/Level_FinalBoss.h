@@ -12,8 +12,10 @@ private:
 
 public:
 	virtual HRESULT Initialize() override;
-	virtual void Tick(_float fTimeDelta) override;
+	virtual void	Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+
+	void			Light_Tick(_float fTimeDelta);
 
 private:
 	void	Ready_FadeIn();

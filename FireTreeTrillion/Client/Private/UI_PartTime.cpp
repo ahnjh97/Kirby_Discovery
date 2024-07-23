@@ -497,6 +497,7 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 		if (m_fCurTime <= fGameoverTime) // GAME OVER 텍스쳐 띄우기
 		{
 			CPartTimeHelper::Get_Instance()->Handle_UI(CPartTimeHelper::GAMEOVER);
+			m_pGameInstance->Set_SecondTimerRatio(0);//QZR
 		}
 		else if (m_fCurTime <= 10.f)
 		{
@@ -785,6 +786,7 @@ void CUI_PartTime::Render_Fade()
 		if (!m_bOnce)
 		{
 			CPartTimeHelper::Get_Instance()->Handle_GameOver();
+			m_pGameInstance->Restore_SecondTimer();
 			m_bOnce = true;
 		}
 	}

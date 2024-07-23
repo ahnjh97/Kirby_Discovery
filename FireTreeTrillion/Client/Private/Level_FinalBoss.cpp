@@ -82,7 +82,7 @@ HRESULT CLevel_FinalBoss::Initialize()
 	pFadingUI->Set_IsRender(true);
 
 	// 검정 포그 설정
-	m_pGameInstance->Fog_Intialize_ForPark(0);
+	m_pGameInstance->Fog_Intialize_ForFinalBoss(0);
 
 	return S_OK;
 }
@@ -106,6 +106,8 @@ void CLevel_FinalBoss::Tick(_float fTimeDelta)
 	fTimeAcc += fTimeDelta;
 	if (fTimeAcc > 1.2f) // 1.2초뒤 페이드인
 		Ready_FadeIn();
+
+	Light_Tick(fTimeDelta);
 }
 
 HRESULT CLevel_FinalBoss::Render()
@@ -127,6 +129,26 @@ HRESULT CLevel_FinalBoss::Render()
 	}
 
 	return S_OK;
+}
+
+void CLevel_FinalBoss::Light_Tick(_float fTimeDelta)
+{
+	//m_pGameInstance->Blink_Light(fTimeDelta, 2, fSpeed);
+
+	static _float fSpeed = 1.f;
+	static _float fAccTime = 0.f;
+	fAccTime += fTimeDelta;
+	if (fAccTime >= fSpeed)
+	{
+		_int iSwitch = CUtils::Make_RandomInt(0, 1);
+		if (iSwitch == 1)
+			m_pGameInstance->Set_CurLightRange(2, 7.f);
+		else
+			m_pGameInstance->Set_CurLightRange(2, 0.f);
+
+		fAccTime = 0.f;
+		fSpeed = CUtils::Make_RandomFloat(0.01f, 0.2f);
+	}
 }
 
 void CLevel_FinalBoss::Ready_FadeIn()

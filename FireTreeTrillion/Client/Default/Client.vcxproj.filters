@@ -1452,6 +1452,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\BossOrigin.h">
       <Filter>02.GameObjects\Map\SimbaObjects\BossOrigin</Filter>
+    <ClInclude Include="..\Public\Gm_ParkShutter.h">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2150,6 +2152,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\SimbaLaser.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_ParkShutter.cpp">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BossOrigin.cpp">
       <Filter>02.GameObjects\Map\SimbaObjects\BossOrigin</Filter>

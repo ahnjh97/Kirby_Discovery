@@ -7,6 +7,7 @@
 #include "Bomber.h"
 #include "SummonEffect.h"
 #include "Effect.h"
+#include "Gm_ParkShutter.h"
 
 CGm_ParkSolarPanelOnce::CGm_ParkSolarPanelOnce(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -95,7 +96,6 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 			if (4 == m_iGimmickIndex) //크래시 능력 몬스터를 생성
 			{
 				HRESULT hr;
-
 				CSummonEffect::SUMMONEFFECT_DESC SummonEffectDesc = {};
 
 				SummonEffectDesc.vPosition = XMVectorSet(35.5f, 75.f, 175.5f, 1.f);
@@ -112,22 +112,20 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 				//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 				Add_Effect("ParticleSummonJS", FXDesc, false);
 
-				//_float4x4 matWorld = XMMatrixIdentity();
-				//matWorld._41 = 35.5f;
-				//matWorld._42 = 73.f;
-				//matWorld._43 = 175.5f;
-				//matWorld._44 = 1.f;
-				//CMonster::MONSTER_DESC MonsterDesc = {};
-				//MonsterDesc.matWorld = matWorld;
-				//hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Bomber"), &MonsterDesc);
-				//CHECK_FAILED(hr);
+				_float4x4 matWorld = XMMatrixIdentity();
+				matWorld._41 = 35.5f;
+				matWorld._42 = 73.f;
+				matWorld._43 = 175.5f;
+				matWorld._44 = 1.f;
+				CMonster::MONSTER_DESC MonsterDesc = {};
+				MonsterDesc.matWorld = matWorld;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Bomber"), &MonsterDesc);
+				CHECK_FAILED(hr);
 			}
 		}
 
 		break; 
-	case STATE_NONE:	
-		break;
-		default:	break;
+	case STATE_NONE:default:		break;
 	}
 
 	return OBJ_NOEVENT;

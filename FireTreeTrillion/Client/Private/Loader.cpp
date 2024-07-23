@@ -199,6 +199,7 @@
 #include "Gm_ParkSolarPanelCharge.h"
 #include "Gm_ParkSolarPanelOnce.h"
 #include "Gm_DynamicField.h"
+#include "Gm_ParkShutter.h"
 
 //UI
 #include "BackGround.h"
@@ -545,7 +546,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Box"), CBox);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Debris"), CDebris);
 
-#pragma region LEVEL_FINALBOSS :: LAB_DISCOVERA
+#pragma region GIMMICK::LEVEL_FINALBOSS :: LAB_DISCOVERA
 
 	//BOSS
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossChimera"), CBossChimera);
@@ -565,6 +566,9 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	//기믹 활성화 시 이동하는 동적 필드
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_DynamicField"), CGm_DynamicField);
+
+	//기믹 활성화 시 셔터 오픈
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkShutter"), CGm_ParkShutter); 
 
 #pragma endregion
 
@@ -2112,6 +2116,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("SolarPanelOnce_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SolarPanelOnce_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		m_vecModelInfo.emplace_back("Shutter_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Shutter_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		
 		//와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);

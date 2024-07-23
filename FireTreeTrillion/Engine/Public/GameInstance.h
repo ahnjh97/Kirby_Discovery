@@ -147,6 +147,8 @@ public: /* For.Light_Manager */
 	void Clear_Light();
 	class CLight* Get_LightLastAddress();
 	class CLight* Get_DirectionLightAddress();
+	void Blink_Light(_float fTimeDelta, _uint iLightNum, _float fRandomSpeed = 1.f);
+	void Set_CurLightRange(_uint iLightNum, _float fRange);
 
 #pragma region FONT_MANAGER
 
