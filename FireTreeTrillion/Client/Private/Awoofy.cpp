@@ -358,7 +358,7 @@ _bool CAwoofy::Custom_Face(_uint iMeshIndex)
 
 		_bool bStencil = true;
 		_bool bRimLight = true;
-		_bool bMotionBlur = true;
+		_bool bMotionBlur = false;
 		m_pShaderCom->Bind_RawValue("g_bStencil", &bStencil, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bRimLight", &bRimLight, sizeof(_bool));
 		m_pShaderCom->Bind_RawValue("g_bMotionBlur", &bMotionBlur, sizeof(_bool));
@@ -413,18 +413,20 @@ HRESULT CAwoofy::Add_Components(const wstring& wstrModelName)
 	/* FSM */
 	SetUp_FSM();
 
+	if(LEVEL_TOWN != *m_pGameInstance->Get_CurrentLevelID())
+	{
+		CHitBox::HITBOX_DESC HitBox{};
+		HitBox.pOwner = this;
+		HitBox.pDesc = &m_tColliderDesc[BODY];
+		HitBox.pCollisionType = MONSTER;
+		if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
+			return E_FAIL;
 
-	CHitBox::HITBOX_DESC HitBox{};
-	HitBox.pOwner = this;
-	HitBox.pDesc = &m_tColliderDesc[BODY];
-	HitBox.pCollisionType = MONSTER;
-	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
-		return E_FAIL;
-
-	if(m_pModelCom->Get_ModelName() != "Awoofy")
-		Set_BodyCollider(COLLIDER_SPHERE, 1.f, 1.5f, 1.2f);
-	else
-		Set_BodyCollider(COLLIDER_SPHERE, 1.f, 1.5f, 1.5f);
+		if (m_pModelCom->Get_ModelName() != "Awoofy")
+			Set_BodyCollider(COLLIDER_SPHERE, 1.f, 1.5f, 1.2f);
+		else
+			Set_BodyCollider(COLLIDER_SPHERE, 1.f, 1.5f, 1.5f);
+	}
 
 	return S_OK;
 }

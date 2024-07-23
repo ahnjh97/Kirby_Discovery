@@ -402,13 +402,12 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		return E_FAIL;
 	}
 
-	//���� ����Ʈ
+	//멀티 이펙트
 	for (auto& entry : directory_iterator(FXPath))
 	{
 		auto& filePath = entry.path();
 		string strname = filePath.stem().string();
-		if (strname == "HS_FB fly smoke")
-			_int a = 0;
+
 		if (filePath.extension() != ".bin")
 			continue;
 

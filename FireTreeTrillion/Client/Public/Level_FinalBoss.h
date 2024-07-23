@@ -1,6 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "Level.h"
+#include "Monster.h"
 
 BEGIN(Client)
 
@@ -12,10 +13,14 @@ private:
 
 public:
 	virtual HRESULT Initialize() override;
-	virtual void Tick(_float fTimeDelta) override;
+	virtual void	Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+	void			Light_Tick(_float fTimeDelta);
+
 private:
+	void	Ready_FadeIn();
+	
 	HRESULT Ready_Lights();
 	HRESULT Ready_Layer_Camera(const wstring& strLayerTag);
 	HRESULT Ready_Layer_BackGround(const wstring& strLayerTag);
@@ -27,9 +32,20 @@ private:
 	HRESULT Ready_Objects();
 	HRESULT Ready_UI();
 
+	void	Teleport_Player();
+	void	SummonMonsters(_uint iTriggerIndex);
+	void	SummonEffectForMonster(_uint iTriggerIndex);
+
 	HRESULT Add_EnvMap();
 	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };
 	CTexture* m_pEnvTexture[TYPE_END] = { nullptr, nullptr, nullptr };
+
+	vector<CMonster::MONSTER_DESC> m_vecMonsterDescs[10];
+	unordered_set<_uint> m_setActivatedMonsterTriggers;
+
+	_float	m_fSummonTime = { 0.f };
+	_uint	m_iTriggerIndex = { 0 };
+	_bool	m_bTrigger = { false };
 
 public:
 	static CLevel_FinalBoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

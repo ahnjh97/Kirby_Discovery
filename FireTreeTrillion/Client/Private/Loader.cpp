@@ -153,6 +153,7 @@
 #include "RoomGlass.h"
 #include "Throne.h"
 #include "OriginCage.h"
+#include "BossOrigin.h"
 
 // Simba
 #include "Simba.h"
@@ -199,6 +200,7 @@
 #include "Gm_ParkSolarPanelCharge.h"
 #include "Gm_ParkSolarPanelOnce.h"
 #include "Gm_DynamicField.h"
+#include "Gm_ParkShutter.h"
 
 //UI
 #include "BackGround.h"
@@ -546,7 +548,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Box"), CBox);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Debris"), CDebris);
 
-#pragma region LEVEL_FINALBOSS :: LAB_DISCOVERA
+#pragma region GIMMICK::LEVEL_FINALBOSS :: LAB_DISCOVERA
 
 	//BOSS
 	//ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossChimera"), CBossChimera);
@@ -567,6 +569,9 @@ HRESULT CLoader::Loading_ObjectAll()
 	//기믹 활성화 시 이동하는 동적 필드
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_DynamicField"), CGm_DynamicField);
 
+	//기믹 활성화 시 셔터 오픈
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Gm_ParkShutter"), CGm_ParkShutter); 
+
 #pragma endregion
 
 	// 미니게임 in 와들디마을
@@ -578,6 +583,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("RoomGlass"), CRoomGlass);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Throne"), CThrone);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OriginCage"), COriginCage);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossOrigin"), CBossOrigin);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Simba"), CSimba);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("SimbaLaser"), CSimbaLaser);
@@ -836,6 +842,7 @@ HRESULT CLoader::Loading_For_DeeDeeDee()
 	LEVEL eLevel = LEVEL_DEEDEEDEE;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+
 #pragma region 텍스쳐
 	if (FAILED(Add_Texture(eLevel, "Level_Town_Env", "Map/Level_Town_Env.dds")))
 		return E_FAIL;
@@ -1686,7 +1693,7 @@ HRESULT CLoader::Add_FXTexture()
 
 
 	//번개
-	hr = Add_Texture(LEVEL_STATIC, "FX_Thunder", "Effects/Thunder/Thunder_%d.png", 3);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Thunder", "Effects/Thunder/Thunder_%d.png", 5);	CHECK_FAILED(hr);
 
 	//아우라
 	hr = Add_Texture(LEVEL_STATIC, "FX_Aura", "Effects/Basic/Aura.png");	CHECK_FAILED(hr);
@@ -1701,14 +1708,14 @@ HRESULT CLoader::Add_StaticUITexture()
 	//KirbyHP
 	hr = Add_Texture(LEVEL_STATIC, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");	CHECK_FAILED(hr);
-
+	hr = Add_Texture(LEVEL_STATIC, "HUD_StatusBar_NameTag", "UI/HUD/Kirby/NameTag_%d.png", 7);	CHECK_FAILED(hr);
+	
 	//StarPoint
 	hr = Add_Texture(LEVEL_STATIC, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);	CHECK_FAILED(hr);
 
 	//Ability Discard
-	hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 3);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 4);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");	CHECK_FAILED(hr);
-
 
 	//UI_MessageWindow
 	hr = Add_Texture(LEVEL_STATIC, "UI_MessageWindow_Base", "UI/MessageWindow/MessageWindow_Base_%d.dds", 3); CHECK_FAILED(hr);
@@ -1798,6 +1805,14 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FXMeteoDash", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXDonut", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("LaserNonAnim", TYPE_NONANIM);
+
+		//사자
+		m_vecModelInfo.emplace_back("FXClaw", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("FXSimbaLaser", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("FXSimbaAtkReady", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("FXSimbaCutter", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("FXFloorAtkCircle", TYPE_NONANIM);
+
 
 		//공통이펙트 - YW
 		m_vecModelInfo.emplace_back("Cube", TYPE_NONANIM);
@@ -2118,6 +2133,9 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		m_vecModelInfo.emplace_back("SolarPanelOnce_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("SolarPanelOnce_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
+
+		m_vecModelInfo.emplace_back("Shutter_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
+		m_vecModelInfo.emplace_back("Shutter_NonAnim", TYPE_NONANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		
 		//와들디
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
@@ -2171,7 +2189,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("RoomGlass_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("Throne_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 		m_vecModelInfo.emplace_back("OriginCage_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
-
+		m_vecModelInfo.emplace_back("BossOrigin_Anim", TYPE_ANIM, 1.f, 0.f, 0, string("MapObjs/"));
 
 		// For Kirby Body
 		Load_KirbyBodyModels();
@@ -2244,6 +2262,22 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// 액체괴물 :: Fecto_Forgo
 		//m_vecModelInfo.emplace_back("", TYPE_ANIM, 1.f, 180.f);
+
+		// For Monster
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.2f, 180.f);
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
+		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 1.3f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
+		m_vecModelInfo.emplace_back("CappyBody", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Bomber", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("AwoofyWild", TYPE_ANIM, 1.35f, 180.f);
+		m_vecModelInfo.emplace_back("RabbitBig", TYPE_ANIM, 1.35f, 180.f);
 
 		// For Boss 
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
@@ -2464,6 +2498,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
 
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
+		m_vecModelInfo.emplace_back("WaddleDeeHungry", TYPE_ANIM, 1.1f, 180.f);
 
 		// Monster
 		m_vecModelInfo.emplace_back("SurprisedBoardBlue", TYPE_ANIM, 1.f, 0.f);

@@ -23,6 +23,9 @@
 #include "GameObject.h"
 #include "Simba.h"
 
+#include "Level_Loading.h"
+#include "UI_Fading.h"
+
 CLevel_Simba::CLevel_Simba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
@@ -76,7 +79,10 @@ HRESULT CLevel_Simba::Initialize()
 	pTransingStar->Set_SmallColor(_float3(48.f / 255.f, 57.f / 255.f, 147.f / 255.f));
 	pTransingStar->Activate(CTransingStar::OPEN);
 
-	//m_pGameInstance->ShowAllAnimations("OriginCage_Anim");
+	//m_pGameInstance->ShowAllAnimations("BossOrigin_Anim");
+
+	// 포그 설정
+	m_pGameInstance->Fog_Zero();
 
 	return S_OK;
 }
@@ -85,6 +91,36 @@ void CLevel_Simba::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
+
+	static _bool bOpenLevel = false;
+	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
+		if (m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS))
+			if (m_pGameInstance->Get_KeyState(DIK_SPACE, KEY_PRESS))
+				if (m_pGameInstance->Get_KeyState(DIK_A, KEY_DOWN))
+					bOpenLevel = true;
+
+
+	static _bool bOnceFade = false;
+	static _bool bOnceChangeLevel = false;
+	if (bOpenLevel)
+	{
+		CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+		CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
+		if (bOnceFade == false)
+		{
+			pFadingUI->Set_InOutState(CUI_Fading::FADEOUT);
+			pFadingUI->Set_IsRender(true);
+			bOnceFade = true;
+		}
+		else if (pFadingUI->Get_FadeRatio() <= 0.f)
+		{
+			if (bOnceChangeLevel == false)
+			{
+				m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_FINALBOSS));
+				bOnceChangeLevel = true;
+			}
+		}
+	}
 
 	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{
@@ -97,7 +133,7 @@ void CLevel_Simba::Tick(_float fTimeDelta)
 		else if (m_pGameInstance->Get_KeyState(DIK_4, KEY_DOWN))
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_WAVE2DEAD);
 		else if (m_pGameInstance->Get_KeyState(DIK_C, KEY_DOWN))
-			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_THRONEBREAK);
+			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_BOSSORIGIN);
 	}
 
 	if (m_iWaveCount == 0)
@@ -684,6 +720,12 @@ HRESULT CLevel_Simba::Ready_Objects()
 		{
 			tDesc.wstrModelName += L"_Anim";
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_OriginCage"), &tDesc)))
+				continue;
+		}
+		else if ("BossOrigin" == strModelName)
+		{
+			tDesc.wstrModelName += L"_Anim";
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_BossOrigin"), &tDesc)))
 				continue;
 		}
 	}

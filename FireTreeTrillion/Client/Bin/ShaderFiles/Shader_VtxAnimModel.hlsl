@@ -875,7 +875,21 @@ PS_OUT PS_FOR_DIMENSIONGATE(PS_IN In)
     //float flength = length(UVVector);
     Out.vDiffuse = saturate(float4(vMtrlDiffuse.rgb, 1.f));
     //Out.vDiffuse.a *= pow(1.f - flength, 3.f);
+}
 
+PS_OUT_EFFECT PS_GlassCrack(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    if (0.0f >= vMtrlDiffuse.a)
+        discard;
+    
+    vector vWhite = vector(1.f, 1.f, 1.f, 1.f);
+    vector mixedColor = lerp(vMtrlDiffuse, vWhite, g_fWhiteColorDiffuse);
+    
+    Out.vColor = mixedColor;
+    Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
     return Out;
 }
 
@@ -1183,7 +1197,22 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_FOR_DEFORMRIM();
 
     }
-    // DimensionGate (22)
+
+    // OriginCage GlassCrack (22)
+    pass GlassCrack
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_GlassCrack();
+    }
+
+    // DimensionGate (23)
     pass DimensionGate
     {
         SetRasterizerState(RS_Default);
@@ -1196,5 +1225,6 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_FOR_DIMENSIONGATE();
     }
+
 
 }

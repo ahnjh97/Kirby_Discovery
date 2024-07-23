@@ -43,6 +43,7 @@ HRESULT CKabu::Initialize(void* pArg)
 	{
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vecRallyPoint[0]);
 		m_vRally = m_vecRallyPoint[1] - m_vecRallyPoint[0];
+		m_fRallyDistance = XMVectorGetX(XMVector4Length(m_vRally));
 	}
 	else
 	{
@@ -78,58 +79,9 @@ _int CKabu::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	_vector vPos = GET_POS;
-
-	m_bbongTime1 += m_fTimeDelta;
-	_float fRandTime = CUtils::Make_RandomFloat(0.2f, 1.f);
-	if (fRandTime < m_bbongTime1)
-	{
-		m_bbongTime1 = 0.f;
-		CEffect::FX_DESC FXDesc{};
-
-		vPos.m128_f32[0] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
-		vPos.m128_f32[2] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
-		FXDesc.vInitPos = vPos;
-		FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 90.f), 0.f };
-		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
-		//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-
-		Add_Effect("BBongBBongE", FXDesc, false);
-	}
-
-	m_bbongTime2 += m_fTimeDelta;
-	fRandTime = CUtils::Make_RandomFloat(0.2f, 0.4f);
-	if (fRandTime < m_bbongTime2)
-	{
-		m_bbongTime2 = 0.f;
-		CEffect::FX_DESC FXDesc{};
-
-		vPos.m128_f32[0] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
-		vPos.m128_f32[2] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
-		FXDesc.vInitPos = vPos;
-		//FXDesc.vInitRot = { 0.f, 45.f, 0.f };
-		FXDesc.vInitScale = { CUtils::Make_RandomFloat(1.f, 1.5f), CUtils::Make_RandomFloat(1.f, 1.5f), CUtils::Make_RandomFloat(1.f, 1.5f) };
-		//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-
-		Add_Effect("BBongBBongE2", FXDesc, false);
-	}
-
-	m_bbongTime3 += m_fTimeDelta;
-	fRandTime = CUtils::Make_RandomFloat(0.2f, 1.f);
-	if (fRandTime < m_bbongTime3)
-	{
-		m_bbongTime3 = 0.f;
-		CEffect::FX_DESC FXDesc{};
-
-		vPos.m128_f32[0] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
-		vPos.m128_f32[2] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
-		FXDesc.vInitPos = vPos;
-		FXDesc.vInitRot = { CUtils::Make_RandomFloat(0.f, 90.f), 0.f, 0.f };
-		FXDesc.vInitScale = { 2.5f, 2.5f, 2.5f };
-		//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-
-		Add_Effect("BBongBBongE", FXDesc, false);
-	}
+	//m_fDelayTime += m_fTimeDelta;
+	//if (10.f > m_fDelayTime)
+	//	m_fTimeDelta = 0.f;
 
 	// 만약, 밟히면 그 순간 그냥 찐빵되고 죽는다.
 	if (m_ePhyXState == PO_PRESSED)
@@ -167,8 +119,12 @@ _int CKabu::Tick(_float fTimeDelta)
 
 			fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), m_vecRallyPoint[m_iCnt + 1])));
 
-			if (0.1f < fDistance)
-				m_pControllerCom->Move_Dir(m_pTransformCom, XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed, m_fTimeDelta);
+			if (0.2f < fDistance)
+			{
+				_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				vPos += XMVector3Normalize(m_vRally) * m_fTimeDelta * m_fSpeed;
+				m_pControllerCom->Move(m_pTransformCom, vPos, m_fTimeDelta);
+			}
 			else
 			{
 				if (m_iCnt < m_vecRallyPoint.size() - 2)
@@ -200,6 +156,9 @@ _int CKabu::Tick(_float fTimeDelta)
 					}
 				}
 			}
+
+			//if (m_fRallyDistance + 4.f < fDistance)
+			//	m_bConvert = !m_bConvert;
 		}
 	}
 
@@ -212,7 +171,64 @@ void CKabu::Late_Tick(_float fTimeDelta)
 {
 	// 커비 입 안에 있고, Fly가 아닐땐 입 안에 있는 상황이므로, Render되지않는다.
 	if (m_ePhyXState == PO_KIRBYMOUTH)
+	{
 		return;
+	}
+	else
+	{
+		_vector vPos = GET_POS;
+
+		m_bbongTime1 += m_fTimeDelta;
+		_float fRandTime = CUtils::Make_RandomFloat(0.2f, 1.f);
+		if (fRandTime < m_bbongTime1)
+		{
+			m_bbongTime1 = 0.f;
+			CEffect::FX_DESC FXDesc{};
+
+			vPos.m128_f32[0] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
+			vPos.m128_f32[2] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
+			FXDesc.vInitPos = vPos;
+			FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 90.f), 0.f };
+			FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+			Add_Effect("BBongBBongE", FXDesc, false);
+		}
+
+		m_bbongTime2 += m_fTimeDelta;
+		fRandTime = CUtils::Make_RandomFloat(0.2f, 0.4f);
+		if (fRandTime < m_bbongTime2)
+		{
+			m_bbongTime2 = 0.f;
+			CEffect::FX_DESC FXDesc{};
+
+			vPos.m128_f32[0] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
+			vPos.m128_f32[2] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
+			FXDesc.vInitPos = vPos;
+			//FXDesc.vInitRot = { 0.f, 45.f, 0.f };
+			FXDesc.vInitScale = { CUtils::Make_RandomFloat(1.f, 1.5f), CUtils::Make_RandomFloat(1.f, 1.5f), CUtils::Make_RandomFloat(1.f, 1.5f) };
+			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+			Add_Effect("BBongBBongE2", FXDesc, false);
+		}
+
+		m_bbongTime3 += m_fTimeDelta;
+		fRandTime = CUtils::Make_RandomFloat(0.2f, 1.f);
+		if (fRandTime < m_bbongTime3)
+		{
+			m_bbongTime3 = 0.f;
+			CEffect::FX_DESC FXDesc{};
+
+			vPos.m128_f32[0] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
+			vPos.m128_f32[2] += CUtils::Make_RandomFloat(-0.5f, 0.5f);
+			FXDesc.vInitPos = vPos;
+			FXDesc.vInitRot = { CUtils::Make_RandomFloat(0.f, 90.f), 0.f, 0.f };
+			FXDesc.vInitScale = { 2.5f, 2.5f, 2.5f };
+			//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+			Add_Effect("BBongBBongE", FXDesc, false);
+		}
+	}
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{

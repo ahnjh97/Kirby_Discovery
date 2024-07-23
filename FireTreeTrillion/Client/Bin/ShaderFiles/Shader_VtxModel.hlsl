@@ -70,6 +70,12 @@ void MaskTest(vector vMaskValue)
         discard;
 }
 
+void MaskTest(float fMaskValue)
+{
+    if (fMaskValue < g_fMaskThreshold)
+        discard;
+
+}
 void AlphaTest(vector vDiffuseValue, float fDiscardValue = .01)
 {
     if (vDiffuseValue.a < fDiscardValue ||
@@ -379,8 +385,12 @@ PS_OUT TRIGGER(PS_IN In)
         Out.vDiffuse = vector(0, 0, 1, 1);
     else if (g_iTriggerType == 3)
         Out.vDiffuse = vector(0, 0.45f, 0.45f, 1);
-    else if (g_iTriggerType == 4)
+    else if (g_iTriggerType == 4) // Monster
         Out.vDiffuse = vector(1, 0, 0, 1);
+    else if (g_iTriggerType == 5) // Simba Attqck
+        Out.vDiffuse = vector(0, 0, 0, 1);
+    else if (g_iTriggerType == 6) // Event
+        Out.vDiffuse = vector(0, 1, 0, 1);
     else
         Out.vDiffuse = vector(1, 1, 1, 1);
     
@@ -532,6 +542,8 @@ PS_OUT_EFFECT PS_MAIN_WHITE_FX_LINEARDIFFUSE_LINEARMASK(PS_IN In)
     
     float fMaskValue = (bMaskAlpha) ? vMask.a : vMask.r;
     
+    MaskTest(vMask.a);
+    
     float fSmoothedAlpha = smoothstep(g_fMaskThreshold - 0.1, g_fMaskThreshold + 0.1, fMaskValue);
     if (fSmoothedAlpha < 0.01)
         discard;
@@ -649,7 +661,7 @@ PS_OUT PS_MAIN_NEARCLIP(PS_IN In)
     vViewPos = mul(vViewPos, g_ViewMatrix);
     
     //if (vViewPos.z < 8.0)
-    float fCameraDistance = 13.0f;
+    float fCameraDistance = 12.4f;
     if (vViewPos.z < fCameraDistance)
     {
         float2 vPixelTexcoord = (float2) 0.f;

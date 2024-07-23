@@ -238,7 +238,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			{
 				if (pFinalBoss->IsAnimFinished()/*0.5f < pFinalBoss->Get_AnimRatio()*/)
 				{
-					++m_iCnt;
+					m_iCnt = 0;
 					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
 					pFinalBoss->Set_Direction(m_vLook);
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
@@ -351,7 +351,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			{
 				if (pFinalBoss->IsAnimFinished()/*0.5f < pFinalBoss->Get_AnimRatio()*/)
 				{
-					m_iCnt = 3;
+					m_iCnt = 19;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPREADY, 50.f, false, true);
 				}
 			}

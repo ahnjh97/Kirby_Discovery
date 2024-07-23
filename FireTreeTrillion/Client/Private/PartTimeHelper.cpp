@@ -54,6 +54,7 @@ void CPartTimeHelper::Register_Camera(CCamera_Main* pCamera)
 // 실질적 문제내는 함수
 void CPartTimeHelper::Make_RandomItem()
 {
+	if (m_bGameOver) return;
 	_int iRandom = CUtils::Make_RandomInt(0,3);
 	m_eFood = (PARTTIME_ITEM)iRandom;
 	m_pHungryDee->Change_Dialog(m_eFood);
@@ -120,6 +121,7 @@ _bool CPartTimeHelper::Handle_GameOver()
 
 	// Dee들 세팅
 	// 효선아 여기야
+	// 효선이 완료
 
 	// UI 세팅
 	m_pHungryDee->Set_RenderDialog(false);
@@ -129,9 +131,11 @@ _bool CPartTimeHelper::Handle_GameOver()
 	{
 		CHungryDee* pDee = static_cast<CHungryDee*>(pGameObj);
 		pDee->Set_RenderDialog(false);
+		pDee->Set_Dead();
 	}
 
 	m_pUI_PartTime->Set_RenderState(CUI_PartTime::BASIC, false);
+	m_bGameOver = true;
 
 	return true;
 }

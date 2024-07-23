@@ -151,16 +151,19 @@ _int CMeteor::Tick(_float fTimeDelta)
 			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 			CHECK_FAILED(hr);
 
-			
+
 			//이펙트
 			CEffect::FX_DESC FXDesc{};
 			FXDesc.vInitPos = static_cast<_float3>(GET_POS) + (_float3)CUtils::Make_Random_Vector(2.f);
-			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
-			_float fScale = CUtils::Make_RandomFloat(20.f, 30.f);
-			FXDesc.vInitScale = { fScale, fScale, fScale };
+			for (_int i = 0; i < 8; ++i)
+			{
+				FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+				_float fScale = CUtils::Make_RandomFloat(2.f, 3.f);
+				FXDesc.vInitScale = { fScale, fScale, fScale };
 
-			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
-				return E_FAIL;
+				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_finale collide smoke test3"), &FXDesc)))
+					return E_FAIL;
+			}
 
 			// 파티클 살리기
 			for (_uint i = 0; i < DEBRISCNT; ++i)
@@ -336,7 +339,7 @@ _int CMeteor::Tick(_float fTimeDelta)
 
 		_float fScale = CUtils::Make_RandomFloat(6.f, 8.f);
 		fScale *= m_bBig ? 2.f : 1.f;
-		
+
 		FXDesc.vInitScale = { fScale, fScale, fScale };
 		Add_Effect("debris smoke", FXDesc);
 

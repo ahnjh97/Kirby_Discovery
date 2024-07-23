@@ -850,6 +850,18 @@ CLight* CGameInstance::Get_DirectionLightAddress()
 	return m_pLight_Manager->Get_DirectionLightAddress();
 }
 
+void CGameInstance::Blink_Light(_float fTimeDelta, _uint iLightNum, _float fRandomSpeed)
+{
+	CHECK_NULLPTR(m_pLight_Manager);
+	m_pLight_Manager->Blink_Light(fTimeDelta, iLightNum, fRandomSpeed);
+}
+
+void CGameInstance::Set_CurLightRange(_uint iLightNum, _float fRange)
+{
+	CHECK_NULLPTR(m_pLight_Manager);
+	m_pLight_Manager->Set_CurLightRange(iLightNum, fRange);
+}
+
 #pragma region FONT_MANAGER
 
 HRESULT CGameInstance::Add_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& strFontTag, const wstring& strFontFilePath)

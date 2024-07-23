@@ -129,6 +129,9 @@ HRESULT CLevel_Finale::Initialize()
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_FINALE);
 
+	// Fog ¼¼ÆÃ
+	m_pGameInstance->Fog_Zero();
+
 	return S_OK;
 }
 

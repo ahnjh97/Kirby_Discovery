@@ -28,7 +28,8 @@ HRESULT CUI_Interactable::Initialize(void* pArg)
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	
 	// 사이즈, 위치 디폴트값 지정
-	m_InitialSize = _float2(116.f * 0.5f, 88.f * 0.5f);
+	//m_InitialSize = _float2(116.f * 0.5f, 88.f * 0.5f);
+	m_InitialSize = _float2(300.f * 0.3f, 200.f * 0.3f);
 	m_pTransformCom->Set_Scaled(m_InitialSize.x, m_InitialSize.y, 1.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(0.f, 0.f, 0.f, 1.f));
 	
@@ -45,7 +46,14 @@ _int CUI_Interactable::Tick(_float fTimeDelta)
 	// 위치 UPDATE
 	CTransform* pTransform = m_pOwner->Get_TransformCom();
 	_float4 vPos = pTransform->Get_State_Float4(CTransform::STATE_POSITION);
-	Update_Pos(_float3(vPos.x, vPos.y + m_fOffset, vPos.z - 1.f));
+
+	//07.22) 대상이 DEEDEEDEE일 경우, ZOffset 값을 별도로 세팅
+	_float fZOffset = { 0.f };
+	if (TEXT("Prototype_GameObject_DeeDeeDee") == m_pOwner->Get_PrototypeTag())
+		fZOffset = -1.f;
+
+	//Update_Pos(_float3(vPos.x, vPos.y + m_fOffset, vPos.z - 1.f));
+	Update_Pos(_float3(vPos.x, vPos.y + m_fOffset, vPos.z + fZOffset));
 	
 	// 사이즈 UPDATE
 	static _float fAccTime = 0.f;
@@ -65,7 +73,7 @@ _int CUI_Interactable::Tick(_float fTimeDelta)
 		{
 			fAccTime = 0.f;
 			m_eState = PLUS;
-		}
+		}			
 	}
 
 	_float fRatio = sin((fAccTime * 3.1415f) / 2);
@@ -94,7 +102,8 @@ HRESULT CUI_Interactable::Render()
 	hr = m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
 	CHECK_FAILED(hr);
 	
-	hr = m_pShaderCom->Begin(POSTEX_DEFAULT); // 사이즈 변화 POSTEX_SOLIDBLEND
+	//hr = m_pShaderCom->Begin(POSTEX_DEFAULT); // 사이즈 변화 POSTEX_SOLIDBLEND
+	hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR); // 사이즈 변화 POSTEX_SOLIDBLEND
 	CHECK_FAILED(hr);
 
 	hr = m_pVIBufferCom->Bind_Buffers();

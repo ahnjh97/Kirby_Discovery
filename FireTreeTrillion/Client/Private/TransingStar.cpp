@@ -55,7 +55,7 @@ HRESULT CTransingStar::Initialize(void* pArg)
 
 _int CTransingStar::Tick(_float fTimeDelta)
 {
-    m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+    m_fTimeDelta = m_pGameInstance->Get_SecondTimer() * 1.5f;
 
     // FOR TEST
     if (m_pGameInstance->Get_DIKeyState(DIK_LALT, KEY_PRESS))
@@ -156,7 +156,6 @@ void CTransingStar::Activate(TYPE _eActivateType)
     case OPEN:
     {
         fill(m_arrayStarMatrix.begin(), m_arrayStarMatrix.end(), _float4x4());
-        
 
         for (_int i = 0; i < 3; ++i)
         {
@@ -261,7 +260,9 @@ void CTransingStar::Tick_GreenStar(_float fTimeDelta)
     if (m_eNextLevel != LEVEL_END) return;
 
     // 레벨이동 트리거가 아닌 커비 이동 트리거를 밟았을때 2초 뒤에 TransingStar는 오픈됩니다.
-    if (*m_pCurrentLevelID == LEVEL_PARK || *m_pCurrentLevelID == LEVEL_TOWN )
+    if (*m_pCurrentLevelID == LEVEL_PARK || 
+        *m_pCurrentLevelID == LEVEL_TOWN ||
+        *m_pCurrentLevelID == LEVEL_FINALBOSS)
     {
         if (m_InitialSize.x <= m_fDecreaseValue)
         {
@@ -376,33 +377,44 @@ void CTransingStar::On_Event()
     }
     else
     {
-        if (*CGameInstance::Get_Instance()->Get_CurrentLevelID() == LEVEL_PARK)
-        {
-            // 스타트 로딩화면 렌더 끄기
-            m_bLoadingStart = false;
+        CCamera_Main*   pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
+        CGameObject*    pPlayer = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
+        CKirby*         pKirby = dynamic_cast<CKirby*>(pPlayer);
 
-            CGameObject* pPlayer = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
-            CKirby* pKirby = dynamic_cast<CKirby*>(pPlayer);
-           // pKirby->Set_ControllerPos(_float4(0.5f, 68.f, 165.f, 1.f)); //for test : 심바맵으로 이동하기 위한
-            pKirby->Set_ControllerPos(_float4(0.5f, 68.f, -10.f, 1.f)); //for test : 엘베 타고 이동한
-            //pKirby->Set_ControllerPos(_float4(5.4f, 39.f, -26.36f, 1.f));  // 엘베
-            CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
-            pCameraMain->Set_FOVY(30);
-        }
-        else if (*m_pCurrentLevelID == LEVEL_TOWN)
+        switch (*CGameInstance::Get_Instance()->Get_CurrentLevelID())
+        {
+        case LEVEL_TOWN:
         {
             // 스타트 로딩화면 렌더 켜기
             m_bLoadingStart = true;
             m_pLoadingStart->Set_TexIndex(1);
 
-            CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
             pCameraMain->Unlock();
             pCameraMain->Set_FOVY(38);
             pCameraMain->Move_ForTrigger(m_fTimeDelta);
-            
-            CGameObject* pPlayer = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_Kirby");
-            CKirby* pKirby = dynamic_cast<CKirby*>(pPlayer);
+
             pKirby->Set_ControllerPos(_float4(140.3f, 23.2f, 104.7f, 1.f));
+        }
+        break;
+        case LEVEL_PARK:
+        {
+            // 스타트 로딩화면 렌더 끄기
+            m_bLoadingStart = false;
+
+            pKirby->Set_ControllerPos(_float4(6.1f, 38.1f, -29.1f, 1.f));  // 엘베
+            //pKirby->Set_ControllerPos(_float4(0.5f, 68.f, 165.f, 1.f));  // for test : 심바맵으로 이동하기 위한
+            //pKirby->Set_ControllerPos(_float4(0.5f, 68.f, -10.f, 1.f));  // for test : 엘베 타고 이동한
+            pCameraMain->Set_FOVY(30);
+        }
+        break;
+        case LEVEL_FINALBOSS:
+        {
+            pKirby->Set_ControllerPos(_float4(-0.45f, -3.9f, -32.54f, 1.f));
+            pCameraMain->Unlock();
+            //pCameraMain->Set_FOVY(38);
+            pCameraMain->Move_ForTrigger(m_fTimeDelta);
+        }
+        break;
         }
 	}
 }

@@ -115,6 +115,8 @@ private:
 	CTransform* m_pTransform = { nullptr };
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
+	_bool m_bChargeEffect = { false };
+	_bool m_bSlashEffect = { false };
 
 public:
 	static	CSimba_QuickClaw* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
@@ -145,6 +147,7 @@ private:
 	CTransform* m_pKirbyTransform = { nullptr };
 	_bool m_bSwingEffect = { false };
 	_bool m_bSmashEffect = { false };
+	_bool m_bChargeEffect = { false };
 
 public:
 	static	CSimba_FinalCrusher* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)

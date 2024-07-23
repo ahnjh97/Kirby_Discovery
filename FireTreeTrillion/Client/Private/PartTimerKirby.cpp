@@ -79,7 +79,7 @@ _int CPartTimerKirby::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return Ready_Dead();
 	 
-	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+	m_fTimeDelta = fTimeDelta;//m_pGameInstance->Get_FirstTimer();
 	__super::Tick(m_fTimeDelta);
 
 	// Dof 초점을 커비에게 맞춘다.
@@ -92,11 +92,11 @@ _int CPartTimerKirby::Tick(_float fTimeDelta)
 	{
 		if (m_pPartTimeFood != nullptr)
 		{
-			m_pPartTimeFood->Tick(fTimeDelta);
+			m_pPartTimeFood->Tick(m_fTimeDelta);
 			m_pPartTimeFood->Update_Position(Compute_BoneWorldMatrix());
 		}
 		if (m_pHat != nullptr)
-			m_pHat->Tick(fTimeDelta);
+			m_pHat->Tick(m_fTimeDelta);
 	}
 
 	if (CPartTimeHelper::Get_Instance()->Get_TimeAttack())

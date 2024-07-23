@@ -262,6 +262,23 @@ HRESULT CLevel_Town::Ready_Layer_BackGround(const wstring& strLayerTag)
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Portal"), TEXT("Prototype_GameObject_PortalSoftEffect"), &ObjDesc)))
 		return E_FAIL;
 
+	// 2층에 있는 아레나 입구쪽
+	CGameObject::GAMEOBJECT_DESC ArenaDesc{};
+	ArenaDesc.fSpeedPerSec = 5.f;
+	ArenaDesc.fRotationPerSec = ToRadian(90.f);
+
+	InitMat = _float4x4::Identity;
+
+	translationMatrix = XMMatrixTranslation(-1.7f, 33.2f, 62.f);
+	rotationY = XMConvertToRadians(-14.f);
+	rotationMatrixY = XMMatrixRotationY(rotationY);
+
+	InitMat = rotationMatrixY * translationMatrix;
+	ArenaDesc.matWorld = InitMat;
+	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Portal"), TEXT("Prototype_GameObject_PortalSoftEffect"), &ArenaDesc)))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 
@@ -729,7 +746,7 @@ HRESULT CLevel_Town::Ready_Monsters()
 			MonsterDesc.iShaderVars = iShaderVars;
 			MonsterDesc.fRimWidth = fRimWidth;
 			MonsterDesc.eMonState = CMonster::MONSTER_STATE(iTriggerIndex);
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Awoofy"), &MonsterDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Pet"), TEXT("Prototype_GameObject_Awoofy"), &MonsterDesc)))
 				return E_FAIL;
 		}
 		else if (L"Rabbit" == tempDesc.wstrModelName)

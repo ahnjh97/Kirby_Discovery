@@ -750,7 +750,6 @@ HRESULT CLevel_Intro::Ready_Triggers()
 
 HRESULT CLevel_Intro::Ready_Monsters()
 {
-
 	string strFileName = "../../../objects_txt/Intro_Monsters.txt";
 
 	ifstream fileInput(strFileName, ios::binary);

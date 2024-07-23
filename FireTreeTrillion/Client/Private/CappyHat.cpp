@@ -113,10 +113,24 @@ _int CCappyHat::Tick(_float fTimeDelta)
 			m_pModelCom->Set_Animation(CAPPYHAT_FLY, 50.f, false, true);
 
 			// ¹ö¼¸ ¸Ó¸® »À¿¡ ºÙÈû
-			_float4x4 WorldMatrix = static_cast<CCappyBody*>(m_pGameObject)->Compute_BoneWorldMatrix();
-			m_pTransformCom->Set_WorldMatrix(WorldMatrix);
-			m_pTransformCom->Set_Scaled(1.f, 1.15f, 1.f);
-			m_fHeightTime = 0.f;
+			if(static_cast<CCappyBody*>(m_pGameObject)->Get_PhyXState() != PO_VACUUMING)
+			{
+				_float4x4 WorldMatrix = static_cast<CCappyBody*>(m_pGameObject)->Compute_BoneWorldMatrix();
+				m_pTransformCom->Set_WorldMatrix(WorldMatrix);
+				m_fHeight = WorldMatrix._42;
+				m_pTransformCom->Set_Scaled(1.f, 1.15f, 1.f);
+				m_fHeightTime = 0.f;
+			}
+			else
+			{
+				//_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+				//if (vPos.m128_f32[1] > m_fHeight)
+				//	vPos.m128_f32[1] -= m_fTimeDelta * 2.f;
+				//else
+					m_bDead = true;
+				//m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+			}
 		}
 		else
 		{
