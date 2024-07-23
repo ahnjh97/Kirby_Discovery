@@ -31,6 +31,8 @@ private:
 	HRESULT				Add_Components(wstring& wstrModelName);
 	HRESULT				Bind_ShaderResources();
 
+	void				Ready_FadeOut();
+
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
@@ -43,6 +45,7 @@ private:
 	_bool m_bStartTimer = { false };
 	_bool m_bNotify = { false };
 	_bool m_bActivated = { false };
+	_bool m_bFadeOut = { false };
 	_float m_fTime = {};
 
 public:

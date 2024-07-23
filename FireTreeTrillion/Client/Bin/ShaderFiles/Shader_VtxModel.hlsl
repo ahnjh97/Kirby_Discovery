@@ -661,7 +661,7 @@ PS_OUT PS_MAIN_NEARCLIP(PS_IN In)
     vViewPos = mul(vViewPos, g_ViewMatrix);
     
     //if (vViewPos.z < 8.0)
-    float fCameraDistance = 13.0f;
+    float fCameraDistance = 12.4f;
     if (vViewPos.z < fCameraDistance)
     {
         float2 vPixelTexcoord = (float2) 0.f;

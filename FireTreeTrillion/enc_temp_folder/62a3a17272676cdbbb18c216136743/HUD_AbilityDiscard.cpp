@@ -113,8 +113,6 @@ HRESULT CHUD_AbilityDiscard::Render()
 		return E_FAIL;
 
 	//07.23) 카피 능력 버리기와 머금기 변형의 뱉기 상태에 대한 텍스처 세분화
-	if (nullptr == m_pKirby)
-		return E_FAIL;
 	CKirby::BODYSTATE eKirbyState = dynamic_cast<CKirby*>(m_pKirby)->Get_KirbyInfo()->m_eBodyState;
 
 	PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
