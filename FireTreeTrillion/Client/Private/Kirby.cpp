@@ -2345,7 +2345,6 @@ void CKirby::AssistLight_Control()
 			return;
 		INFO(m_pKirbyAssistLight2) = CGameInstance::Get_Instance()->Get_LightLastAddress();
 		Safe_AddRef(INFO(m_pKirbyAssistLight2));
-
 	}
 
 
