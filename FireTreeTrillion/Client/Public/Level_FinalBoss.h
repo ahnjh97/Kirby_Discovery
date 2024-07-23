@@ -16,6 +16,8 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	void	Ready_FadeIn();
+	
 	HRESULT Ready_Lights();
 	HRESULT Ready_Layer_Camera(const wstring& strLayerTag);
 	HRESULT Ready_Layer_BackGround(const wstring& strLayerTag);
@@ -26,6 +28,8 @@ private:
 	HRESULT Ready_Kickables();
 	HRESULT Ready_Objects();
 	HRESULT Ready_UI();
+
+	void	Teleport_Player();
 
 	HRESULT Add_EnvMap();
 	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };
