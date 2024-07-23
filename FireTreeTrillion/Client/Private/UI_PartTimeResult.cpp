@@ -171,6 +171,9 @@ void CUI_PartTimeResult::Render_Digits()
 			_int iAddNum = 1;
 			//iAddNum만큼 와들디 등장 // 효선아 여기야
 			//_int iAddNum = CUtils::Make_RandomInt(1, 3);
+
+
+
 			if (m_fScore < Change_ScoreTextures(iAddNum)) // 30만큼 점수판 += 점수
 			{
 				m_bRenderTotalScore = true;
@@ -188,6 +191,9 @@ void CUI_PartTimeResult::Render_Digits()
 						}
 					}
 				}
+
+
+				/*
 				if (fTimeAcc >= 2.5f && !bTwice)
 				{
 
@@ -224,6 +230,8 @@ void CUI_PartTimeResult::Render_Digits()
 
 					bTwice = true;
 				}
+				*/
+
 
 				// 다이얼로그 생성
 				if (fTimeAcc >= 4.f)
@@ -284,6 +292,36 @@ void CUI_PartTimeResult::Render_TotalScore()
 		if (fTimeAcc >= 1.f)
 		{
 			// 효선아 여기야 >> 게임 점수 다 뜨고 이펙트 나오는 구간
+			//결과 UI
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_FoodGame success UI"))))
+				return;
+
+
+			//콘페티
+			_float4x4 CamWorld = m_pGameInstance->Get_Transform_Inv(CPipeLine::D3DTS_VIEW);
+			_float3 vCamPos = CamWorld.Translation();
+
+			for (_int i = 0; i < 80; ++i)
+			{
+				CEffect::FX_DESC FXDesc{};
+				FXDesc.vInitPos = vCamPos + _float3{ CUtils::Make_RandomFloat(-5.f, 5.f), 0.f, -5.f } + (_float3)CUtils::Make_Random_Vector(CUtils::Make_RandomFloat(2.f, 5.f));
+
+				//FXDesc.vInitRot =CUtils::Make_Degree_FromDir(CUtils::Make_Random_Vector(1.f));
+				FXDesc.fStartDelay = CUtils::Make_RandomFloat(0.f, 3.f);
+
+				wstring strPrototypeTag = TEXT("Prototype_GameObject_foodgame clear confetti ");
+				switch (CUtils::Make_RandomInt(1, 4))
+				{
+				case 1: strPrototypeTag += L"A"; break;
+				case 2: strPrototypeTag += L"B"; break;
+				case 3: strPrototypeTag += L"C"; break;
+				case 4: strPrototypeTag += L"D"; break;
+				default:
+					break;
+				}
+				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), strPrototypeTag, &FXDesc)))
+					return;
+			}
 		}
 	}
 

@@ -1684,7 +1684,7 @@ HRESULT CLoader::Add_FXTexture()
 
 
 	//번개
-	hr = Add_Texture(LEVEL_STATIC, "FX_Thunder", "Effects/Thunder/Thunder_%d.png", 3);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "FX_Thunder", "Effects/Thunder/Thunder_%d.png", 5);	CHECK_FAILED(hr);
 
 	//아우라
 	hr = Add_Texture(LEVEL_STATIC, "FX_Aura", "Effects/Basic/Aura.png");	CHECK_FAILED(hr);
@@ -1796,6 +1796,14 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FXMeteoDash", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("FXDonut", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("LaserNonAnim", TYPE_NONANIM);
+
+		//사자
+		m_vecModelInfo.emplace_back("FXClaw", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("FXSimbaLaser", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("FXSimbaAtkReady", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("FXSimbaCutter", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("FXFloorAtkCircle", TYPE_NONANIM);
+
 
 		//공통이펙트 - YW
 		m_vecModelInfo.emplace_back("Cube", TYPE_NONANIM);
@@ -2465,6 +2473,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("DeeDeeDeeHammer", TYPE_NONANIM, 1.0f);
 
 		m_vecModelInfo.emplace_back("WaddleDeeBase", TYPE_ANIM, 1.1f, 180.f);
+		m_vecModelInfo.emplace_back("WaddleDeeHungry", TYPE_ANIM, 1.1f, 180.f);
 
 		// Monster
 		m_vecModelInfo.emplace_back("SurprisedBoardBlue", TYPE_ANIM, 1.f, 0.f);
