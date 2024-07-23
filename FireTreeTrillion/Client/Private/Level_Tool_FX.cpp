@@ -89,7 +89,7 @@ HRESULT CLevel_Tool_FX::Ready_Layer_BackGround(const wstring& strLayerTag)
 
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ 4.f, 0.f, 0.f });
+	InitMat.Translation({ 0.f, 0.f, 0.f });
 	ObjDesc.matWorld = InitMat;
 
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_AnimToolObject"), &ObjDesc)))

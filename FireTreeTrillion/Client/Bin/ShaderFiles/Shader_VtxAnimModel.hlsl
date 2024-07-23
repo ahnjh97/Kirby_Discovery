@@ -831,6 +831,7 @@ PS_OUT PS_FOR_DEFORMRIM(PS_IN In)
     return Out;
 }
 
+
 PS_OUT PS_FOR_DIMENSIONGATE(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -875,6 +876,7 @@ PS_OUT PS_FOR_DIMENSIONGATE(PS_IN In)
     //float flength = length(UVVector);
     Out.vDiffuse = saturate(float4(vMtrlDiffuse.rgb, 1.f));
     //Out.vDiffuse.a *= pow(1.f - flength, 3.f);
+    return Out;
 }
 
 PS_OUT_EFFECT PS_GlassCrack(PS_IN In)
