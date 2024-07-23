@@ -324,6 +324,104 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 	m_EffectSocket = _float4x4::Identity;
 	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
+
+
+	//dof 갱신(자동)
+	
+	if (m_bAutoDOF)
+	{
+		m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
+	}
+
+	//dof 갱신(수동)
+	else
+	{
+		if (m_eSpecialSeq == SEQ_BREAKRACINGMAP)
+		{
+
+		}
+
+
+		//사자 컷
+		if (SEQ_SIMBA_START <= m_eSpecialSeq && m_eSpecialSeq <= SEQ_SIMBA_LOW)
+		{
+			//사자 포커스
+			if (m_eSpecialSeq != SEQ_SIMBA_START)
+			{
+				CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
+				if (nullptr != pSimba)
+					m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+			}
+			//커비
+			else
+			{
+				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
+			}
+		}
+
+		//파이널 보스 등장
+		if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR)
+		{
+			if (m_fSeqCheckTime < 3.f)
+			{
+				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
+			}
+			else if (3.f <= m_fSeqCheckTime/* && m_fSeqCheckTime < 8.9f*/)
+			{
+				m_pGameInstance->Update_DofFocus({ 0.f, -31.f, 13.f });
+			}
+		}
+
+		if (m_eSpecialSeq == SEQ_FINALBOSS_2PHASE || m_eSpecialSeq == SEQ_FINALBOSS_DEAD
+			|| m_eSpecialSeq == SEQ_FINALBOSS_ENDING)
+		{
+			CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster"));
+			if (nullptr != pBoss)
+				m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+		}
+
+		if (m_eSpecialSeq == SEQ_FINALBOSS_DUMP)
+		{
+			m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
+		}
+
+		//피날레
+		if (0 < m_iCurSceneIdx)
+		{
+			//커비
+			if (m_iCurSceneIdx == 1
+				|| m_iCurSceneIdx == 6
+				|| m_iCurSceneIdx == 7
+				|| m_iCurSceneIdx == 8
+				|| m_iCurSceneIdx == 11
+				|| m_iCurSceneIdx == 12
+				|| m_iCurSceneIdx == 14
+				|| m_iCurSceneIdx == 15
+				|| m_iCurSceneIdx == 16
+				|| m_iCurSceneIdx == 17)
+			{
+
+				m_pGameInstance->Update_DofFocus(FINALEKIRBY->m_vBonePos);
+			}
+			else if (m_iCurSceneIdx == 2)
+			{
+				(0.f < m_fSeqEventTime) ?
+					m_pGameInstance->Update_DofFocus(FINALEKIRBY->m_vBonePos) :
+					m_pGameInstance->Update_DofFocus(FINALEBOSS->Get_RootPos());
+			}
+			//중간점
+			else if (m_iCurSceneIdx == 13
+				|| m_iCurSceneIdx == 18)
+			{
+				m_pGameInstance->Update_DofFocus(m_vAnchor);
+			}
+			//보스
+			else
+			{
+				m_pGameInstance->Update_DofFocus(FINALEBOSS->Get_RootPos());
+			}
+		}
+	}
 }
 
 void CCamera_Main::Check_FinaleScene(_float fTimeDelta)
@@ -745,21 +843,24 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 				CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 				if (pFinalBoss != nullptr)
 				{
-					Set_Target(pFinalBoss->Get_TransformCom(), TARGET_SECOND, FOCUS_FINALBOSS, { 0.f,5.f, 0.f }, 10.f);
+					Set_Target(pFinalBoss->Get_TransformCom(), TARGET_SECOND, FOCUS_FINALBOSS, { 0.f, 3.f, 0.f }, 10.f);
 				}
 			}
 			break;
+
 			case SEQ_FINALESTART:
 			{
 				m_fCurShakeTime = m_fInitialShakeTime = 0.f;
 			}
 			break;
+
 			case SEQ_FINALECUT5:
 			{
 				Lock_All({ 2057.f, 24.5f, -136.f }, { 1.f, .08f, -.12f });
 				Unlock();
 			}
 			break;
+
 			default:
 				break;
 			}
@@ -1374,6 +1475,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 	case SEQ_BREAKRACINGMAP:
 	{
+		Set_AutoDOF(false);
+
 		CAMACTION newAction{};
 		newAction.fTime = 0.f;
 		newAction.eCamCut = CUT_HARD;
@@ -2752,85 +2855,7 @@ void CCamera_Main::Set_DeferredCamSet(_float fTimeDelta)
 	m_pTransformCom->Move(vDir);
 
 
-	//컷신용 dof 위치 갱신(자동)
-	if (m_bAutoDOF)
-	{
-		m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
-	}
-	//수동 dof
-	else
-	{
-		//피날레
-		if (0 < m_iCurSceneIdx)
-		{
-			//커비
-			if (m_iCurSceneIdx == 1
-				|| m_iCurSceneIdx == 6
-				|| m_iCurSceneIdx == 7
-				|| m_iCurSceneIdx == 8
-				|| m_iCurSceneIdx == 11
-				|| m_iCurSceneIdx == 12
-				|| m_iCurSceneIdx == 14
-				|| m_iCurSceneIdx == 15
-				|| m_iCurSceneIdx == 16
-				|| m_iCurSceneIdx == 17)
-			{
 
-				m_pGameInstance->Update_DofFocus(FINALEKIRBY->m_vBonePos);
-			}
-			else if (m_iCurSceneIdx == 2)
-			{
-				(0.f < m_fSeqEventTime) ?
-					m_pGameInstance->Update_DofFocus(FINALEKIRBY->m_vBonePos) :
-					m_pGameInstance->Update_DofFocus(FINALEBOSS->Get_RootPos());
-			}
-			//중간점
-			else if (m_iCurSceneIdx == 13
-				|| m_iCurSceneIdx == 18)
-			{
-				m_pGameInstance->Update_DofFocus(m_vAnchor);
-			}
-			//보스
-			else
-			{
-				m_pGameInstance->Update_DofFocus(FINALEBOSS->Get_RootPos());
-			}
-		}
-
-		//사자 컷
-		if (SEQ_SIMBA_START <= m_eSpecialSeq && m_eSpecialSeq <= SEQ_SIMBA_LOW)
-		{
-			//사자 포커스
-			if (m_eSpecialSeq != SEQ_SIMBA_START)
-			{
-				CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
-				if (nullptr != pSimba)
-					m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
-			}
-			//커비
-			else
-			{
-				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
-			}
-		}
-
-		//파이널 보스 등장
-		if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR)
-		{
-			if (m_fSeqEventTime <= 0.f)
-			{
-				//CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, L"Layer_BossMonster");
-
-				//if (pBoss != nullptr)
-					m_pGameInstance->Update_DofFocus({0.f, -31.f, 13.f });
-			}
-			//커비
-			else
-			{
-				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
-			}
-		}
-	}
 
 }
 

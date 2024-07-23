@@ -2044,7 +2044,7 @@ void CFinalBoss_Recovery_State::Free()
 #pragma region LASTDAMAGE STATE
 //*********************************
 //			 LASTDAMAGE STATE
-//*********************************
+//********************************* 
 CFinalBoss_LastDamage_State::CFinalBoss_LastDamage_State()
 {
 }
