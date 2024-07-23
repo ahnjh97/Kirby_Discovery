@@ -36,8 +36,8 @@ private:
 
 	void				SetUpMeshIndices();
 
-	void				RenderMesh(_uint iMeshIdex);
-	void				RenderMeshes(const vector<_uint>& _vecMeshIndices);
+	void				RenderMesh(_uint iMeshIdex, _uint iPassIndex);
+	void				RenderMeshes(const vector<_uint>& _vecMeshIndices, _uint iPassIndex);
 
 private:
 	CShader* m_pShaderCom = { nullptr };

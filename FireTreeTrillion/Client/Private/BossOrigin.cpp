@@ -17,6 +17,11 @@ CBossOrigin::CBossOrigin(const CBossOrigin& rhs)
 void CBossOrigin::Activate(CGameObject* pObj)
 {
 	m_bStartTimer = true;
+	m_fTime = 0.f;
+	m_bActivated = false;
+	m_bNotify = false;
+	m_fWhiteColorDiffuse = 0.f;
+	m_bFadeOut = false;
 }
 
 HRESULT CBossOrigin::Initialize_Prototype()
@@ -87,14 +92,10 @@ _int CBossOrigin::Tick(_float fTimeDelta)
 	}
 
 	if (m_pGameInstance->Get_KeyState(DIK_CAPSLOCK, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_Q, KEY_DOWN))
-	{
-		m_fTime = 0.f;
-		m_bActivated = false;
-		m_bNotify = false;
-	}
+		Activate(nullptr);
 
 	static _bool bOnFadeOut = false;
-	if (BO_GETOUT == m_pModelCom->Get_CurAnimIndex() && true == m_pModelCom->IsFinished()) 
+	if (BO_GETOUT == m_pModelCom->Get_CurAnimIndex() && true == m_pModelCom->IsFinished())
 	{
 		m_pModelCom->Set_Animation(BO_WAIT_EYEOPEN, 60.f, false, false);
 
@@ -104,6 +105,12 @@ _int CBossOrigin::Tick(_float fTimeDelta)
 		pFadingUI->Set_InOutState(CUI_Fading::FADEOUT);
 		pFadingUI->Set_IsRender(true);
 		bOnFadeOut = true;
+	}
+
+	_float fFadeOutTiming = 0.2f;
+	if (BO_WAIT_EYEOPEN == m_pModelCom->Get_CurAnimIndex() && m_pModelCom->Get_AnimRatio() < fFadeOutTiming && false == m_bFadeOut) // 지영누나 여기야 페이드아웃 부탁
+	{
+		m_bFadeOut = true;
 	}
 
 	if(bOnFadeOut)

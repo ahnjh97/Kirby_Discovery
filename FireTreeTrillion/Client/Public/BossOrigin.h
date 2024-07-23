@@ -45,6 +45,7 @@ private:
 	_bool m_bStartTimer = { false };
 	_bool m_bNotify = { false };
 	_bool m_bActivated = { false };
+	_bool m_bFadeOut = { false };
 	_float m_fTime = {};
 
 public:
