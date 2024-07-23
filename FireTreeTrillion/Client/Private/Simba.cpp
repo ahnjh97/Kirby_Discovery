@@ -203,6 +203,7 @@ _int CSimba::Tick(_float fTimeDelta)
 	m_bRenderDimensionClaw = false;
 	m_bLaserActivated = false;
 	m_bStateChanged = false;
+	m_bRenderRing = false;
 
 	if (true == m_pModelCom->IsFinished() || m_pModelCom->Get_Trackposition() == 0.f) // IsAnimFinished
 		Reset_HitBoxTimingMap(SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex()));
@@ -385,6 +386,9 @@ HRESULT CSimba::Render()
 		if (FAILED(m_pModelCom->Render(m_iEyeLidMesh)))
 			return E_FAIL;
 	}
+
+	if (true == m_bRenderRing)
+		RenderRing();
 	
 	return S_OK;
 }
@@ -1061,6 +1065,59 @@ void CSimba::SetUpSecondTarget()
 		pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_BOTH);
 }
 
+void CSimba::CheckFinalCrusherRingCollision(_float fTimeDelta)
+{
+	m_fRingOuterRadius += fTimeDelta * 18.7f;
+	m_fRingInnerRadius = m_fRingOuterRadius * 0.92f;
+	if (m_fRingInnerRadius < 1.f)
+		m_fRingInnerRadius = 1.f;
+
+	m_bRenderRing = true;
+	CTransform* pKirbyTransform = m_pKirby->Get_TransformCom();
+	_float3 vKirbyPos = pKirbyTransform->Get_State(CTransform::STATE_POSITION);
+	_float fDis = (vKirbyPos - m_vRingPos).Length();
+
+	// 바깥원과 안쪽 원 사이에 있고, 높이 차이가 1 미만일때 충돌
+	if (fDis > m_fRingOuterRadius || fDis < m_fRingInnerRadius || vKirbyPos.y > m_vRingPos.y + 1) 
+		return;
+
+#pragma region 충돌했을때 커비 넉백
+	CKirby* pKirby = static_cast<CKirby*>(m_pKirby);
+
+	if (true == CCollisionCenter::Get_Instance()->Kirby_Dodge_SlowMotionSystem(pKirby))
+		return;
+
+	if (pKirby->isOverPower() == false) // 무적이 아닐 경우
+	{
+		CTransform* pKirbyTransform = m_pKirby->Get_TransformCom();
+		_vector vKirbyPos = pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION);
+		_float4 vDistance = vKirbyPos - GET_POS;
+		vDistance.y = 0.f;
+		vDistance.Normalize();
+
+		_float4 vNewDir{};
+		_float4 vSimbaRight = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+		vSimbaRight.Normalize();
+
+		if (true == IsKirbyOnMyLeft())
+			vNewDir = vDistance + vSimbaRight * 2.5f;
+		else
+			vNewDir = vDistance - vSimbaRight * 2.5f;
+		vNewDir.Normalize();
+		_vector vKnockbackDir = vNewDir;
+
+		pKirby->Set_DamageMoving(vKnockbackDir * 1.8f, 8.f); // 심바 전용 넉백
+
+		_float fMonsterAttack = Get_Attack();
+		pKirby->Minus_Hp(fMonsterAttack);
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+		pCamera->Make_Shake(1.2f, 0.5f, _float2(0.f, -1.f));
+
+		pKirby->Collision(CCollisionCenter::CONTENT_ATTACK, this);
+	}
+#pragma endregion
+}
+
 void CSimba::QuickClawNailFlash(_uint eSimbaAnim) // YW : Effect 영우형 여기임 검지손톱 번쩍
 {
 	if (Simba_QuickClawStartL == eSimbaAnim) // 왼손
@@ -1077,9 +1134,32 @@ void CSimba::QuickClawNailFlash(_uint eSimbaAnim) // YW : Effect 영우형 여기임 �
 	}
 }
 
-void CSimba::QuickClawNailTrail() // YW : Effect 영우형 여기임 왼쪽 검지손톱 번쩍
+void CSimba::QuickClawNailTrail() 
 {
+
 }
+
+// 완료
+void CSimba::FinalCrusherCharge()
+{
+
+	CEffect::FX_DESC effectDesc{};
+	_float3 vDir = -m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	vDir.Normalize();
+	_float3 vLook = { 0.f, 0.f, 1.f };
+
+	_float fAngleLook = atan2f(vLook.z, vLook.x);
+	_float fAngleDiff = fAngleLook - atan2f(vDir.z, vDir.x);
+	fAngleDiff = ToDegree(fAngleDiff);
+
+	_float3 vAngle = { 0.f, fAngleDiff, 0.f };
+	effectDesc.vInitRot = vAngle;
+	effectDesc.vInitScale = _float3(1.03f, 1.03f, 0.94f);
+	_float3 vPos = GET_POS;
+	vPos -= vDir * 0.45f;
+	effectDesc.vInitPos = vPos;
+	Add_Effect("HS_lion hit charge", effectDesc);
+} 
 
 void CSimba::FinalCrusherSwing() // YW : Effect 영우형 여기임 양주먹 내려치기시작
 {
@@ -1088,6 +1168,18 @@ void CSimba::FinalCrusherSwing() // YW : Effect 영우형 여기임 양주먹 내려치기시�
 void CSimba::FinalCrusherSmash() // YW : Effect 영우형 여기임 양주먹 바닥에 찍는 타이밍
 {
 	
+}
+
+void CSimba::FinalCrusherRing() // YW : Effect 영우형 여기임 퍼지는 원 이펙트
+{
+	CEffect::FX_DESC effectDesc{};
+	_float3 vPos = (m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone) + m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone)) * 0.5f;
+	vPos.y = 2.3f;
+	effectDesc.vInitPos = vPos;
+	Add_Effect("HS_lion floor atk circle", effectDesc);
+	m_vRingPos = vPos;
+	m_fRingInnerRadius = 0;
+	m_fRingOuterRadius = 0;
 }
 
 void CSimba::JumpStartSmoke() // YW : Effect 영우형 여기임 점프 시작할때 회색방구
@@ -1816,6 +1908,59 @@ void CSimba::RemoveDeadDebrisFromList()
 			iter = m_listUsedDebris.erase(iter);
 		else
 			iter++;
+	}
+}
+
+void CSimba::RenderRing()
+{
+	vector<_vector> vecOuterRingPoints;
+	vector<_vector> vecInnerRingPoints;
+	for (_uint i = 0; i < 36; i++)
+	{
+		_float4 vDir = CUtils::TurnDirectionVector(XMVectorSet(1, 0, 0, 0), _float3(0, 1, 0), i * 10.f);
+		_float4 vOuterPos = m_vRingPos + vDir * m_fRingOuterRadius;
+		vOuterPos.w = 1.f;
+		vecOuterRingPoints.push_back(vOuterPos);
+
+		_float4 vInnerPos = m_vRingPos + vDir * m_fRingInnerRadius;
+		vInnerPos.w = 1.f;
+		vecInnerRingPoints.push_back(vInnerPos);
+	}
+
+	RenderPolygon(vecOuterRingPoints);
+	RenderPolygon(vecInnerRingPoints);
+}
+
+void CSimba::RenderPolygon(vector<_vector>& worldPoints)
+{
+	if (m_pGameInstance->Get_HitBoxRender() == false)
+		return;
+
+	ImDrawList* drawList = ImGui::GetForegroundDrawList();
+
+	_matrix ViewMatrix = m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW); // CPipeLine::D3DTS_VIEW
+	_matrix ProjMatrix = m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ); // CPipeLine::D3DTS_PROJ
+	_matrix VPMatrix = XMMatrixMultiply(ViewMatrix, ProjMatrix);
+
+	auto TransformToScreen = [&](_vector worldPos)
+		{
+			_vector screenPos = XMVector3TransformCoord(worldPos, VPMatrix);
+			screenPos = XMVectorMultiplyAdd(screenPos, XMVectorSet(0.5f, -0.5f, 1.0f, 0.0f), XMVectorSet(0.5f, 0.5f, 0.0f, 0.0f));
+			screenPos = XMVectorMultiply(screenPos, XMVectorSet(g_iWinSizeX, g_iWinSizeY, 1.f, 0.f));
+			return ImVec2(XMVectorGetX(screenPos), XMVectorGetY(screenPos));
+		};
+
+	// 월드 좌표를 화면 좌표로 변환
+	vector<ImVec2> screenPoints;
+	for (const auto& point : worldPoints)
+		screenPoints.push_back(TransformToScreen(point));
+
+	// 점들을 이어서 다각형 그리기
+	for (size_t i = 0; i < screenPoints.size(); ++i)
+	{
+		const ImVec2& p1 = screenPoints[i];
+		const ImVec2& p2 = screenPoints[(i + 1) % screenPoints.size()]; // 마지막 점은 첫 번째 점과 연결
+		drawList->AddLine(p1, p2, IM_COL32(255, 255, 0, 255), 2.0f);
 	}
 }
 

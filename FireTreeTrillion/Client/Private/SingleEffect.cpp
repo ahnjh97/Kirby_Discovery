@@ -202,7 +202,7 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 	if (m_pSoketMatrix != nullptr)
 	{
 		_float4x4 socketMatrix = *m_pSoketMatrix;
-		socketMatrix.Right().Normalize();
+		socketMatrix.Right().Normalize();	
 		socketMatrix.Up().Normalize();
 		socketMatrix.Backward().Normalize();
 

@@ -74,20 +74,20 @@ _int CBossOrigin::Tick(_float fTimeDelta)
 	if (true == m_bStartTimer)
 		m_fTime += m_pGameInstance->Get_SecondTimer();
 
-	if (4.f < m_fTime && false == m_bNotify)
+	if (2.9f < m_fTime && false == m_bNotify)
 	{
 		m_bNotify = true;
 		CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_CAGEBREAK);
 	}
 
-	if (1.f < m_fTime && false == m_bActivated) {
-		m_pModelCom->Set_Animation(BO_GETOUT, 30.f, false, true);
+	if (0.7f < m_fTime && false == m_bActivated) {
+		m_pModelCom->Set_Animation(BO_GETOUT, 18.f, false, true);
 		m_bActivated = true;
 	}
 
-	if (2.2f < m_fTime)
+	if (1.5f < m_fTime)
 	{
-		_float fRatio = RATIO(m_fTime, 2.2f, 4.f);
+		_float fRatio = RATIO(m_fTime, 1.5f, 2.9f);
 		m_fWhiteColorDiffuse = EASE_IN(fRatio);
 	}
 
