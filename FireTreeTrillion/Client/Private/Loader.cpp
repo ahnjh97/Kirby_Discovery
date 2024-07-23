@@ -1791,6 +1791,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("FXDonut", TYPE_NONANIM);
 		m_vecModelInfo.emplace_back("LaserNonAnim", TYPE_NONANIM);
 
+		m_vecModelInfo.emplace_back("FXClaw", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("FXSimbaLaser", TYPE_NONANIM);
+		m_vecModelInfo.emplace_back("FXSimbaAtkReady", TYPE_NONANIM);
+
+
 		//공통이펙트 - YW
 		m_vecModelInfo.emplace_back("Cube", TYPE_NONANIM);
 
