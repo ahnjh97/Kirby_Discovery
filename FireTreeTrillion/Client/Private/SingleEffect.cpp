@@ -12,6 +12,11 @@ CSingleEffect::CSingleEffect(const CSingleEffect& rhs)
 {
 }
 
+_bool CSingleEffect::IsEnded()
+{
+	return m_bDone;
+}
+
 HRESULT CSingleEffect::Initialize_Prototype()
 {
 	return S_OK;
@@ -129,18 +134,21 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 		//툴에서는 다시 시작하기
 		if (*m_pCurrentLevelID != LEVEL_TOOL_FX && m_fDuration.second != FX_MAXDURATION)
 		{
-			m_bDead = true;
+			//단일 생성이면 바로 삭제, 멀티 이펙트중 하나라면 done 처리
+			if (m_bSingle)
+				m_bDead = true;
+			else
+				m_bDone = true;
+
+			return;
 		}
 	}
-
-	if (m_fLifetime.second < m_fDuration.first && .9f < m_vCurScale.x)
-		_int a = 0;
 
 	//true 반환하면 lifetime 끝난 것.
 	if (Calculate_Lifetime(fMyTimeDelta))
 	{
-		if (*m_pCurrentLevelID != LEVEL_TOOL_FX)
-			m_bNoRender = true;
+		//if (*m_pCurrentLevelID != LEVEL_TOOL_FX)
+			//m_bNoRender = true;
 	}
 
 	Compute_ViewZ();
@@ -262,6 +270,26 @@ HRESULT CSingleEffect::Render()
 	}
 	return S_OK;
 }
+
+#ifdef _DEBUG
+void CSingleEffect::Render_IMGUI()
+{
+	_float4x4 WorldMat = m_pTransformCom->Get_WorldMatrix();
+
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._11, WorldMat._12, WorldMat._13, WorldMat._14);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._21, WorldMat._22, WorldMat._23, WorldMat._24);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._31, WorldMat._32, WorldMat._33, WorldMat._34);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._41, WorldMat._42, WorldMat._43, WorldMat._44);
+
+
+	ImDrawList* drawList = ImGui::GetForegroundDrawList();
+
+	ImVec2 vProjPos = CUtils::WorldPosTo_ImguiProjPos(GET_POS);
+	drawList->AddCircleFilled(vProjPos, 5.f, IM_COL32(255, 50, 255, 255));
+
+	//__super::Render_IMGUI();
+}
+#endif
 
 HRESULT CSingleEffect::Add_Components(FX_DESC& FXDesc)
 {

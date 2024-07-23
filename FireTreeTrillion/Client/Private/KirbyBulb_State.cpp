@@ -856,7 +856,7 @@ void CKirbyBulb_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
         {
             CMultiEffect::MULTI_FX_DESC FXDesc{};
             FXDesc.vInitPos = { 0.f, 0.f, 0.f };
-            FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
+            FXDesc.vInitScale = { 1.f, 1.f, 1.f };
             pKirby->Add_Effect("YW Deform Effect2", FXDesc, false);
             m_bLightReset = false;
         }

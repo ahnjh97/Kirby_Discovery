@@ -73,10 +73,16 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 				CEffect* pFX = static_cast<CFXToolDirector*>
 					(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI"), 0))->Find_Effect(FXName);
 				if (nullptr != pFX)
+				{
 					m_FXs.push_back(pFX);
-
-				Safe_AddRef(pFX);
-				m_fDuration.second = pFX->Get_BiggerDuration(m_fDuration.second);
+					Safe_AddRef(pFX);
+					pFX->Set_Multi();
+					m_fDuration.second = pFX->Get_BiggerDuration(m_fDuration.second);
+				}
+				else
+				{
+					ALARM_FAIL("no effect!");
+				}
 			}
 		}
 		return S_OK;
@@ -106,6 +112,7 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 				CHECK_NULLPTR(pFX);
 
 				m_FXs.emplace_back(pFX);
+				pFX->Set_Multi();
 				m_fDuration.second = pFX->Get_BiggerDuration(m_fDuration.second);
 			}
 		}
@@ -122,6 +129,7 @@ _int CMultiEffect::Tick(_float fTimeDelta)
 	{
 		for (auto& pEffect : m_FXs)
 			pEffect->Set_Dead();
+
 		return OBJ_DEAD;
 	}
 
@@ -145,18 +153,34 @@ void CMultiEffect::Late_Tick(_float fTimeDelta)
 		return;
 	}
 
-	m_fDuration.first += fTimeDelta;
+	//m_fDuration.first += fTimeDelta;
+	if (IsEnded())
+	{
+		//99초(영구) 아닐 때
+		if (m_fDuration.second != FX_MAXDURATION && (*m_pCurrentLevelID) != LEVEL_TOOL_FX)
+		{
+			for (auto& pEffect : m_FXs)
+				pEffect->Set_Dead();
+			m_bDead = true;
+		}
+		else if (m_fDuration.second == FX_MAXDURATION)
+		{
+			m_fDuration.first = 0.f;
+			for (auto& pEffect : m_FXs)
+				pEffect->Reset_Duration();
+		}
+	}
 
-	if (m_fDuration.second - .05f <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX && m_fDuration.second != FX_MAXDURATION)
-	{
-		m_bDead = true;
-	}
-	else if (m_fDuration.second - .05f <= m_fDuration.first && (m_bIsLoop || m_fDuration.second == FX_MAXDURATION))
-	{
-		m_fDuration.first = 0.f;
-		for (auto& pEffect : m_FXs)
-			pEffect->Reset_Duration();
-	}
+	//if (m_fDuration.second - .05f <= m_fDuration.first && (*m_pCurrentLevelID) != LEVEL_TOOL_FX && m_fDuration.second != FX_MAXDURATION)
+	//{
+	//	m_bDead = true;
+	//}
+	//else if (m_fDuration.second - .05f <= m_fDuration.first && (m_bIsLoop || m_fDuration.second == FX_MAXDURATION))
+	//{
+	//	m_fDuration.first = 0.f;
+	//	for (auto& pEffect : m_FXs)
+	//		pEffect->Reset_Duration();
+	//}
 
 
 	for (auto& pEffect : m_FXs)
@@ -173,12 +197,48 @@ void CMultiEffect::Add_RenderGroup()
 	}
 }
 
+_bool CMultiEffect::IsEnded()
+{
+	for (auto& fx : m_FXs)
+	{
+		if (fx->IsEnded() == false)
+			return false;
+	}
+	return true;
+}
+
 HRESULT CMultiEffect::Render()
 {
 	//if (0.f < m_fStartDelay)
 	//	return S_OK;
 	return S_OK;
 }
+
+#ifdef _DEBUG
+void CMultiEffect::Render_IMGUI()
+{
+	_float4x4 WorldMat = m_FXs[0]->Get_TransformCom()->Get_WorldMatrix();
+
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._11, WorldMat._12, WorldMat._13, WorldMat._14);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._21, WorldMat._22, WorldMat._23, WorldMat._24);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._31, WorldMat._32, WorldMat._33, WorldMat._34);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._41, WorldMat._42, WorldMat._43, WorldMat._44);
+
+
+	for (auto& fx : m_FXs)
+	{
+		ImGui::Text(fx->IsEnded() ? "END : " : "PLAYING : ");
+		ImGui::SameLine();
+		ImGui::Text(fx->Get_Name().c_str());
+	}
+
+	ImDrawList* drawList = ImGui::GetForegroundDrawList();
+
+	ImVec2 vProjPos = CUtils::WorldPosTo_ImguiProjPos((_float3)m_FXs[0]->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+
+	drawList->AddCircleFilled(vProjPos, 5.f, IM_COL32(255, 50, 255, 255));
+}
+#endif
 
 CMultiEffect* CMultiEffect::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

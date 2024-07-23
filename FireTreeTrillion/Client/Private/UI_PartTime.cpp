@@ -40,7 +40,7 @@ HRESULT CUI_PartTime::Initialize_Prototype()
 {
 	fill(m_arrTexures.begin(), m_arrTexures.end(), nullptr);
 	_int iRatio(1);
-	fill(m_arrSizeRatio.begin(), m_arrSizeRatio.end(), iRatio);
+	fill(m_arrSizeRatio.begin(), m_arrSizeRatio.end(), (_float)iRatio);
 
 	m_arrSize[0] = m_arrSize[4] = m_SizeBar2D;
 	m_arrSize[1] = m_arrSize[2] = m_arrSize[3] = m_SizeTimeBarBlank2D;
@@ -490,7 +490,7 @@ void CUI_PartTime::Compute_Timer(_float fTimeDelta)
 	m_fStandardTime += fTimeDelta;
 	if (m_fStandardTime - m_fBeforeTime >= 1.f)
 	{
-		m_fCurTime = 22.f - m_fStandardTime;
+		m_fCurTime =  50.f - m_fStandardTime;
 		if (m_fCurTime <= 0.f) m_fCurTime = 0.f;
 		Change_TimeTexures(m_fCurTime);
 
@@ -581,7 +581,7 @@ void CUI_PartTime::Repose_ScoreTextures()
 	m_arrPosition[13] = _float2(-100.f, -100.f);
 	m_arrPosition[14] = _float2(-100.f, -100.f);
 
-	_float fScore = m_arrScoreDigits[0] * 100 + m_arrScoreDigits[1] * 10 + m_arrScoreDigits[2];
+	_float fScore = _float(m_arrScoreDigits[0] * 100 + m_arrScoreDigits[1] * 10 + m_arrScoreDigits[2]);
 	if (fScore <= 0.f)				// 0ÀÏ ¶§
 	{
 		m_arrPosition[14] = _float2(180.f, 817.f);

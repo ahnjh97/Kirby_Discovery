@@ -205,8 +205,8 @@ _bool CEffect::Calculate_Lifetime(_float _fTimeDelta)
 	if (m_fDuration.first < m_fLifetime.first)
 		return false;
 
-	if (m_fLifeRatio <= .01f)
-		int a = 0;
+	//if (m_fLifeRatio <= .01f)
+	//	int a = 0;
 
 	if (m_fLifetime.second< m_fDuration.first)
 	{

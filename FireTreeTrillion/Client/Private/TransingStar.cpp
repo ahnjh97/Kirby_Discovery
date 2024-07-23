@@ -6,6 +6,7 @@
 #include "Camera_Main.h"
 #include "Utils.h"
 #include "LoadingStart.h"
+#include "LoadingFont.h"
 
 const _float	g_fPosOffset        = 18.f;
 const _float	g_fTurnOffset       = 72.f;
@@ -366,8 +367,50 @@ void CTransingStar::On_Event()
         // 스타트 로딩화면 렌더 켜기
         m_bLoadingStart = true;
 
-        if (LEVEL_INTRO == m_eNextLevel)
+        if (LEVEL_RACING == m_eNextLevel)
+        {
             m_pLoadingStart->Set_TexIndex(0);
+
+            CLoadingFont::LOADINGFONT_DESC LoadingFont_Desc{};
+            HRESULT hr;
+            LoadingFont_Desc.strTag = TEXT("Prototype_Component_Texture_UI_Forest_Font");
+            //_float fPosX = -40.f;
+            //for(_uint i = 0; i < 5; ++i)
+            //{
+            //    LoadingFont_Desc.fPosX = fPosX;
+            //    LoadingFont_Desc.iTexIndex = i;
+            //    hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+            //    CHECK_FAILED(hr);
+
+            //    fPosX += 20.f;
+            //}
+
+            LoadingFont_Desc.fPosX = -105;
+            LoadingFont_Desc.iTexIndex = 0;
+            hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+            CHECK_FAILED(hr);
+
+            LoadingFont_Desc.fPosX = -55;
+            LoadingFont_Desc.iTexIndex = 1;
+            hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+            CHECK_FAILED(hr);
+
+            LoadingFont_Desc.fPosX = -5;
+            LoadingFont_Desc.iTexIndex = 2;
+            hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+            CHECK_FAILED(hr);
+
+            LoadingFont_Desc.fPosX = 65;
+            LoadingFont_Desc.iTexIndex = 3;
+            hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+            CHECK_FAILED(hr);
+
+            LoadingFont_Desc.fPosX = 115;
+            LoadingFont_Desc.iTexIndex = 4;
+            hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+            CHECK_FAILED(hr);
+
+        }
         else if (LEVEL_SIMBA == m_eNextLevel)
             m_pLoadingStart->Set_TexIndex(2);
         else if (LEVEL_PARK == m_eNextLevel)

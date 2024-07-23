@@ -31,6 +31,8 @@ private:
 	virtual ~CParticle() = default;
 
 public:
+	virtual _bool	IsEnded() override;
+
 	void			Update_InstanceInfo(INSTANCE_DESC* _InstanceDesc = nullptr);
 	virtual void	Fill_SaveData(_Out_ PARTICLE_DATA* pFXData) override;
 
