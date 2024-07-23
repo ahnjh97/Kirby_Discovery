@@ -777,7 +777,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	if (m_CamSeq.empty() && abs(m_fSeqInterpolateTime.first - m_fSeqInterpolateTime.second) < .01f)
 	{ 
 
-		Set_DOFMode(true);
+		Set_AutoDOF(true);
 
 		CAMSEQ eSeq = m_eSpecialSeq;
 
@@ -1654,7 +1654,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//¾î±ú ºä
 	case SEQ_SIMBA_SHOULDER:
 	{
-		Set_DOFMode(false);
+		Set_AutoDOF(false);
 
 		CAMACTION newAction{};
 		Fill_HardCutSet(newAction, 0.f);
@@ -1678,7 +1678,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//¾î±ú - Åë
 	case SEQ_SIMBA_TONG:
 	{
-		Set_DOFMode(false);
+		Set_AutoDOF(false);
 
 		CAMACTION newAction{};
 		Fill_HardCutSet(newAction, 0.f);
@@ -1700,7 +1700,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//¾ó±¼ºä
 	case SEQ_SIMBA_FRONTVIEW:
 	{
-		Set_DOFMode(false);
+		Set_AutoDOF(false);
 
 		CAMACTION newAction{};
 		Fill_HardCutSet(newAction, 0.f);
@@ -1723,7 +1723,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//·Î¿ì ¾Þ±Û
 	case SEQ_SIMBA_LOW:
 	{
-		Set_DOFMode(false);
+		Set_AutoDOF(false);
 
 		CAMACTION newAction{};
 		Fill_HardCutSet(newAction, 0.f);
@@ -1749,7 +1749,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 #pragma region ¿¡ÇÇ¸®½º
 	case SEQ_FINALBOSS_APPEAR:
 	{
-		Set_DOFMode(false);
+		Set_AutoDOF(false);
 
 		CAMACTION newAction = {};
 
@@ -1817,6 +1817,137 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 
 		Fill_InterpolateCutSet(newAction, fLastSeqStartTime + 5.f, EASE_INOUT, 8.f);
+		m_CamSeq.push_back(newAction);
+
+	}
+	break;
+	case SEQ_FINALBOSS_2PHASE:
+	{
+		Set_AutoDOF(false);
+
+		CAMACTION newAction = {};
+
+		//µÚ·Î ¹Ð¸®´Â º¸½º
+
+		_float3 vStartPos = { -3.f, 3.18f, -1.14f };
+		Fill_HardCutSet(newAction, 0.f);
+
+		Fill_ActionPos(newAction, POS_ABSOLUTE, {-8.77f, 4.36f, 1.7f});
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { .4f, 0.f, -.92f });
+		m_CamSeq.push_back(newAction);
+
+		//
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, .5f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos);
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { .11f, 0.f, -1.f });
+		m_CamSeq.push_back(newAction);
+
+
+		// ¾Þ±Û À¯Áö
+		Fill_InterpolateCutSet(newAction, .5f, EASE_INOUT, 4.f);
+		m_CamSeq.push_back(newAction);
+
+
+	}
+	break;
+	case SEQ_FINALBOSS_DEAD:
+	{
+		Set_AutoDOF(false);
+
+		CAMACTION newAction = {};
+
+		//ºó»ç
+		Fill_HardCutSet(newAction, 0.f);
+
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { -7.78f, 4.77f, 19.41f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { .27f, -.07f, -.96f });
+		m_CamSeq.push_back(newAction);
+
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 20.f);
+		m_CamSeq.push_back(newAction);
+
+	}
+	break;
+
+	case SEQ_FINALBOSS_ENDING:
+	{
+		Set_AutoDOF(false);
+
+		CAMACTION newAction = {};
+
+
+		//¹Ù´Ú¿¡¼­ ÀÏ¾î³²
+		Fill_HardCutSet(newAction, 0.f);
+
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { -.22f, .45f, 1.22f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.98f, .13f, .12f });
+		m_CamSeq.push_back(newAction);
+
+
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 3.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { -1.f, .83f, 2.17f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -1.f, .06f, .01f });
+		m_CamSeq.push_back(newAction);
+
+
+		Fill_InterpolateCutSet(newAction, 3.f, EASE_INOUT, 1.5f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { -1.f, 1.45f, 3.27f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.98f, .14f, -.11f });
+		m_CamSeq.push_back(newAction);
+
+		Fill_InterpolateCutSet(newAction, 4.5f, EASE_INOUT, 2.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { -.95f, 2.37f, 3.46f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.99f, .01f, -.13f });
+		m_CamSeq.push_back(newAction);
+
+		Fill_InterpolateCutSet(newAction, 6.5f, EASE_INOUT, 2.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 19.1f, .01f, 3.64f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.82f, .58f, .03f });
+		m_CamSeq.push_back(newAction);
+
+		Fill_InterpolateCutSet(newAction, 8.5f, EASE_INOUT, 30.f);
+		m_CamSeq.push_back(newAction);
+
+
+	}
+	break;
+	case SEQ_FINALBOSS_DUMP:
+	{
+		CAMACTION newAction = {};
+
+		//¸· ¶³¾îÁü
+		Fill_HardCutSet(newAction, 0.f);
+
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 4.9f, .5f, -7.45f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.6f, .17f, .78f });
+		m_CamSeq.push_back(newAction);
+
+
+		//Æ®·° º¸±â
+		Fill_HardCutSet(newAction, 5.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { -14.17f, 14.97f, -21.48f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { .21f, -.47f, .86f });
+		m_CamSeq.push_back(newAction);
+
+		Fill_InterpolateCutSet(newAction, 5.f, EASE_INOUT, 3.f);
+
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { -6.1f, 3.74f, -19.72f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.14f, 0.f, 1.f });
+		m_CamSeq.push_back(newAction);
+
+
+		//Ä¿ºñ ÁÜ
+		Fill_HardCutSet(newAction, 8.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { -4.17f, 1.27f, 6.46f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { .52f, -.06f, -.85f });
+		m_CamSeq.push_back(newAction);
+
+		Fill_InterpolateCutSet(newAction, 8.f, EASE_INOUT, 3.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { -.5f, .78f, .51f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { .52f, -.05f, -.85f });
+		m_CamSeq.push_back(newAction);
+
+		Fill_InterpolateCutSet(newAction, 11.f, EASE_INOUT, 30.f);
 		m_CamSeq.push_back(newAction);
 
 	}

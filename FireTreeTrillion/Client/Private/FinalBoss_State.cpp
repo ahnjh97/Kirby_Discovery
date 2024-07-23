@@ -1851,7 +1851,7 @@ void CFinalBoss_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 	if (pFinalBoss->IsAnimFinished())
 	{
-		if(CFinalBoss::STATE_2PAZE == pFinalBoss->Get_BossState())
+		if (CFinalBoss::STATE_2PAZE == pFinalBoss->Get_BossState())
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPREADY, 50.f, false, true);
 		else
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAIT, 50.f, false, true);
@@ -2063,16 +2063,32 @@ void CFinalBoss_LastDamage_State::OnStateUpdate(CGameObject* pGameObject, _float
 	if (true == pFinalBoss->IsAnimFinished())
 	{
 		CBossClone::BOSSCLONE_DESC BossCloneDesc = {};
+		CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 
 		switch (pFinalBoss->Get_State())
 		{
+			//피 다 깎여서 엎드림
 		case CFinalBoss::FINALBOSS_LASTDAMAGESTART:
+
+			if (pCamera != nullptr)
+				pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_DEAD);
+
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_LASTDAMAGEWAIT, 50.f, false, false);
 			break;
+			//일어서서 빤쓰
 		case CFinalBoss::FINALBOSS_LASTDAMAGEWAIT:
+
+			if (pCamera != nullptr)
+				pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_ENDING);
+
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMODISAPPEARCUT2, 50.f, false, false);
 			break;
+			//커비 애니메이션 시작
 		case CFinalBoss::FINALBOSS_DEMODISAPPEARCUT2:
+
+			if (pCamera != nullptr)
+				pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_DUMP);
+
 			CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 			pKirby->Get_KirbyInfo()->m_bFinalBossDead = true;
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMODISAPPEARCUT3, 50.f, false, false);

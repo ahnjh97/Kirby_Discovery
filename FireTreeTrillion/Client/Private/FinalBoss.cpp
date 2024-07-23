@@ -64,7 +64,7 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_fMaxHp = 500.f;
-	m_fHp = 500.f;
+	m_fHp = 250.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eBossState = STATE_FLYING;
@@ -162,9 +162,15 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 		}
 	}
 
-	if ( m_bStart2PhaseTrigger
+	if (m_bStart2PhaseTrigger
 		&& (m_pGameInstance->Get_KeyState(DIK_K, KEY_DOWN) || m_fHp < m_fMaxHp * 0.45f))
 	{
+
+		//2페이즈 컷신 세팅
+		CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+		if (pCamera != nullptr)
+			pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_2PHASE);
+
 		Set_BossState(STATE_2PAZE);
 		m_pControllerCom->Set_Position(m_pTransformCom, m_vecRallyPoint[1]);
 		m_pTransformCom->Look_At(m_vecRallyPoint[0]);
@@ -176,8 +182,8 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	{
 		Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
 	}
-	else if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
-		Change_State(FINALBOSS_DEMOAPPEARCUT5, 50.f, false, false);
+	//else if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
+	//	Change_State(FINALBOSS_DEMOAPPEARCUT5, 50.f, false, false);
 	else if (m_pGameInstance->Get_KeyState(DIK_O, KEY_DOWN) || m_fHp < 0.f)
 	{
 		Change_State(FINALBOSS_LASTDAMAGESTART, 50.f, false, true);
@@ -343,7 +349,7 @@ void CFinalBoss::Late_Tick(_float fTimeDelta)
 	for (auto& Pair : m_PartObjects)
 		Pair.second->Late_Tick(m_fTimeDelta);
 
-	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 100.0f))
+	//if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 100.0f))
 	{
 		m_pModelCom->Play_Animation(m_fTimeDelta);
 
