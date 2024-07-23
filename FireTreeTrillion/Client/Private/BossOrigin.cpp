@@ -15,7 +15,7 @@ CBossOrigin::CBossOrigin(const CBossOrigin& rhs)
 
 void CBossOrigin::Activate(CGameObject* pObj)
 {
-	m_bActivated = true;
+	m_bStartTimer = true;
 }
 
 HRESULT CBossOrigin::Initialize_Prototype()
@@ -38,7 +38,7 @@ HRESULT CBossOrigin::Initialize(void* pArg)
 		Add_Components(desc->wstrModelName);
 
 	m_bMotionBlur = false;
-	m_bRimLight = true;
+	m_bRimLight = false;
 	m_bStencil = true;
 	
 	for (_uint i = 0; i < m_pModelCom->Get_NumMeshes(); i++)
@@ -65,12 +65,31 @@ _int CBossOrigin::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
-	if (true == m_bActivated)
+	if (true == m_bStartTimer)
 		m_fTime += m_pGameInstance->Get_SecondTimer();
 
-	if (3.f < m_fTime && true == m_bActivated) {
-		m_pModelCom->Set_Animation(BO_GETOUT, 50.f, false, true);
+	if (4.f < m_fTime && false == m_bNotify)
+	{
+		m_bNotify = true;
+		CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_CAGEBREAK);
+	}
+
+	if (1.f < m_fTime && false == m_bActivated) {
+		m_pModelCom->Set_Animation(BO_GETOUT, 30.f, false, true);
+		m_bActivated = true;
+	}
+
+	if (2.2f < m_fTime)
+	{
+		_float fRatio = RATIO(m_fTime, 2.2f, 4.f);
+		m_fWhiteColorDiffuse = EASE_IN(fRatio);
+	}
+
+	if (m_pGameInstance->Get_KeyState(DIK_CAPSLOCK, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_Q, KEY_DOWN))
+	{
+		m_fTime = 0.f;
 		m_bActivated = false;
+		m_bNotify = false;
 	}
 
 	if (BO_GETOUT == m_pModelCom->Get_CurAnimIndex() && true == m_pModelCom->IsFinished()) { // 지영누나 여기야 페이드아웃 부탁
@@ -94,6 +113,9 @@ HRESULT CBossOrigin::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
+	_float fZero{};
+	hr = m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fZero, sizeof(_float));
+	CHECK_FAILED(hr);
 	for (auto& i : m_vecMeshes)
 	{
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
@@ -111,6 +133,15 @@ HRESULT CBossOrigin::Render()
 		CHECK_FAILED(hr);
 	}
 	
+	hr = m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
+	CHECK_FAILED(hr);
+
+	/*if (2.5f < m_fTime) {*/
+	/*	_bool bTrue = true;
+		hr = m_pShaderCom->Bind_RawValue("g_bRimLight", &bTrue, sizeof(_bool));
+		CHECK_FAILED(hr);*/
+	//}
+
 	for (auto& i : m_vecEyeMeshes)
 	{
 		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
@@ -122,7 +153,7 @@ HRESULT CBossOrigin::Render()
 		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
 		CHECK_FAILED(hr);
 
-		hr = m_pShaderCom->Begin(ANIMMODEL_BOSSORIGINEYE);
+		hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O);
 		CHECK_FAILED(hr);
 		hr = m_pModelCom->Render(i);
 		CHECK_FAILED(hr);
@@ -165,8 +196,6 @@ HRESULT CBossOrigin::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("m_fRimWidth", &m_fRimWidth, sizeof(_float))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
 		return E_FAIL;
 
 	return S_OK;

@@ -17,6 +17,7 @@ void COriginCage::Activate(CGameObject* pObj)
 {
 	m_bActivacted = true;
 	m_eState = CAGE_STATE_CRACK;
+	m_fTime = 0.f;
 }
 
 HRESULT COriginCage::Initialize_Prototype()
@@ -65,7 +66,7 @@ _int COriginCage::Tick(_float fTimeDelta)
 	if (true == m_bActivacted && CAGE_STATE_CRACK == m_eState)
 		m_fTime += m_pGameInstance->Get_SecondTimer();
 
-	if (m_fTime > 2.f && CAGE_STATE_CRACK == m_eState)
+	if (m_fTime > 1.45f && CAGE_STATE_CRACK == m_eState)
 	{
 		m_eState = CAGE_STATE_AFTER;
 		m_pModelCom->Set_Animation(CAGE_BREAK, 40.f, false);

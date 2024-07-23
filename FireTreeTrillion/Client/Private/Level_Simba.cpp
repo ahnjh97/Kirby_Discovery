@@ -133,7 +133,7 @@ void CLevel_Simba::Tick(_float fTimeDelta)
 		else if (m_pGameInstance->Get_KeyState(DIK_4, KEY_DOWN))
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_WAVE2DEAD);
 		else if (m_pGameInstance->Get_KeyState(DIK_C, KEY_DOWN))
-			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_THRONEBREAK);
+			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_BOSSORIGIN);
 	}
 
 	if (m_iWaveCount == 0)
