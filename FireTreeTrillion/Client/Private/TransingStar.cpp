@@ -125,9 +125,16 @@ HRESULT CTransingStar::Render()
         RenderOpen();
 
     if (true == m_bLoadingStart)
-        m_pLoadingStart->Render(m_fTimeDelta);
+    {
+        m_fStartDelayTime += m_fTimeDelta;
+        if(0.4f < m_fStartDelayTime)
+            m_pLoadingStart->Render(m_fTimeDelta);
+    }
     else
+    {
+        m_fStartDelayTime = 0.f;
         m_pLoadingStart->Set_Alpha(0.f);
+    }
 
     return S_OK;
 }
@@ -207,6 +214,7 @@ void CTransingStar::Deactivate()
 
     // 준수 
     m_bLoadingStart = false;
+    m_bFontRender = true;
 }
 
 void CTransingStar::Tick_AlphaStar(_float fTimeDelta)
@@ -371,48 +379,70 @@ void CTransingStar::On_Event()
         {
             m_pLoadingStart->Set_TexIndex(0);
 
-            CLoadingFont::LOADINGFONT_DESC LoadingFont_Desc{};
+            CLoadingFont::LOADINGFONT_DESC LoadingFont_Desc{}; 
             HRESULT hr;
             LoadingFont_Desc.strTag = TEXT("Prototype_Component_Texture_UI_Forest_Font");
-            //_float fPosX = -40.f;
-            //for(_uint i = 0; i < 5; ++i)
-            //{
-            //    LoadingFont_Desc.fPosX = fPosX;
-            //    LoadingFont_Desc.iTexIndex = i;
-            //    hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
-            //    CHECK_FAILED(hr);
+            _float fPosX = -40.f;
+            _float fEndPos = -105.f;
+            _float fDisappearPos = -185.f;
+            for (_uint i = 0; i < 5; ++i)
+            {
+                LoadingFont_Desc.fPosX = fPosX;
+                LoadingFont_Desc.fEndPos = fEndPos;
+                LoadingFont_Desc.fDisappearPos = fDisappearPos;
+                LoadingFont_Desc.iTexIndex = i;
+                if (4 == i)
+                    LoadingFont_Desc.bDeadRender = true;
+                hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+                CHECK_FAILED(hr);
 
-            //    fPosX += 20.f;
-            //}
-
-            LoadingFont_Desc.fPosX = -105;
-            LoadingFont_Desc.iTexIndex = 0;
-            hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
-            CHECK_FAILED(hr);
-
-            LoadingFont_Desc.fPosX = -55;
-            LoadingFont_Desc.iTexIndex = 1;
-            hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
-            CHECK_FAILED(hr);
-
-            LoadingFont_Desc.fPosX = -5;
-            LoadingFont_Desc.iTexIndex = 2;
-            hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
-            CHECK_FAILED(hr);
-
-            LoadingFont_Desc.fPosX = 65;
-            LoadingFont_Desc.iTexIndex = 3;
-            hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
-            CHECK_FAILED(hr);
-
-            LoadingFont_Desc.fPosX = 115;
-            LoadingFont_Desc.iTexIndex = 4;
-            hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
-            CHECK_FAILED(hr);
-
+                fPosX += 20.f;
+                if (i != 2)
+                {
+                    fEndPos += 50.f;
+                    fDisappearPos += 90.f;
+                }
+                else 
+                {
+                    fEndPos += 60.f;
+                    fDisappearPos += 100.f;
+                }
+            }
         }
         else if (LEVEL_SIMBA == m_eNextLevel)
+        {
             m_pLoadingStart->Set_TexIndex(2);
+
+            CLoadingFont::LOADINGFONT_DESC LoadingFont_Desc{};
+            HRESULT hr;
+            LoadingFont_Desc.strTag = TEXT("Prototype_Component_Texture_UI_Lab_Font");
+            _float fPosX = -60.f;
+            _float fEndPos = -125.f;
+            _float fDisappearPos = -205.f;
+            for (_uint i = 0; i < 6; ++i)
+            {
+                LoadingFont_Desc.fPosX = fPosX;
+                LoadingFont_Desc.fEndPos = fEndPos;
+                LoadingFont_Desc.fDisappearPos = fDisappearPos;
+                LoadingFont_Desc.iTexIndex = i;
+                if (5 == i)
+                    LoadingFont_Desc.bDeadRender = true;
+                hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+                CHECK_FAILED(hr);
+
+                fPosX += 20.f;
+                if (i != 0)
+                {
+                    fEndPos += 50.f;
+                    fDisappearPos += 90.f;
+                }
+                else
+                {
+                    fEndPos += 60.f;
+                    fDisappearPos += 100.f;
+                }
+            }
+        }
         else if (LEVEL_PARK == m_eNextLevel)
             m_bLoadingStart = false;
 
@@ -431,6 +461,36 @@ void CTransingStar::On_Event()
             // 스타트 로딩화면 렌더 켜기
             m_bLoadingStart = true;
             m_pLoadingStart->Set_TexIndex(1);
+
+            CLoadingFont::LOADINGFONT_DESC LoadingFont_Desc{};
+            HRESULT hr;
+            LoadingFont_Desc.strTag = TEXT("Prototype_Component_Texture_UI_Park_Font");
+            _float fPosX = -80.f;
+            _float fEndPos = -145.f;
+            _float fDisappearPos = -225.f;
+            for (_uint i = 0; i < 7; ++i)
+            {
+                LoadingFont_Desc.fPosX = fPosX;
+                LoadingFont_Desc.fEndPos = fEndPos;
+                LoadingFont_Desc.fDisappearPos = fDisappearPos;
+                LoadingFont_Desc.iTexIndex = i;
+                if (6 == i)
+                    LoadingFont_Desc.bDeadRender = true;
+                hr = m_pGameInstance->Add_Clone(LEVEL_STATIC, TEXT("Layer_UI"), TEXT("Prototype_GameObject_LoadingFont"), &LoadingFont_Desc);
+                CHECK_FAILED(hr);
+
+                fPosX += 20.f;
+                if (i != 1 && i != 3)
+                {
+                    fEndPos += 50.f;
+                    fDisappearPos += 90.f;
+                }
+                else
+                {
+                    fEndPos += 60.f;
+                    fDisappearPos += 100.f;
+                }
+            }
 
             pCameraMain->Unlock();
             pCameraMain->Set_FOVY(38);

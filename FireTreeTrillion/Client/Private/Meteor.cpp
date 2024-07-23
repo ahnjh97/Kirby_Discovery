@@ -221,7 +221,7 @@ _int CMeteor::Tick(_float fTimeDelta)
 				_float fDeceleration = m_fDecreSpeed * m_fDecreSpeed;
 
 				if (0.f < m_fDecreSpeed)
-					m_fDecreSpeed -= fTimeDelta * 0.4f;
+					m_fDecreSpeed -= m_fTimeDelta * 0.4f;
 				else
 					m_fDecreSpeed = 0.f;
 
@@ -312,7 +312,7 @@ _int CMeteor::Tick(_float fTimeDelta)
 	}
 	else
 	{
-		m_pTransformCom->Turn(m_vAxis, fTimeDelta * m_fTurnSpeed);
+		m_pTransformCom->Turn(m_vAxis, m_fTimeDelta* m_fTurnSpeed);
 
 		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 		CTransform* pKirbyTransform = pKirby->Get_TransformCom();

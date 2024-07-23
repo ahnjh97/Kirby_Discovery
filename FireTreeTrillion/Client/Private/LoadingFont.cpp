@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "LoadingFont.h"
+#include "TransingStar.h"
 
 CLoadingFont::CLoadingFont(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CUIObject{ pDevice, pContext }
@@ -24,8 +25,11 @@ HRESULT CLoadingFont::Initialize(void* pArg)
 	{
 		pLoadingFontDesc = (LOADINGFONT_DESC*)pArg;
 
+		m_bDeadRender = pLoadingFontDesc->bDeadRender;
 		m_iTexIndex = pLoadingFontDesc->iTexIndex;
 		m_fPosX = pLoadingFontDesc->fPosX;
+		m_fEndPos = pLoadingFontDesc->fEndPos;
+		m_fDisappearPos = pLoadingFontDesc->fDisappearPos;
 		m_strTag = pLoadingFontDesc->strTag;
 	}
 
@@ -51,6 +55,37 @@ _int CLoadingFont::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 		return OBJ_DEAD;
 
+	CTransingStar* pTransingStar = static_cast<CTransingStar*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar")));
+
+	_float fPos = { 0.f };
+	if (true == pTransingStar->Get_FontRender())
+	{
+		if (nullptr != pTransingStar)
+		{
+			m_fRatio -= fTimeDelta * 1.5f;
+			if (0.f < m_fRatio)
+			{
+				fPos = Compute_Easing(m_fEndPos, m_fDisappearPos, 1.f - m_fRatio);
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(fPos, -50.f, 0.f, 1.f));
+			}
+			else
+			{
+				if(true == m_bDeadRender)
+					pTransingStar->Set_FontRender(false);
+				m_fRatio = 0.f;
+				m_bDead = true;
+			}
+		}
+	}
+	else if (1.f > m_fRatio)
+	{
+		m_fRatio += fTimeDelta * 0.5f;
+		fPos = Compute_Easing(m_fPosX, m_fEndPos, m_fRatio);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVectorSet(fPos, -50.f, 0.f, 1.f));
+	}
+	else
+		m_fRatio = 1.f;
+
 	__super::Tick(fTimeDelta);
 
 	return OBJ_NOEVENT;
@@ -73,7 +108,7 @@ HRESULT CLoadingFont::Render()
 	hr = m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_iTexIndex);
 	CHECK_FAILED(hr);
 
-	hr = m_pShaderCom->Begin(0);
+	hr = m_pShaderCom->Begin(12);
 	CHECK_FAILED(hr);
 
 	hr = m_pVIBufferCom->Bind_Buffers();
@@ -128,13 +163,25 @@ HRESULT CLoadingFont::Bind_ShaderResources()
 	hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
 	CHECK_FAILED(hr);
 
-	//hr = m_pShaderCom->Bind_RawValue("g_fTimeDelta", &m_fTimeDelta, sizeof(_float));
-	//CHECK_FAILED(hr);
+	_float3 vColor = _float3( 1.f, 1.f ,1.f );
+	hr = m_pShaderCom->Bind_RawValue("g_vRColor", &vColor, sizeof(_float3));
+	CHECK_FAILED(hr);
 
-	//hr = m_pShaderCom->Bind_RawValue("g_fAlpha", &fAlpha, sizeof(_float));
-	//CHECK_FAILED(hr);
+	_float fAlpha = m_fRatio + 0.1f;
+	hr = m_pShaderCom->Bind_RawValue("g_fAlpha", &fAlpha, sizeof(_float));
+	CHECK_FAILED(hr);
 
 	return S_OK;
+}
+
+_float CLoadingFont::Compute_Easing(_float vStartPos, _float vEndPos, _float fRatio)
+{
+
+	_float t = 1 - (_float)pow(1 - fRatio, 3);
+
+	_float vResult = vStartPos + (vEndPos - vStartPos) * t;
+
+	return vResult;
 }
 
 CLoadingFont* CLoadingFont::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
