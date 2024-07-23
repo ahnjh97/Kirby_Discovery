@@ -404,7 +404,7 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 	//깜놀보드 충돌거리 조건에 따라 DFMOVE_LEFT, DFMOVE_RIGHT를 체크
 	case DFMOVE_LEFT: case DFMOVE_RIGHT: 
 		vCurPos = GET_POS;
-		if (m_bIsInteraction) //RayCast 상호작용 검사
+		if (m_bIsInteraction)
 		{
 			switch (m_eDFMoveState)
 			{

@@ -1,26 +1,25 @@
 #include "stdafx.h"
-#include "Gm_ParkFhEntranceAlien.h"
+#include "Gm_ParkShutter.h"
 
 #include "HitBox.h"
 #include "Kirby.h"
-//#include "BreakableRockParticle.h"
 
-CGm_ParkFhEntranceAlien::CGm_ParkFhEntranceAlien(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CGm_ParkShutter::CGm_ParkShutter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
 {
 }
 
-CGm_ParkFhEntranceAlien::CGm_ParkFhEntranceAlien(const CGm_ParkFhEntranceAlien& rhs)
+CGm_ParkShutter::CGm_ParkShutter(const CGm_ParkShutter& rhs)
 	: CPhysXObject{ rhs }
 {
 }
 
-HRESULT CGm_ParkFhEntranceAlien::Initialize_Prototype()
+HRESULT CGm_ParkShutter::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CGm_ParkFhEntranceAlien::Initialize(void* pArg)
+HRESULT CGm_ParkShutter::Initialize(void* pArg)
 {
 	GAMEOBJECT_DESC* Desc = { nullptr };
 
@@ -33,11 +32,8 @@ HRESULT CGm_ParkFhEntranceAlien::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_eAnimState = STATE_LOOP;
-	m_pModelCom->Set_Animation(STATE_LOOP, 100.f, TRUE /*_bool bInterpolation = false, _float fLerpTime = 0.1f*/);
-
-	//숨길 메쉬 검색하여 저장
-	m_setBeforeHideMeshs.insert(m_pModelCom->Find_MeshIndex(string("TnnelWallM__FhEntranceAlienTunnelWallC")));
+	m_eCurState = STATE_CLOSEIDLE;
+	m_pModelCom->Set_Animation(STATE_CLOSEIDLE, 60.f, TRUE /*_bool bInterpolation = false, _float fLerpTime = 0.1f*/);
 
 	//피직스 추가
 	m_pStaticActor = m_pNonAnimModelCom->ReturnStaticActor(m_pTransformCom->Get_WorldFloat4x4());
@@ -48,15 +44,29 @@ HRESULT CGm_ParkFhEntranceAlien::Initialize(void* pArg)
 	return S_OK;
 }
 
-_int CGm_ParkFhEntranceAlien::Tick(_float fTimeDelta)
+_int CGm_ParkShutter::Tick(_float fTimeDelta)
 {
 	if (TRUE == m_bDead)
 		return OBJ_DEAD;
 
+	if (nullptr == m_pGimmickSPOnce)
+		return OBJ_NOEVENT;
+
+	//태양전자판 기믹 활성화 애님일 경우, 셔터 애님 변경
+	
+	CGm_ParkSolarPanelOnce::PANELONCE_STATE eSPOnceState = m_pGimmickSPOnce->Get_CurState();
+	if (CGm_ParkSolarPanelOnce::PANELONCE_STATE::STATE_ONWAIT == eSPOnceState
+		&& 4 == m_pGimmickSPOnce->Get_GimmickIndex()
+		&& STATE_CLOSEIDLE == m_eCurState)
+	{
+		m_pModelCom->Set_Animation(STATE_TOOPEN, 60.f, FALSE, TRUE);
+		m_eCurState = STATE_TOOPEN;
+	}
+
 	return OBJ_NOEVENT;
 }
 
-void CGm_ParkFhEntranceAlien::Late_Tick(_float fTimeDelta)
+void CGm_ParkShutter::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom->Play_Animation(m_pGameInstance->Get_SecondTimer());
 
@@ -76,7 +86,7 @@ void CGm_ParkFhEntranceAlien::Late_Tick(_float fTimeDelta)
 		Set_Dead();
 }
 
-HRESULT CGm_ParkFhEntranceAlien::Render()
+HRESULT CGm_ParkShutter::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -100,13 +110,6 @@ HRESULT CGm_ParkFhEntranceAlien::Render()
 
 		hr = m_pShaderCom->Begin(ANIMMODEL_LINEAR_NORMAL_O_NONDISCARD);
 		CHECK_FAILED(hr);
-
-		//특정 애님 상태에 따라 렌더할 메쉬를 체크
-		if (STATE_LOOP == m_eAnimState)
-		{
-			if (m_setBeforeHideMeshs.find(i) != m_setBeforeHideMeshs.end())
-				continue;
-		}
 		
 		hr = m_pModelCom->Render(i);
 		CHECK_FAILED(hr);
@@ -115,7 +118,7 @@ HRESULT CGm_ParkFhEntranceAlien::Render()
 	return S_OK;
 }
 
-HRESULT CGm_ParkFhEntranceAlien::Render_LightDepth()
+HRESULT CGm_ParkShutter::Render_LightDepth()
 {
 	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
 		return E_FAIL;
@@ -124,41 +127,24 @@ HRESULT CGm_ParkFhEntranceAlien::Render_LightDepth()
 }
 
 #ifdef _DEBUG
-void CGm_ParkFhEntranceAlien::Render_IMGUI()
+void CGm_ParkShutter::Render_IMGUI()
 {
-	switch (m_eAnimState)
+	switch (m_eCurState)
 	{
-	case STATE_LOOP:	ImGui::Text(u8"STATE_LOOP"); break;
+	case STATE_CLOSEIDLE:	ImGui::Text(u8"STATE_CLOSEIDLE"); break;
+	case STATE_OPENIDLE:	ImGui::Text(u8"STATE_OPENIDLE"); break;
+	case STATE_TOCLOSE:		ImGui::Text(u8"STATE_TOCLOSE"); break;
+	case STATE_TOOPEN:		ImGui::Text(u8"STATE_TOOPEN"); break;
 	case STATE_NONE:	default: ImGui::Text(u8"STATE_NONE"); break;
 	}
 }
 #endif
 
-void CGm_ParkFhEntranceAlien::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+void CGm_ParkShutter::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
-	/*
-	if (true == m_bStartAnimation)
-		return;
-
-	CKirby* pKirby = static_cast<CKirby*>(pObject);
-	if (pKirby->Get_KirbyInfo()->m_bBooster == false)
-		return;
-
-	pKirby->Set_HitStop();
-	m_pModelCom->Set_Animation(0, 60.f, false, false);
-	m_bStartAnimation = true;
-	SwitchAfterBefore();
-
-	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-	_float4 vPlayerPos = pObject->Get_TransformCom()->Get_State(CTransform::STATE_POSITION);
-	_float4 vDir = vPos - vPlayerPos;
-	vDir.Normalize();
-	m_vDamegeDir = (_float3)vDir;
-	m_fHitPower = pKirby->Get_KirbyInfo()->m_fMoveSpeed;
-	*/
 }
 
-HRESULT CGm_ParkFhEntranceAlien::Add_Components()
+HRESULT CGm_ParkShutter::Add_Components()
 {
 	HRESULT hr;
 
@@ -166,11 +152,11 @@ HRESULT CGm_ParkFhEntranceAlien::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_FhEntranceAlien_Anim"), 
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Shutter_Anim"), 
 		TEXT("Com_Model_Anim"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_FhEntranceAlien_NonAnim"), 
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_Shutter_NonAnim"), 
 		TEXT("Com_Model_NonAnim"), (CComponent**)&m_pNonAnimModelCom);
 	CHECK_FAILED(hr);
 
@@ -178,7 +164,7 @@ HRESULT CGm_ParkFhEntranceAlien::Add_Components()
 	return S_OK;
 }
 
-HRESULT CGm_ParkFhEntranceAlien::Bind_ShaderResources()
+HRESULT CGm_ParkShutter::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -213,33 +199,33 @@ HRESULT CGm_ParkFhEntranceAlien::Bind_ShaderResources()
 	return S_OK;
 }
 
-CGm_ParkFhEntranceAlien* CGm_ParkFhEntranceAlien::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CGm_ParkShutter* CGm_ParkShutter::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CGm_ParkFhEntranceAlien* pInstance = new CGm_ParkFhEntranceAlien(pDevice, pContext);
+	CGm_ParkShutter* pInstance = new CGm_ParkShutter(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Create : CGm_ParkFhEntranceAlien"));
+		MSG_BOX(TEXT("Failed To Create : CGm_ParkShutter"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CGm_ParkFhEntranceAlien::Clone(void* pArg)
+CGameObject* CGm_ParkShutter::Clone(void* pArg)
 {
-	CGm_ParkFhEntranceAlien* pInstance = new CGm_ParkFhEntranceAlien(*this);
+	CGm_ParkShutter* pInstance = new CGm_ParkShutter(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Clone : CGm_ParkFhEntranceAlien"));
+		MSG_BOX(TEXT("Failed To Clone : CGm_ParkShutter"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CGm_ParkFhEntranceAlien::Free()
+void CGm_ParkShutter::Free()
 {
 	__super::Free();
 
@@ -249,5 +235,6 @@ void CGm_ParkFhEntranceAlien::Free()
 	Safe_Release(m_pNonAnimModelCom);
 
 	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pGimmickSPOnce);
 
 }

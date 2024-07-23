@@ -76,7 +76,6 @@ _int CUI_Interactable::Tick(_float fTimeDelta)
 		}			
 	}
 
-
 	_float fRatio = sin((fAccTime * 3.1415f) / 2);
 	m_pTransformCom->Set_Scaled(m_InitialSize.x + m_InitialSize.x * fAccTime,
 							    m_InitialSize.y + m_InitialSize.y * fAccTime, 1.f);
