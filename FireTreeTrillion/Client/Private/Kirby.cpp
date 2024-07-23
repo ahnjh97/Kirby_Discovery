@@ -594,6 +594,8 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			{
 				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 			}
+
+
 			Delete_AllEffect();
 		}
 	}

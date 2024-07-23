@@ -151,7 +151,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 					{
 						pFinalBoss->Set_Chain(true);
 						pFinalBoss->Set_BossState(CFinalBoss::STATE_FLYING);
-						m_iCnt = 20;
+						m_iCnt = 22;
 						pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
 					}
 				}
@@ -234,14 +234,12 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 				}
 			}
-			else if (20 == m_iCnt)
+			else if (21 == m_iCnt)
 			{
 				if (pFinalBoss->IsAnimFinished()/*0.5f < pFinalBoss->Get_AnimRatio()*/)
 				{
 					m_iCnt = 0;
-					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
-					pFinalBoss->Set_Direction(m_vLook);
-					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
 				}
 			}
 		}
@@ -347,7 +345,16 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONSPIKEREADY, 50.f, false, true);
 				}
 			}
-			else if (21 == m_iCnt)
+			else if (20 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
+				}
+			}
+			else if (22 == m_iCnt)
 			{
 				if (pFinalBoss->IsAnimFinished()/*0.5f < pFinalBoss->Get_AnimRatio()*/)
 				{
@@ -463,6 +470,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			else if (true == pFinalBoss->Get_Thrust())
 			{
 				pFinalBoss->Set_Thrust(false);
+				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
 			}
 			else if (true == pFinalBoss->Get_Spike())
 			{

@@ -103,6 +103,11 @@ HRESULT CParticle::Initialize(void* pArg)
 	return S_OK;
 }
 
+_bool CParticle::IsEnded()
+{
+	return m_bDone;
+}
+
 void CParticle::Update_InstanceInfo(INSTANCE_DESC* _instanceDesc)
 {
 	//이건 파티클에 저장하는 거. 값 있을 때만.
@@ -232,9 +237,9 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	default:
 		break;
 	}
-	 
+
 	//duration 다 끝났다면
- 	if (Calculate_Duration(fMyTimeDelta))
+	if (Calculate_Duration(fMyTimeDelta))
 	{
 		//툴에서는 다시 시작하기
 		if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
@@ -242,15 +247,22 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 			m_fDuration.first = 0.f;
 			m_pVIBufferCom->Revive();
 		}
+		////재생 시간 99라면 다시 시작하기
+		//else if (m_fDuration.second == FX_MAXDURATION)
+		//{
+		//	m_fDuration.first = 0.f;
+		//	m_pVIBufferCom->Revive();
+		//}
 		else
 		{
-			m_bDead = true;
+			//단일 생성이면 바로 삭제, 멀티 이펙트중 하나라면 done 처리
+			m_bSingle ? m_bDead = true : m_bDone = true;
 		}
 	}
 
 	m_pVIBufferCom->Compute_AllLifeTime(fMyTimeDelta);
 
-	if ( m_fDuration.second <= m_fDuration.first )
+	if (m_fDuration.second <= m_fDuration.first)
 	{
 		m_fDuration.first = m_fDuration.second;
 
@@ -276,7 +288,6 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE])
 		m_pVIBufferCom->SimpleMove(fMyTimeDelta, pVertices);
-
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE])
 		m_pVIBufferCom->SimpleMove(fMyTimeDelta, pVertices);
@@ -341,8 +352,6 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 
 	m_pVIBufferCom->Save_PrePos(pVertices, m_pSoketMatrix);
 
-
-	//m_pVIBufferCom->Apply_Velocity(fMyTimeDelta, pVertices);
 
 	m_pVIBufferCom->Unmap();
 

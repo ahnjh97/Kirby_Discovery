@@ -733,6 +733,9 @@
     <Filter Include="02.GameObjects\Map\SimbaObjects\BossOrigin">
       <UniqueIdentifier>{f816e833-ade0-4977-932a-35be0b2a9119}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\LoadingStart\LoadingFont">
+      <UniqueIdentifier>{d681abb3-c1df-4fd4-9445-a54ee620bee3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1450,7 +1453,10 @@
     <ClInclude Include="..\Public\SimbaLaser.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BossOrigin.h">
+    <ClInclude Include="..\Public\UnKnownFireMan.h">
+      <Filter>02.GameObjects\Effect\Fire</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\BossOrigin.h">
       <Filter>02.GameObjects\Map\SimbaObjects\BossOrigin</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Gm_ParkShutter.h">
@@ -2156,6 +2162,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\SimbaLaser.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UnKnownFireMan.cpp">
+      <Filter>02.GameObjects\Effect\Fire</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Gm_ParkShutter.cpp">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>

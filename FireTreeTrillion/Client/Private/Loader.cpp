@@ -42,6 +42,7 @@
 // 기타 이펙트스러운거
 #include "Fire.h"
 #include "CrashParticle.h"
+#include "UnKnownFireMan.h"
 
 //애님 툴
 #include "AnimToolHelper.h"
@@ -220,6 +221,7 @@
 #include "UI_Interactable.h"
 #include "LoadingStart.h"
 #include "HUD_KirbyNameTag.h"
+#include "LoadingFont.h"
 
 // 아이템
 #include "Food.h"
@@ -414,6 +416,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UI_Interactable"), CUI_Interactable);
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LoadingStart"), CLoadingStart);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LoadingFont"), CLoadingFont);
 
 	//DIALOG
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Dialog"), CDialog);
@@ -433,6 +436,7 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Fire"), CFire);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("CrashParticle"), CCrashParticle);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("UnKnownFireMan"), CUnKnownFireMan);
 
 	// Deform
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Car"), CCar);
@@ -1228,6 +1232,12 @@ HRESULT CLoader::Loading_For_FinalBoss()
 	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Emissive", "SkySphere/SkySphere_LabBoss_2Pase_Emissive.dds");	CHECK_FAILED(hr);
 	hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Height", "SkySphere/SkySphere_LabBoss_2Pase_Height.dds");	CHECK_FAILED(hr);
 
+
+	// 디멘션 게이트 리소스
+	hr = Add_Texture(eLevel, "GateDiffuse", "DimensionGateTexture/GateDiffuse.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "GateMask", "DimensionGateTexture/GateMask.dds");	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "GateMask2", "DimensionGateTexture/280.dds");	CHECK_FAILED(hr);
+
 #pragma endregion
 
 	// 커비 얼굴 텍스쳐 로드
@@ -1729,6 +1739,9 @@ HRESULT CLoader::Add_StaticUITexture()
 	//UI_LoadingStart
 	hr = Add_Texture(LEVEL_STATIC, "UI_LoadingStart", "UI/LoadingStart/WorldIconLevel%d.png", 3);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "UI_LoadingStartSide", "UI/LoadingStart/ComebackAreaCountBaseLv%d.png", 3);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "UI_Forest_Font", "UI/LoadingStart/Loading_Forest_Font%d.dds", 5);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "UI_Lab_Font", "UI/LoadingStart/Loading_Lab_Font%d.dds", 6);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "UI_Park_Font", "UI/LoadingStart/Loading_Park_Font%d.dds", 7);	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -2256,6 +2269,22 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// 액체괴물 :: Fecto_Forgo
 		//m_vecModelInfo.emplace_back("", TYPE_ANIM, 1.f, 180.f);
+
+		// For Monster
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.2f, 180.f);
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
+		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 1.3f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
+		m_vecModelInfo.emplace_back("CappyBody", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Bomber", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("AwoofyWild", TYPE_ANIM, 1.35f, 180.f);
+		m_vecModelInfo.emplace_back("RabbitBig", TYPE_ANIM, 1.35f, 180.f);
 
 		// For Boss 
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);

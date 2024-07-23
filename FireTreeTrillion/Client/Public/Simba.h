@@ -129,17 +129,26 @@ public:
 
 	void			SetUpSecondTarget();
 
+	void			CheckFinalCrusherRingCollision(_float fTimeDelta);
+
 	// Simba Effects
 	void			QuickClawNailFlash(_uint eSimbaAnim);
-	void			QuickClawNailTrail();
+	void			QuickClawSlash();
+	void			FinalCrusherCharge();
 	void			FinalCrusherSwing();
 	void			FinalCrusherSmash();
+	void			FinalCrusherRing();
 	void			JumpStartSmoke();
 	void			LandingSmoke();
 	void			AttackJumpWind();
 	void			DoubleClawDashGround();
 	void			DoubleClawGround();
 	void			DoubleClawSweep();
+
+	//크로스 공격 나오는 타이밍
+	void			DimensionClaw();
+	//돌진하면서 이빨씹기(씹는 타이밍)
+	void			TeethBite();
 
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
@@ -152,6 +161,7 @@ private:
 	CGameObject*	m_pSimbaLaser = { nullptr };
 	CTransform*		m_pSimbaLaserTransform = { nullptr };
 	PxRigidDynamic* m_pDimensionClawActor = { nullptr };
+	_float4x4		m_DimensionClawMat = { _float4x4::Identity };
 
 	vector<class CBone*> m_vecLeftNailBones;
 	vector<class CBone*> m_vecRightNailBones;
@@ -215,6 +225,12 @@ private:
 	_bool			m_bStateChanged = { false };
 	_bool			m_bWave2Summoned = { false };
 
+	_float3			m_vRingPos = { };
+	_float			m_fRingInnerRadius = {};
+	_float			m_fRingOuterRadius = {};
+
+	_bool			m_bRenderRing;
+
 private:
 	HRESULT		Add_Components();
 	HRESULT		Bind_ShaderResources();
@@ -253,6 +269,10 @@ private:
 	void		RemoveDeadRocksFromList();
 	void		RemoveDeadDebrisFromList();
 
+#ifdef _DEBUG
+	void		RenderRing();
+	void		RenderPolygon(vector<_vector>& worldPoints);
+#endif
 public:
 	static CSimba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
