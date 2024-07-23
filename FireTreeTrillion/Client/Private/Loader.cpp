@@ -2254,6 +2254,22 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		// ¾×Ã¼±«¹° :: Fecto_Forgo
 		//m_vecModelInfo.emplace_back("", TYPE_ANIM, 1.f, 180.f);
 
+		// For Monster
+		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.2f, 180.f);
+		m_vecModelInfo.emplace_back("Rabbit", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Buffahorn", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnight", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BladeKnightSword", TYPE_NONANIM, 1.f);
+		m_vecModelInfo.emplace_back("Kabu", TYPE_ANIM, 2.f, 180.f);
+		m_vecModelInfo.emplace_back("BrontoBurt", TYPE_ANIM, 1.3f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBrosJr", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("PoppyBomb", TYPE_ANIM, 1.3f, 180.f);
+		m_vecModelInfo.emplace_back("CappyBody", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("CappyHat", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("Bomber", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("AwoofyWild", TYPE_ANIM, 1.35f, 180.f);
+		m_vecModelInfo.emplace_back("RabbitBig", TYPE_ANIM, 1.35f, 180.f);
+
 		// For Boss 
 		m_vecModelInfo.emplace_back("FinalBoss", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("FinalBossSpear", TYPE_ANIM, 1.f);

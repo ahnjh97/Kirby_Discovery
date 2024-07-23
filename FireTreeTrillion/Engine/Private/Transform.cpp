@@ -386,6 +386,11 @@ void CTransform::Move(_float4 vDir)
 
 void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
 {
+	if (XMVector3Equal(vAxis, XMVectorZero()))
+		return;
+	if (XMVector3IsInfinite(vAxis))
+		return;
+
 	_matrix			RotationMatrix  = XMMatrixRotationAxis(vAxis, m_fRotationPerSec * fTimeDelta);
 
 	for (size_t i = 0; i < STATE_POSITION; i++)
