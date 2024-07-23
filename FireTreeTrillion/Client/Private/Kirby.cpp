@@ -112,6 +112,7 @@ _int CKirby::Tick(_float fTimeDelta)
 	__super::Tick(m_fTimeDelta);
 	Kirby_SystemTick(m_fTimeDelta);
 
+
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);
 
