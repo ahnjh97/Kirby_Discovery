@@ -64,7 +64,7 @@ _int CDeeDeeDeeHammer::Tick(_float fTimeDelta)
 	if (m_bShowDialog)
 	{
 		m_fShowDialog += fTimeDelta;
-		if (m_fShowDialog > 3.f)
+		if (m_fShowDialog > 1.5f)
 		{
 			(m_bFadeOutEnd == false) ? Ready_FadeOut() : Ready_FadeIn();
 			m_fShowDialog = 0.f;
@@ -246,7 +246,6 @@ void CDeeDeeDeeHammer::Ready_FadeOut()
 		pCameraMain->Lock_All({ 4.85f,  27.19f,  -31.27f }, { -0.09f, -0.09f, 0.99f }, FALSE);
 
 #pragma endregion
-
 
 		m_bFadeOutEnd = true;
 

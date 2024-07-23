@@ -13,7 +13,7 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
 
         if (pairs[i].otherActor ==  m_pPlayerActor && IsActorInTriggerList(pairs[i].triggerActor))
         {
-            if (m_iTriggerType == 1 || m_iTriggerType == 3 || m_iTriggerType == 4 || m_iTriggerType == 5) // 3 : LevelChanger
+            if (m_iTriggerType == 1 || m_iTriggerType == 3 || m_iTriggerType == 4 || m_iTriggerType == 5 || m_iTriggerIndex == 6) // 3 : LevelChanger
             {
                 auto functionIter = m_TriggerFuncs.find(m_iTriggerType);
                 if (functionIter != m_TriggerFuncs.end())

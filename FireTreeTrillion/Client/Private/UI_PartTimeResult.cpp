@@ -71,9 +71,8 @@ HRESULT CUI_PartTimeResult::Initialize(void* _pArg)
 
 _int CUI_PartTimeResult::Tick(_float fTimeDelta)
 {
-	__super::Tick(fTimeDelta);
-
-	m_fTimeDelta = fTimeDelta;
+	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+	__super::Tick(m_fTimeDelta);
 
 	return OBJ_NOEVENT;
 }

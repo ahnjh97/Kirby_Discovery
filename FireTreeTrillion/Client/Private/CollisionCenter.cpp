@@ -791,11 +791,14 @@ void CCollisionCenter::Simba_Battle()
 				return;
 
 			CKirby* pKirby = static_cast<CKirby*>(Dst);
-			CPhysXObject* pMonster = static_cast<CPhysXObject*>(Src);
+			CSimba* pSimba = static_cast<CSimba*>(Src);
+
+			if (false == pSimba->IsDamagable())
+				return;
 
 			// 데미지 공식과 이펙트, 쉐이킹, 히트스탑 등 시스템적인 요소들이 잔뜩 들어가있다.
-			pthis->Damage_And_Effect_For_Monster(pKirby, pMonster, 1.2f);
-			pMonster->Collision(CONTENT_DAMAGE, nullptr);
+			pthis->Damage_And_Effect_For_Monster(pKirby, pSimba, 1.2f);
+			pSimba->Collision(CONTENT_DAMAGE, nullptr);
 			DstHit->Set_Alive(false);
 		});
 
@@ -809,13 +812,14 @@ void CCollisionCenter::Simba_Battle()
 				return;
 
 			CPhysXObject* pObject = static_cast<CPhysXObject*>(Dst);
-			CMonster* pMonster = static_cast<CMonster*>(Src);
+			CSimba* pSimba = static_cast<CSimba*>(Src);
 
 			if (pObject->Get_PhyXState() != PO_FLYAWAY)
 				return;
-
+			if (false == pSimba->IsDamagable())
+				return;
 			_float fAttack = pObject->Get_Attack();
-			pMonster->Minus_Hp(fAttack);
+			pSimba->Minus_Hp(fAttack);
 			pthis->Camera_Shaking(1.2f);
 			DstHit->Set_Alive(false);
 			SrcHit->Set_Alive(false);
@@ -833,10 +837,13 @@ void CCollisionCenter::Simba_Battle()
 				return;
 
 			CKirby* pKirby = static_cast<CKirby*>(Dst);
-			CMonster* pMonster = static_cast<CMonster*>(Src);
+			CSimba* pSimba = static_cast<CSimba*>(Src);
+
+			if (false == pSimba->IsDamagable())
+				return;
 
 			_float fAttack = pKirby->Get_Attack();
-			pMonster->Minus_Hp(fAttack);
+			pSimba->Minus_Hp(fAttack);
 			pthis->Camera_Shaking(1.2f);
 			DstHit->Set_Alive(false);
 			SrcHit->Set_Alive(false);

@@ -53,7 +53,9 @@ public:
 	void	Set_DamageJumpPower(_float fDamageJumpPower) { m_fDamageJumpPower = fDamageJumpPower; }
 
 	void				Set_PhyXState(PHYXOBJECT_CURSTATE eState);
-	PHYXOBJECT_CURSTATE Get_PhyXState() { return m_ePhyXState; }
+	PHYXOBJECT_CURSTATE Get_PhyXState() {
+		return m_ePhyXState; 
+	}
 	_float	Get_ObjTimeDelta() const { return m_fTimeDelta; }
 
 	//이펙트를 자신의 리스트에 추가한다.

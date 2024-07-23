@@ -18,6 +18,7 @@
 #include "SkySphere.h"
 //#include "Kirby.h"
 
+#include "TransingStar.h"
 #include "UI_Fading.h"
 
 CLevel_FinalBoss::CLevel_FinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -63,24 +64,50 @@ HRESULT CLevel_FinalBoss::Initialize()
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
 	
+	// 셰이더 세팅
 	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_FINAL);
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
 	_bool bBloomSky{ true };
 	m_pGameInstance->Bind_DeferredRawValue("g_bBloomSky", &bBloomSky, sizeof(_bool));
 
+	// 플레이어 이동 트리거
+	function<void(_int)> func = bind(&CLevel_FinalBoss::Teleport_Player, this);
+	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_STAR, func);
+
+	// 레벨 시작할 때, FADE-IN
 	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
 	CHECK_NULLPTR(pUIObj);
 	CUI_Fading* pFadingUI = dynamic_cast<CUI_Fading*>(pUIObj);
 	pFadingUI->Set_IsRender(true);
 
+	// 검정 포그 설정
+	m_pGameInstance->Fog_Intialize_ForFinalBoss(0);
+
 	return S_OK;
+}
+
+void CLevel_FinalBoss::Teleport_Player()
+{
+	CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
+	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
+	pTransingStar->Set_NextLevel(LEVEL_END);
+	pTransingStar->Activate(CTransingStar::CLOSE);
+	pTransingStar->Set_LargeColor(_float3(40.f / 255.f, 0.f, 82.f / 255.f)); // 40, 0,  82
+	pTransingStar->Set_SmallColor(_float3(77.f / 255.f, 31.f / 255.f, 125.f / 255.f)); // 77, 31, 125
 }
 
 void CLevel_FinalBoss::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
+
+	static _float fTimeAcc = 0.f;
+	fTimeAcc += fTimeDelta;
+	if (fTimeAcc > 1.2f) // 1.2초뒤 페이드인
+		Ready_FadeIn();
+
+	Light_Tick(fTimeDelta);
 }
 
 HRESULT CLevel_FinalBoss::Render()
@@ -101,13 +128,60 @@ HRESULT CLevel_FinalBoss::Render()
 		m_iFPS = 0;
 	}
 
-
 	return S_OK;
+}
+
+void CLevel_FinalBoss::Light_Tick(_float fTimeDelta)
+{
+	//m_pGameInstance->Blink_Light(fTimeDelta, 2, fSpeed);
+
+	static _float fSpeed = 1.f;
+	static _float fAccTime = 0.f;
+	fAccTime += fTimeDelta;
+	if (fAccTime >= fSpeed)
+	{
+		_int iSwitch = CUtils::Make_RandomInt(0, 1);
+		if (iSwitch == 1)
+			m_pGameInstance->Set_CurLightRange(2, 7.f);
+		else
+			m_pGameInstance->Set_CurLightRange(2, 0.f);
+
+		fAccTime = 0.f;
+		fSpeed = CUtils::Make_RandomFloat(0.01f, 0.2f);
+	}
+}
+
+void CLevel_FinalBoss::Ready_FadeIn()
+{
+	static _bool bOnceFade = false;
+	static _bool bOnceChanger = false;
+
+	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
+	CHECK_NULLPTR(pUIObj);
+	CUI_Fading* pFadingUI = dynamic_cast<CUI_Fading*>(pUIObj);
+
+	// FadingUI가 이전에 FadeOut 안되어있다면 NO FadeIn
+	//if (pFadingUI->Get_State() != CUI_Fading::FADEOUT) return;
+
+	if (bOnceChanger == false)
+	{
+		if (bOnceFade == false)
+		{
+			pFadingUI->Set_InOutState(CUI_Fading::FADEIN);
+			pFadingUI->Set_IsRender(true);
+			bOnceFade = true;
+		}
+		else if (pFadingUI->Get_FadeRatio() >= 1.f)
+		{
+
+			pFadingUI->Set_IsRender(false);
+			bOnceChanger = true;
+		}
+	}
 }
 
 HRESULT CLevel_FinalBoss::Ready_Lights()
 {
-	
 	//Directional Light
 
 #pragma region DIRECTIONAL
@@ -120,8 +194,6 @@ HRESULT CLevel_FinalBoss::Ready_Lights()
 	LightDesc.vAmbient = _float4(1.f, .15f, .1f, 1.f);
 
 #pragma endregion
-
-
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 

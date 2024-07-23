@@ -98,6 +98,8 @@ private:
 	void						Event_Tick(_float fTimeDelta);
 	void						Ready_FadeOut();
 
+	void						StartSimbaDialog();
+
 public:
 	static CUI_MessageWindow*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*		Clone(void* pArg) override;
@@ -135,5 +137,6 @@ private:
 	_bool						m_bIsSkipScript = { FALSE };
 	_bool						m_bHighLightMsg = { FALSE };
 
+	_bool						m_bSimbaApperaNotified = { FALSE };
 };
 END

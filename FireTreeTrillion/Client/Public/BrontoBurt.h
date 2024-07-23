@@ -71,6 +71,7 @@ private:
 	_float4				m_vBeforePos = {};
 
 	// 와리가리 상태의 파리
+	_float				m_fDelayTime = { 0.f };
 	_float4				m_vRally = {};
 	_int				m_iCnt = { 0 };
 	_bool				m_bConvert = { false };

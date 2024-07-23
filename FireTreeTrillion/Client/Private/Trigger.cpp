@@ -118,6 +118,7 @@ HRESULT CTrigger::Add_Components()
 	case TRIGGER_STAR:
 	case TRIGGER_LEVELCHANGER:
 	case TRIGGER_MONSTER:
+	case TRIGGER_EVENT:
 	{
 		CRigidBody::RIGIDBODY_DESC tRigidDesc(RIGID_BOX, m_pTransformCom->Get_WorldMatrix(), true, false);
 		if (FAILED(__super::Add_Component(TEXT("Prototype_Component_RigidBody"),

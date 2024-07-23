@@ -717,7 +717,7 @@
     </Filter>
     <Filter Include="02.GameObjects\UI\LoadingStart">
       <UniqueIdentifier>{072bd44b-22aa-4687-b4a8-8ee6d41a1e54}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="02.GameObjects\Map\LightBugEffect">
       <UniqueIdentifier>{7630a4c0-5e08-41d0-bce2-e03c44b03906}</UniqueIdentifier>
     </Filter>
@@ -729,6 +729,9 @@
     </Filter>
     <Filter Include="02.GameObjects\Map\FinalCutObject\FinalDump">
       <UniqueIdentifier>{e060bfbd-f0d5-40b4-b9bd-5dd24e26ac90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Map\SimbaObjects\BossOrigin">
+      <UniqueIdentifier>{f816e833-ade0-4977-932a-35be0b2a9119}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1444,11 +1447,14 @@
     <ClInclude Include="..\Public\FinalDump.h">
       <Filter>02.GameObjects\Map\FinalCutObject\FinalDump</Filter>
     </ClInclude>
-    <ClInclude Include="SimbaLaser.h">
-      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\SimbaLaser.h">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BossOrigin.h">
+      <Filter>02.GameObjects\Map\SimbaObjects\BossOrigin</Filter>
+	</ClInclude>
+    <ClInclude Include="..\Public\Gm_ParkShutter.h">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2145,11 +2151,14 @@
     <ClCompile Include="..\Private\FinalDump.cpp">
       <Filter>02.GameObjects\Map\FinalCutObject\FinalDump</Filter>
     </ClCompile>
-    <ClCompile Include="SimbaLaser.cpp">
-      <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\SimbaLaser.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\Simba\SimbaLaser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Gm_ParkShutter.cpp">
+      <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BossOrigin.cpp">
+      <Filter>02.GameObjects\Map\SimbaObjects\BossOrigin</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

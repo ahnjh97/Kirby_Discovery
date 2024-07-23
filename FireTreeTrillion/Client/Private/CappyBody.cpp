@@ -45,8 +45,8 @@ HRESULT CCappyBody::Initialize(void* pArg)
 	m_pModelCom->Set_Animation(CAPPYBODY_HIDINGWAITA, 60.f, false, true);
 
 
-	m_fMaxHp = 10.f;
-	m_fHp = 10.f;
+	m_fMaxHp = 5.f;
+	m_fHp = 5.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;

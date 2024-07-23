@@ -100,11 +100,22 @@ HRESULT CUI_MessageWindow::Initialize(void* _pArg)
 
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 	{
-		func = bind(&CUI_MessageWindow::Start_Message, this, placeholders::_1);
-		pEventCenter->Subscribe(KEVENT_SIMBA_APPEAR_START, this, func);
+		//func = bind(&CUI_MessageWindow::Start_Message, this, placeholders::_1);
+		//pEventCenter->Subscribe(KEVENT_SIMBA_APPEAR_START, this, func);
+
+		// 피직스 트리거 함수 바인딩 및 등록
+		function<void(_int)> func2 = bind(&CUI_MessageWindow::StartSimbaDialog, this);
+		m_pGameInstance->Emplace_TriggerFunc(TRIGGER_EVENT, func2);
 	}
 
+	m_bSignalHightlight = FALSE;
+	m_bSignalPostHightlight = FALSE;
+
 	m_bEventCall = false;
+	m_bIsSetKirby = FALSE;
+	m_bIsSkipScript = FALSE;
+	m_bHighLightMsg = FALSE;
+
 	return S_OK;
 }
 
@@ -169,7 +180,6 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 			}
 		}
 		CCamera_Main* pCamera = { nullptr };
-		m_bHighLightMsg = FALSE;
 		if (LEVEL_SIMBA == *m_pCurrentLevelID && !m_bIsSkipScript)
 		{ 
 			switch (m_iCurMessageIndex)
@@ -367,9 +377,7 @@ void CUI_MessageWindow::Show_DialogMessage()
 	if (WINDOW_HIDE == m_eCurState) //단, idle 상태일 경우는 트리거 시점에 show해야하므로 hide만 처리
 		return;
 
-	//07.21) 커비의 상태를 홀드 (키입력하지 않게 처리)
 	m_eCurState = WINDOW_SHOW;
-
 	if (nullptr != m_pUIBtn)
 		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_BLINK);	//버튼 상태 동기화
 
@@ -377,6 +385,7 @@ void CUI_MessageWindow::Show_DialogMessage()
 	if (LEVEL_PARTTIME == *m_pCurrentLevelID || LEVEL_SIMBA == *m_pCurrentLevelID) 
 		return;
 
+	//07.21) 커비의 상태를 홀드 (키입력하지 않게 처리)
 	m_bIsSetKirby = TRUE;
 
 	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby")));
@@ -771,6 +780,17 @@ void CUI_MessageWindow::Ready_FadeOut()
 	}
 }
 
+void CUI_MessageWindow::StartSimbaDialog()
+{
+	if (true == m_bSimbaApperaNotified)
+		return;
+
+	m_bSimbaApperaNotified = true;
+	Reset_MessageIndex(nullptr);
+	m_eCurState = WINDOW_SHOW;
+	Show_DialogMessage();
+}
+
 CUI_MessageWindow* CUI_MessageWindow::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CUI_MessageWindow* pInstance = new CUI_MessageWindow(pDevice, pContext);
@@ -799,7 +819,7 @@ CGameObject* CUI_MessageWindow::Clone(void* pArg)
 
 void CUI_MessageWindow::Free()
 {
-	CEventCenter::Get_Instance()->Unsubscribe(this);
+	//CEventCenter::Get_Instance()->Unsubscribe(this);
 
 	__super::Free();
 

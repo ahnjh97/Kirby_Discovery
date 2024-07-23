@@ -111,6 +111,73 @@ void CLight_Manager::IMGUI_Tick()
 }
 #endif
 
+void CLight_Manager::Blink_Light(_float fTimeDelta, _uint iLightNum, _float fRandomSpeed)
+{
+	auto& iter = m_Lights.begin();
+	_int index = 0;
+	for (; iter != m_Lights.end(); ++iter)
+	{
+		if (index == iLightNum)
+		{
+			break;
+		}
+		++index;
+	}
+
+	LIGHT_DESC* pDesc = (*iter)->Get_LightDesc();
+	static _float fOriginRange = pDesc->fRange;
+	static _bool bOnce = false;
+	
+	if (false == bOnce)
+	{
+		m_eState = SIZE_DOWN;
+		bOnce = true;
+	}
+
+	switch (m_eState)
+	{
+	case SIZE_UP:
+	{
+		if (pDesc->fRange < fOriginRange)
+			pDesc->fRange += fTimeDelta * fRandomSpeed;
+		else
+		{
+			pDesc->fRange = fOriginRange;
+			m_eState = SIZE_DOWN;
+		}
+	}
+	break;
+	case SIZE_DOWN:
+	{
+		if (pDesc->fRange <= 0.5f)
+		{
+			pDesc->fRange = 0.5f;
+			m_eState = SIZE_UP;
+		}
+		else
+			pDesc->fRange -= fTimeDelta * fRandomSpeed;
+	}
+	break;
+	}
+}
+
+void CLight_Manager::Set_CurLightRange(_uint iLightNum, _float fRange)
+{
+	auto& iter = m_Lights.begin();
+	_int index = 0;
+	for (; iter != m_Lights.end(); ++iter)
+	{
+		if (index == iLightNum)
+		{
+			break;
+		}
+		++index;
+	}
+
+	LIGHT_DESC* pDesc = (*iter)->Get_LightDesc();
+	pDesc->fRange = fRange;
+}
+
 void CLight_Manager::Clear_Light()
 {
 	// ¸ğµç ºûÀ» Á×ÀÎ´Ù.

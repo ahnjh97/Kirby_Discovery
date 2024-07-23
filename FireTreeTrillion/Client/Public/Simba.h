@@ -116,6 +116,7 @@ public:
 	void			CreateHpBar();
 	void			SpawnStar(_uint iAnimIdx);
 	_bool			IsKirbyOnMyLeft();
+	_bool			IsDamagable();
 
 	void			SetUpDimensionClawWorldMatrix();
 	void			MoveDimensionClaw(_float fTimeDelta);

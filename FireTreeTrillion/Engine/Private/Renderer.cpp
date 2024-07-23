@@ -658,22 +658,22 @@ void CRenderer::Fog_Intialize_ForFinalBoss(_int iPoint)
 	if (0 == iPoint)
 	{
 		// Y-fog 초기화
-		//m_vFogYColor.x = 0.65f;
-		//m_vFogYColor.y = 0.93f;
-		//m_vFogYColor.z = 0.94f;
+		m_vFogYColor.x = 0.f;
+		m_vFogYColor.y = 0.f;
+		m_vFogYColor.z = 0.f;
 
-		//m_fFogYBottom = 0.f;
-		//m_fFogYTopY = 10.3f;
-		//m_fFogYIntensity = 1.f;
+		m_fFogYBottom = -20.f;
+		m_fFogYTopY = -8.f;
+		m_fFogYIntensity = 1.f;
 
-		//// View-fog 초기화
-		//m_vFogViewColor.x = 0.58f;
-		//m_vFogViewColor.y = 0.93f;
-		//m_vFogViewColor.z = 0.99f;
+		// View-fog 초기화
+		m_vFogViewColor.x = 0.f;
+		m_vFogViewColor.y = 0.f;
+		m_vFogViewColor.z = 0.f;
 
-		//m_fFogViewStart = 0.f;
-		//m_fFogViewEnd = 120.f;
-		//m_fFogViewIntensity = 1.f;
+		m_fFogViewStart = 0.f;
+		m_fFogViewEnd = 150.f;
+		m_fFogViewIntensity = 1.f;
 	}
 }
 

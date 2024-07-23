@@ -202,6 +202,7 @@
     <ClInclude Include="..\Public\BombOrbitGlow.h" />
     <ClInclude Include="..\Public\BossChimera.h" />
     <ClInclude Include="..\Public\BossClone.h" />
+    <ClInclude Include="..\Public\BossOrigin.h" />
     <ClInclude Include="..\Public\BreakableBlock.h" />
     <ClInclude Include="..\Public\BreakableRock.h" />
     <ClInclude Include="..\Public\BreakableRockParticle.h" />
@@ -245,6 +246,7 @@
     <ClInclude Include="..\Public\FinaleBoss_State.h" />
     <ClInclude Include="..\Public\FinaleCut_ControlCenter.h" />
     <ClInclude Include="..\Public\Gm_ParkFhEntranceAlien.h" />
+    <ClInclude Include="..\Public\Gm_ParkShutter.h" />
     <ClInclude Include="..\Public\Gm_ParkSolarPanelCharge.h" />
     <ClInclude Include="..\Public\Gm_ParkSolarPanelOnce.h" />
     <ClInclude Include="..\Public\Gm_DynamicField.h" />
@@ -465,6 +467,7 @@
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
     <ClCompile Include="..\Private\BossChimera.cpp" />
     <ClCompile Include="..\Private\BossClone.cpp" />
+    <ClCompile Include="..\Private\BossOrigin.cpp" />
     <ClCompile Include="..\Private\Box.cpp" />
     <ClCompile Include="..\Private\BreakableBlock.cpp" />
     <ClCompile Include="..\Private\BreakableRock.cpp" />
@@ -508,6 +511,7 @@
     <ClCompile Include="..\Private\FinaleBoss_State.cpp" />
     <ClCompile Include="..\Private\FinaleCut_ControlCenter.cpp" />
     <ClCompile Include="..\Private\Gm_ParkFhEntranceAlien.cpp" />
+    <ClCompile Include="..\Private\Gm_ParkShutter.cpp" />
     <ClCompile Include="..\Private\Gm_ParkSolarPanelCharge.cpp" />
     <ClCompile Include="..\Private\Gm_ParkSolarPanelOnce.cpp" />
     <ClCompile Include="..\Private\Gm_DynamicField.cpp" />

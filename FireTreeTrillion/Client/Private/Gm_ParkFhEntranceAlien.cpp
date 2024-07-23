@@ -50,26 +50,8 @@ HRESULT CGm_ParkFhEntranceAlien::Initialize(void* pArg)
 
 _int CGm_ParkFhEntranceAlien::Tick(_float fTimeDelta)
 {
-	//if (TRUE == m_bDead)
-	//	return OBJ_DEAD;
-
-	/*
-	// 트리거 발동 시에 카메라 컷씬과 함께 커비 위치를 이동하며, 해당 트리거 발동 시점에 진입하면 해당 모델의 애님 정지
-		if (m_bStartAnim)
-	{
-		m_fBreakAnimTime += fTimeDelta;
-		m_pModelCom->Set_Animation(STATE_LOOP, 100.f, TRUE);
-		m_eAnimState = STATE_JOLT;
-
-		if (m_fBreakAnimTime > 4.f)
-		{
-			m_pModelCom->Set_Animation(STATE_BREAK, 60.f, FALSE);
-			m_fBreakAnimTime = 0.f;
-			m_bStartAnim = FALSE;
-			m_eAnimState = STATE_BREAK;
-		}
-	}
-	*/
+	if (TRUE == m_bDead)
+		return OBJ_DEAD;
 
 	return OBJ_NOEVENT;
 }
