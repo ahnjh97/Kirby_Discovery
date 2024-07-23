@@ -38,7 +38,7 @@ CLevel_Park::CLevel_Park(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel_Park::Initialize()
 {
-	m_pGameInstance->Set_RenderMode(CRenderer::MODE_TOOL);
+	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
 
 	HRESULT hr;
 	hr = __super::Initialize();
@@ -127,6 +127,8 @@ void CLevel_Park::Teleport_Player()
 	//{
 	//	pLoadingStart->Set_TexureIndex(1);
 	//}
+
+	m_pGameInstance->Get_DirectionLightAddress()->Set_LightDiffuse(_float4(0.f, 0.f, 0.f, 0.f));
 }
 
 void CLevel_Park::Change_Levels()
@@ -258,7 +260,7 @@ HRESULT CLevel_Park::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE_DIRECTIONAL;
 	LightDesc.vDirection = _float4(0.f, -1.f, -.3f, 0.f);
 
-	LightDesc.vDiffuse = _float4(0.f, 0.f, 0.f, 1.f);
+	LightDesc.vDiffuse = _float4(0.06f, 0.06f, 0.06f, 1.f);
 	//LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
 	//LightDesc.vSpecular = _float4(0.2f, 0.2f, 0.2f, 1.f);
 
