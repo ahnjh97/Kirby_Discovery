@@ -1795,6 +1795,23 @@ void CFXToolDirector::Render_FXProperty()
 			pCurFX->m_eRenderGroup = CRenderer::RENDER_NONLIGHT;
 		}
 
+		Spacing();
+
+		if (RadioButton(u8"SpecialBlend", m_iCurRenderGroup == CRenderer::RENDER_SPECIALBLEND))
+		{
+			m_iCurRenderGroup = CRenderer::RENDER_SPECIALBLEND;
+			pCurFX->m_eRenderGroup = CRenderer::RENDER_SPECIALBLEND;
+		}
+
+		SameLine();
+
+		if (RadioButton(u8"SpecialBlend2", m_iCurRenderGroup == CRenderer::RENDER_SPECIALBLEND_2))
+		{
+			m_iCurRenderGroup = CRenderer::RENDER_SPECIALBLEND_2;
+			pCurFX->m_eRenderGroup = CRenderer::RENDER_SPECIALBLEND_2;
+		}
+
+		SameLine();
 
 		if (RadioButton(u8"Blend", m_iCurRenderGroup == CRenderer::RENDER_BLEND))
 		{

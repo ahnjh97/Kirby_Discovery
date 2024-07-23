@@ -195,6 +195,40 @@ void CKirbyFinalCut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			m_fTime = 0.f;
 			m_uDropCount = 3;
 		}
+
+
+
+		if (8.f < m_fTime && m_fTime <= 8.1f)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_BLINK;
+			DESC(m_eMouthState) = CKirby::MOUTH_SURPRISE;
+		}
+		else if (8.15f < m_fTime && m_fTime <= 8.35f)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			DESC(m_eMouthState) = CKirby::MOUTH_SURPRISE;
+		}
+		else if (8.35f < m_fTime && m_fTime <= 8.45f)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_BLINK;
+			DESC(m_eMouthState) = CKirby::MOUTH_SURPRISE;
+		}
+		else if (8.45f < m_fTime && m_fTime <= 10.f)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			DESC(m_eMouthState) = CKirby::MOUTH_SURPRISE;
+		}
+		else if (10.f < m_fTime && m_fTime <= 10.2f)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_BLINK;
+			DESC(m_eMouthState) = CKirby::MOUTH_IDLE;
+		}
+		else if (10.f < m_fTime)
+		{
+			DESC(m_eEyeState) = CKirby::EYE_ANGER;
+			DESC(m_eMouthState) = CKirby::MOUTH_SMILE;
+		}
+
 	}
 }
 

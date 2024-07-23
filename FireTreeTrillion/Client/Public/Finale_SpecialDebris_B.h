@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
+#include "Effect.h"
 
 BEGIN(Engine)
 class CModel;
@@ -39,6 +40,16 @@ private:
 	void			Set_Animation();
 
 	_bool			m_BlackTrigger = { true };
+
+	void			Compute_My_Look();
+	_float4x4		m_EffectSocket = _float4x4::Identity;
+	_bool			m_bInitializeLook = { true };
+	_float4			m_vPrePos = { 0.f, 0.f, 0.f,  0.f };
+	_float4			m_vCurPos = { 0.f, 0.f, 0.f,  0.f };
+
+	CEffect* m_pEffect = { nullptr };
+	_bool			m_bEffectOn = { true };
+
 
 private:
 	CShader* m_pShaderCom = { nullptr };

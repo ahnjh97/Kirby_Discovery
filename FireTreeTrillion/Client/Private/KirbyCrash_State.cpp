@@ -555,8 +555,8 @@ void CKirbyCrash_Charge_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		{
 			CMultiEffect::MULTI_FX_DESC MFXDesc{};
 			MFXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-			MFXDesc.vInitPos = _float3{ 0.f, 0.f, 0.f };
-			MFXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			MFXDesc.vInitPos = _float3{ 0.f, 1.f, 0.f };
+			MFXDesc.vInitScale = { 2.f, 2.f, 2.f };
 
 			pKirby->Add_Effect("YW Crash Charge MAX", MFXDesc, true);
 

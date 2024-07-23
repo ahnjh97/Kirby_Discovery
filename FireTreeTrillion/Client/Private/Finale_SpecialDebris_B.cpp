@@ -81,17 +81,42 @@ _int CFinale_SpecialDebris_B::Tick(_float fTimeDelta)
 	{
 		m_bRender = true;
 		m_eCurCut = CUT6;
+
+		if (m_bEffectOn == true)
+		{
+			CMultiEffect::MULTI_FX_DESC desc;
+			desc.vInitPos = { 0.f, 1.4f, -0.5f };
+			desc.vInitScale = { 9.f, 9.f, 9.f };
+			desc.pSocketMatrix = &m_EffectSocket;
+
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_HS_meteo dash line"), &desc)))
+				return OBJ_NOEVENT;
+			CEffect* pEffect = static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back());
+			m_pEffect = pEffect;
+			Safe_AddRef(m_pEffect);
+
+			m_bEffectOn = false;
+		}
 	}
 	else if (iCutIndex == 7)
 	{
 		m_bRender = true;
 		m_eCurCut = CUT7;
+
+		if (m_pEffect != nullptr)
+		{
+			m_pEffect->Set_Dead();
+			Safe_Release(m_pEffect);
+			m_pEffect = nullptr;
+		}
+
 	}
 	else
 		m_bRender = false;
 
 	Set_Animation();
 	Make_Particle();
+	Compute_My_Look();
 
 	return OBJ_NOEVENT;
 }
@@ -262,6 +287,35 @@ void CFinale_SpecialDebris_B::Set_Animation()
 
 }
 
+void CFinale_SpecialDebris_B::Compute_My_Look()
+{
+	m_EffectSocket = _float4x4::Identity;
+
+	CBone* pBone = m_pModelCom->Get_BonePtr("AllL");
+	m_vCurPos = m_pTransformCom->ComputeBoneWorldPos(pBone);
+
+	if (m_bInitializeLook == true)
+	{
+		m_vPrePos = m_vCurPos - _float4(-1.f, 0.f, 0.f, 0.f);
+		m_bInitializeLook = false;
+	}
+
+	_float4 vNewLook = m_vCurPos - m_vPrePos;
+	vNewLook.Normalize();
+	_float4 vNewRight = XMVector3Cross(_float4(0.f, 1.f, 0.f, 0.f), vNewLook);
+	vNewRight.Normalize();
+	_float4 vNewUp = XMVector3Cross(vNewLook, vNewRight);
+	vNewUp.Normalize();
+
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_vCurPos);
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_LOOK, vNewLook);
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_UP, vNewUp);
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_RIGHT, vNewRight);
+
+	m_vPrePos = m_vCurPos;
+
+}
+
 CFinale_SpecialDebris_B* CFinale_SpecialDebris_B::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CFinale_SpecialDebris_B* pInstance = new CFinale_SpecialDebris_B(pDevice, pContext);
@@ -293,4 +347,5 @@ void CFinale_SpecialDebris_B::Free()
 	__super::Free();
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pEffect);
 }
