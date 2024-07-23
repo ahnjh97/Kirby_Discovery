@@ -170,7 +170,8 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-    Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+    //Out.vColor = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+    Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 	
 	//알파 테스트
 	if(Out.vColor.a < .8f)

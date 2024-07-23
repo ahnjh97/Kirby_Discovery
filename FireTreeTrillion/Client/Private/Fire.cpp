@@ -48,6 +48,15 @@ HRESULT CFire::Initialize(void* pArg)
 
 	m_fTimeRatio = desc.fTimeRatio;
 
+	m_bPooling = desc.bPoolingFire;
+
+	if (m_bPooling == true)
+	{
+		m_fPoolingDelayMaxTime = CUtils::Make_RandomFloat(0.f, 5.f);
+	}
+
+	m_vMoveDir = desc.vMoveDir;
+
 	return S_OK;
 }
 
@@ -58,52 +67,129 @@ _int CFire::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer() * m_fTimeRatio;
 
-	m_fSpeed += m_fTimeDelta * 0.5f;
-
-	_float4 vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	vPos.y += m_fSpeed * (60.f * m_fTimeDelta);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-
-	if (vPos.y > m_vOriginPos.y + (m_fMaxRange * 0.01f))
+	if (m_bPooling == false)
 	{
-		m_vColor.x -= (m_vFirstColor.x - m_vTargetColor.x) / 20.f * (150.f * m_fTimeDelta);
-		m_vColor.y -= (m_vFirstColor.y - m_vTargetColor.y) / 20.f * (150.f * m_fTimeDelta);
-		m_vColor.z -= (m_vFirstColor.z - m_vTargetColor.z) / 20.f * (150.f * m_fTimeDelta);
-	}
+		m_fSpeed += m_fTimeDelta * 0.5f;
 
+		_float4 vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		vPos.y += m_fSpeed * (60.f * m_fTimeDelta);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + (m_vMoveDir * fTimeDelta));
 
-	if (vPos.y > m_vOriginPos.y + (m_fMaxRange * 0.01f))
-	{
-		m_fDissolve += 0.15f * (60.f * m_fTimeDelta);
-		m_fScale -= (m_fScale / 6.f) * (60.f * m_fTimeDelta);
-		if (m_fScale <= 0.f)
-			m_fScale = 0.00001f;
-
-		m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
-	}
-	else
-	{
-		m_fScale += 0.1f * (60.f * m_fTimeDelta);
-		if (m_fScale > m_fMaxScale)
+		if (vPos.y > m_vOriginPos.y + (m_fMaxRange * 0.01f))
 		{
-			m_fScale = m_fMaxScale;
+			m_vColor.x -= (m_vFirstColor.x - m_vTargetColor.x) / 20.f * (150.f * m_fTimeDelta);
+			m_vColor.y -= (m_vFirstColor.y - m_vTargetColor.y) / 20.f * (150.f * m_fTimeDelta);
+			m_vColor.z -= (m_vFirstColor.z - m_vTargetColor.z) / 20.f * (150.f * m_fTimeDelta);
 		}
-		m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
+
+
+		if (vPos.y > m_vOriginPos.y + (m_fMaxRange * 0.01f))
+		{
+			m_fDissolve += 0.15f * (60.f * m_fTimeDelta);
+			m_fScale -= (m_fScale / 6.f) * (60.f * m_fTimeDelta);
+			if (m_fScale <= 0.f)
+				m_fScale = 0.00001f;
+
+			m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
+		}
+		else
+		{
+			m_fScale += 0.1f * (60.f * m_fTimeDelta);
+			if (m_fScale > m_fMaxScale)
+			{
+				m_fScale = m_fMaxScale;
+			}
+			m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
+		}
+
+		m_pTransformCom->Turn(XMVectorSet(1.f, 1.f, 0.f, 0.f), m_fTimeDelta, 360.f);
+		m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), m_fTimeDelta, 270.f);
+
+		if (vPos.y > m_fMaxRange)
+		{
+			m_bDead = true;
+		}
 	}
-
-	m_pTransformCom->Turn(XMVectorSet(1.f, 1.f, 0.f, 0.f), m_fTimeDelta, 360.f);
-	m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), m_fTimeDelta, 270.f);
-
-	if (vPos.y > m_fMaxRange)
+	else if (m_bPooling == true)
 	{
-		m_bDead = true;
+		m_fPoolingDelayTime += m_fTimeDelta;
+
+		if (m_fPoolingDelayTime <= m_fPoolingDelayMaxTime)
+		{
+			return OBJ_NOEVENT;
+		}
+
+
+		if (m_bResetFire == true)
+		{
+			m_vColor = m_vFirstColor;
+			m_fDissolve = 0.f;
+			m_fScale = m_fMaxScale * CUtils::Make_RandomFloat(0.6f, 1.f) * 0.1f;
+
+			m_pTransformCom->Set_Scaled(m_fMaxScale, m_fMaxScale, m_fMaxScale);
+			_float4 vRandomPos = m_vOriginPos;
+			vRandomPos.x += CUtils::Make_RandomFloat(-0.3f, 0.3f);
+			vRandomPos.z += CUtils::Make_RandomFloat(-0.3f, 0.3f);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vRandomPos);
+			m_fSpeed = 0.f;
+			m_bResetFire = false;
+
+			m_fPoolingDelayMaxTime = CUtils::Make_RandomFloat(0.2f, 0.5f);
+			m_fPoolingDelayTime = 0.f;
+		}
+
+
+		m_fSpeed += m_fTimeDelta * 1.f;
+
+		_float4 vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		vPos.y += m_fSpeed * (60.f * m_fTimeDelta);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos + (m_vMoveDir * fTimeDelta));
+
+		if (vPos.y > m_vOriginPos.y + (m_fMaxRange * 0.01f))
+		{
+			m_vColor.x -= (m_vFirstColor.x - m_vTargetColor.x) / 20.f * (150.f * m_fTimeDelta);
+			m_vColor.y -= (m_vFirstColor.y - m_vTargetColor.y) / 20.f * (150.f * m_fTimeDelta);
+			m_vColor.z -= (m_vFirstColor.z - m_vTargetColor.z) / 20.f * (150.f * m_fTimeDelta);
+		}
+
+
+		if (vPos.y > m_vOriginPos.y + (m_fMaxRange * 0.01f))
+		{
+			m_fDissolve += 0.15f * (60.f * m_fTimeDelta);
+			m_fScale -= (m_fScale / 6.f) * (60.f * m_fTimeDelta);
+			if (m_fScale <= 0.f)
+				m_fScale = 0.00001f;
+
+			m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
+		}
+		else
+		{
+			m_fScale += 0.1f * (60.f * m_fTimeDelta);
+			if (m_fScale > m_fMaxScale)
+			{
+				m_fScale = m_fMaxScale;
+			}
+			m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
+		}
+
+		m_pTransformCom->Turn(XMVectorSet(1.f, 1.f, 0.f, 0.f), m_fTimeDelta, 360.f);
+		m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), m_fTimeDelta, 270.f);
+
+		if (vPos.y > m_fMaxRange)
+		{
+			m_bResetFire = true;
+		}
 	}
+
 
 	return OBJ_NOEVENT;
 }
 
 void CFire::Late_Tick(_float fTimeDelta)
 {
+	if ((m_bPooling == true) && (m_fPoolingDelayTime <= m_fPoolingDelayMaxTime))
+		return;
+
 	Compute_ViewZ();
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
 }

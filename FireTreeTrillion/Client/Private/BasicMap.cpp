@@ -81,7 +81,7 @@ HRESULT CBasicMap::Initialize(void* pArg)
     SetUpAnimDecoInfo("PopFlower", 0.8f, 2, 120.f, 1, 130.f);
 
     SetUpAnimDecoInfo("SmallBirds", 3.5f, 1, 60.f, 0, 60.f);
-    SetUpAnimDecoInfo("ButterflySingle", 3.5f, 1, 60.f, 0, 60.f);
+    SetUpAnimDecoInfo("ButterflySingle", 3.5f, 0, 60.f, 1, 60.f);
     SetUpAnimDecoInfo("ButterflyTriple", 3.5f, 1, 60.f, 0, 60.f);
 
     SetUpAnimDecoInfo("Lizard", 3.5f, 1, 60.f, 0, 60.f);

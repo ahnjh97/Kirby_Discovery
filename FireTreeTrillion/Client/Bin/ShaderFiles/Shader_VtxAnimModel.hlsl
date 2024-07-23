@@ -16,6 +16,7 @@ texture2D g_KirbyEyeTexture;
 texture2D g_ObjNearClipTexture;
 
 texture2D g_MaskTexture;
+texture2D g_MaskTextureSub;
 
 bool g_bStencil;
 bool g_bRimLight;
@@ -36,6 +37,8 @@ float3 g_vDeformRimColor;
 float2 g_vUVOffset;
 float g_fDissolveRatio;
 
+float g_fDimensionMin;
+float g_fDimensionMax;
 
 struct VS_IN
 {
@@ -60,6 +63,24 @@ struct VS_OUT
     float3		vBinormal : BINORMAL;
 
 };
+
+
+// 회전된 UV를 계산
+float2 RotateUV(float2 vCoord, float fAngle)
+{
+    float2 vCenter = float2(0.5, 0.5); // 중점 좌표 설정
+
+    float fSinAngle = sin(fAngle);
+    float fCosAngle = cos(fAngle);
+    float2x2 RotationMatrix = float2x2(fCosAngle, -fSinAngle, fSinAngle, fCosAngle);
+
+    // 텍스처 좌표를 중점을 기준으로 이동시키고 회전 변환 적용
+    vCoord -= vCenter;
+    vCoord = mul(vCoord, RotationMatrix);
+    vCoord += vCenter;
+
+    return vCoord;
+}
 
 /* 정점 쉐이더 */
 VS_OUT VS_MAIN(VS_IN In)
@@ -795,7 +816,7 @@ PS_OUT PS_FOR_DEFORMRIM(PS_IN In)
     
     vector vRimLightColor = 0;
     
-    if (vDot < 0.1f)
+    if (vDot < 0.03f)
         discard;
     
     if (vMask.r < g_fDissolveRatio)
@@ -807,6 +828,54 @@ PS_OUT PS_FOR_DEFORMRIM(PS_IN In)
     vRimLightColor += float4(0.4, 0.4, 0.4, 0);
 
     Out.vDiffuse = saturate(vRimLightColor) * max(vMask, 0.2f);
+    return Out;
+}
+
+
+PS_OUT PS_FOR_DIMENSIONGATE(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    if (0.3f >= vMtrlDiffuse.a)
+        discard;
+    //vector vMask = g_MaskTexture.Sample(LinearSampler, In.vTexcoord);
+    
+    float2 UV = In.vTexcoord;
+    float2 UVVector = float2(0.5, 0.5) - In.vTexcoord;
+    float2 EditUVVector = UVVector *= 0.55;
+    UV = In.vTexcoord + EditUVVector;
+    //bool b = false;
+    //vector vMask2 = g_MaskTextureSub.Sample(LinearSampler, RotateUV(UV, g_fDimensionMax));
+
+    //if (vMask.r < 0.18f)
+    //{
+    //    discard;
+    //}
+    //else if (vMask.r >= 0.15f && vMask.r < 0.3)
+    //{
+    //    b = true;
+    //    if (vMask2.r >= 0.27f)
+    //        discard;
+    //}
+    
+    //Out.vDiffuse = saturate(float4(vMtrlDiffuse.rgb, 1.f));
+    
+    //if (b == true)
+    //{
+    //    Out.vDiffuse *= 0.5f;
+    //}
+    
+    ///
+    
+    vector vMask = g_MaskTextureSub.Sample(LinearSampler, RotateUV(UV, g_fDimensionMax));
+
+    if (vMask.r > g_fDimensionMax)
+        discard;
+    
+    //float flength = length(UVVector);
+    Out.vDiffuse = saturate(float4(vMtrlDiffuse.rgb, 1.f));
+    //Out.vDiffuse.a *= pow(1.f - flength, 3.f);
     return Out;
 }
 
@@ -1128,6 +1197,7 @@ technique11 DefaultTechnique
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_FOR_DEFORMRIM();
+
     }
 
     // OriginCage GlassCrack (22)
@@ -1143,5 +1213,20 @@ technique11 DefaultTechnique
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
         PixelShader = compile ps_5_0 PS_GlassCrack();
     }
+
+    // DimensionGate (23)
+    pass DimensionGate
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_FOR_DIMENSIONGATE();
+    }
+
 
 }

@@ -1255,15 +1255,15 @@ static void Copy_Star(CTransform* pTransformCom)
 	FXDesc.vInitScale = { 2.5f, 2.5f, 2.5f };
 	FXDesc.vInitRot = CUtils::Make_Degree_FromDir(vCamDir);
 
-	//FXDesc.fStartDelay = 0.7f;
+	FXDesc.fStartDelay = 0.7f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_bloom"), &FXDesc)))
 		return;
 
-	//FXDesc.fStartDelay = 0.775f;
+	FXDesc.fStartDelay = 0.775f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
 		return;
 
-	//FXDesc.fStartDelay = 0.85f;
+	FXDesc.fStartDelay = 0.85f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
 		return;
 
@@ -1277,7 +1277,8 @@ static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
 	{
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
-		vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
+		vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f + 
+			(pTransformCom->Get_State(CTransform::STATE_RIGHT) * CUtils::Make_RandomFloat( -0.3f, 0.3f));
 
 		FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
 		FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y + CUtils::Make_RandomFloat(-20.f, 20.f), 0.f};

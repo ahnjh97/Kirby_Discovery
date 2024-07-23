@@ -427,6 +427,7 @@
     <ClInclude Include="..\Public\UI_PartTime.h" />
     <ClInclude Include="..\Public\UI_PartTimeDee.h" />
     <ClInclude Include="..\Public\UI_PartTimeResult.h" />
+    <ClInclude Include="..\Public\UnKnownFireMan.h" />
     <ClInclude Include="..\public\WaddleDee.h" />
     <ClInclude Include="..\Public\WasteCan.h" />
     <ClInclude Include="Box.h" />
@@ -691,6 +692,7 @@
     <ClCompile Include="..\Private\UI_PartTime.cpp" />
     <ClCompile Include="..\Private\UI_PartTimeDee.cpp" />
     <ClCompile Include="..\Private\UI_PartTimeResult.cpp" />
+    <ClCompile Include="..\Private\UnKnownFireMan.cpp" />
     <ClCompile Include="..\private\WaddleDee.cpp" />
     <ClCompile Include="..\Private\WasteCan.cpp" />
     <ClCompile Include="Client.cpp" />

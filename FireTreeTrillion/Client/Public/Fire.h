@@ -9,6 +9,8 @@ class CTexture;
 class CShader;
 END
 
+BEGIN(Client)
+
 class CFire final : public CGameObject
 {
 public:
@@ -20,7 +22,11 @@ public:
 		_float fUpRange;
 		_float fScale;
 		_float fTimeRatio = { 1.f };
+
+		_bool bPoolingFire = { false };
+		_float4 vMoveDir = { 0.f, 0.f, 0.f, 0.f };
 	};
+
 private:
 	CFire(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CFire(const CFire& rhs);
@@ -51,9 +57,16 @@ private:
 	_float m_fDissolve = { 0.f };
 	_float	m_fSpeed = { 0.f };
 	_float4 m_vOriginPos = { 0.f, 0.f, 0.f, 0.f };
+	_float4 m_vMoveDir = { 0.f, 0.f, 0.f, 0.f };
 
 	_float m_fTimeDelta = { 0.f };
 	_float m_fTimeRatio = { 0.f };
+
+	_bool m_bResetFire = { false };
+
+	_bool m_bPooling = { false };
+	_float m_fPoolingDelayMaxTime = { 0.f };
+	_float m_fPoolingDelayTime = { 0.f };
 
 private:
 	HRESULT Add_Components();
@@ -66,3 +79,4 @@ public:
 
 };
 
+END

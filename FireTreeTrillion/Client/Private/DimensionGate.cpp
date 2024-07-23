@@ -73,6 +73,8 @@ _int CDimensionGate::Tick(_float fTimeDelta)
 
 	m_fLifeTime += m_fTimeDelta;
 
+	Compute_DimensionGateMaskRatio(m_fTimeDelta);
+
 	//if (true == m_bCamera)
 	//{
 	//	CCamera_Main* pCameraMain = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
@@ -128,8 +130,8 @@ void CDimensionGate::Late_Tick(_float fTimeDelta)
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
+		//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
 }
 
@@ -142,23 +144,23 @@ HRESULT CDimensionGate::Render()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE)))
+		if (FAILED(m_pTextureCom[TYPE_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture")))
 			return E_FAIL;
-		//if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS)))
-		//	return E_FAIL;
-		//if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS)))
-		//	return E_FAIL;
-
+		if (FAILED(m_pTextureCom[TYPE_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture")))
+			return E_FAIL;
+		if (FAILED(m_pTextureCom[TYPE_MASK2]->Bind_ShaderResource(m_pShaderCom, "g_MaskTextureSub")))
+			return E_FAIL;
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
-
-		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_X)))
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fDimensionMin", &m_fDimensionMin, sizeof(_float))))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fDimensionMax", &m_fDimensionTime, sizeof(_float))))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_DIMENSIONGATE)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
 	}
-
 	return S_OK;
 }
 
@@ -211,6 +213,18 @@ HRESULT CDimensionGate::Add_Components()
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
+	if (FAILED(__super::Add_Component(LEVEL_FINALBOSS, TEXT("Prototype_Component_Texture_GateDiffuse"),
+		TEXT("Com_Texture_Diffuse"), (CComponent**)&m_pTextureCom[TYPE_DIFFUSE])))
+		return E_FAIL;
+
+	if (FAILED(__super::Add_Component(LEVEL_FINALBOSS, TEXT("Prototype_Component_Texture_GateMask"),
+		TEXT("Com_Texture_Mask"), (CComponent**)&m_pTextureCom[TYPE_MASK])))
+		return E_FAIL;
+
+	if (FAILED(__super::Add_Component(LEVEL_FINALBOSS, TEXT("Prototype_Component_Texture_GateMask2"),
+		TEXT("Com_Texture_Mask2"), (CComponent**)&m_pTextureCom[TYPE_MASK2])))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -221,12 +235,10 @@ HRESULT CDimensionGate::Bind_ShaderResources()
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_pGameInstance->Get_Transform_Float4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bStencil", &m_bStencil, sizeof(_bool))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &m_bRimLight, sizeof(_bool))))
@@ -239,6 +251,14 @@ HRESULT CDimensionGate::Bind_ShaderResources()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CDimensionGate::Compute_DimensionGateMaskRatio(_float fTimeDelta)
+{
+
+	m_fDimensionTime += fTimeDelta * (1.f / 18.f);
+	m_fDimensionMin = (sin(m_fDimensionTime) * 0.15f) + 0.3f;
+
 }
 
 void CDimensionGate::Compute_MotionBlur()
@@ -278,4 +298,8 @@ void CDimensionGate::Free()
 
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
+
+	for (auto pTexture : m_pTextureCom)
+		Safe_Release(pTexture);
+
 }
