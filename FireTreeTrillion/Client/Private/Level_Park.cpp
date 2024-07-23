@@ -79,10 +79,7 @@ HRESULT CLevel_Park::Initialize()
 	InitMat.Translation({ 0.f, 0.f, 0.f });
 	ObjDesc.matWorld = InitMat;
 
-	// Car Test
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Deform"), TEXT("Prototype_GameObject_DumpCar"), &ObjDesc)))
-		return E_FAIL;
-	
+
 	// ¼ÎÀÌ´õ ¼¼ÆÃ
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_PARK);
