@@ -271,7 +271,7 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	}
 }
 
-// *********************** FinalCrusher *********************** // 이펙트 및 퍼지는 원 충돌로직 필요
+// *********************** FinalCrusher *********************** // 이펙트 및 퍼지는 원 충돌로직 필요'
 void CSimba_FinalCrusher::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -1100,6 +1100,7 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 void CSimba_Death::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+	m_bCageNotified = false;
 }
 
 void CSimba_Death::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)

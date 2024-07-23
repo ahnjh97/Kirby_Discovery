@@ -1153,8 +1153,8 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_FOR_DEFORMRIM();
     }
 
-    // BossOriginEye (22)
-    pass BossOriginEye
+    // OriginCage GlassCrack (22)
+    pass GlassCrack
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
