@@ -81,7 +81,7 @@ public:
 	}
 
 	virtual _bool	IsEnded() { return m_bDone; }
-
+	void			Set_Multi(_bool bSingle = false) { m_bSingle = bSingle; }
 
 	virtual _int	Get_Size() { return 1; }
 	string			Get_Name() { return m_strFXName; }
@@ -104,7 +104,8 @@ public:
 protected:
 	//재생 시간이 다 되었는가?
 	_bool			m_bDone = { false };
-
+	//단독 이펙트인가?
+	_bool			m_bSingle = { true };
 	/*이펙트 시작 세팅*/
 
 	//이펙트 재생을 시작하는 딜레이

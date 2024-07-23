@@ -73,10 +73,16 @@ HRESULT CMultiEffect::Initialize(void* pArg)
 				CEffect* pFX = static_cast<CFXToolDirector*>
 					(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI"), 0))->Find_Effect(FXName);
 				if (nullptr != pFX)
+				{
 					m_FXs.push_back(pFX);
-
-				Safe_AddRef(pFX);
-				m_fDuration.second = pFX->Get_BiggerDuration(m_fDuration.second);
+					Safe_AddRef(pFX);
+					pFX->Set_Multi();
+					m_fDuration.second = pFX->Get_BiggerDuration(m_fDuration.second);
+				}
+				else
+				{
+					ALARM_FAIL("no effect!");
+				}
 			}
 		}
 		return S_OK;
@@ -149,7 +155,7 @@ void CMultiEffect::Late_Tick(_float fTimeDelta)
 	if (IsEnded())
 	{
 		//99초(영구) 아닐 때
-		if ( m_fDuration.second != FX_MAXDURATION && (*m_pCurrentLevelID) != LEVEL_TOOL_FX )
+		if (m_fDuration.second != FX_MAXDURATION && (*m_pCurrentLevelID) != LEVEL_TOOL_FX)
 		{
 			m_bDead = true;
 		}
