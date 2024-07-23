@@ -840,6 +840,7 @@ HRESULT CLoader::Loading_For_DeeDeeDee()
 	LEVEL eLevel = LEVEL_DEEDEEDEE;
 
 	m_strLoadingText = TEXT("텍스쳐를(을) 로딩 중 입니다.");
+
 #pragma region 텍스쳐
 	if (FAILED(Add_Texture(eLevel, "Level_Town_Env", "Map/Level_Town_Env.dds")))
 		return E_FAIL;
@@ -1699,14 +1700,14 @@ HRESULT CLoader::Add_StaticUITexture()
 	//KirbyHP
 	hr = Add_Texture(LEVEL_STATIC, "HUD_StatusBar_Kirby", "UI/HUD/Kirby/StatusBar/StatusBar_Hard_%d.dds", 23);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "HUD_StatusBar_Kirby_Mask", "UI/HUD/Kirby/StatusBar/KirbyHPMask.png");	CHECK_FAILED(hr);
-
+	hr = Add_Texture(LEVEL_STATIC, "HUD_StatusBar_NameTag", "UI/HUD/Kirby/NameTag_%d.png", 7);	CHECK_FAILED(hr);
+	
 	//StarPoint
 	hr = Add_Texture(LEVEL_STATIC, "HUD_StarPoint", "UI/HUD/Kirby/StarPoint/StarPoint_%d.dds", 10);	CHECK_FAILED(hr);
 
 	//Ability Discard
 	hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_%d.dds", 4);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "HUD_AbilityDiscard_Mask", "UI/HUD/Kirby/AbilityDiscard/AbilityDiscard_Mask.dds");	CHECK_FAILED(hr);
-
 
 	//UI_MessageWindow
 	hr = Add_Texture(LEVEL_STATIC, "UI_MessageWindow_Base", "UI/MessageWindow/MessageWindow_Base_%d.dds", 3); CHECK_FAILED(hr);

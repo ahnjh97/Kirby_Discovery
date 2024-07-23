@@ -102,7 +102,8 @@ HRESULT CUI_Interactable::Render()
 	hr = m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 0);
 	CHECK_FAILED(hr);
 	
-	hr = m_pShaderCom->Begin(POSTEX_DEFAULT); // 사이즈 변화 POSTEX_SOLIDBLEND
+	//hr = m_pShaderCom->Begin(POSTEX_DEFAULT); // 사이즈 변화 POSTEX_SOLIDBLEND
+	hr = m_pShaderCom->Begin(POSTEX_ALPHATEST_COLOR); // 사이즈 변화 POSTEX_SOLIDBLEND
 	CHECK_FAILED(hr);
 
 	hr = m_pVIBufferCom->Bind_Buffers();

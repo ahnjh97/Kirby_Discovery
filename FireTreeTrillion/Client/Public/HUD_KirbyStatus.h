@@ -12,6 +12,12 @@ END
 BEGIN(Client)
 class CHUD_KirbyStatus : public CHUD
 {
+public:
+	enum TEX_NAMETAG { 
+		TEXNT_KIRBY, TEXNT_SWORD, TEXNT_BOMB, TEXNT_TOYHAMMER, TEXNT_CRASH,
+		TEXNT_DEFORMCAR, TEXNT_DEFORMBULB, TEXNT_NONE
+	};
+
 private:
 	CHUD_KirbyStatus(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CHUD_KirbyStatus(const CHUD_KirbyStatus& rhs);
@@ -33,6 +39,7 @@ private:
 	HRESULT						Render_BindSet(CShader* _pShaderCom, CTransform* _pTransCom);
 	HRESULT						Bind_ShaderResources(CShader* _pShaderCom, _uint _iPassIndex, CTexture* _pTextureCom, _uint _iTexIndex);
 	HRESULT						Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom);
+	HRESULT						Add_Transform(void* _pArg);
 
 	void						Compute_Player_Hp(_float fTimeDelta, _float _fKirbyHpMax, _float _fKirbyHp);
 	void						Disappear_HpBar(_float fTimeDelta);
@@ -46,6 +53,8 @@ private:
 
 	// 마스킹을 위한 텍스쳐
 	CTexture*					m_pTexMask = { nullptr };
+	CTexture*					m_pTexNameTag = {nullptr};
+	CTransform*					m_pTransNameTag = { nullptr };
 
 
 #pragma region 피통이 까이거나, 회복되는 로직에 사용되는 변수
