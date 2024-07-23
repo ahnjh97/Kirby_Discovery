@@ -306,6 +306,11 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 		, "Gimmick_PkFunHouse06A", "Gimmick_PkFunHouse06B", "Gimmick_PkFunHouse06C" //Gimmick_PkFunHouse06 분리
 	};
 
+	// 파크에서 이미시브 넣지않은, 알파값들ㅇQZR
+	m_setParkDecoTxts_NoEmissive = { "FhOrnamentGroundAL", "FhOrnamentGroundBL",
+									 "FhOrnamentRoofAL", "FhOrnamentRoofBL", "FhOrnamentRoofCL", "FhOrnamentRoofDL", "FhOrnamentRoofEL",
+									 "FnWallDecorationStickAL", "FnWallDecorationStickBL", "FnWallDecorationStickCL" };
+
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
 	s_vecLightInfo.resize(CMapToolObject::LIGHT_END);
@@ -1854,6 +1859,13 @@ _bool CMapToolHelper::IsParkGimmick(const string& _strModelName)
 	return _bool();
 }
 
+_bool CMapToolHelper::IsParkModelNonDiscard(const string& _strModelName)
+{
+	if (m_setParkDecoTxts_NoEmissive.end() != m_setParkDecoTxts_NoEmissive.find(_strModelName))
+		return true;
+	return _bool();
+}
+
 _bool CMapToolHelper::RenameFile(const string& _strLevel, const string& _tempFileName, const string& _strCustom)
 {
 	// 현재시간 받아오기
@@ -2175,6 +2187,9 @@ _uint CMapToolHelper::DeterminePassIndex_ForEmissive(CModel* pModel)
 	{
 		_int a = 0;
 	}
+
+	if(IsParkModelNonDiscard(strModelName)) //QZR
+		return MODEL_PARKDECO_NONDISCARD;
 
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{

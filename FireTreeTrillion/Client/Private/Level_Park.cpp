@@ -122,12 +122,6 @@ void CLevel_Park::Teleport_Player()
 	pTransingStar->Set_LargeColor(_float3(95.f  / 255.f, 28.f / 255.f, 128.f / 255.f));
 	pTransingStar->Set_SmallColor(_float3(167.f / 255.f, 42.f / 255.f, 168.f / 255.f));
 
-	//CLoadingStart* pLoadingStart = static_cast<CLoadingStart*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar")));
-	//if (nullptr != pLoadingStart)
-	//{
-	//	pLoadingStart->Set_TexureIndex(1);
-	//}
-
 	m_pGameInstance->Get_DirectionLightAddress()->Set_LightDiffuse(_float4(0.f, 0.f, 0.f, 0.f));
 }
 
@@ -388,14 +382,15 @@ HRESULT CLevel_Park::Ready_Layer_BackGround(const wstring& strLayerTag)
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
 
 	_float4x4 InitMat = _float4x4::Identity;
-	_float4x4 translationMatrix = XMMatrixTranslation(5.15f, 5.49f, -48.f);
+	_float4x4 translationMatrix = XMMatrixTranslation(5.15f, 5.49f, -47.f);
 	_float	  rotationY = XMConvertToRadians(0.f);
 	_float4x4 rotationMatrixY = XMMatrixRotationY(rotationY);
 
 	InitMat = rotationMatrixY * translationMatrix;
 	ObjDesc.matWorld = InitMat;
-	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Portal"), TEXT("Prototype_GameObject_PortalSoftEffect"), &ObjDesc)))
-		return E_FAIL;
+	CGameObject* pObj = m_pGameInstance->Add_CloneReturn(m_iLevel, TEXT("Layer_Portal"), TEXT("Prototype_GameObject_PortalSoftEffect"), &ObjDesc);
+	CTransform* pTransform = pObj->Get_TransformCom();
+	pTransform->Set_Scaled(5.f, 8.f, 1.f);
 
 	// 세 번째 랜드로 이동하는 포탈
 	CGameObject::GAMEOBJECT_DESC PortalDesc{};
@@ -409,8 +404,8 @@ HRESULT CLevel_Park::Ready_Layer_BackGround(const wstring& strLayerTag)
 
 	InitMat = rotationMatrixX * translationMatrix;
 	PortalDesc.matWorld = InitMat;
-	CGameObject* pObj = m_pGameInstance->Add_CloneReturn(m_iLevel, TEXT("Layer_Portal"), TEXT("Prototype_GameObject_PortalSoftEffect"), &PortalDesc);
-	CTransform* pTransform = pObj->Get_TransformCom();
+	pObj = m_pGameInstance->Add_CloneReturn(m_iLevel, TEXT("Layer_Portal"), TEXT("Prototype_GameObject_PortalSoftEffect"), &PortalDesc);
+	pTransform = pObj->Get_TransformCom();
 	pTransform->Set_Scaled(5.f, 8.f, 1.f);
 
 	return S_OK;
