@@ -197,7 +197,10 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	
 	else if ((CSimba::Simba_QuickClaw2L == iState || CSimba::Simba_QuickClaw2R == iState)) 
 	{
-		pSimba->QuickClawSlash(); // YW Effect 클로 트레일(일단은 상시호출로 해놨음)
+		if (0.3f < fAnimRatio && false == m_bSlashEffect) {
+			m_bSlashEffect = true;
+			pSimba->QuickClawSlash();
+		}
 
 		if(0.3f > fAnimRatio)
 			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 10.f);
