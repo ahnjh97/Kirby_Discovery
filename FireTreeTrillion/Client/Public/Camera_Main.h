@@ -43,6 +43,7 @@ public:
 
 		SEQ_SIMBA_START,
 
+		//심바
 		SEQ_SIMBA_SHOULDER,
 		SEQ_SIMBA_TONG,
 		SEQ_SIMBA_FRONTVIEW,
@@ -50,6 +51,11 @@ public:
 
 		SEQ_SIMBA_BATTLESTART,
 
+		SEQ_SIMBA_GLASSBREAK,
+		SEQ_SIMBA_BOSSORIGIN,
+		SEQ_SIMBA_CAGEBREAK,
+
+		//파이널보스
 		SEQ_FINALBOSS_APPEAR,
 
 		//단독으로 하나를 즉시 넣어 사용하는 시퀀스
@@ -168,8 +174,10 @@ public:
 	void Make_One_Sequence(CAMACTION newAction);
 
 	//카메라의 이벤트 함수들
+	void Start_ShutterSeq(CGameObject* pNotifier);
+	void Start_BridgeSeq(CGameObject* pNotifier);
+
 	void Ready_Cam_DeeDeeDee(CGameObject* pNotifier);
-	void Ready_Cam_FinalBoss(CGameObject* pNotifier);
 
 	void Ready_Monsters_Leongar(CGameObject* pNotifier);
 
@@ -177,8 +185,11 @@ public:
 	void Ready_Dialog2_Leongar(CGameObject* pNotifier);
 	void Ready_Dialog3_Leongar(CGameObject* pNotifier);
 
-	void Start_ShutterSeq(CGameObject* pNotifier);
-	void Start_BridgeSeq(CGameObject* pNotifier);
+	void Ready_Cam_GlassBreak(CGameObject* pNotifier);
+	void Ready_Cam_BossOrigin(CGameObject* pNotifier);
+	void Ready_Cam_CageBreak(CGameObject* pNotifier);
+
+	void Ready_Cam_FinalBoss(CGameObject* pNotifier);
 
 	//이벤트를 받기 위해 만든 테스트 함수입니다. 인자는 CGameObject* 로 한정
 	void EventFunc(CGameObject* pObj);

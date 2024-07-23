@@ -569,11 +569,11 @@ HRESULT CLevel_GamePlay::Ready_Monsters()
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
 				return E_FAIL;
 		}
-		else if (L"FinalBoss" == tempDesc.wstrModelName)
-		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_FinalBoss"), &tempDesc)))
-				return E_FAIL;
-		}
+		//else if (L"FinalBoss" == tempDesc.wstrModelName)
+		//{
+		//	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_FinalBoss"), &tempDesc)))
+		//		return E_FAIL;
+		//}
 		else if (L"Kabu" == tempDesc.wstrModelName)
 		{
 			CMonster::MONSTER_DESC KabuDesc = {};

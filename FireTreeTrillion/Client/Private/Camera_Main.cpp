@@ -253,7 +253,10 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	m_CamTriggerUpOffsets.resize(LEVEL_END);
 
 	m_CamTriggerUpOffsets[LEVEL_INTRO] = { 0.f, 0.f, 0.f, .2f, .15f, 0.f, 0.f, 0.f, 0.f, 0.1f, 0.1f, 0.1f }; //9 == 11
-	//m_CamTriggerUpOffsets[LEVEL_PARK] = { 0.f, 0.f, 0.f, 100.f, .15f, 0.f, 0.f, 0.f, 0.f };
+	m_CamTriggerUpOffsets[LEVEL_PARK] = { 0.1f, 0.15f, 0.f, 0.1f, 0.f, // 0 ~ 4
+										  0.1f, 0.1f, 0.0f, 0.f, 0.f, // 5 ~ 9
+										  0.1f, 0.f, 0.f, 0.1f, 0.f, // 10 ~ 14
+										  0.1f, 0.f, 0.f, 0.05f, 0.05f }; // 15 ~ 19  // 17 : 맨뒤 폭탄 받는 부분에서 직각으로 만드는 부분, 18 : 맨앞, 19 : 두번째 코너 돌릴때 distance 줄이는 곳
 	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .05f, 0.05f, 0.1f, 0.f, 0.f }; // 0 : 보스 만나기전, 1 : 계단으로 들어가는 입구, 2 : 복도 마지막 트리거
 	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f, .4f, .5f, 0.2f, 0.2f, 0.f };
 
@@ -772,7 +775,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 
 	//예약 동작이 모두 끝나면 다시 기본 상태로 만든다.
 	if (m_CamSeq.empty() && abs(m_fSeqInterpolateTime.first - m_fSeqInterpolateTime.second) < .01f)
-	{
+	{ 
 
 		Set_DOFMode(true);
 
@@ -1165,6 +1168,7 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 	//카메라 보는 기준점 위로 올려주는 놈
 	if (*m_pCurrentLevelID == LEVEL_INTRO
 		|| *m_pCurrentLevelID == LEVEL_PARTTIME
+		|| *m_pCurrentLevelID == LEVEL_PARK
 		|| *m_pCurrentLevelID == LEVEL_FINALBOSS
 		|| *m_pCurrentLevelID == LEVEL_FINALE
 		)
@@ -2538,10 +2542,27 @@ void CCamera_Main::Ready_Dialog3_Leongar(CGameObject* pNotifier)
 	Make_Sequence(SEQ_SIMBA_LOW);
 }
 
+void CCamera_Main::Ready_Cam_GlassBreak(CGameObject* pNotifier)
+{
+	Make_Sequence(SEQ_SIMBA_GLASSBREAK);
+}
+
+void CCamera_Main::Ready_Cam_BossOrigin(CGameObject* pNotifier)
+{
+	Make_Sequence(SEQ_SIMBA_BOSSORIGIN);
+}
+
+void CCamera_Main::Ready_Cam_CageBreak(CGameObject* pNotifier)
+{
+	Make_Sequence(SEQ_SIMBA_CAGEBREAK);
+}
+
 void CCamera_Main::Ready_Cam_FinalBoss(CGameObject* pNotifier)
 {
 	Make_Sequence(SEQ_FINALBOSS_APPEAR);
 }
+
+//레이싱
 
 void CCamera_Main::Start_ShutterSeq(CGameObject* pNotifier)
 {
@@ -3085,7 +3106,6 @@ void CCamera_Main::Render_IMGUI()
 
 	_float4x4 WorldMat = m_pTransformCom->Get_WorldMatrix();
 	_float4 vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-
 
 	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._11, WorldMat._12, WorldMat._13, WorldMat._14);
 	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._21, WorldMat._22, WorldMat._23, WorldMat._24);

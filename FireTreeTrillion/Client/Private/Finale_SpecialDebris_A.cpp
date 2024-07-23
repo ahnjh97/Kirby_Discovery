@@ -49,6 +49,7 @@ HRESULT CFinale_SpecialDebris_A::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_UP, NewUp);
 	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, NewRight);
 
+
 	return S_OK;
 }
 

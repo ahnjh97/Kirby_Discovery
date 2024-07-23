@@ -33,6 +33,8 @@ public:
 	}
 	virtual void Add_RenderGroup() override;
 
+	virtual _bool IsEnded() override;
+
 	virtual _int Get_Size() { return m_FXs.size(); }
 	virtual void Reset_Duration() override
 	{
@@ -52,6 +54,10 @@ public:
 	virtual _int Tick(_float fTimeDelta) override;
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+
+#ifdef _DEBUG
+	virtual void	Render_IMGUI() override;
+#endif
 
 protected:
 	vector<CEffect*> m_FXs;

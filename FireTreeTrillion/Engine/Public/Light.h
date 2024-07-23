@@ -14,7 +14,7 @@ public:
 	LIGHT_DESC* Get_LightDesc() {
 		return &m_LightDesc;
 	}
-	void Set_LigthRange(_float fRange) { m_LightDesc.fRange = fRange; }
+	void Set_LightDiffuse(_float4 vLightColor) { m_LightDesc.vDiffuse = vLightColor; }
 
 
 public:

@@ -111,6 +111,7 @@ private:
 	_bool IsTree(const string& _strModelName);
 	_bool IsBlendDeco(const string& _strModelName);
 	_bool IsParkGimmick(const string& _strModelName);
+	_bool IsParkModelNonDiscard(const string& _strModelName);
 
 	_bool RenameFile(const string& _strLevel, const string& _tempFileName, const string& _strCustom);
 	_bool AreFilesIdentical(const string& file1, const string& file2);
@@ -160,6 +161,7 @@ private:
 	unordered_set<string>	m_setTownDecoTxts;
 	unordered_set<string>	m_setLabDecoTxts;
 	unordered_set<string>	m_setParkDecoTxts;
+	unordered_set<string>	m_setParkDecoTxts_NoEmissive;
 
 	vector<string>	m_vecMapTxts;
 	vector<string>	m_vecTriggerTxts;

@@ -733,6 +733,9 @@
     <Filter Include="02.GameObjects\Map\SimbaObjects\BossOrigin">
       <UniqueIdentifier>{f816e833-ade0-4977-932a-35be0b2a9119}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\LoadingStart\LoadingFont">
+      <UniqueIdentifier>{d681abb3-c1df-4fd4-9445-a54ee620bee3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1455,9 +1458,12 @@
 	</ClInclude>
 	<ClInclude Include="..\Public\BossOrigin.h">
       <Filter>02.GameObjects\Map\SimbaObjects\BossOrigin</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\Public\Gm_ParkShutter.h">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LoadingFont.h">
+      <Filter>02.GameObjects\UI\LoadingStart\LoadingFont</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2165,6 +2171,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BossOrigin.cpp">
       <Filter>02.GameObjects\Map\SimbaObjects\BossOrigin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LoadingFont.cpp">
+      <Filter>02.GameObjects\UI\LoadingStart\LoadingFont</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

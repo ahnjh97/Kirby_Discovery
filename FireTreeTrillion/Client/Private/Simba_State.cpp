@@ -345,7 +345,9 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			m_bSwingEffect = true;
 			pSimba->FinalCrusherSwing();
 		}
-		else if (0.105f < fAnimRatio && false == m_bSmashEffect) {
+		//else if (0.105f < fAnimRatio && false == m_bSmashEffect)
+		else if (0.12f < fAnimRatio && false == m_bSmashEffect)
+		{
 			m_bSmashEffect = true;
 			pSimba->FinalCrusherSmash();
 		}
@@ -359,6 +361,7 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		switch (iState)
 		{
 		case CSimba::Simba_FinalCrusher:
+
 			pSimba->Change_State(CSimba::Simba_FinalCrusherEnd, 66.66f, false, false);
 			break;
 		case CSimba::Simba_FinalCrusherEnd:
