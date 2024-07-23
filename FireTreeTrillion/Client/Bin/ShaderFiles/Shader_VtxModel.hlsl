@@ -70,6 +70,12 @@ void MaskTest(vector vMaskValue)
         discard;
 }
 
+void MaskTest(float fMaskValue)
+{
+    if (fMaskValue < g_fMaskThreshold)
+        discard;
+
+}
 void AlphaTest(vector vDiffuseValue, float fDiscardValue = .01)
 {
     if (vDiffuseValue.a < fDiscardValue ||
@@ -531,6 +537,8 @@ PS_OUT_EFFECT PS_MAIN_WHITE_FX_LINEARDIFFUSE_LINEARMASK(PS_IN In)
         bMaskAlpha = true;
     
     float fMaskValue = (bMaskAlpha) ? vMask.a : vMask.r;
+    
+    MaskTest(vMask.a);
     
     float fSmoothedAlpha = smoothstep(g_fMaskThreshold - 0.1, g_fMaskThreshold + 0.1, fMaskValue);
     if (fSmoothedAlpha < 0.01)
