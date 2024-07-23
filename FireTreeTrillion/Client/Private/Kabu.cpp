@@ -79,9 +79,9 @@ _int CKabu::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	m_fDelayTime += m_fTimeDelta;
-	if (10.f > m_fDelayTime)
-		m_fTimeDelta = 0.f;
+	//m_fDelayTime += m_fTimeDelta;
+	//if (10.f > m_fDelayTime)
+	//	m_fTimeDelta = 0.f;
 
 	// ¸¸¾à, ¹âÈ÷¸é ±× ¼ø°£ ±×³É Âð»§µÇ°í Á×´Â´Ù.
 	if (m_ePhyXState == PO_PRESSED)

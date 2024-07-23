@@ -1277,7 +1277,8 @@ static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
 	{
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
-		vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f;
+		vMyPos += pTransformCom->Get_State(CTransform::STATE_LOOK) * .4f + 
+			(pTransformCom->Get_State(CTransform::STATE_RIGHT) * CUtils::Make_RandomFloat( -0.3f, 0.3f));
 
 		FXDesc.vInitPos = { vMyPos.x, vMyPos.y + .3f, vMyPos.z };
 		FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(pTransformCom->Get_State(CTransform::STATE_LOOK)).y + CUtils::Make_RandomFloat(-20.f, 20.f), 0.f};

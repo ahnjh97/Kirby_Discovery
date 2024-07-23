@@ -47,6 +47,8 @@ HRESULT CMeteor::Initialize(void* pArg)
 	m_vAxis = CUtils::Make_Random_Vector(1.f);
 	m_pTransformCom->Turn(m_vAxis, 1.f);
 
+	m_fAttack = 15.f;
+
 	if (true == m_bBig)
 	{
 		Set_BodyCollider(COLLIDER_SPHERE, 0.f, 1.5f, 18.f);

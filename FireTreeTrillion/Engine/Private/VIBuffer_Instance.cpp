@@ -516,7 +516,7 @@ void CVIBuffer_Instance::Save_PrePos(VTXMATRIX* pVertices, const _float4x4* pSoc
 		if (!pVertices[i].bAlive)
 			continue;
 
-		if (_float3::Distance(m_pPrePositions[i], F4toF3(pVertices[i].vPosition)) < .05f)
+		if (_float3::Distance(m_pPrePositions[i], F4toF3(pVertices[i].vPosition)) < .1f)
 			continue;
 
 

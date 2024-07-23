@@ -23,7 +23,7 @@ HRESULT CRabbit::Initialize_Prototype()
 HRESULT CRabbit::Initialize(void* pArg)
 {
 	wstring wstrModelName;
-	if (LEVEL_SIMBA == *m_pGameInstance->Get_CurrentLevelID())
+	if (LEVEL_SIMBA == *m_pGameInstance->Get_CurrentLevelID() || LEVEL_FINALBOSS == *m_pGameInstance->Get_CurrentLevelID())
 	{
 		MONSTER_DESC tDesc{};
 		if(nullptr != pArg)
@@ -81,7 +81,7 @@ HRESULT CRabbit::Initialize(void* pArg)
 
 	m_iEyeMeshIdx = m_pModelCom->Find_MeshIndex(string("Eye"));
 
-	if (LEVEL_SIMBA == *m_pCurrentLevelID) {
+	if (LEVEL_SIMBA == *m_pCurrentLevelID || LEVEL_FINALBOSS == *m_pGameInstance->Get_CurrentLevelID()) {
 		m_bFind = true;
 		Set_Slope(false);
 	}
@@ -127,8 +127,8 @@ void CRabbit::Late_Tick(_float fTimeDelta)
 		// 날아갈 땐, 애니메이션 재생이 되지 않는다.
 		if (m_ePhyXState != PO_FLYAWAY)
 		{
-			if (Compute_OptimizationAnimation(m_fTimeDelta) == true && m_ePhyXState != PO_PRESSED)
-				m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : m_pModelCom->Play_Animation(m_fAccTime);
+			//if (Compute_OptimizationAnimation(m_fTimeDelta) == true && m_ePhyXState != PO_PRESSED)
+				/*m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : */m_pModelCom->Play_Animation(m_fTimeDelta);
 		}
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);

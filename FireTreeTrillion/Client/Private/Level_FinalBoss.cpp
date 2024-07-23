@@ -12,6 +12,7 @@
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
 #include "FinalBoss.h"
+#include "SummonEffect.h"
 
 #include "BG.h"
 #include "HUD.h"
@@ -20,6 +21,8 @@
 
 #include "TransingStar.h"
 #include "UI_Fading.h"
+
+#define MONSTER_TRIGGER(index) (index - 11)
 
 CLevel_FinalBoss::CLevel_FinalBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -81,6 +84,10 @@ HRESULT CLevel_FinalBoss::Initialize()
 	CUI_Fading* pFadingUI = dynamic_cast<CUI_Fading*>(pUIObj);
 	pFadingUI->Set_IsRender(true);
 
+	// 몬스터 트리거
+	function<void(_int)> funcMonster = bind(&CLevel_FinalBoss::SummonEffectForMonster, this, placeholders::_1);
+	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_MONSTER, funcMonster);
+
 	// 검정 포그 설정
 	m_pGameInstance->Fog_Intialize_ForFinalBoss(0);
 
@@ -97,6 +104,76 @@ void CLevel_FinalBoss::Teleport_Player()
 	pTransingStar->Set_SmallColor(_float3(77.f / 255.f, 31.f / 255.f, 125.f / 255.f)); // 77, 31, 125
 }
 
+void CLevel_FinalBoss::SummonMonsters(_uint iTriggerIndex)
+{
+	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
+	wstring wstrTag;
+
+	for (auto& monsterDesc : m_vecMonsterDescs[MONSTER_TRIGGER(iTriggerIndex)])
+	{
+		wstring wstrModelName = monsterDesc.wstrModelName;
+		size_t underscorePos = wstrModelName.find(L'_');
+		if (underscorePos != wstring::npos)
+			wstrModelName = wstrModelName.substr(underscorePos + 1);
+
+		if (TEXT("Awoofy") == monsterDesc.wstrModelName || TEXT("AwoofyWild") == monsterDesc.wstrModelName)
+			wstrTag = wstrPrototypeTag + TEXT("Awoofy");
+		else if (TEXT("Rabbit") == monsterDesc.wstrModelName || TEXT("RabbitBig") == monsterDesc.wstrModelName)
+			wstrTag = wstrPrototypeTag + TEXT("Rabbit");
+		else
+			wstrTag = wstrPrototypeTag + wstrModelName;
+
+		if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), wstrTag, &monsterDesc)))
+			return;
+	}
+}
+
+void CLevel_FinalBoss::SummonEffectForMonster(_uint iTriggerIndex)
+{
+	if (m_setActivatedMonsterTriggers.end() != m_setActivatedMonsterTriggers.find(iTriggerIndex))
+		return;
+
+	m_setActivatedMonsterTriggers.insert(iTriggerIndex); // 여러번 호출되는거 방지
+
+	m_bTrigger = true;
+	m_iTriggerIndex = iTriggerIndex;
+
+	wstring wstrLayerTag = TEXT("Layer_Effect");
+	if (11 == iTriggerIndex)
+		wstrLayerTag += TEXT("1");
+	else if (12 == iTriggerIndex)
+		wstrLayerTag += TEXT("2");
+
+	wstring wstrPrototypeTag = TEXT("Prototype_GameObject_");
+	HRESULT hr{};
+	CSummonEffect::SUMMONEFFECT_DESC SummonEffectDesc = {};
+
+	//wstring wstrMonsterName;
+
+	//_float fY{};
+	//if (TEXT("Awoofy") == wstrMonsterName || TEXT("Rabbit") == wstrMonsterName || TEXT("RabbitBig") == wstrMonsterName)
+	//	fY = 2.4f;
+	//else if (TEXT("AwoofyWild") == wstrMonsterName)
+	//	fY = 2.7f;
+
+	for (auto& monsterDesc : m_vecMonsterDescs[MONSTER_TRIGGER(iTriggerIndex)])
+	{
+		_float fScale = { 0.f };
+		wstring wstrTag;
+
+		if (TEXT("Awoofy") == monsterDesc.wstrModelName || TEXT("Rabbit") == monsterDesc.wstrModelName)
+			fScale = 3.6f;
+		else if (TEXT("AwoofyWild") == monsterDesc.wstrModelName || TEXT("RabbitBig") == monsterDesc.wstrModelName)
+			fScale = 5.8f;
+
+		SummonEffectDesc.vPosition = _float4(monsterDesc.matWorld._41, monsterDesc.matWorld._42 + 1.f, monsterDesc.matWorld._43, monsterDesc.matWorld._44);
+		SummonEffectDesc.fScale = fScale;
+		SummonEffectDesc.fAlpha = 0.9f;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), wstrLayerTag, TEXT("Prototype_GameObject_SummonEffect"), &SummonEffectDesc);
+		CHECK_FAILED(hr);
+	}
+}
+
 void CLevel_FinalBoss::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
@@ -106,6 +183,16 @@ void CLevel_FinalBoss::Tick(_float fTimeDelta)
 	fTimeAcc += fTimeDelta;
 	if (fTimeAcc > 1.2f) // 1.2초뒤 페이드인
 		Ready_FadeIn();
+
+	if (true == m_bTrigger)
+		m_fSummonTime += fTimeDelta;
+
+	if (1.2f < m_fSummonTime)
+	{
+		m_bTrigger = false;
+		m_fSummonTime = 0.f;
+		SummonMonsters(m_iTriggerIndex);
+	}
 
 	Light_Tick(fTimeDelta);
 }
@@ -384,7 +471,7 @@ HRESULT CLevel_FinalBoss::Ready_Triggers()
 	ifstream fileInput(strFileName, ios::binary);
 	if (fileInput.is_open() == false)
 	{
-		MSG_BOX(TEXT("Failed to open : Town_Triggers.txt"));
+		MSG_BOX(TEXT("Failed to open : Final_Triggers.txt"));
 		return E_FAIL;
 	}
 
@@ -554,14 +641,22 @@ HRESULT CLevel_FinalBoss::Ready_Monsters()
 			vecRallyPoints.push_back(_float4(vRallyPointPos.x, vRallyPointPos.y, vRallyPointPos.z, 1));
 		}
 
-		CGameObject::GAMEOBJECT_DESC tempDesc = {};
+		CMonster::MONSTER_DESC tempDesc = {};
 		tempDesc.matWorld = matWorld;
 		tempDesc.wstrModelName = CUtils::StrToWstr(strModelName);
 		tempDesc.iShaderVars = iShaderVars;
 		tempDesc.fRimWidth = fRimWidth;
+		tempDesc.eMonState = iTriggerIndex;
+		tempDesc.vecRallyPoints = vecRallyPoints;
 		if (strModelName.size() >= 8) { // NonAnim_ 부분 지우기
 			if ("NonAnim" == strModelName.substr(0, 7))
 				tempDesc.wstrModelName.erase(0, 8);
+		}
+
+		if (10 < iTriggerIndex && "Crumble" != strModelName)
+		{
+			m_vecMonsterDescs[MONSTER_TRIGGER(iTriggerIndex)].push_back(tempDesc);
+			continue;
 		}
 
 		if (L"Awoofy" == tempDesc.wstrModelName)
@@ -610,6 +705,11 @@ HRESULT CLevel_FinalBoss::Ready_Monsters()
 		else if (L"CappyBody" == tempDesc.wstrModelName)
 		{
 			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_CappyBody"), &tempDesc)))
+				return E_FAIL;
+		}
+		else if (L"Bomber" == tempDesc.wstrModelName)
+		{
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_Bomber"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (L"FinalBoss" == tempDesc.wstrModelName)
