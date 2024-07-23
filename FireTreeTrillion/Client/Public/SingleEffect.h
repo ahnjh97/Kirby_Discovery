@@ -49,6 +49,10 @@ public:
 	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+#ifdef _DEBUG
+	virtual void	Render_IMGUI() override;
+#endif
+
 private:
 
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
