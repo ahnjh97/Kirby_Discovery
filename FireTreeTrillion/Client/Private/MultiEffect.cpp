@@ -217,15 +217,29 @@ HRESULT CMultiEffect::Render()
 #ifdef _DEBUG
 void CMultiEffect::Render_IMGUI()
 {
+	_float4x4 WorldMat = m_FXs[0]->Get_TransformCom()->Get_WorldMatrix();
+
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._11, WorldMat._12, WorldMat._13, WorldMat._14);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._21, WorldMat._22, WorldMat._23, WorldMat._24);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._31, WorldMat._32, WorldMat._33, WorldMat._34);
+	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._41, WorldMat._42, WorldMat._43, WorldMat._44);
+
+
 	for (auto& fx : m_FXs)
 	{
-		
 		ImGui::Text(fx->IsEnded() ? "END : " : "PLAYING : ");
 		ImGui::SameLine();
 		ImGui::Text(fx->Get_Name().c_str());
 	}
+
+	ImDrawList* drawList = ImGui::GetForegroundDrawList();
+
+	ImVec2 vProjPos = CUtils::WorldPosTo_ImguiProjPos((_float3)m_FXs[0]->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+
+	drawList->AddCircleFilled(vProjPos, 5.f, IM_COL32(255, 50, 255, 255));
 }
 #endif
+
 CMultiEffect* CMultiEffect::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CMultiEffect* pInstance = new CMultiEffect(pDevice, pContext);

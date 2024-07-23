@@ -2542,10 +2542,27 @@ void CCamera_Main::Ready_Dialog3_Leongar(CGameObject* pNotifier)
 	Make_Sequence(SEQ_SIMBA_LOW);
 }
 
+void CCamera_Main::Ready_Cam_GlassBreak(CGameObject* pNotifier)
+{
+	Make_Sequence(SEQ_SIMBA_GLASSBREAK);
+}
+
+void CCamera_Main::Ready_Cam_BossOrigin(CGameObject* pNotifier)
+{
+	Make_Sequence(SEQ_SIMBA_BOSSORIGIN);
+}
+
+void CCamera_Main::Ready_Cam_CageBreak(CGameObject* pNotifier)
+{
+	Make_Sequence(SEQ_SIMBA_CAGEBREAK);
+}
+
 void CCamera_Main::Ready_Cam_FinalBoss(CGameObject* pNotifier)
 {
 	Make_Sequence(SEQ_FINALBOSS_APPEAR);
 }
+
+//·¹ÀÌ½Ì
 
 void CCamera_Main::Start_ShutterSeq(CGameObject* pNotifier)
 {
@@ -3089,7 +3106,6 @@ void CCamera_Main::Render_IMGUI()
 
 	_float4x4 WorldMat = m_pTransformCom->Get_WorldMatrix();
 	_float4 vPosition = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-
 
 	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._11, WorldMat._12, WorldMat._13, WorldMat._14);
 	ImGui::Text("%.2f\t%.2f\t%.2f\t%.2f", WorldMat._21, WorldMat._22, WorldMat._23, WorldMat._24);
