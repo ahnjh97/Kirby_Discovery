@@ -17,6 +17,7 @@
 #include "SimbaLaser.h"
 #include "SimbaRock.h"
 #include "Debris.h"
+#include "Fire.h"
 
 CSimba::CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -214,8 +215,15 @@ _int CSimba::Tick(_float fTimeDelta)
 
 	if (m_pGameInstance->Get_KeyState(DIK_CAPSLOCK, KEY_PRESS))
 	{
-		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN))
-			Change_State(Simba_QuickClawStartL, 50.f, false, true);
+		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN)) {
+			//m_bEyeBloom = true;
+			//m_eEyeState = SIMBAEYE_NONE; // 디버깅용
+			if(0 == CUtils::Make_RandomInt(0, 1))
+				Change_State(Simba_QuickClawStartL, 50.f, false, true);
+			else
+				Change_State(Simba_QuickClawStartR, 50.f, false, true);
+		}
+			
 		else if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
 			Change_State(Simba_FinalCrusherStart, 50.f, false, true);
 		else if (m_pGameInstance->Get_KeyState(DIK_3, KEY_DOWN))
@@ -304,9 +312,11 @@ void CSimba::Late_Tick(_float fTimeDelta)
 
 	if (false == bIsFinished)
 		PlayPartialAnimation();
-
+	m_iEyeRenderCount = 0;
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+	if (true == m_bEyeBloom)
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
 }
 
 HRESULT CSimba::Render()
@@ -314,81 +324,105 @@ HRESULT CSimba::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	for (auto& index : m_vecMeshes)
-	{
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", index, TextureType_DIFFUSE)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", index, TextureType_NORMALS)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", index, TextureType_METALNESS)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", index)))
-			return E_FAIL;
-
-		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Render(index)))
-			return E_FAIL;
-	}
-
-	// Render Eye Mesh
-	if (FAILED(m_pEyeTextureCom[EYETEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_eEyeState)))
-		return E_FAIL;
-	if (FAILED(m_pEyeTextureCom[EYETEX_NORMAL]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", m_eEyeState)))
-		return E_FAIL;
-	if (FAILED(m_pEyeTextureCom[EYETEX_MRA]->Bind_ShaderResource(m_pShaderCom, "g_MRATexture")))
-		return E_FAIL;
-	if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", m_iEyeMesh)))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Begin(ANIMMODEL_SIMBAEYE)))
-		return E_FAIL;
-	if (FAILED(m_pModelCom->Render(m_iEyeMesh)))
-		return E_FAIL;
-
-	if (true == m_bRenderMant) // Render Mant Mesh 
-	{
-		_bool bFalse = { false };
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &bFalse, sizeof(_bool))))
-			return E_FAIL;
-
-		for (auto& idx : m_vecMantMeshes)
+	if (0 == m_iEyeRenderCount) {
+		for (auto& index : m_vecMeshes)
 		{
-			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", idx, TextureType_DIFFUSE)))
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", index, TextureType_DIFFUSE)))
 				return E_FAIL;
-			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", idx, TextureType_NORMALS)))
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", index, TextureType_NORMALS)))
 				return E_FAIL;
-			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", idx, TextureType_METALNESS)))
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", index, TextureType_METALNESS)))
 				return E_FAIL;
-			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", idx)))
+			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", index)))
 				return E_FAIL;
 
 			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
 				return E_FAIL;
-			if (FAILED(m_pModelCom->Render(idx)))
+			if (FAILED(m_pModelCom->Render(index)))
 				return E_FAIL;
 		}
-	}
 
-	if (true == m_bRenderEyeLid)
+		if (true == m_bRenderMant) // Render Mant Mesh 
+		{
+			_bool bFalse = { false };
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_bRimLight", &bFalse, sizeof(_bool))))
+				return E_FAIL;
+
+			for (auto& idx : m_vecMantMeshes)
+			{
+				if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", idx, TextureType_DIFFUSE)))
+					return E_FAIL;
+				if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", idx, TextureType_NORMALS)))
+					return E_FAIL;
+				if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", idx, TextureType_METALNESS)))
+					return E_FAIL;
+				if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", idx)))
+					return E_FAIL;
+
+				if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+					return E_FAIL;
+				if (FAILED(m_pModelCom->Render(idx)))
+					return E_FAIL;
+			}
+		}
+
+		if (true == m_bRenderEyeLid)
+		{
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_iEyeLidMesh, TextureType_DIFFUSE)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", m_iEyeLidMesh, TextureType_NORMALS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", m_iEyeLidMesh, TextureType_METALNESS)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", m_iEyeLidMesh)))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Render(m_iEyeLidMesh)))
+				return E_FAIL;
+		}
+
+		if (true == m_bRenderRing)
+			RenderRing();
+
+		if (m_bEyeBloom == false)
+		{
+			// Render Eye Mesh
+			if (FAILED(m_pEyeTextureCom[EYETEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_eEyeState)))
+				return E_FAIL;
+			if (FAILED(m_pEyeTextureCom[EYETEX_NORMAL]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", m_eEyeState)))
+				return E_FAIL;
+			if (FAILED(m_pEyeTextureCom[EYETEX_MRA]->Bind_ShaderResource(m_pShaderCom, "g_MRATexture")))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", m_iEyeMesh)))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Begin(ANIMMODEL_SIMBAEYE_DEFAULT)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Render(m_iEyeMesh)))
+				return E_FAIL;
+		}
+
+		m_iEyeRenderCount--;
+	}
+	else
 	{
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_iEyeLidMesh, TextureType_DIFFUSE)))
+		// Render Eye Mesh
+		if (FAILED(m_pEyeTextureCom[EYETEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_eEyeState)))
 			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", m_iEyeLidMesh, TextureType_NORMALS)))
+		if (FAILED(m_pEyeTextureCom[EYETEX_NORMAL]->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", m_eEyeState)))
 			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", m_iEyeLidMesh, TextureType_METALNESS)))
+		if (FAILED(m_pEyeTextureCom[EYETEX_MRA]->Bind_ShaderResource(m_pShaderCom, "g_MRATexture")))
 			return E_FAIL;
-		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", m_iEyeLidMesh)))
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", m_iEyeMesh)))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_NORMAL_O)))
+		if (FAILED(m_pShaderCom->Begin(ANIMMODEL_SIMBAEYE)))
 			return E_FAIL;
-		if (FAILED(m_pModelCom->Render(m_iEyeLidMesh)))
+		if (FAILED(m_pModelCom->Render(m_iEyeMesh)))
 			return E_FAIL;
 	}
-
-	if (true == m_bRenderRing)
-		RenderRing();
 	
 	return S_OK;
 }
@@ -415,6 +449,8 @@ void CSimba::Change_State(SIMBA_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _
 	m_iStarCount = 0;
 	m_iRockCount = 0;
 	m_iDebrisCount = 0;
+	m_iFireCount = 0;
+
 	if (true == m_bPhaseTwo)
 	{
 		if (m_setDimensionClawAnims.end() == m_setDimensionClawAnims.find(eState))
@@ -1118,6 +1154,69 @@ void CSimba::CheckFinalCrusherRingCollision(_float fTimeDelta)
 #pragma endregion
 }
 
+void CSimba::SpawnFire(_uint iAnimIdx)
+{
+	CFire::FIREDESC Firedesc = {};
+	_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	_float4 vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+
+	for (auto& leftBones : m_vecLeftNailBones)
+	{
+		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(leftBones);
+		for (_uint i = 0; i < 2; i++)
+		{
+			Firedesc.fUpRange = CUtils::Make_RandomFloat(7.f, 10.f);
+			_float fRandColor1 = CUtils::Make_RandomFloat(0.1f, 0.17f);
+			Firedesc.vFirstColor = _float4(1.0f, fRandColor1, 0.0f, 1.f);
+			_float fRandColor2 = CUtils::Make_RandomFloat(0.8f, 0.9f);
+			Firedesc.vTargetColor = _float4(1.0f, fRandColor2, 0.0f, 1.f);
+			Firedesc.fScale = CUtils::Make_RandomFloat(5.f, 9.f);
+			Firedesc.fTimeRatio = CUtils::Make_RandomFloat(1.2f, 1.6f);
+			_float fLook = CUtils::Make_RandomFloat(-1.5f, 1.5f);
+			_float fRight = CUtils::Make_RandomFloat(-1.5f, 1.5f);
+
+			Firedesc.vFirePos = vPos + (vLook * fLook) + (vRight * fRight) + vLook * 2.f;
+			Firedesc.vFirePos.y -= CUtils::Make_RandomFloat(0.45f, 0.85f);
+
+			if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
+				return;
+			Firedesc.vFirstColor = _float4(1.0f, 0.26f, 0.0f, 1.f);
+			Firedesc.fScale *= 0.75f;
+			if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
+				return;
+		}
+	}
+	
+	for (auto& rightBones : m_vecRightNailBones)
+	{
+		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(rightBones);
+		for (_uint i = 0; i < 2; i++)
+		{
+			Firedesc.fUpRange = CUtils::Make_RandomFloat(7.f, 10.f);
+			_float fRandColor1 = CUtils::Make_RandomFloat(0.1f, 0.17f);
+			Firedesc.vFirstColor = _float4(1.0f, fRandColor1, 0.0f, 1.f);
+			_float fRandColor2 = CUtils::Make_RandomFloat(0.8f, 0.9f);
+			Firedesc.vTargetColor = _float4(1.0f, 0.87f, 0.0f, 1.f);
+			Firedesc.fScale = CUtils::Make_RandomFloat(5.f, 9.f);
+			Firedesc.fTimeRatio = CUtils::Make_RandomFloat(1.2f, 1.6f);
+			_float fLook = CUtils::Make_RandomFloat(-1.5f, 1.5f);
+			_float fRight = CUtils::Make_RandomFloat(-1.5f, 1.5f);
+
+			Firedesc.vFirePos = vPos + (vLook * fLook) + (vRight * fRight) + vLook * 2.f;
+			Firedesc.vFirePos.y -= CUtils::Make_RandomFloat(0.45f, 0.85f);
+
+			if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
+				return;
+			Firedesc.vFirstColor = _float4(1.0f, 0.26f, 0.0f, 1.f);
+			Firedesc.fScale *= 0.75f;
+			if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
+				return;
+		}
+	}
+
+	m_iFireCount++;	
+}
+
 void CSimba::QuickClawNailFlash(_uint eSimbaAnim) // YW : Effect 영우형 여기임 검지손톱 번쩍
 {
 	if (Simba_QuickClawStartL == eSimbaAnim) // 왼손
@@ -1134,15 +1233,44 @@ void CSimba::QuickClawNailFlash(_uint eSimbaAnim) // YW : Effect 영우형 여기임 �
 	}
 }
 
-void CSimba::QuickClawSlash() 
+void CSimba::QuickClawSlash(_uint eSimbaAnim)
 {
+	CEffect::FX_DESC effectDesc{};
+	_float3 vDir = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	vDir.Normalize();
+	_float3 vLook = { 0.f, 0.f, 1.f };
 
+	_float fAngleLook = atan2f(vLook.z, vLook.x);
+	_float fAngleDiff = fAngleLook - atan2f(vDir.z, vDir.x);
+	fAngleDiff = ToDegree(fAngleDiff);
+
+	_float3 vAngle = { 0.f, fAngleDiff, 0.f };
+	effectDesc.vInitRot = vAngle;
+	effectDesc.vInitScale = _float3(2.5f, 2.5f, 2.5f);
+
+	if (Simba_QuickClawL == eSimbaAnim || Simba_QuickClaw2L == eSimbaAnim) // 왼손
+	{
+		_float3 vOffset = _float3(); // Right Up Look 오프셋 계수
+		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone, vOffset);
+		vPos += (m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * 1.5f) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 1.6f;
+		effectDesc.vInitPos = _float3(vPos.x, vPos.y + 0.8f, vPos.z);
+		
+		Add_Effect("HS_lion claw L", effectDesc);
+	}
+	else if (Simba_QuickClawR == eSimbaAnim || Simba_QuickClaw2R == eSimbaAnim) // 오른손
+	{
+		_float3 vOffset = _float3(); // Right Up Look 오프셋 계수
+		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone, vOffset);
+		vPos += (-m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * 1.5f) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 1.8f;
+		effectDesc.vInitPos = _float3(vPos.x, vPos.y + 0.8f, vPos.z);
+		
+		Add_Effect("HS_lion claw R", effectDesc);
+	}	
 }
 
 // 완료
 void CSimba::FinalCrusherCharge()
 {
-
 	CEffect::FX_DESC effectDesc{};
 	_float3 vDir = -m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	vDir.Normalize();
@@ -1150,7 +1278,7 @@ void CSimba::FinalCrusherCharge()
 
 	_float fAngleLook = atan2f(vLook.z, vLook.x);
 	_float fAngleDiff = fAngleLook - atan2f(vDir.z, vDir.x);
-	fAngleDiff = ToDegree(fAngleDiff);
+	fAngleDiff = ToDegree(fAngleDiff);	
 
 	_float3 vAngle = { 0.f, fAngleDiff, 0.f };
 	effectDesc.vInitRot = vAngle;
@@ -1170,6 +1298,7 @@ void CSimba::FinalCrusherSmash() // YW : Effect 영우형 여기임 양주먹 바닥에 찍는
 	
 }
 
+// 완료
 void CSimba::FinalCrusherRing() // YW : Effect 영우형 여기임 퍼지는 원 이펙트
 {
 	CEffect::FX_DESC effectDesc{};
@@ -1194,6 +1323,18 @@ void CSimba::AttackJumpWind() // YW : Effect 영우형 여기임 점프 공격할때 주위 바
 {
 }
 
+void CSimba::AttackJumpHit() // 도약 공격 끝나고 착지타이밍에 나오는 빛가닥들 
+{
+	if (0 == m_iRockCount) // 왼손 바닥에 닿을때
+	{
+
+	}
+	else if (1 == m_iRockCount) // 오른손 바닥에 닿을때
+	{
+
+	}
+}
+
 void CSimba::DoubleClawDashGround() // YW : Effect 영우형 여기임 양손으로 바닥 계속 긁을때 튀기는 작은 불씨들 (아직은 이 함수 호출 안함)
 {
 }
@@ -1203,6 +1344,39 @@ void CSimba::DoubleClawGround() // YW : Effect 영우형 여기임 양슨으로 바닥 긁다�
 }
 
 void CSimba::DoubleClawSweep()// YW : Effect 영우형 여기임 바닥 긁다가 순간적으로 공격 이펙트 (트레일, 불꽃)
+{
+	
+}
+
+void CSimba::DimensionLaserVomit() // DimensionLaser 주위에 나오는 액체부스거리들
+{
+}
+
+void CSimba::DimensionLaser() // 진짜 DimensionLaser
+{
+}
+
+void CSimba::DimensionLaserParticles()
+{
+}
+
+void CSimba::DimensionClaw()
+{
+}
+
+void CSimba::TeethBite()
+{
+}
+
+void CSimba::WalkSmoke() // 걸을때 발 땅에 닿을때 나오는 회색방구
+{
+}
+
+void CSimba::RoarElecParts()
+{
+}
+
+void CSimba::BiteRushJumpSmoke()
 {
 }
 

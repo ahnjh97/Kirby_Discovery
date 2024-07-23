@@ -60,7 +60,7 @@ public:
 	};
 
 	enum SIMBA_EYETEX { EYETEX_DIFFUSE, EYETEX_NORMAL, EYETEX_MRA, EYETEX_END };
-	enum SIMBA_EYESTATE { SIMBAEYE_LONG, SIMBAEYE_SMALL, SIMBAEYE_BIG, SIMBAEYE_END };
+	enum SIMBA_EYESTATE { SIMBAEYE_LONG, SIMBAEYE_SMALL, SIMBAEYE_BIG, SIMBAEYE_NONE, SIMBAEYE_END };
 	enum SIMBA_ROTATION { ATTACKJUMP, BITERUSH, BITERUSHJUMP, ROTATION_END };
 	enum SIMBA_FINGER { INDEX, MIDDLE, PINKY, RING, THUMB, FINGER_END };
 
@@ -99,6 +99,11 @@ public:
 
 	_bool Get_Wave2Summoned() { return m_bWave2Summoned; }
 
+	void ResetFireCount() { m_iFireCount = 0; }
+	_uint Get_FireCount() { return m_iFireCount; }
+	_bool Get_EyeBloom() { return m_bEyeBloom; }
+	void Set_EyeBloom(_bool bEyeBloom) { m_bEyeBloom = bEyeBloom; }
+
 public:
 	virtual HRESULT Initialize_Prototype()			override;
 	virtual HRESULT Initialize(void* pArg)			override;
@@ -131,9 +136,11 @@ public:
 
 	void			CheckFinalCrusherRingCollision(_float fTimeDelta);
 
+	void			SpawnFire(_uint iAnimIdx);
+
 	// Simba Effects
 	void			QuickClawNailFlash(_uint eSimbaAnim);
-	void			QuickClawSlash();
+	void			QuickClawSlash(_uint eSimbaAnim);
 	void			FinalCrusherCharge();
 	void			FinalCrusherSwing();
 	void			FinalCrusherSmash();
@@ -141,9 +148,27 @@ public:
 	void			JumpStartSmoke();
 	void			LandingSmoke();
 	void			AttackJumpWind();
+	void			AttackJumpHit();
 	void			DoubleClawDashGround();
 	void			DoubleClawGround();
 	void			DoubleClawSweep();
+
+	void			DimensionLaserVomit();
+	void			DimensionLaser();
+	void			DimensionLaserParticles();
+
+	//크로스 공격 나오는 타이밍
+	void			DimensionClaw();
+	//돌진하면서 이빨씹기(씹는 타이밍)
+	void			TeethBite();
+
+	void			WalkSmoke();
+
+	// 포효 전기
+	void			RoarElecParts(); 
+
+	// 2페이즈 회전하면서 점프 후 착지할때 회색방구
+	void			BiteRushJumpSmoke();
 
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
@@ -222,8 +247,12 @@ private:
 	_float3			m_vRingPos = { };
 	_float			m_fRingInnerRadius = {};
 	_float			m_fRingOuterRadius = {};
-
 	_bool			m_bRenderRing;
+
+	_uint			m_iFireCount = {};
+	_bool			m_bEyeBloom = { false };
+
+	_uint			m_iEyeRenderCount = {};
 
 private:
 	HRESULT		Add_Components();
