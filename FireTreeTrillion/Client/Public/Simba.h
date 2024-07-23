@@ -263,9 +263,10 @@ private:
 	void		RemoveDeadRocksFromList();
 	void		RemoveDeadDebrisFromList();
 
+#ifdef _DEBUG
 	void		RenderRing();
 	void		RenderPolygon(vector<_vector>& worldPoints);
-
+#endif
 public:
 	static CSimba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

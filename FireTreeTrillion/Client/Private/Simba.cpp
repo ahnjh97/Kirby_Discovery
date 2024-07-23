@@ -387,9 +387,10 @@ HRESULT CSimba::Render()
 			return E_FAIL;
 	}
 
+#ifdef _DEBUG
 	if (true == m_bRenderRing)
 		RenderRing();
-	
+#endif
 	return S_OK;
 }
 
@@ -1911,6 +1912,8 @@ void CSimba::RemoveDeadDebrisFromList()
 	}
 }
 
+#ifdef _DEBUG
+
 void CSimba::RenderRing()
 {
 	vector<_vector> vecOuterRingPoints;
@@ -1963,6 +1966,7 @@ void CSimba::RenderPolygon(vector<_vector>& worldPoints)
 		drawList->AddLine(p1, p2, IM_COL32(255, 255, 0, 255), 2.0f);
 	}
 }
+#endif // DEBUG
 
 CSimba* CSimba::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
