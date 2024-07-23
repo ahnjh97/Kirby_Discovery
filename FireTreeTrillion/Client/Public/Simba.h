@@ -133,7 +133,7 @@ public:
 
 	// Simba Effects
 	void			QuickClawNailFlash(_uint eSimbaAnim);
-	void			QuickClawNailTrail();
+	void			QuickClawSlash();
 	void			FinalCrusherCharge();
 	void			FinalCrusherSwing();
 	void			FinalCrusherSmash();

@@ -1134,7 +1134,7 @@ void CSimba::QuickClawNailFlash(_uint eSimbaAnim) // YW : Effect 영우형 여기임 �
 	}
 }
 
-void CSimba::QuickClawNailTrail() 
+void CSimba::QuickClawSlash() 
 {
 
 }
