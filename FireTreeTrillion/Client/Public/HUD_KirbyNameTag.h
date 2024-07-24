@@ -17,7 +17,7 @@ public:
 		TEXNT_DEFORMCAR, TEXNT_DEFORMBULB, TEXNT_NONE
 	};
 
-	enum NAMETAG_STATE { NAMETAG_IDLE, NAMETAG_SHOW, NAMETAG_HIDE, NAMETAG_NONE };
+	enum NAMETAG_STATE { NAMETAG_IDLE, NAMETAG_SHOW, NAMETAG_HIDE, NAMETAG_DAMAGE, NAMETAG_NONE };
 
 private:
 	CHUD_KirbyNameTag(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -53,10 +53,11 @@ public:
 
 private:
 	class CCharacter*			m_pKirby = { nullptr };
-
-	_float4						m_vInitPos = { 0.f, 0.f, 0.f, 1.f };
-
 	NAMETAG_STATE				m_eCurState = { NAMETAG_NONE };
+	
+	_float						m_fStartShake = { 0.f };
+	_float						m_fShakeTime = { 0.f };
+	_float4						m_vInitPos = { 0.f, 0.f, 0.f, 1.f };
 		
 };
 END
