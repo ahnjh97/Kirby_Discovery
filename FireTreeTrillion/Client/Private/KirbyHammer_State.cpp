@@ -650,7 +650,6 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			CParticle::PARTICLE_DESC PartDesc{};
 			PartDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
 			PartDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-
 			pKirby->Add_Effect("YW HammerChargeParticle", PartDesc, true);
 
 
@@ -759,8 +758,7 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			CParticle::PARTICLE_DESC PartDesc{};
 			PartDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
 			PartDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
-
-			pKirby->Add_Effect("YW HammerChargeParticle", MulFXDesc, true);
+			pKirby->Add_Effect("YW HammerChargeParticle", PartDesc, true);
 
 			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerChargeParticle"), &PartDesc)))
 			//	return;

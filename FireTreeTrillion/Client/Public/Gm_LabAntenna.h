@@ -48,6 +48,12 @@ private:
 	_bool					m_bStartAnimation = { false };
 	_float4					m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 
+	_bool					m_bCollision = { false };
+	_float					m_fAlpha = { 0.f };
+	_float					m_fDissolve = { 0.f };
+
+	class CTexture*			m_pTextureComMask = { nullptr };
+
 public:
 	static CGm_LabAntenna* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

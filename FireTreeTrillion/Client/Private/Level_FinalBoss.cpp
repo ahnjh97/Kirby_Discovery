@@ -1082,6 +1082,9 @@ void CLevel_FinalBoss::Free()
 	_bool bBloomSky{ false };
 	m_pGameInstance->Bind_DeferredRawValue("g_bBloomSky", &bBloomSky, sizeof(_bool));
 
+	_bool	bDeepShadow = false;
+	m_pGameInstance->Bind_DeferredRawValue("g_bDeepShadow", &bDeepShadow, sizeof(_bool));
+
 	m_pGameInstance->Clear_EventCallBack();
 	__super::Free();
 

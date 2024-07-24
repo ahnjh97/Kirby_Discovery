@@ -285,6 +285,7 @@ public:
 
 private:
 	_float	m_fTimeDelta = { 0.f };
+	_bool	m_bEffectTrigger = { true };
 
 public:
 	static	CFinalBoss_Laser_State* Create();

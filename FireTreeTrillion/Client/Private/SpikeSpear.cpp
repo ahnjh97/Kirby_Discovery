@@ -127,8 +127,13 @@ _int CSpikeSpear::Tick(_float fTimeDelta)
 					m_pGameInstance->Get_CurCameraPtr()->Make_Shake(.2f, .5f);
 					Add_Effect("HS_FB down spear circle", FXDesc, false);
 
+					CParticle::PARTICLE_DESC FXPDesc{};
+					FXPDesc.vInitPos = (_float3)vPos;
+					FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
+					pFinalBoss->Add_Effect("YW Final Boss Wiggle B", FXPDesc, false);
+
 					m_vRingPos = (_float3)vPos; 
-					
+
 			}
 		}
 	}
@@ -187,7 +192,7 @@ HRESULT CSpikeSpear::Render()
 			return E_FAIL;
 
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
-		if (FAILED(m_pShaderCom->Begin(MODEL_NORMAL_O)))
+		if (FAILED(m_pShaderCom->Begin(MODEL_FOR_SPIKE)))
 			return E_FAIL;
 
 		m_pModelCom->Render(i);
