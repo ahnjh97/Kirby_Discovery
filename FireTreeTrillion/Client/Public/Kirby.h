@@ -154,6 +154,7 @@ public:
 		// Dialog
 		_bool			m_bDialog = { false };
 
+
 		// 어시스트 라이트
 		class CLight* m_pKirbyAssistLight1 = { nullptr };
 		class CLight* m_pKirbyAssistLight2 = { nullptr };
@@ -335,6 +336,9 @@ private:
 	// For FinalCut
 	_bool				  m_bFinalCutTrigger = { true };
 	_bool				  m_bFinalCutStartTrigger = { true };
+
+	_bool				  m_bShadowFinal = { false };
+
 
 	unordered_map<PxRigidActor*, CGameObject*> m_mapToppleableBridges;
 	unordered_map<PxRigidActor*, CGameObject*> m_mapStarBoxes;

@@ -1263,7 +1263,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			CHECK_NULLPTR(pCamera);
 			pCamera->Set_CamFocus(CCamera::FOCUS_BATTLE);
 
-			CParticle::PARTICLE_DESC FXPDesc{};
+			CMultiEffect::MULTI_FX_DESC FXPDesc{};
 			FXPDesc.pSocketMatrix = pKirby->Get_EffectSocket();
 			FXPDesc.vInitPos = { 0.f, 0.f, 1.f };
 			FXPDesc.vInitScale = { 5.f, 5.f, 5.f };
@@ -1466,7 +1466,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 				pKirby->Add_Effect("HS_finale dump dash multi", FXDesc, true);
 
-				CParticle::PARTICLE_DESC FXPDesc{};
+				CMultiEffect::MULTI_FX_DESC FXPDesc{};
 				FXPDesc.vInitPos = { 0.f, 0.f, 1.f };
 				FXPDesc.vInitScale = { 5.f, 5.f, 5.f };
 				pKirby->Add_Effect("HS_finale qte particle", FXPDesc, true);

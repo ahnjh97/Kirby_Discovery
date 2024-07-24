@@ -186,7 +186,6 @@ void CCarShopWall::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	CEventCenter::Get_Instance()->Notify(KEVENT_BREAK_CARSHOP, this);
 	//m_pGameInstance->Set_FirstTimerRatio(.2f);
 	//m_pGameInstance->Set_SecondTimerRatio(.2f);
-
 }
 
 HRESULT CCarShopWall::Add_Components()

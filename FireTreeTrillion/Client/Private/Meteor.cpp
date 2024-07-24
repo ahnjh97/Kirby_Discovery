@@ -103,7 +103,7 @@ HRESULT CMeteor::Initialize(void* pArg)
 
 	m_bUpdate_FXSocketMatrix = false;
 
-	CEffect::FX_DESC FXDesc{};
+	CMultiEffect::MULTI_FX_DESC FXDesc{};
 	FXDesc.pSocketMatrix = &m_EffectSocket;
 	FXDesc.vInitPos = { 0.f, 1.4f, -.5f };
 	FXDesc.fStartDelay = 2.f;

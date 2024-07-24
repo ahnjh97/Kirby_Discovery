@@ -1914,11 +1914,30 @@ void CKirby::DefaultIdle()
 void CKirby::Kirby_SystemTick(_float fTimeDelta)
 {
 	// 그림자는 무조건 커비를 따라간다.
-	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_vector vLightPos = vPos;
-	vLightPos.m128_f32[1] += 100.f;
-	vLightPos.m128_f32[2] -= 1.f;
-	m_pGameInstance->Update_LightShadow(vLightPos, vPos);
+	
+	_float4 vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+	if ((vPos.y < 1.f) && (vPos.y > -4.f) &&
+		(vPos.z < -20.f) && (vPos.z > -25.f))
+	{
+		m_bShadowFinal = true;
+	}
+
+	if (*m_pCurrentLevelID == LEVEL_FINALBOSS && m_bShadowFinal == true)
+	{
+		m_pGameInstance->Update_LightShadow(_float4(0.f, 100.f, 42.f, 1.f), _float4(0.f, 0.f, 0.f, 1.f));
+	}
+	else
+	{
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		_vector vLightPos = vPos;
+		vLightPos.m128_f32[1] += 100.f;
+		vLightPos.m128_f32[2] -= 1.f;
+		m_pGameInstance->Update_LightShadow(vLightPos, vPos);
+	}
+
+
+
 
 	//// Dof 초점을 커비에게 맞춘다.
 	//_vector vDOFPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);

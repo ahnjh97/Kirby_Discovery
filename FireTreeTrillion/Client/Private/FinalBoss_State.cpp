@@ -40,7 +40,7 @@ void LaserReady(CFinalBoss* pBoss)
 	ParticleDesc.pSocketMatrix = pBoss->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
 	ParticleDesc.vInitPos = { 0.f, 2.f, 0.f };
 	ParticleDesc.vInitScale = { 3.f, 3.f, 3.f };
-	pBoss->Add_Effect("HS_FB laser charge particle", ParticleDesc, false);
+	pBoss->Add_Effect("HS_FB laser charge particle B", ParticleDesc, false);
 
 
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
