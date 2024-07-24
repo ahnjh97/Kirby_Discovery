@@ -249,7 +249,7 @@ HRESULT CBuffahorn::Add_Components()
 	HitBox.pCollisionType = MONSTER;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
-	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
+	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 3.f, 3.f);
 
 	SetUp_FSM();
 

@@ -105,7 +105,9 @@ void CBladeKnight_Move_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		if(rand() % 2 == 0)
 			pBladeKnight->Change_State(CBladeKnight::BLADEKNIGHT_ATTACKSTART, 55.f, false, true);
 		else
+		{
 			pBladeKnight->Change_State(CBladeKnight::BLADEKNIGHT_TORNADOATTACKCHARGE, 55.f, false, true);
+		}
 	}
 
 	pTransformCom->Look_At(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION));
