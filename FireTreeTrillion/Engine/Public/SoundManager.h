@@ -34,8 +34,8 @@ public:
 	_bool IsChannelPaused(CHANNELID eID);
 
 	void PlayMySound(TCHAR* pSoundKey, CHANNELID eID, _float _vol);
-	void PlayBGM(TCHAR* pSoundKey);
-	void PlayBGM(CHANNELID eID, TCHAR* pSoundKey);
+	void PlayBGM(TCHAR* pSoundKey, _float _vol = 0.5f);
+	void PlayBGM(CHANNELID eID, TCHAR* pSoundKey, _float _vol = 0.5f);
 
 	void PlaySmoothUp(CHANNELID eID, _float targetVolume, _float fAddValue);
 	void PlaySmoothDown(CHANNELID eID, _float targetVolume, _float fMinusValue);
