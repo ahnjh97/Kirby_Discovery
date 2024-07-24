@@ -781,6 +781,9 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 
 				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_lunch time logo test"))))
 					return;
+
+				m_pGameInstance->StopSound(CHANNEL_BGM_SUB);
+				m_pGameInstance->PlayMySound(L"K15_FoodShopLunchTime.marker.wav", CHANNEL_BGM_SUB, 0.5f);
 			}
 		}
 		break;
