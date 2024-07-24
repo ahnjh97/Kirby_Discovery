@@ -100,13 +100,6 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 		Safe_AddRef(m_pKirby);
 	}
 
-#pragma region UI_BUTTON
-
-	m_pNameTag = dynamic_cast<CHUD_KirbyNameTag*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_HUD_KirbyNameTag")));
-	CHECK_NULLPTR(m_pNameTag);
-
-#pragma endregion
-
 	return S_OK;
 }
 
@@ -116,8 +109,8 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 	if (nullptr == m_pKirby)
 		return OBJ_NOEVENT;
 
-	if (nullptr != m_pNameTag)
-		m_pNameTag->Tick(fTimeDelta);
+	//if (nullptr != m_pNameTag)
+	//	m_pNameTag->Tick(fTimeDelta);
 
 	m_fTimeDelta = fTimeDelta;
 
@@ -159,8 +152,8 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 
 void CHUD_KirbyStatus::Late_Tick(_float fTimeDelta)
 {
-	if (nullptr != m_pNameTag)
-		m_pNameTag->Late_Tick(fTimeDelta);
+	//if (nullptr != m_pNameTag)
+	//	m_pNameTag->Late_Tick(fTimeDelta);
 
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
@@ -171,9 +164,8 @@ HRESULT CHUD_KirbyStatus::Render()
 	if (KIRBYHP_HIDE == m_eCurState && 0 == m_fAlpha)
 		return S_OK;
 
-	//버튼 렌더링
-	if (nullptr != m_pNameTag)
-		m_pNameTag->Render();
+	//if (nullptr != m_pNameTag)
+	//	m_pNameTag->Render();
 
 	// 만약, 클래스 내부에서 랜더되지 않아도 되는 상황으로 판단한다면, 랜더를 하지 않는다.
 	//if (m_bRenderHpbar == false)
@@ -187,9 +179,7 @@ HRESULT CHUD_KirbyStatus::Render()
 	}
 
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
-	{
 		Render_BindSet(m_pShaderCom, m_pTransformCom);
-	}
 
 	//추후 폰트가 아닌 이미지폰트로 렌더할 예정
 	/*
@@ -513,7 +503,9 @@ void CHUD_KirbyStatus::Disappear_HpBar(_float fTimeDelta)
 		{
 			m_fAlpha = 0.f;
 			m_eCurState = KIRBYHP_HIDE;
-			m_pNameTag->Set_NameTagState(CHUD_KirbyNameTag::NAMETAG_HIDE); //07.24) 네임태그 상태 연동
+
+			CHUD_KirbyNameTag* pNameTag = dynamic_cast<CHUD_KirbyNameTag*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_HUD"), 0));
+			pNameTag->Set_NameTagState(CHUD_KirbyNameTag::NAMETAG_HIDE); //07.24) 네임태그 상태 연동
 		}
 	}
 	// 반대로, 7초 이하이거나 (피격 또는 회복이 되었다는 뜻임) 
@@ -521,7 +513,8 @@ void CHUD_KirbyStatus::Disappear_HpBar(_float fTimeDelta)
 	else if (m_fIdleTime <= 5.f || m_bCustomRenderHpbar == true)
 	{
 		m_eCurState = KIRBYHP_SHOW;
-		m_pNameTag->Set_NameTagState(CHUD_KirbyNameTag::NAMETAG_SHOW); //07.24) 네임태그 상태 연동
+		CHUD_KirbyNameTag* pNameTag = dynamic_cast<CHUD_KirbyNameTag*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_HUD"), 0));
+		pNameTag->Set_NameTagState(CHUD_KirbyNameTag::NAMETAG_SHOW); //07.24) 네임태그 상태 연동
 
 		m_fAlpha = 1.f;
 		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);

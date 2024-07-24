@@ -43,7 +43,7 @@ private:
 	_bool							m_IsKirbyExistence = { FALSE };
 
 	class CCharacter*				m_pKirby = { nullptr };
-	class CHUD_KirbyNameTag*		m_pNameTag = { nullptr };
+	//class CHUD_KirbyNameTag*		m_pNameTag = { nullptr };
 	KIRBYHP_STATE					m_eCurState = { KIRBYHP_NONE };
 
 	// 마스킹을 위한 텍스쳐
