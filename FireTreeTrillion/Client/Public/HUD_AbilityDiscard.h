@@ -35,6 +35,7 @@ public:
 	void						ChaseUI_To_Player();
 	void						Compute_PlayerDumpAbiliyTime();
 	_bool						Key_InputSystem(_float fTimeDelta);
+	TEX_DISCARD					Check_TexIndex();
 
 private:
 	HRESULT						Add_Components();
@@ -54,6 +55,7 @@ private:
 
 	_float						m_fGaugeRatio = { 0.f };
 	_float						m_fDumpAbilityTime = { 0.f };
+	_float						m_fKeyInputTime = { 0.f };
 
 };
 
