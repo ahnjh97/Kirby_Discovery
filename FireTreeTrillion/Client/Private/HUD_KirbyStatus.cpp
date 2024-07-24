@@ -561,7 +561,6 @@ void CHUD_KirbyStatus::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pNameTag);
 	Safe_Release(m_pTexMask);
 	Safe_Release(m_pKirby);
 }
