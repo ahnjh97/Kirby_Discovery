@@ -100,7 +100,7 @@ _int CHUD_KirbyNameTag::Tick(_float fTimeDelta)
 		return OBJ_NOEVENT;
 	}
 
-	//return OBJ_NOEVENT;
+	return OBJ_NOEVENT;
 }
 
 void CHUD_KirbyNameTag::Late_Tick(_float fTimeDelta)
