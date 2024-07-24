@@ -60,7 +60,7 @@ public:
 	};
 
 	enum SIMBA_EYETEX { EYETEX_DIFFUSE, EYETEX_NORMAL, EYETEX_MRA, EYETEX_END };
-	enum SIMBA_EYESTATE { SIMBAEYE_LONG, SIMBAEYE_SMALL, SIMBAEYE_BIG, SIMBAEYE_END };
+	enum SIMBA_EYESTATE { SIMBAEYE_LONG, SIMBAEYE_SMALL, SIMBAEYE_BIG, SIMBAEYE_NONE, SIMBAEYE_END };
 	enum SIMBA_ROTATION { ATTACKJUMP, BITERUSH, BITERUSHJUMP, ROTATION_END };
 	enum SIMBA_FINGER { INDEX, MIDDLE, PINKY, RING, THUMB, FINGER_END };
 
@@ -99,6 +99,14 @@ public:
 
 	_bool Get_Wave2Summoned() { return m_bWave2Summoned; }
 
+	void ResetFireCount() { m_iFireCount = 0; }
+	_uint Get_FireCount() { return m_iFireCount; }
+	_bool Get_EyeBloom() { return m_bEyeBloom; }
+	void Set_EyeBloom(_bool bEyeBloom) { m_bEyeBloom = bEyeBloom; }
+
+	void Set_DimensionGateActivation(_bool bActivation) { m_bDimensionClawActivated = bActivation; }
+	_uint Get_SmokeCount() { return m_iSmokeCount; }
+
 public:
 	virtual HRESULT Initialize_Prototype()			override;
 	virtual HRESULT Initialize(void* pArg)			override;
@@ -131,9 +139,11 @@ public:
 
 	void			CheckFinalCrusherRingCollision(_float fTimeDelta);
 
+	void			SpawnFire(_uint iAnimIdx);
+
 	// Simba Effects
 	void			QuickClawNailFlash(_uint eSimbaAnim);
-	void			QuickClawSlash();
+	void			QuickClawSlash(_uint eSimbaAnim);
 	void			FinalCrusherCharge();
 	void			FinalCrusherSwing();
 	void			FinalCrusherSmash();
@@ -141,14 +151,30 @@ public:
 	void			JumpStartSmoke();
 	void			LandingSmoke();
 	void			AttackJumpWind();
+	void			AttackJumpHit(); // 왼손 오른손 한번씩 호출됨
 	void			DoubleClawDashGround();
 	void			DoubleClawGround();
 	void			DoubleClawSweep();
+
+	void			DimensionLaserVomit();
+	void			DimensionLaser();
+	void			DimensionLaserParticles();
 
 	//크로스 공격 나오는 타이밍
 	void			DimensionClaw();
 	//돌진하면서 이빨씹기(씹는 타이밍)
 	void			TeethBite();
+
+	void			WalkSmoke();
+
+	// 포효 전기
+	void			RoarElecParts(); // 아직 호출안됨
+
+	// 2페이즈 회전하면서 점프할때, 착지할때 회색방구. 점프뛸땐 한번만 호출, 착지할땐 발마다 한번씩 호출
+	void			BiteRushJumpSmoke(_uint iAnimIndex);
+
+	// x자 공격 발사하기 전에 손에 불붙는거
+	void			DimensionClawFire(); 
 
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
@@ -157,6 +183,15 @@ private:
 	class CBone*	m_pLeftHandBone = { nullptr };
 	class CBone*	m_pRightHandBone = { nullptr };
 	class CBone*	m_pLaserBone = { nullptr };
+	class CBone*	m_pLeftFootBone = { nullptr };
+	class CBone*	m_pRightFootBone = { nullptr };
+	class CBone*	m_pMouthBone = { nullptr };
+
+	_float4x4		m_matLeftHand = { _float4x4::Identity };
+	_float4x4		m_matRightHand = { _float4x4::Identity };
+	_float4x4		m_matLip = { _float4x4::Identity };
+	_float4x4		m_matMouth = { _float4x4::Identity };
+
 	const _float4x4* m_pLaserBoneMatrix = { nullptr };
 	CGameObject*	m_pSimbaLaser = { nullptr };
 	CTransform*		m_pSimbaLaserTransform = { nullptr };
@@ -228,8 +263,17 @@ private:
 	_float3			m_vRingPos = { };
 	_float			m_fRingInnerRadius = {};
 	_float			m_fRingOuterRadius = {};
-
 	_bool			m_bRenderRing;
+
+	_uint			m_iFireCount = {};
+	_bool			m_bEyeBloom = { false };
+
+	_uint			m_iEyeRenderCount = {};
+	
+	_bool			m_bDimensionClawActivated = { false };
+	_float			m_fDeactiveTime = {};
+	
+	_uint			m_iSmokeCount = {};
 
 private:
 	HRESULT		Add_Components();
@@ -269,10 +313,13 @@ private:
 	void		RemoveDeadRocksFromList();
 	void		RemoveDeadDebrisFromList();
 
+	_float3		ComputeAngleForEffect(_float fReverseLook = 1.f);
+
 #ifdef _DEBUG
 	void		RenderRing();
 	void		RenderPolygon(vector<_vector>& worldPoints);
 #endif
+
 public:
 	static CSimba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

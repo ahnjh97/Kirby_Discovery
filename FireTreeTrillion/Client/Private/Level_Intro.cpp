@@ -32,8 +32,6 @@
 
 #define FOG_TRIGGER_VALUE_Y		26.f
 
-#define VOLUME_BGM				0.5f
-#define VOLUME_JUNGLE_BGM		0.4f
 
 CLevel_Intro::CLevel_Intro(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
@@ -104,12 +102,6 @@ void CLevel_Intro::Change_Levels()
 	pTransingStar->Set_SmallColor(_float3(160.f / 255.f, 212.f / 255.f, 104.f / 255.f));
 	pTransingStar->Set_LargeColor(_float3(91.f / 255.f, 121.f / 255.f, 59.f / 255.f));
 	pTransingStar->Activate(CTransingStar::CLOSE);
-
-	//CLoadingStart* pLoadingStart = static_cast<CLoadingStart*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar")));
-	//if (nullptr != pLoadingStart)
-	//{
-	//	pLoadingStart->Set_TexIndex(0);
-	//}
 }
 
 void CLevel_Intro::Tick(_float fTimeDelta)
@@ -170,14 +162,14 @@ void CLevel_Intro::Sound_Tick(_float fTimeDelta)
 	break;
 	case JUNGLE:
 	{
-		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_JUNGLE_BGM, fTimeDelta * 0.03f);
+		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_BGM_SUB, fTimeDelta * 0.03f);
 		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM_SUB, 0.0f, fTimeDelta * 0.06f);
 	}
 	break;
 	case NOBGM:
 	{
 		if (eState == BUILDING)
-			m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_JUNGLE_BGM, fTimeDelta * 0.1f);
+			m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_BGM_SUB, fTimeDelta * 0.1f);
 
 		else if (eState == JUNGLE)
 			m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.1f);

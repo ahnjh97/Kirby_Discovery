@@ -626,11 +626,11 @@ void CCollisionCenter::DeeDeeDee_Battle()
 			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
 				return;
 
-			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CPhysXObject* pPlayerBullet = static_cast<CPhysXObject*>(Dst);
 			CDeeDeeDee* pMonster = static_cast<CDeeDeeDee*>(Src);
 
 
-			_float fAttack = pKirby->Get_Attack();
+			_float fAttack = pPlayerBullet->Get_Attack();
 			pMonster->Minus_Hp(fAttack);
 			pthis->Camera_Shaking(1.2f);
 			DstHit->Set_Alive(false);
@@ -836,13 +836,13 @@ void CCollisionCenter::Simba_Battle()
 			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
 				return;
 
-			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CPhysXObject* pPlayerBullet = static_cast<CPhysXObject*>(Dst);
 			CSimba* pSimba = static_cast<CSimba*>(Src);
 
 			if (false == pSimba->IsDamagable())
 				return;
 
-			_float fAttack = pKirby->Get_Attack();
+			_float fAttack = pPlayerBullet->Get_Attack();
 			pSimba->Minus_Hp(fAttack);
 			pthis->Camera_Shaking(1.2f);
 			DstHit->Set_Alive(false);
@@ -997,10 +997,10 @@ void CCollisionCenter::FinalStage_Battle()
 			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
 				return;
 
-			CKirby* pKirby = static_cast<CKirby*>(Dst);
+			CPhysXObject* pPlayerBullet = static_cast<CPhysXObject*>(Dst);
 			CMonster* pMonster = static_cast<CMonster*>(Src);
 
-			_float fAttack = pKirby->Get_Attack();
+			_float fAttack = pPlayerBullet->Get_Attack();
 			pMonster->Minus_Hp(fAttack);
 			pthis->Camera_Shaking(1.2f);
 			DstHit->Set_Alive(false);

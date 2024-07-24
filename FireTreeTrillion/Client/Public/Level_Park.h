@@ -35,6 +35,9 @@ private:
 	void	SummonMonsters(_uint iTriggerIndex);
 	void	SummonEffectForMonster(_uint iTriggerIndex);
 
+	void	Check_KirbyPosState();
+
+
 	HRESULT Add_EnvMap();
 	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };
 	CTexture* m_pEnvTexture[TYPE_END] = { nullptr, nullptr, nullptr };

@@ -1150,9 +1150,9 @@ HRESULT CLoader::Loading_For_Simba()
 	hr = Add_Texture(eLevel, "HUD_BossName_Leongar", "UI/HUD/Boss/BossName_Leongar.png");
 
 
-	if (FAILED(Add_Texture(eLevel, "SimbaEye_Diffuse", "SimbaEye/Eye_BaseColor%d.dds", 3)))
+	if (FAILED(Add_Texture(eLevel, "SimbaEye_Diffuse", "SimbaEye/Eye_BaseColor%d.dds", 4)))
 		return E_FAIL;
-	if (FAILED(Add_Texture(eLevel, "SimbaEye_Normal", "SimbaEye/Eye_Normal%d.dds", 3)))
+	if (FAILED(Add_Texture(eLevel, "SimbaEye_Normal", "SimbaEye/Eye_Normal%d.dds", 4)))
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "SimbaEye_MRA", "SimbaEye/BaseMRA.dds")))
 		return E_FAIL;
