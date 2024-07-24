@@ -23,12 +23,14 @@ private:
 	virtual ~CGully() = default;
 
 public:
-	void Set_Gully(_fvector vPos, _float fLifeTime) {
+	void Set_Gully(_fvector vPos, _float fLifeTime, _bool bFireGully = false) {
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 		m_fLifeTime = fLifeTime;
 		m_fScale = 1.f;
 		m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 		m_bPoolingDead = false;
+
+		m_bFireGully = bFireGully;
 	}
 
 public:
@@ -53,6 +55,8 @@ private:
 	_float	m_fLifeTime = { 0.f };
 	
 	_float	m_fScale = { 0.f };
+
+	_bool	m_bFireGully = { false };
 
 private:
 	HRESULT Add_Components();

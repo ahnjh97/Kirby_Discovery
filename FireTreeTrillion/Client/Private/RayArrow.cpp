@@ -153,10 +153,10 @@ _int CRayArrow::Tick(_float fTimeDelta)
 						FXDesc.vInitPos.y = .1f;
 						FXDesc.vInitScale = {2.5f, 2.5f, 2.5f};
 						Add_Effect("HS_FB arrow bomb", FXDesc, false);
-						CParticle::PARTICLE_DESC FXPDesc{};
-						FXPDesc.vInitPos = (_float3)GET_POS;
-						FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
-						Add_Effect("YW Final Boss Wiggle B", FXPDesc, false);
+						//CParticle::PARTICLE_DESC FXPDesc{};
+						//FXPDesc.vInitPos = (_float3)GET_POS;
+						//FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
+						//Add_Effect("YW Final Boss Wiggle B", FXPDesc, false);
 
 						m_pGameInstance->Get_CurCameraPtr()->Make_Shake(.2f, .5f);
 
