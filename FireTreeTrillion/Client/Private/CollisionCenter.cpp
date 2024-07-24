@@ -24,7 +24,6 @@ IMPLEMENT_SINGLETON(CCollisionCenter)
 void CCollisionCenter::Initialize()
 {
 
-
 	// 레디얼 기름칠
 	GAMEINSTANCE Setting_RadialBlur(5.f, 300.f);
 }

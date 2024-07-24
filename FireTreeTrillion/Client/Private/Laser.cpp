@@ -85,7 +85,7 @@ _int CLaser::Tick(_float fTimeDelta)
 		fDecalTime = 0.f;
 
 		_float3 vCollidingPoint =
-			Compute_CollidingPoint(GET_POS, (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK), {0.f, 0.f, 0.f}, {21.f, .6f, 21.f});
+			 CUtils::Compute_CollidingPoint(GET_POS, (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK), {0.f, 0.f, 0.f}, {21.f, 1.f, 21.f});
 
 		if (!ISDEFAULTFLOAT3(vCollidingPoint))
 		{
@@ -96,21 +96,11 @@ _int CLaser::Tick(_float fTimeDelta)
 			FXDesc.vInitPos = { 0.f, 0.f, 0.f };
 			Add_Effect("HS_FB laser decal", FXDesc, false);
 
-			//for (_int i = 0; i < 10; ++i)
-			//{
-			//	FXDesc.vInitRot = { CUtils::Make_RandomFloat(-45.f, 45.f), CUtils::Make_RandomFloat(-45.f, 45.f), CUtils::Make_RandomFloat(-45.f, 45.f) };
-			//	_float fInitScale = CUtils::Make_RandomFloat(3.f, 5.f);
-			//	FXDesc.vInitScale = { fInitScale, fInitScale, fInitScale };
-			//	FXDesc.fStartDelay = CUtils::Make_RandomFloat(0.f, .15f);
-			//	Add_Effect("HS_billboard up line", FXDesc);
-			//}
 
 			//충돌 시 튀는 파티클
 			CParticle::PARTICLE_DESC ParticleDesc{};
 			ParticleDesc.vInitPos = vCollidingPoint;
-			ParticleDesc.vInitScale = {2.f, 2.f, 2.f };
-
-			//Add_Effect("HS_laser collide particle", ParticleDesc);
+			ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
 
 			Add_Effect("HS_perfect laser collide particle", ParticleDesc);
 		}
@@ -191,6 +181,9 @@ void CLaser::Render_IMGUI()
 		ImGui::TreePop();
 	}
 
+
+
+
 	//ImGui::Text("RePress : %d", m_bRePressBlock);
 	//ImGui::Text("Land : %d", INFO(m_isLanding));
 
@@ -210,6 +203,7 @@ void CLaser::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 {
 }
 
+/*
 _float3 CLaser::Compute_CollidingPoint(_float3 vLaserStart, _float3 vLaserDir, _float3 vLandCenter, _float3 vLandExtent)
 {
 	_float3 vResult{ -1.f, -1.f, -1.f };
@@ -227,6 +221,7 @@ _float3 CLaser::Compute_CollidingPoint(_float3 vLaserStart, _float3 vLaserDir, _
 
 	return vResult;
 }
+*/
 
 HRESULT CLaser::Add_Components()
 {

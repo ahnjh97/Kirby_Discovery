@@ -225,6 +225,7 @@ void CDeeDeeDeeHammer::Ready_FadeOut()
 	else if (pFadingUI->Get_FadeRatio() <= 0.f)
 	{
 #pragma region 카메라 컷신 조정
+		//효선아 여기야 와들디 세팅
 
 		CCamera_Main* pCameraMain = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 		CHECK_NULLPTR(pCameraMain);

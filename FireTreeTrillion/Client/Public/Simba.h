@@ -163,7 +163,7 @@ public:
 	//크로스 공격 나오는 타이밍
 	void			DimensionClaw();
 	//돌진하면서 이빨씹기(씹는 타이밍)
-	void			TeethBite();
+	void			TeethBite(_bool bRight = false);
 
 	void			WalkSmoke();
 

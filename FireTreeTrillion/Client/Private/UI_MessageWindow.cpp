@@ -771,6 +771,8 @@ void CUI_MessageWindow::Ready_FadeOut()
 	}
 	else if (pFadingUI->Get_FadeRatio() <= 0.f)
 	{
+		//페이드 아웃
+		
 		if (bOnceChanger == false)
 		{
 			m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOWN));

@@ -412,16 +412,32 @@ PxTransform CUtils::TransformToPxTransform(CTransform* pTransform)
 
 	PxTransform pxTransform(PxVec3(worldMat._41, worldMat._42, worldMat._43), PxQuat(vRotQuat.x, vRotQuat.y, vRotQuat.z, vRotQuat.w));
 
-
-
-	//PxTransform transform = CUtils::mat44ToTransform(pxMat);
-
 	return pxTransform;
 }
 
 PxTransform CUtils::ToPxTransform(const _float4x4& mat)
 {
 	return mat44ToTransform(To_Float4x4(mat));
+}
+
+_float3 CUtils::Compute_CollidingPoint(_float3 vLaserStart, _float3 vLaserDir, _float3 vLandCenter, _float3 vLandExtent)
+{
+
+	_float3 vResult{ -1.f, -1.f, -1.f };
+	vLaserDir.Normalize();
+
+	BoundingBox landBox;
+	landBox.Center = vLandCenter;
+	landBox.Extents = vLandExtent;
+
+	_float fDist;
+	if (landBox.Intersects(vLaserStart, vLaserDir, fDist))
+	{
+		vResult = vLaserStart + vLaserDir * fDist;
+	}
+
+	return vResult;
+
 }
 
 HRESULT CUtils::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)

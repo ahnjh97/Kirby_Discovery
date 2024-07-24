@@ -1110,10 +1110,9 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			pSimba->TeethBite();
 			s_iBiteCount = 0;
 			pSimba->SpawnStar(iState);
-			
 		}
 		else if (0.65f < fAnimRatio && 0 == s_iBiteCount) {
-			pSimba->TeethBite();
+			pSimba->TeethBite(true);
 			s_iBiteCount++;
 		}
 		else if (0.7f < fAnimRatio && 1 == iStarCount) {
