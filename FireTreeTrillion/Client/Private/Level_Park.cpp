@@ -244,6 +244,11 @@ HRESULT CLevel_Park::Render()
 	return S_OK;
 }
 
+void CLevel_Park::Sound_Tick(_float fTimeDelta)
+{
+
+}
+
 HRESULT CLevel_Park::Ready_Lights()
 {
 	//// 예시코드 1 : 태양광
@@ -357,23 +362,9 @@ HRESULT CLevel_Park::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_Park::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-	//CSkySphere::SKYSPHERE_DESC LabSkyDesc{};
-	//LabSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
-	//LabSkyDesc.strTextureTag = { "SkySphere_Lab_Diffuse" };
-	//HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &LabSkyDesc);
-	//CHECK_FAILED(hr);
+#pragma region 포탈
 
-	////SUB_SKYSPHERE
-	//CSkySphere::SKYSPHERE_DESC LabSkySubDesc{};
-	//_float4x4 InitMat = _float4x4::Identity;
-	//InitMat.Translation({ 0.f, -50.f, -0.f });
-	//LabSkySubDesc.matWorld = InitMat;
-
-	//hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphereSub"), &LabSkySubDesc);
-	//CHECK_FAILED(hr);
-
-
-	// 두 번째 랜드로 이동하는 포탈
+	// 두 번째 랜드로 이동하는 포탈 ------------------------------------------------------
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
@@ -389,7 +380,8 @@ HRESULT CLevel_Park::Ready_Layer_BackGround(const wstring& strLayerTag)
 	CTransform* pTransform = pObj->Get_TransformCom();
 	pTransform->Set_Scaled(5.f, 8.f, 1.f);
 
-	// 세 번째 랜드로 이동하는 포탈
+
+	// 세 번째 랜드로 이동하는 포탈 ------------------------------------------------------
 	CGameObject::GAMEOBJECT_DESC PortalDesc{};
 	PortalDesc.fSpeedPerSec = 5.f;
 	PortalDesc.fRotationPerSec = ToRadian(90.f);
@@ -404,6 +396,23 @@ HRESULT CLevel_Park::Ready_Layer_BackGround(const wstring& strLayerTag)
 	pObj = m_pGameInstance->Add_CloneReturn(m_iLevel, TEXT("Layer_Portal"), TEXT("Prototype_GameObject_PortalSoftEffect"), &PortalDesc);
 	pTransform = pObj->Get_TransformCom();
 	pTransform->Set_Scaled(5.f, 8.f, 1.f);
+
+#pragma endregion
+
+	// 전구 ---------------------------------------------------------------------------
+	CGameObject::GAMEOBJECT_DESC BulbDesc{};
+	BulbDesc.fSpeedPerSec = 5.f;
+	BulbDesc.fRotationPerSec = ToRadian(90.f);
+
+	InitMat = _float4x4::Identity;
+	translationMatrix = XMMatrixTranslation(8.58f, 38.12f, -26.f);
+	
+	rotationY = XMConvertToRadians(70.f);
+	rotationMatrixY = XMMatrixRotationY(rotationY);
+	InitMat = rotationMatrixY * translationMatrix;
+
+	BulbDesc.matWorld = InitMat;
+	pObj = m_pGameInstance->Add_CloneReturn(m_iLevel, TEXT("Layer_Bulb"), TEXT("Prototype_GameObject_Bulb"), &BulbDesc);
 
 	return S_OK;
 }

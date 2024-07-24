@@ -149,7 +149,7 @@ void CCamera_Main::Lock_All(_float3 vPos, _float3 vLook, _bool bInterpolate)
 	}
 
 	m_vDestCamPos = vDestPos;
-	m_vDestCamDir = vDestDir;
+	m_vDestCamDir = vDestDir;                                                                                                                                     
 
 }
 
@@ -2778,7 +2778,9 @@ void CCamera_Main::Move_ForTrigger(_float fTimeDelta, _float3 vPos, _float3 vDir
 	if (LEVEL_TOWN == *m_pCurrentLevelID)
 	{
 		vPos = { 109.9f, 25.2f, 108.5f };
-		vDir = { 1.f, .15f, -.12f };
+		vDir = { 1.f, .07f, -.12f };
+		//vDir = { 1.f, .15f, -.12f };
+
 		CAMACTION newAct = {};
 		newAct.fTime = 0.f;
 		newAct.eCamCut = CUT_HARD;
