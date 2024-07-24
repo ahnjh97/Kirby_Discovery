@@ -189,6 +189,14 @@ void CLevel_Park::SummonEffectForMonster(_uint iTriggerIndex)
 	}
 }
 
+void CLevel_Park::Check_KirbyPosState()
+{
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(m_iLevel, TEXT("Layer_Player")));
+	_float4 vPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+
+	m_eSoundState = (vPos.z < -43.f)? LAND_ONE : LAND_TWO;
+}
+
 void CLevel_Park::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
@@ -203,6 +211,10 @@ void CLevel_Park::Tick(_float fTimeDelta)
 		m_fSummonTime = 0.f;
 		SummonMonsters(m_iTriggerIndex);
 	}
+
+	// for sound
+	Check_KirbyPosState();
+	Sound_Tick(fTimeDelta);
 }
 
 HRESULT CLevel_Park::Render()
@@ -246,7 +258,33 @@ HRESULT CLevel_Park::Render()
 
 void CLevel_Park::Sound_Tick(_float fTimeDelta)
 {
-
+	switch (m_eSoundState)
+	{
+	case LAND_ONE:
+	{
+		static _bool bOnceLandOne = false;
+		if (false == bOnceLandOne)
+		{
+			m_pGameInstance->StopSound(CHANNEL_BGM);
+			m_pGameInstance->PlayBGM(CHANNEL_BGM, L"K15_Park3.wav");
+			m_pGameInstance->SetVolume(CHANNEL_BGM, VOLUME_BGM);
+			bOnceLandOne = true;
+		}
+	}
+	break;
+	case LAND_TWO:
+	{
+		static _bool bOnceLandTwo = false;
+		if (false == bOnceLandTwo)
+		{
+			m_pGameInstance->StopSound(CHANNEL_BGM);
+			m_pGameInstance->PlayBGM(CHANNEL_BGM, L"K15_Park5.marker.wav");
+			bOnceLandTwo = true;
+		}
+		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_BGM, fTimeDelta * 0.03f);
+	}
+	break;
+	}
 }
 
 HRESULT CLevel_Park::Ready_Lights()
@@ -1388,6 +1426,8 @@ void CLevel_Park::Free()
 
 	for (auto& tex : m_pEnvTexture)
 		Safe_Release(tex);
+
+	m_pGameInstance->StopSound(CHANNEL_BGM);
 }
 
 
