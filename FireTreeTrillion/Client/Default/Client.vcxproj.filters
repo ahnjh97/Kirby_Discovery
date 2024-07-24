@@ -241,9 +241,6 @@
     <Filter Include="02.GameObjects\Map\TerrainFog">
       <UniqueIdentifier>{631580d9-5ad3-41b9-b6d7-5fcc5394b093}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI\HUD\kirbyHP">
-      <UniqueIdentifier>{04e3199d-7d6c-4af4-a33d-70cd4bd68509}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\UI\HUD\StarPoint">
       <UniqueIdentifier>{3aabc030-21c4-42d9-b31a-7b69ff957777}</UniqueIdentifier>
     </Filter>
@@ -736,6 +733,9 @@
     <Filter Include="02.GameObjects\UI\LoadingStart\LoadingFont">
       <UniqueIdentifier>{d681abb3-c1df-4fd4-9445-a54ee620bee3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\HUD\KirbyHP">
+      <UniqueIdentifier>{04e3199d-7d6c-4af4-a33d-70cd4bd68509}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1021,7 +1021,7 @@
       <Filter>02.GameObjects\PhysXObject\Character\Monster\BladeKnight\PartObject_Sword</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HUD_KirbyStatus.h">
-      <Filter>02.GameObjects\UI\HUD\kirbyHP</Filter>
+      <Filter>02.GameObjects\UI\HUD\KirbyHP</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HUD_StarPoint.h">
       <Filter>02.GameObjects\UI\HUD\StarPoint</Filter>
@@ -1455,16 +1455,17 @@
     </ClInclude>
     <ClInclude Include="..\Public\UnKnownFireMan.h">
       <Filter>02.GameObjects\Effect\Fire</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\BossOrigin.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\BossOrigin.h">
       <Filter>02.GameObjects\Map\SimbaObjects\BossOrigin</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Gm_ParkShutter.h">
       <Filter>02.GameObjects\Map\Gimmick\Park_Wondaria</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LoadingFont.h">
-      <Filter>02.GameObjects\UI\LoadingStart\LoadingFont</Filter>
+    <ClInclude Include="..\Public\HUD_KirbyNameTag.h">
+      <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LoadingFont.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -1729,7 +1730,7 @@
       <Filter>02.GameObjects\Map\TerrainFog</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HUD_KirbyStatus.cpp">
-      <Filter>02.GameObjects\UI\HUD\kirbyHP</Filter>
+      <Filter>02.GameObjects\UI\HUD\KirbyHP</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HUD_StarPoint.cpp">
       <Filter>02.GameObjects\UI\HUD\StarPoint</Filter>
@@ -2172,9 +2173,10 @@
     <ClCompile Include="..\Private\BossOrigin.cpp">
       <Filter>02.GameObjects\Map\SimbaObjects\BossOrigin</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\LoadingFont.cpp">
-      <Filter>02.GameObjects\UI\LoadingStart\LoadingFont</Filter>
+    <ClCompile Include="..\Private\HUD_KirbyNameTag.cpp">
+      <Filter>02.GameObjects\UI\HUD</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\LoadingFont.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
