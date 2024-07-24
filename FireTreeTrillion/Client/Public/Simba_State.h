@@ -383,6 +383,7 @@ private:
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
 	_bool m_bSetDimensionClawMatrix = { false };
+	_bool m_bClawFire = { false };
 
 public:
 	static	CSimba_DimensionClaw* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
