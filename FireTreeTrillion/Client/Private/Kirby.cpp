@@ -114,6 +114,7 @@ _int CKirby::Tick(_float fTimeDelta)
 	__super::Tick(m_fTimeDelta);
 	Kirby_SystemTick(m_fTimeDelta);
 
+
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);
 
@@ -633,6 +634,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			// CollisionCenter 에서 흡수 가능을 판정을 내렸었다면, X키를 누르면 어떤 상태든 상관없이 흡수 할 수 있다.
 			if ((Get_State() == STATE_IDLE || 
 				Get_State() == STATE_RUN || 
+				Get_State() == STATE_RUNSTART ||
 				Get_State() == SWORDSTATE_RUN || 
 				Get_State() == SWORDSTATE_WAIT ||
 				Get_State() == HAMMERSTATE_IDLE ||
@@ -641,7 +643,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				)
 				return;
 
-			if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && INFO(m_bisDeforming) == false)
+			if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) && INFO(m_bisDeforming) == false)
 			{
 				if (INFO(m_pObject) != nullptr)
 					return;
@@ -649,8 +651,6 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				CMultiEffect::MULTI_FX_DESC FXDesc{};
 				FXDesc.vInitPos = { 0.f, .6f, .4f };
 				FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-
-				Add_Effect("Vacuum_v3", FXDesc, true);
 
 				//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v3"), &FXDesc)))
 				//	return;
@@ -668,8 +668,12 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 
 				// 전방 90도가 아닐 경우
 				if (fDegree > 45.f)
+				{
+					INFO(m_bBlockOtherVacuum) = false;
 					return;
+				}
 
+				Add_Effect("Vacuum_v3", FXDesc, true);
 				// Deforming을 트루로 만든다. 길게 애니메이션이 재생될 준비를 한다. 이건 밖에서 예외처리 될 것이다.
 				INFO(m_bisDeforming) = true;
 				INFO(m_vObjectScale) = pObject->Get_TransformCom()->Get_Scaled();
@@ -2000,7 +2004,7 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 
 
 	// 모션블러가 들어가면 어색한 곳을 해소한다.
-	if (m_pFSM->Get_State() == CARSTATE_CUT2)
+	if (m_pFSM->Get_State() == CARSTATE_CUT2 || m_pFSM->Get_State() == FINALCUTSTATE_CUT1 || m_pFSM->Get_State() == FINALCUTSTATE_CUT2)
 		m_bMotionBlur = false;
 	else
 		m_bMotionBlur = true;
@@ -2347,7 +2351,6 @@ void CKirby::AssistLight_Control()
 			return;
 		INFO(m_pKirbyAssistLight2) = CGameInstance::Get_Instance()->Get_LightLastAddress();
 		Safe_AddRef(INFO(m_pKirbyAssistLight2));
-
 	}
 
 
@@ -2402,7 +2405,11 @@ void CKirby::Reset_If_Damage()
 
 	INFO(m_bFirstChargeEffectTrigger) = true;
 	INFO(m_bSecondChargeEffectTrigger) = true;
+
 	INFO(m_bBulbJump) = false;
+	INFO(m_bLightOn) = false;
+
+	INFO(m_fCrashChargeTime) = 0.f;
 
 	INFO(m_fTimeRatio) = 0.f;
 }

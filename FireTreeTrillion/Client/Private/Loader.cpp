@@ -2467,6 +2467,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 	{
 		//Ä¿ºñ~~
 		m_vecModelInfo.emplace_back("KirbyDefault", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("KirbyDumpDefault", TYPE_ANIM, 1.f, 0.f);
 
 	}
 	else if (eLevel == LEVEL_TOOL_ANIM)

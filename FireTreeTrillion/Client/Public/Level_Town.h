@@ -18,6 +18,8 @@ public:
 	virtual void Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+	void	Sound_Tick(_float fTimeDelta);
+
 private:
 	HRESULT Ready_Lights();
 	HRESULT Ready_Layer_Camera(const wstring& strLayerTag);
@@ -38,6 +40,9 @@ private:
 	HRESULT Add_EnvMap();
 	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };
 	CTexture* m_pEnvTexture[TYPE_END] = { nullptr };
+
+	enum SOUND_STATE { TOWN_BASIC, PARK_ENTRANCE, STATE_END };
+	SOUND_STATE  m_eSoundState = STATE_END;
 
 public:
 	static CLevel_Town* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

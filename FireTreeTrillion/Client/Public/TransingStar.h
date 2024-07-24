@@ -49,6 +49,14 @@ public:
 	void						Set_SmallColor(_float3 vSmallColor) { m_vSmallColor = vSmallColor; }
 	void						Set_LargeColor(_float3 vLargeColor) { m_vLargeColor = vLargeColor; }
 
+	// 로딩 폰트용 입니다 -JS-
+	void Set_FontRender(_bool bFontRender) {
+		m_bFontRender = bFontRender;
+	}
+	_bool Get_FontRender() {
+		return m_bFontRender;
+	}
+
 	// Event
 	void						On_Event();
 
@@ -91,6 +99,8 @@ private:
 	// 스테이지 이름 
 	class CLoadingStart*		m_pLoadingStart = { nullptr };
 	_bool						m_bLoadingStart = { false };
+	_bool						m_bFontRender = { false };
+	_float						m_fStartDelayTime = { 0.f };
 
 public:
 	static CTransingStar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

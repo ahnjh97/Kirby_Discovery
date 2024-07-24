@@ -983,6 +983,84 @@ static _float4 Spit_Target_Object(CKirby* pKirby)
 			return vTargetPos;
 	}
 
+	if (*GAMEINSTANCE Get_CurrentLevelID() == LEVEL_SIMBA)
+	{
+		if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Simba")))
+		{
+			for (auto& pObject : *GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Simba")))
+			{
+				CTransform* pObjectTransform = pObject->Get_TransformCom();
+				_float4 vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
+				vObjectPos.y += 2.f;
+				_float4 vObjectDir = vObjectPos - vPos;
+				_float fObjectDistance = XMVectorGetX(XMVector3Length(vObjectDir));
+
+				// 만약, 목표 오브젝트가 거리보다 멀었을 경우
+				if (fObjectDistance > fDistance)
+					continue;
+				// 만약, 목표 오브젝트가 거리보다 가까웠을 경우
+				else
+				{
+					_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+					_float fDot = XMVectorGetX(XMVector3Dot(XMVector3Normalize(vObjectDir), vLook));
+					// 각도 계산 (도 단위)
+					_float fDegrees = XMConvertToDegrees(acosf(fDot));
+
+					// 60도
+					if (fDegrees > 30.f)
+						continue;
+
+					// 최고기록 갱신
+					fDistance = fObjectDistance;
+					vTargetPos = vObjectPos;
+				}
+			}
+		}
+
+		// 만약, 타겟을 찾았다면
+		if (vTargetPos != _float4(0.f, 0.f, 0.f, 0.f))
+			return vTargetPos;
+	}
+
+	if (*GAMEINSTANCE Get_CurrentLevelID() == LEVEL_FINALBOSS)
+	{
+		if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_BossMonster")))
+		{
+			for (auto& pObject : *GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_BossMonster")))
+			{
+				CTransform* pObjectTransform = pObject->Get_TransformCom();
+				_float4 vObjectPos = pObjectTransform->Get_State_Vector(CTransform::STATE_POSITION);
+				vObjectPos.y += 2.f;
+				_float4 vObjectDir = vObjectPos - vPos;
+				_float fObjectDistance = XMVectorGetX(XMVector3Length(vObjectDir));
+
+				// 만약, 목표 오브젝트가 거리보다 멀었을 경우
+				if (fObjectDistance > fDistance)
+					continue;
+				// 만약, 목표 오브젝트가 거리보다 가까웠을 경우
+				else
+				{
+					_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
+					_float fDot = XMVectorGetX(XMVector3Dot(XMVector3Normalize(vObjectDir), vLook));
+					// 각도 계산 (도 단위)
+					_float fDegrees = XMConvertToDegrees(acosf(fDot));
+
+					// 60도
+					if (fDegrees > 30.f)
+						continue;
+
+					// 최고기록 갱신
+					fDistance = fObjectDistance;
+					vTargetPos = vObjectPos;
+				}
+			}
+		}
+
+		// 만약, 타겟을 찾았다면
+		if (vTargetPos != _float4(0.f, 0.f, 0.f, 0.f))
+			return vTargetPos;
+	}
+
 	// 1차로 우선순위인 몬스터들 순회를 돈다.
 	if (nullptr != GAMEINSTANCE Get_List(*GAMEINSTANCE Get_CurrentLevelID(), g_strLayerMonster))
 	{
