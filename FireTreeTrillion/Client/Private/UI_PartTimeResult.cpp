@@ -171,7 +171,7 @@ void CUI_PartTimeResult::Render_Digits()
 		{
 			_int iAddNum = 1;
 
-			_float fRealTotalScore = Change_ScoreTextures(iAddNum);
+			_float fRealTotalScore = (_float)Change_ScoreTextures(iAddNum);
 			if (m_fScore < fRealTotalScore) // 30만큼 점수판 += 점수
 			{
 				m_bRenderTotalScore = true;

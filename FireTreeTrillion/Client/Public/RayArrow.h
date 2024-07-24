@@ -78,6 +78,8 @@ private:
 	//¶¥¿¡ ²ÈÈ÷´Â ¼ø°£ ÆÄ¾ÇÇÏ´Â 1Æ½
 	_bool			m_bCollided = { false };
 
+	_uint			m_iCnt = { 0 };
+
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();

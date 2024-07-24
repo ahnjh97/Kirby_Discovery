@@ -423,9 +423,9 @@ HRESULT CAwoofy::Add_Components(const wstring& wstrModelName)
 			return E_FAIL;
 
 		if (m_pModelCom->Get_ModelName() != "Awoofy")
-			Set_BodyCollider(COLLIDER_SPHERE, 1.f, 1.5f, 1.2f);
+			Set_BodyCollider(COLLIDER_SPHERE, 1.f, 1.5f, 1.3f);
 		else
-			Set_BodyCollider(COLLIDER_SPHERE, 1.f, 1.5f, 1.5f);
+			Set_BodyCollider(COLLIDER_SPHERE, 1.f, 1.5f, 1.6f);
 	}
 
 	return S_OK;

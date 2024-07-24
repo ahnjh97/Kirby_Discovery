@@ -33,10 +33,10 @@ HRESULT CHUD_KirbyNameTag::Initialize(void* _pArg)
 
 	//_float3 vOffset = { 0.65f, 0.65f, 1.f };
 	//m_vOrigScale = vScale * vOffset;
-	_float3 vScale = { 300.f * 0.5f, 50.f * 0.5f, 1.f };
+	_float3 vScale = { 150.f, 25.f, 1.f };
 	m_pTransformCom->Set_Scaled(vScale);
 
-	_float4	vTrans = { -740.f, 420.f, 1.f, 1.f };
+	_float4	vTrans = { -700.f, 420.f, 1.f, 1.f };
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTrans);
 	m_vInitPos = vTrans;
 
@@ -64,20 +64,14 @@ _int CHUD_KirbyNameTag::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	_float3 vScale = { 300.f * 0.5f, 50.f * 0.5f, 1.f };
-	m_pTransformCom->Set_Scaled(vScale);
-
-	_float4	vTrans = { -740.f, 420.f, 1.f, 1.f };
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTrans);
-
-	_float4 vPos = GET_POS;
+	_float4 vPos = {};
 	switch (m_eCurState)
 	{
 	case NAMETAG_HIDE:
 		m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;
 
 		vPos = GET_POS;
-		vPos.x -= fTimeDelta * 0.1f;
+		vPos.x = m_vInitPos.x;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 		break;
 
@@ -85,7 +79,7 @@ _int CHUD_KirbyNameTag::Tick(_float fTimeDelta)
 		m_UIObjDesc.fAlpha = 1.f;
 
 		vPos = GET_POS;
-		vPos.x = m_vInitPos.x;
+		vPos.x -= fTimeDelta * 0.1f;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
 		break;
@@ -100,7 +94,7 @@ _int CHUD_KirbyNameTag::Tick(_float fTimeDelta)
 		return OBJ_NOEVENT;
 	}
 
-	//return OBJ_NOEVENT;
+	return OBJ_NOEVENT;
 }
 
 void CHUD_KirbyNameTag::Late_Tick(_float fTimeDelta)

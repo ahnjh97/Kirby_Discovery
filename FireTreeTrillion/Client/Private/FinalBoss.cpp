@@ -161,6 +161,10 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 				pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_APPEAR);
 			m_bStartOpeningTrigger = false;
 			pKirby->Get_KirbyInfo()->m_bFinalBossCutStart = true;
+
+			m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
+			m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"K15_BossChimeraPerfect_Interactive.dspadpcm.wav");
+			m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, 0.5f);
 		}
 	}
 

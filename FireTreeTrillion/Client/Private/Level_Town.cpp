@@ -397,6 +397,9 @@ HRESULT CLevel_Town::Ready_UI()
 	}
 
 #pragma endregion
+	
+	//커비 네임태그
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_KirbyNameTag"));
 
 	//능력버리기
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};

@@ -186,6 +186,9 @@ void CBladeKnight::Add_AnimEvent()
 		});
 
 	m_pModelCom->Add_Event("Effect2", [this]() {
+		// 荤款靛 贸府
+		m_pGameInstance->PlaySound_Free(L"0x80c0-0xa358.wav", 0.3f);
+
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = _float3(0.f, 0.5f, 0.8f);
 		FXDesc.vInitRot = { 0.f, 45.f, 0.f };
@@ -237,8 +240,8 @@ HRESULT CBladeKnight::Add_Components()
 	CHECK_FAILED(hr);
 
 	/* For.Com_Model */
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_BladeKnight"),
-								TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_BladeKnight"), 
+		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 	// FOR ANIMTOOL
 	m_ppModelForAnimTool = &m_pModelCom;
@@ -382,6 +385,9 @@ void CBladeKnight::EffectChanger(_uint eState)
 	switch (eState)
 	{
 	case BLADEKNIGHT_ATTACK:
+		// 荤款靛 贸府
+		m_pGameInstance->PlaySound_Free(L"0xd80-0x34a4.wav", 0.3f);
+
 		FXDesc.vInitPos = _float3(0.f, 0.5f, 0.2f);
 		//FXDesc.vInitRot = { 0.f, -90.f 0.f };
 		FXDesc.vInitScale = { 5.f, 5.f, 5.f };
@@ -390,6 +396,9 @@ void CBladeKnight::EffectChanger(_uint eState)
 			return;
 		break;
 	case BLADEKNIGHT_TORNADOATTACK:
+		// 荤款靛 贸府
+		m_pGameInstance->PlaySound_Free(L"0x280c0-0x545f0.wav", 0.3f);
+
 		FXDesc.vInitPos = _float3{ 0.f, 0.95f, 0.f };
 		FXDesc.vInitScale = { 5.f, 5.f, 5.f };
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
@@ -397,6 +406,9 @@ void CBladeKnight::EffectChanger(_uint eState)
 			return;
 		break;
 	case BLADEKNIGHT_DOUBLEATTACK:
+		// 荤款靛 贸府
+		m_pGameInstance->PlaySound_Free(L"0xd80-0x34a4.wav", 0.3f);
+
 		FXDesc.vInitPos = _float3(0.f, 0.5f, 0.8f);
 		FXDesc.vInitRot = { 0.f, 30.f, 0.f };
 		FXDesc.vInitScale = { 5.f, 5.f, 5.f };
