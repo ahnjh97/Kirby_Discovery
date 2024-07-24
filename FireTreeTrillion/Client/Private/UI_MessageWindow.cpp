@@ -198,12 +198,9 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_NEXT_DIALOG2);
 				break;
 
-			case 9:
-				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_LAST_DIALOG);
-				break;
-
 			case 10:
 				m_bHighLightMsg = TRUE;
+				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_LAST_DIALOG);
 				break;
 
 			default:
@@ -253,6 +250,12 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 	case WINDOW_SHOW: //알파 값 및 스케일 증가
 		m_UIObjDesc.fAlpha += fTimeDelta * 5.f;	
 		Display_Message(fTimeDelta);
+
+		if (*m_pCurrentLevelID == LEVEL_SIMBA) {
+			m_fSimbaVoiceIdleTime += fTimeDelta;
+			PlaySimbaVoice();
+		}
+	
 		break;
 
 	default:	break;
@@ -771,6 +774,8 @@ void CUI_MessageWindow::Ready_FadeOut()
 	}
 	else if (pFadingUI->Get_FadeRatio() <= 0.f)
 	{
+		//페이드 아웃
+		
 		if (bOnceChanger == false)
 		{
 			m_pGameInstance->Reserve_Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_TOWN));
@@ -789,6 +794,25 @@ void CUI_MessageWindow::StartSimbaDialog()
 	Reset_MessageIndex(nullptr);
 	m_eCurState = WINDOW_SHOW;
 	Show_DialogMessage();
+
+	m_pGameInstance->StopSound(CHANNEL_BGM);
+	m_pGameInstance->PlayMySound(L"SimbaPreBattle.wav", CHANNEL_BGM, 0.4f);
+}
+
+void CUI_MessageWindow::PlaySimbaVoice()
+{
+	if (m_fSimbaVoiceIdleTime >= m_fSimbaVoicePlayTiming)
+	{
+		/*TCHAR* tcharBuffer = new TCHAR[20];
+		wstring wstrSound = L"lion" + to_wstring(CUtils::Make_RandomInt(0, 16)) + L".wav";
+		wcscpy_s(tcharBuffer, wstrSound.size() + 1, wstrSound.c_str());
+		m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+		m_pGameInstance->PlayMySound(tcharBuffer, CHANNEL_BOSSVOICE, 0.2f);
+		Safe_Delete_Array(tcharBuffer);
+		m_fSimbaVoiceIdleTime = 0.f;
+
+		m_fSimbaVoicePlayTiming = CUtils::Make_RandomFloat(0.4f, 2.f);*/
+	}
 }
 
 CUI_MessageWindow* CUI_MessageWindow::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

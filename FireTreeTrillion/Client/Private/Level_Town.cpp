@@ -70,9 +70,9 @@ HRESULT CLevel_Town::Initialize()
 	// DeeTest
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;
-	ObjDesc.fRotationPerSec = ToRadian(90.f);
+	ObjDesc.fRotationPerSec = ToRadian(70.f);
 	_float4x4 InitMat = _float4x4::Identity;
-	InitMat.Translation({ -14.63f, 33.11f, 51.96f });
+	InitMat.Translation({ -22.1f, 33.11f, 47.8f });
 	ObjDesc.matWorld = InitMat;
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_DeeDeeDee"), TEXT("Prototype_GameObject_DeeDeeDee"), &ObjDesc)))
 		return E_FAIL;

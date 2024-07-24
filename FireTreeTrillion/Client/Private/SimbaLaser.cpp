@@ -28,7 +28,8 @@ void CSimbaLaser::MakeLaser()
 	MultiFXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 	MultiFXDesc.vInitScale = vScale;
 
-	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_DDD land smoke"), &MultiFXDesc)))
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"),
+		TEXT("Prototype_GameObject_") + strName, &MultiFXDesc)))
 		return;
 
 
@@ -87,6 +88,11 @@ _int CSimbaLaser::Tick(_float fTimeDelta)
 
 	m_pDynamicActor->setKinematicTarget(CUtils::TransformToPxTransform(m_pTransformCom));
 
+	//레이저와 지면 충돌하는 지점 확인
+	//_float3 vCollidingPoint =
+	//	CUtils::Compute_CollidingPoint(GET_POS, (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK),
+	//		{ 0.f, 1.f, -66.f }, { 26.f, 1.f, 26.f });
+
 	return OBJ_NOEVENT;
 }
 
@@ -100,6 +106,8 @@ void CSimbaLaser::Late_Tick(_float fTimeDelta)
 
 HRESULT CSimbaLaser::Render()
 {
+	return S_OK;
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 

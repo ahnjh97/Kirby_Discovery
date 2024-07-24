@@ -41,16 +41,29 @@ private:
 	_float	m_fTimeDelta = { 0.f };
 	_float	m_fSpikeTime = { 0.f };
 	_float	m_fLifeTime = { 0.f };
+	_float	m_fEffectTime = { 0.f };
 
 	_bool	m_bItem = { 0.f };
 
 	_vector	m_vPosition = {};
+
+	_float3			m_vRingPos = { };
+	_float			m_fRingInnerRadius = {};
+	_float			m_fRingOuterRadius = {};
+	_bool			m_bRenderRing;
 
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();
 
 	void	Compute_MotionBlur();
+	void	CheckFinalCrusherRingCollision(_float fTimeDelta);
+	_bool	IsKirbyOnMyLeft(class CKirby* pKirby);
+
+#ifdef _DEBUG
+	void		RenderRing();
+	void		RenderPolygon(vector<_vector>& worldPoints);
+#endif
 
 public:
 	static CSpikeSpear* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

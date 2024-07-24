@@ -198,32 +198,32 @@ void CKirbyFinalCut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 
 
-		if (8.f < m_fTime && m_fTime <= 8.1f)
+		if (8.f < m_fTime && m_fTime <= 4.f)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_BLINK;
 			DESC(m_eMouthState) = CKirby::MOUTH_SURPRISE;
 		}
-		else if (8.15f < m_fTime && m_fTime <= 8.35f)
+		else if (4.15f < m_fTime && m_fTime <= 4.35f)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			DESC(m_eMouthState) = CKirby::MOUTH_SURPRISE;
 		}
-		else if (8.35f < m_fTime && m_fTime <= 8.45f)
+		else if (4.35f < m_fTime && m_fTime <= 4.45f)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_BLINK;
 			DESC(m_eMouthState) = CKirby::MOUTH_SURPRISE;
 		}
-		else if (8.45f < m_fTime && m_fTime <= 10.f)
+		else if (4.45f < m_fTime && m_fTime <= 6.f)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			DESC(m_eMouthState) = CKirby::MOUTH_SURPRISE;
 		}
-		else if (10.f < m_fTime && m_fTime <= 10.2f)
+		else if (6.f < m_fTime && m_fTime <= 6.2f)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_BLINK;
 			DESC(m_eMouthState) = CKirby::MOUTH_IDLE;
 		}
-		else if (10.f < m_fTime)
+		else if (6.f < m_fTime)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			DESC(m_eMouthState) = CKirby::MOUTH_SMILE;

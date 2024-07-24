@@ -787,6 +787,9 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 
 				if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_lunch time logo test"))))
 					return;
+
+				m_pGameInstance->StopSound(CHANNEL_BGM_SUB);
+				m_pGameInstance->PlayMySound(L"K15_FoodShopLunchTime.marker.wav", CHANNEL_BGM_SUB, 0.5f);
 			}
 		}
 		break;
@@ -887,7 +890,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 		Set_AutoDOF(true);
 
 		CAMSEQ eSeq = m_eSpecialSeq;
-
+		//clear_sequ
 		m_eSpecialSeq = SEQ_END;
 		m_eCurSeqEase = EASE_END;
 		m_fSeqInterpolateTime = { 0.f, 0.f };
@@ -2817,6 +2820,21 @@ void CCamera_Main::Make_One_Sequence(CAMACTION newAction)
 {
 	m_eSpecialSeq = SEQ_ONE;
 	m_CamSeq.push_back(newAction);
+}
+
+void CCamera_Main::Clear_Sequence()
+{
+	m_eSpecialSeq = SEQ_END;
+	m_eCurSeqEase = EASE_END;
+	m_fSeqInterpolateTime = { 0.f, 0.f };
+	m_fSeqTotalTime = m_fSeqCheckTime;
+
+	m_vDestCamDir = m_vCurCamDir;
+	m_fDestFovy = m_fFovy;
+	m_fDestZAngle = m_fCurZAngle;
+	m_fDestZoomOffset = m_fCurZoomOffset;
+
+	m_fDestDistance = m_fCurDistance = _float3::Distance(F4toF3(m_pFirstTarget->Get_State(CTransform::STATE_POSITION)), GET_POS);
 }
 
 void CCamera_Main::Ready_Cam_DeeDeeDee(CGameObject* pNotifier)

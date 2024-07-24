@@ -304,6 +304,8 @@ void CKirby::Add_AnimEvent()
 {
 	__super::Add_AnimEvent();
 
+#pragma region 충돌처리 함수
+
 	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
 	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
@@ -342,52 +344,62 @@ void CKirby::Add_AnimEvent()
 		Activate_SphereCollider(1.f, 42.f);
 		});
 
-
-	// 사운드 처리
-
-#pragma region SLASH
-
-	//SideSlash
-	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_Slash", [this]() {
-		m_pGameInstance->PlaySound_Free(L"Slash.wav", 0.5f);
-		});
-
-	//SuperSpinSlashEnd, GigantSpinSlash
-	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_SuperSlash", [this]() {
-		m_pGameInstance->PlaySound_Free(L"SuperSlash.wav", 0.5f);
-		});
-
-
 #pragma endregion
 
-#pragma region SPINSLASH
+#pragma region 사운드 처리
 
-	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_SpinSlash", [this]() {
-		m_pGameInstance->PlaySound_Free(L"Spin.wav", 0.5f);
-		});
+	#pragma region BASIC
 
-	//SuperSpinSlashLoop
-	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_SuperSpinSlash", [this]() {
-		m_pGameInstance->PlaySound_Free(L"SuperSpin.wav", 0.5f);
-		});
+		m_pModelCom[BODY_DEFAULT]->Add_Event("Sound_WalkBasic", [this]() {
+			m_pGameInstance->PlaySound_Free(L"WalkOnAnywhere.wav", 0.6f);
+			});
 
-#pragma endregion
 
-#pragma region CHARGE
+	#pragma endregion
 
-	//SpinSlashCharge :: SWORDSTATE_SPINSLASHCHARGE
-	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_Charge", [this]() {
-		m_pGameInstance->PlaySound_Free(L"Charge.wav", 0.5f);
-		});
+	#pragma region SLASH
+
+		//SideSlash
+		m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_Slash", [this]() {
+			m_pGameInstance->PlaySound_Free(L"Slash.wav", 0.5f);
+			});
+
+		//SuperSpinSlashEnd, GigantSpinSlash
+		m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_SuperSlash", [this]() {
+			m_pGameInstance->PlaySound_Free(L"SuperSlash.wav", 0.5f);
+			});
+
+
+	#pragma endregion
+
+	#pragma region SPINSLASH
+
+		m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_SpinSlash", [this]() {
+			m_pGameInstance->PlaySound_Free(L"Spin.wav", 0.5f);
+			});
+
+		//SuperSpinSlashLoop
+		m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_SuperSpinSlash", [this]() {
+			m_pGameInstance->PlaySound_Free(L"SuperSpin.wav", 0.5f);
+			});
+
+	#pragma endregion
+
+	#pragma region CHARGE
+
+		//SpinSlashCharge :: SWORDSTATE_SPINSLASHCHARGE
+		m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_Charge", [this]() {
+			m_pGameInstance->PlaySound_Free(L"Charge.wav", 0.5f);
+			});
 	
-	//완료) SuperSpinSlashChargeStart :: SWORDSTATE_SUPERSPINSLASHCHARGE
-	m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_SuperCharge", [this]() {
-		m_pGameInstance->PlaySound_Free(L"SuperCharge.wav", 0.5f);
-		});
+		//완료) SuperSpinSlashChargeStart :: SWORDSTATE_SUPERSPINSLASHCHARGE
+		m_pModelCom[BODY_SWORDDEFAULT]->Add_Event("Sound_SuperCharge", [this]() {
+			m_pGameInstance->PlaySound_Free(L"SuperCharge.wav", 0.5f);
+			});
+
+	#pragma endregion
 
 #pragma endregion
-
-
 
 }
 
@@ -1913,11 +1925,30 @@ void CKirby::DefaultIdle()
 void CKirby::Kirby_SystemTick(_float fTimeDelta)
 {
 	// 그림자는 무조건 커비를 따라간다.
-	_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	_vector vLightPos = vPos;
-	vLightPos.m128_f32[1] += 100.f;
-	vLightPos.m128_f32[2] -= 1.f;
-	m_pGameInstance->Update_LightShadow(vLightPos, vPos);
+	
+	_float4 vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+
+	if ((vPos.y < 1.f) && (vPos.y > -4.f) &&
+		(vPos.z < -20.f) && (vPos.z > -25.f))
+	{
+		m_bShadowFinal = true;
+	}
+
+	if (*m_pCurrentLevelID == LEVEL_FINALBOSS && m_bShadowFinal == true)
+	{
+		m_pGameInstance->Update_LightShadow(_float4(0.f, 100.f, 42.f, 1.f), _float4(0.f, 0.f, 0.f, 1.f));
+	}
+	else
+	{
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		_vector vLightPos = vPos;
+		vLightPos.m128_f32[1] += 100.f;
+		vLightPos.m128_f32[2] -= 1.f;
+		m_pGameInstance->Update_LightShadow(vLightPos, vPos);
+	}
+
+
+
 
 	//// Dof 초점을 커비에게 맞춘다.
 	//_vector vDOFPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);

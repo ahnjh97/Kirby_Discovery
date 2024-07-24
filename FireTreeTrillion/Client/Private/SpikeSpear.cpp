@@ -4,6 +4,8 @@
 #include "HitBox.h"
 #include "Ability.h"
 #include "Camera.h"
+#include "Kirby.h"
+#include "Camera_Main.h"
 
 CSpikeSpear::CSpikeSpear(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -45,6 +47,9 @@ HRESULT CSpikeSpear::Initialize(void* pArg)
 	m_pTransformCom->Turn(XMVectorSet(-1.f, 0.f, 0.f, 0.f), 1.f);
 
 	m_bNonDead = true;
+
+	m_fRingInnerRadius = 0;
+	m_fRingOuterRadius = 0;
 
 	return S_OK;                                                                                                                                                                                                                          
 }
@@ -122,6 +127,13 @@ _int CSpikeSpear::Tick(_float fTimeDelta)
 					m_pGameInstance->Get_CurCameraPtr()->Make_Shake(.2f, .5f);
 					Add_Effect("HS_FB down spear circle", FXDesc, false);
 
+					CParticle::PARTICLE_DESC FXPDesc{};
+					FXPDesc.vInitPos = (_float3)vPos;
+					FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
+					pFinalBoss->Add_Effect("YW Final Boss Wiggle B", FXPDesc, false);
+
+					m_vRingPos = (_float3)vPos; 
+
 			}
 		}
 	}
@@ -129,6 +141,18 @@ _int CSpikeSpear::Tick(_float fTimeDelta)
 	{
 		m_vPosition.m128_f32[1] += m_fTimeDelta * 35.f;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);
+	}
+
+	if(true == m_bItem)
+	{
+		m_fEffectTime += m_fTimeDelta;
+		if(2.f > m_fEffectTime)
+			CheckFinalCrusherRingCollision(m_fTimeDelta);
+		else
+		{
+			m_fRingInnerRadius = 0;
+			m_fRingOuterRadius = 0;
+		}
 	}
 
 	//m_fLifeTime += m_fTimeDelta;
@@ -173,6 +197,10 @@ HRESULT CSpikeSpear::Render()
 
 		m_pModelCom->Render(i);
 	}
+
+#ifdef _DEBUG
+	RenderRing();
+#endif
 
 	return S_OK;
 }
@@ -267,6 +295,132 @@ HRESULT CSpikeSpear::Bind_ShaderResources()
 void CSpikeSpear::Compute_MotionBlur()
 {
 }
+
+void CSpikeSpear::CheckFinalCrusherRingCollision(_float fTimeDelta)
+{
+	m_fRingOuterRadius += fTimeDelta * 7.4f;
+	m_fRingInnerRadius = m_fRingOuterRadius * 0.92f;
+	if (m_fRingInnerRadius < 1.f)
+		m_fRingInnerRadius = 1.f;
+
+	m_bRenderRing = true;
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
+	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+	_float3 vKirbyPos = pKirbyTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float fDis = (vKirbyPos - m_vRingPos).Length();
+
+	// 바깥원과 안쪽 원 사이에 있고, 높이 차이가 1 미만일때 충돌
+	if (fDis > m_fRingOuterRadius || fDis < m_fRingInnerRadius || vKirbyPos.y > m_vRingPos.y + 1)
+		return;
+
+	if (true == CCollisionCenter::Get_Instance()->Kirby_Dodge_SlowMotionSystem(pKirby))
+		return;
+
+	if (pKirby->isOverPower() == false) // 무적이 아닐 경우
+	{
+		_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		_float4 vDistance = vKirbyPos - GET_POS;
+		vDistance.y = 0.f;
+		vDistance.Normalize();
+
+		_float4 vNewDir{};
+		_float4 vRight = m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT);
+		vRight.Normalize();
+
+		if (true == IsKirbyOnMyLeft(pKirby))
+			vNewDir = vDistance + vRight * 2.5f;
+		else
+			vNewDir = vDistance - vRight * 2.5f;
+		vNewDir.Normalize();
+		_vector vKnockbackDir = vNewDir;
+
+		pKirby->Set_DamageMoving(vKnockbackDir * 1.8f, 8.f); // 심바 전용 넉백
+
+		_float fMonsterAttack = Get_Attack();
+		pKirby->Minus_Hp(fMonsterAttack);
+		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+		pCamera->Make_Shake(1.2f, 0.5f, _float2(0.f, -1.f));
+
+		pKirby->Collision(CCollisionCenter::CONTENT_ATTACK, this);
+	}
+}
+
+_bool CSpikeSpear::IsKirbyOnMyLeft(CKirby* pKirby)
+{
+	_vector vLook = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+	_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	CTransform* pKirbyTransform = pKirby->Get_TransformCom();
+	if (nullptr == pKirbyTransform)
+		return false;
+	_vector vKirbyPos = pKirbyTransform->Get_State(CTransform::STATE_POSITION);
+
+	_vector vDir = vKirbyPos - vPos;
+	vDir = XMVector3Normalize(XMVectorSetY(vDir, 0));
+
+	_vector crossProduct = XMVector3Cross(vLook, vDir);
+	_float fCrossResultY = XMVectorGetY(crossProduct);
+
+	if (fCrossResultY > 0.f)
+		return true;
+	else
+		return false;
+}
+
+#ifdef _DEBUG
+void CSpikeSpear::RenderRing()
+{
+	vector<_vector> vecOuterRingPoints;
+	vector<_vector> vecInnerRingPoints;
+	for (_uint i = 0; i < 36; i++)
+	{
+		_float4 vDir = CUtils::TurnDirectionVector(XMVectorSet(1, 0, 0, 0), _float3(0, 1, 0), i * 10.f);
+		_float4 vOuterPos = m_vRingPos + vDir * m_fRingOuterRadius;
+		vOuterPos.w = 1.f;
+		vecOuterRingPoints.push_back(vOuterPos);
+
+		_float4 vInnerPos = m_vRingPos + vDir * m_fRingInnerRadius;
+		vInnerPos.w = 1.f;
+		vecInnerRingPoints.push_back(vInnerPos);
+	}
+
+	RenderPolygon(vecOuterRingPoints);
+	RenderPolygon(vecInnerRingPoints);
+}
+
+void CSpikeSpear::RenderPolygon(vector<_vector>& worldPoints)
+{
+	if (m_pGameInstance->Get_HitBoxRender() == false)
+		return;
+
+	ImDrawList* drawList = ImGui::GetForegroundDrawList();
+
+	_matrix ViewMatrix = m_pGameInstance->Get_Transform(CPipeLine::D3DTS_VIEW); // CPipeLine::D3DTS_VIEW
+	_matrix ProjMatrix = m_pGameInstance->Get_Transform(CPipeLine::D3DTS_PROJ); // CPipeLine::D3DTS_PROJ
+	_matrix VPMatrix = XMMatrixMultiply(ViewMatrix, ProjMatrix);
+
+	auto TransformToScreen = [&](_vector worldPos)
+	{
+		_vector screenPos = XMVector3TransformCoord(worldPos, VPMatrix);
+		screenPos = XMVectorMultiplyAdd(screenPos, XMVectorSet(0.5f, -0.5f, 1.0f, 0.0f), XMVectorSet(0.5f, 0.5f, 0.0f, 0.0f));
+		screenPos = XMVectorMultiply(screenPos, XMVectorSet(g_iWinSizeX, g_iWinSizeY, 1.f, 0.f));
+		return ImVec2(XMVectorGetX(screenPos), XMVectorGetY(screenPos));
+	};
+
+	// 월드 좌표를 화면 좌표로 변환
+	vector<ImVec2> screenPoints;
+	for (const auto& point : worldPoints)
+		screenPoints.push_back(TransformToScreen(point));
+
+	// 점들을 이어서 다각형 그리기
+	for (size_t i = 0; i < screenPoints.size(); ++i)
+	{
+		const ImVec2& p1 = screenPoints[i];
+		const ImVec2& p2 = screenPoints[(i + 1) % screenPoints.size()]; // 마지막 점은 첫 번째 점과 연결
+		drawList->AddLine(p1, p2, IM_COL32(255, 255, 0, 255), 2.0f);
+	}
+}
+#endif
 
 CSpikeSpear* CSpikeSpear::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

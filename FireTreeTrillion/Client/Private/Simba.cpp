@@ -73,8 +73,8 @@ HRESULT CSimba::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_fMaxHp = 250.f;
-	m_fHp = 250.f;
+	m_fMaxHp = 320.f;
+	m_fHp = 320.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eEyeState = SIMBAEYE_BIG;
@@ -231,12 +231,12 @@ _int CSimba::Tick(_float fTimeDelta)
 		if (m_pGameInstance->Get_KeyState(DIK_1, KEY_DOWN)) {
 			//m_bEyeBloom = true;
 			//m_eEyeState = SIMBAEYE_NONE; // 디버깅용
-			if(0 == CUtils::Make_RandomInt(0, 1))
+			if (0 == CUtils::Make_RandomInt(0, 1))
 				Change_State(Simba_QuickClawStartL, 50.f, false, true);
 			else
 				Change_State(Simba_QuickClawStartR, 50.f, false, true);
 		}
-			
+
 		else if (m_pGameInstance->Get_KeyState(DIK_2, KEY_DOWN))
 			Change_State(Simba_FinalCrusherStart, 50.f, false, true);
 		else if (m_pGameInstance->Get_KeyState(DIK_3, KEY_DOWN))
@@ -257,7 +257,7 @@ _int CSimba::Tick(_float fTimeDelta)
 			Change_State(Simba_BiteRushJumpStartR, 50.f, false, true);
 		else if (m_pGameInstance->Get_KeyState(DIK_GRAVE, KEY_DOWN))
 			Change_State(Simba_Death, 50.f, false, true);
-			
+
 		if (true == m_bStateChanged) {
 			SetUpSecondTarget();
 			SIMBA_ANIM eState = SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex());
@@ -418,7 +418,7 @@ HRESULT CSimba::Render()
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render(m_iEyeMesh)))
 			return E_FAIL;
-		
+
 		m_iEyeRenderCount--;
 	}
 
@@ -449,6 +449,24 @@ HRESULT CSimba::Render_LightDepth()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CSimba::Add_AnimEvent()
+{
+	__super::Add_AnimEvent();
+
+	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
+	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
+	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
+	m_pModelCom->Add_Event("FinalCrusherCharge", [this]() {
+		m_pGameInstance->PlaySound_Free(L"TakeItem01.wav", 0.5f);
+
+		});
+
+	m_pModelCom->Add_Event("FinalCrusherCharge", [this]() {
+		m_pGameInstance->PlaySound_Free(L"TakeItem01.wav", 0.5f);
+		});
+
 }
 
 void CSimba::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
@@ -571,7 +589,7 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 	{
 		_float4 vPos = (m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone) + m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone)) * 0.5f;
 
-		if(0 == CUtils::Make_RandomInt(0, 1))
+		if (0 == CUtils::Make_RandomInt(0, 1))
 			AbilityItemDesc.fRotateDir = 1.f;
 		else
 			AbilityItemDesc.fRotateDir = -1.f;
@@ -610,7 +628,7 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 		else
 			AbilityItemDesc.fRotateDir = -1.f;
 		AbilityItemDesc.vDir = XMVectorZero();
-		
+
 		if (true == m_bDimensionClawUpAttack)
 		{
 			if (0 == m_iStarCount) {
@@ -628,7 +646,7 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 				CHECK_FAILED(hr);
 			}
-				
+
 			else if (1 == m_iStarCount) {
 				AbilityItemDesc.vPosition = vPos + vFloatLook * 18.f + vFloatRight * 8.f;
 				AbilityItemDesc.vPosition.y = fY;
@@ -730,7 +748,7 @@ _bool CSimba::IsKirbyOnMyLeft()
 
 _bool CSimba::IsDamagable()
 {
-	if(m_setUndamagableAnims.end() != m_setUndamagableAnims.find(SIMBA_ANIM(Get_State())))
+	if (m_setUndamagableAnims.end() != m_setUndamagableAnims.find(SIMBA_ANIM(Get_State())))
 		return false;
 
 	return true;
@@ -764,7 +782,7 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 
 	_float4x4 matWorld = CUtils::To_Float4x4(pxTransform);
 	_float4 vLook{}, vPos{};
-	memcpy(&vLook, &(matWorld.m[2]), sizeof(_float4)); 
+	memcpy(&vLook, &(matWorld.m[2]), sizeof(_float4));
 	memcpy(&vPos, &(matWorld.m[3]), sizeof(_float4));
 	vLook.Normalize();
 
@@ -773,15 +791,22 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 	memcpy(&(matWorld.m[3]), &vPos, sizeof(_float4));
 
 	m_pDimensionClawActor->setGlobalPose(CUtils::ToPxTransform(matWorld));
+
 	//이펙트 다는 매트릭스 동기화
 	m_DimensionClawMat = matWorld;
+
+	//공격 밑 데칼 이펙트 출력
+	//_float3 vCollidingPoint =
+	//	CUtils::Compute_CollidingPoint(static_cast<_float3>(vPos), _float3::Down,
+	//		{ 0.f, 1.f, -66.f }, { 26.f, 1.f, 26.f });
+
 }
 
 void CSimba::HideDimensionClawActor()
 {
 	m_bDimensionClawActivated = false;
 	m_fDeactiveTime = 0.f;
-	if(nullptr != m_pDimensionClawActor)
+	if (nullptr != m_pDimensionClawActor)
 		m_pDimensionClawActor->setGlobalPose(PxTransform(0, 0, 0));
 }
 
@@ -814,9 +839,9 @@ void CSimba::SpawnRocks(_uint iAnimIdx)
 	if (Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx || Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
 	{
 		_float4 vPos{};
-		if(Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx)
+		if (Simba_QuickClawL == iAnimIdx || Simba_QuickClaw2L == iAnimIdx)
 			vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
-		else if(Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
+		else if (Simba_QuickClawR == iAnimIdx || Simba_QuickClaw2R == iAnimIdx)
 			vPos = m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone);
 
 		_uint iNumRocks = 25;
@@ -889,18 +914,18 @@ void CSimba::SpawnRocks(_uint iAnimIdx)
 			_uint index = i + m_iRockCount * iNumRocks;
 			_float fRightFactor = CUtils::Make_RandomFloat(-3.f, 3.f);
 			_float4 fRightOffset = vFloatRight * fRightFactor;
-			
+
 			_float4 vLookOffset = vFloatLook * CUtils::Make_RandomFloat(1.5f, 2.6f) * sqrt(3.f - abs(fRightFactor)) * 0.8f;
 			_float4 vOffset = vLookOffset + fRightOffset + vFloatLook * 1.2f;
 
 			if (0 == m_iRockCount) {
-				
+
 				_float4 vResultPos = vLeftHandPos + vOffset;
 				vResultPos.y = CUtils::Make_RandomFloat(1.9f, 2.4f);
 				m_vecSimbaRocks[index]->SetUpSimbaRock(vResultPos);
 				m_listUsedRocks.push_back(index);
 			}
-				
+
 			else if (1 == m_iRockCount) {
 				_float4 vResultPos = vRightHandPos + vOffset;
 				vResultPos.y = CUtils::Make_RandomFloat(1.9f, 2.4f);
@@ -956,7 +981,7 @@ void CSimba::SpawnDebris(_uint iAnimIdx)
 	else if (Simba_FinalCrusher == iAnimIdx)
 	{
 		_uint iNumDebris = 100;
-		
+
 		_float4 vPos = (m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone) + m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone)) * 0.5f;
 		vPos.y = 0;
 
@@ -969,7 +994,7 @@ void CSimba::SpawnDebris(_uint iAnimIdx)
 
 			_float fScale = CUtils::Make_RandomFloat(0.08f, 0.2f);
 			_float fY = CUtils::Make_RandomFloat(16.f, 28.f);
-			
+
 			_float3 vDir = CUtils::TurnDirectionVector(vFloatLook, _float3(0, 1, 0), CUtils::Make_RandomFloat(0, 360));
 			_float fDis = CUtils::Make_RandomFloat(7.f, 11.f);
 			_float fFallSpeed = CUtils::Make_RandomFloat(9.f, 16.f);
@@ -1023,7 +1048,7 @@ void CSimba::SpawnDebris(_uint iAnimIdx)
 	else if (Simba_DoubleClaw == iAnimIdx)
 	{
 		_uint iNumDebris = 100;
-		
+
 		_float4 vPos = (m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone) + m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone)) * 0.5f;
 		vPos.y = 0;
 
@@ -1057,7 +1082,7 @@ void CSimba::SpawnDebris(_uint iAnimIdx)
 		else
 			vPos = m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone);
 		vPos.y = 0.f;
-		
+
 		for (_uint i = m_iNextDebrisIndex; i < m_iNextDebrisIndex + iNumDebris; i++)
 		{
 			_uint iCurIdx = i;
@@ -1070,7 +1095,7 @@ void CSimba::SpawnDebris(_uint iAnimIdx)
 
 			_float3 vDir = CUtils::TurnDirectionVector(vFloatLook, _float3(0, 1, 0), CUtils::Make_RandomFloat(-80, 80));
 			_float fDis = CUtils::Make_RandomFloat(6.f, 10.f);
-			_float fRightOffset =  CUtils::Make_RandomFloat(-2.f, 2.f);
+			_float fRightOffset = CUtils::Make_RandomFloat(-2.f, 2.f);
 
 			_float fLookOffset = CUtils::Make_RandomFloat(0.5f, 3.5f);
 			_float fFallSpeed = CUtils::Make_RandomFloat(9.f, 16.f);
@@ -1091,6 +1116,23 @@ void CSimba::SpawnDebris(_uint iAnimIdx)
 		_float fLaserDis = m_pSimbaLaserTransform->RayCast(CTransform::STATIC, vLaserLook, 40.f);
 		_float4 fResultPos = vLaserPos + (vLaserLook * fLaserDis);
 		fResultPos.y = 0.f;
+
+
+		//효선아 여기야 레이저 파티클
+		//레이저와의 충돌 자국
+		CEffect::FX_DESC FXDesc{};
+		FXDesc.vInitPos = static_cast<_float3>(fResultPos);
+		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+		FXDesc.vInitPos = { 0.f, 1.f, 0.f };
+		Add_Effect("HS_lion cross decal", FXDesc, false);
+
+
+		//충돌 시 튀는 파티클
+		CParticle::PARTICLE_DESC ParticleDesc{};
+		ParticleDesc.vInitPos = static_cast<_float3>(fResultPos);
+		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+
+		Add_Effect("HS_perfect laser collide particle", ParticleDesc);
 
 		for (_uint i = m_iNextDebrisIndex; i < m_iNextDebrisIndex + iNumDebris; i++)
 		{
@@ -1122,7 +1164,7 @@ void CSimba::SetUpSecondTarget()
 {
 	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 	if (pCamera != nullptr)
-		pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_BOTH);
+		pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_FINALBOSS, { 0.f, 2.f, 0.f }, 10.f);
 }
 
 void CSimba::CheckFinalCrusherRingCollision(_float fTimeDelta)
@@ -1138,7 +1180,7 @@ void CSimba::CheckFinalCrusherRingCollision(_float fTimeDelta)
 	_float fDis = (vKirbyPos - m_vRingPos).Length();
 
 	// 바깥원과 안쪽 원 사이에 있고, 높이 차이가 1 미만일때 충돌
-	if (fDis > m_fRingOuterRadius || fDis < m_fRingInnerRadius || vKirbyPos.y > m_vRingPos.y + 1) 
+	if (fDis > m_fRingOuterRadius || fDis < m_fRingInnerRadius || vKirbyPos.y > m_vRingPos.y + 1)
 		return;
 
 #pragma region 충돌했을때 커비 넉백
@@ -1210,7 +1252,7 @@ void CSimba::SpawnFire(_uint iAnimIdx)
 				return;
 		}
 	}
-	
+
 	for (auto& rightBones : m_vecRightNailBones)
 	{
 		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(rightBones);
@@ -1238,7 +1280,7 @@ void CSimba::SpawnFire(_uint iAnimIdx)
 		}
 	}
 
-	m_iFireCount++;	
+	m_iFireCount++;
 }
 
 void CSimba::QuickClawNailFlash(_uint eSimbaAnim) // YW : Effect 영우형 여기임 검지손톱 번쩍
@@ -1267,30 +1309,32 @@ void CSimba::QuickClawSlash(_uint eSimbaAnim)
 	effectDesc.vInitScale = _float3(2.5f, 2.5f, 2.5f);
 	effectDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-	if (Simba_QuickClawL == eSimbaAnim || Simba_QuickClaw2L == eSimbaAnim) // 왼손
+	if (Simba_QuickClawL == eSimbaAnim) // 왼손 1타
 	{
-		effectDesc.vInitRot = _float3(0, 20.f, -24.f);
-		effectDesc.vInitPos = _float3(0, 2.5f, 2.f);
-		//effectDesc.vInitRot.z = -23.5f;
-		//_float3 vOffset = _float3(); // Right Up Look 오프셋 계수
-		//_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone, vOffset);
-		//vPos += (m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * 1.5f) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 1.6f;
-		//effectDesc.vInitPos = _float3(vPos.x, vPos.y + 1.3f, vPos.z);
-		
+		effectDesc.vInitRot = _float3(0, -48, -32);
+		effectDesc.vInitPos = _float3(0, 5.9f, 3.3f);
 		Add_Effect("HS_lion claw L", effectDesc);
 	}
-	else if (Simba_QuickClawR == eSimbaAnim || Simba_QuickClaw2R == eSimbaAnim) // 오른손
+	else if (Simba_QuickClawR == eSimbaAnim) // 오른손 1타
 	{
-		effectDesc.vInitRot = _float3(0, -20.f, 24.f);
-		effectDesc.vInitPos = _float3(0, 3.2f, 2.f);
-		//effectDesc.vInitRot.z = +23.5f;
-		//_float3 vOffset = _float3(); // Right Up Look 오프셋 계수
-		//_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone, vOffset);
-		//vPos += (-m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * 1.5f) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 1.8f;
-		//effectDesc.vInitPos = _float3(vPos.x, vPos.y + 1.3f, vPos.z);
+		effectDesc.vInitRot = _float3(0, 48, 32);
+		effectDesc.vInitPos = _float3(0, 5.9f, 3.3f);
+		Add_Effect("HS_lion claw R", effectDesc);
+
+	}
+	else if (Simba_QuickClaw2L == eSimbaAnim) // 왼손 2타
+	{
+		effectDesc.vInitRot = _float3(0, -47.f, -3.f);
+		effectDesc.vInitPos = _float3(0, 2.5f, 3.3f);
+		Add_Effect("HS_lion claw L", effectDesc);
+	}
+	else if (Simba_QuickClaw2R == eSimbaAnim) // 오른손 2타
+	{
+		effectDesc.vInitRot = _float3(0, 47.f, 3.f);
+		effectDesc.vInitPos = _float3(0, 2.5f, 3.3f);
 		
 		Add_Effect("HS_lion claw R", effectDesc);
-	}	
+	}
 }
 // 완료
 void CSimba::FinalCrusherCharge()
@@ -1298,20 +1342,20 @@ void CSimba::FinalCrusherCharge()
 	CEffect::FX_DESC effectDesc{};
 	_float3 vDir = -m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	vDir.Normalize();
-	
+
 	effectDesc.vInitRot = ComputeAngleForEffect(-1);
 	effectDesc.vInitScale = _float3(1.03f, 1.03f, 0.94f);
 	_float3 vPos = GET_POS;
 	vPos -= vDir * 0.45f;
 	effectDesc.vInitPos = vPos;
 	Add_Effect("HS_lion hit charge", effectDesc);
-} 
+}
 // 완료 
 void CSimba::FinalCrusherSwing() // YW : Effect 영우형 여기임 양주먹 내려치기시작
 {
 	//_float3 vPos = GET_POS;
 	//_float3 vLookDegree = CUtils::Make_Degree_FromDir(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
-	_float3 vScale = { 2.15f, 2.15f, 2.15f };
+	_float3 vScale = { 2.18f, 2.18f, 2.18f };
 
 	//팔 궤적
 	CEffect::FX_DESC SingleFXDesc{};
@@ -1369,7 +1413,7 @@ void CSimba::LandingSmoke() // YW : Effect 영우형 여기임 점프 후 착지 회색방구
 	_float3 vScale = { 2.f, 2.f, 2.f };
 
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
-	MultiFXDesc.vInitPos = vPos + _float3( 0.f, .3f, 0.f );
+	MultiFXDesc.vInitPos = vPos + _float3(0.f, .3f, 0.f);
 
 	Add_Effect("DDD land smoke", MultiFXDesc);
 }
@@ -1436,26 +1480,32 @@ void CSimba::DoubleClawSweep()// YW : Effect 영우형 여기임 바닥 긁다가 순간적으�
 //크로스 발톱 공격
 void CSimba::DimensionClaw()
 {
+	Delete_Effect("HS_lion L cross");
+	Delete_Effect("HS_lion R cross");
+	//Delete_AllEffect();
 	_float3 vPos = GET_POS;
-	_float3 vScale = { 2.5f, 2.5f, 2.5f };
+	_float3 vScale = { 3.2f, 3.2f, 3.2f };
 
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
-	//MultiFXDesc.vInitPos = vPos + _float3(0.f, .3f, 0.f);
 	MultiFXDesc.pSocketMatrix = &m_DimensionClawMat;
 	MultiFXDesc.vInitScale = vScale;
-	Add_Effect("HS_lion L cross", MultiFXDesc);
-	Add_Effect("HS_lion R cross", MultiFXDesc);
+	MultiFXDesc.fStartDelay = .3f;
+
+	Add_Effect("HS_lion L cross", MultiFXDesc, true);
+	Add_Effect("HS_lion R cross", MultiFXDesc, true);
 }
 
-void CSimba::TeethBite()
+void CSimba::TeethBite(_bool bRight)
 {
+	//
 	_float3 vScale = { 3.f, 3.f, 3.f };
 
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
-	//MultiFXDesc.vInitRot = _float3(0, -38, 0);
-	//MultiFXDesc.vInitPos = _float3(0.f, -3.f, 3.f);
 	MultiFXDesc.pSocketMatrix = &m_matMouth;
 	MultiFXDesc.vInitScale = vScale;
+
+	MultiFXDesc.vInitRot = { -90.f, bRight ? -45.f : 45.f, 0.f };
+
 	Add_Effect("HS_lion tooth", MultiFXDesc);
 }
 
@@ -1513,7 +1563,7 @@ void CSimba::BiteRushJumpSmoke(_uint iAnimIndex) // 손 발에서 여러방향으로 회색�
 			vRightHandPos.y = 2.3f;
 		}
 	}
-	else if(Simba_BiteRushLandingR == iAnimIndex)
+	else if (Simba_BiteRushLandingR == iAnimIndex)
 	{
 		if (0 == m_iSmokeCount) // 오른손, 왼발
 		{
@@ -1540,6 +1590,7 @@ void CSimba::BiteRushJumpSmoke(_uint iAnimIndex) // 손 발에서 여러방향으로 회색�
 void CSimba::DimensionClawFire() // 왼손 오른손 하나씩
 {
 	// Fire클래스
+
 }
 
 HRESULT CSimba::Add_Components()
@@ -1578,7 +1629,7 @@ HRESULT CSimba::Add_Components()
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 
 	/* FSM */
-	if(LEVEL_SIMBA == *m_pGameInstance->Get_CurrentLevelID())
+	if (LEVEL_SIMBA == *m_pGameInstance->Get_CurrentLevelID())
 		SetUp_FSM();
 
 	CHitBox::HITBOX_DESC HitBox{};
@@ -1599,7 +1650,7 @@ HRESULT CSimba::Add_Components()
 	tAttack.pSocket = m_pModelCom->Get_BonePtr("L_HaveL");
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
 		return E_FAIL;
-	
+
 	tAttack.pDesc = &m_tColliderDesc[ATTACK2]; // Right Hand
 	tAttack.pSocket = m_pModelCom->Get_BonePtr("R_HaveL");
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
@@ -1680,9 +1731,9 @@ void CSimba::SetUp_FSM()
 
 	for (_uint i = Simba_QuickClaw2L; i <= Simba_QuickClawStartR; i++)
 		m_pFSM->Add_State(i, CSimba_QuickClaw::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
-	for(_uint i = Simba_FinalCrusher; i <= Simba_FinalCrusherStartRepeatEnd; i++)
+	for (_uint i = Simba_FinalCrusher; i <= Simba_FinalCrusherStartRepeatEnd; i++)
 		m_pFSM->Add_State(i, CSimba_FinalCrusher::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
-	for(_uint i = Simba_DoubleClaw; i <= Simba_DoubleClawEnd; i++)
+	for (_uint i = Simba_DoubleClaw; i <= Simba_DoubleClawEnd; i++)
 		m_pFSM->Add_State(i, CSimba_DoubleClaw::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
 	m_pFSM->Add_State(Simba_Wait2, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
@@ -1691,14 +1742,14 @@ void CSimba::SetUp_FSM()
 	m_pFSM->Add_State(Simba_Fall, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 	m_pFSM->Add_State(Simba_Landing, CSimba_Jump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
-	for(_uint i = Simba_BackStep; i <= Simba_BackStepStart; i++)
+	for (_uint i = Simba_BackStep; i <= Simba_BackStepStart; i++)
 		m_pFSM->Add_State(i, CSimba_BackStep::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
 	for (_uint i = Simba_AttackJump; i <= Simba_AttackJumpWait; i++) {
 		m_pFSM->Add_State(i, CSimba_AttackJump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 		m_mapRotation[ATTACKJUMP].insert(SIMBA_ANIM(i));
 	}
-		
+
 	m_pFSM->Add_State(Simba_Damage, CSimba_Damage::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 
 	m_pFSM->Add_State(Simba_Roar2, CSimba_Roar::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
@@ -1707,17 +1758,17 @@ void CSimba::SetUp_FSM()
 		m_pFSM->Add_State(i, CSimba_BiteRushJump::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 		m_mapRotation[BITERUSHJUMP].insert(SIMBA_ANIM(i));
 	}
-	
+
 	for (_uint i = Simba_DimensionClaw; i <= Simba_DimensionClawWait; i++) {
 		m_pFSM->Add_State(i, CSimba_DimensionClaw::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 		m_setDimensionClawAnims.insert(SIMBA_ANIM(i));
 	}
-		
+
 	for (_uint i = Simba_BiteRush; i <= Simba_BiteRushEnd; i++) {
 		m_pFSM->Add_State(i, CSimba_BiteRush::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 		m_mapRotation[BITERUSH].insert(SIMBA_ANIM(i));
-	}	
-	for (_uint i = Simba_BiteRushStart; i <= Simba_BiteRushTiredWait; i++){
+	}
+	for (_uint i = Simba_BiteRushStart; i <= Simba_BiteRushTiredWait; i++) {
 		m_pFSM->Add_State(i, CSimba_BiteRush::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 		m_mapRotation[BITERUSH].insert(SIMBA_ANIM(i));
 	}
@@ -1726,7 +1777,7 @@ void CSimba::SetUp_FSM()
 		m_pFSM->Add_State(i, CSimba_DimensionLaser::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 		m_setDimensionLaserAnims.insert(SIMBA_ANIM(i));
 	}
-		
+
 	m_pFSM->Add_State(Simba_Death, CSimba_Death::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 	m_pFSM->Add_State(Simba_DemoDeadCut1, CSimba_Death::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
 	m_pFSM->Add_State(Simba_DemoDeadCut2, CSimba_Death::Create(m_pControllerCom, m_pTransformCom, m_pKirby, pKirbyTransform));
@@ -1742,7 +1793,7 @@ void CSimba::SetUpHitBoxTimings()
 {
 	vector<tuple<_float, _bool, COLLISION_VALUE>> vecTiming;
 
-	for(_uint i = 1; i < 9; i++)
+	for (_uint i = 1; i < 9; i++)
 		vecTiming.emplace_back(tuple<_float, _bool, COLLISION_VALUE>(i * 0.1f, false, ATTACK));
 	InsertHitboxActivationTiming(Simba_QuickClawL, vecTiming);
 	InsertHitboxActivationTiming(Simba_QuickClaw2L, vecTiming);
@@ -1827,6 +1878,13 @@ void CSimba::PlayLipSinc()
 		if (false == m_bPlayPartialAnim) {
 			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSub, 50.f, false, false);
 			m_bPlayPartialAnim = true;
+
+			TCHAR* tcharBuffer = new TCHAR[20];
+			wstring wstrSound = L"lion" + to_wstring(CUtils::Make_RandomInt(0, 16)) + L".wav";
+			wcscpy_s(tcharBuffer, wstrSound.size() + 1, wstrSound.c_str());
+			m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+			m_pGameInstance->PlayMySound(tcharBuffer, CHANNEL_BOSSVOICE, 0.2f);
+			Safe_Delete_Array(tcharBuffer);
 		}
 	}
 }
@@ -1875,6 +1933,8 @@ void CSimba::OnAppearEnd(CGameObject* pObj)
 	Change_State(Simba_DemoAppear1Cut9, 50.f, false, true);
 	TransformToDefault(0);
 	TriggerMonsterSpawning(11);
+	m_pGameInstance->StopSound(CHANNEL_BGM);
+	m_pGameInstance->PlayMySound(L"SimbaAfterDialog.wav", CHANNEL_BGM, 0.37f);
 }
 
 void CSimba::OnWave1Dead(CGameObject* pObj)
@@ -1938,7 +1998,7 @@ void CSimba::SpawnMonsters(_uint iTriggerIndex)
 		fScaleOffset = 1.2f;
 		m_bWave2Summoned = true;
 	}
-		
+
 	for (auto& monsterDesc : m_vecMonsterDescs)
 	{
 		if (iTriggerIndex == monsterDesc.eMonState)
@@ -2014,7 +2074,7 @@ void CSimba::SpawnEffects(_uint iTriggerIndex)
 	if (11 == iTriggerIndex) {
 		if (0 == m_iEffectCount)
 			wstrMonsterName = TEXT("Awoofy");
-		else if(1 == m_iEffectCount)
+		else if (1 == m_iEffectCount)
 			wstrMonsterName = TEXT("AwoofyWild");
 	}
 	else if (12 == iTriggerIndex)
@@ -2023,14 +2083,14 @@ void CSimba::SpawnEffects(_uint iTriggerIndex)
 			wstrMonsterName = TEXT("Awoofy"); // AwoofyWild로 바꿔야할수도 흠
 		else if (1 == m_iEffectCount)
 			wstrMonsterName = TEXT("Rabbit");
-		else if(2 == m_iEffectCount)
+		else if (2 == m_iEffectCount)
 			wstrMonsterName = TEXT("RabbitBig");
 	}
 
 	_float fY{};
 	if (TEXT("Awoofy") == wstrMonsterName || TEXT("Rabbit") == wstrMonsterName || TEXT("RabbitBig") == wstrMonsterName)
 		fY = 2.4f;
-	else if (TEXT("AwoofyWild") == wstrMonsterName )
+	else if (TEXT("AwoofyWild") == wstrMonsterName)
 		fY = 2.7f;
 
 	for (auto& monsterDesc : m_vecMonsterDescs)
@@ -2066,7 +2126,7 @@ void CSimba::CheckSpawning()
 
 		if (0.f < m_fSpawnTime && 0 == m_iEffectCount)
 			SpawnEffects(11);
-		else if(0.7f < m_fSpawnTime && 1 == m_iEffectCount)
+		else if (0.7f < m_fSpawnTime && 1 == m_iEffectCount)
 			SpawnEffects(11);
 
 		if (1.2f < m_fSpawnTime && 0 == m_iMonsterCount)
@@ -2152,11 +2212,11 @@ void CSimba::CreateDimensionClawActor()
 {
 	auto pPhysics = m_pGameInstance->Get_Physics();
 	PxMaterial* pMtrl = m_pGameInstance->Get_Material();
-	
+
 	PxTransform transform(PxVec3(0, 0, 0));
 	PxRigidDynamic* pRigidDynamic = pPhysics->createRigidDynamic(transform);
 	PxBoxGeometry boxGeometry(10.f, 1.f, 5.f);
-	
+
 	PxQuat rotation1(XMConvertToRadians(40), PxVec3(0, 0, 1)); // z축기준 35도 회전
 	PxQuat rotation2(-XMConvertToRadians(40), PxVec3(0, 0, 1)); // z축기준 35도 회전
 	PxTransform transform1(PxVec3(0.f, 0.f, 0.f), rotation1);
@@ -2175,7 +2235,7 @@ void CSimba::CreateDimensionClawActor()
 	pShape2->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
 	pShape2->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
 	pRigidDynamic->attachShape(*pShape2);
-	
+
 	m_pGameInstance->AddActor(*pRigidDynamic);
 	m_pDimensionClawActor = pRigidDynamic;
 	m_pDimensionClawActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
@@ -2194,7 +2254,7 @@ void CSimba::OnSimbaAttackTrigger()
 
 	if (true == CCollisionCenter::Get_Instance()->Kirby_Dodge_SlowMotionSystem(pKirby))
 		return;
-	
+
 	if (pKirby->isOverPower() == false) // 무적이 아닐 경우
 	{
 		CTransform* pKirbyTransform = m_pKirby->Get_TransformCom();
@@ -2367,10 +2427,11 @@ void CSimba::Free()
 	Safe_Release(m_pLaserBone);
 	Safe_Release(m_pLeftHandBone);
 	Safe_Release(m_pRightHandBone);
+
 	Safe_Release(m_pKirby);
 	Safe_Release(m_pSimbaLaserTransform);
 	Safe_Release(m_pSimbaLaser);
 
-	for(_uint i = 0; i < EYETEX_END; i++)
+	for (_uint i = 0; i < EYETEX_END; i++)
 		Safe_Release(m_pEyeTextureCom[i]);
 }

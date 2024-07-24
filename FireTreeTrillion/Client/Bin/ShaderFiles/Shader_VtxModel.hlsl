@@ -1322,7 +1322,7 @@ technique11 DefaultTechnique
     }
 
     // (24)
-    pass For_Laser 
+    pass For_Laser
     {
         SetRasterizerState(RS_NonCull);
         SetDepthStencilState(DSS_NO_TEST_WRITE, 0);

@@ -185,6 +185,8 @@ void CUI_PartTimeResult::Render_Digits()
 						{
 							CPartTimerKirby* pKirby = dynamic_cast<CPartTimerKirby*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, L"Layer_Player", L"Prototype_GameObject_PartTimerKirby"));
 							pKirby->Change_State(CPartTimerKirby::FOODSHOP_RESULTWINSTART, 50.f, false, true);
+							m_pGameInstance->StopSound(CHANNEL_BGM);
+							m_pGameInstance->PlaySound_Free(L"FoodGame_Win.wav", 0.5f);
 							bOnce = true;
 						}
 					}
@@ -209,6 +211,7 @@ void CUI_PartTimeResult::Render_Digits()
 				HungryDeeDesc.iIdx = ((_int)fRealTotalScore / 30) - 1;
 
 				m_pGameInstance->Add_Clone(LEVEL_PARTTIME, TEXT("Layer_Dee"), TEXT("Prototype_GameObject_HungryDee"), &HungryDeeDesc);
+				m_pGameInstance->PlaySound_Free(L"FoodGame_AddDee.wav", 0.5f);
 			}
 			if (false == m_bRenderTotalScore)
 			{
@@ -264,6 +267,8 @@ void CUI_PartTimeResult::Render_TotalScore()
 			static _bool bOnce{ false };
 			if (!bOnce)
 			{
+				m_pGameInstance->PlaySound_Free(L"FoodGame_TotalUp.wav", 0.5f);
+
 				// 효선아 여기야 >> 게임 점수 다 뜨고 이펙트 나오는 구간
 				// 감사합니다
 

@@ -567,9 +567,9 @@ void CUI_PartTime::Change_TimeTexures(_float _fTime)
 	_int iRest = (iTime % 10);
 	if (iRest <= 0 || iRest > 9) iRest = 0;
 
-	// 첫번째 텍스쳐 iShare과 대응되는 숫자 텍스쳐로 변경
-	m_arrTimerDigits[0] = iShare;
-	// 두번째 텍스쳐 iRest와 대응되는 숫자 텍스쳐로 변경
+	// 첫 번째 텍스쳐 iShare과 대응되는 숫자 텍스쳐로 변경
+	m_arrTimerDigits[0] = iShare;                                                                                                        
+	// 두 번째 텍스쳐 iRest와 대응되는 숫자 텍스쳐로 변경
 	m_arrTimerDigits[1] = iRest;
 }
 
@@ -628,6 +628,12 @@ void CUI_PartTime::Render_READY()
 	static _float fTimeAcc = 0.f;
 	_int iNum = 17; // READY 17, GO 18
 
+	static _bool bOnce = false;
+	if (bOnce == false)
+	{
+		m_pGameInstance->PlaySound_Free(L"FoodGame_Ready.wav", 0.5f);
+		bOnce = true;
+	}
 	m_fMoveRatio += m_fTimeDelta;
 	if (m_fMoveRatio >= 1.f)
 	{
@@ -684,19 +690,24 @@ void CUI_PartTime::Render_GO()
 			m_bTimeStart = true;
 			m_fSizeRatio = 0.f;
 			m_arrRenderState[START] = false;
+
+			m_pGameInstance->StopSound(CHANNEL_BGM);
+			m_pGameInstance->StopSound(CHANNEL_BGM_SUB);
+			m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
+			m_pGameInstance->PlayMySound(L"K15_FoodShopNormal.marker.wav", CHANNEL_BGM_SUB, 0.5f);
 			return;
 		}
 	}
 
 	_float fSizeRatio = 1.f - EaseOutBounce(m_fSizeRatio);
-	_float2 ChangedSize2D = _float2(standardSize2D.x * fSizeRatio + m_arrSize[iNum].x * 2.f
-		, standardSize2D.y * fSizeRatio + m_arrSize[iNum].y * 2.f);
+	_float2 ChangedSize2D = _float2(standardSize2D.x * fSizeRatio + m_arrSize[iNum].x * 2.f,
+									standardSize2D.y * fSizeRatio + m_arrSize[iNum].y * 2.f);
 	m_pTransformCom->Set_Scaled(ChangedSize2D.x, ChangedSize2D.y, 1.f);
 	m_arrPosition[iNum] = _float2(830.f, 200.f);
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION,
 		XMVectorSet(m_arrPosition[iNum].x - g_iWinSizeX * 0.5f,
-			-m_arrPosition[iNum].y + g_iWinSizeY * 0.5f, 0.f, 1.f));
+					- m_arrPosition[iNum].y + g_iWinSizeY * 0.5f, 0.f, 1.f));
 
 	// UI별 포지션, 사이즈, 컬러 조정
 	HRESULT hr = m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
