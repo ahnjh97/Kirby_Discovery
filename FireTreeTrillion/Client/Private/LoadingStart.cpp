@@ -165,8 +165,8 @@ HRESULT CLoadingStart::Bind_ShaderResources(_float fAlpha)
 	hr = m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
 	CHECK_FAILED(hr);
 
-	//hr = m_pShaderCom->Bind_RawValue("g_fTimeDelta", &m_fTimeDelta, sizeof(_float));
-	//CHECK_FAILED(hr);
+	hr = m_pShaderCom->Bind_RawValue("g_fTimeDelta", &m_fTimeDelta, sizeof(_float));
+	CHECK_FAILED(hr);
 
 	hr = m_pShaderCom->Bind_RawValue("g_fAlpha", &fAlpha, sizeof(_float));
 	CHECK_FAILED(hr);
