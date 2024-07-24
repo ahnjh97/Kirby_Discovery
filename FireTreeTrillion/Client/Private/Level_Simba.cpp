@@ -84,6 +84,8 @@ HRESULT CLevel_Simba::Initialize()
 	// 포그 설정
 	m_pGameInstance->Fog_Zero();
 
+	m_pGameInstance->StopSound(CHANNEL_BGM);
+
 	return S_OK;
 }
 

@@ -73,8 +73,8 @@ HRESULT CSimba::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
-	m_fMaxHp = 250.f;
-	m_fHp = 2.f;
+	m_fMaxHp = 320.f;
+	m_fHp = 320.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eEyeState = SIMBAEYE_BIG;
@@ -447,6 +447,24 @@ HRESULT CSimba::Render_LightDepth()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CSimba::Add_AnimEvent()
+{
+	__super::Add_AnimEvent();
+
+	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
+	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
+	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
+	m_pModelCom->Add_Event("FinalCrusherCharge", [this]() {
+		m_pGameInstance->PlaySound_Free(L"TakeItem01.wav", 0.5f);
+
+		});
+
+	m_pModelCom->Add_Event("FinalCrusherCharge", [this]() {
+		m_pGameInstance->PlaySound_Free(L"TakeItem01.wav", 0.5f);
+		});
+
 }
 
 void CSimba::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
@@ -1265,27 +1283,29 @@ void CSimba::QuickClawSlash(_uint eSimbaAnim)
 	effectDesc.vInitScale = _float3(2.5f, 2.5f, 2.5f);
 	effectDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-	if (Simba_QuickClawL == eSimbaAnim || Simba_QuickClaw2L == eSimbaAnim) // 왼손
+	if (Simba_QuickClawL == eSimbaAnim) // 왼손 1타
 	{
-		effectDesc.vInitRot = _float3(0, 20.f, -24.f);
-		effectDesc.vInitPos = _float3(0, 2.5f, 2.f);
-		//effectDesc.vInitRot.z = -23.5f;
-		//_float3 vOffset = _float3(); // Right Up Look 오프셋 계수
-		//_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone, vOffset);
-		//vPos += (m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * 1.5f) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 1.6f;
-		//effectDesc.vInitPos = _float3(vPos.x, vPos.y + 1.3f, vPos.z);
-		
+		effectDesc.vInitRot = _float3(0, -48, -32);
+		effectDesc.vInitPos = _float3(0, 5.9f, 3.3f);
 		Add_Effect("HS_lion claw L", effectDesc);
 	}
-	else if (Simba_QuickClawR == eSimbaAnim || Simba_QuickClaw2R == eSimbaAnim) // 오른손
+	else if (Simba_QuickClawR == eSimbaAnim) // 오른손 1타
 	{
-		effectDesc.vInitRot = _float3(0, -20.f, 24.f);
-		effectDesc.vInitPos = _float3(0, 3.2f, 2.f);
-		//effectDesc.vInitRot.z = +23.5f;
-		//_float3 vOffset = _float3(); // Right Up Look 오프셋 계수
-		//_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone, vOffset);
-		//vPos += (-m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * 1.5f) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 1.8f;
-		//effectDesc.vInitPos = _float3(vPos.x, vPos.y + 1.3f, vPos.z);
+		effectDesc.vInitRot = _float3(0, 48, 32);
+		effectDesc.vInitPos = _float3(0, 5.9f, 3.3f);
+		Add_Effect("HS_lion claw R", effectDesc);
+
+	}
+	else if (Simba_QuickClaw2L == eSimbaAnim) // 왼손 2타
+	{
+		effectDesc.vInitRot = _float3(0, -47.f, -3.f);
+		effectDesc.vInitPos = _float3(0, 2.5f, 3.3f);
+		Add_Effect("HS_lion claw L", effectDesc);
+	}
+	else if (Simba_QuickClaw2R == eSimbaAnim) // 오른손 2타
+	{
+		effectDesc.vInitRot = _float3(0, 47.f, 3.f);
+		effectDesc.vInitPos = _float3(0, 2.5f, 3.3f);
 		
 		Add_Effect("HS_lion claw R", effectDesc);
 	}	
@@ -1309,7 +1329,7 @@ void CSimba::FinalCrusherSwing() // YW : Effect 영우형 여기임 양주먹 내려치기시�
 {
 	//_float3 vPos = GET_POS;
 	//_float3 vLookDegree = CUtils::Make_Degree_FromDir(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
-	_float3 vScale = { 2.15f, 2.15f, 2.15f };
+	_float3 vScale = { 2.18f, 2.18f, 2.18f };
 
 	//팔 궤적
 	CEffect::FX_DESC SingleFXDesc{};
@@ -1825,6 +1845,13 @@ void CSimba::PlayLipSinc()
 		if (false == m_bPlayPartialAnim) {
 			m_pModelCom->Reset_PartialAnimation(Simba_LipSyncSub, 50.f, false, false);
 			m_bPlayPartialAnim = true;
+
+			TCHAR* tcharBuffer = new TCHAR[20];
+			wstring wstrSound = L"lion" + to_wstring(CUtils::Make_RandomInt(0, 16)) + L".wav";
+			wcscpy_s(tcharBuffer, wstrSound.size() + 1, wstrSound.c_str());
+			m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+			m_pGameInstance->PlayMySound(tcharBuffer, CHANNEL_BOSSVOICE, 0.2f);
+			Safe_Delete_Array(tcharBuffer);
 		}
 	}
 }
@@ -1873,6 +1900,8 @@ void CSimba::OnAppearEnd(CGameObject* pObj)
 	Change_State(Simba_DemoAppear1Cut9, 50.f, false, true);
 	TransformToDefault(0);
 	TriggerMonsterSpawning(11);
+	m_pGameInstance->StopSound(CHANNEL_BGM);
+	m_pGameInstance->PlayMySound(L"SimbaAfterDialog.wav", CHANNEL_BGM, 0.37f);
 }
 
 void CSimba::OnWave1Dead(CGameObject* pObj)
@@ -2365,6 +2394,7 @@ void CSimba::Free()
 	Safe_Release(m_pLaserBone);
 	Safe_Release(m_pLeftHandBone);
 	Safe_Release(m_pRightHandBone);
+
 	Safe_Release(m_pKirby);
 	Safe_Release(m_pSimbaLaserTransform);
 	Safe_Release(m_pSimbaLaser);
