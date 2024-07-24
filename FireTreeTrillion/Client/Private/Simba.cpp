@@ -175,6 +175,8 @@ HRESULT CSimba::Initialize(void* pArg)
 	Safe_AddRef(m_pLeftFootBone);
 	m_pRightFootBone = m_pModelCom->Get_BonePtr("R_ToeJ");
 	Safe_AddRef(m_pRightFootBone);
+	m_pMouthBone = m_pModelCom->Get_BonePtr("T_MouthJ");
+	Safe_AddRef(m_pMouthBone);
 #pragma endregion
 
 	SetCamSequence(CCamera_Main::SEQ_SIMBA_START);
@@ -202,6 +204,12 @@ _int CSimba::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return Ready_Dead();
+
+	m_matLeftHand = m_pTransformCom->ComputeBoneWorldMatrix(m_pLeftHandBone); // 소켓용
+	m_matRightHand = m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone); // 소켓용
+	m_matLip = m_pTransformCom->ComputeBoneWorldMatrix(m_pLipBone); // Socket Dragon
+	_float4 vMouthPos = m_pTransformCom->ComputeBoneWorldPos(m_pMouthBone);
+	memcpy(&(m_matMouth.m[3]), &vMouthPos, sizeof(vMouthPos));
 
 	m_fHpRatio = m_fHp / m_fMaxHp;
 
@@ -1439,11 +1447,19 @@ void CSimba::DimensionClaw()
 
 void CSimba::TeethBite()
 {
-	
+	_float3 vScale = { 3.f, 3.f, 3.f };
+
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+	//MultiFXDesc.vInitRot = _float3(0, -38, 0);
+	//MultiFXDesc.vInitPos = _float3(0.f, -3.f, 3.f);
+	MultiFXDesc.pSocketMatrix = &m_matMouth;
+	MultiFXDesc.vInitScale = vScale;
+	Add_Effect("HS_lion tooth", MultiFXDesc);
 }
 
 void CSimba::DimensionLaserVomit() // DimensionLaser 주위에 나오는 액체부스거리들
 {
+	// Fire클래스
 }
 
 void CSimba::DimensionLaser() // 진짜 DimensionLaser
@@ -1458,7 +1474,7 @@ void CSimba::WalkSmoke() // 걸을때 발 땅에 닿을때 나오는 회색방구
 {
 }
 
-void CSimba::RoarElecParts() // 아직 호출안됨
+void CSimba::RoarElecParts() // 아직 호출안됨 // 아마 한번 호출 된 이후 전기 계속 생성해야할듯
 {
 }
 
@@ -1517,6 +1533,11 @@ void CSimba::BiteRushJumpSmoke(_uint iAnimIndex) // 손 발에서 여러방향으로 회색�
 	}
 
 	m_iSmokeCount++;
+}
+
+void CSimba::DimensionClawFire() // 왼손 오른손 하나씩
+{
+	// Fire클래스
 }
 
 HRESULT CSimba::Add_Components()
@@ -2134,8 +2155,8 @@ void CSimba::CreateDimensionClawActor()
 	PxRigidDynamic* pRigidDynamic = pPhysics->createRigidDynamic(transform);
 	PxBoxGeometry boxGeometry(10.f, 1.f, 5.f);
 	
-	PxQuat rotation1(XMConvertToRadians(35), PxVec3(0, 0, 1)); // z축기준 35도 회전
-	PxQuat rotation2(-XMConvertToRadians(35), PxVec3(0, 0, 1)); // z축기준 35도 회전
+	PxQuat rotation1(XMConvertToRadians(40), PxVec3(0, 0, 1)); // z축기준 35도 회전
+	PxQuat rotation2(-XMConvertToRadians(40), PxVec3(0, 0, 1)); // z축기준 35도 회전
 	PxTransform transform1(PxVec3(0.f, 0.f, 0.f), rotation1);
 	PxTransform transform2(PxVec3(0.f, 0.f, 0.f), rotation2);
 
@@ -2337,6 +2358,7 @@ void CSimba::Free()
 	for (auto& bone : m_vecRightNailBones)
 		Safe_Release(bone);
 
+	Safe_Release(m_pMouthBone);
 	Safe_Release(m_pLeftFootBone);
 	Safe_Release(m_pRightFootBone);
 	Safe_Release(m_pLipBone);

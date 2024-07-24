@@ -173,6 +173,9 @@ public:
 	// 2페이즈 회전하면서 점프할때, 착지할때 회색방구. 점프뛸땐 한번만 호출, 착지할땐 발마다 한번씩 호출
 	void			BiteRushJumpSmoke(_uint iAnimIndex);
 
+	// x자 공격 발사하기 전에 손에 불붙는거
+	void			DimensionClawFire(); 
+
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
 	CGameObject*	m_pKirby = { nullptr };
@@ -182,6 +185,12 @@ private:
 	class CBone*	m_pLaserBone = { nullptr };
 	class CBone*	m_pLeftFootBone = { nullptr };
 	class CBone*	m_pRightFootBone = { nullptr };
+	class CBone*	m_pMouthBone = { nullptr };
+
+	_float4x4		m_matLeftHand = { _float4x4::Identity };
+	_float4x4		m_matRightHand = { _float4x4::Identity };
+	_float4x4		m_matLip = { _float4x4::Identity };
+	_float4x4		m_matMouth = { _float4x4::Identity };
 
 	const _float4x4* m_pLaserBoneMatrix = { nullptr };
 	CGameObject*	m_pSimbaLaser = { nullptr };
