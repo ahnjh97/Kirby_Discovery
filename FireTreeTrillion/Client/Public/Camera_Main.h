@@ -51,7 +51,7 @@ public:
 
 		SEQ_SIMBA_BATTLESTART,
 
-		SEQ_SIMBA_GLASSBREAK,
+		SEQ_SIMBA_THRONEBREAK,
 		SEQ_SIMBA_BOSSORIGIN,
 		SEQ_SIMBA_CAGEBREAK,
 
@@ -437,6 +437,8 @@ private:
 
 	void Fill_HardCutSet(CAMACTION& Action, _float fTime);
 	void Fill_InterpolateCutSet(CAMACTION& Action, _float fTime, EASING eEase, _float fInterpolateSpeed);
+
+	void Fill_Delay(CAMACTION& Action, _float fStartTime, _float fDelayTime);
 
 	void Fill_ActionPos(CAMACTION& Action, CAMPOS eCamPos, _float3 vPos);
 	void Fill_ActionDir(CAMACTION& Action, CAMDIR eCamDir, _float3 vDir);
