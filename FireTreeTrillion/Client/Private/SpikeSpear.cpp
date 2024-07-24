@@ -122,6 +122,11 @@ _int CSpikeSpear::Tick(_float fTimeDelta)
 					m_pGameInstance->Get_CurCameraPtr()->Make_Shake(.2f, .5f);
 					Add_Effect("HS_FB down spear circle", FXDesc, false);
 
+					CParticle::PARTICLE_DESC FXPDesc{};
+					FXPDesc.vInitPos = (_float3)vPos;
+					FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
+					pFinalBoss->Add_Effect("YW Final Boss Wiggle B", FXPDesc, false);
+
 			}
 		}
 	}

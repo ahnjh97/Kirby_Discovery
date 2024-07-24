@@ -36,21 +36,21 @@ void DimensionGateLight(CFinalBoss* pBoss)
 
 void LaserReady(CFinalBoss* pBoss)
 {
-	CParticle::PARTICLE_DESC ParticleDesc{};
-	ParticleDesc.pSocketMatrix = pBoss->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
-	ParticleDesc.vInitPos = { 0.f, 2.f, 0.f };
-	ParticleDesc.vInitScale = { 3.f, 3.f, 3.f };
-	pBoss->Add_Effect("HS_FB laser charge particle B", ParticleDesc, false);
+	CMultiEffect::MULTI_FX_DESC MDesc{};
+	MDesc.pSocketMatrix = pBoss->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
+	MDesc.vInitPos = { 0.f, 2.f, 0.f };
+	MDesc.vInitScale = { 2.f, 2.f, 2.f };
+	//pBoss->Add_Effect("HS_FB laser charge particle B", ParticleDesc, false);YW Laser Set Effects
+	pBoss->Add_Effect("YW Laser Set Effects B", MDesc, true);
 
-
-	CMultiEffect::MULTI_FX_DESC FXDesc{};
+	/*CMultiEffect::MULTI_FX_DESC FXDesc{};
 	FXDesc.pSocketMatrix = pBoss->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
 	FXDesc.vInitPos = { 0.f, 3.f, 2.f };
 	FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 
 	FXDesc.fStartDelay = 1.f;
 
-	pBoss->Add_Effect("HS_FB charge light", FXDesc);
+	pBoss->Add_Effect("HS_FB charge light", FXDesc);*/
 }
 #pragma region APPEAR STATE
 //*********************************
@@ -589,11 +589,22 @@ void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if (pController->Is_Terrain())
 			{
+				_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
+				_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
+
+				CMultiEffect::MULTI_FX_DESC FXDesc{};
+				FXDesc.vInitPos = (_float3)(vPos + vLook * 3.f);
+				FXDesc.vInitScale = { 2.5f, 2.5f, 2.5f };
+				pFinalBoss->Add_Effect("HS_FB arrow bomb", FXDesc, false);
+				CParticle::PARTICLE_DESC FXPDesc{};
+				FXPDesc.vInitPos = (_float3)(vPos + vLook * 3.f);
+				FXPDesc.vInitScale = { 1.f, 1.f, 1.f };
+				pFinalBoss->Add_Effect("YW Final Boss Wiggle B", FXPDesc, false);
+
 				// 사운드 처리
 				m_pGameInstance->PlaySound_Free(L"BossChimera_Stab.wav", 0.8f);
 
-				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
-				vLook.m128_f32[1] = 0.f;
+				vLook.y = 0.f;
 				HRESULT hr = S_OK;
 
 				// 별 아이템 떨굼
@@ -606,8 +617,8 @@ void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 					else
 						AbilityItemDesc.fRotateDir = -1.f;																	// 별 회전 방향 왼쪽
 					AbilityItemDesc.fAngle = 360.f / (_float)iItemCnt * i;													// 별의 진행 방향의 각도
-					AbilityItemDesc.vDir = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);							// 별의 진행 방향
-					AbilityItemDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + vLook * 5.5f;	// 별의 생성 위치
+					AbilityItemDesc.vDir = pTransformCom->Get_State(CTransform::STATE_LOOK);							// 별의 진행 방향
+					AbilityItemDesc.vPosition = pTransformCom->Get_State(CTransform::STATE_POSITION) + vLook * 5.5f;	// 별의 생성 위치
 					AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
 					hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 					CHECK_FAILED(hr);
@@ -1431,9 +1442,27 @@ void CFinalBoss_Laser_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 
 	if (CFinalBoss::FINALBOSS_DIMENSIONLASERSTART == pFinalBoss->Get_State())
 	{
+		if (m_bEffectTrigger == true)
+		{
+			pFinalBoss->Delete_Effect("YW Laser Set Effects B");
+			CEffect::FX_DESC FX_Desc{};
+			FX_Desc.pSocketMatrix = pFinalBoss->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
+			FX_Desc.vInitPos = { 0.f, 2.f, 0.f };
+			FX_Desc.vInitScale = { 1.f, 1.f, 1.f };
+			pFinalBoss->Add_Effect("YW FB Laser Charge Complete Effect", FX_Desc, false);
+			m_bEffectTrigger = false;
+		}
+
+
 		if (pFinalBoss->IsAnimFinished())
 		{
 			HRESULT hr;
+
+			CEffect::FX_DESC FX_Desc{};
+			FX_Desc.pSocketMatrix = pFinalBoss->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
+			FX_Desc.vInitPos = { 0.f, 2.f, 0.f };
+			FX_Desc.vInitScale = { 1.f, 1.f, 1.f };
+			pFinalBoss->Add_Effect("HS_FB general charge", FX_Desc, true);
 
 			CLaser::LASER_DESC LaserDesc = {};
 			LaserDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
@@ -1449,6 +1478,7 @@ void CFinalBoss_Laser_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		if (7.f < m_fTimeDelta)
 		{
 			pLaser->Set_EndLaser(true);
+			pFinalBoss->Delete_Effect("HS_FB general charge");
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASEREND, 50.f, false, true);
 		}
 	}

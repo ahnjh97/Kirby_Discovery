@@ -89,12 +89,6 @@ _int CLaser::Tick(_float fTimeDelta)
 
 		if (!ISDEFAULTFLOAT3(vCollidingPoint))
 		{
-			//레이저와의 충돌 자국
-			CEffect::FX_DESC FXDesc{};
-			FXDesc.vInitPos = vCollidingPoint;
-			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
-			FXDesc.vInitPos = { 0.f, 0.f, 0.f };
-			Add_Effect("HS_FB laser decal", FXDesc, false);
 
 			//for (_int i = 0; i < 10; ++i)
 			//{
@@ -105,14 +99,20 @@ _int CLaser::Tick(_float fTimeDelta)
 			//	Add_Effect("HS_billboard up line", FXDesc);
 			//}
 
-			//충돌 시 튀는 파티클
-			CParticle::PARTICLE_DESC ParticleDesc{};
-			ParticleDesc.vInitPos = vCollidingPoint;
-			ParticleDesc.vInitScale = {2.f, 2.f, 2.f };
+			if (m_pModelCom->Get_CurAnimIndex() != 0)
+			{
+				//레이저와의 충돌 자국
+				CEffect::FX_DESC FXDesc{};
+				FXDesc.vInitPos = vCollidingPoint;
+				FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+				Add_Effect("HS_FB laser decal", FXDesc, false);
 
-			//Add_Effect("HS_laser collide particle", ParticleDesc);
-
-			Add_Effect("HS_perfect laser collide particle", ParticleDesc);
+				//충돌 시 튀는 파티클
+				CParticle::PARTICLE_DESC ParticleDesc{};
+				ParticleDesc.vInitPos = vCollidingPoint;
+				ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+				Add_Effect("HS_perfect laser collide particle", ParticleDesc);
+			}
 		}
 	}
 
