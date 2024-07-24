@@ -254,6 +254,9 @@ void CTransform::Look_At_Dir(_float4 vDir)
 
 void CTransform::Look_At_Axis(_fvector vAxis)
 {
+	if (XMVector3Equal(vAxis, XMVectorZero()))
+		return;
+
 	_vector		vLook = vAxis;
 	_vector		vRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook);
 	_vector		vUp = XMVector3Cross(vLook, vRight);

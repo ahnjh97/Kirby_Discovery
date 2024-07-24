@@ -1303,12 +1303,7 @@ void CSimba_Death::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 
 	if (pSimba->IsAnimFinished())
 	{
-		if (CSimba::Simba_Death == iState) {
-			pSimba->Change_State(CSimba::Simba_DemoDeadCut1, 50.f, false, true);
-			pSimba->Set_SimbaEye(CSimba::SIMBAEYE_NONE);
-			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_THRONEBREAK);
-		}
-		else if (CSimba::Simba_DemoDeadCut1 == iState)
+		if (CSimba::Simba_DemoDeadCut1 == iState)
 			pSimba->Change_State(CSimba::Simba_DemoDeadCut2, 60.f, false, false);
 		else if (CSimba::Simba_DemoDeadCut2 == iState && false == m_bCageNotified) {
 			m_bCageNotified = true;

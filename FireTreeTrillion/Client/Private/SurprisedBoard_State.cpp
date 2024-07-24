@@ -69,19 +69,26 @@ void CSurprisedBoard_Popout_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		case CSurprisedBoard::ARM_MOVE_L:
 			pSurprisedBoard->Change_State(CSurprisedBoard::RETURN_L, 50.f, false, true);
 			break;
+
 		case CSurprisedBoard::ARM_MOVE_R:
 			pSurprisedBoard->Change_State(CSurprisedBoard::RETURN_R, 50.f, false, true);
 			break;
+
 		case CSurprisedBoard::POP_OUT_L:
 			pSurprisedBoard->Change_State(CSurprisedBoard::ARM_MOVE_L, 50.f, false, true);
-		break;
+			break;
+
 		case CSurprisedBoard::POP_OUT_R:
 			pSurprisedBoard->Change_State(CSurprisedBoard::ARM_MOVE_R, 50.f, false, true);
 			break;
+
 		case CSurprisedBoard::PREPOP_OUT_L:
+			m_pGameInstance->PlaySound_Free(L"SupriseBoard_Popout.wav", 0.5f);
 			pSurprisedBoard->Change_State(CSurprisedBoard::POP_OUT_L, 50.f, false, true);
 			break;
+				
 		case CSurprisedBoard::PREPOP_OUT_R:
+			m_pGameInstance->PlaySound_Free(L"SupriseBoard_Popout.wav", 0.5f);
 			pSurprisedBoard->Change_State(CSurprisedBoard::POP_OUT_R, 50.f, false, true);
 			break;
 		}

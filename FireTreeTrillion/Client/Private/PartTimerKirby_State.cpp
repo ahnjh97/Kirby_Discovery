@@ -46,6 +46,8 @@ void CPartTimerKirby_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			RenderOff_Food(uItem);
 			pAlbaKirby->Render_Food(true, curItem);
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_CORRECT, 50.f, false, true);
+
+			m_pGameInstance->PlaySound_Free(L"FoodGame_Correct.wav", 0.5f);
 		}
 		else
 		{
@@ -53,6 +55,8 @@ void CPartTimerKirby_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float 
 			_float4 vPos = pTransform->Get_State(CTransform::STATE_POSITION);
 			pAlbaKirby->Set_PrePosition(vPos);
 			pAlbaKirby->Change_State(CPartTimerKirby::FOODSHOP_INCORRECTSTART, 50.f, false, true);
+
+			m_pGameInstance->PlaySound_Free(L"FoodGame_Incorrect.wav", 0.5f);
 		}
 	}
 }
@@ -108,6 +112,7 @@ void CPartTimerKirby_Move_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	m_uDir = CPartTimerKirby::FOODSHOP_MOVEL == _iAnimIndex ? LEFT : RIGHT;
+	m_pGameInstance->PlaySound_Free(L"FoodGame_Move.wav", 0.5f);
 }
 
 void CPartTimerKirby_Move_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)

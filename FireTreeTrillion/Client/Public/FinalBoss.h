@@ -110,6 +110,9 @@ public:
 	void Set_Auto(_float bAuto) { m_bAuto = bAuto; }
 	_bool Get_Auto() { return m_bAuto; }
 
+	void Set_BeforePos(_vector vBeforePos) { m_vBeforePos = vBeforePos; }
+	_vector Get_BeforePos() { return m_vBeforePos; }
+
 	//이벤트 함수
 	void Appear_Event(CGameObject* pObj);
 
@@ -143,6 +146,7 @@ private:
 
 	_vector				m_vDir = {};
 	_vector				m_vPosition = {};
+	_vector				m_vBeforePos = { 0.f };
 
 	_bool				m_bGlide = { false };
 	_bool				m_bChain = { false };
@@ -150,6 +154,7 @@ private:
 	_bool				m_bShake = { false };
 	_bool				m_bEffect = { false };
 	_bool				m_bAuto = { false };
+	_bool				m_bLastDamage = { false };
 
 	// 임구이용
 	_bool				m_bStab = { false };
@@ -188,6 +193,7 @@ private:
 	// FSM
 	void SetUp_FSM();
 	void HitBoxChanger(_uint eState);
+	void Create_Gully();
 
 public:
 	static CFinalBoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

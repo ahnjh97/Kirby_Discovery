@@ -80,6 +80,7 @@ public:
 
 private:
 	_float	m_fSpeed = { 0.f };
+	_bool	m_bSound = { false };
 
 public:
 	static	CFinalBoss_Stab_State* Create();

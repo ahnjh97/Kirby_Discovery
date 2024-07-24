@@ -427,7 +427,7 @@ HRESULT CAbility::Add_Components()
 		HitBox.pCollisionType = ABILITYITEM;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
-	Set_BodyCollider(COLLIDER_SPHERE, 0.5f, 0.f, 0.7f);
+	Set_BodyCollider(COLLIDER_SPHERE, 0.5f, 0.f, 1.f);
 
 	return S_OK;
 }

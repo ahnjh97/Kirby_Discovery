@@ -140,6 +140,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 					if (0 == m_iMeteor)
 					{
 						++m_iMeteor;
+						// 荤款靛 贸府
+						m_pGameInstance->PlaySound_Free(L"BossChimeraRoar.wav", 0.5f);
 						pFinalBoss->Change_State(CFinalBoss::FINALBOSS_ROAR, 50.f, false, true);
 					}
 					else if (1 == m_iMeteor)
@@ -151,7 +153,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 					{
 						pFinalBoss->Set_Chain(true);
 						pFinalBoss->Set_BossState(CFinalBoss::STATE_FLYING);
-						m_iCnt = 22;
+						m_iCnt = 18;
 						pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
 					}
 				}
@@ -238,8 +240,18 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			{
 				if (pFinalBoss->IsAnimFinished()/*0.5f < pFinalBoss->Get_AnimRatio()*/)
 				{
-					m_iCnt = 0;
+					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
+				}
+			}
+			else if (22 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+					pFinalBoss->Set_Direction(m_vLook);
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 				}
 			}
 		}
@@ -354,11 +366,11 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
 				}
 			}
-			else if (22 == m_iCnt)
+			else if (23 == m_iCnt)
 			{
 				if (pFinalBoss->IsAnimFinished()/*0.5f < pFinalBoss->Get_AnimRatio()*/)
 				{
-					m_iCnt = 19;
+					m_iCnt = 6;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPREADY, 50.f, false, true);
 				}
 			}
@@ -529,6 +541,7 @@ void CFinalBoss_Stab_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _fl
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 
 	m_fSpeed = 100.f;
+	m_bSound = false;
 }
 
 void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -539,6 +552,19 @@ void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+
+	if (CFinalBoss::FINALBOSS_STABREADY == pFinalBoss->Get_State())
+	{
+		if (0.8f < pFinalBoss->Get_AnimRatio())
+		{
+			if(false == m_bSound)
+			{
+				m_bSound = true;
+				// 荤款靛 贸府
+				m_pGameInstance->PlaySound_Free(L"BossChimera_StabStart.wav", 0.5f);
+			}
+		}
+	}
 
 	pTransformCom->Look_At_Axis(pFinalBoss->Get_Direction());
 
@@ -573,6 +599,9 @@ void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if (pController->Is_Terrain())
 			{
+				// 荤款靛 贸府
+				m_pGameInstance->PlaySound_Free(L"BossChimera_Stab.wav", 0.8f);
+
 				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
 				vLook.m128_f32[1] = 0.f;
 				HRESULT hr = S_OK;
@@ -848,7 +877,7 @@ void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		if (1.f > m_fTimeDelta)
 		{
 			vPos.m128_f32[0] += m_fTimeDelta;
-			vPos.m128_f32[1] += -tan(m_fTimeDelta) * 1.5f;
+			vPos.m128_f32[1] += -tan(m_fTimeDelta) * 2.f;
 		}
 
 		if (5.f > vPos.m128_f32[1])
@@ -868,6 +897,7 @@ void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		if (5.f > pController->Compute_Height(XMVectorSet(0.f, -1.f, 0.f, 0.f)))
 		{
 			pFinalBoss->Set_Gully(true);
+
 			//m_fSpeed = 10.f;
 		}
 		else
@@ -1770,12 +1800,14 @@ void CFinalBoss_Roar_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
 	CTransform* pTransform = pFinalBoss->Get_TransformCom();
 
-	if (0.35f < pFinalBoss->Get_AnimRatio())
+	if (0.36f < pFinalBoss->Get_AnimRatio())
 	{
 		if (false == m_bShake)
 		{
 			m_bShake = true;
 
+			// 荤款靛 贸府
+			m_pGameInstance->PlaySound_Free(L"BossChimeraRoar.wav", 0.5f);
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 			if (pCamera != nullptr)
 				pCamera->Make_Shake(0.5f, 3.5f);
