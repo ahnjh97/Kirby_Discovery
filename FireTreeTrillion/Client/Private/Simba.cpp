@@ -74,7 +74,7 @@ HRESULT CSimba::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_fMaxHp = 250.f;
-	m_fHp = 2.f;
+	m_fHp = 250.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eEyeState = SIMBAEYE_BIG;
