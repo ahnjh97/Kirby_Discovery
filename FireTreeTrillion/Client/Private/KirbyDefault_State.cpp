@@ -148,6 +148,7 @@ _bool CKirbyDefault_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelt
 			FXDesc.vInitPos = { 0.f, .6f, .4f };
 			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 
+			m_pGameInstance->PlayMySound(L"Kirby_Vacuuming.wav", CHANNEL_PLAYERVOICE, 0.5f);
 			pKirby->Add_Effect("Vacuum_v3", FXDesc, true);
 
 			//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v3"), &FXDesc)))
@@ -358,6 +359,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			FXDesc.vInitPos = { 0.f, .65f, .4f };
 			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 
+			m_pGameInstance->PlayMySound(L"Kirby_Vacuuming.wav", CHANNEL_PLAYERVOICE, 0.5f);
 			pKirby->Add_Effect("Vacuum_v3", FXDesc, true);
 
 			//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v3"), &FXDesc)))
@@ -776,6 +778,7 @@ _bool CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelt
 			FXDesc.vInitPos = { 0.f, .65f, .4f };
 			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 
+			m_pGameInstance->PlayMySound(L"Kirby_Vacuuming.wav", CHANNEL_PLAYERVOICE, 0.5f);
 			pKirby->Add_Effect("Vacuum_v3", FXDesc, true);
 
 			pKirby->Change_State(CKirby::STATE_INHALEFALL, 50.f, true, true, CKirby::BODY_VACUUM);

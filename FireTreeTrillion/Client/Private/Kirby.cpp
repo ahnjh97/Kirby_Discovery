@@ -350,9 +350,9 @@ void CKirby::Add_AnimEvent()
 
 	#pragma region BASIC
 
-		m_pModelCom[BODY_DEFAULT]->Add_Event("Sound_WalkBasic", [this]() {
-			m_pGameInstance->PlaySound_Free(L"WalkOnAnywhere.wav", 0.6f);
-			});
+		//m_pModelCom[BODY_DEFAULT]->Add_Event("Sound_WalkBasic", [this]() {
+		//	m_pGameInstance->PlaySound_Free(L"WalkOnAnywhere.wav", 0.15f);
+		//	});
 
 
 	#pragma endregion
@@ -425,6 +425,8 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				pObject->Set_PhyXState(PO_KIRBYMOUTH);
 
 			Delete_AllEffect();
+			//m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+			m_pGameInstance->PlayMySound(L"Kirby_EatDefault.wav", CHANNEL_PLAYERVOICE, 0.5f);
 		}
 		// 입에 머금은 상태의 몬스터
 		else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
@@ -499,6 +501,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			}
 
 			Delete_AllEffect();
+			m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
 		}
 	}
 	// 맵 오브젝트들과의 충돌.
@@ -521,6 +524,8 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				pObject->Set_PhyXState(PO_KIRBYMOUTH);
 
 			Delete_AllEffect();
+			//m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+			m_pGameInstance->PlayMySound(L"Kirby_EatDefault.wav", CHANNEL_PLAYERVOICE, 0.5f);
 		}
 	}
 	else if (eContent == CCollisionCenter::CONTENT_ATTACK)
@@ -542,6 +547,8 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				pObject->Set_PhyXState(PO_KIRBYMOUTH);
 
 			Delete_AllEffect();
+			//m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+			m_pGameInstance->PlayMySound(L"Kirby_EatDefault.wav", CHANNEL_PLAYERVOICE, 0.5f);
 		}
 		// 입에 머금은 상태의 몬스터
 		else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
@@ -609,7 +616,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 			}
 
-
+			m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
 			Delete_AllEffect();
 		}
 	}
@@ -639,6 +646,8 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			_float4 vCamLook = XMVector3Cross(vCamRight, XMVectorSet(0.f, 1.f, 0.f, 1.f));
 			INFO(m_vTargetDir) = XMVector3Normalize(vCamLook + vCamRight) * -1.f;
 			Delete_AllEffect();
+			//m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+			m_pGameInstance->PlayMySound(L"Kirby_EatDefault.wav", CHANNEL_PLAYERVOICE, 0.5f);
 		}
 		else if (pObject->Get_PhyXState() == PO_NORMAL)
 		{
@@ -684,6 +693,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 					return;
 				}
 
+				m_pGameInstance->PlayMySound(L"Kirby_Vacuuming.wav", CHANNEL_PLAYERVOICE, 0.5f);
 				Add_Effect("Vacuum_v3", FXDesc, true);
 				// Deforming을 트루로 만든다. 길게 애니메이션이 재생될 준비를 한다. 이건 밖에서 예외처리 될 것이다.
 				INFO(m_bisDeforming) = true;
