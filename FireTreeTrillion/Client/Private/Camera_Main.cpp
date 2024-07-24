@@ -2843,6 +2843,8 @@ void CCamera_Main::Make_One_Sequence(CAMACTION newAction)
 
 void CCamera_Main::Clear_Sequence()
 {
+	m_CamSeq.clear();
+
 	m_eSpecialSeq = SEQ_END;
 	m_eCurSeqEase = EASE_END;
 	m_fSeqInterpolateTime = { 0.f, 0.f };
