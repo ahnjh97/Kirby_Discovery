@@ -97,6 +97,7 @@ void CLevel_DeeDeeDee::Tick(_float fTimeDelta)
 	Ready_FadeIn();
 
 	Fog_Tick(fTimeDelta);
+	Sound_Tick(fTimeDelta);
 }
 
 HRESULT CLevel_DeeDeeDee::Render()
@@ -127,6 +128,23 @@ void CLevel_DeeDeeDee::Fog_Tick(_float fTimeDelta)
 	_float4 vPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
 	if (vPos.z >= -20.f)
 		m_pGameInstance->Decrease_FogViewValue(fTimeDelta);
+}
+
+void CLevel_DeeDeeDee::Sound_Tick(_float fTimeDelta)
+{
+	//커버가 특정 위치에 도착할 경우 BGM 재생
+	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(m_iLevel, TEXT("Layer_Player")));
+	_float4 vKirbyPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+	_bool bIsKirbyState = (vKirbyPos.z < -21.f) ? TRUE : FALSE;
+
+	if (bIsKirbyState)
+	{
+		m_pGameInstance->StopSound(CHANNEL_BGM);
+		m_pGameInstance->PlayBGM(CHANNEL_BGM, L"K15_BossDedede1.marker.wav");
+		m_pGameInstance->SetVolume(CHANNEL_BGM, VOLUME_BGM);
+
+		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_BGM, fTimeDelta * 0.03f);
+	}
 }
 
 void CLevel_DeeDeeDee::Ready_FadeIn()
@@ -343,8 +361,6 @@ HRESULT CLevel_DeeDeeDee::Ready_UI()
 
 HRESULT CLevel_DeeDeeDee::Ready_Map()
 {
-
-
 	string strFileName = "../../../objects_txt/DeeDeeDee_Map.txt";
 	ifstream fileInput(strFileName, ios::binary);
 	if (fileInput.is_open() == false)

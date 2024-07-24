@@ -87,7 +87,7 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
 	{
 		// 도랑 풀링
-		for (size_t i = 0; i < 120; i++)
+		for (size_t i = 0; i < 200; i++)
 		{
 			HRESULT hr;
 			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gully"), TEXT("Prototype_GameObject_Gully"));
@@ -190,10 +190,14 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	}
 	//else if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
 	//	Change_State(FINALBOSS_DEMOAPPEARCUT5, 50.f, false, false);
-	else if (m_pGameInstance->Get_KeyState(DIK_O, KEY_DOWN) || m_fHp < 0.f)
+	else if (m_pGameInstance->Get_KeyState(DIK_O, KEY_DOWN) || m_fHp <= 0.f)
 	{
-		Change_State(FINALBOSS_LASTDAMAGESTART, 50.f, false, true);
-		m_pControllerCom->Set_Position(m_pTransformCom, XMVectorSet(0.f, 0.f, 0.f, 1.f));
+		if(false == m_bLastDamage)
+		{
+			m_bLastDamage = true;
+			Change_State(FINALBOSS_LASTDAMAGESTART, 50.f, false, true);
+			m_pControllerCom->Set_Position(m_pTransformCom, XMVectorSet(0.f, 0.f, 0.f, 1.f));
+		}
 	}
 	else if (m_pGameInstance->Get_KeyState(DIK_I, KEY_DOWN))
 		m_bAuto = !m_bAuto;
@@ -225,98 +229,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	else
 		m_fGlideTime = 0.f;
 
-	//풀링임
-	if (true == m_bGully)
-	{
-		//m_fGullyTime += m_fTimeDelta;
-
-		if (false == m_bShake)
-		{
-			m_fTimeDelay = 0.8f;
-			m_bShake = true;
-			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
-			if (pCamera != nullptr)
-				pCamera->Make_Shake(1.f, 1.f);
-		}
-
-		_float3 vFXPosA, vFXPosB;
-
-		// 쟁기질
-		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
-		vPos.m128_f32[1] = 0.f;
-		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
-
-		vFXPosA = vPos;
-
-
-		++m_iGullyCnt;
-		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
-		vPos.m128_f32[1] = 0.f;
-		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
-
-		vFXPosB = vPos;
-
-
-		//특정 순간에 rock slash 이펙트 생성하기
-		static _float fSlashFXTime{ 0.f };
-		fSlashFXTime += m_fTimeDelta;
-		if (.1f < fSlashFXTime)
-		{
-			fSlashFXTime = 0.f;
-
-			CMultiEffect::MULTI_FX_DESC FXDesc{};
-			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
-			FXDesc.vInitPos = vFXPosA;
-			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
-
-			Add_Effect("HS_FB rock slash", FXDesc, false);
-
-
-			//FXDesc.vInitPos = vFXPosB;
-			//FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
-			//Add_Effect("HS_FB rock slash", FXDesc, false);
-
-
-
-			CParticle::PARTICLE_DESC ParticleDesc{};
-			ParticleDesc.vInitPos = vFXPosA;
-			Add_Effect("HS_perfect laser collide particle", FXDesc);
-
-			//ParticleDesc.vInitPos = vFXPosB;
-			//Add_Effect("HS_perfect laser collide particle", FXDesc);
-
-			m_pGameInstance->Get_CurCameraPtr()->Make_Shake(0.3f, 0.5f);
-		}
-
-
-
-		++m_iGullyCnt;
-		if (m_vecGully.size() <= m_iGullyCnt)
-			m_iGullyCnt = 0;
-
-		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-		vPos.m128_f32[1] -= 6.f;
-
-		// 파편 파티클 튀는거 
-		if (m_vecDebris.size() > m_iDebrsiMaxCnt)
-			m_iDebrsiMaxCnt += DEBRISCNT;
-		else
-		{
-			m_iDebrsiMaxCnt = DEBRISCNT;
-			m_iDebrisCnt = 0;
-		}
-
-		// 파편 파티클 살리기
-		for (m_iDebrisCnt; m_iDebrisCnt < m_iDebrsiMaxCnt; ++m_iDebrisCnt)
-			m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vPos);
-
-		//}
-	}
-	else
-	{
-		m_fTimeDelay = 1.f;
-		m_bShake = false;
-	}
+	Create_Gully();
 
 	if (true == m_bEffect)
 	{
@@ -791,6 +704,110 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 	break;
 	default:
 		break;
+	}
+}
+
+void CFinalBoss::Create_Gully()
+{
+	//풀링임
+	if (true == m_bGully)
+	{
+		//m_fGullyTime += m_fTimeDelta;
+
+		if (false == m_bShake)
+		{
+			m_fTimeDelay = 0.8f;
+			m_bShake = true;
+			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+			if (pCamera != nullptr)
+				pCamera->Make_Shake(1.f, 1.f);
+		}
+
+
+		_float3 vFXPosA, vFXPosB;
+
+		// 쟁기질
+		_vector vOrginPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
+
+		_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vOrginPos, m_vBeforePos)));
+		if (0.5f > fDistance)
+			return;
+
+		m_vBeforePos = vOrginPos;
+
+		vPos.m128_f32[1] = 0.f;
+		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
+
+		vFXPosA = vPos;
+
+		++m_iGullyCnt;
+		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT) * 0.8f;
+		vPos.m128_f32[1] = 0.f;
+		m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f);
+
+		vFXPosB = vPos;
+
+
+		//특정 순간에 rock slash 이펙트 생성하기
+		static _float fSlashFXTime{ 0.f };
+		fSlashFXTime += m_fTimeDelta;
+		if (.1f < fSlashFXTime)
+		{
+			fSlashFXTime = 0.f;
+
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+			FXDesc.vInitPos = vFXPosA;
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+
+			Add_Effect("HS_FB rock slash", FXDesc, false);
+
+
+			FXDesc.vInitPos = vFXPosB;
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+			Add_Effect("HS_FB rock slash", FXDesc, false);
+
+
+
+			CParticle::PARTICLE_DESC ParticleDesc{};
+			ParticleDesc.vInitPos = vFXPosA;
+			Add_Effect("HS_perfect laser collide particle", FXDesc);
+
+			ParticleDesc.vInitPos = vFXPosB;
+			Add_Effect("HS_perfect laser collide particle", FXDesc);
+
+			m_pGameInstance->Get_CurCameraPtr()->Make_Shake(0.3f, 0.5f);
+		}
+
+
+
+		++m_iGullyCnt;
+		if (m_vecGully.size() <= m_iGullyCnt)
+			m_iGullyCnt = 0;
+
+		vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		vPos.m128_f32[1] -= 6.f;
+
+		// 파편 파티클 튀는거 
+		if (m_vecDebris.size() > m_iDebrsiMaxCnt)
+			m_iDebrsiMaxCnt += DEBRISCNT;
+		else
+		{
+			m_iDebrsiMaxCnt = DEBRISCNT;
+			m_iDebrisCnt = 0;
+		}
+
+		// 파편 파티클 살리기
+		for (m_iDebrisCnt; m_iDebrisCnt < m_iDebrsiMaxCnt; ++m_iDebrisCnt)
+			m_vecDebris[m_iDebrisCnt]->Set_ParticleDebris(vPos);
+
+		//}
+	}
+	else
+	{
+		m_fTimeDelay = 1.f;
+		m_bShake = false;
 	}
 }
 

@@ -19,6 +19,7 @@ public:
 	virtual HRESULT Render()				override;
 
 	void			Fog_Tick(_float fTimeDelta);
+	void			Sound_Tick(_float fTimeDelta);
 
 private:
 	void	Ready_FadeIn();

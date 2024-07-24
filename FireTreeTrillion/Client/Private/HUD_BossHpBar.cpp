@@ -45,8 +45,9 @@ HRESULT CHUD_BossHpBar::Initialize(void* pArg)
 		CUtils::Turn_OtherMatrix(m_BarMatrix[i], _float4(0.f, 0.f, 1.f, 0.f), 1.f, 3.5f);
 	}
 	XMStoreFloat4x4(&m_NameMatrix, XMMatrixIdentity());
-	CUtils::Set_Scaled_Matrix(m_NameMatrix, 240.f, 40.f, 1.f);
-	CUtils::Turn_OtherMatrix(m_NameMatrix, _float4(0.f, 0.f, 1.f, 0.f), 1.f, 3.5f);
+	//CUtils::Set_Scaled_Matrix(m_NameMatrix, 240.f, 40.f, 1.f); //07.24) 보스네임 사이즈 조정
+	CUtils::Set_Scaled_Matrix(m_NameMatrix, 300.f * 0.75f, 100.f * 0.75f, 1.f); //07.24) 보스네임 사이즈 조정
+	CUtils::Turn_OtherMatrix(m_NameMatrix, _float4(0.f, 0.f, 1.f, 0.f), 1.f, -3.5f);
 
 	CUtils::Set_State_Matrix(m_BarMatrix[UI_BARPLATE], CUtils::STATE_POSITION,
 		_float4(m_fX - (m_fSizeX * 0.3f),
@@ -78,12 +79,13 @@ HRESULT CHUD_BossHpBar::Initialize(void* pArg)
 
 
 	CUtils::Set_State_Matrix(m_NameMatrix, CUtils::STATE_POSITION,
-		_float4(m_fX - (m_fSizeX * 0.1f),
-			-m_fY + (m_fSizeY * 0.175f),
+		_float4(m_fX - (m_fSizeX * 0.08f),
+			-m_fY + (m_fSizeY * 0.17f),
+//		_float4(m_fX - (m_fSizeX * 0.1f),
+//			-m_fY + (m_fSizeY * 0.175f),
 			1.f,
 			1.f));
 	m_fNameOriginY = m_NameMatrix._42;
-
 
 
 

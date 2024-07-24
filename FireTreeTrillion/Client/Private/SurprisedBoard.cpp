@@ -212,12 +212,14 @@ void CSurprisedBoard::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXO
 		_uint uState = __super::Get_State();
 		if (uState == WAIT_L)
 		{
+			m_pGameInstance->PlaySound_Free(L"SupriseBoard_Trigger.wav", 0.25f);	//07.24) 사운드 매칭
 			Change_State(CSurprisedBoard::PREPOP_OUT_L, 60.f, false, false);
 			m_bActivated = true; //깜놀보드 기믹 1회성 > 재수행을 위해 로직 수정
 		}
 
 		else if (uState == WAIT_R)
 		{
+			m_pGameInstance->PlaySound_Free(L"SupriseBoard_Trigger.wav", 0.25f);
 			Change_State(CSurprisedBoard::PREPOP_OUT_R, 60.f, false, false);
 			m_bActivated = true;
 		}
