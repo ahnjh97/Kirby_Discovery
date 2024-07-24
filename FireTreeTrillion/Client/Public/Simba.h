@@ -105,6 +105,7 @@ public:
 	void Set_EyeBloom(_bool bEyeBloom) { m_bEyeBloom = bEyeBloom; }
 
 	void Set_DimensionGateActivation(_bool bActivation) { m_bDimensionClawActivated = bActivation; }
+	_uint Get_SmokeCount() { return m_iSmokeCount; }
 
 public:
 	virtual HRESULT Initialize_Prototype()			override;
@@ -150,7 +151,7 @@ public:
 	void			JumpStartSmoke();
 	void			LandingSmoke();
 	void			AttackJumpWind();
-	void			AttackJumpHit();
+	void			AttackJumpHit(); // 왼손 오른손 한번씩 호출됨
 	void			DoubleClawDashGround();
 	void			DoubleClawGround();
 	void			DoubleClawSweep();
@@ -167,10 +168,10 @@ public:
 	void			WalkSmoke();
 
 	// 포효 전기
-	void			RoarElecParts(); 
+	void			RoarElecParts(); // 아직 호출안됨
 
-	// 2페이즈 회전하면서 점프 후 착지할때 회색방구
-	void			BiteRushJumpSmoke();
+	// 2페이즈 회전하면서 점프할때, 착지할때 회색방구. 점프뛸땐 한번만 호출, 착지할땐 발마다 한번씩 호출
+	void			BiteRushJumpSmoke(_uint iAnimIndex);
 
 private:
 	CTexture*		m_pEyeTextureCom[EYETEX_END] = { nullptr, nullptr, nullptr };
@@ -179,6 +180,9 @@ private:
 	class CBone*	m_pLeftHandBone = { nullptr };
 	class CBone*	m_pRightHandBone = { nullptr };
 	class CBone*	m_pLaserBone = { nullptr };
+	class CBone*	m_pLeftFootBone = { nullptr };
+	class CBone*	m_pRightFootBone = { nullptr };
+
 	const _float4x4* m_pLaserBoneMatrix = { nullptr };
 	CGameObject*	m_pSimbaLaser = { nullptr };
 	CTransform*		m_pSimbaLaserTransform = { nullptr };
@@ -259,6 +263,8 @@ private:
 	
 	_bool			m_bDimensionClawActivated = { false };
 	_float			m_fDeactiveTime = {};
+	
+	_uint			m_iSmokeCount = {};
 
 private:
 	HRESULT		Add_Components();
@@ -298,10 +304,13 @@ private:
 	void		RemoveDeadRocksFromList();
 	void		RemoveDeadDebrisFromList();
 
+	_float3		ComputeAngleForEffect(_float fReverseLook = 1.f);
+
 #ifdef _DEBUG
 	void		RenderRing();
 	void		RenderPolygon(vector<_vector>& worldPoints);
 #endif
+
 public:
 	static CSimba* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

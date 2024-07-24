@@ -376,7 +376,7 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		{
 		case CSimba::Simba_FinalCrusher:
 
-			pSimba->Change_State(CSimba::Simba_FinalCrusherEnd, 66.66f, false, false);
+			pSimba->Change_State(CSimba::Simba_FinalCrusherEnd, 60.f, false, false);
 			break;
 		case CSimba::Simba_FinalCrusherEnd:
 			//pSimba->Change_State(CSimba::Simba_FinalCrusherStart, 60, false, true); // 디버깅용
@@ -388,14 +388,14 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 				if(0 == CUtils::Make_RandomInt(0, 1))
 					pSimba->Change_State(CSimba::Simba_Wait2, 40.f, false, true);
 				else
-					pSimba->Change_State(CSimba::Simba_AttackJumpPre, 60.f, false, true); // 점프공격
+					pSimba->Change_State(CSimba::Simba_AttackJumpPre, 50.f, false, true); // 점프공격
 			}
 			else
 				pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 50.f, false, true);
 
 			break;
 		case CSimba::Simba_FinalCrusherStart: // After Jump
-			pSimba->Change_State(CSimba::Simba_FinalCrusher, 66.66f, false, false);
+			pSimba->Change_State(CSimba::Simba_FinalCrusher, 50.f, false, false);
 			break;
 		}
 	}
@@ -429,8 +429,8 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		if (0.f <= fAnimRatio && 5 <= pSimba->Get_DebrisCount())
 			pSimba->ResetDebrisCount();
 
-		for (_uint i = 0; i < 5; i++) {
-			if (i * 0.2f < fAnimRatio && i == iRockCount) {
+		for (_uint i = 0; i < 3; i++) {
+			if (i * 0.33f < fAnimRatio && i == iRockCount) {
 				pSimba->SpawnDebris(iState);
 				pSimba->DoubleClawDashGround();
 			}
@@ -898,6 +898,15 @@ void CSimba_BiteRushJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		m_pController->Jump(m_pTransform, s_fJumpPower, fTimeDelta);
 		s_fJumpPower -= GRAVITY * fTimeDelta * 38.f;
 		m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
+
+		_uint iSmokeCount = pSimba->Get_SmokeCount();
+
+		if (0.08f < fAnimRatio && 0 == iSmokeCount)
+			pSimba->BiteRushJumpSmoke(iState);
+		else if (0.115f < fAnimRatio && 1 == iSmokeCount)
+			pSimba->BiteRushJumpSmoke(iState);
+		else if (0.18f < fAnimRatio && 2 == iSmokeCount)
+			pSimba->BiteRushJumpSmoke(iState);
 	}
 	else
 		m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
@@ -916,11 +925,14 @@ void CSimba_BiteRushJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		
 	if (pSimba->IsAnimFinished())
 	{
-		if (CSimba::Simba_BiteRushJumpStartL == iState)
+		if (CSimba::Simba_BiteRushJumpStartL == iState) {
+			pSimba->BiteRushJumpSmoke(iState);
 			pSimba->Change_State(CSimba::Simba_BiteRushJumpL, 50.f, false, false);
-		else if (CSimba::Simba_BiteRushJumpStartR == iState)
+		}
+		else if (CSimba::Simba_BiteRushJumpStartR == iState) {
+			pSimba->BiteRushJumpSmoke(iState);
 			pSimba->Change_State(CSimba::Simba_BiteRushJumpR, 50.f, false, false);
-
+		}
 		else if (CSimba::Simba_BiteRushJumpL == iState)
 			pSimba->Change_State(CSimba::Simba_BiteRushFallL, 60.f, true, false);
 		else if (CSimba::Simba_BiteRushJumpR == iState)
@@ -1082,10 +1094,12 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 		else if (0.15f < fAnimRatio && 0.7f > fAnimRatio && 0 == iStarCount) {
 			pSimba->Set_StarPosToLeftHand();
 			pSimba->SpawnStar(iState);
+			pSimba->TeethBite();
 		}
 		else if (0.7f < fAnimRatio && 1 == iStarCount) {
 			pSimba->Set_StarPosToRightHand();
 			pSimba->SpawnStar(iState);
+			pSimba->TeethBite();
 		}
 	}
 
@@ -1131,8 +1145,16 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		
 	if (CSimba::Simba_DimensionLaser == iState)
 	{
-		if (0.1f < fAnimRatio && 0.55f > fAnimRatio)
+		if (0.1f < fAnimRatio && 0.55f > fAnimRatio) {
 			pSimba->LaserAttack(fTimeDelta);
+
+			if (false == m_bLaserActivated)
+			{
+				m_bLaserActivated = true;
+				pSimba->DimensionLaser();
+			}
+		}
+			
 
 		_uint iDebrisCount = pSimba->Get_DebrisCount();
 		for (_uint i = 0; i < 35; i++)
