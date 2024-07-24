@@ -72,6 +72,7 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 	{
 	case STATE_OFFWAIT: //충전 전 대기
 		break;
+
 	case STATE_CHARGE: //충전 중
 		if (TRUE == m_pModelCom->IsFinished()) //충전 중 애님 종료 시 충전 완료 상태 변경
 		{
@@ -80,7 +81,7 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 		}
 		break;
 
-	case STATE_ONWAITSTART: //충전 시작
+	case STATE_ONWAITSTART: //충전 완료 
 		fAnimRatio = m_pModelCom->Get_AnimRatio();
 		if (0.15f < fAnimRatio)
 		{
@@ -89,7 +90,9 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 		}
 		break;
 		
-	case STATE_ONWAIT: //충전 완료
+	case STATE_ONWAIT: //충전 완료 대기
+		//m_pGameInstance->PlaySound_Free(L"SolarPanel_OnWait.wav", 0.5f);
+
 		if(false == m_bSpawn)
 		{
 			m_bSpawn = true;
