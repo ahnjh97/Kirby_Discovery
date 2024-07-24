@@ -1464,6 +1464,7 @@ void CFinalBoss_Laser_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 			LaserReady(pFinalBoss);
 			break;
 		case CFinalBoss::FINALBOSS_DIMENSIONLASERCHARGE:
+			pFinalBoss->Delete_AllEffect();
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASERSTART, 50.f, false, true);
 			break;
 		case CFinalBoss::FINALBOSS_DIMENSIONLASERSTART:

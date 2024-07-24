@@ -116,7 +116,6 @@ _int CLaser::Tick(_float fTimeDelta)
 		}
 	}
 
-
 	if (true == m_bEnd)
 	{
 		m_bEnd = false;

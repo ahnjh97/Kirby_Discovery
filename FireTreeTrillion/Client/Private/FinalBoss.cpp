@@ -272,9 +272,9 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 			Add_Effect("HS_FB rock slash", FXDesc, false);
 
 
-			FXDesc.vInitPos = vFXPosB;
-			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
-			Add_Effect("HS_FB rock slash", FXDesc, false);
+			//FXDesc.vInitPos = vFXPosB;
+			//FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+			//Add_Effect("HS_FB rock slash", FXDesc, false);
 
 
 
@@ -282,8 +282,8 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 			ParticleDesc.vInitPos = vFXPosA;
 			Add_Effect("HS_perfect laser collide particle", FXDesc);
 
-			ParticleDesc.vInitPos = vFXPosB;
-			Add_Effect("HS_perfect laser collide particle", FXDesc);
+			//ParticleDesc.vInitPos = vFXPosB;
+			//Add_Effect("HS_perfect laser collide particle", FXDesc);
 
 			m_pGameInstance->Get_CurCameraPtr()->Make_Shake(0.3f, 0.5f);
 		}
