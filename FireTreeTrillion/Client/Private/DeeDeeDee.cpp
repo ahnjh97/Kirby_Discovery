@@ -237,7 +237,18 @@ void CDeeDeeDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 
 		CCamera_Main* pCameraMain = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 		CHECK_NULLPTR(pCameraMain);
-		pCameraMain->Lock_All({ -4.95f, 38.9f, 29.9f }, { -0.32f, -0.17f, 0.93f }, true);
+
+		CCamera_Main::CAMACTION newAction{};
+
+		pCameraMain->Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 1.f);
+		pCameraMain->Fill_ActionPos(newAction, CCamera_Main::POS_ABSOLUTE , {-4.95f, 38.9f, 29.9f});
+		pCameraMain->Fill_ActionDir(newAction, CCamera_Main::DIR_ABSOLUTE, { -0.32f, -0.17f, 0.93f });
+		pCameraMain->Make_One_Sequence(newAction);
+
+		pCameraMain->Fill_Delay(newAction, 1.f, 30.f);
+
+		//지영아 여기야
+		//맵 이동할 때 Camera Main의 Clear_Sequence 함수를 호출해 줘
 	}
 
 	m_pUI_Interactable->Set_IsRender(true);

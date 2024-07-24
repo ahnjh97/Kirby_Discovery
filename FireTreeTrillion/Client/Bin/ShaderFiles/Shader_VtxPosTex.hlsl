@@ -295,7 +295,8 @@ PS_OUT PS_MAIN_BLEND_FX_NOSOFTFX(PS_IN_ALPHABLEND In)
     if (smoothedAlpha < 0.1)
         discard;
     
-
+    MaskTest(vMask);
+    
     vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
     AlphaTest(vDiffuse);
     

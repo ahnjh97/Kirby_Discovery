@@ -168,14 +168,24 @@ public:
 
 	//카메라에게 특정 동작들을 시퀀스로 선예약한다.
 	void Make_Sequence(CAMSEQ eSeq);
+	//카메라에게 동작을 수행시킨다.
+	void Make_One_Sequence(CAMACTION newAction);
+	//시퀀스 내용을 비운다.
+	void Clear_Sequence();
+	//시퀀스 내용을 채운다.
+	void Fill_HardCutSet(CAMACTION& Action, _float fTime);
+	void Fill_InterpolateCutSet(CAMACTION& Action, _float fTime, EASING eEase, _float fInterpolateSpeed);
+	//위치, 방향 
+	void Fill_ActionPos(CAMACTION& Action, CAMPOS eCamPos, _float3 vPos);
+	void Fill_ActionDir(CAMACTION& Action, CAMDIR eCamDir, _float3 vDir);
+	//딜레이용 시퀀스
+	void Fill_Delay(CAMACTION& Action, _float fStartTime, _float fDelayTime);
 
 	void Set_AutoDOF(_bool bAuto) { m_bAutoDOF = bAuto; }
 
 
 	_bool IsSequencePlaying() { return m_eSpecialSeq == SEQ_END; }
 
-	//카메라에게 동작을 수행시킨다.
-	void Make_One_Sequence(CAMACTION newAction);
 
 	//카메라의 이벤트 함수들
 	void Start_ShutterSeq(CGameObject* pNotifier);
@@ -435,13 +445,7 @@ private:
 	void Check_FinaleTime(_float fTimeDelta);
 	void Deferred_Blackoperation(CAMSEQ eSEQ);
 
-	void Fill_HardCutSet(CAMACTION& Action, _float fTime);
-	void Fill_InterpolateCutSet(CAMACTION& Action, _float fTime, EASING eEase, _float fInterpolateSpeed);
 
-	void Fill_Delay(CAMACTION& Action, _float fStartTime, _float fDelayTime);
-
-	void Fill_ActionPos(CAMACTION& Action, CAMPOS eCamPos, _float3 vPos);
-	void Fill_ActionDir(CAMACTION& Action, CAMDIR eCamDir, _float3 vDir);
 
 	// [임시] 레이싱맵에서 level전환하는 함수 written by JYWI
 	void Change_LevelTrigger();
