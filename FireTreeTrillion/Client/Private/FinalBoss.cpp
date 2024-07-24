@@ -758,23 +758,14 @@ void CFinalBoss::Create_Gully()
 
 			CMultiEffect::MULTI_FX_DESC FXDesc{};
 			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
-			FXDesc.vInitPos = vFXPosA;
+			FXDesc.vInitPos = (vFXPosA + vFXPosB) * .5f;
 			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
 
 			Add_Effect("HS_FB rock slash", FXDesc, false);
-
-
-			FXDesc.vInitPos = vFXPosB;
-			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
-			Add_Effect("HS_FB rock slash", FXDesc, false);
-
 
 
 			CParticle::PARTICLE_DESC ParticleDesc{};
-			ParticleDesc.vInitPos = vFXPosA;
-			Add_Effect("HS_perfect laser collide particle", FXDesc);
-
-			ParticleDesc.vInitPos = vFXPosB;
+			ParticleDesc.vInitPos = (vFXPosA + vFXPosB) * .5f;
 			Add_Effect("HS_perfect laser collide particle", FXDesc);
 
 			m_pGameInstance->Get_CurCameraPtr()->Make_Shake(0.3f, 0.5f);
