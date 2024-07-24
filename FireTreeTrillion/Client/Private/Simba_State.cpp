@@ -821,6 +821,8 @@ void CSimba_Roar::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnim
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	s_fOffsetY = -0.7f;
 	m_bCamNotified = false;
+	m_bEyeBloom = false;
+	m_bElecParts = false;
 }
 
 void CSimba_Roar::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -831,8 +833,14 @@ void CSimba_Roar::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	_float fRatio = RATIO(fAnimRatio, 0, 0.08f);
 	if (0.06f > fAnimRatio)
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * (1- EASE_IN(fRatio)) * 4.f);
+
+	if (0.285f < fAnimRatio && false == m_bElecParts) // ¿­Á¤ÀûÀÎ Àü±â
+	{
+		m_bElecParts = true;
+		pSimba->RoarElecParts(); 
+	}
 	
-	if (0.54f < fAnimRatio && false == m_bEyeBloom)
+	if (0.54f < fAnimRatio && false == m_bEyeBloom) // ÀÜÀÜÇÑ Àü±â + ´« ºû³²
 	{
 		m_bEyeBloom = true;
 		pSimba->Set_EyeBloom(true);

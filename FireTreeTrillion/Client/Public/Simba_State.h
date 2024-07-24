@@ -326,6 +326,7 @@ private:
 	CTransform* m_pKirbyTransform = { nullptr };
 	_bool m_bEyeBloom = { false };
 	_bool m_bCamNotified = { false };
+	_bool m_bElecParts = { false };
 
 public:
 	static	CSimba_Roar* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
