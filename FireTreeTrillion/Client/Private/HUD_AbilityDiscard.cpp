@@ -124,8 +124,7 @@ HRESULT CHUD_AbilityDiscard::Render()
 		return E_FAIL;
 
 	//07.23) 카피 능력 버리기와 머금기 변형의 뱉기 상태에 대한 텍스처 세분화
-
-	hr = Bind_ShaderResources(m_pShaderCom, ePassType, m_pTexCom[TEX_DIFFUSE], eTexIndex);
+	hr = Bind_ShaderResources(m_pShaderCom, POSTEX_ALPHABLEND_NOTEST, m_pTexCom[TEX_DIFFUSE], eTexIndex);
 	CHECK_FAILED(hr);
 
 	hr = Bind_ShaderResources(m_pShaderCom, POSTEX_UIWHITEALPHA, m_pTexCom[TEX_DIFFUSE], TEXDC_BTN);

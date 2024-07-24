@@ -17,6 +17,8 @@ public:
 		TEXNT_DEFORMCAR, TEXNT_DEFORMBULB, TEXNT_NONE
 	};
 
+	enum NAMETAG_STATE { NAMETAG_IDLE, NAMETAG_SHOW, NAMETAG_HIDE, NAMETAG_NONE };
+
 private:
 	CHUD_KirbyNameTag(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CHUD_KirbyNameTag(const CHUD_KirbyNameTag& rhs);
@@ -24,7 +26,7 @@ private:
 
 #pragma region GETTER/SETTER
 public:
-	//void Set_BtnState(BTN_STATE _eBtnState) { m_eCurState = _eBtnState;	}
+	void Set_NameTagState(NAMETAG_STATE _eNameTagState) { m_eCurState = _eNameTagState;	}
 #pragma endregion
 
 public:
@@ -52,13 +54,9 @@ public:
 private:
 	class CCharacter*			m_pKirby = { nullptr };
 
-	_float						m_fBtnAlpha = { 0.f };
-	_float						m_fBlinkAlpha = { 0.f };
-	_float						m_fBlinkTime = { 0.f };
-	_float						m_fSelectTime = { 0.f };
-	_float3						m_vOrigScale = { 0.f, 0.f, 1.f };
+	_float4						m_vInitPos = { 0.f, 0.f, 0.f, 1.f };
 
-	//BTN_STATE					m_eCurState = { BTN_NONE };
+	NAMETAG_STATE				m_eCurState = { NAMETAG_NONE };
 		
 };
 END

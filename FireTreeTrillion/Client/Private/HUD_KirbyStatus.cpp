@@ -167,13 +167,13 @@ void CHUD_KirbyStatus::Late_Tick(_float fTimeDelta)
 
 HRESULT CHUD_KirbyStatus::Render()
 {
-	//버튼 렌더링
-	if (nullptr != m_pNameTag)
-		m_pNameTag->Render();
-
 	//07.15) Render OFF 처리 추가
 	if (KIRBYHP_HIDE == m_eCurState && 0 == m_fAlpha)
 		return S_OK;
+
+	//버튼 렌더링
+	if (nullptr != m_pNameTag)
+		m_pNameTag->Render();
 
 	// 만약, 클래스 내부에서 랜더되지 않아도 되는 상황으로 판단한다면, 랜더를 하지 않는다.
 	//if (m_bRenderHpbar == false)
@@ -513,7 +513,7 @@ void CHUD_KirbyStatus::Disappear_HpBar(_float fTimeDelta)
 		{
 			m_fAlpha = 0.f;
 			m_eCurState = KIRBYHP_HIDE;
-
+			m_pNameTag->Set_NameTagState(CHUD_KirbyNameTag::NAMETAG_HIDE); //07.24) 네임태그 상태 연동
 		}
 	}
 	// 반대로, 7초 이하이거나 (피격 또는 회복이 되었다는 뜻임) 
@@ -521,10 +521,13 @@ void CHUD_KirbyStatus::Disappear_HpBar(_float fTimeDelta)
 	else if (m_fIdleTime <= 5.f || m_bCustomRenderHpbar == true)
 	{
 		m_eCurState = KIRBYHP_SHOW;
+		m_pNameTag->Set_NameTagState(CHUD_KirbyNameTag::NAMETAG_SHOW); //07.24) 네임태그 상태 연동
+
 		m_fAlpha = 1.f;
 		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		vPos.x = m_fSaveMyX;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+
 		if (UI_FONT == m_UIObjDesc.eUIType)
 		{
 			m_vFontPos.x = m_fFontSavePosX;

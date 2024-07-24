@@ -36,8 +36,9 @@ HRESULT CHUD_KirbyNameTag::Initialize(void* _pArg)
 	_float3 vScale = { 300.f * 0.5f, 50.f * 0.5f, 1.f };
 	m_pTransformCom->Set_Scaled(vScale);
 
-	_float4	vTrans = { -700.f, 400.f, 1.f, 1.f };
+	_float4	vTrans = { -740.f, 420.f, 1.f, 1.f };
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTrans);
+	m_vInitPos = vTrans;
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
@@ -63,11 +64,32 @@ _int CHUD_KirbyNameTag::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	//_float3 vScale = { 300.f * 0.5f, 50.f * 0.5f, 1.f };
-	//m_pTransformCom->Set_Scaled(vScale);
+	_float3 vScale = { 300.f * 0.5f, 50.f * 0.5f, 1.f };
+	m_pTransformCom->Set_Scaled(vScale);
 
-	//_float4	vTrans = { -700.f, 400.f, 1.f, 1.f };
-	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTrans);
+	_float4	vTrans = { -740.f, 420.f, 1.f, 1.f };
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vTrans);
+
+	_float4 vPos = GET_POS;
+	switch (m_eCurState)
+	{
+	case NAMETAG_HIDE:
+		m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;
+
+		vPos = GET_POS;
+		vPos.x -= fTimeDelta * 0.1f;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+		break;
+
+	case NAMETAG_SHOW:
+		m_UIObjDesc.fAlpha = 1.f;
+
+		vPos = GET_POS;
+		vPos.x = m_vInitPos.x;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+
+		break;
+	}
 
 	if (m_UIObjDesc.fAlpha >= 1.f)
 		m_UIObjDesc.fAlpha = 1.f;
@@ -78,8 +100,7 @@ _int CHUD_KirbyNameTag::Tick(_float fTimeDelta)
 		return OBJ_NOEVENT;
 	}
 
-
-	return OBJ_NOEVENT;
+	//return OBJ_NOEVENT;
 }
 
 void CHUD_KirbyNameTag::Late_Tick(_float fTimeDelta)
@@ -96,7 +117,7 @@ HRESULT CHUD_KirbyNameTag::Render()
 #pragma region RENDER_BINDSET
 
 	//·»´õ OFF
-	if (0.f == m_UIObjDesc.fAlpha)
+	if (NAMETAG_HIDE == m_eCurState && 0.f == m_UIObjDesc.fAlpha)
 		return S_OK;
 
 #pragma region KIRBY_NAMETAG
