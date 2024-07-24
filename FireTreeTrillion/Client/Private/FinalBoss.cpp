@@ -712,12 +712,6 @@ void CFinalBoss::Create_Gully()
 	//«Æ∏µ¿”
 	if (true == m_bGully)
 	{
-		if (m_iGullyCount < 5)
-			m_iGullyCount++;
-		else
-			m_iGullyCount = 0;
-
-		//m_fGullyTime += m_fTimeDelta;
 
 		if (false == m_bShake)
 		{
@@ -742,7 +736,8 @@ void CFinalBoss::Create_Gully()
 		m_vBeforePos = vOrginPos;
 
 		vPos.m128_f32[1] = 0.f;
-		m_iGullyCount == 3 ? m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f) : m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f, true);
+		_int iRandomFire = CUtils::Make_RandomInt(0, 2);
+		iRandomFire == 2 ? m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f, true) : m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f, false);
 
 		vFXPosA = vPos;
 
