@@ -468,7 +468,7 @@ HRESULT CUI_PartTimeResult::Bind_ShaderResources()
 
 // 123 : 토탈 숫자
 // 567 : 올라가는 점수 숫자
-// 0일때, 십의자리일때, 백의자리일때 숫자텍스쳐 위치 보정
+// 0일 때, 십의자리일때, 백의자리일때 숫자텍스쳐 위치 보정
 void CUI_PartTimeResult::Repose_TotalScoreTextures()
 {
 	// 리셋

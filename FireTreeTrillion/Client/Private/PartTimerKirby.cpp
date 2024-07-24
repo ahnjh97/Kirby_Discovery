@@ -119,7 +119,7 @@ _int CPartTimerKirby::Tick(_float fTimeDelta)
 
 void CPartTimerKirby::Late_Tick(_float fTimeDelta)
 {
-	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+	//m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
 		m_pModelCom->Play_Animation(m_fTimeDelta);
@@ -335,25 +335,25 @@ HRESULT CPartTimerKirby::Add_Components()
 	CHECK_FAILED(hr);
 	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_pupil"),
 		TEXT("Com_Texture_Eye_Pupil"), (CComponent**)&m_pEyeTexture[EYE_PUPIL]);
-	                                                                                                                                                                                                                                 CHECK_FAILED(hr);
+	CHECK_FAILED(hr);
 	#pragma endregion
 
 	#pragma region Kirby Mouth
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_base"),
-			TEXT("Com_Texture_Mouth_Idle"), (CComponent**)&m_pMouthTexture[MOUTH_IDLE]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_anger"),
-			TEXT("Com_Texture_Mouth_Anger"), (CComponent**)&m_pMouthTexture[MOUTH_ANGER]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_happy"),
-			TEXT("Com_Texture_Mouth_Happy"), (CComponent**)&m_pMouthTexture[MOUTH_HAPPY]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_smile"),
-			TEXT("Com_Texture_Mouth_Smile"), (CComponent**)&m_pMouthTexture[MOUTH_SMILE]);
-		CHECK_FAILED(hr);
-		hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_surprise"),
-			TEXT("Com_Texture_Mouth_Surprise"), (CComponent**)&m_pMouthTexture[MOUTH_SURPRISE]);
-		CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_base"),
+		TEXT("Com_Texture_Mouth_Idle"), (CComponent**)&m_pMouthTexture[MOUTH_IDLE]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_anger"),
+		TEXT("Com_Texture_Mouth_Anger"), (CComponent**)&m_pMouthTexture[MOUTH_ANGER]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_happy"),
+		TEXT("Com_Texture_Mouth_Happy"), (CComponent**)&m_pMouthTexture[MOUTH_HAPPY]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_smile"),
+		TEXT("Com_Texture_Mouth_Smile"), (CComponent**)&m_pMouthTexture[MOUTH_SMILE]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_mouth_surprise"),
+		TEXT("Com_Texture_Mouth_Surprise"), (CComponent**)&m_pMouthTexture[MOUTH_SURPRISE]);
+	CHECK_FAILED(hr);
 	#pragma endregion
 
 	/* For.HitBox */
@@ -364,7 +364,6 @@ HRESULT CPartTimerKirby::Add_Components()
 	hr = m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox);
 	CHECK_FAILED(hr);
 	Set_BodyCollider(COLLIDER_CYLINDER, 0.5f, 1.f, 0.85f);
-
 
 	/* For. FSM */
 	SetUp_FSM();

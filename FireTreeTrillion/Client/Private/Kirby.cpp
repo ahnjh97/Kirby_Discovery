@@ -76,7 +76,9 @@ HRESULT CKirby::Initialize(void* pArg)
 	// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
 	m_eAbilityType = ABILITY_SWORD;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
-		m_eAbilityType = ABILITY_SWORD;
+	//	m_eAbilityType = ABILITY_SWORD;
+		m_eAbilityType = ABILITY_BOMB;
+
 	m_fHp = 1000.f;
 	m_fMaxHp = 1000.f;
 	// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
@@ -111,6 +113,7 @@ _int CKirby::Tick(_float fTimeDelta)
 	// 유틸업데이트가 들어가있다.
 	__super::Tick(m_fTimeDelta);
 	Kirby_SystemTick(m_fTimeDelta);
+
 
 	m_pWeapons->Tick(m_fTimeDelta);
 	m_pArmours->Tick(m_fTimeDelta);

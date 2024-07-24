@@ -713,7 +713,7 @@ void CUI_MessageWindow::OnEvent()
 		if (m_tMessageDesc.wstrNPC == L"DeeDeeDee")
 		{
 			CGameObject* pGameObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_TransingStar"));
-			CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
+			CTransingStar* pTransingStar = dynamic_cast<CTransingStar*>(pGameObj);
 			pTransingStar->Set_NextLevel(LEVEL_END);
 			pTransingStar->Activate(CTransingStar::CLOSE);
 			pTransingStar->Set_LargeColor(_float3(95.f / 255.f,  28.f / 255.f, 128.f / 255.f));
@@ -761,7 +761,7 @@ void CUI_MessageWindow::Ready_FadeOut()
 	static _bool bOnceFade = false;
 	static _bool bOnceChanger = false;
 	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
-	CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
+	CUI_Fading* pFadingUI = dynamic_cast<CUI_Fading*>(pUIObj);
 
 	if (bOnceFade == false)
 	{
