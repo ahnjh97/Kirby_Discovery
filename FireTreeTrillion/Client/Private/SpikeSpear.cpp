@@ -193,7 +193,9 @@ HRESULT CSpikeSpear::Render()
 		m_pModelCom->Render(i);
 	}
 
+#ifdef _DEBUG
 	RenderRing();
+#endif
 
 	return S_OK;
 }
