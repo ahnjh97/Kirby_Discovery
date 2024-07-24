@@ -151,6 +151,10 @@ void CCarShopWall::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	m_pModelCom->Set_Animation(0, 60.f, false, false);
 	m_bStartAnimation = true;
 
+
+
+
+
 	SwitchAfterBefore();
 	m_pGameInstance->DisableActor(m_pStaticActor);
 
@@ -161,6 +165,20 @@ void CCarShopWall::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 	m_vDamegeDir = (_float3)vDir;
 	m_fHitPower = pKirby->Get_KirbyInfo()->m_fMoveSpeed;
 
+
+	vPos.y += 20.f;
+	CMultiEffect::MULTI_FX_DESC MDesc = {};
+	MDesc.vInitPos = (_float3)vPos;
+	MDesc.vInitRot = CUtils::Make_Degree_FromDir(vDir);
+	MDesc.vInitScale = { 0.6f, 0.6f , 0.6f };
+	this->Add_Effect("YW CarCenter Crash Effects", MDesc, false);
+
+	CMultiEffect::MULTI_FX_DESC Effectdesc = {};
+	Effectdesc.vInitPos = (_float3)vPos;
+	Effectdesc.vInitRot = CUtils::Make_Degree_FromDir(vDir);
+	Effectdesc.vInitScale = { 4.f, 4.f, 4.f };
+	if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
+		return;
 
 	m_pTransformCom->Move(_float4{ 0.f, -10.f, 0.f, 0.f });
 

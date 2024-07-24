@@ -74,7 +74,7 @@ HRESULT CSimba::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_fMaxHp = 250.f;
-	m_fHp = 2.f;
+	m_fHp = 250.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eEyeState = SIMBAEYE_BIG;
@@ -292,7 +292,9 @@ _int CSimba::Tick(_float fTimeDelta)
 	{
 		m_bDeathAnimPlayed = true;
 		TransformToDefault(0.f);
-		Change_State(Simba_Death, 2.f, false, true);
+		Change_State(Simba_DemoDeadCut1, 50.f, false, true);
+		Set_SimbaEye(CSimba::SIMBAEYE_NONE);
+		CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_THRONEBREAK);
 	}
 
 	DetermineSimbaRotation();

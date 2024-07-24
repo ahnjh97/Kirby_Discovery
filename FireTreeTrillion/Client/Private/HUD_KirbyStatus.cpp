@@ -454,6 +454,9 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta, _float _fKirbyHpMax,
 
 	if (m_bShaking == TRUE)
 	{
+		CHUD_KirbyNameTag* pNameTag = dynamic_cast<CHUD_KirbyNameTag*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_HUD"), 0));
+		pNameTag->Set_NameTagState(CHUD_KirbyNameTag::NAMETAG_DAMAGE); //07.24) 네임태그 상태 연동
+
 		// 진동 주기
 		_float fCycle = 50.f;
 
@@ -497,15 +500,15 @@ void CHUD_KirbyStatus::Disappear_HpBar(_float fTimeDelta)
 				m_vFontPos.x -= m_fTimeDelta * 170.f;
 			}
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+
+			CHUD_KirbyNameTag* pNameTag = dynamic_cast<CHUD_KirbyNameTag*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_HUD"), 0));
+			pNameTag->Set_NameTagState(CHUD_KirbyNameTag::NAMETAG_HIDE); //07.24) 네임태그 상태 연동
 		}
 
 		if (m_fAlpha < 0.f)
 		{
 			m_fAlpha = 0.f;
 			m_eCurState = KIRBYHP_HIDE;
-
-			CHUD_KirbyNameTag* pNameTag = dynamic_cast<CHUD_KirbyNameTag*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_HUD"), 0));
-			pNameTag->Set_NameTagState(CHUD_KirbyNameTag::NAMETAG_HIDE); //07.24) 네임태그 상태 연동
 		}
 	}
 	// 반대로, 7초 이하이거나 (피격 또는 회복이 되었다는 뜻임) 

@@ -27,11 +27,13 @@ void CFinalBoss::Appear_Event(CGameObject* pObj)
 
 	CParticle::PARTICLE_DESC FXDesc{};
 	FXDesc.pSocketMatrix = &m_EffectSocket;
-	FXDesc.vInitPos = { 0.f, 2.f, 0.f };
-	//Add_Effect("HS_orbit bidm", FXDesc);
-
+	FXDesc.vInitPos = { 0.f, 5.f, 0.f };
 	FXDesc.fStartDelay = 1.f;
 	Add_Effect("HS_bidm C", FXDesc);
+
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+	MultiFXDesc.pSocketMatrix = &m_EffectSocket;
+	Add_Effect("HS_orbit bidm", MultiFXDesc);
 }
 
 HRESULT CFinalBoss::Initialize_Prototype()
@@ -64,7 +66,7 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_fMaxHp = 500.f;
-	m_fHp = 250.f;
+	m_fHp = 500.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eBossState = STATE_FLYING;
