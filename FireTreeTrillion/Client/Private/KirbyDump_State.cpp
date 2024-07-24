@@ -1058,6 +1058,18 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				pCameraMain->Set_FOVY(45.f - m_fQTERatio * .5f);
 				pCameraMain->Set_FinalOffset({ 0.f, -3.f - (m_fQTERatio * .2f), 0.f }, 1.f);
 
+
+				if (m_bEffectTrigger[0] == true)
+				{
+					pKirby->Delete_Effect("YW Real Dash");
+					CMultiEffect::MULTI_FX_DESC FXDesc{};
+					FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+					FXDesc.vInitPos = { 0.f, -4.f, 3.f };
+					FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+					pKirby->Add_Effect("HS_finale dump dash multi", FXDesc, true);
+					m_bEffectTrigger[0] = false;
+				}
+
 			}
 
 			if (15.f <= m_fQTERatio)
@@ -1073,6 +1085,14 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 				m_iQTECnt++;
 				QTE_End();
+
+				pKirby->Delete_Effect("HS_finale dump dash multi");
+				CMultiEffect::MULTI_FX_DESC FXDesc{};
+				FXDesc.vInitPos = { 0.f, -.5f, -1.f };
+				FXDesc.vInitScale = { 15.f, 15.f, 30.f };
+				FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+				pKirby->Add_Effect("YW Real Dash", FXDesc, true);
+
 				m_pGameInstance->Set_ObjectBlack(0.6f, 0.4f);
 			}
 		}
@@ -1183,6 +1203,20 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT10)
 	{
+		if (m_bEffectTrigger[0] == true)
+		{
+			pKirby->Delete_AllEffect();
+
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitPos = { 0.9f, -.5f, -1.f };
+			FXDesc.vInitScale = { 17.f, 17.f, 30.f };
+			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+			pKirby->Add_Effect("YW Real Dash", FXDesc, true);
+			m_bEffectTrigger[0] = false;
+		}
+
+
+
 
 		m_fTime += fTimeDelta;
 		if (m_fTime > 0.2f && m_bShakeTrigger1 == true)
@@ -1204,7 +1238,21 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT12)
 	{
+		if (m_bEffectTrigger[0] == true)
+		{
+			// 들이 받을 때, 첫번째 QTE가 시작된다. 그와 동시에 이펙트의 시작.
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitPos = { 0.f, 0.f, + 5.f };
+			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+			pKirby->Add_Effect("YW Finale Debris Cols", FXDesc, false);
 
+			FXDesc.vInitPos = { 0.f, -4.f, 3.f };
+			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			pKirby->Add_Effect("HS_finale dump dash multi", FXDesc, true);
+
+			m_bEffectTrigger[0] = false;
+		}
 
 
 		if (pKirby->isAnimFinish())
@@ -1215,21 +1263,18 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			CHECK_NULLPTR(pCamera);
 			pCamera->Set_CamFocus(CCamera::FOCUS_BATTLE);
 
+			CParticle::PARTICLE_DESC FXPDesc{};
+			FXPDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+			FXPDesc.vInitPos = { 0.f, 0.f, 1.f };
+			FXPDesc.vInitScale = { 5.f, 5.f, 5.f };
+			pKirby->Add_Effect("HS_finale qte particle", FXPDesc, true);
+
 
 			CMultiEffect::MULTI_FX_DESC FXDesc{};
-			FXDesc.vInitPos = { 0.f, 0.f, +1.f };
+			FXDesc.vInitPos = { 0.f, 0.f, +10.f };
 			FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
 			pKirby->Add_Effect("YW Finale Debris Cols", FXDesc, false);
-
-			FXDesc.vInitPos = { 0.f, 0.f, +1.f };
-			FXDesc.vInitScale = { 5.f, 5.f, 5.f };
-			pKirby->Add_Effect("HS_finale dump dash multi", FXDesc, true);
-
-			CParticle::PARTICLE_DESC FXPDesc{};
-			FXPDesc.vInitPos = { 0.f, 0.f, +1.f };
-			FXPDesc.vInitScale = { 5.f, 5.f, 5.f };
-			pKirby->Add_Effect("HS_finale qte particle", FXDesc, true);
 		}
 
 	}
@@ -1301,14 +1346,15 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 	else if (pKirby->Get_State() == CFinaleKirby::DUMPCUTSTATE_CUT15)
 	{
-		if (pKirby->Get_AnimTrackPosition() >= 26.f)
+		// 밀려날 때, 지운다.
+		if (pKirby->Get_AnimTrackPosition() >= 26.f && m_bEffectTrigger[0] == true)
 		{
 			CMultiEffect::MULTI_FX_DESC FXDesc{};
-			FXDesc.vInitPos = { 0.f, 0.f, +1.f };
-			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			FXDesc.vInitPos = { 0.f, 0.f, + 10.f };
+			FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
 			pKirby->Add_Effect("YW Finale Debris Cols", FXDesc, false);
-
+			m_bEffectTrigger[0] = false;
 			pKirby->Delete_AllEffect();
 		}
 
@@ -1333,10 +1379,10 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		vLWheelPos.y -= 1.f;
 		vRWheelPos.y -= 1.f;
-		vBackWheelLPos.y -= 1.f;
-		vBackWheelRPos.y -= 1.f;
-		vBackWheelLPos.x += 3.f;
-		vBackWheelRPos.x -= 3.f;
+		vBackWheelLPos.y -= 0.5f;
+		vBackWheelRPos.y -= 0.5f;
+		vBackWheelLPos.z += 3.f;
+		vBackWheelRPos.z -= 3.f;
 
 		_float4 vNewLook = CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK);
 		vNewLook.Normalize();
@@ -1369,12 +1415,12 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (m_bEffectTrigger[0] == true && fTrackPosition > 120.f)
 		{
-			CMultiEffect::MULTI_FX_DESC FXDesc{};
-			FXDesc.vInitPos = { -1.f, -.5f, -1.f };
-			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+			//CMultiEffect::MULTI_FX_DESC FXDesc{};
+			//FXDesc.vInitPos = { -1.f, -.5f, -1.f };
+			//FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
 
-			// 앞에서 뒤로 모이는 스멀스멀 이펙트
-			m_bEffectTrigger[0] = false;
+			//// 앞에서 뒤로 모이는 스멀스멀 이펙트
+			//m_bEffectTrigger[0] = false;
 		}
 
 
@@ -1398,44 +1444,32 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (fTrackPosition > 410.f)
 		{
-			//// 바퀴에 단다!!!
-			//CFire::FIREDESC Firedesc = {};
-			//Firedesc.vFirePos = vBackWheelLPos;
-			//Firedesc.fUpRange = { 3.f };
-			//Firedesc.vFirstColor = { 0.8f, 0.8f, 0.6f, 1.f };
-			//Firedesc.vTargetColor = { 0.6, 1.f, 1.f , 1.f};
-			//Firedesc.fScale = { 3.f };
-			//Firedesc.fTimeRatio = { 1.f };
-			//Firedesc.bPoolingFire = false;
-			//Firedesc.vMoveDir = CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK) * CUtils::Make_RandomFloat(-5.f, -1.f);
-			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
-			//	return;
-			//Firedesc.vMoveDir = CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK) * CUtils::Make_RandomFloat(-5.f, -1.f);
-			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
-			//	return;
-
-
-			//Firedesc.vFirePos = vBackWheelRPos;
-			//Firedesc.vMoveDir = CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK) * CUtils::Make_RandomFloat(-5.f, -1.f);
-			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
-			//	return;
-			//Firedesc.vMoveDir = CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK) * CUtils::Make_RandomFloat(-5.f, -1.f);
-			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
-			//	return;
-
 			if (m_bEffectTrigger[2] == true)
 			{
+				// 장전 시작
+				CMultiEffect::MULTI_FX_DESC FXWheelDesc{};
+				FXWheelDesc.vInitPos = { 0.f, 0.f, 0.f };
+				pKirby->Add_Effect("YW Finale Charge Finish Effects", FXWheelDesc, false);
+
+				//// 바퀴에 단다!!! 기를 모으면서 출발함.
+				FXWheelDesc.vInitPos = { 0.f, 0.f, 0.f };
+				FXWheelDesc.pSocketMatrix = &pKirby->m_BoneBackLMatrix;
+				pKirby->Add_Effect("YW Dump Wheel Effects", FXWheelDesc, true);
+
+				FXWheelDesc.pSocketMatrix = &pKirby->m_BoneBackRMatrix;
+				pKirby->Add_Effect("YW Dump Wheel Effects", FXWheelDesc, true);
+
 
 				CMultiEffect::MULTI_FX_DESC FXDesc{};
 				FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
-				FXDesc.vInitPos = { 0.f, 0.f, +1.f };
-				FXDesc.vInitScale = { 5.f, 5.f, 5.f };
+				FXDesc.vInitPos = { 0.f, -4.f, 3.f };
+				FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 				pKirby->Add_Effect("HS_finale dump dash multi", FXDesc, true);
 
 				CParticle::PARTICLE_DESC FXPDesc{};
-				FXPDesc.vInitPos = { 0.f, 0.f, +1.f };
+				FXPDesc.vInitPos = { 0.f, 0.f, 1.f };
 				FXPDesc.vInitScale = { 5.f, 5.f, 5.f };
-				pKirby->Add_Effect("HS_finale qte particle", FXDesc, true);
+				pKirby->Add_Effect("HS_finale qte particle", FXPDesc, true);
 				m_bEffectTrigger[2] = false;
 			}
 			
@@ -1468,7 +1502,45 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		_float fTrackPosition = pKirby->Get_AnimTrackPosition();
 		pKirby->Compute_RimLight(fTimeDelta);
 
+		// 이펙트
+		_float4 vLWheelPos = pKirby->Get_BoneWorldPos("L_WheelAJ");
+		_float4 vRWheelPos = pKirby->Get_BoneWorldPos("L_WheelAJ");
+		_float4 vBackWheelLPos = pKirby->Get_BoneWorldPos("C_WheelDJ");
+		_float4 vBackWheelRPos = pKirby->Get_BoneWorldPos("C_WheelDJ");
 
+		vLWheelPos.y -= 1.f;
+		vRWheelPos.y -= 1.f;
+		vBackWheelLPos.y -= 0.5f;
+		vBackWheelRPos.y -= 0.5f;
+		vBackWheelLPos.z += 3.f;
+		vBackWheelRPos.z -= 3.f;
+
+		_float4 vNewLook = CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK);
+		vNewLook.Normalize();
+		_float4 vNewRight = XMVector3Cross(_float4(0.f, 1.f, 0.f, 0.f), vNewLook);
+		vNewRight.Normalize();
+		_float4 vNewUp = XMVector3Cross(vNewLook, vNewRight);
+		vNewUp.Normalize();
+
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontLMatrix, CUtils::STATE_POSITION, vLWheelPos);
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontLMatrix, CUtils::STATE_LOOK, vNewLook);
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontLMatrix, CUtils::STATE_UP, vNewUp);
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontLMatrix, CUtils::STATE_RIGHT, vNewRight);
+
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontRMatrix, CUtils::STATE_POSITION, vRWheelPos);
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontRMatrix, CUtils::STATE_LOOK, vNewLook);
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontRMatrix, CUtils::STATE_UP, vNewUp);
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontRMatrix, CUtils::STATE_RIGHT, vNewRight);
+
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackRMatrix, CUtils::STATE_POSITION, vBackWheelRPos);
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackRMatrix, CUtils::STATE_LOOK, vNewLook);
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackRMatrix, CUtils::STATE_UP, vNewUp);
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackRMatrix, CUtils::STATE_RIGHT, vNewRight);
+
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackLMatrix, CUtils::STATE_POSITION, vBackWheelLPos);
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackLMatrix, CUtils::STATE_LOOK, vNewLook);
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackLMatrix, CUtils::STATE_UP, vNewUp);
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackLMatrix, CUtils::STATE_RIGHT, vNewRight);
 
 
 
@@ -1477,7 +1549,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			pCenter->Set_CutScene(18);
 
 			CMultiEffect::MULTI_FX_DESC FXDesc{};
-			FXDesc.vInitPos = { 0.f, 0.f, +1.f };
+			FXDesc.vInitPos = { 0.f, 0.f, + 5.f };
 			FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
 			pKirby->Add_Effect("YW Finale Debris Cols", FXDesc, false);
@@ -1490,6 +1562,52 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		_float fTrackPosition = pKirby->Get_AnimTrackPosition();
 		pKirby->Compute_RimLight(fTimeDelta);
 		m_fTime += fTimeDelta;
+
+
+		// 이펙트
+		_float4 vLWheelPos = pKirby->Get_BoneWorldPos("L_WheelAJ");
+		_float4 vRWheelPos = pKirby->Get_BoneWorldPos("L_WheelAJ");
+		_float4 vBackWheelLPos = pKirby->Get_BoneWorldPos("C_WheelDJ");
+		_float4 vBackWheelRPos = pKirby->Get_BoneWorldPos("C_WheelDJ");
+
+		vLWheelPos.y -= 1.f;
+		vRWheelPos.y -= 1.f;
+		vBackWheelLPos.y -= 0.5f;
+		vBackWheelRPos.y -= 0.5f;
+		vBackWheelLPos.z += 3.f;
+		vBackWheelRPos.z -= 3.f;
+
+		_float4 vNewLook = CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK);
+		vNewLook.Normalize();
+		_float4 vNewRight = XMVector3Cross(_float4(0.f, 1.f, 0.f, 0.f), vNewLook);
+		vNewRight.Normalize();
+		_float4 vNewUp = XMVector3Cross(vNewLook, vNewRight);
+		vNewUp.Normalize();
+
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontLMatrix, CUtils::STATE_POSITION, vLWheelPos);
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontLMatrix, CUtils::STATE_LOOK, vNewLook);
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontLMatrix, CUtils::STATE_UP, vNewUp);
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontLMatrix, CUtils::STATE_RIGHT, vNewRight);
+
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontRMatrix, CUtils::STATE_POSITION, vRWheelPos);
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontRMatrix, CUtils::STATE_LOOK, vNewLook);
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontRMatrix, CUtils::STATE_UP, vNewUp);
+		CUtils::Set_State_Matrix(pKirby->m_BoneFrontRMatrix, CUtils::STATE_RIGHT, vNewRight);
+
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackRMatrix, CUtils::STATE_POSITION, vBackWheelRPos);
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackRMatrix, CUtils::STATE_LOOK, vNewLook);
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackRMatrix, CUtils::STATE_UP, vNewUp);
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackRMatrix, CUtils::STATE_RIGHT, vNewRight);
+
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackLMatrix, CUtils::STATE_POSITION, vBackWheelLPos);
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackLMatrix, CUtils::STATE_LOOK, vNewLook);
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackLMatrix, CUtils::STATE_UP, vNewUp);
+		CUtils::Set_State_Matrix(pKirby->m_BoneBackLMatrix, CUtils::STATE_RIGHT, vNewRight);
+
+
+
+
+
 
 		if (m_bShakeTrigger1 == true)
 		{
@@ -1548,11 +1666,34 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		_float fTrackPosition = pKirby->Get_AnimTrackPosition();
 		pKirby->Compute_RimLight(fTimeDelta);
 
+		if (m_bEffectTrigger[0] == true)
+		{
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.vInitPos = { 0.f, 0.f, +10.f };
+			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+			pKirby->Add_Effect("YW Finale Debris Cols", FXDesc, false);
+
+			FXDesc.vInitPos = { 0.f, 0.f, +10.f };
+			FXDesc.vInitScale = { 1.f, 2.f, 1.f };
+			FXDesc.fStartDelay = 0.1f;
+			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+			pKirby->Add_Effect("YW Finale Debris Cols", FXDesc, false);
+
+			m_bEffectTrigger[0] = false;
+		}
 
 		if (pKirby->isAnimFinish())
 		{
+			pKirby->Delete_AllEffect();
 			pCenter->Set_CutScene(20);
 			m_pGameInstance->Set_ObjectBlack(1.f);
+
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
+			FXDesc.vInitPos = { 0.f, -4.f, 3.f };
+			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			pKirby->Add_Effect("YW Real Finale White Effects", FXDesc, true);
 
 			//CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 			//CHECK_NULLPTR(pCamera);
@@ -1572,6 +1713,12 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake(4.f, 0.5f);
 
+			CMultiEffect::MULTI_FX_DESC FXDesc{};
+			_float4 vEffectPos = CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_POSITION) + (CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK) * 26.f);
+			FXDesc.vInitPos = (_float3)vEffectPos;
+			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir(-1.f * (_float4)CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK));
+			pKirby->Add_Effect("YW Real Finale White Effects", FXDesc, false);
 			m_bShakeTrigger2 = false;
 		}
 

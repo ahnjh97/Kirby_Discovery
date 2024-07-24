@@ -64,10 +64,7 @@ void CGm_ParkFhEntranceAlien::Late_Tick(_float fTimeDelta)
 
 	//절두체 컬링 처리
 	if (TRUE == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 50.0f))
-	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
-	}
 
 #pragma endregion
 

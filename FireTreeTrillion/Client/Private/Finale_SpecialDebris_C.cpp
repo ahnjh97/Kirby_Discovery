@@ -6,6 +6,7 @@
 #include "FinalePartical_Maker.h"
 #include "MultiEffect.h"
 #include "Camera_Main.h"
+#include "FinaleKirby.h"
 
 
 CFinale_SpecialDebris_C::CFinale_SpecialDebris_C(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -50,7 +51,6 @@ HRESULT CFinale_SpecialDebris_C::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_UP, NewUp);
 	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, NewRight);
 
-
 	return S_OK;
 }
 
@@ -70,11 +70,48 @@ _int CFinale_SpecialDebris_C::Tick(_float fTimeDelta)
 
 	if (iCutIndex == 10)
 	{
+		if (m_bEffectOn == true)
+		{
+			CMultiEffect::MULTI_FX_DESC desc;
+			desc.vInitPos = { 0.f, 1.4f, -1.5f };
+			desc.vInitScale = { 3.5f, 3.5f, 3.5f };
+			desc.pSocketMatrix = &m_EffectSocket;
+
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_HS_meteo dash line"), &desc)))
+				return OBJ_NOEVENT;
+			CEffect* pEffect = static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back());
+			m_pEffect = pEffect;
+			Safe_AddRef(m_pEffect);
+
+			m_bEffectOn = false;
+		}
+
+
 		m_bRender = true;
 		m_eCurCut = CUT10;
 	}
 	else if (iCutIndex == 11)
 	{
+		if (m_bEffectOn == false)
+		{
+			m_pEffect->Set_Dead();
+			Safe_Release(m_pEffect);
+			m_pEffect = nullptr;
+
+			CMultiEffect::MULTI_FX_DESC desc;
+			desc.vInitPos = { 0.f, 1.4f, -1.5f };
+			desc.vInitScale = { 2.7f, 2.7f, 2.7f };
+			desc.pSocketMatrix = &m_EffectSocket;
+
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_HS_meteo dash line"), &desc)))
+				return OBJ_NOEVENT;
+			CEffect* pEffect = static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back());
+			m_pEffect = pEffect;
+			Safe_AddRef(m_pEffect);
+
+			m_bEffectOn = true;
+		}
+
 		m_bRender = true;
 		m_eCurCut = CUT11;
 	}
@@ -100,11 +137,32 @@ _int CFinale_SpecialDebris_C::Tick(_float fTimeDelta)
 	}
 	else if (iCutIndex == 16)
 	{
+		if (m_pEffect != nullptr)
+		{
+			m_pEffect->Set_Dead();
+			Safe_Release(m_pEffect);
+			m_pEffect = nullptr;
+		}
+
 		m_bRender = false;
 		//m_eCurCut = CUT16;
 	}
 	else if (iCutIndex == 17)
 	{
+		if (m_pEffect == nullptr)
+		{
+			CMultiEffect::MULTI_FX_DESC desc;
+			desc.vInitPos = { 0.f, 1.4f, -1.5f };
+			desc.vInitScale = { 2.7f, 2.7f, 2.7f };
+			desc.pSocketMatrix = &m_EffectSocket;
+
+			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_HS_meteo dash line"), &desc)))
+				return OBJ_NOEVENT;
+			CEffect* pEffect = static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back());
+			m_pEffect = pEffect;
+			Safe_AddRef(m_pEffect);
+		}
+			
 		m_bRender = true;
 		m_eCurCut = CUT17;
 	}
@@ -117,6 +175,13 @@ _int CFinale_SpecialDebris_C::Tick(_float fTimeDelta)
 	{
 		if (m_bMakeParticle == true)
 		{
+			if (m_pEffect != nullptr)
+			{
+				m_pEffect->Set_Dead();
+				Safe_Release(m_pEffect);
+				m_pEffect = nullptr;
+			}
+
 			CBone* pBone = m_pModelCom->Get_BonePtr("AllL");
 			_float4x4 pBoneLocalMatrix = *pBone->Get_CombinedTransformationMatrix();
 			_float4x4 pBoneWorldMatrix = pBoneLocalMatrix * m_pTransformCom->Get_WorldFloat4x4();
@@ -158,7 +223,7 @@ _int CFinale_SpecialDebris_C::Tick(_float fTimeDelta)
 		m_bRender = false;
 
 	Set_Animation();
-
+	Compute_My_Look(iCutIndex);
 
 	return OBJ_NOEVENT;
 }
@@ -277,7 +342,7 @@ void CFinale_SpecialDebris_C::Set_Animation()
 		m_pModelCom->Set_Animation(CUT12, 40.f, false, false);
 		break;
 	case CUT13:
-		m_pModelCom->Set_Animation(CUT13, 40.f, false, false);
+		m_pModelCom->Set_Animation(CUT13, 40.f, true, false);
 		break;
 	case CUT14:
 		m_pModelCom->Set_Animation(CUT14, 40.f, false, false);
@@ -292,7 +357,7 @@ void CFinale_SpecialDebris_C::Set_Animation()
 		m_pModelCom->Set_Animation(CUT17, 40.f, false, false);
 		break;
 	case CUT18:
-		m_pModelCom->Set_Animation(CUT18, 40.f, false, false);
+		m_pModelCom->Set_Animation(CUT18, 40.f, true, false);
 		break;
 	case CUT19:
 		m_pModelCom->Set_Animation(CUT19, 40.f, false, false);
@@ -305,6 +370,44 @@ void CFinale_SpecialDebris_C::Set_Animation()
 	}
 
 	m_ePreCut = m_eCurCut;
+
+}
+
+void CFinale_SpecialDebris_C::Compute_My_Look(_int iIndex)
+{
+	m_EffectSocket = _float4x4::Identity;
+
+	CBone* pBone = m_pModelCom->Get_BonePtr("AllL");
+	m_vCurPos = m_pTransformCom->ComputeBoneWorldPos(pBone);
+
+	if (m_bInitializeLook == true)
+	{
+		m_vPrePos = m_vCurPos - _float4(-1.f, 0.f, 0.f, 0.f);
+		m_bInitializeLook = false;
+	}
+
+	_float4 vNewLook;
+	//if (iIndex < 11)
+	//{
+	//	vNewLook = m_vCurPos - m_vPrePos;
+	//}
+	//else
+	{
+		CFinaleKirby* pKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+		vNewLook = -1.f * CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK);
+	}
+	vNewLook.Normalize();
+	_float4 vNewRight = XMVector3Cross(_float4(0.f, 1.f, 0.f, 0.f), vNewLook);
+	vNewRight.Normalize();
+	_float4 vNewUp = XMVector3Cross(vNewLook, vNewRight);
+	vNewUp.Normalize();
+
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_vCurPos);
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_LOOK, vNewLook);
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_UP, vNewUp);
+	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_RIGHT, vNewRight);
+
+	m_vPrePos = m_vCurPos;
 
 }
 
@@ -339,4 +442,6 @@ void CFinale_SpecialDebris_C::Free()
 	__super::Free();
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
+
+	Safe_Release(m_pEffect);
 }

@@ -13,9 +13,11 @@ class CLoadingFont : public CUIObject
 {
 public:
 	struct LOADINGFONT_DESC : public CGameObject::GAMEOBJECT_DESC {
+		_bool	bDeadRender = { false };
 		_uint	iTexIndex = { 0 };
 		_float	fPosX = { 0.f };
 		_float	fEndPos = { 0.f };
+		_float	fDisappearPos = { 0.f };
 		wstring	strTag = { L"" };
 	};
 private:
@@ -39,11 +41,17 @@ private:
 
 	_float		m_fPosX = { 0.f };
 	_float		m_fEndPos = { 0.f };
+	_float		m_fRatio = { 0.f };
+	_float		m_fDisappearPos = { 0.f };
+
+	_bool		m_bDeadRender = { false };
 	wstring		m_strTag = { L"" };
 
 private:
 	HRESULT		Add_Components();
 	HRESULT		Bind_ShaderResources();
+
+	_float		Compute_Easing(_float vStartPos, _float vEndPos, _float fSpeed);
 
 public:
 	static CLoadingFont* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

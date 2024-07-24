@@ -1459,6 +1459,25 @@ HRESULT CRenderer::Render_Effect()
 	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Effect"))))
 		return E_FAIL;
 
+	for (auto& pRenderObject : m_RenderObjects[RENDER_SPECIALBLEND])
+	{
+		if (nullptr != pRenderObject)
+			pRenderObject->Render();
+		Safe_Release(pRenderObject);
+	}
+	m_RenderObjects[RENDER_SPECIALBLEND].clear();
+
+
+	for (auto& pRenderObject : m_RenderObjects[RENDER_SPECIALBLEND_2])
+	{
+		if (nullptr != pRenderObject)
+			pRenderObject->Render();
+		Safe_Release(pRenderObject);
+	}
+	m_RenderObjects[RENDER_SPECIALBLEND_2].clear();
+
+
+
 	list<CGameObject*> RenderObjects;
 	RenderObjects.insert(RenderObjects.end(), m_RenderObjects[RENDER_BLOOM].begin(), m_RenderObjects[RENDER_BLOOM].end());
 	RenderObjects.insert(RenderObjects.end(), m_RenderObjects[RENDER_BLEND].begin(), m_RenderObjects[RENDER_BLEND].end());
@@ -1477,6 +1496,7 @@ HRESULT CRenderer::Render_Effect()
 
 	m_RenderObjects[RENDER_BLEND].clear();
 	m_RenderObjects[RENDER_BLOOM].clear();
+
 
 	if (FAILED(m_pGameInstance->End_MRT()))
 		return E_FAIL;

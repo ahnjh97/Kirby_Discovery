@@ -41,10 +41,10 @@ HRESULT CFinalDump::Initialize(void* pArg)
 	m_bStencil = true;
 	m_bMotionBlur = false;
 
-	CParticle::PARTICLE_DESC ParticleDesc{};
-	ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-	ParticleDesc.vInitPos = _float3(0.f, 0.5f, 0.f);
-	Add_Effect("YW Deform Ora", ParticleDesc, true);
+	//CParticle::PARTICLE_DESC ParticleDesc{};
+	//ParticleDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+	//ParticleDesc.vInitPos = _float3(0.f, 0.5f, 0.f);
+	//Add_Effect("YW Deform Ora", ParticleDesc, true);
 
 
 	return S_OK;

@@ -110,7 +110,7 @@ _bool CKirbyDefault_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelt
 	CGameObject* pCamera = (CGameObject*)m_pGameInstance->Get_CurCameraPtr();
 
 	// Idle일 때, X를 누르면 흡수를 시작한다.
-	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBlockOtherVacuum) == false)
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) && DESC(m_bBlockOtherVacuum) == false)
 	{
 		if (pKirby->Get_AbilityType() == ABILITY_BOMB)
 		{
@@ -326,7 +326,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	}
 
 	// X를 누르면 흡수를 시작한다.
-	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBlockOtherVacuum) == false)
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) && DESC(m_bBlockOtherVacuum) == false)
 	{
 		if (pKirby->Get_AbilityType() == ABILITY_BOMB)
 		{
@@ -764,7 +764,7 @@ _bool CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelt
 	CCharacterController* pController = dynamic_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
+	if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) && DESC(m_bBlockOtherVacuum) == false)
 	{
 		// 디폴트 상태일때만 빨아들인다.
 		if (pKirby->Get_AbilityType() == ABILITY_DEFAULT)
