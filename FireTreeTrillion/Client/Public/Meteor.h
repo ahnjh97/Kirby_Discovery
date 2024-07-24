@@ -78,6 +78,9 @@ private:
 
 	wstring m_strTag = {};
 
+	_float m_fEffectTime = { 0.f };
+	_float4x4 m_vEffectSocket[8];
+
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();

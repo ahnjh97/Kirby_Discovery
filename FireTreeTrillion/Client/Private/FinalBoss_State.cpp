@@ -313,6 +313,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
+					//효선아 Thrust
+					ThrustCharge(pFinalBoss);
 				}
 			}
 			else if (13 == m_iCnt)
@@ -330,6 +332,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
+					//효선아 Thrust
+					ThrustCharge(pFinalBoss);
 				}
 			}
 			else if (16 == m_iCnt)
@@ -483,6 +487,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			{
 				pFinalBoss->Set_Thrust(false);
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
+				//효선아 Thrust
+				ThrustCharge(pFinalBoss);
 			}
 			else if (true == pFinalBoss->Get_Spike())
 			{

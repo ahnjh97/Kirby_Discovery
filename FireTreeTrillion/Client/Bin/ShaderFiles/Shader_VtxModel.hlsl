@@ -998,7 +998,7 @@ PS_OUT PS_SPIKESPEAR(PS_IN In)
 
     PS_OUT Out = (PS_OUT) 0;
 
-    if (In.vWorldPos.y > 10.f)
+    if (In.vWorldPos.y > 10.5f)
         discard;
     
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
