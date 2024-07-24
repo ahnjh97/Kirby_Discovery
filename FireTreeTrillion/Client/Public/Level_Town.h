@@ -18,8 +18,6 @@ public:
 	virtual void Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
-	void	Sound_Tick(_float fTimeDelta);
-
 private:
 	HRESULT Ready_Lights();
 	HRESULT Ready_Layer_Camera(const wstring& strLayerTag);
@@ -36,6 +34,7 @@ private:
 
 	void	Change_Levels();
 	void	Teleport_Player();
+	void	Change_SoundBGM();
 
 	HRESULT Add_EnvMap();
 	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };

@@ -39,9 +39,10 @@ public:
 	virtual void Lock_All(_float3 vPos = { -1.f, -1.f, -1.f }, _float3 vLook = { -1.f, -1.f, -1.f }, _bool bInterpolate = false);
 	
 	virtual void Make_Shake(_float fPower = 1.f, _float fTime = .5f, _float2 vDir = _float2(0.f, -1.f)) {}
-	
-	_float Get_FOVY() { return ToDegree(m_fFovy); }
-	void Set_FOVY(_float fFOVY) { m_fFovy = ToRadian(m_fFovy); }
+
+	_float	Get_FOVY() { return ToDegree(m_fFovy); }
+	void	Set_FOVY(_float fFOVY) { m_fFovy = ToRadian(m_fFovy); }
+	void	Set_InterpolateSpeed(_float _fInterpolateSpeed) { m_fInterpolateSpeed = _fInterpolateSpeed; }
 
 	//카메라 프리용 락.
 	void Unlock() { m_eCamLockMode = LOCK_END; }

@@ -958,4 +958,6 @@ void CLevel_DeeDeeDee::Free()
 
 	for (auto& tex : m_pEnvTexture)
 		Safe_Release(tex);
+
+	m_pGameInstance->StopSound(CHANNEL_BGM);
 }

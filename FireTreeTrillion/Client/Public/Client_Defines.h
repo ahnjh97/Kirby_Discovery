@@ -58,7 +58,7 @@ namespace Client
     };
     
     const unsigned int	g_iWinSizeX = 1600; //1280;
-    const unsigned int	g_iWinSizeY = 900; //720;
+    const unsigned int	g_iWinSizeY = 900;  //720;
 
     const float g_fCamFar = 20000.f;
 
@@ -83,6 +83,11 @@ using namespace Client;
 #define AXIS_X 1.f, 0.f, 0.f, 0.f
 #define AXIS_Y 0.f, 1.f, 0.f, 0.f
 #define AXIS_Z 0.f, 0.f, 1.f, 0.f
+
+// SOUND MACRO
+#define VOLUME_BGM          0.5f
+#define VOLUME_BGM_SUB      0.4f
+
 
 enum PASS_POSTEX {
     POSTEX_DEFAULT, POSTEX_SOLIDBLEND, POSTEX_BLENDFX, POSTEX_BLOOM, POSTEX_DEFAULTFX, POSTEX_SOLIDBLEND_NOZTEST,
