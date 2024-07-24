@@ -226,19 +226,18 @@ void CDeeDeeDee::Add_AnimEvent()
 void CDeeDeeDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	// PARK로 이동하기 위한 다이얼로그 출력
-	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN)) //07.14) 키 변경 C > A
+	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
 	{
 		m_pUI_Interactable->Set_IsRender(false);
 		m_bIsInteractKirby = TRUE;
 
-		CUI_MessageWindow* pMWindow = dynamic_cast<CUI_MessageWindow*>
-			(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_DeeDeeDee")));
+		CUI_MessageWindow* pMWindow = dynamic_cast<CUI_MessageWindow*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_DeeDeeDee")));
 		CHECK_NULLPTR(pMWindow);
 		pMWindow->Show_DialogMessage();
 
 		CCamera_Main* pCameraMain = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 		CHECK_NULLPTR(pCameraMain);
-		pCameraMain->Lock_All({ -5.f, 39.f, 30.f }, { -0.3f, -0.2f, 0.93f }, true);
+		pCameraMain->Lock_All({ -4.95f, 38.9f, 29.9f }, { -0.32f, -0.17f, 0.93f }, true);
 	}
 
 	m_pUI_Interactable->Set_IsRender(true);

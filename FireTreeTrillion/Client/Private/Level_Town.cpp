@@ -67,10 +67,6 @@ HRESULT CLevel_Town::Initialize()
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
 
-	// Part-timer Kirby Test
-	//if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Player"), TEXT("Prototype_GameObject_PartTimerKirby"))))
-	//	return E_FAIL;
-
 	// DeeTest
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;
@@ -95,9 +91,10 @@ HRESULT CLevel_Town::Initialize()
 	m_pGameInstance->Emplace_TriggerFunc(TRIGGER_STAR, funcTeleport);
 
 	// BGM
+	m_pGameInstance->StopSound(CHANNEL_BGM);
 	m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
-	m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"K15_TownNewWorld1.marker.wav"); // SOUND_WI
-	m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, 0.5f);
+	m_pGameInstance->PlayBGM(CHANNEL_BGM, L"K15_TownNewWorld1.marker.wav"); // SOUND_WI
+	m_pGameInstance->SetVolume(CHANNEL_BGM, VOLUME_BGM);
 
 	// 타운은 포그가 없습니다.
 	m_pGameInstance->Fog_Zero();
@@ -121,16 +118,37 @@ void CLevel_Town::Teleport_Player()
 	CTransingStar* pTransingStar = static_cast<CTransingStar*>(pGameObj);
 	pTransingStar->Set_NextLevel(LEVEL_END);
 	pTransingStar->Activate(CTransingStar::CLOSE);
-	pTransingStar->Set_LargeColor(_float3(95.f / 255.f, 28.f / 255.f, 128.f / 255.f));
+	pTransingStar->Set_LargeColor(_float3(95.f / 255.f,  28.f / 255.f, 128.f / 255.f));
 	pTransingStar->Set_SmallColor(_float3(167.f / 255.f, 42.f / 255.f, 168.f / 255.f));
 
 	// 카메라 shift ctrl + L
+}
+
+void CLevel_Town::Change_SoundBGM()
+{
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(m_iLevel, TEXT("Layer_Player")));
+	_float4 vPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+
+	m_eSoundState = (vPos.x < 130.f) ? TOWN_BASIC : PARK_ENTRANCE;
+	if (m_eSoundState == PARK_ENTRANCE)
+	{
+		static _bool bOnce = false;
+		if (false == bOnce)
+		{
+			m_pGameInstance->StopSound(CHANNEL_BGM);
+			m_pGameInstance->PlayBGM(CHANNEL_BGM, L"K15_Park1.wav");
+			m_pGameInstance->SetVolume(CHANNEL_BGM, VOLUME_BGM);
+			bOnce = true;
+		}
+	}
 }
 
 void CLevel_Town::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
+
+	Change_SoundBGM();
 }
 
 HRESULT CLevel_Town::Render()
@@ -379,6 +397,9 @@ HRESULT CLevel_Town::Ready_UI()
 	}
 
 #pragma endregion
+	
+	//커비 네임태그
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_KirbyNameTag"));
 
 	//능력버리기
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
@@ -1027,4 +1048,6 @@ void CLevel_Town::Free()
 
 	for (auto& tex : m_pEnvTexture)
 		Safe_Release(tex);
+
+	m_pGameInstance->StopSound(CHANNEL_BGM);
 }

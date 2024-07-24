@@ -27,10 +27,6 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 	if (nullptr != _pArg)
 		HUDKirby_Desc = *(UIOBJ_DESC*)_pArg;
 
-	//07.23) 네임 태그용 Transform 컴포넌트 추가
-	if (FAILED(Add_Transform(_pArg)))
-		return E_FAIL;
-
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
@@ -52,12 +48,14 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 			m_UIObjDesc.vPos.z, 1.f));
 
 #pragma region SET_PROJ
+
 	if (PROJ_ORTHO == m_UIObjDesc.eUIProj)
 	{
 		m_UIObjDesc.vDegree.z = HUDKirby_Desc.vDegree.z;
 		m_pTransformCom->Rotation(XMVectorSet(AXIS_Z), XMConvertToRadians(m_UIObjDesc.vDegree.z));
 		XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(g_iWinSizeX, g_iWinSizeY, 0.f, 1.f));
 	}
+
 	if (PROJ_PERSPEC == m_UIObjDesc.eUIProj)
 	{
 		m_UIObjDesc.vDegree = HUDKirby_Desc.vDegree;
@@ -70,6 +68,7 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 		_float fRadianZ = XMConvertToRadians(m_UIObjDesc.vDegree.z);
 		m_pTransformCom->Rotation(fRadianX, fRadianY, fRadianZ);
 	}
+
 #pragma endregion
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
@@ -91,36 +90,15 @@ HRESULT CHUD_KirbyStatus::Initialize(void* _pArg)
 	m_eCurState = KIRBYHP_HIDE;
 	if (LEVEL_FINALE != *m_pCurrentLevelID)
 	{
-		m_pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+		m_pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 		Safe_AddRef(m_pKirby);
-
 	}
 
 	if (LEVEL_FINALE == *m_pCurrentLevelID)
 	{
-		m_pKirby = static_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+		m_pKirby = dynamic_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 		Safe_AddRef(m_pKirby);
 	}
-
-#pragma region MESSAGEWINDOW BASE
-
-	_float3 vNameTagScale = { 300.f * 0.8f, 50.f * 0.8f, 1.f };
-	m_pTransNameTag->Set_Scaled(vNameTagScale);
-
-	_float4 vNameTagPos = { 502.f, -394.f, 1.f, 1.f };
-	m_pTransNameTag->Set_State(CTransform::STATE_POSITION, vNameTagPos);
-
-
-	_float fRadianX = XMConvertToRadians(0.f);
-	_float fRadianY = XMConvertToRadians(0.f);
-	_float fRadianZ = XMConvertToRadians(0.f);
-	m_pTransNameTag->Rotation(fRadianX, fRadianY, fRadianZ);
-
-	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
-	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixPerspectiveFovLH(ToRadian(30.f), ((_float)g_iWinSizeX / (_float)g_iWinSizeY), .1f, 1000.f));
-
-#pragma endregion
-
 
 	return S_OK;
 }
@@ -130,6 +108,9 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 	if (nullptr == m_pKirby)
 		return OBJ_NOEVENT;
+
+	//if (nullptr != m_pNameTag)
+	//	m_pNameTag->Tick(fTimeDelta);
 
 	m_fTimeDelta = fTimeDelta;
 
@@ -171,6 +152,9 @@ _int CHUD_KirbyStatus::Tick(_float fTimeDelta)
 
 void CHUD_KirbyStatus::Late_Tick(_float fTimeDelta)
 {
+	//if (nullptr != m_pNameTag)
+	//	m_pNameTag->Late_Tick(fTimeDelta);
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
@@ -179,6 +163,9 @@ HRESULT CHUD_KirbyStatus::Render()
 	//07.15) Render OFF 처리 추가
 	if (KIRBYHP_HIDE == m_eCurState && 0 == m_fAlpha)
 		return S_OK;
+
+	//if (nullptr != m_pNameTag)
+	//	m_pNameTag->Render();
 
 	// 만약, 클래스 내부에서 랜더되지 않아도 되는 상황으로 판단한다면, 랜더를 하지 않는다.
 	//if (m_bRenderHpbar == false)
@@ -191,13 +178,11 @@ HRESULT CHUD_KirbyStatus::Render()
 			return S_OK;
 	}
 
-
 	if (UI_TEXTURE == m_UIObjDesc.eUIType)
-	{
 		Render_BindSet(m_pShaderCom, m_pTransformCom);
-	}
 
 	//추후 폰트가 아닌 이미지폰트로 렌더할 예정
+	/*
 	if (UI_FONT == m_UIObjDesc.eUIType)
 	{
 		_float4 vFontRGBA = { m_UIObjDesc.vColorRGB.x, m_UIObjDesc.vColorRGB.y, m_UIObjDesc.vColorRGB.z, m_UIObjDesc.fAlpha * m_fAlpha };
@@ -208,62 +193,7 @@ HRESULT CHUD_KirbyStatus::Render()
 		m_pGameInstance->Render_Font(wstrFontTag, m_UIObjDesc.wstrText, m_vFontPos, vFontRGBA,
 			XMConvertToRadians(m_UIObjDesc.vDegree.z), vFontOrig, vFontScale);
 	}
-
-#pragma region KIRBY_NAMETAG
-
-	if (nullptr == m_pKirby)
-		return E_FAIL;
-
-	HRESULT hr = S_OK;
-	CKirby::BODYSTATE eKirbyState = dynamic_cast<CKirby*>(m_pKirby)->Get_KirbyInfo()->m_eBodyState;
-
-	_uint iTexIndex = { TEXNT_NONE };
-	switch (eKirbyState)
-	{
-		//카피 능력 상태
-	case CKirby::BODY_SWORDDEFAULT:
-	case CKirby::BODY_SWORDBALLOON:
-		iTexIndex = TEXNT_SWORD;
-		break;
-
-	case CKirby::BODY_BOOMDEFAULT:	iTexIndex = TEXNT_BOMB;	break;
-	case CKirby::BODY_HAMMER:		iTexIndex = TEXNT_TOYHAMMER;	break;
-	case CKirby::BODY_CRASHDEFAULT:	iTexIndex = TEXNT_CRASH;	break;
-
-		//머금기 변형 상태
-	case CKirby::BODY_CARDEFAULT:
-	case CKirby::BODY_CARVACUUM:
-		iTexIndex = TEXNT_DEFORMCAR;
-		break;
-
-	case CKirby::BODY_BULBDEFAULT:
-	case CKirby::BODY_BULBVACUUM:
-		iTexIndex = TEXNT_DEFORMBULB;
-		break;
-
-	case CKirby::BODY_FINALCUT:
-		break;
-
-	default:
-		iTexIndex = TEXNT_KIRBY;
-		break;
-	}
-
-	if (FAILED(m_pTransNameTag->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-		return E_FAIL;
-
-	hr = Bind_ShaderResources(m_pShaderCom, POSTEX_ALPHABLEND_NOTEST, m_pTexNameTag, iTexIndex);
-	CHECK_FAILED(hr);
-
-
-#pragma endregion
-
+	*/
 
 	return S_OK;
 }
@@ -280,10 +210,6 @@ HRESULT CHUD_KirbyStatus::Add_Components()
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_HUD_StatusBar_Kirby_Mask"),
 		TEXT("Com_Texture_Mask"), (CComponent**)&m_pTexMask)))
-		return E_FAIL;
-
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Texture_HUD_StatusBar_NameTag"),
-		TEXT("Com_Texture_NameTag"), (CComponent**)&m_pTexNameTag)))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"),
@@ -377,19 +303,6 @@ HRESULT CHUD_KirbyStatus::Bind_VIBuffer(CVIBuffer_Rect* _pVIBufferCom)
 		return E_FAIL;
 
 	if (FAILED(_pVIBufferCom->Render()))
-		return E_FAIL;
-
-	return S_OK;
-}
-
-HRESULT CHUD_KirbyStatus::Add_Transform(void* _pArg)
-{
-	m_pTransNameTag = CTransform::Create(m_pDevice, m_pContext);
-
-	if (nullptr == m_pTransNameTag)
-		return E_FAIL;
-
-	if (FAILED(m_pTransNameTag->Initialize(_pArg)))
 		return E_FAIL;
 
 	return S_OK;
@@ -591,6 +504,8 @@ void CHUD_KirbyStatus::Disappear_HpBar(_float fTimeDelta)
 			m_fAlpha = 0.f;
 			m_eCurState = KIRBYHP_HIDE;
 
+			CHUD_KirbyNameTag* pNameTag = dynamic_cast<CHUD_KirbyNameTag*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_HUD"), 0));
+			pNameTag->Set_NameTagState(CHUD_KirbyNameTag::NAMETAG_HIDE); //07.24) 네임태그 상태 연동
 		}
 	}
 	// 반대로, 7초 이하이거나 (피격 또는 회복이 되었다는 뜻임) 
@@ -598,10 +513,14 @@ void CHUD_KirbyStatus::Disappear_HpBar(_float fTimeDelta)
 	else if (m_fIdleTime <= 5.f || m_bCustomRenderHpbar == true)
 	{
 		m_eCurState = KIRBYHP_SHOW;
+		CHUD_KirbyNameTag* pNameTag = dynamic_cast<CHUD_KirbyNameTag*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_HUD"), 0));
+		pNameTag->Set_NameTagState(CHUD_KirbyNameTag::NAMETAG_SHOW); //07.24) 네임태그 상태 연동
+
 		m_fAlpha = 1.f;
 		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		vPos.x = m_fSaveMyX;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+
 		if (UI_FONT == m_UIObjDesc.eUIType)
 		{
 			m_vFontPos.x = m_fFontSavePosX;
@@ -639,11 +558,7 @@ void CHUD_KirbyStatus::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pTransNameTag);
-
 	Safe_Release(m_pTexMask);
-	Safe_Release(m_pTexNameTag);
-
 	Safe_Release(m_pKirby);
 }
 

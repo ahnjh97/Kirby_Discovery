@@ -176,24 +176,24 @@ _int CRayArrow::Tick(_float fTimeDelta)
 	else if (true == m_bActive)
 	{
 		m_fTurnTime += m_fTimeDelta;
+		if (0.5f > m_fTurnTime)
 		{
-			if (0.25f > m_fTurnTime)
-			{
-				m_pTransformCom->Turn(m_vRight, m_fTimeDelta * 16.f);
-				m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), ToRadian(m_fAngle) * m_fTimeDelta * 4.f);
-				_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-				vPos.m128_f32[1] += m_fTimeDelta * 2.f;
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-			}
-			else
-			{
-				m_bFire = true;
-				m_bActive = false;
+			//m_pTransformCom->Turn(XMVector3Normalize(m_vRight), 1.f / 60.f, 360.f);
+			m_pTransformCom->Turn(m_vRight, m_fTimeDelta * 8.f);
+			m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_UP), ToRadian(m_fAngle) * m_fTimeDelta * 2.f);
+			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+			vPos.m128_f32[1] += m_fTimeDelta * 2.f;
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+		}
+		else
+		{
+			m_iCnt = 0;
+			m_bFire = true;
+			m_bActive = false;
 
-				m_vControllPos.m128_f32[0] = (m_vPosition.m128_f32[0] + m_vKirbyPos.m128_f32[0]) * 0.5f + m_vSide.m128_f32[0];
-				m_vControllPos.m128_f32[1] = (m_vPosition.m128_f32[1] + m_vKirbyPos.m128_f32[1]) * 0.5f + m_fHeight; // Y축 높이 조정
-				m_vControllPos.m128_f32[2] = (m_vPosition.m128_f32[2] + m_vKirbyPos.m128_f32[2]) * 0.5f + m_vSide.m128_f32[2];
-			}
+			m_vControllPos.m128_f32[0] = (m_vPosition.m128_f32[0] + m_vKirbyPos.m128_f32[0]) * 0.5f + m_vSide.m128_f32[0];
+			m_vControllPos.m128_f32[1] = (m_vPosition.m128_f32[1] + m_vKirbyPos.m128_f32[1]) * 0.5f + m_fHeight; // Y축 높이 조정
+			m_vControllPos.m128_f32[2] = (m_vPosition.m128_f32[2] + m_vKirbyPos.m128_f32[2]) * 0.5f + m_vSide.m128_f32[2];
 		}
 	}
 

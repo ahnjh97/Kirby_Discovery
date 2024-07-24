@@ -57,7 +57,10 @@ public:
 
 		//파이널보스
 		SEQ_FINALBOSS_APPEAR,
-
+		SEQ_FINALBOSS_2PHASE,
+		SEQ_FINALBOSS_DEAD,
+		SEQ_FINALBOSS_ENDING,
+		SEQ_FINALBOSS_DUMP,
 		//단독으로 하나를 즉시 넣어 사용하는 시퀀스
 		SEQ_ONE,
 		SEQ_END
@@ -166,7 +169,8 @@ public:
 	//카메라에게 특정 동작들을 시퀀스로 선예약한다.
 	void Make_Sequence(CAMSEQ eSeq);
 
-	void Set_DOFMode(_bool bAuto) { m_bAutoDOF = bAuto; }
+	void Set_AutoDOF(_bool bAuto) { m_bAutoDOF = bAuto; }
+
 
 	_bool IsSequencePlaying() { return m_eSpecialSeq == SEQ_END; }
 

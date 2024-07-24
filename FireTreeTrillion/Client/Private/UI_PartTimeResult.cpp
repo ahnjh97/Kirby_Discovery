@@ -171,7 +171,7 @@ void CUI_PartTimeResult::Render_Digits()
 		{
 			_int iAddNum = 1;
 
-			_float fRealTotalScore = Change_ScoreTextures(iAddNum);
+			_float fRealTotalScore = (_float)Change_ScoreTextures(iAddNum);
 			if (m_fScore < fRealTotalScore) // 30만큼 점수판 += 점수
 			{
 				m_bRenderTotalScore = true;
@@ -468,7 +468,7 @@ HRESULT CUI_PartTimeResult::Bind_ShaderResources()
 
 // 123 : 토탈 숫자
 // 567 : 올라가는 점수 숫자
-// 0일때, 십의자리일때, 백의자리일때 숫자텍스쳐 위치 보정
+// 0일 때, 십의자리일때, 백의자리일때 숫자텍스쳐 위치 보정
 void CUI_PartTimeResult::Repose_TotalScoreTextures()
 {
 	// 리셋

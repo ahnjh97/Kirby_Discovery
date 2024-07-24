@@ -168,25 +168,30 @@ void CLevel_Park::SummonEffectForMonster(_uint iTriggerIndex)
 		_float4 vPos = _float4(monsterDesc.matWorld._41, monsterDesc.matWorld._42, monsterDesc.matWorld._43, monsterDesc.matWorld._44);
 		_float4 vRight = _float4(monsterDesc.matWorld._11, monsterDesc.matWorld._12, monsterDesc.matWorld._13, monsterDesc.matWorld._14);
 		_float4 vUp = _float4(monsterDesc.matWorld._21, monsterDesc.matWorld._22, monsterDesc.matWorld._23, monsterDesc.matWorld._24);
-		_float4 vLook = _float4(monsterDesc.matWorld._31, monsterDesc.matWorld._32, monsterDesc.matWorld._33, monsterDesc.matWorld._34);
+		_float4 vLook = _float3(monsterDesc.matWorld._31, monsterDesc.matWorld._32, monsterDesc.matWorld._33);
 
 		_float fAngle = { 0.f };
 		_uint iNum = CUtils::Make_RandomInt(5, 7);
 		for (_uint i = 0; i < iNum; ++i)
 		{
-			_float fDistance = CUtils::Make_RandomFloat(2.f, 4.f);
-			_float4 vRotatePos = {};
-			fAngle += 360.f / (_float)iNum + i + CUtils::Make_RandomFloat(0.f, 10.f);
-			vRotatePos.x = vPos.x + (fDistance * cos(fAngle) * vLook.x) - (fDistance * sin(fAngle) * vLook.z);
-			vRotatePos.y = vPos.y + (fDistance * sin(fAngle) * vLook.x) + (fDistance * cos(fAngle) * vLook.y);
-			vRotatePos.z = vPos.z;
-			vRotatePos.w = 1.f;
-			tDesc.vPosition = vRotatePos;
+			_float fDistance = CUtils::Make_RandomFloat(0.3f, 0.8f);
+			_float fRandAngle = CUtils::Make_RandomFloat(0.f, 90.f);
+			vRight.Normalize();
+			_float3 vRotateRight = CUtils::TurnDirectionVector(vRight, (_float3)vLook, ((_float)i * 360.f / iNum) + fRandAngle);
+			tDesc.vPosition = vPos + fDistance * (_float4)vRotateRight + vLook;
 			tDesc.fScale = 1.9f;
 			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
 			CHECK_FAILED(hr);
 		}
 	}
+}
+
+void CLevel_Park::Check_KirbyPosState()
+{
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(m_iLevel, TEXT("Layer_Player")));
+	_float4 vPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
+
+	m_eSoundState = (vPos.z < -43.f)? LAND_ONE : LAND_TWO;
 }
 
 void CLevel_Park::Tick(_float fTimeDelta)
@@ -203,6 +208,10 @@ void CLevel_Park::Tick(_float fTimeDelta)
 		m_fSummonTime = 0.f;
 		SummonMonsters(m_iTriggerIndex);
 	}
+
+	// for sound
+	Check_KirbyPosState();
+	Sound_Tick(fTimeDelta);
 }
 
 HRESULT CLevel_Park::Render()
@@ -242,6 +251,37 @@ HRESULT CLevel_Park::Render()
 
 
 	return S_OK;
+}
+
+void CLevel_Park::Sound_Tick(_float fTimeDelta)
+{
+	switch (m_eSoundState)
+	{
+	case LAND_ONE:
+	{
+		static _bool bOnceLandOne = false;
+		if (false == bOnceLandOne)
+		{
+			m_pGameInstance->StopSound(CHANNEL_BGM);
+			m_pGameInstance->PlayBGM(CHANNEL_BGM, L"K15_Park3.wav");
+			m_pGameInstance->SetVolume(CHANNEL_BGM, VOLUME_BGM);
+			bOnceLandOne = true;
+		}
+	}
+	break;
+	case LAND_TWO:
+	{
+		static _bool bOnceLandTwo = false;
+		if (false == bOnceLandTwo)
+		{
+			m_pGameInstance->StopSound(CHANNEL_BGM);
+			m_pGameInstance->PlayBGM(CHANNEL_BGM, L"K15_Park5.marker.wav");
+			bOnceLandTwo = true;
+		}
+		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_BGM, fTimeDelta * 0.03f);
+	}
+	break;
+	}
 }
 
 HRESULT CLevel_Park::Ready_Lights()
@@ -357,23 +397,9 @@ HRESULT CLevel_Park::Ready_Layer_Camera(const wstring& strLayerTag)
 
 HRESULT CLevel_Park::Ready_Layer_BackGround(const wstring& strLayerTag)
 {
-	//CSkySphere::SKYSPHERE_DESC LabSkyDesc{};
-	//LabSkyDesc.strModelTag = { "SkySphere_Stage1_Day" };
-	//LabSkyDesc.strTextureTag = { "SkySphere_Lab_Diffuse" };
-	//HRESULT hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphere"), &LabSkyDesc);
-	//CHECK_FAILED(hr);
+#pragma region 포탈
 
-	////SUB_SKYSPHERE
-	//CSkySphere::SKYSPHERE_DESC LabSkySubDesc{};
-	//_float4x4 InitMat = _float4x4::Identity;
-	//InitMat.Translation({ 0.f, -50.f, -0.f });
-	//LabSkySubDesc.matWorld = InitMat;
-
-	//hr = m_pGameInstance->Add_Clone(m_iLevel, strLayerTag, TEXT("Prototype_GameObject_SkySphereSub"), &LabSkySubDesc);
-	//CHECK_FAILED(hr);
-
-
-	// 두 번째 랜드로 이동하는 포탈
+	// 두 번째 랜드로 이동하는 포탈 ------------------------------------------------------
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);
@@ -389,7 +415,8 @@ HRESULT CLevel_Park::Ready_Layer_BackGround(const wstring& strLayerTag)
 	CTransform* pTransform = pObj->Get_TransformCom();
 	pTransform->Set_Scaled(5.f, 8.f, 1.f);
 
-	// 세 번째 랜드로 이동하는 포탈
+
+	// 세 번째 랜드로 이동하는 포탈 ------------------------------------------------------
 	CGameObject::GAMEOBJECT_DESC PortalDesc{};
 	PortalDesc.fSpeedPerSec = 5.f;
 	PortalDesc.fRotationPerSec = ToRadian(90.f);
@@ -404,6 +431,23 @@ HRESULT CLevel_Park::Ready_Layer_BackGround(const wstring& strLayerTag)
 	pObj = m_pGameInstance->Add_CloneReturn(m_iLevel, TEXT("Layer_Portal"), TEXT("Prototype_GameObject_PortalSoftEffect"), &PortalDesc);
 	pTransform = pObj->Get_TransformCom();
 	pTransform->Set_Scaled(5.f, 8.f, 1.f);
+
+#pragma endregion
+
+	// 전구 ---------------------------------------------------------------------------
+	CGameObject::GAMEOBJECT_DESC BulbDesc{};
+	BulbDesc.fSpeedPerSec = 5.f;
+	BulbDesc.fRotationPerSec = ToRadian(90.f);
+
+	InitMat = _float4x4::Identity;
+	translationMatrix = XMMatrixTranslation(8.58f, 38.12f, -26.f);
+	
+	rotationY = XMConvertToRadians(70.f);
+	rotationMatrixY = XMMatrixRotationY(rotationY);
+	InitMat = rotationMatrixY * translationMatrix;
+
+	BulbDesc.matWorld = InitMat;
+	pObj = m_pGameInstance->Add_CloneReturn(m_iLevel, TEXT("Layer_Bulb"), TEXT("Prototype_GameObject_Bulb"), &BulbDesc);
 
 	return S_OK;
 }
@@ -750,7 +794,7 @@ HRESULT CLevel_Park::Ready_Monsters()
 		}
 		else if (L"GhostGordo" == tempDesc.wstrModelName)
 		{
-			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Monster"), TEXT("Prototype_GameObject_GhostGordo"), &tempDesc)))
+			if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Mon"), TEXT("Prototype_GameObject_GhostGordo"), &tempDesc)))
 				return E_FAIL;
 		}
 		else if (L"Bomber" == tempDesc.wstrModelName)
@@ -1315,6 +1359,9 @@ HRESULT CLevel_Park::Ready_UI()
 
 #pragma endregion
 
+	//커비 네임태그
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_KirbyNameTag"));
+
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
 	DiscardUIDesc.vPos = { DiscardUIDesc.vCenter.x, DiscardUIDesc.vCenter.y, 0.f };
@@ -1379,6 +1426,8 @@ void CLevel_Park::Free()
 
 	for (auto& tex : m_pEnvTexture)
 		Safe_Release(tex);
+
+	m_pGameInstance->StopSound(CHANNEL_BGM);
 }
 
 

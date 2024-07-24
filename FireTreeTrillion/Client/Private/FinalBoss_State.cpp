@@ -140,6 +140,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 					if (0 == m_iMeteor)
 					{
 						++m_iMeteor;
+						// 사운드 처리
+						m_pGameInstance->PlaySound_Free(L"BossChimeraRoar.wav", 0.5f);
 						pFinalBoss->Change_State(CFinalBoss::FINALBOSS_ROAR, 50.f, false, true);
 					}
 					else if (1 == m_iMeteor)
@@ -529,6 +531,7 @@ void CFinalBoss_Stab_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _fl
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 
 	m_fSpeed = 100.f;
+	m_bSound = false;
 }
 
 void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -539,6 +542,19 @@ void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+
+	if (CFinalBoss::FINALBOSS_STABREADY == pFinalBoss->Get_State())
+	{
+		if (0.8f < pFinalBoss->Get_AnimRatio())
+		{
+			if(false == m_bSound)
+			{
+				m_bSound = true;
+				// 사운드 처리
+				m_pGameInstance->PlaySound_Free(L"BossChimera_StabStart.wav", 0.5f);
+			}
+		}
+	}
 
 	pTransformCom->Look_At_Axis(pFinalBoss->Get_Direction());
 
@@ -573,6 +589,9 @@ void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if (pController->Is_Terrain())
 			{
+				// 사운드 처리
+				m_pGameInstance->PlaySound_Free(L"BossChimera_Stab.wav", 0.8f);
+
 				_vector vLook = pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
 				vLook.m128_f32[1] = 0.f;
 				HRESULT hr = S_OK;
@@ -1770,12 +1789,14 @@ void CFinalBoss_Roar_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
 	CTransform* pTransform = pFinalBoss->Get_TransformCom();
 
-	if (0.35f < pFinalBoss->Get_AnimRatio())
+	if (0.36f < pFinalBoss->Get_AnimRatio())
 	{
 		if (false == m_bShake)
 		{
 			m_bShake = true;
 
+			// 사운드 처리
+			m_pGameInstance->PlaySound_Free(L"BossChimeraRoar.wav", 0.5f);
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 			if (pCamera != nullptr)
 				pCamera->Make_Shake(0.5f, 3.5f);
@@ -1851,7 +1872,7 @@ void CFinalBoss_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 	if (pFinalBoss->IsAnimFinished())
 	{
-		if(CFinalBoss::STATE_2PAZE == pFinalBoss->Get_BossState())
+		if (CFinalBoss::STATE_2PAZE == pFinalBoss->Get_BossState())
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPREADY, 50.f, false, true);
 		else
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAIT, 50.f, false, true);
@@ -2044,7 +2065,7 @@ void CFinalBoss_Recovery_State::Free()
 #pragma region LASTDAMAGE STATE
 //*********************************
 //			 LASTDAMAGE STATE
-//*********************************
+//********************************* 
 CFinalBoss_LastDamage_State::CFinalBoss_LastDamage_State()
 {
 }
@@ -2063,16 +2084,32 @@ void CFinalBoss_LastDamage_State::OnStateUpdate(CGameObject* pGameObject, _float
 	if (true == pFinalBoss->IsAnimFinished())
 	{
 		CBossClone::BOSSCLONE_DESC BossCloneDesc = {};
+		CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 
 		switch (pFinalBoss->Get_State())
 		{
+			//피 다 깎여서 엎드림
 		case CFinalBoss::FINALBOSS_LASTDAMAGESTART:
+
+			if (pCamera != nullptr)
+				pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_DEAD);
+
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_LASTDAMAGEWAIT, 50.f, false, false);
 			break;
+			//일어서서 빤쓰
 		case CFinalBoss::FINALBOSS_LASTDAMAGEWAIT:
+
+			if (pCamera != nullptr)
+				pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_ENDING);
+
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMODISAPPEARCUT2, 50.f, false, false);
 			break;
+			//커비 애니메이션 시작
 		case CFinalBoss::FINALBOSS_DEMODISAPPEARCUT2:
+
+			if (pCamera != nullptr)
+				pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_DUMP);
+
 			CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 			pKirby->Get_KirbyInfo()->m_bFinalBossDead = true;
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DEMODISAPPEARCUT3, 50.f, false, false);

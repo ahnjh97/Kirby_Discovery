@@ -953,6 +953,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				DESC(m_eEyeState) = CKirby::EYE_IDLE;
 				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
 				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				pKirby->Delete_Effect("YW SwordParticle");
 				return;
 			}
 			else

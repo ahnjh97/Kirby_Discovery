@@ -16,6 +16,8 @@ public:
 	virtual void Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+	void	Sound_Tick(_float fTimeDelta);
+
 private:
 	HRESULT Ready_Lights();
 	HRESULT Ready_Layer_Camera(const wstring& strLayerTag);
@@ -33,6 +35,9 @@ private:
 	void	SummonMonsters(_uint iTriggerIndex);
 	void	SummonEffectForMonster(_uint iTriggerIndex);
 
+	void	Check_KirbyPosState();
+
+
 	HRESULT Add_EnvMap();
 	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };
 	CTexture* m_pEnvTexture[TYPE_END] = { nullptr, nullptr, nullptr };
@@ -44,9 +49,13 @@ private:
 	_uint	m_iTriggerIndex = { 0 };
 	_bool	m_bTrigger = { false };
 
+	enum SOUND_STATE { LAND_ONE, LAND_TWO, STATE_END };
+	SOUND_STATE  m_eSoundState = STATE_END;
+
 public:
 	static CLevel_Park* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;
+
 };
 
 END

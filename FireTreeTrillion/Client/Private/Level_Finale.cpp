@@ -881,6 +881,9 @@ HRESULT CLevel_Finale::Ready_UI()
 #pragma endregion
 	
 	/*
+	//커비 네임태그
+	hr = m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_UI_HUD"), TEXT("Prototype_GameObject_HUD_KirbyNameTag"));
+
 	//능력 버리기
 	CUIObject::UIOBJ_DESC DiscardUIDesc{};
 	DiscardUIDesc.vCenter = { g_iWinSizeX * 0.5f, g_iWinSizeY * 0.5f, 0.f };
