@@ -18,23 +18,6 @@ void CSimbaLaser::HideLaser()
 	m_pDynamicActor->setGlobalPose(PxTransform(0, 0, 0));
 }
 
-void CSimbaLaser::MakeLaser()
-{
-	_float3 vPos = GET_POS;
-	_float3 vScale = { 3.f, 3.f, 3.f };
-	wstring strName = { L"HS_lion laser" };
-
-	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
-	MultiFXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-	MultiFXDesc.vInitScale = vScale;
-
-	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"),
-		TEXT("Prototype_GameObject_") + strName, &MultiFXDesc)))
-		return;
-
-
-	//Add_Effect("HS_lion laser", MultiFXDesc);
-}
 
 HRESULT CSimbaLaser::Initialize_Prototype()
 {
@@ -77,6 +60,7 @@ HRESULT CSimbaLaser::Initialize(void* pArg)
 	m_pDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 
 	m_pGameInstance->Register_Trigger(m_pDynamicActor, TRIGGER_SIMBA_ATTACK, 1);
+	
 
 	return S_OK;
 }

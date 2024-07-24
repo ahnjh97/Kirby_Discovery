@@ -111,6 +111,14 @@ HRESULT CMeteor::Initialize(void* pArg)
 	Add_Effect("HS_meteo dash line", FXDesc, true);
 
 
+	for (_int i = 0; i < 8; ++i)
+	{
+		_float4x4 RotMat = _float4x4::Identity;
+		CUtils::Turn_OtherMatrix(RotMat, _float4(0.f, 1.f, 0.f, 0.f), 1.f, i * CUtils::Make_RandomFloat(30.f, 50.f) * 80.f);
+		m_vEffectSocket[i] = RotMat;
+	}
+
+
 	return S_OK;
 }
 
@@ -185,6 +193,8 @@ _int CMeteor::Tick(_float fTimeDelta)
 	{
 		if (1.f < fRatio)
 			fRatio = 1.f;
+
+		m_fEffectTime += m_fTimeDelta;
 	}
 	m_pTransformCom->Set_Scaled(1.f * fRatio, 1.f * fRatio, 1.f * fRatio);
 
@@ -213,7 +223,49 @@ _int CMeteor::Tick(_float fTimeDelta)
 					m_bShake = true;
 					CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 					if (pCamera != nullptr)
-						pCamera->Make_Shake(1.f, 2.5f);
+						pCamera->Make_Shake(1.f, 3.f);
+				}
+
+				if (m_fEffectTime > 0.35f)
+				{
+					CMultiEffect::MULTI_FX_DESC FXDesc{};
+					_float4 vEffectPos = vPos;
+					vEffectPos.y = 0.f;
+					FXDesc.vInitPos = (_float3)vEffectPos;
+					FXDesc.vInitPos.y -= 2.f;
+					FXDesc.vInitScale = { 0.8f, 0.8f, 0.8f };
+					this->Add_Effect("YW Debris Booms", FXDesc, false);
+
+					for (_int i = 0; i < 8; ++i)
+					{
+						//YW Debris Spark A; YW Debris Spark B;
+						_float	fGroundDistance = 1.f * (34.f - fDistance);
+						if (fGroundDistance > 18.f)
+							fGroundDistance = 18.f;
+						_float4 vDir = { 1.f * fGroundDistance, 0.f, 0.f, 0.f };
+						_float4x4 RotMat = _float4x4::Identity;
+						CUtils::Turn_OtherMatrix(RotMat, _float4(0.f, 1.f, 0.f, 0.f), 1.f, i * CUtils::Make_RandomFloat(30.f, 50.f) * 80.f );
+						vDir = XMVector3Transform(vDir, RotMat);
+						CUtils::Set_State_Matrix(m_vEffectSocket[i], CUtils::STATE_POSITION, (_float3)vEffectPos + vDir);
+
+						CParticle::PARTICLE_DESC PDesc{};
+						PDesc.pSocketMatrix = &m_vEffectSocket[i];
+						//PDesc.vInitPos = (_float3)vEffectPos + vDir;
+						//PDesc.vInitRot = CUtils::Make_Degree_FromDir(vDir);
+						_float fScale = CUtils::Make_RandomFloat(1.f, 2.f);
+						PDesc.vInitScale = { fScale , fScale , fScale };
+						this->Add_Effect("YW Debris Spark B", PDesc, false);
+
+						PDesc.fStartDelay = 0.1f;
+						PDesc.vInitPos = { CUtils::Make_RandomFloat(-3.f, 3.f), 0.f, CUtils::Make_RandomFloat(-3.f, 3.f) };
+						PDesc.vInitScale = { 2.f , 2.f , 2.f };
+						this->Add_Effect("YW Debris Spark A", PDesc, false);
+						PDesc.vInitPos = { CUtils::Make_RandomFloat(-3.f, 3.f), 0.f, CUtils::Make_RandomFloat(-3.f, 3.f) };
+						PDesc.vInitScale = { 1.5f , 1.5f , 1.5f };
+						this->Add_Effect("YW Debris Spark A", PDesc, false);
+					}
+					m_fEffectTime = 0.f;
+
 				}
 
 
@@ -275,7 +327,45 @@ _int CMeteor::Tick(_float fTimeDelta)
 			{
 				m_fDeadTime += m_fTimeDelta;
 				if (0.5f < m_fDeadTime)
+				{
+					CMultiEffect::MULTI_FX_DESC FXDesc{};
+					_float4 vEffectPos = vPos;
+					vEffectPos.y = 0.f;
+					FXDesc.vInitPos = (_float3)vEffectPos;
+					FXDesc.vInitPos.y -= 2.f;
+					FXDesc.vInitScale = { 0.8f, 0.8f, 0.8f };
+					this->Add_Effect("YW Debris Booms", FXDesc, false);
+
+					for (_int i = 0; i < 8; ++i)
+					{
+						//YW Debris Spark A; YW Debris Spark B;
+						_float	fGroundDistance = 1.f * (34.f - fDistance);
+						if (fGroundDistance > 18.f)
+							fGroundDistance = 18.f;
+						_float4 vDir = { 1.f * fGroundDistance, 0.f, 0.f, 0.f };
+						_float4x4 RotMat = _float4x4::Identity;
+						CUtils::Turn_OtherMatrix(RotMat, _float4(0.f, 1.f, 0.f, 0.f), 1.f, i * CUtils::Make_RandomFloat(30.f, 50.f) * 80.f);
+						vDir = XMVector3Transform(vDir, RotMat);
+						CUtils::Set_State_Matrix(m_vEffectSocket[i], CUtils::STATE_POSITION, (_float3)vEffectPos + vDir);
+
+						CParticle::PARTICLE_DESC PDesc{};
+						PDesc.pSocketMatrix = &m_vEffectSocket[i];
+						//PDesc.vInitPos = (_float3)vEffectPos + vDir;
+						//PDesc.vInitRot = CUtils::Make_Degree_FromDir(vDir);
+						_float fScale = CUtils::Make_RandomFloat(1.f, 2.f);
+						PDesc.vInitScale = { fScale , fScale , fScale };
+						this->Add_Effect("YW Debris Spark B", PDesc, false);
+
+						PDesc.fStartDelay = 0.1f;
+						PDesc.vInitPos = { CUtils::Make_RandomFloat(-3.f, 3.f), 0.f, CUtils::Make_RandomFloat(-3.f, 3.f) };
+						PDesc.vInitScale = { 2.f , 2.f , 2.f };
+						this->Add_Effect("YW Debris Spark A", PDesc, false);
+						PDesc.vInitPos = { CUtils::Make_RandomFloat(-3.f, 3.f), 0.f, CUtils::Make_RandomFloat(-3.f, 3.f) };
+						PDesc.vInitScale = { 1.5f , 1.5f , 1.5f };
+						this->Add_Effect("YW Debris Spark A", PDesc, false);
+					}
 					m_bDead = true;
+				}
 			}
 		}
 		else
@@ -296,6 +386,12 @@ _int CMeteor::Tick(_float fTimeDelta)
 			}
 			else
 			{
+
+				CMultiEffect::MULTI_FX_DESC Multidesc = {};
+				Multidesc.vInitPos = (_float3)m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+				Multidesc.vInitScale = { 3.5f, 3.5f, 3.5f };
+				this->Add_Effect("YW Debris SmallBooms", Multidesc, false);
+
 				if (false == m_bShake)
 				{
 					m_bShake = true;
