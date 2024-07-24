@@ -121,7 +121,6 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInstance, _uint iNumLevels, 
 	return S_OK;
 }
 
-
 void CGameInstance::Tick_Engine(_float fTimeDelta)
 {
 	if (nullptr == m_pLevel_Manager ||
@@ -1011,6 +1010,7 @@ HRESULT CGameInstance::Draw_RTVDebug(const wstring& strMRTTag, CShader* pShader,
 }
 #endif
 
+#pragma region SOUND_MANAGER
 
 _int CGameInstance::SetVolume(CHANNELID eID, _float _vol)
 {
@@ -1099,6 +1099,8 @@ void CGameInstance::PlaySound_Free(TCHAR* pSoundKey, _float _vol)
 {
 	m_pSound_Manager->PlaySound_Free(pSoundKey, _vol);
 }
+
+#pragma endregion
 
 #ifdef _DEBUG
 void CGameInstance::ImGui_Render()

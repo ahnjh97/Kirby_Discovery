@@ -153,7 +153,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 					{
 						pFinalBoss->Set_Chain(true);
 						pFinalBoss->Set_BossState(CFinalBoss::STATE_FLYING);
-						m_iCnt = 22;
+						m_iCnt = 18;
 						pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
 					}
 				}
@@ -240,8 +240,18 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			{
 				if (pFinalBoss->IsAnimFinished()/*0.5f < pFinalBoss->Get_AnimRatio()*/)
 				{
-					m_iCnt = 0;
+					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONSTART, 50.f, false, true);
+				}
+			}
+			else if (22 == m_iCnt)
+			{
+				if (pFinalBoss->IsAnimFinished())
+				{
+					++m_iCnt;
+					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+					pFinalBoss->Set_Direction(m_vLook);
+					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 				}
 			}
 		}
@@ -356,11 +366,11 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTREADY, 50.f, false, true);
 				}
 			}
-			else if (22 == m_iCnt)
+			else if (23 == m_iCnt)
 			{
 				if (pFinalBoss->IsAnimFinished()/*0.5f < pFinalBoss->Get_AnimRatio()*/)
 				{
-					m_iCnt = 19;
+					m_iCnt = 6;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPREADY, 50.f, false, true);
 				}
 			}
@@ -878,7 +888,7 @@ void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		if (1.f > m_fTimeDelta)
 		{
 			vPos.m128_f32[0] += m_fTimeDelta;
-			vPos.m128_f32[1] += -tan(m_fTimeDelta) * 1.5f;
+			vPos.m128_f32[1] += -tan(m_fTimeDelta) * 2.f;
 		}
 
 		if (5.f > vPos.m128_f32[1])
@@ -898,6 +908,7 @@ void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		if (5.f > pController->Compute_Height(XMVectorSet(0.f, -1.f, 0.f, 0.f)))
 		{
 			pFinalBoss->Set_Gully(true);
+
 			//m_fSpeed = 10.f;
 		}
 		else
@@ -1494,6 +1505,7 @@ void CFinalBoss_Laser_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 			LaserReady(pFinalBoss);
 			break;
 		case CFinalBoss::FINALBOSS_DIMENSIONLASERCHARGE:
+			pFinalBoss->Delete_AllEffect();
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASERSTART, 50.f, false, true);
 			break;
 		case CFinalBoss::FINALBOSS_DIMENSIONLASERSTART:

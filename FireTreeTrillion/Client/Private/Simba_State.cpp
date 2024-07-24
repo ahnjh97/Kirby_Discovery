@@ -11,21 +11,29 @@ static _float s_fJumpPower = {};
 static _uint s_iWalkSmokeCount = {};
 static _uint s_iBiteCount = {};
 
-// *********************** Appear1 ***********************  // 완료
+// *********************** Appear1 ***********************  // 사운드 완료
 void CSimba_Appear1::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	s_fOffsetY = 0.f;
+	m_bPlaySound = false;
 }
 
 void CSimba_Appear1::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 {
 	m_pController->FreeFall(m_pTransform, fTimeDelta, 6.f, s_fOffsetY);
-
 	CSimba* pSimba = static_cast<CSimba*>(pGameObject);
+	_uint iState = pSimba->Get_State();
+	_float fAnimRatio = pSimba->Get_AnimRatio();
+	if (CSimba::Simba_DemoAppear1Cut10 == iState && 0.24f < fAnimRatio && false == m_bPlaySound) {
+		m_bPlaySound = true;
+		m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+		m_pGameInstance->PlayMySound(L"SimbaLastDialog.wav", CHANNEL_BOSSVOICE, 0.3f);
+	}
+
 	if (true == pSimba->IsAnimFinished())
 	{
-		switch (pSimba->Get_State())
+		switch (iState)
 		{
 		case CSimba::Simba_DemoAppear1Cut2:
 			pSimba->Change_State(CSimba::Simba_DemoAppear1Cut2Wait, 66.66f, true, false);
@@ -46,14 +54,14 @@ void CSimba_Appear1::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** Appear2 *********************** // 완료
+// *********************** Appear2 *********************** // 사운드 완료
 void CSimba_Appear2::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	m_fTime = 0.f; 
-
+	m_bPlaySound = false;
 	_uint iCurAnim = _pModel->Get_CurAnimIndex();
-	if(CSimba::Simba_DemoAppear2Cut1 == iCurAnim)
+	if (CSimba::Simba_DemoAppear2Cut1 == iCurAnim)
 		s_fOffsetY = -0.3f;
 	else if(CSimba::Simba_DemoAppear2Cut2 == iCurAnim)
 		s_fOffsetY = -0.5f;
@@ -76,6 +84,22 @@ void CSimba_Appear2::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			s_fOffsetY = -0.4f;
 		else if(fAnimRatio > 0.75f)
 			s_fOffsetY = -0.35f;
+
+		if (0.081f < fAnimRatio && false == m_bPlaySound)
+		{
+			m_bPlaySound = true;
+			m_pGameInstance->StopSound(CHANNEL_BGM);
+			m_pGameInstance->PlayMySound(L"SimbaBattleStart.wav", CHANNEL_BGM, 0.5f);
+		}
+	}
+
+	if (CSimba::Simba_DemoAppear2Cut2 == iState)
+	{
+		if (0.8f < fAnimRatio && false == m_bPlaySound) {
+			m_bPlaySound = true;
+			m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+			m_pGameInstance->PlayMySound(L"SimbaName.wav", CHANNEL_BOSSVOICE, 0.33f);
+		}
 	}
 		
 	if (true == pSimba->IsAnimFinished())
@@ -107,7 +131,7 @@ void CSimba_Appear2::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** Walk *********************** // 완료
+// *********************** Walk *********************** // 사운드 완료
 void CSimba_Walk::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -120,16 +144,18 @@ void CSimba_Walk::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
 	CSimba* pSimba = static_cast<CSimba*>(pGameObject);
 	_float fAnimRatio = pSimba->Get_AnimRatio();
-	if (2 <= s_iWalkSmokeCount)
+	if (0.285f > fAnimRatio && 2 <= s_iWalkSmokeCount)
 		s_iWalkSmokeCount = 0;
 
 	if (0.285f < fAnimRatio && 0 == s_iWalkSmokeCount)
 	{
 		pSimba->WalkSmoke();
+		m_pGameInstance->PlaySound_Free(L"SimbaWalk.wav", 0.23f);
 		s_iWalkSmokeCount++;
 	}
 	else if (0.76f < fAnimRatio && 1 == s_iWalkSmokeCount) {
 		pSimba->WalkSmoke();
+		m_pGameInstance->PlaySound_Free(L"SimbaWalk.wav", 0.23f);
 		s_iWalkSmokeCount++;
 	}
 
@@ -156,10 +182,15 @@ void CSimba_QuickClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	s_fOffsetY = -0.58f;
 	if (CSimba::Simba_QuickClawL == _iAnimIndex || CSimba::Simba_QuickClawR == _iAnimIndex
-		|| CSimba::Simba_QuickClaw2L == _iAnimIndex || CSimba::Simba_QuickClaw2R == _iAnimIndex)
+		|| CSimba::Simba_QuickClaw2L == _iAnimIndex || CSimba::Simba_QuickClaw2R == _iAnimIndex) {
 		m_bSlashEffect = false;
+		m_bPlaySound = false;
+	}
+		
 	else if (CSimba::Simba_QuickClawLFromStart == _iAnimIndex || CSimba::Simba_QuickClawRFromStart == _iAnimIndex)
 		m_bChargeEffect = false;
+	else if (CSimba::Simba_QuickClawStartL == _iAnimIndex || CSimba::Simba_QuickClawStartR == _iAnimIndex)
+		m_bNailEffect = false;
 }
 
 void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -174,14 +205,29 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	_uint iStarCount = pSimba->Get_StarCount();
 	_uint iRockCount = pSimba->Get_RockCount();
 	
-	if ((CSimba::Simba_QuickClawStartL == iState || CSimba::Simba_QuickClawStartR == iState) && fAnimRatio < 0.3f)
-		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 6.f);
+	if ((CSimba::Simba_QuickClawStartL == iState || CSimba::Simba_QuickClawStartR == iState)) {
+		if(0.3f > fAnimRatio)
+			m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 6.f);
+
+		if (0.89f < fAnimRatio && false == m_bNailEffect)
+		{
+			m_bNailEffect = true;
+			pSimba->QuickClawNailFlash(iState);
+			m_pGameInstance->PlaySound_Free(L"SimbaNail.wav", 0.4f);
+		}
+	}
 
 	else if ((CSimba::Simba_QuickClawL == iState || CSimba::Simba_QuickClawR == iState))
 	{
+		if (0.25f < fAnimRatio && false == m_bPlaySound) {
+			m_bPlaySound = true;
+			m_pGameInstance->PlaySound_Free(L"SimbaQuickClawVoice1.wav", 0.32f);
+		}
+		
 		if (0.4f < fAnimRatio && false == m_bSlashEffect) {
 			m_bSlashEffect = true;
 			pSimba->QuickClawSlash(iState);
+			m_pGameInstance->PlaySound_Free(L"SimbaQuickClaw.wav", 0.32f);
 		}
 			
 		_float fStart = 0.42f;
@@ -212,9 +258,16 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	
 	else if ((CSimba::Simba_QuickClaw2L == iState || CSimba::Simba_QuickClaw2R == iState)) 
 	{
+		if (0.18f < fAnimRatio && false == m_bPlaySound)
+		{
+			m_bPlaySound = true;
+			m_pGameInstance->PlaySound_Free(L"SimbaQuickClawVoice2.wav", 0.35f);
+		}
+
 		if (0.3f < fAnimRatio && false == m_bSlashEffect) {
 			m_bSlashEffect = true;
 			pSimba->QuickClawSlash(iState);
+			m_pGameInstance->PlaySound_Free(L"SimbaQuickClaw.wav", 0.35f);
 		}
 
 		if(0.3f > fAnimRatio)
@@ -258,39 +311,37 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 		switch (iState)
 		{
 		case CSimba::Simba_QuickClawStartL:
-			pSimba->QuickClawNailFlash(iState);
-			pSimba->Change_State(CSimba::Simba_QuickClawChargeL, 66.66f, false, false);
+			pSimba->Change_State(CSimba::Simba_QuickClawL, 60, false, false);
 			break;
 		case CSimba::Simba_QuickClawStartR:
-			pSimba->QuickClawNailFlash(iState);
-			pSimba->Change_State(CSimba::Simba_QuickClawChargeR, 66.66f, false, false);
+			pSimba->Change_State(CSimba::Simba_QuickClawR, 60, false, false);
 			break;
 
-		case CSimba::Simba_QuickClawChargeL:
-			pSimba->Change_State(CSimba::Simba_QuickClawL, 66.66f, false, false);
-			break;
-		case CSimba::Simba_QuickClawChargeR:
-			pSimba->Change_State(CSimba::Simba_QuickClawR, 66.66f, false, false);
-			break;
+		//case CSimba::Simba_QuickClawChargeL:
+		//	pSimba->Change_State(CSimba::Simba_QuickClawL, 66.66f, false, false);
+		//	break;
+		//case CSimba::Simba_QuickClawChargeR:
+		//	pSimba->Change_State(CSimba::Simba_QuickClawR, 66.66f, false, false);
+		//	break;
 
 		case CSimba::Simba_QuickClawL:
-			pSimba->Change_State(CSimba::Simba_QuickClaw2R, 66.66f, false, false);
+			pSimba->Change_State(CSimba::Simba_QuickClaw2R, 60, false, false);
 			break;
 		case CSimba::Simba_QuickClawR:
-			pSimba->Change_State(CSimba::Simba_QuickClaw2L, 66.66f, false, false);
+			pSimba->Change_State(CSimba::Simba_QuickClaw2L, 60, false, false);
 			break;
 
 		case CSimba::Simba_QuickClaw2L:
 			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 18.f)
-				pSimba->Change_State(CSimba::Simba_QuickClawEndL, 66.66f, false, false);
+				pSimba->Change_State(CSimba::Simba_QuickClawEndL, 60, false, false);
 			else
-				pSimba->Change_State(CSimba::Simba_QuickClawLFromStart, 66.66f, false, false);
+				pSimba->Change_State(CSimba::Simba_QuickClawLFromStart, 60, false, false);
 			break;
 		case CSimba::Simba_QuickClaw2R:
 			if (m_pGameInstance->Compute_Distance(m_pKirby, pSimba) > 18.f)
-				pSimba->Change_State(CSimba::Simba_QuickClawEndR, 66.66f, false, false);
+				pSimba->Change_State(CSimba::Simba_QuickClawEndR, 60, false, false);
 			else
-				pSimba->Change_State(CSimba::Simba_QuickClawRFromStart, 66.66f, false, false);
+				pSimba->Change_State(CSimba::Simba_QuickClawRFromStart, 60, false, false);
 			break;
 
 		case CSimba::Simba_QuickClawEndL: case CSimba::Simba_QuickClawEndR:
@@ -299,7 +350,7 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 			break;
 
 		case CSimba::Simba_QuickClawLFromStart: case CSimba::Simba_QuickClawRFromStart:
-			pSimba->Change_State(CSimba::Simba_FinalCrusher, 66.66f, false, false);
+			pSimba->Change_State(CSimba::Simba_FinalCrusher, 50, false, false);
 			break;
 		}
 	}
@@ -821,6 +872,8 @@ void CSimba_Roar::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnim
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	s_fOffsetY = -0.7f;
 	m_bCamNotified = false;
+	m_bEyeBloom = false;
+	m_bElecParts = false;
 }
 
 void CSimba_Roar::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -831,8 +884,14 @@ void CSimba_Roar::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	_float fRatio = RATIO(fAnimRatio, 0, 0.08f);
 	if (0.06f > fAnimRatio)
 		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * (1- EASE_IN(fRatio)) * 4.f);
+
+	if (0.285f < fAnimRatio && false == m_bElecParts) // 열정적인 전기
+	{
+		m_bElecParts = true;
+		pSimba->RoarElecParts(); 
+	}
 	
-	if (0.54f < fAnimRatio && false == m_bEyeBloom)
+	if (0.54f < fAnimRatio && false == m_bEyeBloom) // 잔잔한 전기 + 눈 빛남
 	{
 		m_bEyeBloom = true;
 		pSimba->Set_EyeBloom(true);
@@ -1110,10 +1169,9 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			pSimba->TeethBite();
 			s_iBiteCount = 0;
 			pSimba->SpawnStar(iState);
-			
 		}
 		else if (0.65f < fAnimRatio && 0 == s_iBiteCount) {
-			pSimba->TeethBite();
+			pSimba->TeethBite(true);
 			s_iBiteCount++;
 		}
 		else if (0.7f < fAnimRatio && 1 == iStarCount) {
@@ -1244,12 +1302,7 @@ void CSimba_Death::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 
 	if (pSimba->IsAnimFinished())
 	{
-		if (CSimba::Simba_Death == iState) {
-			pSimba->Change_State(CSimba::Simba_DemoDeadCut1, 50.f, false, true);
-			pSimba->Set_SimbaEye(CSimba::SIMBAEYE_NONE);
-			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_THRONEBREAK);
-		}
-		else if (CSimba::Simba_DemoDeadCut1 == iState)
+		if (CSimba::Simba_DemoDeadCut1 == iState)
 			pSimba->Change_State(CSimba::Simba_DemoDeadCut2, 60.f, false, false);
 		else if (CSimba::Simba_DemoDeadCut2 == iState && false == m_bCageNotified) {
 			m_bCageNotified = true;

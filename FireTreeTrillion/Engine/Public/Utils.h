@@ -90,6 +90,9 @@ public:
 	static void				MoveActor(PxRigidActor* pActor, _float3 vRightUpLook, _float fTimeDelta);
 
 
+	//레이가 특정 사각 영역에 충돌하는가?
+	static _float3 Compute_CollidingPoint(_float3 vLaserStart, _float3 vLaserDir, _float3 vLandCenter, _float3 vLandExtent);
+
 	//이펙트 관련 함수
 	static HRESULT Load_Effect(path _FilePath, _Out_ SINGLE_FX_DATA* _pData);
 	static HRESULT Load_Effect(path _FilePath, _Out_ PARTICLE_DATA* _pData);

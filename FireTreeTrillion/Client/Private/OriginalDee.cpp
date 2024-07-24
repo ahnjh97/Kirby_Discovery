@@ -7,212 +7,423 @@
 
 pair<_float3, vector<TOWN_POINT_INFO>> COriginalDee::m_TownPoints =
 {
-	//잘못했슴다 이 부분을 이동 오프셋으로 주겠음...
-	_float3{1.7f, 22.f, 4.f},
+	//이 부분을 이동 오프셋으로
+	_float3{0.f, 0.f, 0.f},
 	{
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_0,
-			{0.f, 0.f, 10.f},
+			{1.7f, 22.f, 9.3f},
 			{DEEANIM_WALK, DEEANIM_MOVEFALL},
 			{TOWNPOINT_1, TOWNPOINT_7, TOWNPOINT_8}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_1,
-			{1.6f - 1.7f, 0.f, 18.3f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL},
+			{1.9f, 22.f, 18.f},
+			{DEEANIM_WALK},
 			{TOWNPOINT_0, TOWNPOINT_2, TOWNPOINT_12}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_2,
-			{-8.8f - 1.7f, 0.f, 19.f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL},
-			{TOWNPOINT_1, TOWNPOINT_3, TOWNPOINT_FLOWERUPLEFT}
+			{-7.6f , 22.f, 19.6f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_1, TOWNPOINT_30, TOWNPOINT_31}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_3,
-			{-11.9f - 1.7f, 0.f, 7.6f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL},
-			{TOWNPOINT_2, TOWNPOINT_4, TOWNPOINT_5, TOWNPOINT_FLOWERDOWNLEFT}
+			{-16.f, 22.f, -.8f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_4, TOWNPOINT_5, TOWNPOINT_FLOWERDOWNLEFT, TOWNPOINT_31}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_4,
-			{-17.2f - 1.7f, 0.f, 2.f - 4.f},
-			{DEEANIM_WALK},
+			{-24.7f, 22.f, -1.4f},
+			{DEEANIM_CHOOSE_START},
 			{TOWNPOINT_3}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_5,
-			{-10.1f - 1.7f, 0.f, -8.f - 4.f},
+			{-11.6f, 22.f, -9.3f},
 			{DEEANIM_WALK, DEEANIM_MOVEFALL},
-			{TOWNPOINT_3, TOWNPOINT_6, TOWNPOINT_FLOWERDOWNLEFT}
+			{TOWNPOINT_3, TOWNPOINT_6}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_6,
-			{2.8f - 1.7f, 0.f, -12.f - 4.f},
+			{1.6f, 22.f, -12.7f},
 			{DEEANIM_WALK, DEEANIM_MOVEFALL},
-			{TOWNPOINT_5, TOWNPOINT_7, TOWNPOINT_8, TOWNPOINT_9}
+			{TOWNPOINT_5, TOWNPOINT_9, TOWNPOINT_32}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_7,
-			{-1.2f - 1.7f, 0.f, 1.6f - 4.f},
+			{-2.9f, 22.f, 4.5f},
 			{DEEANIM_WALK},
-			{TOWNPOINT_0, TOWNPOINT_6, TOWNPOINT_8}
+			{TOWNPOINT_0, TOWNPOINT_32}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_8,
-			{5.7f - 1.7f, 0.f, 2.8f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL},
+			{7.f, 22.f, 3.4f},
+			{DEEANIM_WALK},
 			{TOWNPOINT_0, TOWNPOINT_6, TOWNPOINT_7}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_9,
-			{15.f - 1.7f, 0.f, -10.5f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL},
+			{13.7f, 22.f, -11.1f},
+			{DEEANIM_WALK},
 			{TOWNPOINT_6, TOWNPOINT_10, TOWNPOINT_14}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_10,
-			{20.7f - 1.7f, 0.f, 1.2f - 4.f},
+			{18.8f, 22.f, -2.9f},
 			{DEEANIM_WALK, DEEANIM_MOVEFALL},
-			{TOWNPOINT_9, TOWNPOINT_11, TOWNPOINT_FLOWERDOWNRIGHT}
+			{TOWNPOINT_9, TOWNPOINT_FLOWERDOWNRIGHT, TOWNPOINT_33}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_11,
-			{20.1f - 1.7f, 0.f, 16.1f - 4.f},
+			{20.6f, 22.f, 19.2f},
 			{DEEANIM_WALK, DEEANIM_MOVEFALL},
-			{TOWNPOINT_10, TOWNPOINT_12, TOWNPOINT_1FLOOR, TOWNPOINT_FLOWERDOWNRIGHT}
+			{TOWNPOINT_12, TOWNPOINT_1FLOOR, TOWNPOINT_33}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_12,
-			{12.7f - 1.7f, 0.f, 19.6f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL},
-			{TOWNPOINT_1, TOWNPOINT_11, TOWNPOINT_FOODSHOP, TOWNPOINT_FLOWERUPRIGHT}
+			{11.2f, 22.f, 20.2f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_1, TOWNPOINT_11, TOWNPOINT_FOODSHOP}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_FOODSHOP,
-			{13.8f - 1.7f, 0.f, 24.1f - 4.f},
+			{17.1f, 22.f, 25.f},
 			{DEEANIM_CHOOSE_START},
 			{TOWNPOINT_12}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_14,
-			{33.f - 1.7f, 0.f, -3.f - 4.f},
+			{36.6f, 22.f, -1.7f},
 			{DEEANIM_WALK, DEEANIM_MOVEFALL},
-			{TOWNPOINT_9, TOWNPOINT_FISHING}
+			{TOWNPOINT_9, TOWNPOINT_34}
 		},
 		TOWN_POINT_INFO
 		{
-			TOWNPOINT_FISHING,
-			{44.f - 1.7f, 0.f, 8.5f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL},
-			{TOWNPOINT_14, TOWNPOINT_16}
+			TOWNPOINT_FIRE,
+			{49.1f, 22.f, 6.1f},
+			{DEEANIM_WALK, DEEANIM_TOWNWAIT},
+			{TOWNPOINT_34, TOWNPOINT_56}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_16,
-			{41.4f - 1.7f, 0.f, 17.5f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL},
-			{TOWNPOINT_FISHING, TOWNPOINT_1FLOOR}
+			{38.3f, 22.f, 18.9f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_1FLOOR, TOWNPOINT_34}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_1FLOOR,
-			{31.8f - 1.7f, 0.f, 22.8f - 4.f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL},
+			{32.5f, 22.f, 27.4f},
+			{DEEANIM_WALK},
 			{TOWNPOINT_11, TOWNPOINT_16, TOWNPOINT_UNDERSTAIRA, TOWNPOINT_UNDERSTAIRB}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_UNDERSTAIRA,
-			{35.4f - 1.7f, 0.f, 37.2f - 4.f},
+			{35.4f, 22.f, 37.2f},
 			{DEEANIM_WALK},
 			{TOWNPOINT_1FLOOR, TOWNPOINT_MIDSTAIRA}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_MIDSTAIRA,
-			{42.f - 1.7f, 0.f, 53.5f - 4.f},
-			{DEEANIM_WALK},
+			{42.f, 25.f, 53.5f},
+			{DEEANIM_WALK,DEEANIM_MOVEFALL},
 			{TOWNPOINT_UNDERSTAIRA, TOWNPOINT_UPSTAIRA}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_UPSTAIRA,
-			{45.7f - 1.7f, 0.f, 70.9f - 4.f},
+			{45.7f, 28.f, 70.9f},
 			{DEEANIM_WALK},
 			{TOWNPOINT_MIDSTAIRA, TOWNPOINT_2FLOOR}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_2FLOOR,
-			{48.2f - 1.7f, 0.f, 76.8f - 4.f},
+			{48.2f, 33.f, 76.8f},
 			{DEEANIM_WALK},
-			{TOWNPOINT_UPSTAIRA,TOWNPOINT_UPSTAIRB }
+			{TOWNPOINT_UPSTAIRA,TOWNPOINT_UPSTAIRB, TOWNPOINT_35}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_UPSTAIRB,
-			{50.8f - 1.7f, 0.f, 71.f - 4.f},
+			{50.8f, 28.f, 71.f },
 			{DEEANIM_WALK},
 			{TOWNPOINT_2FLOOR, TOWNPOINT_MIDSTAIRB}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_MIDSTAIRB,
-			{47.5f - 1.7f, 0.f, 51.f - 4.f},
+			{47.5f , 25.f, 51.f },
 			{DEEANIM_WALK},
 			{TOWNPOINT_UPSTAIRB, TOWNPOINT_UNDERSTAIRB}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_UNDERSTAIRB,
-			{40.7f - 1.7f, 0.f, 34.2f - 4.f},
+			{40.7f , 22.f, 34.2f },
 			{DEEANIM_WALK},
 			{TOWNPOINT_MIDSTAIRB, TOWNPOINT_1FLOOR}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_FLOWERUPRIGHT,
-			{13.4f - 1.7f, 0.f, 12.f - 4.f},
+			{15.3f,22.f, 8.6f},
 			{DEEANIM_WATERING},
-			{TOWNPOINT_12}
+			{TOWNPOINT_33}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_FLOWERDOWNRIGHT,
-			{14.9f - 1.7f, 0.f, -1.f - 4.f},
+			{14.8f,22.f, -1.5f},
 			{DEEANIM_WATERING},
-			{TOWNPOINT_10, TOWNPOINT_11}
+			{TOWNPOINT_10, TOWNPOINT_33}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_FLOWERUPLEFT,
-			{-10.f - 1.7f, 0.f, 10.6f - 4.f},
+			{-10.1f,22.f, 10.6f },
 			{DEEANIM_WATERING},
-			{TOWNPOINT_2}
+			{TOWNPOINT_2, TOWNPOINT_3, TOWNPOINT_31}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_FLOWERDOWNLEFT,
-			{-10.f - 1.7f, 0.f, -1.f - 4.f},
+			{-11.3f,22.f, .7f},
 			{DEEANIM_WATERING},
-			{TOWNPOINT_3, TOWNPOINT_5}
+			{TOWNPOINT_3, TOWNPOINT_31}
 		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_29,
+			{-25.f, 22.f, 30.4f},
+			{DEEANIM_WATERING},
+			{TOWNPOINT_30}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_30,
+			{-15.6f, 22.f, 21.1f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_2, TOWNPOINT_29, TOWNPOINT_31}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_31,
+			{-14.8f, 22.f, 13.f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_2, TOWNPOINT_3, TOWNPOINT_FLOWERUPLEFT, TOWNPOINT_31}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_32,
+			{2.f, 22.f, -2.2f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_6, TOWNPOINT_7, TOWNPOINT_8}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_33,
+			{19.2f, 22.f, 10.1f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_10,TOWNPOINT_11, TOWNPOINT_FLOWERUPRIGHT}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_34,
+			{42.f, 22.f, 8.3f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_14, TOWNPOINT_FIRE, TOWNPOINT_16}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_35,
+			{38.f, 33.f, 71.6f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_2FLOOR, TOWNPOINT_36, TOWNPOINT_49}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_36,
+			{30.4f, 33.f, 75.3f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_35, TOWNPOINT_37}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_37,
+			{21.9f, 33.f, 64.7f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_36, TOWNPOINT_38}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_38,
+			{14.4f, 33.f, 56.3f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_37, TOWNPOINT_39, TOWNPOINT_40}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_39,
+			{11.8f, 33.f, 58.8f},
+			{DEEANIM_CHOOSE_START},
+			{TOWNPOINT_38}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_40,
+			{7.9f, 33.f, 51.9f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_38, TOWNPOINT_41}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_41,
+			{.6f, 33.f, 52.3f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_40, TOWNPOINT_42}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_42,
+			{-6.5f, 33.f, 48.2f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_41, TOWNPOINT_43}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_43,
+			{-9.6f, 33.f, 44.f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_42, TOWNPOINT_44, TOWNPOINT_50, TOWNPOINT_51}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_44,
+			{-5.5f, 33.f, 40.6f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_43, TOWNPOINT_45}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_45,
+			{1.9f, 33.f, 42.8f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_44, TOWNPOINT_46}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_46,
+			{9.6f, 33.f, 45.1f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_45, TOWNPOINT_47}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_47,
+			{18.4f, 33.f, 49.9f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_46, TOWNPOINT_48}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_48,
+			{22.5f, 33.f, 55.7f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_47, TOWNPOINT_49}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_49,
+			{31.f, 33.f, 63.4f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_35, TOWNPOINT_48}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_50,
+			{-15.f, 33.f, 45.4f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_43, TOWNPOINT_51}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_51,
+			{-17.1f, 33.f, 40.5f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_43, TOWNPOINT_50, TOWNPOINT_52}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_52,
+			{-18.5f, 33.f, 34.1f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_51, TOWNPOINT_53}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_53,
+			{-30.f, 33.f, 22.3f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_52, TOWNPOINT_54, TOWNPOINT_55}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_54,
+			{-35.4f, 33.f, 26.f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_53}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_55,
+			{-32.8f, 33.f, 16.7f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_53}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_56,
+			{56.7f, 22.f, 3.7f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_FIRE, TOWNPOINT_57}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_57,
+			{62.3f, 22.f, 11.8f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_56, TOWNPOINT_58}
+		},
+		TOWN_POINT_INFO
+		{
+			TOWNPOINT_58,
+			{53.8f, 22.f, 19.4f},
+			{DEEANIM_WALK},
+			{TOWNPOINT_34, TOWNPOINT_57}
+		},
+
 	}
 };
 
@@ -415,7 +626,7 @@ void COriginalDee::Render_IMGUI()
 
 	ImGui::Text(u8"현재 애님 인덱스 : %d", m_pFSM->Get_State());
 
-	//Draw_TownPoints();
+	Draw_TownPoints();
 
 }
 
@@ -722,21 +933,25 @@ _bool COriginalDee::Custom_Face(_uint iMeshIndex)
 
 void COriginalDee::Draw_TownPoints()
 {
-	ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+	ImDrawList* drawList = ImGui::GetForegroundDrawList();
 
 	for (const auto& point : m_TownPoints.second)
 	{
-		_float3 vWorldPos = m_TownPoints.first + point.vPosOffset;
-		vWorldPos = CUtils::Make_World_ToScreen(vWorldPos);
-		ImVec2 vMyPos = { vWorldPos.x, vWorldPos.y };
+		//vWorldPos = CUtils::WorldPosTo_ImguiProjPos(vWorldPos);
+		_float3 vWorldPos = /*m_TownPoints.first + */point.vPosOffset;
+		ImVec2 vMyPos = CUtils::WorldPosTo_ImguiProjPos(vWorldPos);
+
 		drawList->AddCircleFilled(vMyPos, 5.0f, IM_COL32(255, 0, 0, 255));
+		string strText = to_string(point.MyPoint);
+		drawList->AddText(vMyPos + ImVec2{ 0.f, -20.f }, IM_COL32(255, 255, 255, 255), strText.c_str());
 
 		// 연결된 점들 사이에 선 그리기
 		for (const auto& conn : point.NearPoint)
 		{
+			//vTargetWorldPos = CUtils::Make_World_ToScreen(vTargetWorldPos);
 			_float3 vTargetWorldPos = m_TownPoints.first + m_TownPoints.second[conn].vPosOffset;
-			vTargetWorldPos = CUtils::Make_World_ToScreen(vTargetWorldPos);
-			ImVec2 vTargetPos = { vTargetWorldPos.x, vTargetWorldPos.y };
+			ImVec2 vTargetPos = CUtils::WorldPosTo_ImguiProjPos(vTargetWorldPos);
 
 			drawList->AddLine(vMyPos, vTargetPos, IM_COL32(255, 255, 255, 255), 2.0f);
 		}

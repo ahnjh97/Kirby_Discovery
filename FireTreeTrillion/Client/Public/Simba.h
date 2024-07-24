@@ -114,6 +114,7 @@ public:
 	virtual void	Late_Tick(_float fTimeDelta)	override;
 	virtual HRESULT Render()						override;
 	virtual HRESULT Render_LightDepth()				override;
+	virtual void	Add_AnimEvent()					override;
 
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
@@ -163,7 +164,7 @@ public:
 	//크로스 공격 나오는 타이밍
 	void			DimensionClaw();
 	//돌진하면서 이빨씹기(씹는 타이밍)
-	void			TeethBite();
+	void			TeethBite(_bool bRight = false);
 
 	void			WalkSmoke();
 
