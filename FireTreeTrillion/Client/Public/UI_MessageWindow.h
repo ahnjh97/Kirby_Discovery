@@ -99,6 +99,8 @@ private:
 	void						Ready_FadeOut();
 
 	void						StartSimbaDialog();
+	
+	void						PlaySimbaVoice();
 
 public:
 	static CUI_MessageWindow*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -138,5 +140,8 @@ private:
 	_bool						m_bHighLightMsg = { FALSE };
 
 	_bool						m_bSimbaApperaNotified = { FALSE };
+
+	_float						m_fSimbaVoiceIdleTime = {};
+	_float						m_fSimbaVoicePlayTiming = {};
 };
 END

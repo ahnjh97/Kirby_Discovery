@@ -29,6 +29,7 @@ private:
 	CTransform*				m_pTransform = { nullptr };
 	CGameObject*			m_pKirby = { nullptr };
 	CTransform*				m_pKirbyTransform = { nullptr };
+	_bool					m_bPlaySound = { false };
 
 public:
 	static	CSimba_Appear1* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
@@ -59,6 +60,7 @@ private:
 	CTransform* m_pKirbyTransform = { nullptr };
 
 	_float m_fTime = {};
+	_bool m_bPlaySound = { false };
 
 public:
 	static	CSimba_Appear2* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform) 
@@ -118,6 +120,8 @@ private:
 	CTransform* m_pKirbyTransform = { nullptr };
 	_bool m_bChargeEffect = { false };
 	_bool m_bSlashEffect = { false };
+	_bool m_bNailEffect = { false };
+	_bool m_bPlaySound = { false };
 
 public:
 	static	CSimba_QuickClaw* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
@@ -326,6 +330,7 @@ private:
 	CTransform* m_pKirbyTransform = { nullptr };
 	_bool m_bEyeBloom = { false };
 	_bool m_bCamNotified = { false };
+	_bool m_bElecParts = { false };
 
 public:
 	static	CSimba_Roar* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
