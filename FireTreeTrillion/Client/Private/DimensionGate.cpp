@@ -130,7 +130,7 @@ void CDimensionGate::Late_Tick(_float fTimeDelta)
 
 	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 2.0f))
 	{
-		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLEND, this);
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SPECIALBLEND, this);
 		//m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	}
 }
