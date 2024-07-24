@@ -359,6 +359,13 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 			}
 		}
 
+		if (SEQ_SIMBA_THRONEBREAK)
+		{
+			CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
+			if (nullptr != pSimba)
+				m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+		}
+
 		//파이널 보스 등장
 		if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR)
 		{
@@ -1344,7 +1351,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//해당 시퀀스를 명시적으로 변수로 저장!
 	m_eSpecialSeq = eSeq;
 	m_fSeqCheckTime = 0.f;
-
+	//오토 dof 끄기
+	Set_AutoDOF(false);
 
 	switch (eSeq)
 	{
@@ -1484,7 +1492,6 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 	case SEQ_BREAKRACINGMAP:
 	{
-		Set_AutoDOF(false);
 
 		CAMACTION newAction{};
 		newAction.fTime = 0.f;
@@ -1691,6 +1698,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//통 보여주고 줌아웃
 	case SEQ_SIMBA_START:
 	{
+
 		CAMACTION newAction{};
 		Fill_HardCutSet(newAction, 0.f);
 
@@ -1721,6 +1729,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//심바 배틀 start
 	case SEQ_SIMBA_BATTLESTART:
 	{
+
 		CAMACTION newAction{};
 		Fill_HardCutSet(newAction, 0.f);
 

@@ -209,8 +209,8 @@ _int CSimba::Tick(_float fTimeDelta)
 	m_matRightHand = m_pTransformCom->ComputeBoneWorldMatrix(m_pRightHandBone); // 소켓용
 	m_matLip = m_pTransformCom->ComputeBoneWorldMatrix(m_pLipBone); // Socket Dragon
 	_float4 vMouthPos = m_pTransformCom->ComputeBoneWorldPos(m_pMouthBone);
-	memcpy(&(m_matMouth.m[3]), &vMouthPos, sizeof(vMouthPos));
-
+	//memcpy(&(m_matMouth.m[3]), &vMouthPos, sizeof(vMouthPos));
+	CUtils::Set_State_Matrix(m_matMouth, CUtils::STATE_POSITION, vMouthPos);
 	m_fHpRatio = m_fHp / m_fMaxHp;
 
 	ResetRotation();
@@ -223,6 +223,18 @@ _int CSimba::Tick(_float fTimeDelta)
 		Reset_HitBoxTimingMap(SIMBA_ANIM(m_pModelCom->Get_CurAnimIndex()));
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
+
+	//2페이즈 확인, 맞을 경우 주기적으로 보라색 아우라 생성
+	if (m_bEyeBloom && 0.f < m_fHp)
+	{
+		static _float fAuraTime{ 0.f };
+		fAuraTime += m_fTimeDelta;
+		if (.1f < fAuraTime)
+		{
+			fAuraTime = 0.f;
+			RoarElecParts();
+		}
+	}
 
 	CheckSpawning();
 
@@ -795,10 +807,70 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 	//이펙트 다는 매트릭스 동기화
 	m_DimensionClawMat = matWorld;
 
+
 	//공격 밑 데칼 이펙트 출력
-	//_float3 vCollidingPoint =
-	//	CUtils::Compute_CollidingPoint(static_cast<_float3>(vPos), _float3::Down,
-	//		{ 0.f, 1.f, -66.f }, { 26.f, 1.f, 26.f });
+	_float3 vClawMatPoint = m_DimensionClawMat.Translation();
+	_float3 vCollidingPoint = CUtils::Compute_CollidingPoint(vClawMatPoint + _float3{ 0.f, 5.f, 0.f }, _float3::Down, { 0.f, -1.f, -60.f }, { 26.f, 1.f, 26.f });
+	static _float fMakeFXTime{ 0.f };
+	fMakeFXTime += fTimeDelta;
+
+	if (.05f < fMakeFXTime && !ISDEFAULTFLOAT3(vCollidingPoint))
+	{
+		fMakeFXTime = 0.f;
+		//두 부분에서 출력
+		if (3.f < m_DimensionClawMat.Translation().y)
+		{
+			_float3 vCollidingPointA = vClawMatPoint - m_DimensionClawMat.Right() * 5.f;
+			_float3 vCollidingPointB = vClawMatPoint + m_DimensionClawMat.Right() * 5.f;
+
+			//레이저와의 충돌 자국
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.vInitScale = { 4.f, 4.f, 4.f };
+			FXDesc.vInitPos = static_cast<_float3>(vCollidingPointA);
+			FXDesc.vInitPos.y = 2.3f;
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Get_State_Vector_Matrix(m_DimensionClawMat, CUtils::STATE_LOOK));
+			Add_Effect("HS_lion cross decal", FXDesc);
+
+			FXDesc.vInitPos = static_cast<_float3>(vCollidingPointB);
+			FXDesc.vInitPos.y = 2.3f;
+			Add_Effect("HS_lion cross decal", FXDesc);
+
+
+			//충돌 시 튀는 파티클
+			CParticle::PARTICLE_DESC ParticleDesc{};
+			ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+			ParticleDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Get_State_Vector_Matrix(m_DimensionClawMat, CUtils::STATE_LOOK));
+
+			ParticleDesc.vInitPos = static_cast<_float3>(vCollidingPointA);
+			ParticleDesc.vInitPos.y = 2.3f;
+
+			Add_Effect("HS_perfect laser collide particle", ParticleDesc);
+
+			ParticleDesc.vInitPos = static_cast<_float3>(vCollidingPointB);
+			ParticleDesc.vInitPos.y = 2.3f;
+
+			Add_Effect("HS_perfect laser collide particle", ParticleDesc);
+		}
+		//한 부분에서 출력
+		else
+		{
+			//레이저와의 충돌 자국
+			CEffect::FX_DESC FXDesc{};
+			FXDesc.vInitPos = static_cast<_float3>(vClawMatPoint);
+			FXDesc.vInitScale = { 4.f, 4.f, 4.f };
+			FXDesc.vInitPos.y = 2.3f;
+			Add_Effect("HS_lion cross decal", FXDesc);
+
+
+			//충돌 시 튀는 파티클
+			CParticle::PARTICLE_DESC ParticleDesc{};
+			ParticleDesc.vInitPos = static_cast<_float3>(vClawMatPoint);
+			ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+			ParticleDesc.vInitPos.y = 2.3f;
+
+			Add_Effect("HS_perfect laser collide particle", ParticleDesc);
+		}
+	}
 
 }
 
@@ -1118,18 +1190,18 @@ void CSimba::SpawnDebris(_uint iAnimIdx)
 		fResultPos.y = 0.f;
 
 
-		//효선아 여기야 레이저 파티클
 		//레이저와의 충돌 자국
 		CEffect::FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(fResultPos);
-		FXDesc.vInitScale = { 3.f, 3.f, 3.f };
-		FXDesc.vInitPos = { 0.f, 1.f, 0.f };
-		Add_Effect("HS_lion cross decal", FXDesc, false);
+		FXDesc.vInitPos.y = 2.3f;
+		FXDesc.vInitScale = { 4.f, 4.f, 4.f };
+		Add_Effect("HS_lion cross decal", FXDesc);
 
 
 		//충돌 시 튀는 파티클
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		ParticleDesc.vInitPos = static_cast<_float3>(fResultPos);
+		ParticleDesc.vInitPos.y = 2.3f;
 		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
 
 		Add_Effect("HS_perfect laser collide particle", ParticleDesc);
@@ -1332,7 +1404,7 @@ void CSimba::QuickClawSlash(_uint eSimbaAnim)
 	{
 		effectDesc.vInitRot = _float3(0, 47.f, 3.f);
 		effectDesc.vInitPos = _float3(0, 2.5f, 3.3f);
-		
+
 		Add_Effect("HS_lion claw R", effectDesc);
 	}
 }
@@ -1503,8 +1575,34 @@ void CSimba::TeethBite(_bool bRight)
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 	MultiFXDesc.pSocketMatrix = &m_matMouth;
 	MultiFXDesc.vInitScale = vScale;
+	MultiFXDesc.vInitRot = CUtils::Make_Degree_FromDir(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+	MultiFXDesc.vInitPos += (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 3.f;
 
-	MultiFXDesc.vInitRot = { -90.f, bRight ? -45.f : 45.f, 0.f };
+	_float4x4 RotMat = m_pTransformCom->Get_WorldMatrix();
+	RotMat._44 = 0.f;
+	Quaternion RotMatQuat = Quaternion::CreateFromRotationMatrix(RotMat);
+
+
+	if (bRight)
+	{
+		_float3 vAngle = CUtils::Degree_ToRadian({ 0.f, 0.f, 65.f });
+		Quaternion vQuat = Quaternion::CreateFromYawPitchRoll(vAngle);
+
+		Quaternion vResultQuat = vQuat * RotMatQuat;
+		_float3 vEulerAngle = vResultQuat.ToEuler();
+		vEulerAngle = { ToDegree(vEulerAngle.x), ToDegree(vEulerAngle.y) , ToDegree(vEulerAngle.z) };
+		MultiFXDesc.vInitRot = vEulerAngle;
+	}
+	else
+	{
+		_float3 vAngle = CUtils::Degree_ToRadian({ 0.f, 0.f, -55.f });
+		Quaternion vQuat = Quaternion::CreateFromYawPitchRoll(vAngle);
+
+		Quaternion vResultQuat = vQuat * RotMatQuat;
+		_float3 vEulerAngle = vResultQuat.ToEuler();
+		vEulerAngle = { ToDegree(vEulerAngle.x), ToDegree(vEulerAngle.y) , ToDegree(vEulerAngle.z) };
+		MultiFXDesc.vInitRot = vEulerAngle;
+	}
 
 	Add_Effect("HS_lion tooth", MultiFXDesc);
 }
@@ -1516,6 +1614,17 @@ void CSimba::DimensionLaserVomit() // DimensionLaser 주위에 나오는 액체부스거리�
 
 void CSimba::DimensionLaser() // 진짜 DimensionLaser
 {
+	_float3 vPos = GET_POS;
+	wstring strName = { L"HS_lion laser" };
+
+	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+	MultiFXDesc.pSocketMatrix = m_pSimbaLaserTransform->Get_WorldFloat4x4_Ptr();
+	MultiFXDesc.vInitRot = { 0.f, 180.f, 0.f };
+	MultiFXDesc.vInitScale = { .05f, .05f, .05f };
+	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"),
+		TEXT("Prototype_GameObject_") + strName, &MultiFXDesc)))
+		return;
+
 }
 
 void CSimba::DimensionLaserParticles()
@@ -1528,6 +1637,19 @@ void CSimba::WalkSmoke() // 걸을때 발 땅에 닿을때 나오는 회색방구
 
 void CSimba::RoarElecParts() // 아직 호출안됨 // 아마 한번 호출 된 이후 전기 계속 생성해야할듯
 {
+	CEffect::FX_DESC FXDesc{};
+
+	_float3 vMyPos = GET_POS;
+	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+	//FXDesc.vInitPos = vMyPos;
+	FXDesc.vInitPos.x = CUtils::Make_RandomFloat(-3.f, 3.f);
+	FXDesc.vInitPos.y = CUtils::Make_RandomFloat(0.f, 9.f);
+	FXDesc.vInitPos.z = CUtils::Make_RandomFloat(-3.f, 3.f);
+
+	FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+	FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+	Add_Effect("HS_lion 2phase aura A", FXDesc);
 }
 
 void CSimba::BiteRushJumpSmoke(_uint iAnimIndex) // 손 발에서 여러방향으로 회색방구 나오게 해주쎄요

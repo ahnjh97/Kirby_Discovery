@@ -39,7 +39,7 @@ private:
 
 	_float		m_fWhiteColorDiffuse = {};
 
-	void		MakeLaser();
+	//void		MakeLaser();
 
 public:
 	static CSimbaLaser* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

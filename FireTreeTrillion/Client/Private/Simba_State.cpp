@@ -1154,25 +1154,25 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 		_vector vLook3 = CUtils::TurnDirectionVector(vLook, _float3(0, 1, 0), -30.f);
 
 		_vector vDir = XMVector3Normalize(vLook) * fTimeDelta * 12.f;
-		//m_pController->Move_Dir(m_pTransform, vDir, fTimeDelta, s_fOffsetY);
-		//m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 1.6f);
+		m_pController->Move_Dir(m_pTransform, vDir, fTimeDelta, s_fOffsetY);
+		m_pTransform->Look_At_Rotate(m_pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 1.6f);
 
-		/*_float fDis = 8.f;
+		_float fDis = 8.f;
 		if (fDis > m_pController->RayCastToStaticActor(vLook) || fDis > m_pController->RayCastToStaticActor(vLook2)
 			|| fDis > m_pController->RayCastToStaticActor(vLook3) || 2.8f < m_fTime)
-			pSimba->Change_State(CSimba::Simba_BiteRushTiredStart, 50.f, false, false);*/
+			pSimba->Change_State(CSimba::Simba_BiteRushTiredStart, 50.f, false, false);
 
 		if (2 <= pSimba->Get_StarCount())
 			pSimba->ResetStarCount();
 		else if (0.15f < fAnimRatio && 0.7f > fAnimRatio && 0 == iStarCount) {
 			pSimba->Set_StarPosToLeftHand();
-			pSimba->TeethBite();
 			s_iBiteCount = 0;
+			pSimba->TeethBite(s_iBiteCount);
 			pSimba->SpawnStar(iState);
 		}
 		else if (0.65f < fAnimRatio && 0 == s_iBiteCount) {
-			pSimba->TeethBite(true);
 			s_iBiteCount++;
+			pSimba->TeethBite(s_iBiteCount);
 		}
 		else if (0.7f < fAnimRatio && 1 == iStarCount) {
 			pSimba->Set_StarPosToRightHand();
@@ -1186,7 +1186,7 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	if (pSimba->IsAnimFinished())
 	{
 		if (CSimba::Simba_BiteRushStart == iState || CSimba::Simba_BiteRushStartStraight == iState)
-			pSimba->Change_State(CSimba::Simba_BiteRush, 10.f, true, false);
+			pSimba->Change_State(CSimba::Simba_BiteRush, 50.f, true, false);
 		else if (CSimba::Simba_BiteRushEnd == iState)
 			//pSimba->Change_State(CSimba::Simba_BiteRushStart, 50.f, false, false); // µð¹ö±ë¿ë
 			pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 50.f, false, false);
