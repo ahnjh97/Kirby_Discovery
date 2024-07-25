@@ -1,0 +1,600 @@
+<Root>
+    <Version>240628</Version>
+    <ModelName>BladeKnight
+        <Animation>Attack</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="Attack" StartFrame="9" EndFrame="11"/>
+        <Data1 EventName="Effect" StartFrame="9" EndFrame="10"/>
+        <Animation>TornadoAttackCharge</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>TornadoAttack</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>4</Count>
+        <Data0 EventName="Attack" StartFrame="1" EndFrame="2"/>
+        <Data1 EventName="Attack" StartFrame="12" EndFrame="12"/>
+        <Data2 EventName="Attack" StartFrame="27" EndFrame="27"/>
+        <Data3 EventName="Effect" StartFrame="1" EndFrame="2"/>
+        <Animation>ThrustWait</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>ThrustLoop</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>DoubleAttack</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>4</Count>
+        <Data0 EventName="Attack" StartFrame="3" EndFrame="4"/>
+        <Data1 EventName="Attack" StartFrame="23" EndFrame="24"/>
+        <Data2 EventName="Effect" StartFrame="2" EndFrame="3"/>
+        <Data3 EventName="Effect2" StartFrame="22" EndFrame="24"/>
+        <Animation>TornadoAttackCharge2</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>TornadoAttackChargeMax</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>AttackStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Damage</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+    </ModelName>
+    <ModelName>Awoofy
+        <Animation>Run</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="Bboong" StartFrame="2" EndFrame="3"/>
+        <Data1 EventName="PlaySound" StartFrame="19" EndFrame="40"/>
+    </ModelName>
+    <ModelName>FinalBoss
+        <Animation>RayArrowReadyAir</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>BigSwingLeftEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>SwingFinishLeft</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="Attack" StartFrame="31" EndFrame="33"/>
+        <Data1 EventName="Sound" StartFrame="20" EndFrame="22"/>
+        <Animation>SwingRightStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>SwingLeft</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="Attack" StartFrame="8" EndFrame="9"/>
+        <Data1 EventName="Sound" StartFrame="6" EndFrame="7"/>
+        <Animation>RayArrowStartAir</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Sound" StartFrame="1" EndFrame="2"/>
+        <Animation>RayArrowStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Sound" StartFrame="1" EndFrame="2"/>
+        <Animation>SwingFinishLeftEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>SwingRight</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="Attack" StartFrame="8" EndFrame="9"/>
+        <Data1 EventName="Sound" StartFrame="6" EndFrame="7"/>
+        <Animation>BigSwingLeft</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>BigSwingFinishLeftEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>BigSwingRightEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>SwingRightEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>DimensionSpikeReady</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>DimensionSpikeStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>DimensionSpike</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Sound" StartFrame="13" EndFrame="15"/>
+        <Animation>DimensionSpike</Animation>
+        <AnimSpeed>20</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Sound" StartFrame="12" EndFrame="13"/>
+    </ModelName>
+    <ModelName>KirbySwordDefault
+        <Animation>SwordDive</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
+        <Animation>DecisiveSlash</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+        <Animation>GigantSpinSlash</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>3</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+        <Data1 EventName="ApplyDamage" StartFrame="17" EndFrame="18"/>
+        <Data2 EventName="ApplyDamage" StartFrame="33" EndFrame="34"/>
+        <Animation>MultiswordAttack</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+        <Animation>SuperSpinSlashLoop</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+        <Animation>SideSlash</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+        <Animation>SuperSpinSlashEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
+        <Animation>SpinSlash</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+        <Animation>SwordSpin</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="4" EndFrame="5"/>
+        <Animation>UpwardSlash</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
+        <Animation>GuardMask</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Run</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Guard</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Shuffle</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>ShuffleFront</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>SpinSlashEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
+    </ModelName>
+    <ModelName>KirbyDefault
+        <Animation>DoorOpenBackWalk</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>VacuumWalk</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>AirThrowStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>AbilityDump</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>RunStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>BackJump</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>AirBall</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>StuffedRun</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>AirBullet</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>AirThrow</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>ArenaDeath</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>ArenaDeathWait</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Walk</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>EatWalk</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>SleepWalk</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>StuffedWalk</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>InhaleWalk</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>StuffedWaterUnder</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>SuperInhaleWalk</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Run</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="Sound_WalkBasic" StartFrame="13" EndFrame="14"/>
+        <Data1 EventName="Sound_WalkBasic" StartFrame="33" EndFrame="34"/>
+    </ModelName>
+    <ModelName>DeeDeeDee
+        <Animation>HammerAttackHit</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="HammerAttackHit" StartFrame="11" EndFrame="12"/>
+        <Animation>HammerSideAttack</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="HammerSideAttack" StartFrame="6" EndFrame="7"/>
+        <Animation>SlidingEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>HammerJumpRise</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>HammerFall</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>HammerAttackMiss</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Jump</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Jump" StartFrame="27" EndFrame="27"/>
+        <Animation>Landing</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Run</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Sliding</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>6</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
+        <Data1 EventName="ApplyDamage" StartFrame="19" EndFrame="20"/>
+        <Data2 EventName="ApplyDamage" StartFrame="40" EndFrame="41"/>
+        <Data3 EventName="ApplyDamage" StartFrame="60" EndFrame="61"/>
+        <Data4 EventName="ApplyDamage" StartFrame="80" EndFrame="81"/>
+        <Data5 EventName="Sliding" StartFrame="1" EndFrame="2"/>
+        <Animation>JumpStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>ShoutStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Shout" StartFrame="48" EndFrame="50"/>
+        <Animation>Command</Animation>
+        <AnimSpeed>20</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Encount" StartFrame="26" EndFrame="27"/>
+        <Animation>HammerAttackSwim</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>HammerAttack</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>HammerAttackCharge</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Shout</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>ShoutEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>HammerJumpAttack</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>JumpEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="JumpEnd" StartFrame="17" EndFrame="17"/>
+        <Data1 EventName="JumpEnd2" StartFrame="19" EndFrame="19"/>
+    </ModelName>
+    <ModelName>KirbyHammerDefault
+        <Animation>WheelHammer</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="6" EndFrame="7"/>
+        <Animation>HammerAttackFinalRock</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>HammerAttackHitToy</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
+        <Animation>HammerAttackHit</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>HammerAttackFinalToy</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="30" EndFrame="32"/>
+        <Animation>OnigorosiHammerFirst</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="10" EndFrame="11"/>
+        <Animation>OnigorosiHammerEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="27" EndFrame="28"/>
+    </ModelName>
+    <ModelName>KirbyCrashDefault
+        <Animation>Attack</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>3</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="0" EndFrame="1"/>
+        <Data1 EventName="ApplyDamage1" StartFrame="11" EndFrame="12"/>
+        <Data2 EventName="ApplyDamage2" StartFrame="26" EndFrame="27"/>
+        <Animation>AttackStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>BigAttacklFire</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>5</Count>
+        <Data0 EventName="ApplyDamage" StartFrame="6" EndFrame="7"/>
+        <Data1 EventName="ApplyDamage1" StartFrame="21" EndFrame="23"/>
+        <Data2 EventName="ApplyDamage2" StartFrame="36" EndFrame="37"/>
+        <Data3 EventName="ApplyDamage3" StartFrame="49" EndFrame="51"/>
+        <Data4 EventName="ApplyDamage4" StartFrame="61" EndFrame="62"/>
+    </ModelName>
+    <ModelName>Simba
+        <Animation>DimensionClawStartContinue</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>AttackJump</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="AttackJump" StartFrame="1" EndFrame="18"/>
+        <Animation>Jump</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="SimbaJump" StartFrame="1" EndFrame="2"/>
+        <Animation>BiteRushJumpR</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="BiteRushJumpR" StartFrame="1" EndFrame="2"/>
+        <Animation>Roar2</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Roar" StartFrame="148" EndFrame="150"/>
+        <Animation>Jump</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="SimbaJump" StartFrame="1" EndFrame="2"/>
+        <Animation>DimensionClawStartContinue</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>AttackJump</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="AttackJump" StartFrame="1" EndFrame="18"/>
+        <Animation>AttackJumpStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="AttackJumpStart" StartFrame="1" EndFrame="12"/>
+        <Animation>JumpStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>FinalCrusher</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="FinalCrusherCharge" StartFrame="1" EndFrame="2"/>
+        <Data1 EventName="FinalCrusher" StartFrame="11" EndFrame="15"/>
+        <Animation>AttackJumpPre</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="AttackJumpPre" StartFrame="27" EndFrame="36"/>
+        <Animation>FinalCrusherStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="FinalCrusherStart" StartFrame="38" EndFrame="75"/>
+        <Animation>DoubleClawDash</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="DoubleClawDash" StartFrame="1" EndFrame="2"/>
+        <Animation>FinalCrusherStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="FinalCrusherStart" StartFrame="38" EndFrame="75"/>
+        <Animation>DemoDeadCut2</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="DemoDead" StartFrame="148" EndFrame="162"/>
+        <Animation>AttackJumpHit</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="AttackJumpHit" StartFrame="8" EndFrame="11"/>
+        <Animation>DemoDeadCut2</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="DemoDead" StartFrame="148" EndFrame="162"/>
+        <Animation>FinalCrusherStartContinue</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Landing</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="SimbaLand" StartFrame="1" EndFrame="2"/>
+        <Animation>AttackJumpWait</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>BiteRushLandingL</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="BiteRushLandingL" StartFrame="7" EndFrame="9"/>
+        <Animation>AttackJumpEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>DimensionClawStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="DimensionClawStart" StartFrame="1" EndFrame="70"/>
+        <Animation>DoubleClaw</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="DoubleClaw" StartFrame="13" EndFrame="22"/>
+        <Animation>DoubleClawChargeStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="DoubleClawCharge" StartFrame="44" EndFrame="49"/>
+        <Animation>BiteRushJumpStartL</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="BiteRushJumpStartL" StartFrame="1" EndFrame="3"/>
+        <Animation>BiteRushJumpStartR</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="BiteRushJumpStartR" StartFrame="1" EndFrame="3"/>
+        <Animation>BiteRushJumpL</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="BiteRushJumpL" StartFrame="1" EndFrame="3"/>
+        <Animation>BiteRushFallL</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>BiteRushLandingR</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="BiteRushLandingR" StartFrame="7" EndFrame="9"/>
+        <Animation>DimensionClaw</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>DimensionClawContinue</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>BiteRush</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="BiteRush0" StartFrame="13" EndFrame="14"/>
+        <Data1 EventName="BiteRush1" StartFrame="38" EndFrame="41"/>
+        <Animation>BiteRushStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="BiteRushStart" StartFrame="1" EndFrame="22"/>
+        <Animation>DimensionLaser</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="DimensionLaser" StartFrame="19" EndFrame="34"/>
+        <Animation>DemoDeadCut1</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+    </ModelName>
+    <ModelName>Bomber
+        <Animation>Walk</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="Sound_Chop" StartFrame="10" EndFrame="12"/>
+        <Data1 EventName="Sound_Chop" StartFrame="24" EndFrame="25"/>
+        <Animation>Find</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>FindWait</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+    </ModelName>
+    <ModelName>FinaleBoss
+        <Animation>Cut20</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Finale" StartFrame="1" EndFrame="22"/>
+        <Animation>Cut8</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut5</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="ThrowDebris" StartFrame="58" EndFrame="64"/>
+        <Data1 EventName="ThrowDebris" StartFrame="107" EndFrame="113"/>
+        <Animation>Cut18</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut5</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="ThrowDebris" StartFrame="58" EndFrame="64"/>
+        <Data1 EventName="ThrowDebris" StartFrame="107" EndFrame="113"/>
+        <Animation>Cut10</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="QTE2" StartFrame="0" EndFrame="4"/>
+        <Animation>Cut7</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut9</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut6</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut21</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut22</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut2</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut12</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut19</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut17</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut13</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut10</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="QTE2" StartFrame="1" EndFrame="5"/>
+        <Animation>Cut4</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut11</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut7</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut9</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut8</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut6</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>Cut3</Animation>
+        <AnimSpeed>30</AnimSpeed>
+        <Count>0</Count>
+    </ModelName>
+</Root>
