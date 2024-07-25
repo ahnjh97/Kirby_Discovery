@@ -66,7 +66,7 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 	CHECK_FAILED(hr);
 
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_TOWN);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_DDD);
 	m_pGameInstance->Set_ObjectBlack(1.f);
 
 
