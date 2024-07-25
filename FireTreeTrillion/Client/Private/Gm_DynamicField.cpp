@@ -74,6 +74,7 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 		|| TEXT("Gimmick_PkFunHouseDarkness05") == wstrModelTag)
 	{
 		m_eDFieldType = DFMOVE_UP;
+		m_eDFMoveState = DFIELD_WAIT;
 		m_eGimmickType = GIMMICK_SPONCE;
 		m_vInitPos = GET_POS;
 	}
@@ -338,6 +339,7 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 {
 	_float3 vCurPos = { 0.f, 0.f, 0.f };
 	_float fMaxPosX = { 0.f };
+	_float fOffsetPosY = { 0.f };
 
 	_float fMoveSpeed = { 0.f };
 	DFMOVEUP_TYPE eDFMoveUPType = { DFMOVEUP_END };
@@ -349,7 +351,14 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 		{
 			switch (m_eDFMoveState)
 			{
+			case DFIELD_WAIT:
+				m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+				m_eDFMoveState = DFIELD_MOVE;
+				break;
+
 			case DFIELD_MOVE:
+				m_pGameInstance->PlayMySound(L"DynamicField_Move.wav", CHANNEL_GIMMICK_SUB, 0.5f); //1회만 재생
+
 				eDFMoveUPType = (DFMOVEUP_TYPE)m_iGimmickIndex;
 				switch (eDFMoveUPType)
 				{
@@ -368,36 +377,42 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 
 				m_pTransformCom->Go_Up(_fTimeDelta * fMoveSpeed);
 				MoveItems(_float3(0, 1, 0), _fTimeDelta * fMoveSpeed);
+				fOffsetPosY = m_vInitPos.y + 20.f;
+				if (fOffsetPosY <= vCurPos.y) //36.963 > 56.963
+				{
+					vCurPos.y = fOffsetPosY;
+					m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+					m_pGameInstance->PlayMySound(L"DynamicField_Quake.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+
+					m_fStartQuake += _fTimeDelta;
+
+					if (m_fStartQuake < 0.5f)
+						m_eDFMoveState = DFIELD_QUAKE;
+
+					else
+						m_eDFMoveState = DFIELD_WAIT;
+				}
+				else
+					m_eDFMoveState = DFIELD_MOVE;
 				break;
 
 			case DFIELD_QUAKE:
 				m_fStartQuake += _fTimeDelta;
 
-				if (m_fStartQuake < 0.5f)
+				if (m_fStartQuake < 0.25f)
 					Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
 
 				else
 				{
 					m_fStartQuake = 0.f;
+					m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+					m_pGameInstance->PlayMySound(L"DynamicField_Idle.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+					m_eDFMoveState = DFIELD_IDLE; //리턴 상태 이후 지진을 체크
+
 					return OBJ_NOEVENT;
 				}
 				break;
 			}
-
-			_float fOffsetPosY = m_vInitPos.y + 20.f;
-			if (fOffsetPosY <= vCurPos.y) //36.963 > 56.963
-			{
-				vCurPos.y = fOffsetPosY;
-				m_fStartQuake += _fTimeDelta;
-
-				if (m_fStartQuake < 0.5f)
-					m_eDFMoveState = DFIELD_QUAKE;
-
-				else
-					m_eDFMoveState = DFIELD_WAIT;
-			}
-			else
-				m_eDFMoveState = DFIELD_MOVE;
 		}
 		break;
 
@@ -413,6 +428,8 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				break;
 
 			case DFIELD_MOVE:
+				m_pGameInstance->PlayMySound(L"DynamicField_Move.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+
 				if (DFMOVE_RIGHT == m_eDFieldType)
 				{
 					m_pTransformCom->Go_Right(_fTimeDelta * 0.4f);
@@ -422,6 +439,9 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 					if (vCurPos.x >= fMaxPosX)
 					{
 						vCurPos.x = fMaxPosX;
+						m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+						m_pGameInstance->PlayMySound(L"DynamicField_Quake.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+
 						m_eDFMoveState = DFIELD_QUAKE;
 					}
 				}
@@ -434,15 +454,19 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 					if (vCurPos.x <= fMaxPosX)
 					{
 						vCurPos.x = fMaxPosX;
+						m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+						m_pGameInstance->PlayMySound(L"DynamicField_Quake.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+
 						m_eDFMoveState = DFIELD_QUAKE;
 					}
 				}
 				break;
 
 			case DFIELD_QUAKE:
+
 				m_fStartQuake += _fTimeDelta;
 
-				if (m_fStartQuake < 0.5f)
+				if (m_fStartQuake < 0.25f)
 					Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
 
 				else
@@ -463,6 +487,7 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			case DFIELD_RETURN:
 				if (m_bReturnMove)
 				{
+
 					if (DFMOVE_RIGHT == m_eDFieldType)
 					{
 						m_pTransformCom->Go_Left(_fTimeDelta * 1.5f); //2.25 > 2.0 > 1.5
@@ -474,7 +499,10 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 							m_eDFMoveState = DFIELD_QUAKE;
 							m_eDFMovePreState = DFIELD_RETURN;
 						}
-					} 
+						fMaxPosX = m_vInitPos.x + 6.f;
+						if (vCurPos.x >= fMaxPosX)
+							m_pGameInstance->PlaySound_Free(L"DynamicField_Idle.wav", 0.5f);
+					}
 					else if (DFMOVE_LEFT == m_eDFieldType)
 					{
 						m_pTransformCom->Go_Right(_fTimeDelta * 2.f);
@@ -486,6 +514,9 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 							m_eDFMoveState = DFIELD_QUAKE;
 							m_eDFMovePreState = DFIELD_RETURN;
 						}
+						fMaxPosX = m_vInitPos.x - 6.f;
+						if (vCurPos.x <= fMaxPosX)
+							m_pGameInstance->PlaySound_Free(L"DynamicField_Idle.wav", 0.5f);
 					}
 				}
 				break;
@@ -509,14 +540,17 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			switch (m_eDFMoveState)
 			{
 			case DFIELD_MOVE: //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
-				m_pTransformCom->Go_Backward(_fTimeDelta * 0.75f); //2.0 > 1.5
-				MoveItems(_float3(0, 0, -1), _fTimeDelta * 0.75f);
+				//07.25) 0.75 좀더 빠른게 자연스러워서 수치 값 재조정
+				m_pGameInstance->PlayMySound(L"DynamicField_Move.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+
+				m_pTransformCom->Go_Backward(_fTimeDelta * 1.5f); //2.0 > 1.5 > 
+				MoveItems(_float3(0, 0, -1), _fTimeDelta * 1.5f);
 				break;
 
 			case DFIELD_QUAKE:
 				m_fStartQuake += _fTimeDelta;
 
-				if (m_fStartQuake < 0.5f)
+				if (m_fStartQuake < 0.25f)
 					Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
 
 				else
@@ -538,27 +572,53 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			switch (m_eDFMoveState)
 			{
 			case DFIELD_MOVE:
+
 				if (m_vInitPos.z <= vCurPos.z)
 				{
 					vCurPos.z = m_vInitPos.z;
 					m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vInitPos);
+
+					m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+					m_pGameInstance->PlayMySound(L"DynamicField_Quake.wav", CHANNEL_GIMMICK_SUB, 0.5f);
 				}
-				else {
+				else 
+				{
 					m_pTransformCom->Go_Straight(_fTimeDelta * 0.2f);
 					MoveItems(_float3(0, 0, 1), _fTimeDelta * 0.2f);
+
+					m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+					m_pGameInstance->PlayMySound(L"DynamicField_Move.wav", CHANNEL_GIMMICK_SUB, 0.5f);
 				}
 					
 				break;
 			}
 
-			if (m_vInitPos.z <= vCurPos.z)
-				m_eDFMoveState = DFIELD_QUAKE;
+			//if (m_vInitPos.z <= vCurPos.z)
+			//	m_eDFMoveState = DFIELD_QUAKE;
 
-			else
+			//else
 				m_eDFMoveState = DFIELD_MOVE;
 		}
 		if (CGm_ParkSolarPanelCharge::STATE_OFFWAITSTART == m_eSPChargeState) //충전 해제
 		{
+			if (DFIELD_MOVE == m_eDFMoveState)
+			{
+				m_fStartQuake += _fTimeDelta;
+
+				if (m_fStartQuake < 0.25f)
+					Apply_Quake(_fTimeDelta, 0.25f, 0.2f);
+
+				else
+				{
+					m_fStartQuake = 0.f;
+					m_pGameInstance->PlayMySound(L"DynamicField_Idle.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+					return OBJ_NOEVENT;
+				}
+
+
+			}
+
+			/*
 			switch (m_eDFMoveState)
 			{
 			case DFIELD_QUAKE:
@@ -568,10 +628,12 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				else
 				{
 					m_fStartQuake = 0.f;
+					m_pGameInstance->PlayMySound(L"DynamicField_Idle.wav", CHANNEL_GIMMICK_SUB, 0.5f);
 					return OBJ_NOEVENT;
 				}
 				break;
 			}
+			*/
 		}
 		break;
 	}

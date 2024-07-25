@@ -1584,6 +1584,8 @@ void CCollisionCenter::Hitbox_Collision()
 			// 오브젝트
 			CPhysXObject* pObject = static_cast<CPhysXObject*>(Src);
 			pObject->Collision(CONTENT_ATTACKBULLET, pDst);
+			GAMEINSTANCE PlaySound_Free(L"KirbyBomb_Bomb.wav", 0.5f);
+
 			Dst->Set_Dead();
 		});
 
@@ -1694,6 +1696,7 @@ void CCollisionCenter::Hitbox_Collision()
 			DstHit->Set_Alive(false);
 			SrcHit->Set_Alive(false);
 			pthis->Camera_Shaking(1.2f);
+			GAMEINSTANCE PlaySound_Free(L"KirbyBomb_Bomb.wav", 0.5f);
 			Dst->Set_Dead();
 		});
 

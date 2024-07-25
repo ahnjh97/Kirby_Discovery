@@ -595,11 +595,8 @@ void CKirbyCar_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 			FXDesc.vInitPos = { 0.f, 0.f, 0.f };
 			FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 			pKirby->Add_Effect("YW Deform Effect2", FXDesc, false);
-<<<<<<< Updated upstream
-=======
 			m_pGameInstance->PlaySound_Free(L"Kirby_DeformEvent.wav", 0.5f);
 			m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyCar_Idle.wav", 0.3f);
->>>>>>> Stashed changes
 			return;
 		}
 	}

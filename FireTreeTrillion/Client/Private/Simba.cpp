@@ -869,12 +869,12 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 			ParticleDesc.vInitPos = static_cast<_float3>(vCollidingPointA);
 			ParticleDesc.vInitPos.y = 2.3f;
 
-			Add_Effect("HS_perfect laser collide particle", ParticleDesc);
+			Add_Effect("HS_lion laser collide particle B", ParticleDesc);
 
 			ParticleDesc.vInitPos = static_cast<_float3>(vCollidingPointB);
 			ParticleDesc.vInitPos.y = 2.3f;
 
-			Add_Effect("HS_perfect laser collide particle", ParticleDesc);
+			Add_Effect("HS_lion laser collide particle B", ParticleDesc);
 		}
 		//한 부분에서 출력
 		else
@@ -893,7 +893,7 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 			ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
 			ParticleDesc.vInitPos.y = 2.3f;
 
-			Add_Effect("HS_perfect laser collide particle", ParticleDesc);
+			Add_Effect("HS_lion laser collide particle B", ParticleDesc);
 		}
 	}
 
@@ -1669,10 +1669,28 @@ void CSimba::WalkSmoke() // 걸을때 발 땅에 닿을때 나오는 회색방구
 
 void CSimba::RoarElecParts() // 아직 호출안됨 // 아마 한번 호출 된 이후 전기 계속 생성해야할듯
 {
+	static _bool bInitialElec{ false };
+
 	CEffect::FX_DESC FXDesc{};
 
 	_float3 vMyPos = GET_POS;
 	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
+
+	if (bInitialElec == false)
+	{
+		bInitialElec = true;
+		for (_int i = 0; i < 10; ++i)
+		{
+			FXDesc.vInitPos.x = CUtils::Make_RandomFloat(-3.f, 3.f);
+			FXDesc.vInitPos.y = CUtils::Make_RandomFloat(3.f, 9.f);
+			FXDesc.vInitPos.z = CUtils::Make_RandomFloat(-3.f, 3.f);
+
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Make_Random_Vector(1.f));
+			FXDesc.vInitScale = { 2.f, 2.f, 2.f };
+			FXDesc.fStartDelay = CUtils::Make_RandomFloat(0.f, 2.f);
+			Add_Effect("HS_lion 2phase aura A", FXDesc);
+		}
+	}
 
 	//FXDesc.vInitPos = vMyPos;
 	FXDesc.vInitPos.x = CUtils::Make_RandomFloat(-3.f, 3.f);

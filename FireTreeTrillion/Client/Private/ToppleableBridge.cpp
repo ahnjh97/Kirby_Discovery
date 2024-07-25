@@ -29,7 +29,10 @@ void CToppleableBridge::OnCollision()
 	pAnimBridge->OnCollision();
 
 	if (TEXT("BoardC") == m_wstrModelName)
+	{
 		CEventCenter::Get_Instance()->Notify(KEVENT_BREAK_RACINGMAP, this);
+		m_bSoundSignal = true;
+	}
 
 	return;
 }
@@ -109,6 +112,9 @@ _int CToppleableBridge::Tick(_float fTimeDelta)
 		if (m_fHitTime > 0.f && m_fHitTime < 0.75f)
 			m_pTransformCom->Turn(m_pTransformCom->Get_State_Vector(CTransform::STATE_RIGHT), m_pGameInstance->Get_SecondTimer());
 	}
+
+	if(m_bSoundSignal)
+		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM_STREAMING, 0.0f, fTimeDelta * 0.5f);
 
 	return OBJ_NOEVENT;
 }
