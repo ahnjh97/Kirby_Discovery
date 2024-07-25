@@ -159,6 +159,7 @@ private:
 	_float	m_fTimeDelta = { 0.f };
 	_float	m_fSpeed = { 0.f };
 	_bool	m_bChain = { false };
+	_bool	m_bSound = { false };
 
 public:
 	static	CFinalBoss_Slash_State* Create();
