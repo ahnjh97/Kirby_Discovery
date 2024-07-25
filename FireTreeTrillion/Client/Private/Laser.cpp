@@ -102,25 +102,25 @@ _int CLaser::Tick(_float fTimeDelta)
 			_float3 vCollidingPoint =
 				CUtils::Compute_CollidingPoint(GET_POS, (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK), { 0.f, 0.f, 0.f }, { 21.f, 1.f, 21.f });
 
-		if (!ISDEFAULTFLOAT3(vCollidingPoint))
-		{
-			if (m_pModelCom->Get_CurAnimIndex() != 0)
+			if (!ISDEFAULTFLOAT3(vCollidingPoint))
 			{
-				//레이저와의 충돌 자국
-				CEffect::FX_DESC FXDesc{};
-				FXDesc.vInitPos = vCollidingPoint;
-				FXDesc.vInitPos.y = 0.5f;
-				FXDesc.vInitScale = { 3.f, 3.f, 3.f };
-				Add_Effect("HS_FB laser decal", FXDesc, false);
+				if (m_pModelCom->Get_CurAnimIndex() != 0)
+				{
+					//레이저와의 충돌 자국
+					CEffect::FX_DESC FXDesc{};
+					FXDesc.vInitPos = vCollidingPoint;
+					FXDesc.vInitPos.y = 0.5f;
+					FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+					Add_Effect("HS_FB laser decal", FXDesc, false);
 
-				//충돌 시 튀는 파티클
-				CParticle::PARTICLE_DESC ParticleDesc{};
-				ParticleDesc.vInitPos = vCollidingPoint;
-				FXDesc.vInitPos.y = 0.5f;
-				ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
-				Add_Effect("HS_FB laser collider particle B", ParticleDesc);
+					//충돌 시 튀는 파티클
+					CParticle::PARTICLE_DESC ParticleDesc{};
+					ParticleDesc.vInitPos = vCollidingPoint;
+					FXDesc.vInitPos.y = 0.5f;
+					ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+					Add_Effect("HS_FB laser collider particle B", ParticleDesc);
+				}
 			}
-
 		}
 	}
 
