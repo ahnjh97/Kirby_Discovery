@@ -226,6 +226,9 @@ void CDeeDeeDeeHammer::Ready_FadeOut()
 	{
 #pragma region 카메라 컷신 조정
 
+		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, VOLUME_BGM, 0.03f);
+		m_pGameInstance->StopSound(CHANNEL_BGM);
+
 		//효선아 여기야 와들디 세팅
 		if (m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_BattleDee")) == nullptr)
 			return;
