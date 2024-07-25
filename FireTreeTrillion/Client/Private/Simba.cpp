@@ -198,6 +198,9 @@ HRESULT CSimba::Initialize(void* pArg)
 	}
 #pragma endregion
 
+	tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(2);
+	m_pGameInstance->Add_Clone(LEVEL_SIMBA, TEXT("Layer_TestRock"), TEXT("Prototype_GameObject_SimbaRock"), &tDesc);
+
 	return S_OK;
 }
 
@@ -885,18 +888,25 @@ void CSimba::SetUpDimensionClawWorldMatrix()
 	if (nullptr == m_pDimensionClawActor)
 		return;
 
-	_float4 vPos = (m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone) + m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone)) * 0.5f;
-	if (true == m_bDimensionClawUpAttack)
-		vPos.y = 6.5f;
-	else
-		vPos.y = 0.8f;
+	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	_float4 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	vPos += vLook * 6.f;
+
 	_float4x4 matWorld = m_pTransformCom->Get_WorldMatrix();
+	if (true == m_bDimensionClawUpAttack)
+		vPos.y = 6.8f;
+	else
+		vPos.y = -0.2f;
+
 	memcpy(&matWorld.m[3], &vPos, sizeof(_float4));
+
+	m_pDimensionClawActor->setKinematicTarget(CUtils::ToPxTransform(matWorld));
 
 	//이펙트
 	DimensionClaw();
 
-	m_pDimensionClawActor->setKinematicTarget(CUtils::ToPxTransform(matWorld));
+	m_fClawMoveTime = 0.f;
+	m_vClawVelocity = vLook * 13.f;
 }
 
 void CSimba::MoveDimensionClaw(_float fTimeDelta)
@@ -912,7 +922,10 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 	memcpy(&vPos, &(matWorld.m[3]), sizeof(_float4));
 	vLook.Normalize();
 
-	vPos += vLook * 26.f * fTimeDelta;
+	_float4 vAccel = vLook * 47.f;
+	m_vClawVelocity += vAccel * fTimeDelta;
+
+	vPos += m_vClawVelocity * fTimeDelta + 0.5f * vAccel * fTimeDelta * fTimeDelta; // 가속도운동
 
 	memcpy(&(matWorld.m[3]), &vPos, sizeof(_float4));
 
@@ -920,7 +933,10 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 
 	//이펙트 다는 매트릭스 동기화
 	m_DimensionClawMat = matWorld;
-
+	
+	CGameObject* pRock = m_pGameInstance->Get_GameObject(LEVEL_SIMBA, TEXT("Layer_TestRock"));
+	if (nullptr != pRock)
+		dynamic_cast<CSimbaRock*>(pRock)->TestRock(vPos);
 
 	//공격 밑 데칼 이펙트 출력
 	_float3 vClawMatPoint = m_DimensionClawMat.Translation();
@@ -972,7 +988,7 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 			CEffect::FX_DESC FXDesc{};
 			FXDesc.vInitPos = static_cast<_float3>(vClawMatPoint);
 			FXDesc.vInitScale = { 4.f, 4.f, 4.f };
-			FXDesc.vInitPos.y = 2.3f;
+			FXDesc.vInitPos.y = 2.3f;	
 			Add_Effect("HS_lion cross decal", FXDesc);
 
 
@@ -1676,15 +1692,16 @@ void CSimba::DimensionClaw()
 	Delete_Effect("HS_lion L cross");
 	Delete_Effect("HS_lion R cross");
 	//Delete_AllEffect();
-	_float3 vPos = GET_POS;
-	_float3 vScale = { 3.2f, 3.2f, 3.2f };
+	_float3 vScale = { 1.8f, 4.2f, 1.f };
 
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+	MultiFXDesc.vInitPos = _float3(2.7f, -4.3f, -7.f);
 	MultiFXDesc.pSocketMatrix = &m_DimensionClawMat;
 	MultiFXDesc.vInitScale = vScale;
 	MultiFXDesc.fStartDelay = .3f;
-
+	MultiFXDesc.vInitRot = _float3(0, 0, 8.5f);
 	Add_Effect("HS_lion L cross", MultiFXDesc, true);
+	MultiFXDesc.vInitRot = _float3(0, 0, -8.5f);
 	Add_Effect("HS_lion R cross", MultiFXDesc, true);
 }
 
@@ -2509,10 +2526,10 @@ void CSimba::CreateDimensionClawActor()
 
 	PxTransform transform(PxVec3(0, 0, 0));
 	PxRigidDynamic* pRigidDynamic = pPhysics->createRigidDynamic(transform);
-	PxBoxGeometry boxGeometry(16.f, 4.f, 1.f);
+	PxBoxGeometry boxGeometry(16.f, 1.8f, 1.f);
 
-	PxQuat rotation1(XMConvertToRadians(42), PxVec3(0, 0, 1)); // z축기준 35도 회전
-	PxQuat rotation2(-XMConvertToRadians(42), PxVec3(0, 0, 1)); // z축기준 35도 회전
+	PxQuat rotation1(XMConvertToRadians(38), PxVec3(0, 0, 1)); // z축기준 35도 회전
+	PxQuat rotation2(-XMConvertToRadians(38), PxVec3(0, 0, 1)); // z축기준 35도 회전
 	PxTransform transform1(PxVec3(0.f, 0.f, 0.f), rotation1);
 	PxTransform transform2(PxVec3(0.f, 0.f, 0.f), rotation2);
 

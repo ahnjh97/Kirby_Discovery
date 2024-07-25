@@ -275,6 +275,8 @@ private:
 	_float			m_fDeactiveTime = {};
 	
 	_uint			m_iSmokeCount = {};
+	_float			m_fClawMoveTime = {};
+	_float4			m_vClawVelocity = {};
 
 private:
 	HRESULT		Add_Components();
