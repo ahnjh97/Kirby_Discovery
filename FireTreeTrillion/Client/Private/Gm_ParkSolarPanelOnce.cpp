@@ -75,11 +75,7 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 
 	case STATE_CHARGE: //충전 중
 		if (m_bPlaySoundFX)
-		{
-			//도레미파솔 사운드 세팅필요
-			//m_pGameInstance->PlayMySound(L"SolarPanel_OnWait.wav", CHANNEL_GIMMICK, 0.5f);
-			m_bPlaySoundFX = FALSE;
-		}
+			Play_MusicScaleSound(fTimeDelta);
 
 		if (TRUE == m_pModelCom->IsFinished()) //충전 중 애님 종료 시 충전 완료 상태 변경
 		{
@@ -264,7 +260,7 @@ void CGm_ParkSolarPanelOnce::Collision(CCollisionCenter::CONTENT_TYPE eContent, 
 		&& CKirby::BODYSTATE::BODY_BULBDEFAULT == eKirbyState)
 	{
 		m_IsInteraction = TRUE;
-		m_pModelCom->Set_Animation(STATE_CHARGE, 60.f, FALSE, TRUE);
+		m_pModelCom->Set_Animation(STATE_CHARGE, 45.f, FALSE, TRUE);
 		m_eCurState = STATE_CHARGE;
 		m_bPlaySoundFX = TRUE;
 	}
@@ -289,6 +285,82 @@ void CGm_ParkSolarPanelOnce::Collision(CCollisionCenter::CONTENT_TYPE eContent, 
 
 #pragma endregion
 
+}
+
+void CGm_ParkSolarPanelOnce::Play_MusicScaleSound(_float _fTimeDelta)
+{
+	m_fMScaleTime += _fTimeDelta;
+
+	if (m_fMScaleTime > 0.0f)
+		m_eMSState = MSCALE_DO;
+
+	if (m_fMScaleTime > 0.2f)
+		m_eMSState = MSCALE_RE;
+
+	if (m_fMScaleTime > 0.4f)
+		m_eMSState = MSCALE_MI;
+
+	if (m_fMScaleTime > 0.6f)
+		m_eMSState = MSCALE_FA;
+
+	if (m_fMScaleTime > 0.8f)
+		m_eMSState = MSCALE_SOL;
+
+	if (m_fMScaleTime > 1.0f)
+		m_eMSState = MSCALE_LA;
+
+	if (m_fMScaleTime > 1.2f)
+		m_eMSState = MSCALE_SI;
+
+	if (m_fMScaleTime > 1.4f)
+		m_eMSState = MSCALE_DO2;
+
+	switch (m_eMSState)
+	{
+	case MSCALE_DO:
+		//m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+		m_pGameInstance->PlayMySound(L"SolarPanel_Do.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+		break;
+
+	case MSCALE_RE:
+		//m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+		m_pGameInstance->PlayMySound(L"SolarPanel_Re.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+		break;
+
+	case MSCALE_MI:
+		//m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+		m_pGameInstance->PlayMySound(L"SolarPanel_Mi.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+		break;
+
+	case MSCALE_FA:
+		//m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+		m_pGameInstance->PlayMySound(L"SolarPanel_Fa.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+		break;
+
+	case MSCALE_SOL:
+		//m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+		m_pGameInstance->PlayMySound(L"SolarPanel_Sol.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+		break;
+
+	case MSCALE_LA:
+		//m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+		m_pGameInstance->PlayMySound(L"SolarPanel_La.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+		break;
+
+	case MSCALE_SI:
+		//m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+		m_pGameInstance->PlayMySound(L"SolarPanel_Si.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+		break;
+
+	case MSCALE_DO2:
+		//m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+		m_pGameInstance->PlayMySound(L"SolarPanel_Do2.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+		break;
+	default:	break;
+	}
+
+	if (MSCALE_DO2 == m_eMSState)
+		m_bPlaySoundFX = FALSE;
 }
 
 HRESULT CGm_ParkSolarPanelOnce::Add_Components()
