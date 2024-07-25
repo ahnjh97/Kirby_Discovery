@@ -78,7 +78,7 @@ _int COriginCage::Tick(_float fTimeDelta)
 	if (0.97f < m_fTime && false == m_bPlaySound)
 	{
 		m_bPlaySound = true;
-		m_pGameInstance->PlaySound_Free(L"CageBreak.wav", 0.5f);
+		m_pGameInstance->PlaySound_Free(L"CageBreak.wav", 0.55f);
 	}
 
 	if (true == m_pModelCom->IsFinished() && CAGE_BREAK == m_pModelCom->Get_CurAnimIndex()) {

@@ -74,7 +74,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ�
-	m_eAbilityType = ABILITY_HAMMER;
+	m_eAbilityType = ABILITY_CRASH;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 			m_eAbilityType = ABILITY_HAMMER;
 

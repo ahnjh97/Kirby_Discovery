@@ -216,11 +216,87 @@ void CDeeDeeDee::Add_AnimEvent()
 	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
 	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
+
 	m_pModelCom->Add_Event("ApplyDamage", [this]() {
 		// 커비의 히트박스를 실시간으로 변화시킨다.
 		HitBoxChanger(m_pFSM->Get_State());
 		});
-	// 사운드 처리
+
+#pragma region DEDEDE_ENCOUNT 조우
+
+	//STATE_COMMAND :: 3
+	m_pModelCom->Add_Event("Encount", [this]() {
+		m_pGameInstance->PlaySound_Free(L"DeDeDe_Shout.wav", 0.5f);
+		});
+
+#pragma endregion
+
+#pragma region DEDEDE_SHOUT_PATTERN
+
+	//STATE_SHOUTSTART :: 52
+	m_pModelCom->Add_Event("Shout", [this]() {
+		m_pGameInstance->PlaySound_Free(L"DeDeDe_Shout.wav", 0.5f);
+		});
+
+#pragma endregion
+
+#pragma region DEDEDE_SLIDING_PATTERN
+
+	//STATE_SLIDING :: 53
+	m_pModelCom->Add_Event("Sliding", [this]() {
+		m_pGameInstance->PlaySound_Free(L"DeDeDe_Sliding.wav", 0.5f);
+		});
+
+#pragma endregion
+
+#pragma region DEDEDE_JUMPATTACK_PATTERN
+
+	//STATE_JUMP :: 45
+	m_pModelCom->Add_Event("Jump", [this]() {
+		m_pGameInstance->PlaySound_Free(L"DeDeDe_Jump_Voice.wav", 0.5f);
+		});
+
+	//STATE_JUMPEND :: 46
+	m_pModelCom->Add_Event("JumpEnd", [this]() {
+		m_pGameInstance->PlaySound_Free(L"DeDeDe_JumpEnd.wav", 0.75f);
+		});
+
+	//강화
+	m_pModelCom->Add_Event("JumpEnd2", [this]() {
+		m_pGameInstance->PlaySound_Free(L"DeDeDe_JumpEnd2.wav", 0.75f);
+		});
+
+#pragma endregion
+
+#pragma region DEDEDE_SIDEATTACK_PATTERN
+
+	//STATE_HAMMERSIDEATTACK :: 38
+	m_pModelCom->Add_Event("HammerSideAttack", [this]() {
+		m_pGameInstance->PlaySound_Free(L"DeDeDe_HammerSideAttack.wav", 0.75f);
+		});
+
+#pragma endregion
+
+#pragma region DEDEDE_HAMMERATTACK_PATTERN
+
+	//STATE_HAMMERATTACKHIT :: 28
+	m_pModelCom->Add_Event("HammerAttackHit", [this]() {
+		m_pGameInstance->PlaySound_Free(L"DeDeDe_HammerAttackHit.wav", 0.5f);
+		});
+
+#pragma endregion
+
+#pragma region DEDEDE_DEATH
+
+	//STATE_DEATH :: 6
+	//앓는 소리내고 사망하는 사운드 리소스가 없음.. 
+	m_pModelCom->Add_Event("", [this]() {
+		m_pGameInstance->PlaySound_Free(L".wav", 0.5f);
+		});
+
+#pragma endregion
+
+
 }
 
 void CDeeDeeDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)

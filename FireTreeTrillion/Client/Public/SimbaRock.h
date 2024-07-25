@@ -36,6 +36,7 @@ private:
 
 public:
 	void SetUpSimbaRock(_fvector vPos);
+	void TestRock(_fvector vPos);
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelName);

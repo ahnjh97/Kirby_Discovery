@@ -142,6 +142,23 @@ CModel* CModel::CreateModelFromMesh(_uint iMeshIndex, _float3& vOffset,
 	return pModel;
 }
 
+void CModel::SetUpSoundInfo(wstring& _wstrSound, _float fVolume)
+{
+	m_wstrSound = _wstrSound;
+	m_fVolume = fVolume;
+}
+
+void CModel::PlayModelSound()
+{
+	if (L"" == m_wstrSound)
+		return;
+
+	TCHAR* tcharBuffer = new TCHAR[50];
+	wcscpy_s(tcharBuffer, m_wstrSound.size() + 1, m_wstrSound.c_str());
+	m_pGameInstance->PlaySound_Free(tcharBuffer, m_fVolume);
+	Safe_Delete_Array(tcharBuffer);
+}
+
 HRESULT CModel::Initialize_Prototype(MODEL tModel)
 {
 	HRESULT hr = S_OK;

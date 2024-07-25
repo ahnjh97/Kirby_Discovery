@@ -185,8 +185,6 @@ static void Shout(_float fTimeDelta, CTransform* pTransformCom)
 }
 
 
-
-
 #pragma region IDLE STATE
 
 CDeeDeeDee_Idle_State::CDeeDeeDee_Idle_State()
@@ -787,16 +785,17 @@ void CDeeDeeDee_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 			Landing(fTimeDelta, pTransformCom);
 
+
 			return;
 		}
 
 	}
 	else if (pDee->Get_State() == CDeeDeeDee::STATE_LANDING)
 	{
-
 		DESC(m_isBattle) = true;
 
 		pController->FreeFall(pTransformCom, fTimeDelta, 6.0f);
+
 		if (pDee->IsAnimFinished())
 		{
 			pDee->Change_State(CDeeDeeDee::STATE_WAIT, 60.f, true, false);
@@ -974,7 +973,6 @@ void CDeeDeeDee_HammerAttack_State::OnStateUpdate(CGameObject* pGameObject, _flo
 			m_bTargetTrigger = false;
 		}
 
-
 		if (m_bTarget)
 		{
 			Make_TargetDir(DDDDesc, vPos, vKirbyPos);
@@ -1011,9 +1009,6 @@ void CDeeDeeDee_HammerAttack_State::OnStateUpdate(CGameObject* pGameObject, _flo
 	}
 	else if (pDee->Get_State() == CDeeDeeDee::STATE_HAMMERATTACKHIT)
 	{
-
-
-
 		if (pDee->IsAnimFinished())
 		{
 			pDee->Change_State(CDeeDeeDee::STATE_WAIT, 60.f, false, true);
@@ -1067,7 +1062,6 @@ void CDeeDeeDee_Death_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 
 	if (pDee->Get_State() == CDeeDeeDee::STATE_DEATH)
 	{
-
 
 		if (pDee->IsAnimFinished())
 		{

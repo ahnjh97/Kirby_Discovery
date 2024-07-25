@@ -1740,7 +1740,16 @@ void CFinalBoss_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		switch (pFinalBoss->Get_State())
 		{
 		case CFinalBoss::FINALBOSS_JUMPREADY:
+		{
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPSTART, 50.f, false, true);
+
+			CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+			MultiFXDesc.vInitPos = static_cast<_float3> (pTransformCom->Get_State(CTransform::STATE_POSITION));
+			MultiFXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f),0.f };
+			MultiFXDesc.vInitScale = { 2.f, 2.f, 2.f };
+			MultiFXDesc.fStartDelay = .5f;
+			pFinalBoss->Add_Effect("HS_FB fly smoke", MultiFXDesc);
+		}
 			break;
 		case CFinalBoss::FINALBOSS_JUMPSTART:
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPEND, 50.f, false, true);
