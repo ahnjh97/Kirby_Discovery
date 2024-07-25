@@ -773,7 +773,7 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 		if (true == m_bDimensionClawUpAttack)
 		{
 			if (0 == m_iStarCount) {
-				AbilityItemDesc.vPosition = vPos + vFloatLook * 8.f + vFloatRight * 8.f;
+				AbilityItemDesc.vPosition = vPos + vFloatLook * 8.f + vFloatRight * 5.7f;
 				AbilityItemDesc.vPosition.y = fY;
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 				CHECK_FAILED(hr);
@@ -782,14 +782,14 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 					AbilityItemDesc.fRotateDir = 1.f;
 				else
 					AbilityItemDesc.fRotateDir = -1.f;
-				AbilityItemDesc.vPosition = vPos + vFloatLook * 8.f - vFloatRight * 8.f;
+				AbilityItemDesc.vPosition = vPos + vFloatLook * 8.f - vFloatRight * 5.7f;
 				AbilityItemDesc.vPosition.y = fY;
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 				CHECK_FAILED(hr);
 			}
 
 			else if (1 == m_iStarCount) {
-				AbilityItemDesc.vPosition = vPos + vFloatLook * 18.f + vFloatRight * 8.f;
+				AbilityItemDesc.vPosition = vPos + vFloatLook * 18.f + vFloatRight * 5.7f;
 				AbilityItemDesc.vPosition.y = fY;
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 				CHECK_FAILED(hr);
@@ -798,7 +798,7 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 					AbilityItemDesc.fRotateDir = 1.f;
 				else
 					AbilityItemDesc.fRotateDir = -1.f;
-				AbilityItemDesc.vPosition = vPos + vFloatLook * 18.f - vFloatRight * 8.f;
+				AbilityItemDesc.vPosition = vPos + vFloatLook * 18.f - vFloatRight * 5.7f;
 				AbilityItemDesc.vPosition.y = fY;
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 				CHECK_FAILED(hr);
