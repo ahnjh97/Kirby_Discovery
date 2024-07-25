@@ -244,15 +244,13 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 		//툴에서는 다시 시작하기
 		if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
 		{
-			m_fDuration.first = 0.f;
-			m_pVIBufferCom->Revive();
+			Reset_Duration();
 		}
 		////재생 시간 99라면 다시 시작하기
-		//else if (m_fDuration.second == FX_MAXDURATION)
-		//{
-		//	m_fDuration.first = 0.f;
-		//	m_pVIBufferCom->Revive();
-		//}
+		else if (m_fDuration.second == FX_MAXDURATION)
+		{
+			Reset_Duration();
+		}
 		else
 		{
 			//단일 생성이면 바로 삭제, 멀티 이펙트중 하나라면 done 처리

@@ -118,7 +118,7 @@ _int CLaser::Tick(_float fTimeDelta)
 					ParticleDesc.vInitPos = vCollidingPoint;
 					FXDesc.vInitPos.y = 0.5f;
 					ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
-					Add_Effect("HS_FB laser collider particle B", ParticleDesc);
+					Add_Effect("HS_FB laser collide particle B", ParticleDesc);
 				}
 			}
 		}

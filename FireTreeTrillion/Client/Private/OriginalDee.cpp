@@ -731,6 +731,16 @@ HRESULT COriginalDee::Add_PartObjects(DEE_CHARACTER eCharacter)
 		m_PartObjects.emplace(TEXT("Part_InstrumentL"), pPartObj);
 
 	}
+	else if (eCharacter == DEECHARACTER_DDAGGARI)
+	{
+		PartDesc.wstrModelName = TEXT("DeePart_Plate");
+
+		pPartObj = static_cast<CPartObject*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_DeePart"), &PartDesc));
+		if (nullptr == pPartObj)
+			return E_FAIL;
+
+		m_PartObjects.emplace(TEXT("Part_Plate"), pPartObj);
+	}
 	else
 	{
 		PartDesc.wstrModelName = TEXT("DeePart_WateringCan");
@@ -854,6 +864,9 @@ void COriginalDee::Make_InitialState(DEE_CHARACTER eCharacter)
 		eAnim = DEEANIM_ANGER;
 		break;
 	case DEECHARACTER_SLEEPY:
+		eAnim = DEEANIM_SITSLEEP;
+		break;
+	case DEECHARACTER_DDAGGARI:
 		eAnim = DEEANIM_SITSLEEP;
 		break;
 	default:
