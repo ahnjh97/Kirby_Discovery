@@ -1337,11 +1337,18 @@ void CCollisionCenter::Body_To_Body_Collision()
 			switch (pItem->Get_ItemType())
 			{
 			case CItemObject::ITEM_FOOD:
+			{
+				CGameInstance::Get_Instance()->PlaySound_Free(L"GetItem.wav", 0.5f);
 				pthis->Compute_Heal(pKirby, pItem);
-				break;
+			}
+			break;
 			case CItemObject::ITEM_COIN:
+			{
+				//CGameInstance::Get_Instance()->PlaySound_Free(L"TakeACoin.wav", 0.3f);
+				CGameInstance::Get_Instance()->PlaySound_Free(L"OneCoin.wav", 0.5f);
 				pthis->Compute_Coin(pKirby, pItem);
-				break;
+			}
+			break;
 			case CItemObject::ITEM_SUPERPOWER:
 				pthis->Compute_SuperPower(pKirby, pItem);
 				break;
