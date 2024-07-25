@@ -224,6 +224,9 @@ void CFinale_SpecialDebris_A::Make_Particle()
 	{
 		if (m_bParticleTrigger == true)
 		{
+
+			m_pGameInstance->PlaySound_Free(L"덤프트럭으로 부수는 소리.wav", 0.5f);
+
 			CBone* pBone = m_pModelCom->Get_BonePtr("AllL");
 			_float4x4 pBoneLocalMatrix = *pBone->Get_CombinedTransformationMatrix();
 			_float4x4 pBoneWorldMatrix = pBoneLocalMatrix * m_pTransformCom->Get_WorldFloat4x4();
@@ -269,6 +272,7 @@ void CFinale_SpecialDebris_A::Set_Animation()
 		m_pModelCom->Set_Animation(CUT4, 40.f, false, false);
 		break;
 	case CUT5:
+		m_pGameInstance->PlaySound_Free(L"덤프트럭 qte 부스터 시작.wav", .5f);
 		m_pModelCom->Set_Animation(CUT5, 40.f, false, false);
 		break;
 	case CUT6:
