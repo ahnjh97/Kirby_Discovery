@@ -417,6 +417,8 @@ private:
 	_float			m_fSeqPlayedTime = { 0.f };
 	_float			m_fSeqTotalTime = { 0.f };
 
+	_bool			m_bOnceFade = false;
+
 private:
 	void Reset_DeferredCamSet();
 	void Set_DeferredCamSet(_float fTimeDelta);

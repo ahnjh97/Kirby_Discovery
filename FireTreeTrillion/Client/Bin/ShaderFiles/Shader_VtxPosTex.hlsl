@@ -215,6 +215,10 @@ PS_OUT PS_MAIN_SOLIDALPHABLEND(PS_IN_ALPHABLEND In)
     vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 
+    //알파 값 예외처리
+    if (Out.vColor.a <= 0.f)
+        discard;
+    
     Out.vColor.rgb = g_vRColor;
     Out.vColor.a *= g_fAlpha;
 
@@ -255,7 +259,7 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN_ALPHABLEND In)
     if (smoothedAlpha < 0.1)
         discard;
     
-    
+    MaskTest(vMask);
 
     vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
     if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f))
