@@ -349,6 +349,14 @@ void CGameInstance::Update_DofFocus(_fvector vWorldPos)
 
 }
 
+void CGameInstance::Update_RimLight(_float fRimRatio, _float fRimRadius, _float3 vRimColor)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Update_RimLight(fRimRatio, fRimRadius, vRimColor);
+}
+
 void CGameInstance::Bind_RendererFunc(_int iTriggerType)
 {
 	if (nullptr == m_pRenderer)
@@ -1098,10 +1106,14 @@ _int CGameInstance::VolumeRestore(CHANNELID eID)
 {
 	return m_pSound_Manager->VolumeRestore(eID);
 }
-
 void CGameInstance::PlaySound_Free(TCHAR* pSoundKey, _float _vol)
 {
 	m_pSound_Manager->PlaySound_Free(pSoundKey, _vol);
+}
+
+void CGameInstance::LoopSound(CHANNELID eID, TCHAR* pSoundKey, _float _vol)
+{
+	m_pSound_Manager->LoopSound(eID, pSoundKey, _vol);
 }
 
 #pragma endregion

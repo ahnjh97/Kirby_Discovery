@@ -47,8 +47,10 @@ public: /* For.Renderer */
 	void Setting_RadialBlur(_float fRadial, _float fSubtraction = 70.f);
 	HRESULT Render_LightDepth_For_GameObject(class CShader* pShader, class CTransform* pTransform, class CModel* pModel);
 	HRESULT Render_LightDepth_For_PartObject(class CShader* pShader, const _float4x4* pMatrix, class CModel* pModel);
+	
 	void Update_LightShadow(_fvector vLightPos, _fvector vFocusPos);
 	void Update_DofFocus(_fvector vWorldPos);
+	void Update_RimLight(_float fRimRatio, _float fRimRadius = -1.f, _float3 vRimColor = { -1.f, -1.f, -1.f });
 	void Set_BlackBackGround(_bool bSet);
 	HRESULT Bind_DeferredTexture(CTexture* pTexture, const _char* pConstantName, _uint iIndex = 0);
 	HRESULT Bind_DeferredRawValue(const _char* pConstantName, const void* pData, _uint iLength);
@@ -197,7 +199,7 @@ public: // Sound Manager
 	_bool IsChannelPaused(CHANNELID eID);
 	void  PlayMySound(TCHAR* pSoundKey, CHANNELID eID, _float _vol);
 	void  PlayBGM(TCHAR* pSoundKey, _float _vol = 0.5f);
-	void  PlayBGM(CHANNELID eID, TCHAR* pSoundKey, _float _vol = 0.5f);
+	void  PlayBGM(CHANNELID eID, TCHAR* pSoundKey, _float _vol = 0.0f);
 	void  PlaySmoothUp(CHANNELID eID, _float targetVolume, _float fAddValue);
 	void  PlaySmoothDown(CHANNELID eID, _float targetVolume, _float fMinusValue);
 	void  PlaySmoothKill(CHANNELID eID, _float fMinusValue);
@@ -208,6 +210,7 @@ public: // Sound Manager
 	_int  VolumeMin(CHANNELID eID);
 	_int  VolumeRestore(CHANNELID eID);
 	void PlaySound_Free(TCHAR* pSoundKey, _float _vol);
+	void LoopSound(CHANNELID eID, TCHAR* pSoundKey, _float _vol);
 
 #ifdef _DEBUG
 public: /* For.ImGui_Manager */

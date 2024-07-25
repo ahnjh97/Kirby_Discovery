@@ -72,6 +72,7 @@ HRESULT CLevel_Park::Initialize()
 	hr = Ready_UI();
 	CHECK_FAILED(hr);
 
+
 	CGameObject::GAMEOBJECT_DESC ObjDesc{};
 	ObjDesc.fSpeedPerSec = 5.f;
 	ObjDesc.fRotationPerSec = ToRadian(90.f);

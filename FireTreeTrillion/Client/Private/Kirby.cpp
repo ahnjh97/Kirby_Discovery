@@ -487,6 +487,8 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 					Effectdesc.vInitScale = { 2.f, 2.f, 2.f };
 					if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
 						return;
+
+					m_pGameInstance->PlaySound_Free(L"KirbyCar_Collision.wav", 0.4f);
 				}
 			}
 			else if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
@@ -911,11 +913,16 @@ HRESULT CKirby::Make_TargetToCams()
 	}
 
 	_float3 vAnchor = _float3();
-	if (*m_pCurrentLevelID == LEVEL_SIMBA)
+	if(*m_pCurrentLevelID == LEVEL_INTRO)
+		vAnchor = { 0.f, 4.f, 0.f };
+
+	else if (*m_pCurrentLevelID == LEVEL_SIMBA)
 		vAnchor = { 0.f, 3.f, 0.f };
 
 	m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, vAnchor);
 
+	if (*m_pCurrentLevelID == LEVEL_INTRO)
+		dynamic_cast<CCamera_Main*> (m_pCamera)->Make_Sequence(CCamera_Main::SEQ_INTRO);
 	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
 	if (LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END)
 	{
@@ -2066,6 +2073,8 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 			m_vBulbColor += (vTargetColor - m_vBulbColor) / (fTimeDelta * 300.f);
 
 			m_pBulbFlare->Set_Position(m_pTransformCom->Get_State(CTransform::STATE_POSITION), false);
+
+			m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
 		}
 
 		m_pBulbFlare->Tick(fTimeDelta);
@@ -2216,7 +2225,12 @@ void CKirby::Kirby_LookInitialize()
 	fCameraRight = XMVector4Normalize(fCameraRight);
 
 	// 카메라 기준 바라보는 방향을 설정한다.
-	if (uLevel == LEVEL_RACING)
+	
+	if (uLevel == LEVEL_INTRO)
+	{
+		INFO(m_vTargetDir) = INFO(m_vMoveDir) = fCameraLook;
+	}
+	else if (uLevel == LEVEL_RACING)
 	{
 		// 오른쪽을 보고 시작함.
 		INFO(m_vTargetDir) = INFO(m_vMoveDir) = fCameraRight;
@@ -2248,6 +2262,8 @@ void CKirby::Kirby_StateInitialize()
 			Change_State(CARSTATE_MOVING, 60.f, true, false, BODY_CARDEFAULT, OFFSET_CAR);
 			m_pModelCom[BODY_CARDEFAULT]->Set_Animation(19, 60.f, true, true);
 		}
+
+		m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyCar_Idle.wav", 0.3f);
 	}
 	else if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
 	{

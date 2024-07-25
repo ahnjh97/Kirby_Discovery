@@ -37,6 +37,8 @@ public:
 	void PlayBGM(TCHAR* pSoundKey, _float _vol = 0.5f);
 	void PlayBGM(CHANNELID eID, TCHAR* pSoundKey, _float _vol = 0.5f);
 
+	void LoopSound(CHANNELID eID, TCHAR* pSoundKey, _float _vol = 0.5f);
+
 	void PlaySmoothUp(CHANNELID eID, _float targetVolume, _float fAddValue);
 	void PlaySmoothDown(CHANNELID eID, _float targetVolume, _float fMinusValue);
 	void PlaySmoothKill(CHANNELID eID, _float fMinusValue);

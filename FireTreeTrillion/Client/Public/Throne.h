@@ -17,7 +17,7 @@ private:
 	virtual ~CThrone() = default;
 
 public:
-	void Break(CGameObject* pObj) { m_bPlayAnimation = true; }
+	void Break(CGameObject* pObj);
 
 public:
 	virtual HRESULT		Initialize_Prototype()			override;

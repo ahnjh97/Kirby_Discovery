@@ -31,6 +31,10 @@ void CFinalBoss::Appear_Event(CGameObject* pObj)
 	FXDesc.fStartDelay = 2.f;
 	Add_Effect("HS_bidm C", FXDesc);
 
+	FXDesc = {};
+	FXDesc.vInitPos = { 0.f, 15.f, 0.f };
+	Add_Effect("BDBY", FXDesc);
+
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 	MultiFXDesc.pSocketMatrix = &m_EffectSocket;
 	MultiFXDesc.vInitPos = { 0.f, 6.f, 0.f };

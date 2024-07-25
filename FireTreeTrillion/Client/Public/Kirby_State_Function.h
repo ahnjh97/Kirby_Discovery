@@ -1285,6 +1285,8 @@ static void ComeOn_Dash(CKirby* pKirby)
 	FXDesc.vInitPos = { 0.f, 1.4f, 0.3f };
 	FXDesc.vInitScale = { 8.f, 8.f, 8.f };
 
+	GAMEINSTANCE PlayMySound(L"KirbyCar_BoosterStart.wav", CHANNEL_PLAYERVOICE, 0.5f);
+
 	pKirby->Add_Effect("YW Real Dash", FXDesc, true);
 
 	//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Real Dash"), &FXDesc)))
@@ -1592,10 +1594,10 @@ static void Fire_Maker(_float3 vLocalPos, CTransform* pTransformCom, _float Scal
 
 #pragma region Sound
 
-static void Make_BBongSound(_float& fBBongDelay, _float fTimeDelta)
+static void Make_BBongSound(_float& fBBongDelay, _float fTimeDelta, _float Delay = 0.2f)
 {
 	fBBongDelay += fTimeDelta;
-	if (fBBongDelay > 0.2f)
+	if (fBBongDelay > Delay)
 	{
 		GAMEINSTANCE PlaySound_Free(L"Kirby_BBong.wav", 0.15f);
 		fBBongDelay = 0.f;

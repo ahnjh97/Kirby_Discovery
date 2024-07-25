@@ -13,6 +13,12 @@ CThrone::CThrone(const CThrone& rhs)
 {
 }
 
+void CThrone::Break(CGameObject* pObj)
+{
+	 m_bPlayAnimation = true;
+	 m_pGameInstance->PlaySound_Free(L"ThroneBreak.wav", 0.5f);
+}
+
 HRESULT CThrone::Initialize_Prototype()
 {
 	return S_OK;
