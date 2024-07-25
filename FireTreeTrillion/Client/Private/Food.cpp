@@ -4,6 +4,8 @@
 
 #include "Hitbox.h"
 
+#include "Kirby.h"
+
 CFood::CFood(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CItemObject{ pDevice, pContext }
 {
@@ -78,7 +80,13 @@ _int CFood::Tick(_float fTimeDelta)
 			m_pTransformCom->Set_Scaled(fScaled, fScaled, fScaled);
 
 			_vector vTargetPos = m_pPlayer->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
-			vTargetPos.m128_f32[1] += 2.f;
+			CKirby::BODYSTATE estate = static_cast<CKirby*>(m_pPlayer)->Get_KirbyInfo()->m_eBodyState;
+			if (estate == CKirby::BODY_CARDEFAULT || estate == CKirby::BODY_BULBDEFAULT)
+			{
+				vTargetPos.m128_f32[1] += 4.5f;
+			}
+			else
+				vTargetPos.m128_f32[1] += 2.f;
 
 			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 			_vector vDir = vTargetPos - vPos;
@@ -91,7 +99,13 @@ _int CFood::Tick(_float fTimeDelta)
 			m_fDrinkTime += m_fTimeDelta;
 
 			_vector vTargetPos = m_pPlayer->Get_TransformCom()->Get_State_Vector(CTransform::STATE_POSITION);
-			vTargetPos.m128_f32[1] += 2.f;
+			CKirby::BODYSTATE estate = static_cast<CKirby*>(m_pPlayer)->Get_KirbyInfo()->m_eBodyState;
+			if (estate == CKirby::BODY_CARDEFAULT || estate == CKirby::BODY_BULBDEFAULT)
+			{
+				vTargetPos.m128_f32[1] += 4.5f;
+			}
+			else
+				vTargetPos.m128_f32[1] += 2.f;
 
 			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 			_vector vDir = vTargetPos - vPos;

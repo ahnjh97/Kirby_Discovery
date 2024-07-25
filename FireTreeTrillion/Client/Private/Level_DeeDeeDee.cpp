@@ -83,6 +83,7 @@ HRESULT CLevel_DeeDeeDee::Initialize()
 	// 안개 초기화
 	m_pGameInstance->Fog_Intialize_ForDeeDeeDee(0);
 
+
 	return S_OK;
 }
 
@@ -132,6 +133,10 @@ void CLevel_DeeDeeDee::Fog_Tick(_float fTimeDelta)
 
 void CLevel_DeeDeeDee::Sound_Tick(_float fTimeDelta)
 {
+	// initialize sound
+	//if(m_pGameInstance->Get_Volume(CHANNEL_BGM) > 0.f)
+	//	m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.5f);
+
 	//커버가 특정 위치에 도착할 경우 BGM 재생
 	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(m_iLevel, TEXT("Layer_Player")));
 	_float4 vKirbyPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);

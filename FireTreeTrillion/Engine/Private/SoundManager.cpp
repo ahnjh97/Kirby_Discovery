@@ -63,11 +63,12 @@ void CSound_Manager::AddLowPass()
 
 }
 
-//wstring CSound_Manager::Get_CurSound(CHANNELID eID)
-//{
-//	m_pChannelArr[eID]->
-//
-//}
+_float CSound_Manager::Get_Volume(CHANNELID eID)
+{
+	_float volume = 0.f;
+	FMOD_Channel_GetVolume(m_pChannelArr[eID], &volume);
+	return volume;
+}
 
 int CSound_Manager::SetVolume(CHANNELID eID, _float _vol)
 {
@@ -263,6 +264,26 @@ void CSound_Manager::PlayBGM(CHANNELID eID, TCHAR* pSoundKey, _float _vol)
 		ALARM_FAIL("PlayBGM에서 채널을 넣어줄 대 BGM채널 enum값을 넣어주지 않았습니다.");
 		return;
 	}
+
+	map<TCHAR*, FMOD_SOUND*>::iterator iter;
+	iter = find_if(m_mapSound.begin(), m_mapSound.end(), [&](auto& iter)
+		{
+			return !lstrcmp(pSoundKey, iter.first);
+		});
+
+	if (iter == m_mapSound.end())
+		return;
+
+	FMOD_System_PlaySound(m_pSystem, iter->second, nullptr, FALSE, &m_pChannelArr[eID]);
+	FMOD_Channel_SetMode(m_pChannelArr[eID], FMOD_LOOP_NORMAL);
+	FMOD_Channel_SetVolume(m_pChannelArr[eID], _vol);
+
+	FMOD_System_Update(m_pSystem);
+}
+
+void CSound_Manager::LoopSound(CHANNELID eID, TCHAR* pSoundKey, _float _vol)
+{
+	StopSound(eID);
 
 	map<TCHAR*, FMOD_SOUND*>::iterator iter;
 	iter = find_if(m_mapSound.begin(), m_mapSound.end(), [&](auto& iter)
