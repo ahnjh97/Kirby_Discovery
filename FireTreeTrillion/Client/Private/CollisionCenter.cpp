@@ -68,6 +68,10 @@ void CCollisionCenter::Collision_Tick(_float fTimeDelta)
 			Safe_Release(pObject);
 		ObjectVector.clear();
 	}
+
+
+	// 매 틱마다, 불 값을 줌으로서 히트 관련 사운드가 중첩되지 않게 한다.
+	m_bDontSoundOverLap = false;
 }
 
 void CCollisionCenter::Add_Ladder(CLadder* pLadder)
@@ -1878,6 +1882,11 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
 		SwordHit(pMonsterTransform);
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_Knife3.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
 	}
 	break;
 	// SWORD 연속기 2타
@@ -1887,6 +1896,11 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
 		SwordHit(pMonsterTransform);
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_Knife2.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
 	}
 	break;
 	// SWORD 연속기 3타
@@ -1896,7 +1910,11 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		HitStop_Rogic(pKirby);
 		Camera_Shaking();
 		SwordHit_Big(pMonsterTransform);
-
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_Knife.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
 	}
 	break;
 	// 덜 차징 회전베기
@@ -1906,6 +1924,13 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
 		SwordHit(pMonsterTransform);
+
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_Knife2.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
+
 
 	}
 	break;
@@ -1917,6 +1942,13 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		Camera_Shaking(0.7f, 0.5f);
 		SwordHit(pMonsterTransform);
 
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_Knife2.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
+
+
 	}
 	break;
 	// 위로 올려베기 (대쉬기 중 점프 키)
@@ -1926,6 +1958,13 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		HitStop_Rogic(pKirby);
 		Camera_Shaking();
 		SwordHit(pMonsterTransform);
+
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_Knife.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
+
 	}
 	// 공중제비 도는 공격
 	case CKirby::SWORDSTATE_SWORDSPIN:
@@ -1934,6 +1973,13 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		HitStop_Rogic(pKirby);
 		Camera_Shaking();
 		SwordHit(pMonsterTransform);
+
+		if (m_bDontSoundOverLap == false)
+		{
+			CUtils::Make_RandomInt(0, 1) == 0 ? GAMEINSTANCE PlaySound_Free(L"Collision_Knife2.wav", 0.7f) : GAMEINSTANCE PlaySound_Free(L"Collision_Knife.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
+
 	}
 	break;
 	// 풀 차징 엔드
@@ -1942,6 +1988,12 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		fAttack = 10.f;
 		Camera_Shaking();
 		SwordHit_Big(pMonsterTransform);
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_Zindong.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
+
 	}
 	break;
 	// 덜 차징 엔드
@@ -1950,6 +2002,11 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		fAttack = 5.f;
 		Camera_Shaking();
 		SwordHit_Big(pMonsterTransform);
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_Zindong.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
 	}
 	break;
 
@@ -1965,6 +2022,13 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
+
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_BigToy.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
+
 	}
 	break;
 	// 해머 평타
@@ -1979,6 +2043,12 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
+
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_SmallToy.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
 
 	}
 	break;
@@ -1997,6 +2067,13 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE StopSound(CHANNEL_SOUND2);
+			GAMEINSTANCE PlaySound_Free(L"KirbyHammer_Hit.wav", 1.f);
+			m_bDontSoundOverLap = true;
+		}
+
 	}
 	break;
 	// 해머 덜 차징 공격
@@ -2014,6 +2091,12 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE StopSound(CHANNEL_SOUND2);
+			GAMEINSTANCE PlaySound_Free(L"KirbyHammer_Hit.wav", 1.f);
+			m_bDontSoundOverLap = true;
+		}
 	}
 	break;
 	// 해머 공중 회전 공격
@@ -2029,9 +2112,14 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 
+		if (m_bDontSoundOverLap == false)
+		{
+			CUtils::Make_RandomInt(0, 1) == 0 ? GAMEINSTANCE PlaySound_Free(L"Collision_BigToy.wav", 0.7f) : GAMEINSTANCE PlaySound_Free(L"Collision_SmallToy.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
 	}
 	break;
-	// 해머 공중 회전 공격
+	// 크래쉬 일반
 	case CKirby::CRASHSTATE_ATTACK:
 	{
 		fAttack = 20.f;
@@ -2039,7 +2127,7 @@ void CCollisionCenter::Damage_And_Effect_For_Monster(CKirby* pKirby, CPhysXObjec
 		Camera_Shaking(0.5f);
 	}
 	break;
-	// 해머 공중 회전 공격
+	// 크래쉬 찐탱
 	case CKirby::CRASHSTATE_BIGATTACK:
 	{
 		fAttack = 20.f;
@@ -2076,6 +2164,12 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
 		SwordHit(pObjectTransform);
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_Knife3.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
+
 	}
 	break;
 	// SWORD 연속기 2타
@@ -2084,6 +2178,12 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
 		SwordHit(pObjectTransform);
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_Knife2.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
+
 	}
 	break;
 	// SWORD 연속기 3타
@@ -2092,7 +2192,11 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		HitStop_Rogic(pKirby);
 		Camera_Shaking();
 		SwordHit_Big(pObjectTransform);
-
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_Knife.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
 	}
 	break;
 	// 덜 차징 회전베기
@@ -2102,6 +2206,12 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		Camera_Shaking(0.7f, 0.5f);
 		SwordHit(pObjectTransform);
 
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_Knife2.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
+
 	}
 	break;
 	// 풀 차징 회전베기
@@ -2110,6 +2220,13 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		HitStop_Rogic(pKirby);
 		Camera_Shaking(0.7f, 0.5f);
 		SwordHit(pObjectTransform);
+
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_Knife2.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
+
 	}
 	break;
 	// 위로 올려베기 (대쉬기 중 점프 키)
@@ -2118,6 +2235,13 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		HitStop_Rogic(pKirby);
 		Camera_Shaking();
 		SwordHit(pObjectTransform);
+
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_Knife.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
+
 	}
 	// 공중제비 도는 공격
 	case CKirby::SWORDSTATE_SWORDSPIN:
@@ -2125,6 +2249,13 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		HitStop_Rogic(pKirby);
 		Camera_Shaking();
 		SwordHit(pObjectTransform);
+
+		if (m_bDontSoundOverLap == false)
+		{
+			CUtils::Make_RandomInt(0, 1) == 0 ? GAMEINSTANCE PlaySound_Free(L"Collision_Knife2.wav", 0.7f) : GAMEINSTANCE PlaySound_Free(L"Collision_Knife.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
+
 	}
 	break;
 	// 해머 5타 통 애님 (막타)
@@ -2137,6 +2268,12 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_BigToy.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
+
 	}
 	break;
 	// 해머 평타
@@ -2149,6 +2286,12 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
+
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE PlaySound_Free(L"Collision_SmallToy.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
 
 	}
 	break;
@@ -2165,6 +2308,14 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
+
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE StopSound(CHANNEL_SOUND2);
+			GAMEINSTANCE PlaySound_Free(L"KirbyHammer_Hit.wav", 1.f);
+			m_bDontSoundOverLap = true;
+		}
+
 	}
 	break;
 	// 해머 덜 차징 공격
@@ -2180,6 +2331,13 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 
+		if (m_bDontSoundOverLap == false)
+		{
+			GAMEINSTANCE StopSound(CHANNEL_SOUND2);
+			GAMEINSTANCE PlaySound_Free(L"KirbyHammer_Hit.wav", 1.f);
+			m_bDontSoundOverLap = true;
+		}
+
 	}
 	break;
 	// 해머 공중 회전 공격
@@ -2194,16 +2352,22 @@ void CCollisionCenter::Effect(CKirby* pKirby, CPhysXObject* pObject)
 		if (FAILED(GAMEINSTANCE Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Colliding"), &FXDesc)))
 			return;
 
+		if (m_bDontSoundOverLap == false)
+		{
+			CUtils::Make_RandomInt(0, 1) == 0 ? GAMEINSTANCE PlaySound_Free(L"Collision_BigToy.wav", 0.7f) : GAMEINSTANCE PlaySound_Free(L"Collision_SmallToy.wav", 0.7f);
+			m_bDontSoundOverLap = true;
+		}
+
 	}
 	break;
-	// 해머 공중 회전 공격
+	// 크래쉬 일반
 	case CKirby::CRASHSTATE_ATTACK:
 	{
 		//HitStop_Rogic(pKirby);
 		Camera_Shaking(0.5f);
 	}
 	break;
-	// 해머 공중 회전 공격
+	// 크래쉬 큰 공격
 	case CKirby::CRASHSTATE_BIGATTACK:
 	{
 		//HitStop_Rogic(pKirby);
@@ -2271,10 +2435,13 @@ void CCollisionCenter::Player_Monster_Knock_back(CPhysXObject* pPlayer, CPhysXOb
 	_vector vMonsterKnockbackDir = -1.f * vPlayerKnockbackDir;
 
 	if (static_cast<CCharacter*>(pPlayer)->Get_State() != CKirby::STATE_SLIDE)
+	{
 		pPlayer->Set_DamageMoving(vPlayerKnockbackDir, 5.f);
+	}
 
 	if (static_cast<CCharacter*>(pPlayer)->Get_State() == CKirby::STATE_SLIDE)
 	{
+		GAMEINSTANCE PlaySound_Free(L"Collision_KirbyMonster.wav", 0.6f);
 		pMonster->Set_DamageMoving(vMonsterKnockbackDir, 15.f);
 
 		CMultiEffect::MULTI_FX_DESC FXDesc{};

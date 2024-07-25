@@ -43,24 +43,67 @@
         <Count>0</Count>
     </ModelName>
     <ModelName>FinalBoss
+        <Animation>RayArrowReadyAir</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>BigSwingLeftEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
         <Animation>SwingFinishLeft</Animation>
         <AnimSpeed>60</AnimSpeed>
-        <Count>1</Count>
+        <Count>2</Count>
         <Data0 EventName="Attack" StartFrame="31" EndFrame="33"/>
+        <Data1 EventName="Sound" StartFrame="20" EndFrame="22"/>
         <Animation>SwingRightStart</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>0</Count>
         <Animation>SwingLeft</Animation>
         <AnimSpeed>60</AnimSpeed>
-        <Count>1</Count>
+        <Count>2</Count>
         <Data0 EventName="Attack" StartFrame="8" EndFrame="9"/>
-        <Animation>SwingRight</Animation>
+        <Data1 EventName="Sound" StartFrame="6" EndFrame="7"/>
+        <Animation>RayArrowStartAir</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
-        <Data0 EventName="Attack" StartFrame="8" EndFrame="9"/>
+        <Data0 EventName="Sound" StartFrame="1" EndFrame="2"/>
+        <Animation>RayArrowStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Sound" StartFrame="1" EndFrame="2"/>
         <Animation>SwingFinishLeftEnd</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>0</Count>
+        <Animation>SwingRight</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="Attack" StartFrame="8" EndFrame="9"/>
+        <Data1 EventName="Sound" StartFrame="6" EndFrame="7"/>
+        <Animation>BigSwingLeft</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>BigSwingFinishLeftEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>BigSwingRightEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>SwingRightEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>DimensionSpikeReady</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>DimensionSpikeStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>DimensionSpike</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Sound" StartFrame="13" EndFrame="15"/>
+        <Animation>DimensionSpike</Animation>
+        <AnimSpeed>20</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Sound" StartFrame="12" EndFrame="13"/>
     </ModelName>
     <ModelName>Awoofy
         <Animation>Run</Animation>
@@ -293,6 +336,9 @@
         <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
         <Data0 EventName="AttackJumpStart" StartFrame="1" EndFrame="12"/>
+        <Animation>JumpStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
         <Animation>FinalCrusher</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>2</Count>

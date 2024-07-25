@@ -14,6 +14,7 @@ class CRayArrow final : public CPhysXObject
 {
 public:
 	struct RAYARROW_DESC : public CGameObject::GAMEOBJECT_DESC {
+		_uint iSoundChannel = { 0 };
 		_float fAngle = { 0.f };
 		_float fHeight = { 0.f };
 		_float fDelayTime = { 0.f };
@@ -59,6 +60,7 @@ private:
 	_float			m_fHeight = { 0.f };
 	_float			m_fSpeedWeight = { 0.f };
 	_float			m_fRotateSpeed = { 0.f };
+	_float			m_bSound = { 0.f };
 
 	_vector			m_vPosition = {};
 	_vector			m_vKirbyPos = {};
@@ -79,6 +81,7 @@ private:
 	_bool			m_bCollided = { false };
 
 	_uint			m_iCnt = { 0 };
+	_uint			m_iSoundChannel = { 0 };
 
 private:
 	HRESULT Add_Components();

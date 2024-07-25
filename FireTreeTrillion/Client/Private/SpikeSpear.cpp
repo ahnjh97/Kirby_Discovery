@@ -99,6 +99,8 @@ _int CSpikeSpear::Tick(_float fTimeDelta)
 			{
 				m_bItem = true;
 
+				m_pGameInstance->PlaySound_Free(L"BossChimera_Spike2.wav", 0.5f);
+
 				_float4 vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 				vPos.y -= 10.f;
 				for (_uint i = 0; i < 3; ++i)
@@ -118,7 +120,7 @@ _int CSpikeSpear::Tick(_float fTimeDelta)
 				}
 
 					//효선아 여기야
-					vPos.y -= 1.f; 
+					vPos.y = 0.f; 
 					CMultiEffect::MULTI_FX_DESC FXDesc{};
 					FXDesc.vInitPos = (_float3)vPos;
 					FXDesc.vInitScale = { 5.f, 5.f, 5.f };

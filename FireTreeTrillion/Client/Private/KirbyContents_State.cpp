@@ -31,7 +31,9 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	// 능력을 획득 하였을 때 나오는 애니메이션이다.
 	if (pKirby->Get_State() == CKirby::STATE_GETABILITY)
 	{
-		if (m_bDumpSound == true)
+		m_fDelayTime += fTimeDelta;
+
+		if (m_bDumpSound == true && m_fDelayTime > 0.2f)
 		{
 			m_pGameInstance->PlaySound_Free(L"Kirby_Contents.wav", 0.5f);
 			m_bDumpSound = false;

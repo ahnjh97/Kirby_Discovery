@@ -20,6 +20,7 @@ public:
 
 public:
 	_bool	m_bDumpSound = { true };
+	_float	m_fDelayTime = { 0.f };
 	static	CKirbyGet_State* Create();
 	virtual void						Free() override;
 };

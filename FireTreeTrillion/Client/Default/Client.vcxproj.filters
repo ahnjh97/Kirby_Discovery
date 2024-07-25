@@ -283,9 +283,6 @@
     <Filter Include="01.Levels\_Loader">
       <UniqueIdentifier>{2433d7e5-8e5b-4e5a-9e6b-265a49b4604a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Map\BreakableRock">
-      <UniqueIdentifier>{1804a8b8-0c68-4296-836c-c88b4878fba8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\PhysXObject\Character\Monster\DeeDeeDee">
       <UniqueIdentifier>{e785f913-87d7-41e1-bd17-d70a1c0e8458}</UniqueIdentifier>
     </Filter>
@@ -736,6 +733,9 @@
     <Filter Include="02.GameObjects\UI\HUD\KirbyHP">
       <UniqueIdentifier>{04e3199d-7d6c-4af4-a33d-70cd4bd68509}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Map\Bridge\BreakableRock">
+      <UniqueIdentifier>{1804a8b8-0c68-4296-836c-c88b4878fba8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1075,7 +1075,7 @@
       <Filter>01.Levels\2. Racing</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BreakableRock.h">
-      <Filter>02.GameObjects\Map\BreakableRock</Filter>
+      <Filter>02.GameObjects\Map\Bridge\BreakableRock</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Car.h">
       <Filter>02.GameObjects\PhysXObject\Deform\Car</Filter>
@@ -1099,7 +1099,7 @@
       <Filter>02.GameObjects\MiniGame\_Helper</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BreakableRockParticle.h">
-      <Filter>02.GameObjects\Map\BreakableRock</Filter>
+      <Filter>02.GameObjects\Map\Bridge\BreakableRock</Filter>
     </ClInclude>
     <ClInclude Include="..\public\OriginalDee.h">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Original</Filter>
@@ -1787,7 +1787,7 @@
       <Filter>02.GameObjects\PhysXObject\Deform\Car</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BreakableRock.cpp">
-      <Filter>02.GameObjects\Map\BreakableRock</Filter>
+      <Filter>02.GameObjects\Map\Bridge\BreakableRock</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\AnimDeco.cpp">
       <Filter>02.GameObjects\Map\Deco\AnimDeco</Filter>
@@ -1808,7 +1808,7 @@
       <Filter>02.GameObjects\MiniGame\_Helper</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BreakableRockParticle.cpp">
-      <Filter>02.GameObjects\Map\BreakableRock</Filter>
+      <Filter>02.GameObjects\Map\Bridge\BreakableRock</Filter>
     </ClCompile>
     <ClCompile Include="..\private\OriginalDee.cpp">
       <Filter>02.GameObjects\PhysXObject\Character\WaddleDee\Original</Filter>

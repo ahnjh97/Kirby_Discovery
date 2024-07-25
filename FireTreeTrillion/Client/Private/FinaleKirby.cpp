@@ -60,10 +60,12 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
 
     m_bSlope = false;
 
-    // 마지막 스테이지에서 운석을 지속적으로 날려주는 기능을 가진 클래스를 생성한다.
-    if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Disaster_Master"), TEXT("Prototype_GameObject_Disaster_Master"), this)))
-        return E_FAIL;
-
+    if (LEVEL_TOOL_ANIM != *m_pGameInstance->Get_CurrentLevelID())
+    {
+        // 마지막 스테이지에서 운석을 지속적으로 날려주는 기능을 가진 클래스를 생성한다.
+        if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_Disaster_Master"), TEXT("Prototype_GameObject_Disaster_Master"), this)))
+            return E_FAIL;
+    }
     ////BDBY
     //CParticle::PARTICLE_DESC FXDesc{};
     //FXDesc.pSocketMatrix = &m_EffectSocket;
@@ -169,9 +171,11 @@ _int CFinaleKirby::Tick(_float fTimeDelta)
 
         // 유틸업데이트가 들어가있다. (FSM)
         //__super::Tick(m_fTimeDelta);
-        if (m_pFSM != nullptr)
-            m_pFSM->Update(this, fTimeDelta);
-
+        if (LEVEL_TOOL_ANIM != *m_pGameInstance->Get_CurrentLevelID())
+        {
+            if (m_pFSM != nullptr)
+                m_pFSM->Update(this, fTimeDelta);
+        }
         //캡슐의 위치만 업데이트한다.
         m_pControllerCom->Set_CapsulePosition(m_vBonePos);
     }
@@ -413,7 +417,9 @@ void CFinaleKirby::Add_AnimEvent()
     //m_pModelCom[BODY_DUMPCUT]->Add_Event("Collided", [this]() {
     //    m_pGameInstance->PlaySound_Free(L"finale_collide2.wav", 0.5f);
 
-    //    });
+    //m_pModelCom[INFO(m_eBodyState)]->Add_Event("Sound_Chop", [this]() {
+    //    m_pGameInstance->PlaySound_Free(L"Bomber_Chop.wav", 0.3f);
+    //});
 }
 
 void CFinaleKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
@@ -657,8 +663,11 @@ HRESULT CFinaleKirby::Make_TargetToCams()
         Safe_AddRef(m_pCamera);
     }
 
-    m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FINALE, /*{ 0.f, 2.f, 3.f }*/{0.f, 2.f, 0.f}, 5.f);
-    static_cast<CCamera_Main*>(m_pCamera)->Make_Sequence(CCamera_Main::SEQ_FINALESTART);
+    if (LEVEL_TOOL_ANIM != *m_pGameInstance->Get_CurrentLevelID())
+    {
+        m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FINALE, /*{ 0.f, 2.f, 3.f }*/{0.f, 2.f, 0.f}, 5.f);
+        static_cast<CCamera_Main*>(m_pCamera)->Make_Sequence(CCamera_Main::SEQ_FINALESTART);
+    }
 
     //게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
     if (LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END)
@@ -684,6 +693,7 @@ HRESULT CFinaleKirby::Add_Components()
     CHECK_FAILED(hr);
 
 #pragma region Kirby Model
+
     // 커비의 기본 상태 모델
     hr = __super::Add_Component(TEXT("Prototype_Component_Model_KirbyDefault"),
         TEXT("Com_Model_Default"), (CComponent**)&m_pModelCom[BODY_DEFAULT]);
@@ -709,6 +719,9 @@ HRESULT CFinaleKirby::Add_Components()
         TEXT("Com_Model_DumpCut"), (CComponent**)&m_pModelCom[BODY_DUMPCUT]);
     CHECK_FAILED(hr);
 
+    // FOR ANIMTOOL
+    m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
+    m_uModelCnt = BODY_END;
 
 #pragma endregion
 
@@ -761,10 +774,6 @@ HRESULT CFinaleKirby::Add_Components()
     hr = __super::Add_Component(TEXT("Prototype_Component_CharacterController"),
         TEXT("Com_Controller"), (CComponent**)&m_pControllerCom, &desc);
     CHECK_FAILED(hr);
-
-    // FOR ANIMTOOL
-    m_ppModelForAnimTool = &m_pModelCom[BODY_DEFAULT];
-    m_uModelCnt = BODY_END;
 
     CHitBox::HITBOX_DESC HitBox{};
     HitBox.pOwner = this;
