@@ -1313,6 +1313,8 @@ static void LadderStart_FX(CTransform* pTransformCom)
 	FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Ladder Star"), &FXDesc)))
 		return;
+
+	GAMEINSTANCE PlaySound_Free(L"Kirby_LadderSound.wav", 0.5f);
 }
 
 static void FlyEnd_Smoke(CTransform* pTransformCom)
@@ -1602,6 +1604,17 @@ static void Make_BBongSound(_float& fBBongDelay, _float fTimeDelta, _float Delay
 		GAMEINSTANCE PlaySound_Free(L"Kirby_BBong.wav", 0.15f);
 		fBBongDelay = 0.f;
 	}
+}
+
+static void Make_LadderSound(_float& fBBongDelay, _float fTimeDelta, _float Delay = 0.15f)
+{
+	fBBongDelay += fTimeDelta;
+	if (fBBongDelay > Delay)
+	{
+		GAMEINSTANCE PlaySound_Free(L"Kirby_LadderSound.wav", 0.8f);
+		fBBongDelay = 0.f;
+	}
+
 }
 
 #pragma endregion 

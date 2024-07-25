@@ -385,7 +385,7 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	if (pKirby->Get_State() == CKirby::SWORDSTATE_GUARD)
 	{
 		Guard_Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
-		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), 0.3f);
+		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), 0.2f);
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_DOWN) ||
 			m_pGameInstance->Get_DIKeyState(DIK_DOWN, KEY_DOWN) ||
