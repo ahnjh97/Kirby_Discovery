@@ -45,7 +45,7 @@ HRESULT CBossOrigin::Initialize(void* pArg)
 
 	m_bMotionBlur = false;
 	m_bRimLight = true;
-	m_fRimWidth = 3.f;
+	m_fRimWidth = .8f;
 	m_bStencil = true;
 	
 	for (_uint i = 0; i < m_pModelCom->Get_NumMeshes(); i++)
@@ -81,9 +81,15 @@ _int CBossOrigin::Tick(_float fTimeDelta)
 		CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_CAGEBREAK);
 	}
 
-	if (0.7f < m_fTime && false == m_bActivated) {
+	if (0.7f < m_fTime && 0.8f > m_fTime && false == m_bActivated) {
 		m_pModelCom->Set_Animation(BO_GETOUT, 18.f, false, true);
 		m_bActivated = true;
+	}
+
+	if (0.8f < m_fTime && true == m_bActivated)
+	{
+		m_bActivated = false;
+		m_pGameInstance->PlaySound_Free(L"OriginEyeOpen.wav", 0.6f);
 	}
 
 	if (1.5f < m_fTime)

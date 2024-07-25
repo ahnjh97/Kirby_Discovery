@@ -79,7 +79,10 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 _int CBrontoBurt::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
+	{
+		m_pGameInstance->PlaySound_Free(L"BrontoBurt_Dead.wav", 0.3f);
 		return Ready_Dead();
+	}
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 

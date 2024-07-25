@@ -128,6 +128,8 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			Safe_Release(DESC(m_pKirbyAssistLight2));
 			DESC(m_pKirbyAssistLight2) = nullptr;
 
+			m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+			//m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyCar_Idle.wav", 0.3f);
 			return;
 		}
 	}
@@ -143,6 +145,7 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		DESC(m_fJumpVelocity) = 20.f;
 		DESC(m_bCarJump) = true;
 		pKirby->Change_State(CKirby::CARSTATE_JUMPSTART, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+		m_pGameInstance->PlaySound_Free(L"KirbyCar_Jump.wav", 0.5f);
 		return;
 	}
 
@@ -164,6 +167,7 @@ void CKirbyCar_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	if (JoyStick_On() == true)
 	{
 		pKirby->Change_State(CKirby::CARSTATE_MOVING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+		m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyCar_Booster.wav", 0.3f);
 		return;
 	}
 
@@ -221,6 +225,7 @@ void CKirbyCar_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 		else if (m_fCutTime > 2.f)
 		{
 			pKirby->Change_State(CKirby::CARSTATE_BOOSTEND, 60.f, false, true, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			m_pGameInstance->PlaySound_Free(L"KirbyCar_Break.wav", 0.5f);
 			return;
 		}
 		return;
@@ -269,6 +274,7 @@ void CKirbyCar_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			DESC(m_bCarJump) = true;
 			DESC(m_fJumpVelocity) = 20.f;
 			pKirby->Change_State(CKirby::CARSTATE_JUMPSTART, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			m_pGameInstance->PlaySound_Free(L"KirbyCar_Jump.wav", 0.5f);
 			return;
 		}
 
@@ -289,6 +295,7 @@ void CKirbyCar_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	}
 	else
 	{
+		m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyCar_Idle.wav", 0.3f);
 		pKirby->Change_State(CKirby::CARSTATE_IDLING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 		return;
 	}
@@ -396,6 +403,7 @@ void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
 			pKirby->Delete_Effect("YW Real Dash");
+			m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyCar_Idle.wav", 0.3f);
 		}
 	}
 	else if (DESC(m_bBooster) == false)
@@ -436,6 +444,7 @@ void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			DESC(m_bCarJump) = false;
 			pKirby->Change_State(CKirby::CARSTATE_LANDING, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			m_pGameInstance->PlaySound_Free(L"KirbyCar_Landing.wav", 0.5f);
 			return;
 		}
 	}
@@ -445,6 +454,7 @@ void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			DESC(m_bCarJump) = false;
 			pKirby->Change_State(CKirby::CARSTATE_LANDING, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			m_pGameInstance->PlaySound_Free(L"KirbyCar_Landing.wav", 0.5f);
 			return;
 		}
 	}
@@ -455,6 +465,7 @@ void CKirbyCar_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			DESC(m_fJumpVelocity) = 20.f;
 			DESC(m_bCarJump) = true;
 			pKirby->Change_State(CKirby::CARSTATE_JUMPSTART, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			m_pGameInstance->PlaySound_Free(L"KirbyCar_Jump.wav", 0.5f);
 			return;
 		}
 
@@ -584,6 +595,7 @@ void CKirbyCar_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 			FXDesc.vInitPos = { 0.f, 0.f, 0.f };
 			FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 			pKirby->Add_Effect("YW Deform Effect2", FXDesc, false);
+			m_pGameInstance->PlaySound_Free(L"Kirby_DeformEvent.wav", 0.5f);
 			m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyCar_Idle.wav", 0.3f);
 			return;
 		}
@@ -700,6 +712,7 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			DESC(m_bCarJump) = true;
 			DESC(m_fJumpVelocity) = 20.f;
 			pKirby->Change_State(CKirby::CARSTATE_JUMPSTART, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			m_pGameInstance->PlaySound_Free(L"KirbyCar_Jump.wav", 0.5f);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			return;
 		}
@@ -709,15 +722,18 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
 			pKirby->Delete_Effect("YW Real Dash");
+			m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyCar_Idle.wav", 0.3f);
 			if (JoyStick_On() == false)
 			{
 				pKirby->Change_State(CKirby::CARSTATE_BOOSTEND, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 				DESC(m_eEyeState) = CKirby::EYE_IDLE;
+				m_pGameInstance->PlaySound_Free(L"KirbyCar_Break.wav", 0.5f);
 				return;
 			}
 			else
 			{
 				pKirby->Change_State(CKirby::CARSTATE_MOVING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+				m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyCar_Booster.wav", 0.3f);
 				DESC(m_eEyeState) = CKirby::EYE_IDLE;
 				return;
 			}
@@ -765,10 +781,12 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				return;
 			}
 			
+			m_pGameInstance->PlaySound_Free(L"KirbyCar_CollisionBridge.wav", 0.5f);
 			pKirby->Change_State(CKirby::CARSTATE_CRASH, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
 			DESC(m_fBoosterTime) = 0.f;
 			DESC(m_bBooster) = false;
 			pKirby->Delete_Effect("YW Real Dash");
+			m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyCar_Idle.wav", 0.3f);
 			Kirbydesc->m_fMoveSpeed = 0.f;
 			DESC(m_bCarJump) = true;
 			DESC(m_fJumpVelocity) = 20.f;
@@ -785,6 +803,7 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				Effectdesc.vInitScale = { 2.f, 2.f, 2.f };
 				if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
 					return;
+				GAMEINSTANCE PlaySound_Free(L"KirbyCar_CollisionBridge.wav", 0.5f);
 				return;
 			}
 			return;
@@ -809,6 +828,7 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		if (JoyStick_On() == true)
 		{
 			pKirby->Change_State(CKirby::CARSTATE_MOVING, 60.f, true, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyCar_Booster.wav", 0.3f);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			return;
 		}
@@ -827,6 +847,7 @@ void CKirbyCar_Boost_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			DESC(m_bCarJump) = false;
 			pKirby->Change_State(CKirby::CARSTATE_LANDING, 60.f, false, false, CKirby::BODY_CARDEFAULT, CKirby::OFFSET_CAR);
+			m_pGameInstance->PlaySound_Free(L"KirbyCar_Landing.wav", 0.5f);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			return;
 		}
@@ -864,6 +885,16 @@ void CKirbyCar_Cut_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _floa
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 	m_fSpeed = 21.f;
+
+	if (_iAnimIndex == CKirby::CARSTATE_CUT1)
+	{
+		m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyCar_Idle.wav", 0.5f);
+	}
+	else if (_iAnimIndex == CKirby::CARSTATE_CUT2)
+	{
+		m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+	}
+
 }
 
 void CKirbyCar_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -899,6 +930,7 @@ void CKirbyCar_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 
 			if (m_fCutAnimTime > 0.5f && pController->Is_Terrain())
 			{
+				m_pGameInstance->PlaySound_Free(L"KirbyCar_Landing.wav", 0.6f);
 				m_iTurnCount = 1;
 			}
 		}
@@ -915,6 +947,7 @@ void CKirbyCar_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 
 			if (m_fCutAnimTime > 1.2f)
 			{
+				m_pGameInstance->PlaySound_Free(L"KirbyCar_Break.wav", 0.6f);
 				m_iTurnCount = 2;
 			}
 		}

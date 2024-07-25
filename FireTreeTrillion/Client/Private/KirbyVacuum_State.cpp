@@ -113,6 +113,8 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
 		if (m_bSpitTrigger == true)
 		{
+			m_pGameInstance->PlaySound_Free(L"Kirby_DumpDeform.wav", 0.5f);
+
 			if (DESC(m_pLight) == nullptr)
 			{
 				_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);

@@ -64,6 +64,7 @@ private:
 	
 	_bool					m_IsInteraction = { FALSE };
 	_bool					m_bStartCharge = { FALSE };
+	_bool					m_bPlaySoundFX = { FALSE };
 
 	vector<_uint>			m_vecPassIndices;
 

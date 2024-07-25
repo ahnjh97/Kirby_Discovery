@@ -25,7 +25,7 @@
 
 #define BEACH_TO_JUNGLE			-66.f
 #define JUNGLE_TO_NOWHERE		57.f
-#define NOWHERE_TO_BUILDING		80.f
+#define NOWHERE_TO_BUILDING		77.f
 #define BUILDING_TO_FLOOR		260.f
 #define FLOOR_TO_CARCENTER_Z	283.f
 #define FLOOR_TO_CARCENTER_X	42.f
@@ -79,7 +79,7 @@ HRESULT CLevel_Intro::Initialize()
 
 	// 셰이더 트리거
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_BEACH);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_INTRO);
 	m_pGameInstance->Set_ObjectBlack(1.f);
 
 	// 레벨전환 트리거

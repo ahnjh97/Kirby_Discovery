@@ -78,6 +78,9 @@ _int CPoppyBomb::Tick(_float fTimeDelta)
 		if (FAILED(CGameInstance::Get_Instance()->Add_Light(LightDesc)))
 			return E_FAIL;
 
+		if(!m_bIsCulling)
+			m_pGameInstance->PlaySound_Free(L"PoppyBomb_Dead.wav", 0.3f);
+
 		return Ready_Dead();
 	}
 
@@ -200,7 +203,12 @@ void CPoppyBomb::Late_Tick(_float fTimeDelta)
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+
+		// 컬링 되지 않고 렌더되는 경우, bomb dead sound를 처리한다.
+		m_bIsCulling = false;
 	}
+	else
+		m_bIsCulling = true;
 }
 
 HRESULT CPoppyBomb::Render()

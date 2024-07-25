@@ -205,6 +205,8 @@ void CBox::Break_From_Car()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
 		return;
 
+	m_pGameInstance->PlaySound_Free(L"KirbyCar_BoxCollision.wav", 0.5f);
+
 	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 	pCamera->Make_Shake(1.6f, 0.5f);
 	/*CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));

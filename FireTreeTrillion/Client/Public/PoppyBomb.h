@@ -88,6 +88,7 @@ private:
 
 	// 점프공격
 	_float4		m_vGoPos = {}; // 포물선을 그릴 때 포물선 공식을 계속 더해줄 값
+	_bool		m_bIsCulling = true;
 
 private:
 	HRESULT Add_Components();

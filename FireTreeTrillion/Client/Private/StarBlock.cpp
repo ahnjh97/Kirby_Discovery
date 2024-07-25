@@ -57,6 +57,8 @@ _int CStarBlock::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 	{
 		m_pGameInstance->DisableActor(m_pStaticActor);
+		// 박스가 부숴지는 소리입니다.
+		CGameInstance::Get_Instance()->PlaySound_Free(L"StarBlockBump.wav", 1.f);
 		return Make_Partical();
 	}
 
@@ -229,6 +231,7 @@ void CStarBlock::Break_From_Car()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
 		return;
 
+	m_pGameInstance->PlaySound_Free(L"KirbyCar_BoxCollision.wav", 0.5f);
 
 	m_pGameInstance->DisableActor(m_pStaticActor);
 	m_bDead = true;

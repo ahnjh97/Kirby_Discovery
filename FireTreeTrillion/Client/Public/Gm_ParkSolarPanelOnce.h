@@ -19,6 +19,10 @@ public: //괄호의 숫자는 실제 인게임의 기믹 애님 순서. index는 아님
 						STATE_NONE };
 
 	enum LAMP_TYPE { LAMP_GREEN, LAMP_RED, LAMP_YELLOW, LAMP_NONE };
+	enum MUSIC_SCALE {
+		MSCALE_DO, MSCALE_RE, MSCALE_MI, MSCALE_FA,
+		MSCALE_SOL, MSCALE_LA, MSCALE_SI, MSCALE_DO2, MSCALE_NONE
+	};
 
 public:
 	PANELONCE_STATE Get_CurState() { return m_eCurState; }
@@ -41,6 +45,7 @@ public:
 #endif
 
 	virtual void		Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
+	void				Play_MusicScaleSound(_float _fTimeDelta);
 
 private:
 	HRESULT				Add_Components();
@@ -57,15 +62,17 @@ private:
 	PxRigidStatic*			m_pStaticActor = { nullptr };
 
 	PANELONCE_STATE			m_eCurState = { STATE_NONE };
+	MUSIC_SCALE				m_eMSState = { MSCALE_NONE };
 
-	_float					m_fDecreasesTime = { 0.f };
 	_float					m_fWhiteColorDiffuse = { 0.f };
 	_float4					m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };
 	//_float				m_fHitPower = {};
+	_float					m_fMScaleTime = { 0.f };
 	
 	_bool					m_IsInteraction = { FALSE };
 	_bool					m_bStartCharge = { FALSE };
 	_bool					m_bSpawn = { false };
+	_bool					m_bPlaySoundFX = { FALSE };
 
 	vector<_uint>			m_vecPassIndices;
 

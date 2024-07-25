@@ -1619,7 +1619,7 @@ void CFinalBoss_Spike_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 				CMultiEffect::MULTI_FX_DESC FXDesc{};
 				vInitPos.y -= 1.f;
 				FXDesc.vInitPos = vInitPos;
-				FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+				FXDesc.vInitScale = {2.f, 2.f, 2.f };
 				FXDesc.vInitRot = { 0.f, 0.f, 0.f };
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"),
 					TEXT("Prototype_GameObject_HS_FB downward light"), &FXDesc);

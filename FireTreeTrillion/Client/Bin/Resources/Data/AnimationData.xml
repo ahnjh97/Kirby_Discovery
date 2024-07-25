@@ -313,6 +313,14 @@
         <Data4 EventName="ApplyDamage4" StartFrame="61" EndFrame="62"/>
     </ModelName>
     <ModelName>Simba
+        <Animation>BiteRushJumpR</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="BiteRushJumpR" StartFrame="1" EndFrame="2"/>
+        <Animation>Roar2</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="Roar" StartFrame="148" EndFrame="150"/>
         <Animation>Jump</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
@@ -333,30 +341,111 @@
         <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
         <Data0 EventName="AttackJumpPre" StartFrame="27" EndFrame="36"/>
-        <Animation>FinalCrusherStart</Animation>
-        <AnimSpeed>60</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="FinalCrusherStart" StartFrame="38" EndFrame="75"/>
-        <Animation>AttackJumpHit</Animation>
-        <AnimSpeed>60</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="AttackJumpHit" StartFrame="8" EndFrame="11"/>
-        <Animation>FinalCrusherStartContinue</Animation>
-        <AnimSpeed>60</AnimSpeed>
-        <Count>0</Count>
-        <Animation>Landing</Animation>
-        <AnimSpeed>60</AnimSpeed>
-        <Count>1</Count>
-        <Data0 EventName="SimbaLand" StartFrame="1" EndFrame="2"/>
-        <Animation>AttackJumpWait</Animation>
-        <AnimSpeed>60</AnimSpeed>
-        <Count>0</Count>
-        <Animation>AttackJumpEnd</Animation>
+        <Animation>DimensionClawStartContinue</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>0</Count>
         <Animation>AttackJump</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
         <Data0 EventName="AttackJump" StartFrame="1" EndFrame="18"/>
+        <Animation>FinalCrusherStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="FinalCrusherStart" StartFrame="38" EndFrame="75"/>
+        <Animation>DoubleClawDash</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="DoubleClawDash" StartFrame="1" EndFrame="2"/>
+        <Animation>FinalCrusherStartContinue</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>AttackJumpHit</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="AttackJumpHit" StartFrame="8" EndFrame="11"/>
+        <Animation>Landing</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="SimbaLand" StartFrame="1" EndFrame="2"/>
+        <Animation>BiteRushLandingL</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="BiteRushLandingL" StartFrame="7" EndFrame="9"/>
+        <Animation>AttackJumpWait</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>AttackJumpEnd</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>DimensionClawStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="DimensionClawStart" StartFrame="1" EndFrame="70"/>
+        <Animation>DoubleClaw</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="DoubleClaw" StartFrame="13" EndFrame="22"/>
+        <Animation>DoubleClawChargeStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="DoubleClawCharge" StartFrame="44" EndFrame="49"/>
+        <Animation>BiteRushJumpStartL</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="BiteRushJumpStartL" StartFrame="1" EndFrame="3"/>
+        <Animation>BiteRushJumpStartR</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="BiteRushJumpStartR" StartFrame="1" EndFrame="3"/>
+        <Animation>BiteRushJumpL</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="BiteRushJumpL" StartFrame="1" EndFrame="3"/>
+        <Animation>BiteRushFallL</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>BiteRushLandingR</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="BiteRushLandingR" StartFrame="7" EndFrame="9"/>
+        <Animation>DimensionClaw</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>DimensionClawContinue</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>0</Count>
+        <Animation>BiteRush</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="BiteRush0" StartFrame="13" EndFrame="14"/>
+        <Data1 EventName="BiteRush1" StartFrame="38" EndFrame="41"/>
+        <Animation>BiteRushStart</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="BiteRushStart" StartFrame="1" EndFrame="22"/>
+        <Animation>DimensionLaser</Animation>
+        <AnimSpeed>60</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="DimensionLaser" StartFrame="19" EndFrame="34"/>
+        <Animation>DemoDeadCut2</Animation>
+        <AnimSpeed>20</AnimSpeed>
+        <Count>1</Count>
+        <Data0 EventName="DemoDead" StartFrame="148" EndFrame="162"/>
+        <Animation>DemoDeadCut1</Animation>
+        <AnimSpeed>20</AnimSpeed>
+        <Count>0</Count>
+    </ModelName>
+    <ModelName>Bomber
+        <Animation>Walk</Animation>
+        <AnimSpeed>20</AnimSpeed>
+        <Count>2</Count>
+        <Data0 EventName="Sound_Chop" StartFrame="10" EndFrame="12"/>
+        <Data1 EventName="Sound_Chop" StartFrame="24" EndFrame="25"/>
+        <Animation>Find</Animation>
+        <AnimSpeed>20</AnimSpeed>
+        <Count>0</Count>
+        <Animation>FindWait</Animation>
+        <AnimSpeed>20</AnimSpeed>
+        <Count>0</Count>
     </ModelName>
 </Root>
