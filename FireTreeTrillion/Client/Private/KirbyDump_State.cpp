@@ -665,9 +665,8 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			FXDesc.vInitPos = { 0.f, .6f, .4f };
 			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 
-
 			m_pGameInstance->PlayMySound(L"Kirby_Vacuuming.wav", CHANNEL_PLAYERVOICE, 0.5f);
-			pKirby->Add_Effect("Vacuum_v3", FXDesc, true);
+			pKirby->Add_Effect("YW Vacuum Multi", FXDesc, true);
 
 			//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v3"), &FXDesc)))
 			//	return;
