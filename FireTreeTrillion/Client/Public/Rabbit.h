@@ -62,7 +62,7 @@ public:
 	void Compute_Parabola(_vector vEndPos);
 	_vector JumpAttak(_float fTimeDelta);
 
-	_bool Get_IsCulling() const { return m_bIsCulling; }
+	_bool IsNearKirby();
 
 private:
 	CTexture* m_pEyeTextureCom = { nullptr };
@@ -99,7 +99,7 @@ private:
 	_float4						m_vGoPos = {}; // 포물선을 그릴 때 포물선 공식을 계속 더해줄 값
 
 	_uint						m_iEyeMeshIdx = {};
-	_bool						m_bIsCulling = true;
+	_bool						m_bIsNear = false;
 
 private:
 	HRESULT Add_Components(const wstring& _wstrModelName);

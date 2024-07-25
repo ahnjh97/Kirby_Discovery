@@ -985,6 +985,20 @@ void CCollisionCenter::FinalStage_Battle()
 
 
 	// 플레이어 공격에 대한 처리.
+	Collision_Collider(m_GameObjects[FINALGM], m_GameObjects[BOSS_FINALBOSS], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pLab = static_cast<CPhysXObject*>(Dst);
+
+			pLab->Collision(CONTENT_ATTACK, pLab);
+		});
+
+	// 플레이어 공격에 대한 처리.
 	Collision_Collider(m_GameObjects[FINALGM], m_GameObjects[HITBOX_MONSTER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{
@@ -2525,8 +2539,12 @@ void CCollisionCenter::Compute_Heal(CPhysXObject* pPlayer, CPhysXObject* pItem)
 
 	CMultiEffect::MULTI_FX_DESC Effectdesc = {};
 	Effectdesc.vInitPos = { 0.f, 0.5f, 0.f };
-	Effectdesc.vInitScale = { 1.f, 1.f, 1.f };
-	Effectdesc.pSocketMatrix = pCPlayer->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
+	if (pCPlayer->Get_KirbyInfo()->m_eBodyState == CKirby::BODY_BULBDEFAULT)
+	{
+		Effectdesc.vInitScale = { 2.f, 2.f, 2.f };
+	}
+
+	Effectdesc.pSocketMatrix = pCPlayer->Get_EffectSocket();
 	//if (FAILED(GAMEINSTANCE Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Food Eat Effects"), &Effectdesc)))
 	//	return;
 	pCPlayer->Add_Effect("YW Food Eat Effects", Effectdesc, false);

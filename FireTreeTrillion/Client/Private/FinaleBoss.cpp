@@ -45,6 +45,8 @@ HRESULT CFinaleBoss::Initialize(void* pArg)
 		pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_FINALE);
 	}
 
+	Add_AnimEvent();
+
 	m_pModelCom->Set_Animation(FINALEBOSS_DEMOWAITAIR, 50.f, true, true);
 
 	return S_OK;
@@ -146,6 +148,47 @@ void CFinaleBoss::Render_IMGUI()
 
 void CFinaleBoss::Add_AnimEvent()
 {
+	__super::Add_AnimEvent();
+
+	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
+	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
+	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
+
+	m_pModelCom->Add_Event("ReadyDebris", [this]() {
+		m_pGameInstance->PlaySound_Free(L"보스 고함 1.wav", .5f);
+
+		});
+
+
+	m_pModelCom->Add_Event("ThrowDebris", [this]() {
+		m_pGameInstance->PlaySound_Free(L"운석 던지기.wav", .5f);
+
+		});
+
+	m_pModelCom->Add_Event("Charge", [this]()
+		{
+			m_pGameInstance->PlaySound_Free(L"운석 생성.wav", .5f);
+		});
+
+	m_pModelCom->Add_Event("QTE2", [this]()
+		{
+		m_pGameInstance->PlaySound_Free(L"마지막.wav", .5f);
+		});
+
+	m_pModelCom->Add_Event("QTE Collide", [this]()
+		{
+			m_pGameInstance->PlaySound_Free(L"qte 충돌 2.wav", .5f);
+		});
+
+	m_pModelCom->Add_Event("Finale", [this]()
+		{ 
+			m_pGameInstance->PlaySound_Free(L"피날레.wav",.5f);
+		});
+
+	//m_pModelCom->Add_Event("Finale2", [this]()
+	//	{
+	//		m_pGameInstance->PlaySound_Free(L"마지막 2.wav", 0.4f);
+	//	});
 }
 
 void CFinaleBoss::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)

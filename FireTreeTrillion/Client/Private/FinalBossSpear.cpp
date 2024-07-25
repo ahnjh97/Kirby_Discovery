@@ -68,6 +68,7 @@ _int CFinalBossSpear::Tick(_float fTimeDelta)
 				++m_iCnt;
 				m_fDelayTime = 0.f;
 				CRayArrow::RAYARROW_DESC RayArrow = {};
+				RayArrow.iSoundChannel = m_iSoundChannel;
 				_float4x4 WorldMatrix = m_WorldMatrix;
 				WorldMatrix._41 -= m_WorldMatrix._31 * 4.5f;
 				WorldMatrix._42 -= m_WorldMatrix._32 * 4.5f;
@@ -93,6 +94,7 @@ _int CFinalBossSpear::Tick(_float fTimeDelta)
 					return E_FAIL;
 				}
 
+				++m_iSoundChannel;
 				m_fAngle += 13.f;
 				m_fSide -= 20.f;
 				m_fHeight -= 5.f;
@@ -143,6 +145,7 @@ _int CFinalBossSpear::Tick(_float fTimeDelta)
 					return E_FAIL;
 				}
 
+				++m_iSoundChannel;
 				if (6 == m_iCnt)
 					m_fCreateTime = 0.08f;
 				else
@@ -167,12 +170,11 @@ _int CFinalBossSpear::Tick(_float fTimeDelta)
 			{
 				m_bGate = true;
 
-
 				CDimensionGate::DIMENSIONGATE_DESC DimensionGateDesc = {};
 				_vector vPos = XMLoadFloat4x4(&m_WorldMatrix).r[3];
-				vPos.m128_f32[1] += -4.6f;
+				vPos.m128_f32[1] = 0.1f;
 				DimensionGateDesc.vPosition = vPos;
-				DimensionGateDesc.fScale = 0.02f;
+				DimensionGateDesc.fScale = 0.025f;
 				DimensionGateDesc.bSwitch = true;
 				if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Gate"), TEXT("Prototype_GameObject_DimensionGate"), &DimensionGateDesc)))
 					return E_FAIL;
@@ -182,6 +184,7 @@ _int CFinalBossSpear::Tick(_float fTimeDelta)
 	else
 	{
 		m_iCnt = 0;
+		m_iSoundChannel = 107;
 		m_fDelayTime = 0.f;
 	}
 

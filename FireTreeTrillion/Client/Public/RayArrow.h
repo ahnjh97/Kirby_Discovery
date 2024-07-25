@@ -14,6 +14,7 @@ class CRayArrow final : public CPhysXObject
 {
 public:
 	struct RAYARROW_DESC : public CGameObject::GAMEOBJECT_DESC {
+		_uint iSoundChannel = { 0 };
 		_float fAngle = { 0.f };
 		_float fHeight = { 0.f };
 		_float fDelayTime = { 0.f };
@@ -72,6 +73,7 @@ private:
 	_bool			m_bActive = { false };
 	_bool			m_bFire = { false };
 	_bool			m_bFireActive = { false };
+	_bool			m_bSound = { false };
 
 	//이펙트 체크 위한 타임
 	_float			m_fFlyingTime = { 0.f };
@@ -79,6 +81,7 @@ private:
 	_bool			m_bCollided = { false };
 
 	_uint			m_iCnt = { 0 };
+	_uint			m_iSoundChannel = { 0 };
 
 private:
 	HRESULT Add_Components();

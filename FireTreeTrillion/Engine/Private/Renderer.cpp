@@ -1115,7 +1115,7 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 		Update_RimLight(0.f);
 
 		Update_Ocean(.9f, -45.3f, 10.5f, { .03f, .55f, .61f }, { .7f, 1.f, 1.f });
-		Update_OceanWave(1.f, 1.4f);
+		Update_OceanWave(1.f, .8f);
 
 		break;
 	case 13:
@@ -1151,6 +1151,7 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 		m_DestColorData = Find_ColorSet("Tutorial");
 		Update_Option(OPTION_DOF, true);
 		Update_Ocean(0.f, -45.f, -10.f);
+		Update_Ocean(0.f, -2000.f, -1000.f);
 
 		break;
 	}

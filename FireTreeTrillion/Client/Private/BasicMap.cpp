@@ -74,10 +74,11 @@ HRESULT CBasicMap::Initialize(void* pArg)
     if (true == m_bBlendMap)
         return S_OK;
 
-    // --- ModelName -- TriggerRadius -- IdleIndex & Speed -- ActionIndex & Speed ----------
-    SetUpAnimDecoInfo("BushL", 1.5f, 2, 60.f, 0, 50.f);
-    SetUpAnimDecoInfo("BushM", 1.1f, 2, 60.f, 0, 50.f);
-    SetUpAnimDecoInfo("BushS", 0.8f, 2, 60.f, 0, 50.f);
+    wstring wstrBushSound = L"BushSound.wav";
+    // --- ModelName -- TriggerRadius -- IdleIndex & Speed -- ActionIndex & Speed ---------- SoundName & Volume -----------
+    SetUpAnimDecoInfo("BushL", 1.5f, 2, 60.f, 0, 50.f, wstrBushSound, 1.f);
+    SetUpAnimDecoInfo("BushM", 1.1f, 2, 60.f, 0, 50.f, wstrBushSound, 1.f);
+    SetUpAnimDecoInfo("BushS", 0.8f, 2, 60.f, 0, 50.f, wstrBushSound, 1.f);
     SetUpAnimDecoInfo("PopFlower", 0.8f, 2, 120.f, 1, 130.f);
 
     SetUpAnimDecoInfo("SmallBirds", 3.5f, 1, 60.f, 0, 60.f);
@@ -539,6 +540,10 @@ void CBasicMap::InsertMapDecos()
             if (m_setAfterHideAnimDecos.end() != m_setAfterHideAnimDecos.find(strModelName))
                 pModel->SetUp_ActionAnimForOctree(animIter->second.first);
 
+            auto soundIter = m_mapModelSoundInfo.find(strModelName);
+            if (soundIter != m_mapModelSoundInfo.end())
+                pModel->SetUpSoundInfo(soundIter->second.first, soundIter->second.second);
+            
             m_pGameInstance->Emplace_MapDecoTrigger(pRigidStatic, pModel, animIter->second.first, animIter->second.second);
             CAnimDeco::ANIMDECO_DESC tAnimDeco{};
             tAnimDeco.pAnimDecoModel = pModel;
@@ -597,11 +602,14 @@ PxRigidStatic* CBasicMap::AddTriggerActorForAnimDeco(const string& _strModelName
     return pStaticActor;
 }
 
-void CBasicMap::SetUpAnimDecoInfo(const string& _strModelName, _float _fTriggerRadius, _uint iIdleIndex, _float fIdleAnimSpeed, _uint iActionIndex, _float fActionAnimSpeed)
+void CBasicMap::SetUpAnimDecoInfo(const string& _strModelName, _float _fTriggerRadius, _uint iIdleIndex, _float fIdleAnimSpeed
+    , _uint iActionIndex, _float fActionAnimSpeed, const wstring& _wstrSound, _float fVolume)
 {
     m_ModelShapeRadiiMap.emplace(_strModelName, _fTriggerRadius);
     m_ModelIdleAnimMap.emplace(_strModelName, pair<_uint, _float>(iIdleIndex, fIdleAnimSpeed));
     m_ModelActionAnimMap.emplace(_strModelName, pair<_uint, _float>(iActionIndex, fActionAnimSpeed));
+    if(_wstrSound != L"")
+        m_mapModelSoundInfo.emplace(_strModelName, pair<wstring, _float>(_wstrSound, fVolume));
 }
 
 void CBasicMap::ReadDecos_ForSmallLevels()
@@ -610,7 +618,7 @@ void CBasicMap::ReadDecos_ForSmallLevels()
 
     string strLevel;
     if (LEVEL_TOWN == *m_pCurrentLevelID)
-        strLevel = "Town";
+        strLevel = "Town";                                                                                              
     else if (LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
         strLevel = "DeeDeeDee";
     else if (LEVEL_PARTTIME == *m_pCurrentLevelID)

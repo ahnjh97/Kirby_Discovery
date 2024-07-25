@@ -74,6 +74,7 @@ private:
 	unordered_map<string, _float> m_ModelShapeRadiiMap;
 	unordered_map<string, pair<_uint, _float>> m_ModelActionAnimMap;
 	unordered_map<string, pair<_uint, _float>> m_ModelIdleAnimMap;
+	unordered_map<string, pair<wstring, _float>> m_mapModelSoundInfo;
 	vector<PxRigidStatic*> m_vecAnimDecoTriggersActors;
 	vector<PxShape*> m_vecShapes;
 	vector<string>	m_vecConstantNames;
@@ -111,7 +112,7 @@ private:
 	void InsertMapDecos(); // For Octree Decos
 	PxRigidStatic* AddTriggerActorForAnimDeco(const string& _strModelName, _float4x4& _matWorld);
 	void SetUpAnimDecoInfo(const string& _strModelName, _float _fTriggerRadius, _uint iIdleIndex, _float fIdleAnimSpeed
-		, _uint iActionIndex, _float fActionAnimSpeed);
+		, _uint iActionIndex, _float fActionAnimSpeed, const wstring& _wstrSound = L"", _float fVolume = 0.5f);
 
 	void ReadDecos_ForSmallLevels(); // For NonOctree Decos;
 

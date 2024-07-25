@@ -93,6 +93,7 @@ _int CAnimBridge::Tick(_float fTimeDelta)
 		{
 			m_pModelCom->Set_Animation(1, 60.f, false, false);
 			m_bSecondAnim = false;
+			m_pGameInstance->PlaySound_Free(L"BridgeLand.wav", 0.5f);
 		}
 	}
 
@@ -102,6 +103,12 @@ _int CAnimBridge::Tick(_float fTimeDelta)
 			m_fAngle += 1.f;
 		else if (m_pGameInstance->Get_DIKeyState(DIK_M, KEY_DOWN))
 			m_fAngle -= 1.f;
+
+		if (3.6f < m_fHitTime && false == m_bSound)
+		{
+			m_bSound = true;
+			m_pGameInstance->PlaySound_Free(L"BridgeToppleStart.wav", 0.5f);
+		}
 
 		if(m_bBoundTrigger == true && m_fHitTime >= 2.f)
 		{
@@ -141,6 +148,7 @@ _int CAnimBridge::Tick(_float fTimeDelta)
 			*m_pEditMatrix = _float4x4::Identity;
 			m_pModelCom->Set_Animation(0, 60.f, true, false);
 			m_bSecondAnim = false;
+			m_pGameInstance->PlaySound_Free(L"BridgeToppleEnd.wav", 0.55f); // 타이밍 잡아두기
 		}
 	}
 

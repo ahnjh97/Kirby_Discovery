@@ -144,7 +144,8 @@ void CPhysXObject::Set_PhyXState(PHYXOBJECT_CURSTATE eState)
 
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.vInitPos = static_cast<_float3>(m_pTransformCom->Get_State(CTransform::STATE_POSITION) - m_pGameInstance->Get_CamLook());
-		FXDesc.vInitRot = CUtils::Make_Degree_FromDir(m_pGameInstance->Get_CamLook());
+		//FXDesc.vInitRot = CUtils::Make_Degree_FromDir(m_pGameInstance->Get_CamLook());
+		FXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f), 0.f };
 		FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 
 		Add_Effect("Colliding", FXDesc, false);

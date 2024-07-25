@@ -2,7 +2,7 @@
 #include "Laser.h"
 #include "Kirby.h"
 #include "HitBox.h"
-
+#include "FinalBoss.h"
 
 
 CLaser::CLaser(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -68,42 +68,59 @@ _int CLaser::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
-	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
-	_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-	vKirbyPos.m128_f32[1] = 0.f;
-
-	m_pTransformCom->Look_At_Interpolate(vKirbyPos, m_fTimeDelta * 0.2f);
-	Activate_FrustumCollider(0.f, 200.f, 5.f);
-
-	//레이저에 보스 건물 영역이 들어맞는지 판단, 그 영역에 자국을 남긴다.
-	static _float fDecalTime{ 0.f };
-	fDecalTime += m_fTimeDelta;
-	
-	if (.15f < fDecalTime)
+	if (true == m_bEnd)
 	{
-		fDecalTime = 0.f;
+		m_bEnd = false;
+		m_pModelCom->Set_Animation(0, 60.f, false, true);
+	}
+	else
+	{
+		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
+		CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+		_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+		vKirbyPos.m128_f32[1] = 0.f;
 
-		_float3 vCollidingPoint =
-			 CUtils::Compute_CollidingPoint(GET_POS, (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK), {0.f, 0.f, 0.f}, {21.f, 1.f, 21.f});
-
-		if (!ISDEFAULTFLOAT3(vCollidingPoint))
+		CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
+		if (CFinalBoss::FINALBOSS_DIMENSIONLASER == pFinalBoss->Get_State())
 		{
-			if (m_pModelCom->Get_CurAnimIndex() != 0)
+			m_fColliderTime += m_fTimeDelta;
+			if(7.f > m_fColliderTime)
 			{
-				//레이저와의 충돌 자국
-				CEffect::FX_DESC FXDesc{};
-				FXDesc.vInitPos = vCollidingPoint;
-				FXDesc.vInitScale = { 3.f, 3.f, 3.f };
-				Add_Effect("HS_FB laser decal", FXDesc, false);
-
-				//충돌 시 튀는 파티클
-				CParticle::PARTICLE_DESC ParticleDesc{};
-				ParticleDesc.vInitPos = vCollidingPoint;
-				ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
-				Add_Effect("HS_perfect laser collide particle", ParticleDesc);
+				m_pTransformCom->Look_At_Interpolate(vKirbyPos, m_fTimeDelta * 0.2f);
+				Activate_FrustumCollider(0.f, 200.f, 5.f);
 			}
+		}
 
+		//레이저에 보스 건물 영역이 들어맞는지 판단, 그 영역에 자국을 남긴다.
+		static _float fDecalTime{ 0.f };
+		fDecalTime += m_fTimeDelta;
+
+		if (.15f < fDecalTime)
+		{
+			fDecalTime = 0.f;
+
+			_float3 vCollidingPoint =
+				CUtils::Compute_CollidingPoint(GET_POS, (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK), { 0.f, 0.f, 0.f }, { 21.f, 1.f, 21.f });
+
+			if (!ISDEFAULTFLOAT3(vCollidingPoint))
+			{
+				if (m_pModelCom->Get_CurAnimIndex() != 0)
+				{
+					//레이저와의 충돌 자국
+					CEffect::FX_DESC FXDesc{};
+					FXDesc.vInitPos = vCollidingPoint;
+					FXDesc.vInitPos.y = 0.5f;
+					FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+					Add_Effect("HS_FB laser decal", FXDesc, false);
+
+					//충돌 시 튀는 파티클
+					CParticle::PARTICLE_DESC ParticleDesc{};
+					ParticleDesc.vInitPos = vCollidingPoint;
+					FXDesc.vInitPos.y = 0.5f;
+					ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+					Add_Effect("HS_FB laser collide particle B", ParticleDesc);
+				}
+			}
 		}
 	}
 

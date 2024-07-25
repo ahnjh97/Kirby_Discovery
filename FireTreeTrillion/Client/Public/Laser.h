@@ -44,6 +44,7 @@ private:
 	_vector		m_vPosition = {};
 	_float		m_fTimeDelta = { 0.f };
 	_float		m_fLifeTime = { 0.f };
+	_float		m_fColliderTime = { 0.f };
 
 	_bool		m_bEnd = { false };
 

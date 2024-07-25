@@ -108,8 +108,10 @@ public:
 	virtual void	Add_AnimEvent()								override;
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
 
-
 	FINALEKIRBY_INFODESC*	Get_KirbyInfo() { return &m_tKirbyInfo; }
+	void			Set_KirbyInfo(FINALEKIRBY_INFODESC _tInfo) {
+		m_tKirbyInfo = _tInfo;
+	}
 	void					Change_State(STATE eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, BODYSTATE eBody, _uint iOffSet = 0);
 
 	_uint					Get_Coin() const { return m_uCoin; }

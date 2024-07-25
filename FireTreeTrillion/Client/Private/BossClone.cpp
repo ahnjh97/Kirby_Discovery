@@ -4,12 +4,12 @@
 #include "HitBox.h"
 
 CBossClone::CBossClone(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CPhysXObject{ pDevice, pContext }
+	: CCharacter{ pDevice, pContext }
 {
 }
 
 CBossClone::CBossClone(const CBossClone& rhs)
-	: CPhysXObject{ rhs }
+	: CCharacter{ rhs }
 {
 }
 
@@ -39,6 +39,9 @@ HRESULT CBossClone::Initialize(void* pArg)
 	if (FAILED(Add_Components()))
 		return E_FAIL;
 
+	m_fMaxHp = 5.f;
+	m_fHp = 5.f;
+
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);
 	m_pTransformCom->Look_At_Axis(m_vLook);
 
@@ -54,6 +57,12 @@ _int CBossClone::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
+	if (Get_PhyXState() == PO_NORMAL)
+	{
+		if (m_fHp <= 0.f)
+			m_bDead = true;
+	}
+
 	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 	if (CFinalBoss::FINALBOSS_DAMAGE == pFinalBoss->Get_State())
 		m_bDead = true;
@@ -68,17 +77,23 @@ _int CBossClone::Tick(_float fTimeDelta)
 			if (0.f < m_fSpeed)
 				m_fSpeed -= m_fTimeDelta * 1.1f;
 			else
+			{
 				m_fSpeed = 0.f;
+			}
 
 			vPos += XMVector3Normalize(m_vTargetPos - vPos) * m_fTimeDelta * 22.f * m_fSpeed;
 			vPos.m128_f32[1] = m_vPosition.m128_f32[1];
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+
 		}
 		else
 		{
 			m_fDelayTime += m_fTimeDelta;
 			if(0.1f < m_fDelayTime)
+			{
 				m_bMove = true;
+				m_pGameInstance->PlaySound_Free(L"BossChimera_Recovery.wav", 0.5f);
+			}
 		}
 	}
 	else if (true == m_bMove)
@@ -94,28 +109,6 @@ _int CBossClone::Tick(_float fTimeDelta)
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 		}
 	}
-
-	//if (14.6f < fDistance)
-	//{
-	//	if (0.f < m_fSpeed)
-	//		m_fSpeed -= m_fTimeDelta;
-	//	else
-	//		m_fSpeed = 0.f;
-
-	//	vPos += XMVector3Normalize(m_vTargetPos - vPos) * m_fTimeDelta * 22.f * m_fSpeed;
-	//	vPos.m128_f32[1] = m_vPosition.m128_f32[1];
-	//	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-	//}
-	//else if (0.5f < fDistance)
-	//{
-	//	if (0.f < m_fSecondSpeed)
-	//		m_fSecondSpeed -= m_fTimeDelta * 0.8f;
-	//	else
-	//		m_fSecondSpeed = 0.f;
-
-	//	vPos += XMVector3Normalize(m_vTargetPos - vPos) * m_fTimeDelta * 22.f * m_fSecondSpeed;
-	//	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
-	//}
 
 	return OBJ_NOEVENT;
 }

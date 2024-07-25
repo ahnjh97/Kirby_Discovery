@@ -74,7 +74,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
-	m_eAbilityType = ABILITY_HAMMER;
+	m_eAbilityType = ABILITY_CRASH;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 			m_eAbilityType = ABILITY_HAMMER;
 
@@ -106,9 +106,10 @@ _int CKirby::Tick(_float fTimeDelta)
 	// 커비의 기본적인 축 보정, 밸런스 보정을 담당한다.
 	Setting_KirbyBalance();
 
+	/*
 	// 테스트 전용
 	Key_Input(m_fTimeDelta);
-
+	*/
 	// 유틸업데이트가 들어가있다.
 	__super::Tick(m_fTimeDelta);
 	Kirby_SystemTick(m_fTimeDelta);
@@ -124,7 +125,11 @@ _int CKirby::Tick(_float fTimeDelta)
 		//RayCast_SurpriseBoards();
 	}
 		
-	//m_bOverPower = true;
+	if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
+	{
+		m_EffectSocket._42 += 1.5f;
+	}
+
 	return OBJ_NOEVENT;
 }
 
@@ -698,7 +703,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				}
 
 				m_pGameInstance->PlayMySound(L"Kirby_Vacuuming.wav", CHANNEL_PLAYERVOICE, 0.5f);
-				Add_Effect("Vacuum_v3", FXDesc, true);
+				Add_Effect("YW Vacuum Multi", FXDesc, true);
 				// Deforming을 트루로 만든다. 길게 애니메이션이 재생될 준비를 한다. 이건 밖에서 예외처리 될 것이다.
 				INFO(m_bisDeforming) = true;
 				INFO(m_vObjectScale) = pObject->Get_TransformCom()->Get_Scaled();

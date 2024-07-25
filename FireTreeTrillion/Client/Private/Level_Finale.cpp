@@ -30,6 +30,9 @@ HRESULT CLevel_Finale::Initialize()
 	m_pGameInstance->Setting_LensFlare(false);
 
 
+
+	//m_pGameInstance->LoopSound(CHANNEL_GIMMICK_SUB)
+
 	HRESULT hr;
 	hr = __super::Initialize();
 	CHECK_FAILED(hr);

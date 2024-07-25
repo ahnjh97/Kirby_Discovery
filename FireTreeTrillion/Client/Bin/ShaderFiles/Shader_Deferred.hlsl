@@ -216,6 +216,9 @@ float3 FOGViewZ(float fViewZ, float4 vColor, float3 vFogColor, float fFogStart, 
 
 float3 Ocean(float fWorldY, float3 vColor, float3 vTopColor, float3 vBottomColor, float fOceanTopY, float fOceanBottomY, float fintensity)
 {
+    if (fintensity <= 0.01f)
+        return vColor;
+        
     if (fWorldY > fOceanTopY)
         return vColor;
     
@@ -231,7 +234,7 @@ float3 Ocean(float fWorldY, float3 vColor, float3 vTopColor, float3 vBottomColor
     // 1에 가까울 수록 기존 컬러를 유지한다.
     float3 vNewColor = lerp(vInterpolatedColor, vColor, pow(fintensity * depthRatio, 7.f));
     
-    return vNewColor;
+    return saturate(vNewColor);
 }
 
 //////////////////////////////////// For PBR 
@@ -1243,6 +1246,7 @@ PS_OUT PS_MAIN_FINAL(PS_IN In)
     float3 vFogY = FOGY(vWorldPos.y, vFogBeforeColor, g_vFogYColor, g_fFogYBottom, g_fFogYTopY, g_fFogYIntensity);
     float3 vFogView = FOGViewZ(fViewZ, vFogBeforeColor, g_vFogViewColor, g_fFogViewStart, g_fFogViewEnd, g_fFogViewIntensity);
     Out.vColor.rgb = saturate((vFogY + vFogView) / 2);
+    //Out.vColor.rgb = vFogBeforeColor;
     
     return Out;
 }

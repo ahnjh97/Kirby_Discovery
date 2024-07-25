@@ -339,7 +339,7 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 	else
 	{
 		if (m_eSpecialSeq == SEQ_INTRO)
-		{ 
+		{
 			m_pGameInstance->Update_DofFocus(
 				m_pFirstTarget->Get_State(CTransform::STATE_POSITION) + KIRBY_DOFOFFSET);
 		}
@@ -361,8 +361,15 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 		//사자 컷
 		if (SEQ_SIMBA_START <= m_eSpecialSeq && m_eSpecialSeq <= SEQ_SIMBA_LOW)
 		{
-			//사자 포커스
-			if (m_eSpecialSeq != SEQ_SIMBA_START)
+			//사자 로우 앵글포커스
+			if (m_eSpecialSeq == SEQ_SIMBA_LOW)
+			{
+				CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
+				if (nullptr != pSimba)
+					m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 8.f, 0.f });
+			}
+			//그 외 사자
+			else if (m_eSpecialSeq != SEQ_SIMBA_START)
 			{
 				CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
 				if (nullptr != pSimba)
@@ -378,8 +385,17 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 		if (m_eSpecialSeq == SEQ_SIMBA_THRONEBREAK)
 		{
 			CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
-			if (nullptr != pSimba)
-				m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{0.f, 5.f, 0.f});
+			if (m_fSeqCheckTime < 2.f)
+			{
+				if (nullptr != pSimba)
+					m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 5.f, 0.f });
+
+			}
+			else
+			{
+	
+					m_pGameInstance->Update_DofFocus({ 2.6f, 7.3f, .42f });
+			}
 		}
 
 		if (m_eSpecialSeq == SEQ_SIMBA_BOSSORIGIN)
@@ -387,7 +403,7 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 			CGameObject* pOrigin = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_BossOrigin"));
 
 			if (nullptr != pOrigin)
-				m_pGameInstance->Update_DofFocus(pOrigin->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{0.f, 3.f, 0.f});
+				m_pGameInstance->Update_DofFocus(pOrigin->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 3.f, 0.f });
 		}
 
 #pragma endregion
@@ -403,17 +419,23 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 			{
 				CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster"));
 				if (nullptr != pBoss)
-					m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{0.f, 4.5, 0.f});
+					m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 4.5f, 0.f });
 				//m_pGameInstance->Update_DofFocus({ 0.f, -31.f, 13.f });
 			}
 		}
 
-		if (m_eSpecialSeq == SEQ_FINALBOSS_2PHASE || m_eSpecialSeq == SEQ_FINALBOSS_DEAD
-			|| m_eSpecialSeq == SEQ_FINALBOSS_ENDING)
+		if (m_eSpecialSeq == SEQ_FINALBOSS_2PHASE)
 		{
 			CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster"));
 			if (nullptr != pBoss)
-				m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 4.5, 0.f });
+				m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 4.5f, 0.f });
+		}
+
+		if (m_eSpecialSeq == SEQ_FINALBOSS_DEAD || m_eSpecialSeq == SEQ_FINALBOSS_ENDING)
+		{
+			CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster"));
+			if (nullptr != pBoss)
+				m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 1.5f, 0.f });
 		}
 
 		if (m_eSpecialSeq == SEQ_FINALBOSS_DUMP)
@@ -842,6 +864,15 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 
 			}
 			break;
+		case SEQ_SIMBA_BOSSORIGIN:
+		{
+			if (m_SeqEventTriggers[0] == true && 5.f < m_fSeqCheckTime)
+			{
+				Make_Shake(2.f);
+				m_SeqEventTriggers[0] = false;
+			}
+		}
+		break;
 		default:
 			break;
 		}
@@ -1296,7 +1327,7 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 		//_float4 vPos = GET_POS;
 		//SET_POS(_float4(vPos.x, vPos.y + 0.2f, vPos.z, 1.f));
 	}
-;
+	;
 
 	m_vSlerpedDir = _float3::Lerp(m_vecFrontDirRadius[m_iMatrixIndex].first, m_vecRearDirRadius[m_iMatrixIndex].first, m_fTriggerRatio);
 	m_fLerpedRadius = LERP(m_vecFrontDirRadius[m_iMatrixIndex].second, m_vecRearDirRadius[m_iMatrixIndex].second, m_fTriggerRatio);
@@ -1477,10 +1508,10 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	case SEQ_INTRO:
 	{
 		CAMACTION newAction = {};
-		
+
 		Fill_HardCutSet(newAction, 0.f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { -130.f, 3.2f, -130.f });
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, {0.f, .16f, 1.f});
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .16f, 1.f });
 		newAction.fFOVY = 20.f;
 		m_CamSeq.emplace_back(newAction);
 
@@ -1945,19 +1976,19 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	{
 		CAMACTION newAction{};
 		Fill_HardCutSet(newAction, 0.f);
-		Fill_ActionPos(newAction, POS_ABSOLUTE, { 9.87f, 20.f, 16.f});
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 9.87f, 20.f, 16.f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.64f, .06f, .76f });
 		m_CamSeq.push_back(newAction);
 
 		//확 땡기기
 		Fill_InterpolateCutSet(newAction, .7f, EASE_INOUT_FAST, .4f);
-		Fill_ActionPos(newAction, POS_ABSOLUTE, { 7.54f, 19.07f, 19.53f});
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 7.54f, 19.07f, 19.53f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.62f, .25f, .75f });
 		m_CamSeq.push_back(newAction);
 
 
 		Fill_HardCutSet(newAction, 3.f);
-		Fill_ActionPos(newAction, POS_ABSOLUTE, { -1.75f, 25.33f, -1.65f});
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { -1.75f, 25.33f, -1.65f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { .06f, -.09f, .99f });
 		m_CamSeq.push_back(newAction);
 
@@ -1966,11 +1997,11 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 
 		newAction.fFOVY = 30.f;
-		Fill_InterpolateCutSet(newAction, 5.f, EASE_INOUT, .5f);
+		Fill_InterpolateCutSet(newAction, 5.f, EASE_INOUT, .4f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { 1.01f, 12.29f, -59.03f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.02f, .12f, .99f });
 		m_CamSeq.push_back(newAction);
-		 
+
 
 
 		Fill_InterpolateCutSet(newAction, 6.f, EASE_INOUT, 7.f);
@@ -2041,7 +2072,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_fSeqEventTime = fLastSeqStartTime;
 
 		//보스 정면으로
-		vStartPos = { 0.f, 35.f, -3.f };
+		vStartPos = { 0.f, 35.f, -3.f } + _float3{0.f, 0.f, 40.f};
 		Fill_HardCutSet(newAction, fLastSeqStartTime);
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos);
@@ -2051,7 +2082,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		//
 		Fill_InterpolateCutSet(newAction, fLastSeqStartTime, EASE_INOUT, 5.f);
-		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ 0.f, -5.f, -5.f });
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ 0.f, -5.f, 5.f });
 		m_CamSeq.push_back(newAction);
 
 		Fill_InterpolateCutSet(newAction, fLastSeqStartTime + 5.f, EASE_INOUT, 8.f);
@@ -2903,12 +2934,17 @@ void CCamera_Main::Ready_Monsters_Leongar(CGameObject* pNotifier)
 {
 	//위에서 보기
 	CAMACTION newAction{};
-	Fill_HardCutSet(newAction, 0.f);
 
+	newAction.fFOVY = 35.f;
+
+	Fill_HardCutSet(newAction, 0.f);
 	Fill_ActionPos(newAction, POS_ABSOLUTE, { 1.2f, 14.f, -102.f });
-	Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, -.35f, 1.f });
+	Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, -.25f, 1.f });
 	Make_One_Sequence(newAction);
-	Set_TargetAnchor({ 0.f, 4.f, 5.f });
+
+	Fill_Delay(newAction, 0.f, .1f);
+
+	Set_TargetAnchor({ 0.f, 4.f, 0.f });
 
 	//Make_Sequence(SEQ_SIMBA_BATTLESTART);
 }
@@ -3447,7 +3483,7 @@ void CCamera_Main::Render_IMGUI()
 	ImGui::SeparatorText(u8"시퀀스");
 
 
-	if(m_eSpecialSeq != SEQ_END)
+	if (m_eSpecialSeq != SEQ_END)
 		ImGui::Text(u8"현재 시퀀스: playing");
 	else
 		ImGui::Text(u8"현재 시퀀스: none");

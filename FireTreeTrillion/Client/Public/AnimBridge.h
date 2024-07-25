@@ -60,6 +60,7 @@ private:
 	_bool			m_bBoundTrigger = { true };
 	_float			m_fBoundTime = { 0.f };
 	_float			m_fAngle = { 0.f };
+	_bool			m_bSound = { false };
 
 public:
 	static CAnimBridge* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -42,6 +42,7 @@ HRESULT CFinale_SpecialDebris_C::Initialize(void* pArg)
 	m_bRimLight = true;
 	m_bStencil = true;
 
+
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _float4(2550.f, 239.f, -136.f, 1.f));
 	_float4 NewLook = _float4(1.f, 0.f, 0.f, 0.f);
 	_float4 NewUp = _float4(0.f, 1.f, 0.f, 0.f);
@@ -51,6 +52,8 @@ HRESULT CFinale_SpecialDebris_C::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_UP, NewUp);
 	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, NewRight);
 
+	m_pGameInstance->PlaySound_Free(L"ÁöÁø.wav", .4f);
+	
 	return S_OK;
 }
 

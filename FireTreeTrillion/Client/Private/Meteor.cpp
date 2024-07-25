@@ -126,9 +126,13 @@ _int CMeteor::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 	{
+		// 사운드
+		m_pGameInstance->PlaySound_Free(L"BrokeBigMeteor.wav", 0.5f);
+
 		//별 아이템 생성
 		if (true == m_bBig)
 		{
+			m_pGameInstance->StopSound(CHANNEL_SOUND11);
 			_vector vPos = m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 			vPos.m128_f32[1] += 10.f;
 
@@ -148,6 +152,9 @@ _int CMeteor::Tick(_float fTimeDelta)
 		}
 		else
 		{
+			// 사운드
+			m_pGameInstance->PlaySound_Free(L"BrokeMeteor.wav", 0.5f);
+
 			HRESULT hr;
 			// 별 아이템 떨굼
 			CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
@@ -224,6 +231,9 @@ _int CMeteor::Tick(_float fTimeDelta)
 					CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 					if (pCamera != nullptr)
 						pCamera->Make_Shake(1.f, 3.f);
+
+					// 사운드
+					m_pGameInstance->PlayMySound(L"MeteorDebris.wav", CHANNEL_SOUND11, 0.5f);
 				}
 
 				if (m_fEffectTime > 0.35f)
@@ -371,7 +381,7 @@ _int CMeteor::Tick(_float fTimeDelta)
 		else
 		{
 			_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, m_vTargetPos)));
-			if (2.f < fDistance)
+			if (2.5f < fDistance)
 			{
 				m_fTurnSpeed += m_fTimeDelta;
 

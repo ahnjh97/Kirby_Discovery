@@ -63,6 +63,9 @@ CFinalBoss_Appear_State::CFinalBoss_Appear_State()
 void CFinalBoss_Appear_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+
+	m_bSound1 = false;
+	m_bSound2 = false;
 }
 
 void CFinalBoss_Appear_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -72,6 +75,25 @@ void CFinalBoss_Appear_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
 	m_pGameInstance->Update_DofFocus(pTransformCom->Get_State(CTransform::STATE_POSITION));
+
+	if (0.7f < pFinalBoss->Get_AnimRatio())
+	{
+		if (false == m_bSound2)
+		{
+			m_bSound2 = true;
+			// 사운드
+			m_pGameInstance->PlaySound_Free(L"BossChimera_LaserCharge.wav", 0.5f);
+		}
+	}
+	//else if (0.4f < pFinalBoss->Get_AnimRatio())
+	//{
+	//	if (false == m_bSound1)
+	//	{
+	//		m_bSound1 = true;
+	//		// 사운드
+	//		m_pGameInstance->PlaySound_Free(L"BossChimera_Appear.wav", 0.5f);
+	//	}
+	//}
 
 	if (pFinalBoss->IsAnimFinished())
 	{
@@ -124,9 +146,10 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+	_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 
 	// 플레이어를 향해 바라본다
-	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f, false);
+	pTransformCom->Look_At_Rotate(vKirbyPos, fTimeDelta * 4.f, false);
 
 	if (true == pFinalBoss->Get_Auto())
 	{
@@ -140,8 +163,6 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 					if (0 == m_iMeteor)
 					{
 						++m_iMeteor;
-						// 사운드 처리
-						m_pGameInstance->PlaySound_Free(L"BossChimeraRoar.wav", 0.5f);
 						pFinalBoss->Change_State(CFinalBoss::FINALBOSS_ROAR, 50.f, false, true);
 					}
 					else if (1 == m_iMeteor)
@@ -163,17 +184,18 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if (0 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished()/*0.5f < pFinalBoss->Get_AnimRatio()*/)
+				if (0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
-					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+					vKirbyPos.m128_f32[1] = 0.f;
+					m_vLook = vKirbyPos - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
 					pFinalBoss->Set_Direction(m_vLook);
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 				}
 			}
 			else if (5 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
@@ -181,28 +203,30 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (8 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					// 좌우 활공 패턴
 					_vector vBossPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-					_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+					_vector vKirbyRotatePos = vKirbyPos;
 
-					pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, 45.f));
+					pFinalBoss->Set_Direction(RotateGlide(vKirbyRotatePos, vBossPos, 45.f));
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNRIGHTAIRSTART, 50.f, false, true);
 				}
 			}
 			else if (9 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
+					// 사운드
+					m_pGameInstance->PlaySound_Free(L"BossChimera_Laser.wav", 0.5f);
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASEREADY, 50.f, false, true);
 				}
 			}
 			else if (10 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
@@ -210,17 +234,18 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (11 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
-					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+					vKirbyPos.m128_f32[1] = 0.f;
+					m_vLook = vKirbyPos - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
 					pFinalBoss->Set_Direction(m_vLook);
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 				}
 			}
 			else if (14 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
@@ -228,10 +253,11 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (18 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
-					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+					vKirbyPos.m128_f32[1] = 0.f;
+					m_vLook = vKirbyPos - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
 					pFinalBoss->Set_Direction(m_vLook);
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 				}
@@ -249,7 +275,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				if (pFinalBoss->IsAnimFinished())
 				{
 					++m_iCnt;
-					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+					vKirbyPos.m128_f32[1] = 0.f;
+					m_vLook = vKirbyPos - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
 					pFinalBoss->Set_Direction(m_vLook);
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 				}
@@ -275,7 +302,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (3 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 40.f, false, true);
@@ -283,7 +310,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (4 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
@@ -292,7 +319,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (6 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 50.f, false, true);
@@ -312,6 +339,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				if (pFinalBoss->IsAnimFinished())
 				{
 					++m_iCnt;
+					// 사운드
+					m_pGameInstance->PlaySound_Free(L"BossChimera_ThrustReady.wav", 0.5f);
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
 					//효선아 Thrust
 					ThrustCharge(pFinalBoss);
@@ -331,6 +360,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				if (pFinalBoss->IsAnimFinished())
 				{
 					++m_iCnt;
+					// 사운드
+					m_pGameInstance->PlaySound_Free(L"BossChimera_ThrustReady.wav", 0.5f);
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
 					//효선아 Thrust
 					ThrustCharge(pFinalBoss);
@@ -338,7 +369,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (16 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 50.f, false, true);
@@ -414,7 +445,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			{
 				pFinalBoss->Set_Stab(false);
 				// Stab 패턴
-				m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+				m_vLook = vKirbyPos - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
 				pFinalBoss->Set_Direction(m_vLook);
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 			}
@@ -431,6 +462,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			else if (true == pFinalBoss->Get_Laser())
 			{
 				pFinalBoss->Set_Laser(false);
+				// 사운드
+				m_pGameInstance->PlaySound_Free(L"BossChimera_Laser.wav", 0.5f);
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASEREADY, 50.f, false, true);
 			}
 			else if (true == pFinalBoss->Get_Side())
@@ -438,16 +471,16 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				pFinalBoss->Set_Side(false);
 				// 좌우 활공 패턴
 				_vector vBossPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-				_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				_vector vKirbyRotatePos = vKirbyPos;
 
 				if (rand() % 2 == 0)
 				{
-					pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, -45.f));
+					pFinalBoss->Set_Direction(RotateGlide(vKirbyRotatePos, vBossPos, -45.f));
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNLEFTAIRSTART, 50.f, false, true);
 				}
 				else
 				{
-					pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, 45.f));
+					pFinalBoss->Set_Direction(RotateGlide(vKirbyRotatePos, vBossPos, 45.f));
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNRIGHTAIRSTART, 50.f, false, true);
 				}
 			}
@@ -485,6 +518,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (true == pFinalBoss->Get_Thrust())
 			{
+				// 사운드
+				m_pGameInstance->PlaySound_Free(L"BossChimera_ThrustReady.wav", 0.5f);
 				pFinalBoss->Set_Thrust(false);
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
 				//효선아 Thrust
@@ -725,6 +760,7 @@ void CFinalBoss_GlideBack_State::OnStateUpdate(CGameObject* pGameObject, _float 
 		switch (pFinalBoss->Get_State())
 		{
 		case CFinalBoss::FINALBOSS_AWAYFASTREADY:
+			m_pGameInstance->PlaySound_Free(L"BossChimera_BackStep.wav", 0.35f);
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_AWAYFASTSTART, 50.f, false, true);
 			break;
 		case CFinalBoss::FINALBOSS_AWAYFASTSTART:
@@ -847,6 +883,7 @@ void CFinalBoss_Slash_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _f
 	m_fTimeDelta = 0.f;
 	m_fSpeed = 70.f;
 	m_bChain = false;
+	m_bSound = false;
 }
 
 void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -867,6 +904,7 @@ void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		switch (pFinalBoss->Get_State())
 		{
 		case CFinalBoss::FINALBOSS_SLASHREADY:
+			m_pGameInstance->PlaySound_Free(L"BossChimera_GullyStart.wav", 0.5f);
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHSTART, 50.f, false, true);
 			break;
 		case CFinalBoss::FINALBOSS_SLASHSTART:
@@ -914,8 +952,13 @@ void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		if (5.f > pController->Compute_Height(XMVectorSet(0.f, -1.f, 0.f, 0.f)))
 		{
 			pFinalBoss->Set_Gully(true);
-
 			//m_fSpeed = 10.f;
+
+			if(false == m_bSound)
+			{
+				m_bSound = true;
+				m_pGameInstance->PlaySound_Free(L"BossChimera_Gully.wav", 0.5f);
+			}
 		}
 		else
 		{
@@ -924,7 +967,7 @@ void CFinalBoss_Slash_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		}
 
 		m_fTimeDelta += fTimeDelta;
-		if (4.f < m_fTimeDelta)
+		if (3.f < m_fTimeDelta)
 		{
 			if (false == pFinalBoss->Get_Chain())
 			{
@@ -1017,6 +1060,7 @@ void CFinalBoss_Chain_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 		switch (pFinalBoss->Get_State())
 		{
 		case CFinalBoss::FINALBOSS_SLASHCHAINREADY:
+			m_pGameInstance->PlaySound_Free(L"BossChimera_GullyStart.wav", 0.5f);
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHSTART, 50.f, false, true);
 			break;
 		case CFinalBoss::FINALBOSS_SLASHCHAINSTABREADY:
@@ -1316,6 +1360,8 @@ void CFinalBoss_Thrust_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
 
+	pController->FreeFall(pTransformCom, fTimeDelta);
+
 	if (CFinalBoss::FINALBOSS_FLASHTHRUSTREADY == pFinalBoss->Get_State() || CFinalBoss::FINALBOSS_FLASHTHRUSTSWINGFINISHLEFT == pFinalBoss->Get_State())
 	{
 		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
@@ -1372,6 +1418,8 @@ void CFinalBoss_Thrust_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		{
 		case CFinalBoss::FINALBOSS_FLASHTHRUSTREADY:
 		{
+			// 사운드
+			m_pGameInstance->PlaySound_Free(L"BossChimera_Jump.wav", 0.5f);
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTSTART, 50.f, false, true);
 
 			CEffect::FX_DESC FXDesc{};
@@ -1405,6 +1453,8 @@ void CFinalBoss_Thrust_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAIT, 50.f, false, true);
 			else
 			{
+				// 사운드
+				m_pGameInstance->PlaySound_Free(L"BossChimera_ThrustReady.wav", 0.5f);
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
 
 				//효선아 Thrust
@@ -1511,12 +1561,17 @@ void CFinalBoss_Laser_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 			break;
 		case CFinalBoss::FINALBOSS_DIMENSIONLASERCHARGE:
 			pFinalBoss->Delete_AllEffect();
+			m_pGameInstance->PlayMySound(L"BossChimera_LaserCharge.wav", CHANNEL_SOUND12, 0.5f);
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASERSTART, 50.f, false, true);
 			break;
 		case CFinalBoss::FINALBOSS_DIMENSIONLASERSTART:
+			// 사운드
+			m_pGameInstance->StopSound(CHANNEL_SOUND12);
+			m_pGameInstance->PlayMySound(L"BossChimera_LaserAttack.wav", CHANNEL_SOUND12, 0.5f);
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_DIMENSIONLASER, 50.f, true, true);
 			break;
 		case CFinalBoss::FINALBOSS_DIMENSIONLASEREND:
+			m_pGameInstance->StopSound(CHANNEL_SOUND12);
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAITAIR, 50.f, false, true);
 			break;
 		}
@@ -1685,7 +1740,16 @@ void CFinalBoss_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		switch (pFinalBoss->Get_State())
 		{
 		case CFinalBoss::FINALBOSS_JUMPREADY:
+		{
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPSTART, 50.f, false, true);
+
+			CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
+			MultiFXDesc.vInitPos = static_cast<_float3> (pTransformCom->Get_State(CTransform::STATE_POSITION));
+			MultiFXDesc.vInitRot = { 0.f, CUtils::Make_RandomFloat(0.f, 360.f),0.f };
+			MultiFXDesc.vInitScale = { 2.f, 2.f, 2.f };
+			MultiFXDesc.fStartDelay = .5f;
+			pFinalBoss->Add_Effect("HS_FB fly smoke", MultiFXDesc);
+		}
 			break;
 		case CFinalBoss::FINALBOSS_JUMPSTART:
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPEND, 50.f, false, true);
@@ -1836,14 +1900,15 @@ void CFinalBoss_Roar_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
 	CTransform* pTransform = pFinalBoss->Get_TransformCom();
 
-	if (0.36f < pFinalBoss->Get_AnimRatio())
+	if (0.3f < pFinalBoss->Get_AnimRatio())
 	{
 		if (false == m_bShake)
 		{
 			m_bShake = true;
 
 			// 사운드 처리
-			m_pGameInstance->PlaySound_Free(L"BossChimeraRoar.wav", 0.5f);
+			m_pGameInstance->PlaySound_Free(L"BossChimera_Roar.wav", 0.5f);
+
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 			if (pCamera != nullptr)
 				pCamera->Make_Shake(0.5f, 3.5f);
@@ -1920,7 +1985,10 @@ void CFinalBoss_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	if (pFinalBoss->IsAnimFinished())
 	{
 		if (CFinalBoss::STATE_2PAZE == pFinalBoss->Get_BossState())
+		{
+			m_pGameInstance->PlaySound_Free(L"BossChimera_Jump.wav", 0.5f);
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_JUMPREADY, 50.f, false, true);
+		}
 		else
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAIT, 50.f, false, true);
 	}
@@ -2074,10 +2142,10 @@ void CFinalBoss_Recovery_State::OnStateUpdate(CGameObject* pGameObject, _float f
 			BossCloneDesc.vPosition = pTransformCom->Get_State(CTransform::STATE_POSITION);
 			BossCloneDesc.vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
 			BossCloneDesc.vTargetPos = pFinalBoss->Get_RallyPoint()[3];
-			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Clone"), TEXT("Prototype_GameObject_BossClone"), &BossCloneDesc);
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_BossMonster"), TEXT("Prototype_GameObject_BossClone"), &BossCloneDesc);
 			CHECK_FAILED(hr);
 			BossCloneDesc.vTargetPos = pFinalBoss->Get_RallyPoint()[4];
-			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Clone"), TEXT("Prototype_GameObject_BossClone"), &BossCloneDesc);
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_BossMonster"), TEXT("Prototype_GameObject_BossClone"), &BossCloneDesc);
 			CHECK_FAILED(hr);
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RECOVERYWAIT, 50.f, true, true);
 			break;
@@ -2120,6 +2188,8 @@ CFinalBoss_LastDamage_State::CFinalBoss_LastDamage_State()
 void CFinalBoss_LastDamage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+
+	m_bSound = false;
 }
 
 void CFinalBoss_LastDamage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -2127,6 +2197,19 @@ void CFinalBoss_LastDamage_State::OnStateUpdate(CGameObject* pGameObject, _float
 	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	if (CFinalBoss::FINALBOSS_DEMODISAPPEARCUT2 == pFinalBoss->Get_State())
+	{
+		if(0.76f < pFinalBoss->Get_AnimRatio())
+		{
+			if(false == m_bSound)
+			{
+				m_bSound = true;
+				m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"K15_BossChimeraPerfectAfter1.wav");
+				m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, 0.5f);
+			}
+		}
+	}
 
 	if (true == pFinalBoss->IsAnimFinished())
 	{
@@ -2137,9 +2220,6 @@ void CFinalBoss_LastDamage_State::OnStateUpdate(CGameObject* pGameObject, _float
 		{
 			//피 다 깎여서 엎드림
 		case CFinalBoss::FINALBOSS_LASTDAMAGESTART:
-
-			if (pCamera != nullptr)
-				pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_DEAD);
 
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_LASTDAMAGEWAIT, 50.f, false, false);
 			break;

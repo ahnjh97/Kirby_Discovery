@@ -680,6 +680,14 @@ void CUI_PartTime::Render_GO()
 	static _float fTimeAcc = 0.f;
 	static _float2 standardSize2D = m_arrSize[iNum];
 
+	// for sound
+	static _bool bOnce = false;
+	if (bOnce == false)
+	{
+		m_pGameInstance->PlaySound_Free(L"GameStartEnd.wav", 0.5f);
+		bOnce = true;
+	}
+
 	m_fSizeRatio += m_fTimeDelta * 2.f;
 	if (m_fSizeRatio >= 1.f)
 	{
@@ -732,6 +740,14 @@ void CUI_PartTime::Render_Finish()
 	_int iNum = 15;
 	static _float fTimeAcc = 0.f;
 	static _float2 standardFSize2D = m_arrSize[iNum];
+	
+	// for sound
+	static _bool bOnce = false;
+	if (bOnce == false)
+	{
+		m_pGameInstance->PlaySound_Free(L"GameStartEnd.wav", 0.5f);
+		bOnce = true;
+	}
 
 	m_fSizeRatio += m_fTimeDelta;
 	if (m_fSizeRatio >= 1.f)

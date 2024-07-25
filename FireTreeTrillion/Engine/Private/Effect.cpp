@@ -190,11 +190,11 @@ _bool CEffect::Calculate_Duration(_float _fTimeDelta)
 	{
 		m_fDuration.first = m_fDuration.second;
 
-		if (m_fDuration.second == FX_MAXDURATION)
-		{
-			m_fDuration.first = 0.f;
-			return false;
-		}
+		//if (m_fDuration.second == FX_MAXDURATION)
+		//{
+		//	m_fDuration.first = 0.f;
+		//	return false;
+		//}
 		return true;
 	}
 	return false;
@@ -415,7 +415,6 @@ void CEffect::Billboard_Effect()
 
 	vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	m_pTransformCom->Turn(vLook, 1.f, vValue.z);
-
 }
 
 void CEffect::Free()

@@ -61,6 +61,8 @@ HRESULT CDimensionGate::Initialize(void* pArg)
 
 	m_pModelCom->Set_Animation(1, 60.f, false, false);
 
+	m_pGameInstance->PlaySound_Free(L"DimensionGate.wav", 0.5f);
+
 	return S_OK;
 }
 
