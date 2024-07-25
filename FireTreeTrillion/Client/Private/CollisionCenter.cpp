@@ -1116,6 +1116,9 @@ void CCollisionCenter::Body_To_Body_Collision()
 					if (FAILED(GAMEINSTANCE Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
 						return;
 
+					GAMEINSTANCE PlaySound_Free(L"KirbyCar_Collision.wav", 0.5f);
+
+
 					pKirby->Set_HitStop();
 					pthis->Camera_Shaking(1.2f);
 					return;
