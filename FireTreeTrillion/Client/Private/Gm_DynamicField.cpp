@@ -352,11 +352,12 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			switch (m_eDFMoveState)
 			{
 			case DFIELD_WAIT:
-				m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
+				//m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
 				m_eDFMoveState = DFIELD_MOVE;
 				break;
 
 			case DFIELD_MOVE:
+				m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
 				m_pGameInstance->PlayMySound(L"DynamicField_Move.wav", CHANNEL_GIMMICK_SUB, 0.5f); //1회만 재생
 
 				eDFMoveUPType = (DFMOVEUP_TYPE)m_iGimmickIndex;
@@ -428,6 +429,7 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				break;
 
 			case DFIELD_MOVE:
+				m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
 				m_pGameInstance->PlayMySound(L"DynamicField_Move.wav", CHANNEL_GIMMICK_SUB, 0.5f);
 
 				if (DFMOVE_RIGHT == m_eDFieldType)
@@ -487,7 +489,6 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			case DFIELD_RETURN:
 				if (m_bReturnMove)
 				{
-
 					if (DFMOVE_RIGHT == m_eDFieldType)
 					{
 						m_pTransformCom->Go_Left(_fTimeDelta * 1.5f); //2.25 > 2.0 > 1.5
@@ -541,6 +542,7 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			{
 			case DFIELD_MOVE: //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
 				//07.25) 0.75 좀더 빠른게 자연스러워서 수치 값 재조정
+				m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
 				m_pGameInstance->PlayMySound(L"DynamicField_Move.wav", CHANNEL_GIMMICK_SUB, 0.5f);
 
 				m_pTransformCom->Go_Backward(_fTimeDelta * 1.5f); //2.0 > 1.5 > 
