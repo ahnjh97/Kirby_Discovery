@@ -487,6 +487,8 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 					Effectdesc.vInitScale = { 2.f, 2.f, 2.f };
 					if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
 						return;
+
+					m_pGameInstance->PlaySound_Free(L"KirbyCar_Collision.wav", 0.4f);
 				}
 			}
 			else if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
@@ -2248,6 +2250,8 @@ void CKirby::Kirby_StateInitialize()
 			Change_State(CARSTATE_MOVING, 60.f, true, false, BODY_CARDEFAULT, OFFSET_CAR);
 			m_pModelCom[BODY_CARDEFAULT]->Set_Animation(19, 60.f, true, true);
 		}
+
+		m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyCar_Idle.wav", 0.3f);
 	}
 	else if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
 	{

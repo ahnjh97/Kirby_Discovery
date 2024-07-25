@@ -78,6 +78,7 @@ _int CCar::Tick(_float fTimeDelta)
 		if (m_pControllerCom->Is_Terrain() && m_fFallTime > 0.3f)
 		{
 			m_eAnimIndex = CAR_LANDING;
+			m_pGameInstance->PlaySound_Free(L"KirbyCar_Landing.wav", 0.5f);
 			m_fFallTime = 0.f;
 		}
 	}

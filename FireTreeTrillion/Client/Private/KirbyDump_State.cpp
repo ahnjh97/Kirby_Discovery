@@ -752,6 +752,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			FXDesc.vInitPos = { 0.f, 0.f, 0.f };
 			FXDesc.vInitScale = { 1.8f, 1.8f, 1.8f };
 			pKirby->Add_Effect("YW Deform Effect2", FXDesc, false);
+			m_pGameInstance->PlaySound_Free(L"Kirby_DeformEvent.wav", 0.5f);
 			m_bEffectTrigger = false;
 		}
 

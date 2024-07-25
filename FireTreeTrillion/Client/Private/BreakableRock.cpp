@@ -127,6 +127,8 @@ void CBreakableRock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXOb
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
 		return;
 
+	m_pGameInstance->PlaySound_Free(L"KirbyCar_CollisionBridge.wav", 0.5f);
+
 }
 
 HRESULT CBreakableRock::Add_Components(wstring strPrototag)
