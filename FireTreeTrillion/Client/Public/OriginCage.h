@@ -57,6 +57,8 @@ private:
 	vector<_uint> m_vecBeforeMeshes;
 	vector<_uint> m_vecAfterMeshes;
 
+	_bool m_bPlaySound = {};
+
 public:
 	static COriginCage* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);

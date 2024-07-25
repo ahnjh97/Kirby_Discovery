@@ -128,11 +128,14 @@ void CRabbit::Late_Tick(_float fTimeDelta)
 		if (m_ePhyXState != PO_FLYAWAY)
 		{
 			//if (Compute_OptimizationAnimation(m_fTimeDelta) == true && m_ePhyXState != PO_PRESSED)
-				/*m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : */m_pModelCom->Play_Animation(m_fTimeDelta);
+			/*m_ePhyXState == PO_FLYDEADAWAY ? m_pModelCom->Play_Animation(m_fAccTime * 0.3f) : */m_pModelCom->Play_Animation(m_fTimeDelta);
 		}
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+		m_bIsCulling = false;
 	}
+	else
+		m_bIsCulling = true;
 }
 
 HRESULT CRabbit::Render()

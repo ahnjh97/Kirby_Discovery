@@ -184,6 +184,7 @@ void CLevel_Park::SummonEffectForMonster(_uint iTriggerIndex)
 			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_SpawnEffect"), &tDesc);
 			CHECK_FAILED(hr);
 		}
+		m_pGameInstance->PlaySound_Free(L"PhantaSpawn.wav", 0.1f);
 	}
 }
 
@@ -264,7 +265,7 @@ void CLevel_Park::Sound_Tick(_float fTimeDelta)
 		if (false == bOnceLandOne)
 		{
 			m_pGameInstance->StopSound(CHANNEL_BGM);
-			m_pGameInstance->PlayBGM(CHANNEL_BGM, L"K15_Park3.wav");
+			m_pGameInstance->PlayBGM(CHANNEL_BGM, L"K15_Park3_long.wav");
 			m_pGameInstance->SetVolume(CHANNEL_BGM, VOLUME_BGM);
 			bOnceLandOne = true;
 		}
@@ -276,7 +277,7 @@ void CLevel_Park::Sound_Tick(_float fTimeDelta)
 		if (false == bOnceLandTwo)
 		{
 			m_pGameInstance->StopSound(CHANNEL_BGM);
-			m_pGameInstance->PlayBGM(CHANNEL_BGM, L"K15_Park5.marker.wav");
+			m_pGameInstance->PlayBGM(CHANNEL_BGM, L"K15_Park5_long.wav");
 			bOnceLandTwo = true;
 		}
 		m_pGameInstance->PlaySmoothUp(CHANNEL_BGM, VOLUME_BGM, fTimeDelta * 0.03f);

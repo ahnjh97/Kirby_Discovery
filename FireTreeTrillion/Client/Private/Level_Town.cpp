@@ -93,7 +93,7 @@ HRESULT CLevel_Town::Initialize()
 	// BGM
 	m_pGameInstance->StopSound(CHANNEL_BGM);
 	m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
-	m_pGameInstance->PlayBGM(CHANNEL_BGM, L"K15_TownNewWorld1.marker.wav"); // SOUND_WI
+	m_pGameInstance->PlayBGM(CHANNEL_BGM, L"K15_TownNewWorld_long.wav"); // SOUND_WI
 	m_pGameInstance->SetVolume(CHANNEL_BGM, VOLUME_BGM);
 
 	// 타운은 포그가 없습니다.

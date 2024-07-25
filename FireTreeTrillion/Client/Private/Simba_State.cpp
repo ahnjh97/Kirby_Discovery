@@ -176,7 +176,7 @@ void CSimba_Walk::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** QuickClaw *********************** // 완료
+// *********************** QuickClaw *********************** // 사운드 완료
 void CSimba_QuickClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -356,7 +356,7 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	}
 }
 
-// *********************** FinalCrusher *********************** // 완료
+// *********************** FinalCrusher *********************** // 사운드 완료
 void CSimba_FinalCrusher::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -453,7 +453,7 @@ void CSimba_FinalCrusher::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 	}
 }
 
-// *********************** DoubleClaw *********************** // 완료
+// *********************** DoubleClaw *********************** // 사운드 완료
 void CSimba_DoubleClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -478,7 +478,7 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 		
 	else if (CSimba::Simba_DoubleClawDash == iState)
 	{
-		if (0.f <= fAnimRatio && 5 <= pSimba->Get_DebrisCount())
+		if (0.f <= fAnimRatio && 3 <= pSimba->Get_DebrisCount())
 			pSimba->ResetDebrisCount();
 
 		for (_uint i = 0; i < 3; i++) {
@@ -564,7 +564,7 @@ void CSimba_DoubleClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	}
 }
 
-// *********************** Jump *********************** // 완료
+// *********************** Jump *********************** // 사운드 완료
 void CSimba_Jump::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -675,7 +675,7 @@ void CSimba_Jump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 						pSimba->Change_State(CSimba::Simba_FinalCrusherStart, 66.66f, false, true);
 					else if (CSimba::Simba_FinalCrusherEnd == iPreState)
 						pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 50.f, false, true);
-					else if (CSimba::Simba_AttackJumpHit == iPreState)
+					else /*if (CSimba::Simba_AttackJumpHit == iPreState)*/
 					{
 						if (0 == iRandNum)
 							pSimba->Change_State(CSimba::Simba_QuickClawStartL, 66.66f, false, true);
@@ -726,7 +726,7 @@ void CSimba_BackStep::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** AttackJump *********************** // 완료
+// *********************** AttackJump *********************** // 사운드 완료
 void CSimba_AttackJump::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -832,9 +832,9 @@ void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 					pSimba->Change_State(CSimba::Simba_FinalCrusherStart, 66.66f, false, true);
 				else if (CSimba::Simba_FinalCrusherEnd == iPreState)
 					pSimba->Change_State(CSimba::Simba_DoubleClawChargeStart, 50.f, false, true);
-				else if(CSimba::Simba_DoubleClaw == iPreState)
+				else if(CSimba::Simba_DoubleClawEnd == iPreState)
 					pSimba->Change_State(CSimba::Simba_AttackJumpPre, 50.f, false, true);
-				else if (CSimba::Simba_AttackJumpHit == iPreState)
+				else
 				{
 					if (0 == iRandNum)
 						pSimba->Change_State(CSimba::Simba_QuickClawStartL, 66.66f, false, true);
@@ -846,7 +846,7 @@ void CSimba_AttackJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelt
 	}
 }
 
-// *********************** Damage *********************** // 완료
+// *********************** Damage *********************** // 사운드 없음
 void CSimba_Damage::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -866,7 +866,7 @@ void CSimba_Damage::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** Roar *********************** // 완료
+// *********************** Roar *********************** // 사운드 완료
 void CSimba_Roar::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -919,7 +919,7 @@ void CSimba_Roar::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** BiteRushJump *********************** // 완료
+// *********************** BiteRushJump *********************** // 사운드 완료
 void CSimba_BiteRushJump::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -1016,11 +1016,13 @@ void CSimba_BiteRushJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 				pSimba->Change_State(CSimba::Simba_BiteRushStart, 50.f, false, true);
 			else if (CSimba::Simba_DimensionLaserEnd == iPreState)
 				pSimba->Change_State(CSimba::Simba_DimensionClawStart, 60.f, false, true);
+			else 
+				pSimba->Change_State(CSimba::Simba_DimensionClawStart, 60.f, false, true);
 		}
 	}
 }
 
-// *********************** DimensionClaw *********************** // 완료
+// *********************** DimensionClaw *********************** // 사운드 완료
 void CSimba_DimensionClaw::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -1066,6 +1068,9 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			m_bSetDimensionClawMatrix = true;
 			pSimba->SetUpDimensionClawWorldMatrix();
+			m_pGameInstance->PlaySound_Free(L"SimbaQuickClaw.wav", 0.35f);
+			m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+			m_pGameInstance->PlayMySound(L"SimbaDimensionClawVoice.wav", CHANNEL_BOSSVOICE, 0.35f);
 		}
 
 		if (0.32f < fAnimRatio && 0 == iStarCount)
@@ -1080,6 +1085,9 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			m_bSetDimensionClawMatrix = true;
 			pSimba->SetUpDimensionClawWorldMatrix();
+			m_pGameInstance->PlaySound_Free(L"SimbaQuickClaw.wav", 0.35f);
+			m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+			m_pGameInstance->PlayMySound(L"SimbaDimensionClawVoice.wav", CHANNEL_BOSSVOICE, 0.35f);
 		}
 
 		if (0.53f < fAnimRatio && 0 == iStarCount)
@@ -1133,7 +1141,7 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	}
 }
 
-// *********************** BiteRush *********************** // 완료
+// *********************** BiteRush *********************** // 사운드 완료
 void CSimba_BiteRush::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
@@ -1181,7 +1189,7 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 		else if (0.7f < fAnimRatio && 1 == iStarCount) {
 			pSimba->Set_StarPosToRightHand();
 			pSimba->SpawnStar(iState);
-		}
+		}	
 	}
 
 	if(CSimba::Simba_BiteRushTiredEnd == iState && 0.8f < fAnimRatio)
@@ -1203,11 +1211,19 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 }
 
-// *********************** DimensionLaser *********************** // 완료
+// *********************** DimensionLaser *********************** // 사운드 완료
 void CSimba_DimensionLaser::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	m_bLaserActivated = false;
+
+	if (CSimba::Simba_DimensionLaserStart == _iAnimIndex)
+	{
+		m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+		m_pGameInstance->PlayMySound(L"SimbaDimensionLaserVoice.wav", CHANNEL_BOSSVOICE, 0.3f);
+	}
+
+	m_bStopSound = false;
 }
 
 void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -1228,7 +1244,7 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		
 	if (CSimba::Simba_DimensionLaser == iState)
 	{
-		if (0.1f < fAnimRatio && 0.55f > fAnimRatio) {
+		if (0.1f < fAnimRatio && 0.8f > fAnimRatio) {
 			pSimba->LaserAttack(fTimeDelta);
 
 			if (false == m_bLaserActivated)
@@ -1237,7 +1253,14 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				pSimba->DimensionLaser();
 			}
 		}
-			
+
+		if (0.8f < fAnimRatio/* && false == m_bStopSound*/)
+		{
+			//m_bStopSound = true;
+			m_pGameInstance->PlaySmoothKill(CHANNEL_SOUND12, fTimeDelta * 0.9f);
+		}
+		else if(0.95f < fAnimRatio)
+			m_pGameInstance->StopSound(CHANNEL_SOUND12);
 
 		_uint iDebrisCount = pSimba->Get_DebrisCount();
 		for (_uint i = 0; i < 35; i++)
@@ -1281,11 +1304,16 @@ void CSimba_DimensionLaser::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	}
 }
 
-// *********************** Death *********************** // 완료
+// *********************** Death *********************** // 사운드 완료
 void CSimba_Death::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	m_bCageNotified = false;
+	if (CSimba::Simba_DemoDeadCut1 == _iAnimIndex)
+	{
+		m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+		m_pGameInstance->PlayMySound(L"SimbaDeath.wav", CHANNEL_BOSSVOICE, 0.5f);
+	}
 }
 
 void CSimba_Death::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -1311,6 +1339,8 @@ void CSimba_Death::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 		else if (CSimba::Simba_DemoDeadCut2 == iState && false == m_bCageNotified) {
 			m_bCageNotified = true;
 			CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_BOSSORIGIN);
+			m_pGameInstance->StopSound(CHANNEL_BGM);
+			m_pGameInstance->PlayBGM(L"OriginBGM.wav");
 		}
 	}
 }
