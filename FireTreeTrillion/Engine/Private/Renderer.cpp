@@ -2,7 +2,7 @@
 #include "GameObject.h"
 #include "GameInstance.h"
 #include "Effect.h"
-
+#include "Light.h"
 _uint		g_iSizeX = 8192;
 _uint		g_iSizeY = 4608;
 _uint		g_iOriginSizeX = 1600; //1280;
@@ -412,13 +412,21 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Forest",
 		COLOR_DATA{
-		0.759866f, 1.f, 0.95f, 1.3f, 0.930407f,
-		1.03727f, 0.890097f, 1.00997f, 0.6f, 0.6f,
-		0.689825f, 0.96f, 1.04f, 0.252849f, 0.0147043f, 0.0610405f,
-		0.12f, 0.917647f, 0.513726f, 0.145098f, 0.170057f, 1.f,
-		0.847059f, 0.254902f, 0.34f, 0.13f, 0.559638f
+0.690238f, 1.f, 0.920175f, 1.5095f, 0.929998f,
+1.15048f, 0.899648f,
+0.746074f, 0.6f, 0.6f, 0.640464f, 0.950003f, 1.04f,
+0.243342f, 0.0156856f, 0.0665922f, 0.00977886f,
+0.917647f, 0.513726f, 0.145098f, 0.00993354f,
+1.f, 0.847059f, 0.254902f, 0.00976593f,
+0.13984f, 0.55005f
 		});
-
+	//	COLOR_DATA{
+	//0.759866f, 1.f, 0.95f, 1.3f, 0.930407f,
+	//1.03727f, 0.890097f, 1.00997f, 0.6f, 0.6f,
+	//0.689825f, 0.96f, 1.04f, 0.252849f, 0.0147043f, 0.0610405f,
+	//0.12f, 0.917647f, 0.513726f, 0.145098f, 0.170057f, 1.f,
+	//0.847059f, 0.254902f, 0.34f, 0.13f, 0.559638f
+	//	});
 	Save_ColorSet("Night",
 		COLOR_DATA{
 		0.75f,
@@ -436,24 +444,36 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Stage1",
 		COLOR_DATA{
-		0.79f, 1.f, 1.00999f, 1.44943f, 1.17964f, 1.14037f, 1.11018f, 0.720338f, 0.6f, 0.6f, 1.3f, 1.06f, 1.1f, 0.0649942f, 0.0378847f, 0.199115f, 0.00958735f, 0.466084f, 0.676991f, 0.218674f, 0.0796085f, 0.499961f, 0.912908f, 0.99115f, 0.209722f, 0.209559f, 0.340393f
+		0.799913f, 1.f, 1.00091f, 1.43953f, 1.20029f,
+		1.13103f, 1.10039f,
+		0.750569f, 0.6f, 0.6f, 1.24976f, 1.06f, 1.1f,
+		0.0747022f, 0.0366763f, 0.191901f, 0.0187542f,
+		0.466084f, 0.676991f, 0.218674f, 0.0895937f,
+		0.499961f, 0.912908f, 0.99115f, 0.219511f,
+		0.200487f, 0.349984f
 		});
-
+	//0.79f, 1.f, 1.00999f, 1.44943f, 1.17964f, 1.14037f, 1.11018f, 0.720338f, 0.6f, 0.6f, 1.3f, 1.06f, 1.1f, 0.0649942f, 0.0378847f, 0.199115f, 0.00958735f, 0.466084f, 0.676991f, 0.218674f, 0.0796085f, 0.499961f, 0.912908f, 0.99115f, 0.209722f, 0.209559f, 0.340393f
+		
 	Save_ColorSet("Town",
 		COLOR_DATA{
-		0.719726f, 1.f, 1.03994f, 1.43951f, 1.30029f, 1.24978f,
-		1.10968f, 0.730198f, 0.6f, 0.6f, 1.32995f, 1.08f, 1.1f,
-		0.0749753f, 0.0362015f, 0.188398f, 0.00991405f, 0.466084f,
-		0.676991f, 0.218674f, 0.00980014f, 0.499961f, 0.912908f,
-		0.99115f, 0.00976099f, 0.199837f, 0.350306f
+		0.790123f, 1.f, 1.00945f, 1.59058f, 1.29023f,
+		1.29037f, 1.00969f,
+		0.720199f, 0.6f, 0.6f, 1.32008f, 1.07341f, 1.0967f,
+		0.0849043f, 0.0345271f, 0.177737f, 0.0197524f,
+		0.466084f, 0.676991f, 0.218674f, 0.0197459f,
+		0.499961f, 0.912908f, 0.99115f, 0.0196069f,
+		0.189941f, 0.360106f
 		});
 
 	Save_ColorSet("Final",
 		COLOR_DATA{
-		1.1f, 1.f, 1.08023f, 0.809684f, 0.990206f, 1.1f, 1.f,
-		0.74032f, 0.6f, 0.6f, 1.03f, 0.96f, 1.04f, 0.243137f, 0.00784314f,
-		0.00784314f, 0.00971069f, 0.917647f, 0.513726f, 0.145098f, 0.00992562f,
-		1.f, 0.847059f, 0.254902f, 0.00999975f, 0.13f, 0.55f
+		1.55017f, 1.f, 1.f, 0.890193f, 0.940072f,
+		1.10975f, 1.14001f,
+		0.69027f, 0.569912f, 0.6f, 1.03029f, 0.960124f, 1.04017f,
+		0.233328f, 0.0171173f, 0.0368468f, 0.00993926f,
+		0.917647f, 0.513726f, 0.145098f, 0.00972117f,
+		1.f, 0.847059f, 0.254902f, 0.00967303f,
+		0.139852f, 0.540133f
 		});
 
 	Save_ColorSet("Finale",
@@ -473,10 +493,13 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Park",
 		COLOR_DATA{
-		0.590069f, 1.f, 0.979981f, 1.20988f, 2.0299f, 1.20026f, 1.10964f,
-		0.720317f, 0.699998f, 0.7f, 0.949932f, 0.999996f, 1.f, 0.0945045f,
-		0.0329081f, 0.167429f, 0.00977626f, 0.466084f, 0.676991f, 0.218674f,
-		0.00982029f, 0.499961f, 0.912908f, 0.99115f, 0.00960964f, 0.180212f, 0.369867f
+		0.654073f, 1.f, 1.00722f, 1.10959f, 1.79011f,
+		1.21023f, 1.07992f,
+		0.720199f, 0.6f, 0.6f, 0.9598f, 1.00195f, 1.00258f,
+		0.0849043f, 0.0345271f, 0.177737f, 0.00997121f,
+		0.466084f, 0.676991f, 0.218674f, 0.00997041f,
+		0.499961f, 0.912908f, 0.99115f, 0.00982132f,
+		0.189941f, 0.360106f
 		});
 
 	Save_ColorSet("Lab",
@@ -500,6 +523,28 @@ void CRenderer::Color_Initialize()
 		0.6f, 1.32023f, 1.07612f, 1.09806f, 0.0846788f, 0.0345651f, 0.177979f, 0.019863f,
 		0.466084f, 0.676991f, 0.218674f, 0.019726f, 0.499961f, 0.912908f, 0.99115f,
 		0.0197512f, 0.189896f, 0.360017f
+		});
+
+	Save_ColorSet("Intro",
+		COLOR_DATA{
+		1.0902f, 1.f, 1.1196f, 1.30047f, 0.990065f,
+		1.12931f, 1.05995f,
+		0.689942f, 0.6f, 0.6f, 1.28007f, 1.02993f, 1.04f,
+		0.243137f, 0.00784314f, 0.00784314f, 0.00931742f,
+		0.917647f, 0.513726f, 0.145098f, 0.00968085f,
+		1.f, 0.847059f, 0.254902f, 0.00989194f,
+		0.13f, 0.55f
+		});
+
+	Save_ColorSet("ParkFront",
+		COLOR_DATA{
+		0.640434f, 1.f, 1.00945f, 1.50966f, 1.19037f,
+		1.24043f, 0.990033f,
+		0.720199f, 0.6f, 0.6f, 1.32008f, 1.07341f, 1.0967f,
+		0.0849043f, 0.0345271f, 0.177737f, 0.00997121f,
+		0.466084f, 0.676991f, 0.218674f, 0.00997041f,
+		0.499961f, 0.912908f, 0.99115f, 0.00982132f,
+		0.189941f, 0.360106f
 		});
 
 	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
@@ -550,7 +595,7 @@ void CRenderer::Fog_Intialize_ForIntroLevel(_int iPoint)
 		m_fFogViewEnd = 117.f;
 		//m_fFogViewIntensity = 1.f;
 	}
-	else if(iPoint == 2) // 사다리 타고 건물 올라가서
+	else if (iPoint == 2) // 사다리 타고 건물 올라가서
 	{
 		// Y-FOG 실행
 		m_vFogYColor.x = 0.26f;
@@ -655,6 +700,7 @@ void CRenderer::Fog_Intialize_ForPark(_int iPoint)
 
 void CRenderer::Fog_Intialize_ForFinalBoss(_int iPoint)
 {
+	//마지막 보스, 포그가 없어야 할 것 같아 수정하였슴다
 	if (0 == iPoint)
 	{
 		// Y-fog 초기화
@@ -664,7 +710,8 @@ void CRenderer::Fog_Intialize_ForFinalBoss(_int iPoint)
 
 		m_fFogYBottom = -20.f;
 		m_fFogYTopY = -8.f;
-		m_fFogYIntensity = 1.f;
+		//m_fFogYIntensity = 1.f;
+		m_fFogYIntensity = 0.f;
 
 		// View-fog 초기화
 		m_vFogViewColor.x = 0.f;
@@ -673,7 +720,8 @@ void CRenderer::Fog_Intialize_ForFinalBoss(_int iPoint)
 
 		m_fFogViewStart = 0.f;
 		m_fFogViewEnd = 150.f;
-		m_fFogViewIntensity = 1.f;
+		//m_fFogViewIntensity = 1.f;
+		m_fFogViewIntensity = 0.f;
 	}
 }
 
@@ -897,17 +945,12 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 	{
 	case 0:
 		m_DestColorData = Find_ColorSet("Tutorial");
-
-		m_fRimLightRatio.second = .7f;
-		m_fRimLightRadius.second = 1.f;
-		m_vRimColor.second = _float3(1.f, .7f, 4.f);
-
+		Update_RimLight(.7f, 1.f, { 1.f, .7f, 4.f });
 		break;
 	case 1:
 		m_DestColorData = Find_ColorSet("Forest");
-		m_fRimLightRatio.second = .1f;
-		m_fRimLightRadius.second = 1.f;
-
+		Update_RimLight(.2f, 4.f, { .6f, .8f, 1.f });
+		Update_Ocean(0.f, -2000.f, -1000.f);
 		break;
 	case 2:
 		m_DestColorData = Find_ColorSet("Night");
@@ -915,10 +958,10 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 	case 3:
 	{
 		m_DestColorData = Find_ColorSet("Stage1");
-		
-		m_fRimLightRatio.second = 1.f;
-		m_fRimLightRadius.second = 1.f;
-		m_vRimColor.second = _float3(1.f, .5f, .3f);
+		Update_RimLight(1.f, 1.8f, { 1.f, .5f, .3f });
+		Update_DirectionalLight({ .6f, .6f, .6f, 1.f }, { 1.f, .45f, .42f, 1.f });
+		Update_DOFSet(1.f, {.15f, .12f, .05f});
+		Update_Ocean(0.f, -2000.f, -1000.f);
 
 		if (m_iCurColorIdx != iSetIdx)
 		{
@@ -984,81 +1027,75 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 	break;
 	case 4:
 		m_DestColorData = Find_ColorSet("Town");
-		m_fRimLightRatio.second = .7f;
-		m_fRimLightRadius.second = 1.f;
-		m_vRimColor.second = _float3(1.f, .5f, .3f);
-
+		Update_RimLight(1.f, 1.5f, { 1.f, .5f, .3f });
+		Update_DirectionalLight({ .6f, .6f, .6f, 1.f }, { .6f, .6f, .6f, 1.f });
+		Update_Ocean(.9f, -45.3f, 4.8f);
+		Update_OceanWave(.5f, .2f);
 		break;
 	case 5:
 	{
 		m_DestColorData = Find_ColorSet("Finale");
+		Update_RimLight(1.f, 1.f, { 1.f, .45f, 0.f });
+		Update_DOFSet(.1f, { .07f, .05f, .09f });
 
-		m_fRimLightRatio.second = 1.f;
-		m_vRimColor.second = _float3(1.f, .45f, 0.f);
-
-		m_fDOFIntensity = .1f;
-		m_vDOFColor = _float3{ .07f, .05f, .09f };
+		Update_Ocean(0.f, -2000.f, -1000.f);
 	}
 	break;
 	case 6:
 	{
 		m_DestColorData = Find_ColorSet("Horror");
-		m_fRimLightRatio.second = 0.f;
+		Update_RimLight(0.f);
+		Update_Ocean(0.f, -2000.f, -1000.f);
+
 	}
 	break;
 	case 7:
 	{
 		m_DestColorData = Find_ColorSet("Final");
 
-		m_fRimLightRatio.second = .8f;
-		m_fRimLightRadius.second = 2.f;
-		m_vRimColor.second = _float3(1.f, .6f, .35f);
+		Update_RimLight(.8f, 2.f, { 1.f, .6f, .35f });
+		Update_Ocean(0.f, -2000.f, -1000.f);
 
-		m_fDOFIntensity = 1.f;
-		m_vDOFColor = _float3{ .26f, 0.f, -.11f };
+		Update_DOFSet(0.f, { .26f, 0.f, -.11f });
 	}
 	break;
 	case 8:
 	{
 		m_DestColorData = Find_ColorSet("Lab");
 
-		m_fRimLightRatio.second = .5f;
-		m_fRimLightRadius.second = 3.f;
-		m_vRimColor.second = _float3(.4f, .8f, 1.f);
+		Update_RimLight(.5f, 3.f, { .4f, .8f, 1.f });
 
-		m_fDOFIntensity = 1.f;
-		m_vDOFColor = _float3{ .7f, .65f, .92f };
+		Update_DOFSet(1.f, { .7f, .65f, .92f });
+		Update_Ocean(0.f, -2000.f, -1000.f);
+
 	}
 	break;
 	case 9:
 	{
 		m_DestColorData = Find_ColorSet("Park");
 
-		m_fRimLightRatio.second = .0f;
+		Update_RimLight(0.f);
+		Update_DOFSet(0.f);;
+		Update_DirectionalLight({ .08f, .04f, .1f, 1.f }, { 1.f, 1.f, 1.f, 1.f });
+		Update_Ocean(0.f, -2000.f, -1000.f);
 
-		m_fDOFIntensity = 0.f;
+
 	}
 	break;
 	case 10:
 	{
 		m_DestColorData = Find_ColorSet("Beach");
 
-		m_vFogYColor = { 0.f, 0.88f, 0.7f };
-		m_fFogYBottom = { 0.f };
-		m_fFogYTopY = 18.2f;
-		m_fFogYIntensity = 10.f;
+		Update_DirectionalLight({ .8f, .8f, .8f, 1.f }, { .6f, .6f, .6f, 1.f });
 
-		m_vFogViewColor = { 0.f, 0.88f, 0.7f };
-		m_fFogViewStart = { 1.f };
-		m_fFogViewEnd = 370.f;
-		m_fFogViewIntensity = .5f;
+		Update_YFog(/*10.f*/0.f, 0.f, 18.2f, { 0.f, .88f, .7f });
 
-		m_fRimLightRatio.second = 1.f;
-		m_fRimLightRadius.second = 1.f;
-		m_vRimColor.second = _float3(.84f, 1.f, .5f);
+		Update_ViewFog(.5f, 1.f, 370.f, { 0.f, 0.88f, 0.7f });
 
-		m_fDOFIntensity = 1.f;
-		m_vDOFColor = _float3{ .03f, .07f, 0.f };
+		Update_RimLight(1.f, 1.f, { .84f, 1.f, .5f });
+
+		Update_DOFSet(1.f, { .03f, .07f, 0.f });
+
 	}
 	break;
 	case 11:
@@ -1066,15 +1103,54 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 		m_DestColorData = Find_ColorSet("PartTime");
 		Update_Option(OPTION_DOF, false);
 
-		m_fRimLightRatio.second = .2f;
-		m_fRimLightRadius.second = 1.f;
-		m_vRimColor.second = _float3(1.f, .5f, .3f);
-
+		Update_RimLight(.2f, 1.f, { 1.f, .5f, .3f });
 	}
 	break;
+	//racing_shop
+	case 12:
+		m_DestColorData = Find_ColorSet("Beach");
+
+		Update_DirectionalLight({ .03f, .03f, .04f, 1.f }, { 0.f, 0.f, .05f, 1.f });
+
+		Update_RimLight(0.f);
+
+		Update_Ocean(.9f, -45.3f, 10.5f, { .03f, .55f, .61f }, { .7f, 1.f, 1.f });
+		Update_OceanWave(1.f, 1.4f);
+
+		break;
+	case 13:
+		m_DestColorData = Find_ColorSet("Intro");
+
+		Update_DirectionalLight({ .34f, .56f, .45f, 1.f }, { .1f, .1f, .1f, 1.f });
+
+		Update_RimLight(1.f, 1.f, { 1.f, .5f, .3f });
+
+		Update_Ocean(.93f, -2.8f, 2.5f, { .03f, .55f, .61f }, { .36f, .65f, .59f });
+		Update_OceanWave(1.f, .1f);
+
+		break;
+	case 14:
+		m_DestColorData = Find_ColorSet("Town");
+
+		Update_RimLight(1.f, 1.5f, { 1.f, .5f, .3f });
+		Update_Ocean(0.f, -2000.f, -1000.f);
+
+		break;
+	case 15:
+		m_DestColorData = Find_ColorSet("ParkFront");
+
+		Update_RimLight(.6f, 1.5f, { 1.f, .5f, .3f });
+		Update_DOFSet(1.f, { -.05f, -.01f, -.02f });
+		Update_DirectionalLight({ .28f, .14f, .19f, 1.f }, { .13f, .04f, 0.f, 1.f });
+		Setting_GodRay({ 3450.f, 940.f, 580.f });
+		Update_Ocean(0.f, -2000.f, -1000.f);
+
+
+		break;
 	default:
 		m_DestColorData = Find_ColorSet("Tutorial");
 		Update_Option(OPTION_DOF, true);
+		Update_Ocean(0.f, -45.f, -10.f);
 
 		break;
 	}
@@ -1130,6 +1206,14 @@ void CRenderer::Update_DofFocus(_fvector vWorldPos)
 	m_vDofFocus = _float2(fScreenX, 1.f - fScreenY);
 }
 
+void CRenderer::Update_DirectionalLight(_float4 vDiffuse, _float4 vAmbient)
+{
+	CLight* pDirectionalLight = m_pGameInstance->Get_DirectionLightAddress();
+	pDirectionalLight->Set_LightDiffuse(vDiffuse);
+	pDirectionalLight->Set_LightAmbient(vAmbient);
+
+}
+
 void CRenderer::Update_RimLight(_float fRimRatio, _float fRimRadius, _float3 vRimColor)
 {
 	m_fRimLightRatio.second = fRimRatio;
@@ -1140,6 +1224,51 @@ void CRenderer::Update_RimLight(_float fRimRatio, _float fRimRadius, _float3 vRi
 	if (ISDEFAULTFLOAT3(vRimColor) == false)
 		m_vRimColor.second = vRimColor;
 }
+
+void CRenderer::Update_YFog(_float fIntensity, _float fBottom, _float fTop, _float3 vColor)
+{
+	m_fFogYIntensity = fIntensity;
+	m_fFogYBottom = fBottom;
+	m_fFogYTopY = fTop;
+	m_vFogYColor = vColor;
+}
+
+void CRenderer::Update_Ocean(_float fIntensity, _float fBottom, _float fTop, _float3 vBottomColor, _float3 vTopColor)
+{
+	m_fOceanIntensity = fIntensity;
+	if (!ISDEFAULTFLOAT(fBottom))
+		m_fOceanBottomY = fBottom;
+	if (!ISDEFAULTFLOAT3(vBottomColor))
+		m_vOceanBottomColor = vBottomColor;
+
+	if (!ISDEFAULTFLOAT(fTop))
+		m_fOceanTopY = fTop;
+	if (!ISDEFAULTFLOAT3(vTopColor))
+		m_vOceanTopColor = vTopColor;
+}
+
+void CRenderer::Update_OceanWave(_float fOceanfrequency, _float fOceanAmplitude)
+{
+	m_fOceanFrequency = fOceanfrequency;
+	m_fOceanAmplitude = fOceanAmplitude;
+}
+
+void CRenderer::Update_ViewFog(_float fIntensity, _float fStart, _float fEnd, _float3 vColor)
+{
+	m_fFogViewIntensity = fIntensity;
+	m_fFogViewStart = fStart;
+	m_fFogViewEnd = fEnd;
+	m_vFogViewColor = vColor;
+}
+
+
+void CRenderer::Update_DOFSet(_float fIntensity, _float3 vColor)
+{
+	m_fDOFIntensity = fIntensity;
+
+	if (!ISDEFAULTFLOAT3(vColor))
+		m_vDOFColor = vColor;
+};
 
 void CRenderer::Setting_GodRay(_fvector vWorldPos, _float fRayExposure, _float fRayDecay, _float fRayIlluminationDecay, _float fRayDensity, _float fWeight)
 {
@@ -1688,6 +1817,13 @@ HRESULT CRenderer::Render_Result()
 	if (FAILED(m_pShader->Bind_RawValue("g_fOceanIntensity", &m_fOceanIntensity, sizeof(_float))))
 		return E_FAIL;
 
+	if (FAILED(m_pShader->Bind_RawValue("g_fOceanTime", &m_fOceanTime, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fOceanFrequency", &m_fOceanFrequency, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Bind_RawValue("g_fOceanAmplitude", &m_fOceanAmplitude, sizeof(_float))))
+		return E_FAIL;
+
 
 	if (FAILED(m_pShader->Bind_RawValue("g_fObjectBlack", &m_fObjectBlack, sizeof(_float))))
 		return E_FAIL;
@@ -2157,6 +2293,24 @@ void CRenderer::Render_IMGUI()
 
 	}
 
+	if (ImGui::TreeNode(u8"오션"))
+	{
+		ImGui::DragFloat(u8"바다 강도", &m_fOceanIntensity, .1f, -10.f, 100.f, "%.2f");
+
+		ImGui::DragFloat3(u8"바다 위 색상", &(m_vOceanTopColor.x), .01f, 0.f, 1.f, "%.2f");
+		ImGui::DragFloat3(u8"바다 아래 색상", &(m_vOceanBottomColor.x), .01f, 0.f, 1.f, "%.2f");
+		ImGui::DragFloat(u8"바다 밑", &m_fOceanBottomY, .1f, -1000.f, 1000.f, "%.2f");
+		ImGui::DragFloat(u8"바다 위", &m_fOceanTopY, .1f, -1000.f, 1000.f, "%.2f");
+
+
+		ImGui::DragFloat(u8"바다 파도 빈도", &m_fOceanFrequency, .1f, 0.f, 120.f, "%.2f");
+		ImGui::DragFloat(u8"바다 파도 폭", &m_fOceanAmplitude, .1f, 0.f, 120.f, "%.2f");
+
+
+		ImGui::TreePop();
+
+	}
+
 	if (ImGui::TreeNode(u8"SSAO"))
 	{
 
@@ -2255,6 +2409,7 @@ void CRenderer::Interpolate_ColorData(_float _fTimeDelta)
 
 	_float fInterpolateSpeed = 2.f * _fTimeDelta;
 
+	m_fOceanTime += _fTimeDelta;
 
 	//림 라이트 배율
 	if (.001f < abs(m_fRimLightRatio.second - m_fRimLightRatio.first))

@@ -66,41 +66,91 @@ _int CGm_ParkSolarPanelCharge::Tick(_float fTimeDelta)
 	//if (TRUE == m_bDead)
 	//	return OBJ_DEAD;
 
-	if (TRUE == m_pModelCom->IsFinished())
-	{
 		switch (m_eCurState)
 		{
 		case STATE_OFFWAIT: //충전 전 대기
 			break;
+
 		case STATE_OFFWAITSTART: //충전 전
-			m_pModelCom->Set_Animation(STATE_OFFWAIT, 60.f, FALSE, TRUE);
-			m_eCurState = STATE_OFFWAIT;
+			if (m_bPlaySoundFX)
+			{
+				m_pGameInstance->PlayMySound(L"SolarPanel_OffWait.wav", CHANNEL_GIMMICK, 0.5f);
+				m_bPlaySoundFX = FALSE;
+			}
+
+			if (TRUE == m_pModelCom->IsFinished())
+			{
+				m_pModelCom->Set_Animation(STATE_OFFWAIT, 60.f, FALSE, TRUE);
+				m_eCurState = STATE_OFFWAIT;
+
+				m_pGameInstance->StopSound(CHANNEL_GIMMICK);
+			}
 			break;
 
 		case STATE_CHARGE: //충전 중
-			m_pModelCom->Set_Animation(STATE_CHARGEDSTART, 60.f, FALSE, TRUE);
-			m_eCurState = STATE_CHARGEDSTART;
+			if (m_bPlaySoundFX)
+			{
+				m_pGameInstance->PlayMySound(L"SolarPanel_Charge.wav", CHANNEL_GIMMICK, 0.5f);
+				m_bPlaySoundFX = FALSE;
+			}
+
+			if (TRUE == m_pModelCom->IsFinished())
+			{
+				m_pModelCom->Set_Animation(STATE_CHARGEDSTART, 100.f, FALSE, TRUE);
+				m_eCurState = STATE_CHARGEDSTART;
+
+				m_bPlaySoundFX = TRUE;
+				m_pGameInstance->StopSound(CHANNEL_GIMMICK);
+			}
 			break;
 		
 		case STATE_CHARGEDSTART: //충전 완료
-			m_pModelCom->Set_Animation(STATE_CHARGEDWAIT, 60.f, FALSE, TRUE);
-			m_eCurState = STATE_CHARGEDWAIT;
+			if (m_bPlaySoundFX)
+			{
+				m_pGameInstance->PlayMySound(L"SolarPanel_OnWait.wav", CHANNEL_GIMMICK, 0.5f);
+				m_bPlaySoundFX = FALSE;
+			}
+
+			if (TRUE == m_pModelCom->IsFinished())
+			{
+				m_pModelCom->Set_Animation(STATE_CHARGEDWAIT, 60.f, FALSE, TRUE);
+				m_eCurState = STATE_CHARGEDWAIT;
+
+				m_pGameInstance->StopSound(CHANNEL_GIMMICK);
+			}
 			break;
 
 		case STATE_CHARGEDWAIT: //충전 완료 대기
-			m_pModelCom->Set_Animation(STATE_DECREASES, 12.5f, FALSE, TRUE);
-			m_eCurState = STATE_DECREASES;
+			if (TRUE == m_pModelCom->IsFinished())
+			{
+				m_pModelCom->Set_Animation(STATE_DECREASES, 12.5f, FALSE, TRUE);
+				m_eCurState = STATE_DECREASES;
+
+				m_bPlaySoundFX = TRUE;
+			}
 			break;
 
 		case STATE_DECREASES: //충전 해제
-			m_pModelCom->Set_Animation(STATE_OFFWAITSTART, 60.f, FALSE, TRUE);
-			m_eCurState = STATE_OFFWAITSTART;
+			if (m_bPlaySoundFX)
+			{
+				m_pGameInstance->PlayMySound(L"SolarPanel_Decreases.wav", CHANNEL_GIMMICK, 0.5f);
+				m_bPlaySoundFX = FALSE;
+			}
+
+			if (TRUE == m_pModelCom->IsFinished())
+			{
+				m_pModelCom->Set_Animation(STATE_OFFWAITSTART, 60.f, FALSE, TRUE);
+				m_eCurState = STATE_OFFWAITSTART;
+
+				m_pGameInstance->StopSound(CHANNEL_GIMMICK);
+
+				m_bPlaySoundFX = TRUE;
+			}
 			break;
 		case STATE_NONE:	
 		default:	
 			break;
 		}
-	}
 
 	return OBJ_NOEVENT;
 }
@@ -229,8 +279,9 @@ void CGm_ParkSolarPanelCharge::Collision(CCollisionCenter::CONTENT_TYPE eContent
 		&& CKirby::BODYSTATE::BODY_BULBDEFAULT == eKirbyState)
 	{
 		m_IsInteraction = TRUE;
-		m_pModelCom->Set_Animation(STATE_CHARGE, 60.f, FALSE, TRUE);
+		m_pModelCom->Set_Animation(STATE_CHARGE, 30.f, FALSE, TRUE);
 		m_eCurState = STATE_CHARGE;
+		m_bPlaySoundFX = TRUE;
 	}
 
 #pragma region KEY_FRAME CUSTOM 1 SCOOP

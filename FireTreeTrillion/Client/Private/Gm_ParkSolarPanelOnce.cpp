@@ -78,21 +78,29 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 		{
 			m_pModelCom->Set_Animation(STATE_ONWAITSTART, 60.f, FALSE, TRUE);
 			m_eCurState = STATE_ONWAITSTART;
+
+			m_bPlaySoundFX = TRUE;
 		}
 		break;
 
 	case STATE_ONWAITSTART: //충전 완료 
+		if (m_bPlaySoundFX)
+		{
+			m_pGameInstance->PlayMySound(L"SolarPanel_OnWait.wav", CHANNEL_GIMMICK, 0.5f);
+			m_bPlaySoundFX = FALSE;
+		}
+
 		fAnimRatio = m_pModelCom->Get_AnimRatio();
 		if (0.15f < fAnimRatio)
 		{
 			m_eCurState = STATE_ONWAIT;
 			m_pModelCom->Set_Animation(STATE_ONWAIT, 60.f, TRUE, TRUE);
+
+			m_pGameInstance->StopSound(CHANNEL_GIMMICK);
 		}
 		break;
 		
 	case STATE_ONWAIT: //충전 완료 대기
-		//m_pGameInstance->PlaySound_Free(L"SolarPanel_OnWait.wav", 0.5f);
-
 		if(false == m_bSpawn)
 		{
 			m_bSpawn = true;
@@ -128,7 +136,11 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 		}
 
 		break; 
-	case STATE_NONE:default:		break;
+	case STATE_NONE:
+		break;
+
+	default:		
+		break;
 	}
 
 	return OBJ_NOEVENT;

@@ -72,7 +72,7 @@ _int CHUD_KirbyNameTag::Tick(_float fTimeDelta)
 		m_UIObjDesc.fAlpha -= fTimeDelta * 5.f;
 
 		vPos = GET_POS;
-		vPos.x -= fTimeDelta * 20.f;
+		vPos.x -= fTimeDelta * 125.f;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 		break;
 

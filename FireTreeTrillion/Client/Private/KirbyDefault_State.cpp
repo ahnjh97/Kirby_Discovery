@@ -148,6 +148,7 @@ _bool CKirbyDefault_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelt
 			FXDesc.vInitPos = { 0.f, .6f, .4f };
 			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 
+			m_pGameInstance->PlayMySound(L"Kirby_Vacuuming.wav", CHANNEL_PLAYERVOICE, 0.5f);
 			pKirby->Add_Effect("Vacuum_v3", FXDesc, true);
 
 			//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v3"), &FXDesc)))
@@ -298,6 +299,9 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
 
+	Make_BBongSound(DESC(m_fWalkSoundDelay), fTimeDelta);
+
+
 	if (Kirby_Ladder_Logic(pKirby, Kirbydesc, pTransformCom))
 	{
 		pController->Set_Position(pTransformCom, DESC(m_vLadderPoint));
@@ -358,6 +362,7 @@ void CKirbyDefault_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			FXDesc.vInitPos = { 0.f, .65f, .4f };
 			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 
+			m_pGameInstance->PlayMySound(L"Kirby_Vacuuming.wav", CHANNEL_PLAYERVOICE, 0.5f);
 			pKirby->Add_Effect("Vacuum_v3", FXDesc, true);
 
 			//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v3"), &FXDesc)))
@@ -523,6 +528,7 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				m_fFallTime = 0.f;
 				//pKirby->Change_State(CKirby::STATE_LANDINGEND, 30.f, false, false, CKirby::BODY_DEFAULT);
 				Kirby_AbilityType_Assist(pKirby, CKirby::STATE_LANDINGEND);
+				m_pGameInstance->PlaySound_Free(L"Kirby_BigLanding.wav", 0.2f);
 			}
 			else
 			{
@@ -531,6 +537,7 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				m_fFallTime = 0.f;
 				//pKirby->Change_State(CKirby::STATE_LANDINGSMALL, 50.f, false, false, CKirby::BODY_DEFAULT);
 				Kirby_AbilityType_Assist(pKirby, CKirby::STATE_LANDINGSMALL);
+				m_pGameInstance->PlaySound_Free(L"Kirby_SmallLanding.wav", 0.7f);
 			}
 		}
 	}
@@ -626,6 +633,7 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Smoke Fast"), &FXDesc)))
 					return;
 				pKirby->Change_State(CKirby::STATE_LANDINGEND, 30.f, false, false, CKirby::BODY_DEFAULT);
+				m_pGameInstance->PlaySound_Free(L"Kirby_BigLanding.wav", 0.2f);
 			}
 			else
 			{
@@ -648,6 +656,7 @@ void CKirbyDefault_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 					return;
 
 				pKirby->Change_State(CKirby::STATE_LANDINGSMALL, 50.f, false, false, CKirby::BODY_DEFAULT);
+				m_pGameInstance->PlaySound_Free(L"Kirby_SmallLanding.wav", 0.7f);
 			}
 		}
 	}
@@ -776,6 +785,7 @@ _bool CKirbyDefault_Jump_State::Key_X(CGameObject* pGameObject, _float fTimeDelt
 			FXDesc.vInitPos = { 0.f, .65f, .4f };
 			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 
+			m_pGameInstance->PlayMySound(L"Kirby_Vacuuming.wav", CHANNEL_PLAYERVOICE, 0.5f);
 			pKirby->Add_Effect("Vacuum_v3", FXDesc, true);
 
 			pKirby->Change_State(CKirby::STATE_INHALEFALL, 50.f, true, true, CKirby::BODY_VACUUM);
@@ -875,6 +885,11 @@ CKirbyDefault_Guard_State::CKirbyDefault_Guard_State()
 void CKirbyDefault_Guard_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+	if (_iAnimIndex == CKirby::STATE_GUARD)
+	{
+		m_pGameInstance->PlaySound_Free(L"Kirby_Guard.wav", 0.5f);
+	}
 }
 
 void CKirbyDefault_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -968,6 +983,8 @@ void CKirbyDefault_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		// 끝나면 바로 본격적인 닷지 스타트 ( 여기서 애니메이션을 분기한다.)
 		if (pKirby->isAnimFinish() == true)
 		{
+			Jump_FX(pTransformCom);
+
 			CKirby::DIR eDir = Kirby_Standard_Angle(Kirbydesc);
 			DESC(m_fJumpVelocity) = 12.f;
 
@@ -1140,6 +1157,8 @@ void CKirbyDefault_Slide_State::OnStateUpdate(CGameObject* pGameObject, _float f
 
 	if (pKirby->Get_State() == CKirby::STATE_SLIDESTART)
 	{
+
+
 		if (pKirby->isAnimFinish())
 		{
 			DESC(m_fMoveSpeed) = 18.f;
@@ -1163,9 +1182,12 @@ void CKirbyDefault_Slide_State::OnStateUpdate(CGameObject* pGameObject, _float f
 				return;
 
 			BodySlide(pKirby);
+			m_pGameInstance->PlaySound_Free(L"Kirby_Slide.wav", 0.5f);
+
 			//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 			pKirby->Change_State(CKirby::STATE_SLIDE, 60.f, true, false, CKirby::BODY_DEFAULT);
 			return;
+
 
 
 		}

@@ -226,7 +226,8 @@ void CDeeDeeDeeHammer::Ready_FadeOut()
 	{
 #pragma region 카메라 컷신 조정
 		//효선아 여기야 와들디 세팅
-
+		if (m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_Dee")) == nullptr)
+			return;
 		CCamera_Main* pCameraMain = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 		CHECK_NULLPTR(pCameraMain);
 

@@ -20,7 +20,7 @@ public:
 	HRESULT Initialize();
 	void  Tick(_float fTimeDelta);
 
-
+	_float Get_Volume(CHANNELID eID);
 	int  SetVolume(CHANNELID eID, _float _vol);
 
 	int  VolumeUp(CHANNELID eID, _float _vol);
@@ -36,6 +36,8 @@ public:
 	void PlayMySound(TCHAR* pSoundKey, CHANNELID eID, _float _vol);
 	void PlayBGM(TCHAR* pSoundKey, _float _vol = 0.5f);
 	void PlayBGM(CHANNELID eID, TCHAR* pSoundKey, _float _vol = 0.5f);
+
+	void LoopSound(CHANNELID eID, TCHAR* pSoundKey, _float _vol = 0.5f);
 
 	void PlaySmoothUp(CHANNELID eID, _float targetVolume, _float fAddValue);
 	void PlaySmoothDown(CHANNELID eID, _float targetVolume, _float fMinusValue);

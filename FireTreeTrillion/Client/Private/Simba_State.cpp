@@ -894,7 +894,11 @@ void CSimba_Roar::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	if (0.54f < fAnimRatio && false == m_bEyeBloom) // ÀÜÀÜÇÑ Àü±â + ´« ºû³²
 	{
 		m_bEyeBloom = true;
+
 		pSimba->Set_EyeBloom(true);
+		m_pGameInstance->Update_RimLight(.5f, 3.f, { 1.f, .7f, 1.f });
+		//È¿¼±¾Æ ¿©±â¾ß Ä«¸Þ¶ó Ã£¾Æ¿Í
+
 		pSimba->Set_SimbaEye(CSimba::SIMBAEYE_NONE);
 	}
 

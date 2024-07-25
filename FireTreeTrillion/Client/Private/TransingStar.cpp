@@ -491,7 +491,8 @@ void CTransingStar::On_Event()
                     fDisappearPos += 100.f;
                 }
             }
-
+            pCameraMain->Clear_Sequence();
+            pCameraMain->Lock_All(_float3(109.9f, 25.2f, 108.5f), _float3(1.f, .07f, -.12f));
             pCameraMain->Unlock();
             pCameraMain->Set_FOVY(38);
             pCameraMain->Set_InterpolateSpeed(3.f);
@@ -504,7 +505,7 @@ void CTransingStar::On_Event()
         {
             // 스타트 로딩화면 렌더 끄기
             m_bLoadingStart = false;
-
+            m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_HORROR);
             pKirby->Set_ControllerPos(_float4(6.1f, 38.1f, -29.1f, 1.f));  // 엘베
             //pKirby->Set_ControllerPos(_float4(0.5f, 68.f, 165.f, 1.f));  // for test : 심바맵으로 이동하기 위한
             //pKirby->Set_ControllerPos(_float4(0.5f, 68.f, -10.f, 1.f));  // for test : 엘베 타고 이동한
