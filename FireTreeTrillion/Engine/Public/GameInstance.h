@@ -208,6 +208,7 @@ public: // Sound Manager
 	_int  VolumeMin(CHANNELID eID);
 	_int  VolumeRestore(CHANNELID eID);
 	void PlaySound_Free(TCHAR* pSoundKey, _float _vol);
+	void LoopSound(CHANNELID eID, TCHAR* pSoundKey, _float _vol);
 
 #ifdef _DEBUG
 public: /* For.ImGui_Manager */

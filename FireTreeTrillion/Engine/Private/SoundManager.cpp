@@ -281,6 +281,26 @@ void CSound_Manager::PlayBGM(CHANNELID eID, TCHAR* pSoundKey, _float _vol)
 	FMOD_System_Update(m_pSystem);
 }
 
+void CSound_Manager::LoopSound(CHANNELID eID, TCHAR* pSoundKey, _float _vol)
+{
+	StopSound(eID);
+
+	map<TCHAR*, FMOD_SOUND*>::iterator iter;
+	iter = find_if(m_mapSound.begin(), m_mapSound.end(), [&](auto& iter)
+		{
+			return !lstrcmp(pSoundKey, iter.first);
+		});
+
+	if (iter == m_mapSound.end())
+		return;
+
+	FMOD_System_PlaySound(m_pSystem, iter->second, nullptr, FALSE, &m_pChannelArr[eID]);
+	FMOD_Channel_SetMode(m_pChannelArr[eID], FMOD_LOOP_NORMAL);
+	FMOD_Channel_SetVolume(m_pChannelArr[eID], _vol);
+
+	FMOD_System_Update(m_pSystem);
+}
+
 /// <summary> 특정 채널을 목표 수치까지 볼륨을 점진적으로 올린다. </summary>
 /// <param name="eID"> 특정 채널 </param>
 /// <param name="targetVolume"> 목표 수치 </param>

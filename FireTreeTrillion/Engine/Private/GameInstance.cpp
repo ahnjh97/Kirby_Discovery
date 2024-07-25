@@ -1104,6 +1104,11 @@ void CGameInstance::PlaySound_Free(TCHAR* pSoundKey, _float _vol)
 	m_pSound_Manager->PlaySound_Free(pSoundKey, _vol);
 }
 
+void CGameInstance::LoopSound(CHANNELID eID, TCHAR* pSoundKey, _float _vol)
+{
+	m_pSound_Manager->LoopSound(eID, pSoundKey, _vol);
+}
+
 #pragma endregion
 
 #ifdef _DEBUG
