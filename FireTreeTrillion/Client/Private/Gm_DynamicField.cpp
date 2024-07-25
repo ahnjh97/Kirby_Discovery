@@ -93,6 +93,7 @@ HRESULT CGm_DynamicField::Initialize(void* pArg)
 		|| TEXT("Gimmick_PkFunHouse06C") == wstrModelTag)
 	{
 		m_eDFieldType = DFMOVE_FRONTBACK;
+		m_eDFMoveState = DFIELD_WAIT;
 		m_eGimmickType = GIMMICK_SPCHARGE;
 		m_vInitPos = GET_POS;
 	}
@@ -340,6 +341,7 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 	_float3 vCurPos = { 0.f, 0.f, 0.f };
 	_float fMaxPosX = { 0.f };
 	_float fOffsetPosY = { 0.f };
+	_float fOffsetPosZ = { 0.f };
 
 	_float fMoveSpeed = { 0.f };
 	DFMOVEUP_TYPE eDFMoveUPType = { DFMOVEUP_END };
@@ -352,13 +354,17 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			switch (m_eDFMoveState)
 			{
 			case DFIELD_WAIT:
-				//m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
 				m_eDFMoveState = DFIELD_MOVE;
+				m_bPlaySoundFX = TRUE;
+				m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
 				break;
 
 			case DFIELD_MOVE:
-				m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
-				m_pGameInstance->PlayMySound(L"DynamicField_Move.wav", CHANNEL_GIMMICK_SUB, 0.5f); //1회만 재생
+				if (m_bPlaySoundFX)
+				{
+					m_pGameInstance->PlayMySound(L"DynamicField_Move.wav", CHANNEL_GIMMICK_SUB, 0.5f); //1회만 재생
+					m_bPlaySoundFX = FALSE;
+				}
 
 				eDFMoveUPType = (DFMOVEUP_TYPE)m_iGimmickIndex;
 				switch (eDFMoveUPType)
@@ -395,6 +401,7 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				}
 				else
 					m_eDFMoveState = DFIELD_MOVE;
+
 				break;
 
 			case DFIELD_QUAKE:
@@ -426,16 +433,22 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 			{
 			case DFIELD_WAIT:
 				m_eDFMoveState = DFIELD_MOVE;
+				m_bPlaySoundFX = TRUE;
+				m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
 				break;
 
 			case DFIELD_MOVE:
-				m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
-				m_pGameInstance->PlayMySound(L"DynamicField_Move.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+				if (m_bPlaySoundFX)
+				{
+					m_pGameInstance->PlayMySound(L"DynamicField_Move.wav", CHANNEL_GIMMICK_SUB, 0.5f); //1회만 재생
+					m_bPlaySoundFX = FALSE;
+				}
 
 				if (DFMOVE_RIGHT == m_eDFieldType)
 				{
 					m_pTransformCom->Go_Right(_fTimeDelta * 0.4f);
 					MoveItems(_float3(1, 0, 0), _fTimeDelta * 0.4f);
+
 
 					fMaxPosX = m_vInitPos.x + 6.f;
 					if (vCurPos.x >= fMaxPosX)
@@ -540,13 +553,28 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 		{
 			switch (m_eDFMoveState)
 			{
-			case DFIELD_MOVE: //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
-				//07.25) 0.75 좀더 빠른게 자연스러워서 수치 값 재조정
+			case DFIELD_WAIT:
+				m_eDFMoveState = DFIELD_MOVE;
+				m_bPlaySoundFX = TRUE;
 				m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
-				m_pGameInstance->PlayMySound(L"DynamicField_Move.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+				break;
+
+			case DFIELD_MOVE: //깜놀보드 애님 상태가 종료될 경우, 해당 움직임을 수행
+				if (m_bPlaySoundFX)
+				{
+					m_pGameInstance->PlayMySound(L"DynamicField_Move.wav", CHANNEL_GIMMICK_SUB, 0.5f); //1회만 재생
+					m_bPlaySoundFX = FALSE;
+				}
 
 				m_pTransformCom->Go_Backward(_fTimeDelta * 1.5f); //2.0 > 1.5 > 
 				MoveItems(_float3(0, 0, -1), _fTimeDelta * 1.5f);
+
+				fOffsetPosZ = m_vInitPos.z - 8.f;
+				if (fOffsetPosZ >= vCurPos.z)
+					m_eDFMoveState = DFIELD_QUAKE;
+
+				else
+					m_eDFMoveState = DFIELD_MOVE;
 				break;
 
 			case DFIELD_QUAKE:
@@ -560,13 +588,6 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 
 				break;
 			}
-
-			_float fOffsetPosZ = m_vInitPos.z - 8.f;
-			if (fOffsetPosZ >= vCurPos.z)
-				m_eDFMoveState = DFIELD_QUAKE;
-
-			else
-				m_eDFMoveState = DFIELD_MOVE;
 		}
 		//충전 해제 상태동안은 천천히 이동 후 비활성화 처리
 		if (CGm_ParkSolarPanelCharge::STATE_DECREASES == m_eSPChargeState) //충전 해제
@@ -613,11 +634,12 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 				else
 				{
 					m_fStartQuake = 0.f;
+					m_pGameInstance->StopSound(CHANNEL_GIMMICK_SUB);
 					m_pGameInstance->PlayMySound(L"DynamicField_Idle.wav", CHANNEL_GIMMICK_SUB, 0.5f);
+					m_eDFMoveState = DFIELD_WAIT; //리턴 상태 이후 지진을 체크
+
 					return OBJ_NOEVENT;
 				}
-
-
 			}
 
 			/*

@@ -313,6 +313,8 @@ void CAwoofy_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 		pAwoofy->Set_AwoofyEye(CAwoofy::AWOOFYEYE_ANGER);
 		pAwoofy->Set_MonState(CAwoofy::MON_WAIT);
 		pAwoofy->Change_State(CAwoofy::AWOOFY_RUN, 40.f, true, true);
+
+		m_pGameInstance->PlaySound_Free(L"Awoofy_BeAttacked.wav", 0.3f);
 	}
 }
 

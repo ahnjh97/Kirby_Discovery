@@ -152,6 +152,15 @@ void CBomber::Render_IMGUI()
 }
 #endif
 
+void CBomber::Add_AnimEvent()
+{
+	__super::Add_AnimEvent();
+
+	m_pModelCom->Add_Event("Sound_Chop", [this]() {
+		m_pGameInstance->PlaySound_Free(L"Bomber_Chop.wav", 0.3f);
+		});
+}
+
 void CBomber::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	if (eContent == CCollisionCenter::CONTENT_BODY)

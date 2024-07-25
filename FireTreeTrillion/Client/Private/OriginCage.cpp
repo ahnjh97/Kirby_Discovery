@@ -71,6 +71,14 @@ _int COriginCage::Tick(_float fTimeDelta)
 	{
 		m_eState = CAGE_STATE_AFTER;
 		m_pModelCom->Set_Animation(CAGE_BREAK, 40.f, false);
+		m_pGameInstance->StopSound(CHANNEL_BGM);
+		m_pGameInstance->PlayBGM(L"SimbaAfterCageBreak.wav");
+	}
+
+	if (0.97f < m_fTime && false == m_bPlaySound)
+	{
+		m_bPlaySound = true;
+		m_pGameInstance->PlaySound_Free(L"CageBreak.wav", 0.5f);
 	}
 
 	if (true == m_pModelCom->IsFinished() && CAGE_BREAK == m_pModelCom->Get_CurAnimIndex()) {

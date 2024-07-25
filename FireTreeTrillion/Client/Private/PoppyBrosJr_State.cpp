@@ -235,6 +235,7 @@ void CPoppyBrosJr_Damage_State::OnStateUpdate(CGameObject* pGameObject, _float f
 				pPoppyJr->Set_Dead();
 			else
 			{
+				m_pGameInstance->PlaySound_Free(L"PoppyBrosJr_BeAttacked.wav", 0.3f);
 				pPoppyJr->Change_State(CPoppyBrosJr::POPPY_ENEMYWAIT2, 50.f, true, true);
 			}
 		}

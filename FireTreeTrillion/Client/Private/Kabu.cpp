@@ -75,7 +75,10 @@ HRESULT CKabu::Initialize(void* pArg)
 _int CKabu::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
+	{
+		m_pGameInstance->PlaySound_Free(L"Kabu_Dead.wav", 0.3f);
 		return Ready_Dead();
+	}
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
@@ -330,6 +333,8 @@ void CKabu::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pOb
 			m_vLook = m_pTransformCom->Get_State_Vector(CTransform::STATE_LOOK);
 			Change_State(KABU_DAMAGE, 50.f, false, true);
 		}
+
+		m_pGameInstance->PlaySound_Free(L"Kabu_BeAttacked.wav", 0.3f);
 	}
 }
 

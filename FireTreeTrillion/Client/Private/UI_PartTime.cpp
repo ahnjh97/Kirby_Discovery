@@ -694,7 +694,7 @@ void CUI_PartTime::Render_GO()
 			m_pGameInstance->StopSound(CHANNEL_BGM);
 			m_pGameInstance->StopSound(CHANNEL_BGM_SUB);
 			m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
-			m_pGameInstance->PlayMySound(L"K15_FoodShopNormal.marker.wav", CHANNEL_BGM_SUB, 0.5f);
+			m_pGameInstance->PlayMySound(L"K15_FoodShopNormal_long.wav", CHANNEL_BGM_SUB, 0.5f);
 			return;
 		}
 	}
