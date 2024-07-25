@@ -1705,6 +1705,8 @@ HRESULT CLoader::Add_FXTexture()
 	//아우라
 	hr = Add_Texture(LEVEL_STATIC, "FX_Aura", "Effects/Basic/Aura.png");	CHECK_FAILED(hr);
 
+	//파도
+	hr = Add_Texture(LEVEL_STATIC, "FX_Wave", "Effects/BeachWave.dds");	CHECK_FAILED(hr);
 	return S_OK;
 }
 

@@ -121,10 +121,14 @@ _int CBossOrigin::Tick(_float fTimeDelta)
 		CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
 		pFadingUI->Set_InOutState(CUI_Fading::FADEOUT);
 		pFadingUI->Set_IsRender(true);
+		m_bSoundDown = true;
 	}
 
-	if(m_bFadeOut)
+	if (m_bFadeOut)
 		Ready_FadeOut();
+
+	if(m_bSoundDown)
+		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.9f);
 
 	return OBJ_NOEVENT;
 }

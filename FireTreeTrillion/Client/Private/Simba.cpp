@@ -967,14 +967,19 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 
 			//레이저와의 충돌 자국
 			CEffect::FX_DESC FXDesc{};
-			FXDesc.vInitScale = { 4.f, 4.f, 4.f };
+
+			FXDesc.fStartDelay = .15f;
+			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Get_State_Vector_Matrix(m_DimensionClawMat, CUtils::STATE_LOOK));
+
 			FXDesc.vInitPos = static_cast<_float3>(vCollidingPointA);
 			FXDesc.vInitPos.y = 2.3f;
-			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Get_State_Vector_Matrix(m_DimensionClawMat, CUtils::STATE_LOOK));
+			FXDesc.vInitPos.z += 2.f;
 			Add_Effect("HS_lion cross decal", FXDesc);
 
 			FXDesc.vInitPos = static_cast<_float3>(vCollidingPointB);
 			FXDesc.vInitPos.y = 2.3f;
+			FXDesc.vInitPos.z += 2.f;
 			Add_Effect("HS_lion cross decal", FXDesc);
 
 
@@ -985,6 +990,7 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 
 			ParticleDesc.vInitPos = static_cast<_float3>(vCollidingPointA);
 			ParticleDesc.vInitPos.y = 2.3f;
+			FXDesc.vInitPos.z += 2.f;
 
 			Add_Effect("HS_lion laser collide particle B", ParticleDesc);
 
@@ -998,9 +1004,13 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 		{
 			//레이저와의 충돌 자국
 			CEffect::FX_DESC FXDesc{};
+			FXDesc.fStartDelay = .15f;
+
 			FXDesc.vInitPos = static_cast<_float3>(vClawMatPoint);
-			FXDesc.vInitScale = { 4.f, 4.f, 4.f };
-			FXDesc.vInitPos.y = 2.3f;	
+			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+			FXDesc.vInitPos.y = 2.3f;
+			FXDesc.vInitPos.z += 2.f;
+
 			Add_Effect("HS_lion cross decal", FXDesc);
 
 
