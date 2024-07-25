@@ -981,6 +981,20 @@ void CCollisionCenter::FinalStage_Battle()
 
 
 	// 플레이어 공격에 대한 처리.
+	Collision_Collider(m_GameObjects[FINALGM], m_GameObjects[BOSS_FINALBOSS], this,
+		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
+		{
+			CGameObject* Dst = DstHit->Get_Owner();
+			CGameObject* Src = SrcHit->Get_Owner();
+			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
+				return;
+
+			CPhysXObject* pLab = static_cast<CPhysXObject*>(Dst);
+
+			pLab->Collision(CONTENT_ATTACK, pLab);
+		});
+
+	// 플레이어 공격에 대한 처리.
 	Collision_Collider(m_GameObjects[FINALGM], m_GameObjects[HITBOX_MONSTER], this,
 		[](CHitBox* DstHit, CHitBox* SrcHit, CCollisionCenter* pthis)
 		{

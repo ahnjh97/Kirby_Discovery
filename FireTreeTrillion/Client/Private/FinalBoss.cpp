@@ -202,9 +202,12 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	{
 		if(false == m_bLastDamage)
 		{
+			m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
+
 			m_bLastDamage = true;
 			Change_State(FINALBOSS_LASTDAMAGESTART, 50.f, false, true);
 			m_pControllerCom->Set_Position(m_pTransformCom, XMVectorSet(0.f, 0.f, 0.f, 1.f));
+			m_pTransformCom->Look_At(XMVectorSet(0.f, 0.f, 1.f, 0.f));
 		}
 	}
 	else if (m_pGameInstance->Get_KeyState(DIK_I, KEY_DOWN))

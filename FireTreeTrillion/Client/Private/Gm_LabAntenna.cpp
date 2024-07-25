@@ -3,6 +3,7 @@
 #include "HitBox.h"
 #include "Kirby.h"
 #include "BreakableRockParticle.h"
+#include "Bone.h"
 
 CGm_LabAntenna::CGm_LabAntenna(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPhysXObject{ pDevice, pContext }
@@ -226,10 +227,12 @@ HRESULT CGm_LabAntenna::Add_Components()
 	HitBox.pOwner = this;
 	HitBox.pDesc = &m_tColliderDesc[BODY];
 	HitBox.pCollisionType = FINALGM;
+	HitBox.pSocket = m_pModelCom->Get_BonePtrByIndex(0);
+	HitBox.vBoneOffset = _float3(0.f, 5.f, 13.f);
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 
-	Set_BodyCollider(COLLIDER_CYLINDER, 10.f, 20.f, 20.f);
+	Set_BodyCollider(COLLIDER_SPHERE, 0.f, 0.f, 10.f);
 
 #pragma endregion
 

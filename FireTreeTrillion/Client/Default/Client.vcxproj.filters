@@ -1465,7 +1465,9 @@
     <ClInclude Include="..\Public\HUD_KirbyNameTag.h">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LoadingFont.h" />
+    <ClInclude Include="..\Public\LoadingFont.h">
+      <Filter>02.GameObjects\UI\LoadingStart\LoadingFont</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -2176,7 +2178,9 @@
     <ClCompile Include="..\Private\HUD_KirbyNameTag.cpp">
       <Filter>02.GameObjects\UI\HUD</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\LoadingFont.cpp" />
+    <ClCompile Include="..\Private\LoadingFont.cpp">
+      <Filter>02.GameObjects\UI\LoadingStart\LoadingFont</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
