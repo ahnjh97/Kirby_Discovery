@@ -57,6 +57,8 @@ _int CStarBlock::Tick(_float fTimeDelta)
 	if (true == m_bDead)
 	{
 		m_pGameInstance->DisableActor(m_pStaticActor);
+		// 박스가 부숴지는 소리입니다.
+		CGameInstance::Get_Instance()->PlaySound_Free(L"StarBlockBump.wav", 1.f);
 		return Make_Partical();
 	}
 

@@ -59,6 +59,10 @@ HRESULT CMonster::Render_LightDepth()
 	return S_OK;
 }
 
+void CMonster::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+{
+}
+
 void CMonster::Damage_Delay(_float fTimeDelta)
 {
 	if (m_fPreHp > m_fHp)
@@ -87,6 +91,7 @@ void CMonster::Render_IMGUI()
 }
 
 #endif
+
 
 void CMonster::Free()
 {
