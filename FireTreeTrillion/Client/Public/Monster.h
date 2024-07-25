@@ -49,6 +49,7 @@ public:
 	virtual void	Render_IMGUI()					override;
 #endif
 	virtual void	Add_AnimEvent()  override {}
+	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject);
 
 	void			Damage_Delay(_float fTimeDelta);
 	void			Set_Damage_Delay(_float fMaxTime) { m_fMonsterOverPowerMaxTime = fMaxTime; }
