@@ -74,7 +74,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ�
-	m_eAbilityType = ABILITY_DEFAULT;
+	m_eAbilityType = ABILITY_CRASH;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 			m_eAbilityType = ABILITY_HAMMER;
 
@@ -125,7 +125,11 @@ _int CKirby::Tick(_float fTimeDelta)
 		//RayCast_SurpriseBoards();
 	}
 		
-	//m_bOverPower = true;
+	if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
+	{
+		m_EffectSocket._42 += 1.5f;
+	}
+
 	return OBJ_NOEVENT;
 }
 
