@@ -1753,7 +1753,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			pCamera->Make_Shake(4.f, 0.5f);
 
 			CMultiEffect::MULTI_FX_DESC FXDesc{};
-			_float4 vEffectPos = CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_POSITION) + (CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK) * 24.f);
+			_float4 vEffectPos = CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_POSITION) + (CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK) * 23.f);
 			FXDesc.vInitPos = (_float3)vEffectPos;
 			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 			FXDesc.vInitRot = CUtils::Make_Degree_FromDir(-1.f * (_float4)CUtils::Get_State_Vector_Matrix(*pKirby->Get_EffectSocket(), CUtils::STATE_LOOK));

@@ -210,6 +210,9 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 			m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
 
 			m_bLastDamage = true;
+			CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+			if (pCamera != nullptr)
+				pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_DEAD);
 			Change_State(FINALBOSS_LASTDAMAGESTART, 50.f, false, true);
 			m_pControllerCom->Set_Position(m_pTransformCom, XMVectorSet(0.f, 0.f, 0.f, 1.f));
 			m_pTransformCom->Look_At(XMVectorSet(0.f, 0.f, 1.f, 0.f));
