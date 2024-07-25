@@ -105,7 +105,6 @@ _int CHUD_BossHpBar::Tick(_float fTimeDelta)
 	if (m_pMyMonster == nullptr || m_pMyMonster->Get_Dead() || m_bDead == true)
 		return OBJ_DEAD;
 
-
 	if (m_uInitializeBar == 0)
 	{
 		// 처음 등장하는 등장 바 애니메이션. 알파값이 전부 차면서, 시작된다. 그 이후로 절대 발동안함.

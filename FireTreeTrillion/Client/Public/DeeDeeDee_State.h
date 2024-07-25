@@ -125,6 +125,7 @@ public:
 	_bool	m_bTargetTrigger = { true };
 	_bool	m_bTarget = { true };
 	_float  m_fJumpDelayTime = { 0.f };
+	_bool	m_bPlaySoundFX = { FALSE };
 
 	static	CDeeDeeDee_Jump_State* Create();
 	virtual void Free() override;

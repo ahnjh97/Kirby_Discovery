@@ -417,9 +417,6 @@ void CHUD_StarPoint::Compute_Coin(_float _fTimeDelta)
 	// 만약, 현재 코인이 전 코인보다 크다면, 획득한 것이다.
 	if (m_iCurCoin > m_iPreCoin)
 	{
-		m_pGameInstance->StopSound(CHANNEL_UI);
-		m_pGameInstance->PlayMySound(L".wav", CHANNEL_UI, 2.0f); //ItemPointStar랑 동일한 사운드
-
 		m_bPlusCoin = true;
 		m_fIdleTime = 0.f;
 		m_fUpNumY = 1.f;

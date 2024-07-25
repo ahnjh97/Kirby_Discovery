@@ -211,22 +211,6 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 
 			if (m_iCurMessageIndex == m_tMessageDesc.vecMsg.size())
 				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_APPEAR_END);
-
-			/*
-			if (1 == m_iCurMessageIndex)
-				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_NEXT_DIALOG1);
-			if (4 == m_iCurMessageIndex)
-			{
-				CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
-				if (pCamera != nullptr)
-					pCamera->Make_Sequence(CCamera_Main::SEQ_SIMBA_TONG);
-			}
-			if (8 == m_iCurMessageIndex)
-				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_NEXT_DIALOG2);
-
-			if (m_iCurMessageIndex == m_tMessageDesc.vecMsg.size() - 1)
-				CEventCenter::Get_Instance()->Notify(KEVENT_SIMBA_LAST_DIALOG);
-			*/
 		}
 	}
 
