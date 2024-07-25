@@ -96,6 +96,7 @@ HRESULT CHUD_AbilityDiscard::Render()
 	if (DISCARD_HIDE == m_eCurState && 0.f == m_UIObjDesc.fAlpha)
 		return S_OK;
 
+	//이전 렌더가 능력버리기인지 뱉기인지 체크하여 렌더 OFF
 	if (1 <= m_fKeyInputTime)
 		return S_OK;
 
