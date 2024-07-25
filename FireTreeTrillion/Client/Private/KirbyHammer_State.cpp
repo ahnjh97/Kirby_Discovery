@@ -112,6 +112,7 @@ void CKirbyHammer_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 	else if (pKirby->Get_State() == CKirby::HAMMERSTATE_RUN)
 	{
+		Make_BBongSound(DESC(m_fWalkSoundDelay), fTimeDelta);
 		Bbong_FX(fTimeDelta, pTransformCom);
 		Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
 		Turn_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
@@ -229,6 +230,7 @@ void CKirbyHammer_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex,
 		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 
 		static_cast<CPhysXObject*>(pObject)->Add_Effect("YW KirbyHammerTrail", FXDesc, true);
+		m_pGameInstance->PlaySound_Free(L"KirbyHammer_One.wav", 0.5f);
 
 		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail"), &FXDesc)))
 		//	return;
@@ -330,6 +332,7 @@ void CKirbyHammer_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		if (pKirby->isAnimFinish())
 		{
 			pKirby->Change_State(CKirby::HAMMERSTATE_HAMMERATTACKHITTOY, 60.f, false, false, CKirby::BODY_HAMMER, CKirby::OFFSET_HAMMER);
+			m_pGameInstance->PlaySound_Free(L"KirbyHammer_Hit.wav", 0.5f);
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake();
 
@@ -438,10 +441,19 @@ void CKirbyHammer_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		else
 			Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
 
+		if (m_bSoundTrigger == true && m_fAttackJumpTime > 0.41f)
+		{
+			m_pGameInstance->PlaySound_Free(L"KirbyHammer_Two.wav", 0.8f);
+			m_bSoundTrigger = false;
+		}
+
+
 		if (m_fAttackJumpTime > 0.45f && m_bAttackJumpTrigger == true)
 		{
 			if (m_bCountTrigger == true)
 			{
+				m_pGameInstance->PlaySound_Free(L"KirbyHammer_Hit.wav", 0.5f);
+
 				CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 				pCamera->Make_Shake();
 
@@ -512,6 +524,7 @@ void CKirbyHammer_Attack_State::OnStateExit()
 	m_fAttackJumpTime = 0.f;
 	m_fPreAttackJumpTime = 0.f;
 	m_bCountTrigger = true;
+	m_bSoundTrigger = true;
 }
 
 CKirbyHammer_Attack_State* CKirbyHammer_Attack_State::Create()
@@ -552,6 +565,8 @@ void CKirbyHammer_Onigorosi_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 
 		static_cast<CPhysXObject*>(pObject)->Add_Effect("YW KirbyHammerTrail2", FXDesc, true);
+		m_pGameInstance->PlaySound_Free(L"KirbyHammer_One.wav", 0.7f);
+
 
 		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail2"), &FXDesc)))
 		//	return;
@@ -568,7 +583,6 @@ void CKirbyHammer_Onigorosi_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 
 		static_cast<CPhysXObject*>(pObject)->Add_Effect("YW KirbyHammerTrail2", FXDesc, true);
-
 
 		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail2"), &FXDesc)))
 		//	return;
@@ -629,6 +643,9 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 
 		if (DESC(m_fHammerChargeTime) > 0.5f && DESC(m_bFirstChargeEffectTrigger) == true)
 		{
+			m_pGameInstance->PlaySound_Free(L"KirbyHammer_ChargeSoundOne.wav", 0.8f);
+			m_pGameInstance->PlayMySound(L"KirbyHammer_ChargeSound.wav", CHANNEL_PLAYERVOICE, 0.5f);
+
 			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
 			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
 			_float4 vUp = pTransformCom->Get_State(CTransform::STATE_UP);
@@ -663,6 +680,9 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
 			_float4 vUp = pTransformCom->Get_State(CTransform::STATE_UP);
 			_float4 vRight = pTransformCom->Get_State(CTransform::STATE_RIGHT);
+
+			m_pGameInstance->PlaySound_Free(L"KirbyHammer_ChargeSoundTwo.wav", 0.8f);
+
 
 			CMultiEffect::MULTI_FX_DESC MulFXDesc{};
 			MulFXDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
@@ -699,6 +719,7 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				DESC(m_bFirstChargeEffectTrigger) = true;
 				DESC(m_bSecondChargeEffectTrigger) = true;
 				pKirby->Delete_Effect("YW HammerChargeParticle");
+				m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
 
 				return;
 			}
@@ -712,6 +733,7 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				DESC(m_bFirstChargeEffectTrigger) = true;
 				DESC(m_bSecondChargeEffectTrigger) = true;
 				pKirby->Delete_Effect("YW HammerChargeParticle");
+				m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
 
 				pKirby->Set_WeaponAnim(10);
 				return;
@@ -751,6 +773,10 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 
 			pKirby->Add_Effect("YW Light Cluster", MulFXDesc, true);
 
+			m_pGameInstance->PlaySound_Free(L"KirbyHammer_ChargeSoundOne.wav", 0.8f);
+			m_pGameInstance->PlayMySound(L"KirbyHammer_ChargeSound.wav", CHANNEL_PLAYERVOICE, 0.5f);
+
+
 			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Light Cluster"), &MulFXDesc)))
 			//	return;
 			//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
@@ -772,6 +798,9 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 			_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
 			_float4 vUp = pTransformCom->Get_State(CTransform::STATE_UP);
 			_float4 vRight = pTransformCom->Get_State(CTransform::STATE_RIGHT);
+
+			m_pGameInstance->PlaySound_Free(L"KirbyHammer_ChargeSoundTwo.wav", 0.8f);
+
 
 			CMultiEffect::MULTI_FX_DESC MulFXDesc{};
 			MulFXDesc.vInitPos = { -0.4f, 1.7f, -0.7f };
@@ -816,6 +845,8 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				DESC(m_bFirstChargeEffectTrigger) = true;
 				DESC(m_bSecondChargeEffectTrigger) = true;
 				pKirby->Delete_Effect("YW HammerChargeParticle");
+				m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+
 				return;
 			}
 			else if (DESC(m_fHammerChargeTime) >= 2.f)
@@ -829,6 +860,8 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				DESC(m_bFirstChargeEffectTrigger) = true;
 				DESC(m_bSecondChargeEffectTrigger) = true;
 				pKirby->Delete_Effect("YW HammerChargeParticle");
+				m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+
 				return;
 			}
 			else
@@ -859,6 +892,12 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 	{
 		m_fMoveTime += fTimeDelta;
 
+		if (0.4f < m_fMoveTime && m_bSoundTrigger == true)
+		{
+			m_pGameInstance->PlaySound_Free(L"KirbyHammer_One.wav", 0.8f);
+			m_bSoundTrigger = false;
+		}
+
 		if (0.4f < m_fMoveTime && m_fMoveTime < 0.6f)
 		{
 			_float fDelta = EASE_INOUT((m_fMoveTime - 0.4f) * 5.f) - EASE_INOUT((m_fPreMoveTime - 0.4f) * 5.f);
@@ -868,6 +907,7 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 
 		if (pKirby->isAnimFinish())
 		{
+
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Zoom(0.f);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
@@ -884,6 +924,7 @@ void CKirbyHammer_Onigorosi_State::OnStateExit()
 {
 	m_fMoveTime = 0.f;
 	m_fPreMoveTime = 0.f;
+	m_bSoundTrigger = true;
 }
 
 CKirbyHammer_Onigorosi_State* CKirbyHammer_Onigorosi_State::Create()
@@ -923,6 +964,8 @@ void CKirbyHammer_JumpAttack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIn
 		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 
 		static_cast<CPhysXObject*>(pObject)->Add_Effect("YW HammerWheel", FXDesc, true);
+		m_pGameInstance->PlaySound_Free(L"KirbyHammer_SpinAttack.wav", 0.5f);
+
 
 		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW HammerWheel"), &FXDesc)))
 		//	return;
@@ -1189,6 +1232,7 @@ void CKirbyHammer_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Smoke Fast"), &FXDesc)))
 					return;
 				Kirby_AbilityType_Assist(pKirby, CKirby::STATE_LANDINGEND);
+				m_pGameInstance->PlaySound_Free(L"Kirby_BigLanding.wav", 0.2f);
 				//pKirby->Change_State(CKirby::STATE_LANDINGEND, 30.f, false, false, CKirby::BODY_DEFAULT);
 			}
 			else
@@ -1211,6 +1255,7 @@ void CKirbyHammer_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 				if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
 					return;
 				Kirby_AbilityType_Assist(pKirby, CKirby::STATE_LANDINGSMALL);
+				m_pGameInstance->PlaySound_Free(L"Kirby_SmallLanding.wav", 0.7f);
 				//pKirby->Change_State(CKirby::STATE_LANDINGSMALL, 50.f, false, false, CKirby::BODY_DEFAULT);
 			}
 		}

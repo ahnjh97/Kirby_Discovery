@@ -51,6 +51,7 @@ private:
 	_bool			m_bCollision = { false };
 	_bool			m_bActorCreated = { false };
 	_float			m_fHitTime = {};
+	_bool			m_bSoundSignal = false;
 
 public:
 	static CToppleableBridge* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

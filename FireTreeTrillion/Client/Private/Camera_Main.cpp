@@ -29,6 +29,8 @@
 #define QTE2 13
 #define QTE3 18
 
+#define KIRBY_DOFOFFSET _float3{0.f, .5f, 0.f}
+
 _float3 vertices[] = {
 	// Front face
    { -1.0f, -1.0f, -1.0f },
@@ -257,7 +259,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 										  0.1f, 0.1f, 0.0f, 0.f, 0.f, // 5 ~ 9
 										  0.1f, 0.f, 0.f, 0.1f, 0.f, // 10 ~ 14
 										  0.1f, 0.f, 0.f, 0.05f, 0.05f }; // 15 ~ 19  // 17 : 맨뒤 폭탄 받는 부분에서 직각으로 만드는 부분, 18 : 맨앞, 19 : 두번째 코너 돌릴때 distance 줄이는 곳
-	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .05f, 0.05f, 0.1f, 0.f, 0.f }; // 0 : 보스 만나기전, 1 : 계단으로 들어가는 입구, 2 : 복도 마지막 트리거
+	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .05f, 0.05f, 0.1f, 0.f, 0.f, 0.f }; // 0 : 보스 만나기전, 1 : 계단으로 들어가는 입구, 2 : 복도 마지막 트리거
 	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f, .4f, .5f, 0.2f, 0.2f, 0.f };
 
 
@@ -336,11 +338,25 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 	//dof 갱신(수동)
 	else
 	{
-		if (m_eSpecialSeq == SEQ_BREAKRACINGMAP)
-		{
-
+		if (m_eSpecialSeq == SEQ_INTRO)
+		{ 
+			m_pGameInstance->Update_DofFocus(
+				m_pFirstTarget->Get_State(CTransform::STATE_POSITION) + KIRBY_DOFOFFSET);
 		}
 
+		if (m_eSpecialSeq == SEQ_BREAKRACINGMAP)
+		{
+			if (m_fSeqCheckTime < 19.f)
+			{
+				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION) + KIRBY_DOFOFFSET);
+			}
+			//else
+			//{
+			//	
+			//}
+		}
+
+#pragma region 사자
 
 		//사자 컷
 		if (SEQ_SIMBA_START <= m_eSpecialSeq && m_eSpecialSeq <= SEQ_SIMBA_LOW)
@@ -350,25 +366,45 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 			{
 				CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
 				if (nullptr != pSimba)
-					m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+					m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 5.f, 0.f });
 			}
 			//커비
 			else
 			{
-				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
+				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION) + KIRBY_DOFOFFSET);
 			}
 		}
+
+		if (m_eSpecialSeq == SEQ_SIMBA_THRONEBREAK)
+		{
+			CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
+			if (nullptr != pSimba)
+				m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{0.f, 5.f, 0.f});
+		}
+
+		if (m_eSpecialSeq == SEQ_SIMBA_BOSSORIGIN)
+		{
+			CGameObject* pOrigin = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_BossOrigin"));
+
+			if (nullptr != pOrigin)
+				m_pGameInstance->Update_DofFocus(pOrigin->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{0.f, 3.f, 0.f});
+		}
+
+#pragma endregion
 
 		//파이널 보스 등장
 		if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR)
 		{
-			if (m_fSeqCheckTime < 3.f)
+			if (m_fSeqCheckTime < 6.f)
 			{
 				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
 			}
-			else if (3.f <= m_fSeqCheckTime/* && m_fSeqCheckTime < 8.9f*/)
+			else if (6.f <= m_fSeqCheckTime)
 			{
-				m_pGameInstance->Update_DofFocus({ 0.f, -31.f, 13.f });
+				CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster"));
+				if (nullptr != pBoss)
+					m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{0.f, 4.5, 0.f});
+				//m_pGameInstance->Update_DofFocus({ 0.f, -31.f, 13.f });
 			}
 		}
 
@@ -377,7 +413,7 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 		{
 			CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster"));
 			if (nullptr != pBoss)
-				m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+				m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 4.5, 0.f });
 		}
 
 		if (m_eSpecialSeq == SEQ_FINALBOSS_DUMP)
@@ -820,9 +856,9 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 				//case SEQ_BREAKCARSHOP:
 			case SEQ_BREAKRACINGMAP:
 			{
-				m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
-				m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"Welcome to the New World!.mp3");
-				m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, 0.5f);
+				m_pGameInstance->StopSound(CHANNEL_BGM);
+				m_pGameInstance->PlayBGM(CHANNEL_BGM, L"Welcome to the New World!.mp3");
+				m_pGameInstance->SetVolume(CHANNEL_BGM, 0.5f);
 			}
 			break;
 
@@ -1260,13 +1296,7 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 		//_float4 vPos = GET_POS;
 		//SET_POS(_float4(vPos.x, vPos.y + 0.2f, vPos.z, 1.f));
 	}
-	//CGameObject* pKirby = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0);
-	//if (nullptr == pKirby)
-	//	return;
-	//CTransform* pKirbyTransform = static_cast<CTransform*>(pKirby->Get_Component(g_strTransformTag));
-	//if (nullptr == pKirbyTransform)
-	//	return;
-	//_vector pKirbyPos = pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION);
+;
 
 	m_vSlerpedDir = _float3::Lerp(m_vecFrontDirRadius[m_iMatrixIndex].first, m_vecRearDirRadius[m_iMatrixIndex].first, m_fTriggerRatio);
 	m_fLerpedRadius = LERP(m_vecFrontDirRadius[m_iMatrixIndex].second, m_vecRearDirRadius[m_iMatrixIndex].second, m_fTriggerRatio);
@@ -1285,6 +1315,13 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 	{
 		m_fDestUpOffset = m_CamTriggerUpOffsets[*m_pCurrentLevelID][m_iMatrixIndex];
 	}
+
+	//맨 처음 앵커 오프셋
+	if (*m_pCurrentLevelID == LEVEL_INTRO && m_iMatrixIndex == 10)
+	{
+		Set_TargetAnchor({ 0.f, 0.f, 0.f });
+	}
+
 	// = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f }
 	//m_fDestUpOffset = m_CamTriggerUpOffsets[m_iMatrixIndex];
 }
@@ -1344,7 +1381,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//해당 시퀀스를 명시적으로 변수로 저장!
 	m_eSpecialSeq = eSeq;
 	m_fSeqCheckTime = 0.f;
-
+	//오토 dof 끄기
+	Set_AutoDOF(false);
 
 	switch (eSeq)
 	{
@@ -1435,6 +1473,25 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	}
 	break;
 
+	//본 컷신 시작
+	case SEQ_INTRO:
+	{
+		CAMACTION newAction = {};
+		
+		Fill_HardCutSet(newAction, 0.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { -130.f, 3.2f, -130.f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, {0.f, .16f, 1.f});
+		newAction.fFOVY = 20.f;
+		m_CamSeq.emplace_back(newAction);
+
+
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 6.f);
+		newAction.fFOVY = 30.f;
+		m_CamSeq.emplace_back(newAction);
+
+		Fill_Delay(newAction, 6.f, 5.f);
+	}
+	break;
 	case SEQ_BREAKCARSHOP:
 	{
 		CAMACTION newAction{};
@@ -1484,7 +1541,6 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 	case SEQ_BREAKRACINGMAP:
 	{
-		Set_AutoDOF(false);
 
 		CAMACTION newAction{};
 		newAction.fTime = 0.f;
@@ -1691,6 +1747,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//통 보여주고 줌아웃
 	case SEQ_SIMBA_START:
 	{
+
 		CAMACTION newAction{};
 		Fill_HardCutSet(newAction, 0.f);
 
@@ -1721,6 +1778,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//심바 배틀 start
 	case SEQ_SIMBA_BATTLESTART:
 	{
+
 		CAMACTION newAction{};
 		Fill_HardCutSet(newAction, 0.f);
 
@@ -1857,46 +1915,42 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	//사자 날라감
 	case SEQ_SIMBA_THRONEBREAK:
 	{
-		Set_AutoDOF(false);
 
 		CAMACTION newAction{};
 		Fill_HardCutSet(newAction, 0.f);
-		Fill_ActionPos(newAction, POS_ABSOLUTE, { .11f, 5.36f, -96.7f });
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 0.f, 5.36f, -96.7f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .18f, .98f });
 		m_CamSeq.push_back(newAction);
 
 		Fill_InterpolateCutSet(newAction, 0.f, EASE_LINEAR, 2.f);
-		Fill_ActionPos(newAction, POS_ABSOLUTE, { 0.f, .16f, .99f });
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.21f, 9.26f, -63.67f });
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { 0.f, 9.26f, -63.67f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.f, .16f, .99f });
 		m_CamSeq.push_back(newAction);
 
 		Fill_HardCutSet(newAction, 2.f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { 13.08f, 12.39f, -28.18f });
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.44f, .08f, .89f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.44f, -.08f, .89f });
 		m_CamSeq.push_back(newAction);
 
-		Fill_InterpolateCutSet(newAction, 2.f, EASE_INOUT, .5f);
+		Fill_InterpolateCutSet(newAction, 2.f, EASE_INOUT, 1.f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { 9.39f, 11.36f, -18.27f });
-		Fill_ActionDir(newAction, DIR_ABSOLUTE, { 0.46f, -.09f, .88f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -0.46f, -.09f, .88f });
 		m_CamSeq.push_back(newAction);
 
-		Fill_Delay(newAction, 2.5f, 20.f);
-
+		Fill_Delay(newAction, 3.f, 20.f);
 	}
 	break;
 	//보스 눈뜨기
 	case SEQ_SIMBA_BOSSORIGIN:
 	{
-		Set_AutoDOF(false);
-
 		CAMACTION newAction{};
 		Fill_HardCutSet(newAction, 0.f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { 9.87f, 20.f, 16.f});
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.64f, .06f, .76f });
 		m_CamSeq.push_back(newAction);
 
-
-		Fill_InterpolateCutSet(newAction, .7f, EASE_INOUT_FAST, .3f);
+		//확 땡기기
+		Fill_InterpolateCutSet(newAction, .7f, EASE_INOUT_FAST, .4f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { 7.54f, 19.07f, 19.53f});
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.62f, .25f, .75f });
 		m_CamSeq.push_back(newAction);
@@ -1908,18 +1962,18 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 
 		newAction.fFOVY = 25.f;
-		Fill_InterpolateCutSet(newAction, 3.f, EASE_INOUT_FAST, 1.5f);
+		Fill_InterpolateCutSet(newAction, 3.f, EASE_INOUT, 1.5f);
 		m_CamSeq.push_back(newAction);
 
 		newAction.fFOVY = 30.f;
-		Fill_InterpolateCutSet(newAction, 5.5f, EASE_INOUT_FAST, .3f);
+		Fill_InterpolateCutSet(newAction, 5.f, EASE_INOUT, .5f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { 1.01f, 12.29f, -59.03f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.02f, .12f, .99f });
 		m_CamSeq.push_back(newAction);
 		 
 
 
-		Fill_InterpolateCutSet(newAction, 5.5f, EASE_INOUT, 7.f);
+		Fill_InterpolateCutSet(newAction, 6.f, EASE_INOUT, 7.f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { .6f, 14.29f, -42.15f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.01f, .12f, .99f });
 		m_CamSeq.push_back(newAction);
@@ -2824,6 +2878,8 @@ void CCamera_Main::Make_One_Sequence(CAMACTION newAction)
 
 void CCamera_Main::Clear_Sequence()
 {
+	m_CamSeq.clear();
+
 	m_eSpecialSeq = SEQ_END;
 	m_eCurSeqEase = EASE_END;
 	m_fSeqInterpolateTime = { 0.f, 0.f };
@@ -3129,8 +3185,8 @@ _float3 CCamera_Main::Make_TargetPos()
 		//지형 위치를 구하여 같이 쓰기
 		_float4 vTerrainPos = static_cast<CCharacter*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
 
-		if (vTerrainPos.y != 0.f && m_eCamFocus != FOCUS_BOTH)
-			vTargetPos.y = vTargetPos.y * .2f + vTerrainPos.y * .8f;
+		if (vTerrainPos.y != 0.f)
+			vTargetPos.y = vTerrainPos.y;
 	}
 	//피날레 카메라 포커스
 	else if (m_eCamFocus == FOCUS_FINALE)
@@ -3389,6 +3445,14 @@ void CCamera_Main::Render_IMGUI()
 
 
 	ImGui::SeparatorText(u8"시퀀스");
+
+
+	if(m_eSpecialSeq != SEQ_END)
+		ImGui::Text(u8"현재 시퀀스: playing");
+	else
+		ImGui::Text(u8"현재 시퀀스: none");
+
+
 	ImGui::Text(u8"지나간 시퀀스 시간: %.2f", m_fSeqPlayedTime);
 
 	ImGui::Text(u8"현재 시퀀스 시간: %.2f", m_fSeqCheckTime);

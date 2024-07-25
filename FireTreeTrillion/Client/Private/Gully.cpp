@@ -81,14 +81,18 @@ _int CGully::Tick(_float fTimeDelta)
 	if (m_bFireGully == true && m_fLifeTime > 0.f)
 	{
 		_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		vPos.y += 0.5f;
+		vPos.x += CUtils::Make_RandomFloat(-1.f, 1.f);
+		vPos.z += CUtils::Make_RandomFloat(-1.f, 1.f);
 
 		CFire::FIREDESC Firedesc = {};
 		Firedesc.vFirePos = vPos;
-		Firedesc.fUpRange = { 3.f };
+		Firedesc.fUpRange = { 100.f };
 		Firedesc.vFirstColor = { 1.f, .5f, .2f , 1.f };
 		Firedesc.vTargetColor = { .7f, 0.f, 1.f, 1.f };
-		Firedesc.fScale = { 1.5f };
+		Firedesc.fScale = { 2.7f };
 		Firedesc.fTimeRatio = { 0.8f };
+		Firedesc.vMoveDir = { 0.f, 1.f, 0.f };
 		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Fire"), TEXT("Prototype_GameObject_Fire"), &Firedesc)))
 			return OBJ_NOEVENT;
 	}

@@ -313,6 +313,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
+					//효선아 Thrust
+					ThrustCharge(pFinalBoss);
 				}
 			}
 			else if (13 == m_iCnt)
@@ -330,6 +332,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
+					//효선아 Thrust
+					ThrustCharge(pFinalBoss);
 				}
 			}
 			else if (16 == m_iCnt)
@@ -483,6 +487,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			{
 				pFinalBoss->Set_Thrust(false);
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTREADY, 50.f, false, true);
+				//효선아 Thrust
+				ThrustCharge(pFinalBoss);
 			}
 			else if (true == pFinalBoss->Get_Spike())
 			{
@@ -1367,7 +1373,6 @@ void CFinalBoss_Thrust_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		case CFinalBoss::FINALBOSS_FLASHTHRUSTREADY:
 		{
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTSTART, 50.f, false, true);
-			//효선아 여기야 thrust
 
 			CEffect::FX_DESC FXDesc{};
 			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
@@ -1588,7 +1593,7 @@ void CFinalBoss_Spike_State::OnStateUpdate(CGameObject* pGameObject, _float fTim
 				CMultiEffect::MULTI_FX_DESC FXDesc{};
 				vInitPos.y -= 1.f;
 				FXDesc.vInitPos = vInitPos;
-				FXDesc.vInitScale = { 3.f, 3.f, 3.f };
+				FXDesc.vInitScale = {2.f, 2.f, 2.f };
 				FXDesc.vInitRot = { 0.f, 0.f, 0.f };
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"),
 					TEXT("Prototype_GameObject_HS_FB downward light"), &FXDesc);

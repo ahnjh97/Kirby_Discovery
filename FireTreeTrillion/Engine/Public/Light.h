@@ -15,6 +15,7 @@ public:
 		return &m_LightDesc;
 	}
 	void Set_LightDiffuse(_float4 vLightColor) { m_LightDesc.vDiffuse = vLightColor; }
+	void Set_LightAmbient(_float4 vLightColor) { m_LightDesc.vAmbient = vLightColor; }
 
 
 public:

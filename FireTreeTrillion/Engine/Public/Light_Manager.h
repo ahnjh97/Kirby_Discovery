@@ -23,6 +23,7 @@ public:
 	void	Set_LightState(_uint uState) { m_eState = static_cast<STATE>(uState); }
 	void	Set_CurLightRange(_uint iLightNum, _float fRange);
 
+
 	// 방금 추가한 놈의 주소를 뜯어온다. ( 빛을 따라오게 하는 용도 )
 	class CLight* Get_LightLastAddress() {
 		return m_Lights.back();

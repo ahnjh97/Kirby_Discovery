@@ -229,6 +229,7 @@ void CStarBlock::Break_From_Car()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
 		return;
 
+	m_pGameInstance->PlaySound_Free(L"KirbyCar_BoxCollision.wav", 0.5f);
 
 	m_pGameInstance->DisableActor(m_pStaticActor);
 	m_bDead = true;

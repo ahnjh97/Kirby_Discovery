@@ -257,6 +257,8 @@ void CDimensionGate::Compute_DimensionGateMaskRatio(_float fTimeDelta)
 {
 
 	m_fDimensionTime += fTimeDelta * (1.f / 18.f);
+	if (m_fDimensionTime > 0.8f)
+		m_fDimensionTime = 0.8f;
 	m_fDimensionMin = (sin(m_fDimensionTime) * 0.15f) + 0.3f;
 
 }

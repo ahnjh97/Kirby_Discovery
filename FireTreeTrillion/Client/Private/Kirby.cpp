@@ -74,7 +74,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
-	m_eAbilityType = ABILITY_HAMMER;
+	m_eAbilityType = ABILITY_BOMB;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 			m_eAbilityType = ABILITY_HAMMER;
 
@@ -350,9 +350,9 @@ void CKirby::Add_AnimEvent()
 
 	#pragma region BASIC
 
-		m_pModelCom[BODY_DEFAULT]->Add_Event("Sound_WalkBasic", [this]() {
-			m_pGameInstance->PlaySound_Free(L"WalkOnAnywhere.wav", 0.6f);
-			});
+		//m_pModelCom[BODY_DEFAULT]->Add_Event("Sound_WalkBasic", [this]() {
+		//	m_pGameInstance->PlaySound_Free(L"WalkOnAnywhere.wav", 0.15f);
+		//	});
 
 
 	#pragma endregion
@@ -425,6 +425,8 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				pObject->Set_PhyXState(PO_KIRBYMOUTH);
 
 			Delete_AllEffect();
+			//m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+			m_pGameInstance->PlayMySound(L"Kirby_EatDefault.wav", CHANNEL_PLAYERVOICE, 0.5f);
 		}
 		// 입에 머금은 상태의 몬스터
 		else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
@@ -485,6 +487,8 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 					Effectdesc.vInitScale = { 2.f, 2.f, 2.f };
 					if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
 						return;
+
+					m_pGameInstance->PlaySound_Free(L"KirbyCar_Collision.wav", 0.4f);
 				}
 			}
 			else if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
@@ -499,6 +503,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			}
 
 			Delete_AllEffect();
+			m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
 		}
 	}
 	// 맵 오브젝트들과의 충돌.
@@ -521,6 +526,8 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				pObject->Set_PhyXState(PO_KIRBYMOUTH);
 
 			Delete_AllEffect();
+			//m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+			m_pGameInstance->PlayMySound(L"Kirby_EatDefault.wav", CHANNEL_PLAYERVOICE, 0.5f);
 		}
 	}
 	else if (eContent == CCollisionCenter::CONTENT_ATTACK)
@@ -542,6 +549,8 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				pObject->Set_PhyXState(PO_KIRBYMOUTH);
 
 			Delete_AllEffect();
+			//m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+			m_pGameInstance->PlayMySound(L"Kirby_EatDefault.wav", CHANNEL_PLAYERVOICE, 0.5f);
 		}
 		// 입에 머금은 상태의 몬스터
 		else if (pObject->Get_PhyXState() == PO_KIRBYMOUTH)
@@ -609,7 +618,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				Change_State(STATE_DAMAGE, 60.f, false, false, BODY_DEFAULT);
 			}
 
-
+			m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
 			Delete_AllEffect();
 		}
 	}
@@ -639,6 +648,8 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			_float4 vCamLook = XMVector3Cross(vCamRight, XMVectorSet(0.f, 1.f, 0.f, 1.f));
 			INFO(m_vTargetDir) = XMVector3Normalize(vCamLook + vCamRight) * -1.f;
 			Delete_AllEffect();
+			//m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+			m_pGameInstance->PlayMySound(L"Kirby_EatDefault.wav", CHANNEL_PLAYERVOICE, 0.5f);
 		}
 		else if (pObject->Get_PhyXState() == PO_NORMAL)
 		{
@@ -684,6 +695,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 					return;
 				}
 
+				m_pGameInstance->PlayMySound(L"Kirby_Vacuuming.wav", CHANNEL_PLAYERVOICE, 0.5f);
 				Add_Effect("Vacuum_v3", FXDesc, true);
 				// Deforming을 트루로 만든다. 길게 애니메이션이 재생될 준비를 한다. 이건 밖에서 예외처리 될 것이다.
 				INFO(m_bisDeforming) = true;
@@ -901,11 +913,16 @@ HRESULT CKirby::Make_TargetToCams()
 	}
 
 	_float3 vAnchor = _float3();
-	if (*m_pCurrentLevelID == LEVEL_SIMBA)
+	if(*m_pCurrentLevelID == LEVEL_INTRO)
+		vAnchor = { 0.f, 4.f, 0.f };
+
+	else if (*m_pCurrentLevelID == LEVEL_SIMBA)
 		vAnchor = { 0.f, 3.f, 0.f };
 
 	m_pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_FIRST, CCamera::FOCUS_FIRST, vAnchor);
 
+	if (*m_pCurrentLevelID == LEVEL_INTRO)
+		dynamic_cast<CCamera_Main*> (m_pCamera)->Make_Sequence(CCamera_Main::SEQ_INTRO);
 	//게임 레벨에 free camera 있다면 그놈에게도 타겟 등록해 준다.
 	if (LEVEL_INTRO <= *m_pCurrentLevelID && *m_pCurrentLevelID < LEVEL_END)
 	{
@@ -2056,6 +2073,8 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 			m_vBulbColor += (vTargetColor - m_vBulbColor) / (fTimeDelta * 300.f);
 
 			m_pBulbFlare->Set_Position(m_pTransformCom->Get_State(CTransform::STATE_POSITION), false);
+
+			m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
 		}
 
 		m_pBulbFlare->Tick(fTimeDelta);
@@ -2166,19 +2185,17 @@ HRESULT CKirby::Kirby_SystemInitialize()
 		else if (LEVEL_TOWN == eLEVEL && LEVEL_TOWN == *m_pCurrentLevelID)
 		{
 			_float3 vNewPos = tLevelData.vLastPos;
+			Set_ControllerPos(_float4(vNewPos.x, vNewPos.y, vNewPos.z, 1.f));
 		}
-		else if (*m_pCurrentLevelID == LEVEL_PARK)
-		{
-
-		}
-		else if (*m_pCurrentLevelID == LEVEL_SIMBA)
-		{
-
-		}
-		else if (*m_pCurrentLevelID == LEVEL_FINALBOSS)
-		{
-
-		}
+		//else if (*m_pCurrentLevelID == LEVEL_PARK)
+		//{
+		//}
+		//else if (*m_pCurrentLevelID == LEVEL_SIMBA)
+		//{
+		//}
+		//else if (*m_pCurrentLevelID == LEVEL_FINALBOSS)
+		//{
+		//}
 	}
 
 
@@ -2208,7 +2225,12 @@ void CKirby::Kirby_LookInitialize()
 	fCameraRight = XMVector4Normalize(fCameraRight);
 
 	// 카메라 기준 바라보는 방향을 설정한다.
-	if (uLevel == LEVEL_RACING)
+	
+	if (uLevel == LEVEL_INTRO)
+	{
+		INFO(m_vTargetDir) = INFO(m_vMoveDir) = fCameraLook;
+	}
+	else if (uLevel == LEVEL_RACING)
 	{
 		// 오른쪽을 보고 시작함.
 		INFO(m_vTargetDir) = INFO(m_vMoveDir) = fCameraRight;
@@ -2240,6 +2262,8 @@ void CKirby::Kirby_StateInitialize()
 			Change_State(CARSTATE_MOVING, 60.f, true, false, BODY_CARDEFAULT, OFFSET_CAR);
 			m_pModelCom[BODY_CARDEFAULT]->Set_Animation(19, 60.f, true, true);
 		}
+
+		m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyCar_Idle.wav", 0.3f);
 	}
 	else if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
 	{

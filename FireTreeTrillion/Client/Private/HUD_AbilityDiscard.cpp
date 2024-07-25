@@ -85,6 +85,13 @@ _int CHUD_AbilityDiscard::Tick(_float fTimeDelta)
 
 void CHUD_AbilityDiscard::Late_Tick(_float fTimeDelta)
 {
+	if (nullptr == m_pKirby)
+		return;
+
+	CKirby::KIRBY_INFODESC tKirbyInfo = *dynamic_cast<CKirby*>(m_pKirby)->Get_KirbyInfo();
+	if(tKirbyInfo.m_eBodyState == CKirby::BODY_VACUUM)
+		return;
+
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
@@ -96,16 +103,14 @@ HRESULT CHUD_AbilityDiscard::Render()
 	if (DISCARD_HIDE == m_eCurState && 0.f == m_UIObjDesc.fAlpha)
 		return S_OK;
 
-	//이전 렌더가 능력버리기인지 뱉기인지 체크하여 렌더 OFF
-	if (1 <= m_fKeyInputTime)
-		return S_OK;
-
 	HRESULT hr;
 	PASS_POSTEX ePassType = { POSTEX_ALPHABLEND_NOTEST };
 	TEX_DISCARD eTexIndex = Check_TexIndex();
-	ABILITYTYPE eAbilityType = dynamic_cast<CKirby*>(m_pKirby)->Get_AbilityType(); //카피 능력 정보		
-	if (TEXDC_ABILITYBASE == eTexIndex && ABILITY_DEFAULT == eAbilityType)
-		return S_OK;
+	//ABILITYTYPE eAbilityType = dynamic_cast<CKirby*>(m_pKirby)->Get_AbilityType(); //카피 능력 정보		
+	//if (TEXDC_ABILITYBASE == eTexIndex && ABILITY_DEFAULT == eAbilityType) {
+	//	m_eRenderType = RENDER_NONE;
+	//	return S_OK;
+	//}
 
 	//For.Mask
 	if (FAILED(m_pTexCom[TEX_MASK]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", 0)))
@@ -220,7 +225,8 @@ CHUD_AbilityDiscard::TEX_DISCARD CHUD_AbilityDiscard::Check_TexIndex()
 	//07.24) 카피 능력 / 머금기 변경 정보 분리
 	CKirby::BODYSTATE eVacuumState = dynamic_cast<CKirby*>(m_pKirby)->Get_KirbyInfo()->m_eBodyState; //머금기 변형 정보
 
-	if (CKirby::BODY_BULBDEFAULT == eVacuumState || CKirby::BODY_CARDEFAULT == eVacuumState)
+	if (CKirby::BODY_BULBDEFAULT == eVacuumState || CKirby::BODY_CARDEFAULT == eVacuumState
+		|| CKirby::BODY_BULBVACUUM == eVacuumState || CKirby::BODY_CARVACUUM == eVacuumState)
 		return TEXDC_DEFORMBASE;
 
 	 return TEXDC_ABILITYBASE;

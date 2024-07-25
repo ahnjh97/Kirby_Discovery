@@ -27,12 +27,17 @@ void CFinalBoss::Appear_Event(CGameObject* pObj)
 
 	CParticle::PARTICLE_DESC FXDesc{};
 	FXDesc.pSocketMatrix = &m_EffectSocket;
-	FXDesc.vInitPos = { 0.f, 5.f, 0.f };
-	FXDesc.fStartDelay = 1.f;
+	FXDesc.vInitPos = { 0.f, 6.f, 0.f };
+	FXDesc.fStartDelay = 2.f;
 	Add_Effect("HS_bidm C", FXDesc);
+
+	FXDesc = {};
+	FXDesc.vInitPos = { 0.f, 15.f, 0.f };
+	Add_Effect("BDBY", FXDesc);
 
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 	MultiFXDesc.pSocketMatrix = &m_EffectSocket;
+	MultiFXDesc.vInitPos = { 0.f, 6.f, 0.f };
 	Add_Effect("HS_orbit bidm", MultiFXDesc);
 }
 
@@ -712,12 +717,6 @@ void CFinalBoss::Create_Gully()
 	//«Æ∏µ¿”
 	if (true == m_bGully)
 	{
-		if (m_iGullyCount < 5)
-			m_iGullyCount++;
-		else
-			m_iGullyCount = 0;
-
-		//m_fGullyTime += m_fTimeDelta;
 
 		if (false == m_bShake)
 		{
@@ -742,7 +741,8 @@ void CFinalBoss::Create_Gully()
 		m_vBeforePos = vOrginPos;
 
 		vPos.m128_f32[1] = 0.f;
-		m_iGullyCount == 3 ? m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f) : m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f, true);
+		_int iRandomFire = CUtils::Make_RandomInt(0, 2);
+		iRandomFire == 2 ? m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f, true) : m_vecGully[m_iGullyCnt]->Set_Gully(vPos, 6.f, false);
 
 		vFXPosA = vPos;
 

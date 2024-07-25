@@ -630,6 +630,7 @@ void CCollisionCenter::DeeDeeDee_Battle()
 
 
 			_float fAttack = pPlayerBullet->Get_Attack();
+			GAMEINSTANCE PlaySound_Free(L"KirbyBomb_Bomb.wav", 0.5f);
 			pMonster->Minus_Hp(fAttack);
 			pthis->Camera_Shaking(1.2f);
 			DstHit->Set_Alive(false);
@@ -842,6 +843,7 @@ void CCollisionCenter::Simba_Battle()
 				return;
 
 			_float fAttack = pPlayerBullet->Get_Attack();
+			GAMEINSTANCE PlaySound_Free(L"KirbyBomb_Bomb.wav", 0.5f);
 			pSimba->Minus_Hp(fAttack);
 			pthis->Camera_Shaking(1.2f);
 			DstHit->Set_Alive(false);
@@ -1028,6 +1030,7 @@ void CCollisionCenter::FinalStage_Battle()
 			CMonster* pMonster = static_cast<CMonster*>(Src);
 
 			_float fAttack = pPlayerBullet->Get_Attack();
+			GAMEINSTANCE PlaySound_Free(L"KirbyBomb_Bomb.wav", 0.5f);
 			pMonster->Minus_Hp(fAttack);
 			pthis->Camera_Shaking(1.2f);
 			DstHit->Set_Alive(false);
@@ -1112,6 +1115,9 @@ void CCollisionCenter::Body_To_Body_Collision()
 					Effectdesc.vInitScale = { 2.f, 2.f, 2.f };
 					if (FAILED(GAMEINSTANCE Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
 						return;
+
+					GAMEINSTANCE PlaySound_Free(L"KirbyCar_Collision.wav", 0.5f);
+
 
 					pKirby->Set_HitStop();
 					pthis->Camera_Shaking(1.2f);
@@ -1560,6 +1566,7 @@ void CCollisionCenter::Hitbox_Collision()
 			// 오브젝트
 			CPhysXObject* pObject = static_cast<CPhysXObject*>(Src);
 			pObject->Collision(CONTENT_ATTACKBULLET, pDst);
+			GAMEINSTANCE PlaySound_Free(L"KirbyBomb_Bomb.wav", 0.5f);
 			Dst->Set_Dead();
 		});
 
@@ -1577,6 +1584,8 @@ void CCollisionCenter::Hitbox_Collision()
 			// 오브젝트
 			CPhysXObject* pObject = static_cast<CPhysXObject*>(Src);
 			pObject->Collision(CONTENT_ATTACKBULLET, pDst);
+			GAMEINSTANCE PlaySound_Free(L"KirbyBomb_Bomb.wav", 0.5f);
+
 			Dst->Set_Dead();
 		});
 
@@ -1630,6 +1639,7 @@ void CCollisionCenter::Hitbox_Collision()
 			if (Dst == nullptr || Src == nullptr || Dst->Get_Dead() || Src->Get_Dead())
 				return;
 
+			GAMEINSTANCE PlaySound_Free(L"KirbyBomb_Bomb.wav", 0.5f);
 			pthis->Camera_Shaking(1.2f);
 			Dst->Set_Dead();
 			Src->Set_Dead();
@@ -1647,6 +1657,7 @@ void CCollisionCenter::Hitbox_Collision()
 			if (static_cast<CPhysXObject*>(Src)->Get_AbilityType() != ABILITY_BOMB)
 				return;
 
+			GAMEINSTANCE PlaySound_Free(L"KirbyBomb_Bomb.wav", 0.5f);
 			pthis->Camera_Shaking(1.2f);
 			Dst->Set_Dead();
 			Src->Set_Dead();
@@ -1685,6 +1696,7 @@ void CCollisionCenter::Hitbox_Collision()
 			DstHit->Set_Alive(false);
 			SrcHit->Set_Alive(false);
 			pthis->Camera_Shaking(1.2f);
+			GAMEINSTANCE PlaySound_Free(L"KirbyBomb_Bomb.wav", 0.5f);
 			Dst->Set_Dead();
 		});
 

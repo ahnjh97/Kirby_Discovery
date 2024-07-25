@@ -79,7 +79,7 @@ HRESULT CLevel_Intro::Initialize()
 
 	// 셰이더 트리거
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_BEACH);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_INTRO);
 	m_pGameInstance->Set_ObjectBlack(1.f);
 
 	// 레벨전환 트리거
@@ -216,7 +216,7 @@ void CLevel_Intro::Manage_BGM() // SOUND_WI
 		static _bool bOnce(false);
 		if (false == bOnce)
 		{
-			m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"Running Through the New World.mp3");
+			m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"Running Through the New World.wav");
 			bOnce = true;
 		}
 		else
