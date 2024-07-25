@@ -467,10 +467,13 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Final",
 		COLOR_DATA{
-		1.1f, 1.f, 1.08023f, 0.809684f, 0.990206f, 1.1f, 1.f,
-		0.74032f, 0.6f, 0.6f, 1.03f, 0.96f, 1.04f, 0.243137f, 0.00784314f,
-		0.00784314f, 0.00971069f, 0.917647f, 0.513726f, 0.145098f, 0.00992562f,
-		1.f, 0.847059f, 0.254902f, 0.00999975f, 0.13f, 0.55f
+		1.55017f, 1.f, 1.f, 0.890193f, 0.940072f,
+		1.10975f, 1.14001f,
+		0.69027f, 0.569912f, 0.6f, 1.03029f, 0.960124f, 1.04017f,
+		0.233328f, 0.0171173f, 0.0368468f, 0.00993926f,
+		0.917647f, 0.513726f, 0.145098f, 0.00972117f,
+		1.f, 0.847059f, 0.254902f, 0.00967303f,
+		0.139852f, 0.540133f
 		});
 
 	Save_ColorSet("Finale",
@@ -947,7 +950,7 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 	case 1:
 		m_DestColorData = Find_ColorSet("Forest");
 		Update_RimLight(.2f, 4.f, { .6f, .8f, 1.f });
-		Update_Ocean(0.f, -30.f, -9.f);
+		Update_Ocean(0.f, -2000.f, -1000.f);
 		break;
 	case 2:
 		m_DestColorData = Find_ColorSet("Night");
@@ -958,7 +961,7 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 		Update_RimLight(1.f, 1.8f, { 1.f, .5f, .3f });
 		Update_DirectionalLight({ .6f, .6f, .6f, 1.f }, { 1.f, .45f, .42f, 1.f });
 		Update_DOFSet(1.f, {.15f, .12f, .05f});
-		Update_Ocean(0.f, -30.f, -9.f);
+		Update_Ocean(0.f, -2000.f, -1000.f);
 
 		if (m_iCurColorIdx != iSetIdx)
 		{
@@ -1035,13 +1038,15 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 		Update_RimLight(1.f, 1.f, { 1.f, .45f, 0.f });
 		Update_DOFSet(.1f, { .07f, .05f, .09f });
 
-		Update_Ocean(0.f, -2000.f, 1000.f);
+		Update_Ocean(0.f, -2000.f, -1000.f);
 	}
 	break;
 	case 6:
 	{
 		m_DestColorData = Find_ColorSet("Horror");
 		Update_RimLight(0.f);
+		Update_Ocean(0.f, -2000.f, -1000.f);
+
 	}
 	break;
 	case 7:
@@ -1049,7 +1054,8 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 		m_DestColorData = Find_ColorSet("Final");
 
 		Update_RimLight(.8f, 2.f, { 1.f, .6f, .35f });
-		Update_Ocean(0.f, -1090.f, -990.f);
+		Update_Ocean(0.f, -2000.f, -1000.f);
+
 		Update_DOFSet(0.f, { .26f, 0.f, -.11f });
 	}
 	break;
@@ -1060,6 +1066,7 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 		Update_RimLight(.5f, 3.f, { .4f, .8f, 1.f });
 
 		Update_DOFSet(1.f, { .7f, .65f, .92f });
+		Update_Ocean(0.f, -2000.f, -1000.f);
 
 	}
 	break;
@@ -1068,9 +1075,9 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 		m_DestColorData = Find_ColorSet("Park");
 
 		Update_RimLight(0.f);
-		Update_DOFSet(0.f);
-		Update_Ocean(0.f, -45.f, -10.f);
+		Update_DOFSet(0.f);;
 		Update_DirectionalLight({ .08f, .04f, .1f, 1.f }, { 1.f, 1.f, 1.f, 1.f });
+		Update_Ocean(0.f, -2000.f, -1000.f);
 
 
 	}
@@ -1126,8 +1133,7 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 		m_DestColorData = Find_ColorSet("Town");
 
 		Update_RimLight(1.f, 1.5f, { 1.f, .5f, .3f });
-
-		Update_Ocean(0.f, -45.f, -10.f);
+		Update_Ocean(0.f, -2000.f, -1000.f);
 
 		break;
 	case 15:
@@ -1137,7 +1143,8 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 		Update_DOFSet(1.f, { -.05f, -.01f, -.02f });
 		Update_DirectionalLight({ .28f, .14f, .19f, 1.f }, { .13f, .04f, 0.f, 1.f });
 		Setting_GodRay({ 3450.f, 940.f, 580.f });
-		Update_Ocean(0.f, -45.f, -10.f);
+		Update_Ocean(0.f, -2000.f, -1000.f);
+
 
 		break;
 	default:

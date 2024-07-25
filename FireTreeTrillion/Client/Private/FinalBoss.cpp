@@ -28,7 +28,7 @@ void CFinalBoss::Appear_Event(CGameObject* pObj)
 	CParticle::PARTICLE_DESC FXDesc{};
 	FXDesc.pSocketMatrix = &m_EffectSocket;
 	FXDesc.vInitPos = { 0.f, 6.f, 0.f };
-	FXDesc.fStartDelay = .8f;
+	FXDesc.fStartDelay = 2.f;
 	Add_Effect("HS_bidm C", FXDesc);
 
 	FXDesc = {};

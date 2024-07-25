@@ -346,7 +346,14 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 
 		if (m_eSpecialSeq == SEQ_BREAKRACINGMAP)
 		{
-
+			if (m_fSeqCheckTime < 19.f)
+			{
+				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION) + KIRBY_DOFOFFSET);
+			}
+			//else
+			//{
+			//	
+			//}
 		}
 
 #pragma region 사자
@@ -359,12 +366,12 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 			{
 				CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
 				if (nullptr != pSimba)
-					m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+					m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 5.f, 0.f });
 			}
 			//커비
 			else
 			{
-				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
+				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION) + KIRBY_DOFOFFSET);
 			}
 		}
 
@@ -372,7 +379,7 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 		{
 			CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
 			if (nullptr != pSimba)
-				m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+				m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{0.f, 5.f, 0.f});
 		}
 
 		if (m_eSpecialSeq == SEQ_SIMBA_BOSSORIGIN)
@@ -380,7 +387,7 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 			CGameObject* pOrigin = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_BossOrigin"));
 
 			if (nullptr != pOrigin)
-				m_pGameInstance->Update_DofFocus(pOrigin->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+				m_pGameInstance->Update_DofFocus(pOrigin->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{0.f, 3.f, 0.f});
 		}
 
 #pragma endregion
@@ -406,7 +413,7 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 		{
 			CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster"));
 			if (nullptr != pBoss)
-				m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION));
+				m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 4.5, 0.f });
 		}
 
 		if (m_eSpecialSeq == SEQ_FINALBOSS_DUMP)
@@ -1942,7 +1949,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.64f, .06f, .76f });
 		m_CamSeq.push_back(newAction);
 
-
+		//확 땡기기
 		Fill_InterpolateCutSet(newAction, .7f, EASE_INOUT_FAST, .4f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { 7.54f, 19.07f, 19.53f});
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.62f, .25f, .75f });
@@ -1959,7 +1966,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_CamSeq.push_back(newAction);
 
 		newAction.fFOVY = 30.f;
-		Fill_InterpolateCutSet(newAction, 5.5f, EASE_INOUT, .5f);
+		Fill_InterpolateCutSet(newAction, 5.f, EASE_INOUT, .5f);
 		Fill_ActionPos(newAction, POS_ABSOLUTE, { 1.01f, 12.29f, -59.03f });
 		Fill_ActionDir(newAction, DIR_ABSOLUTE, { -.02f, .12f, .99f });
 		m_CamSeq.push_back(newAction);
@@ -3438,6 +3445,14 @@ void CCamera_Main::Render_IMGUI()
 
 
 	ImGui::SeparatorText(u8"시퀀스");
+
+
+	if(m_eSpecialSeq != SEQ_END)
+		ImGui::Text(u8"현재 시퀀스: playing");
+	else
+		ImGui::Text(u8"현재 시퀀스: none");
+
+
 	ImGui::Text(u8"지나간 시퀀스 시간: %.2f", m_fSeqPlayedTime);
 
 	ImGui::Text(u8"현재 시퀀스 시간: %.2f", m_fSeqCheckTime);
