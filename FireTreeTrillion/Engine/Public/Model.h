@@ -68,6 +68,9 @@ public:
 	vector<class CAnimation*>* const Get_Animations() { return &m_Animations; }
 	_uint Get_CurAnimIndex() { return m_iCurrentAnimIndex; }
 	void Reset_TrackPosition(_uint iAnimIndex) { m_Animations[iAnimIndex]->Reset_TrackPosition(); }
+
+	void SetUpSoundInfo(wstring& _wstrSound, _float fVolume);
+	void PlayModelSound();
 	
 public:
 	virtual HRESULT Initialize_Prototype(MODEL tModel);
@@ -196,6 +199,9 @@ private:
 	_bool m_bPlayPartialAnim = { false };
 	_bool m_bLerpPartialAnim = { false };
 	_float m_fPartialAnimLerpTime = {};
+
+	wstring m_wstrSound;
+	_float m_fVolume = {};
 
 private:
 	HRESULT Ready_Meshes(_bool bOctree);
