@@ -71,6 +71,7 @@ _int CFinalDump::Tick(_float fTimeDelta)
 			vPos.y = -0.3f;
 			m_fGravity = 0.f;
 			m_bBound = true;
+			m_pGameInstance->PlaySound_Free(L"KirbyDump_Landing.wav", 0.6f);
 
 			_float4 vEffectPos = vPos;
 			vEffectPos += m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * 16.f;

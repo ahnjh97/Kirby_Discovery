@@ -26,6 +26,8 @@ public:
 	_uint	m_uDropCount = { 0 };
 	_bool	m_bJump = { false };
 	_bool	m_bJumpTrigger = { true };
+
+	_bool	m_bSound[3] = { true, true, true };
 	static	CKirbyFinalCut_State* Create();
 	virtual void				  Free() override;
 };
