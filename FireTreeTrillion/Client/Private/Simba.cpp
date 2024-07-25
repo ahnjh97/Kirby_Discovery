@@ -295,6 +295,8 @@ _int CSimba::Tick(_float fTimeDelta)
 	if ((m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_D, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_F, KEY_DOWN))
 		|| (0.6f > m_fHpRatio && 0.f < m_fHpRatio && m_bPhaseTwo == false))
 	{
+		m_pGameInstance->StopSound(CHANNEL_SOUND12);
+		m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
 		m_bPhaseTwo = true;
 		Change_State(Simba_Damage, 50.f, false, true);
 	}
@@ -305,6 +307,8 @@ _int CSimba::Tick(_float fTimeDelta)
 
 	if (m_fHp <= 0.f && false == m_bDeathAnimPlayed)
 	{
+		m_pGameInstance->StopSound(CHANNEL_SOUND12);
+		m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
 		m_bDeathAnimPlayed = true;
 		TransformToDefault(0.f);
 		Change_State(Simba_DemoDeadCut1, 50.f, false, true);
