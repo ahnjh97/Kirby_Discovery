@@ -76,7 +76,7 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_fMaxHp = 500.f;
-	m_fHp = 250.f;
+	m_fHp = 500.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eBossState = STATE_FLYING;

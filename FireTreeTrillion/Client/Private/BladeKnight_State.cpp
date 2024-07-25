@@ -39,7 +39,10 @@ void CBladeKnight_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPos, vKirbyPos)));
 
 	if(6.f > fDistance)
+	{
+		m_pGameInstance->PlaySound_Free(L"bump_sth3.wav", 0.5f);
 		pBladeKnight->Change_State(CBladeKnight::BLADEKNIGHT_FIND, 50.f, false, true);
+	}
 }
 
 void CBladeKnight_Idle_State::OnStateExit()

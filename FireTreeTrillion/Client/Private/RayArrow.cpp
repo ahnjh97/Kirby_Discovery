@@ -186,7 +186,9 @@ _int CRayArrow::Tick(_float fTimeDelta)
 		{
 			CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
 			CTransform* pKirbyTransform = pKirby->Get_TransformCom();
-			m_vKirbyPos = pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			_vector vKirbyPos = pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION);
+			vKirbyPos.m128_f32[1] = 0.f;
+			m_vKirbyPos = vKirbyPos;
 		}
 	}
 	// 화살 활성화
