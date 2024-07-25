@@ -186,6 +186,7 @@ public: /* For.Extractor */
 #endif
 
 public: // Sound Manager
+	_float Get_Volume(CHANNELID eID);
 	_int  SetVolume(CHANNELID eID, _float _vol);
 	_int  VolumeUp(CHANNELID eID, _float _vol);
 	_int  VolumeDown(CHANNELID eID, _float _vol);
@@ -207,6 +208,7 @@ public: // Sound Manager
 	_int  VolumeMin(CHANNELID eID);
 	_int  VolumeRestore(CHANNELID eID);
 	void PlaySound_Free(TCHAR* pSoundKey, _float _vol);
+	void LoopSound(CHANNELID eID, TCHAR* pSoundKey, _float _vol);
 
 #ifdef _DEBUG
 public: /* For.ImGui_Manager */

@@ -48,6 +48,7 @@ void CKirbyBulb_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
     {
         DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 6.f, 1.f);
         pKirby->Change_State(CKirby::BULBSTATE_WAIT, 60.f, true, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
+        m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
         DESC(m_bLightOn) = false;
         return;
     }
@@ -143,6 +144,7 @@ void CKirbyBulb_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
     Kirby_EyeState_Assist(Kirbydesc);
 
     Bbong_FX(fTimeDelta, pTransformCom);
+    Make_BBongSound(DESC(m_fWalkSoundDelay), fTimeDelta);
 
     if (DESC(m_pLight) != nullptr)
         DESC(m_pLight)->Update_LightPos(pKirby->Get_BulbLightPos());
@@ -384,7 +386,7 @@ void CKirbyBulb_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
     {
         if (m_bJumpEffectTrigger == true && (pKirby->Get_State() == CKirby::BULBSTATE_JUMP))
         {
-            Jump_FX(pTransformCom);
+            Jump_FX(pTransformCom, true);
             m_bJumpEffectTrigger = false;
         }
 
@@ -462,6 +464,9 @@ void CKirbyBulb_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
                 FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y - 20.f, 0.f };
                 if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Smoke Fast"), &FXDesc)))
                     return;
+
+                m_pGameInstance->PlaySound_Free(L"Kirby_BigLanding.wav", 0.2f);
+
             }
             else
             {
@@ -479,6 +484,9 @@ void CKirbyBulb_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
                 FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir(vKirbyLook).y - -30.f, 0.f };
                 if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
                     return;
+
+                m_pGameInstance->PlaySound_Free(L"Kirby_BigLanding.wav", 0.2f);
+
             }
 
             if (DESC(m_bLightOn) == true)
@@ -646,6 +654,12 @@ CKirbyBulb_Light_State::CKirbyBulb_Light_State()
 void CKirbyBulb_Light_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
     __super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+    if (_iAnimIndex == CKirby::BULBSTATE_LIGHTON)
+    {
+        m_pGameInstance->PlaySound_Free(L"KirbyBulb_LightOn.wav", 0.5f);
+        m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyBulb_Lighting.wav", 0.05f);
+    }
 }
 
 void CKirbyBulb_Light_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -858,6 +872,7 @@ void CKirbyBulb_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
             FXDesc.vInitPos = { 0.f, 0.f, 0.f };
             FXDesc.vInitScale = { 1.f, 1.f, 1.f };
             pKirby->Add_Effect("YW Deform Effect2", FXDesc, false);
+            m_pGameInstance->PlaySound_Free(L"Kirby_DeformEvent.wav", 0.5f);
             m_bLightReset = false;
         }
 
