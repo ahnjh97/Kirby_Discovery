@@ -54,7 +54,10 @@ HRESULT CGhostGordo::Initialize(void* pArg)
 _int CGhostGordo::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
+	{
+		m_pGameInstance->PlaySound_Free(L"Gordo_Dead.wav", 0.1f);
 		return Ready_Dead();
+	}
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 

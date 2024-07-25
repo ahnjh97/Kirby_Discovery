@@ -200,7 +200,7 @@ void CBossChimera::Add_AnimEvent()
 
 	m_pModelCom->Add_Event("PlaySound", [this]() {
 		// 사운드 처리
-		m_pGameInstance->PlaySound_Free(L"TakeItem01.wav", 0.5f);
+		//m_pGameInstance->PlaySound_Free(L"TakeItem01.wav", 0.5f);
 		});
 
 	m_pModelCom->Add_Event("ApplyDamage", [this]() {

@@ -42,7 +42,10 @@ void CCappyBody_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vPosistion, vKirbyPos)));
 
 	if (8.f > fDistance)
+	{
 		pCappyBody->Change_State(CCappyBody::CAPPYBODY_KASAUP1, 60.f, false, true);
+		m_pGameInstance->PlaySound_Free(L"Cappy_BByong.wav", 0.3f);
+	}
 
 	if (CCappyBody::CAPPYBODY_HIDINGWAITA == pCappyBody->Get_State())
 	{
@@ -251,6 +254,8 @@ void CCappyBody_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pCappyBody->Change_State(CCappyBody::CAPPYBODY_KASAUP2, 45.f, false, true);
 		else if (iRand == 2)
 			pCappyBody->Change_State(CCappyBody::CAPPYBODY_KASAUP3, 65.f, false, true);
+
+		m_pGameInstance->PlaySound_Free(L"Cappy_BByong.wav", 0.3f);
 	}
 }
 
