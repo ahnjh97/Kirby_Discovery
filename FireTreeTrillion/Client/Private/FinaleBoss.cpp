@@ -161,10 +161,12 @@ void CFinaleBoss::Add_AnimEvent()
 
 
 	m_pModelCom->Add_Event("ThrowDebris", [this]() {
-		if(CUtils::Make_RandomInt(1, 2) == 1)
+		m_pGameInstance->PlaySound_Free(L"운석 던지기.wav", 0.3f);
+
+		/*if(CUtils::Make_RandomInt(1, 2) == 1)
 			m_pGameInstance->PlaySound_Free(L"옆으로 지나감.wav", 0.1f);
 		else
-			m_pGameInstance->PlaySound_Free(L"운석 던지기.wav", 0.1f);
+			m_pGameInstance->PlaySound_Free(L"운석 던지기.wav", 0.3f);*/
 
 		});
 

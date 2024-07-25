@@ -231,7 +231,7 @@ float3 Ocean(float fWorldY, float3 vColor, float3 vTopColor, float3 vBottomColor
     // 1에 가까울 수록 기존 컬러를 유지한다.
     float3 vNewColor = lerp(vInterpolatedColor, vColor, pow(fintensity * depthRatio, 7.f));
     
-    return vNewColor;
+    return saturate(vNewColor);
 }
 
 //////////////////////////////////// For PBR 

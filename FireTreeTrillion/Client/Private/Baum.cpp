@@ -421,22 +421,29 @@ void CBaum::Find_MyRoad()
 
 _int CBaum::Make_Partical()
 {
-	//사운드 재생
-	switch (CUtils::Make_RandomInt(1, 4))
+	if (0 == static_cast<CFinaleCut_ControlCenter*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinaleCut_ControlCenter")))
+		->Get_CutScene())
 	{
-	case 1:
-		m_pGameInstance->PlaySound_Free(L"finale_collide1.wav", .5f);
-		break;
-	case 2:
-		m_pGameInstance->PlaySound_Free(L"finale_collide2.wav", .5f);
-		break;
-	case 3:
-		m_pGameInstance->PlaySound_Free(L"finale_collide3.wav", .5f);
-		break;
-	case 4:
-		m_pGameInstance->PlaySound_Free(L"finale_collide4.wav", .5f);
-		break;
+		//사운드 재생
+		switch (CUtils::Make_RandomInt(1, 4))
+		{
+		case 1:
+			m_pGameInstance->PlaySound_Free(L"finale_collide1.wav", .5f);
+			break;
+		case 2:
+			m_pGameInstance->PlaySound_Free(L"finale_collide2.wav", .5f);
+			break;
+		case 3:
+			m_pGameInstance->PlaySound_Free(L"finale_collide3.wav", .5f);
+			break;
+		case 4:
+			m_pGameInstance->PlaySound_Free(L"finale_collide4.wav", .5f);
+			break;
+		}
+
 	}
+
+
 
 	for (_int i = 0; i < 15; ++i)
 	{

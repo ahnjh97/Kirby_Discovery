@@ -1027,6 +1027,8 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if (2170.f < pKirby->m_vBonePos.x)
 			{
+				m_pGameInstance->PlaySound_Free(L"옆으로 지나감.wav", .4f);
+
 				m_pGameInstance->Set_FirstTimerRatio(.04f);
 				m_pGameInstance->Set_SecondTimerRatio(.04f);
 
@@ -1053,6 +1055,8 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 			if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) == true)
 			{
+				m_pGameInstance->PlaySound_Free(L"덤프트럭 부스터.wav", .02f);
+
 				m_fQTERatio += 1.f;
 
 				CCamera_Main* pCameraMain = static_cast<CCamera_Main*>
@@ -1079,6 +1083,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			{
 				m_pGameInstance->Restore_FirstTimer(.2f);
 				m_pGameInstance->Restore_SecondTimer(.2f);
+				m_pGameInstance->PlaySound_Free(L"덤프트럭 부릉.wav", .4f);
 
 				CCamera_Main* pCameraMain = static_cast<CCamera_Main*>
 					(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
@@ -1128,6 +1133,8 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				m_iQTECnt++;
 				m_pGameInstance->Restore_FirstTimer();
 				m_pGameInstance->Restore_SecondTimer();
+				m_pGameInstance->PlaySound_Free(L"덤프트럭 점프.wav", .3f);
+
 				CCamera_Main* pCameraMain = static_cast<CCamera_Main*>
 					(m_pGameInstance->Get_GameObject_ByTag(LEVEL_FINALE, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 				CHECK_NULLPTR(pCameraMain);
@@ -1253,6 +1260,9 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			FXDesc.vInitPos = { 0.f, -4.f, 3.f };
 			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 			pKirby->Add_Effect("HS_finale dump dash multi", FXDesc, true);
+
+			//소리 재생
+			m_pGameInstance->PlaySound_Free(L"qte 충돌 2.wav", 0.5f);
 
 			m_bEffectTrigger[0] = false;
 		}
@@ -1440,6 +1450,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				ParticleDesc.vInitPos = _float3(0.f, 2.f, 0.f);
 				pKirby->Add_Effect("YW Deform Ora", ParticleDesc, true);
 				m_bEffectTrigger[1] = false;
+
 			}
 
 			
@@ -1474,6 +1485,9 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				FXPDesc.vInitScale = { 5.f, 5.f, 5.f };
 				pKirby->Add_Effect("HS_finale qte particle", FXPDesc, true);
 				m_bEffectTrigger[2] = false;
+
+				//부스터 소리 준비 시작
+				m_pGameInstance->PlaySound_Free(L"덤프트럭 qte 부스터 시작.wav", .4f);
 			}
 			
 
@@ -1557,6 +1571,9 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
 			pKirby->Add_Effect("YW Finale Debris Cols", FXDesc, false);
 
+			//소리 재생
+			m_pGameInstance->PlaySound_Free(L"qte 충돌 2.wav", 0.5f);
+			m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"덤프트럭 주행.wav", .4f);
 		}
 
 	}
@@ -1661,6 +1678,8 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			QTE_End();
 			pCenter->Set_CutScene(19);
 			m_pGameInstance->Set_ObjectBlack(0.3f);
+
+			m_pGameInstance->PlaySound_Free(L"건물 부서지는 소리.wav", .4f);
 		}
 
 	}
