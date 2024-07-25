@@ -99,6 +99,7 @@ private:
 	_bool					m_bStartQuake = { FALSE };
 
 	_bool					m_bReturnMove = { FALSE };
+	_bool					m_bPlaySoundFX = { FALSE };
 
 	_uint					m_iGimmickIndex = {};
 
