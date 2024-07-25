@@ -79,7 +79,7 @@ HRESULT CLevel_Intro::Initialize()
 
 	// 셰이더 트리거
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
-	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_BEACH);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_INTRO);
 	m_pGameInstance->Set_ObjectBlack(1.f);
 
 	// 레벨전환 트리거

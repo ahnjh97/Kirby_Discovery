@@ -45,7 +45,7 @@ HRESULT CBossOrigin::Initialize(void* pArg)
 
 	m_bMotionBlur = false;
 	m_bRimLight = true;
-	m_fRimWidth = 3.f;
+	m_fRimWidth = 2.f;
 	m_bStencil = true;
 	
 	for (_uint i = 0; i < m_pModelCom->Get_NumMeshes(); i++)

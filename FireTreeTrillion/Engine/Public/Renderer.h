@@ -47,7 +47,8 @@ public:
 		COLORSET_PARK,
 		COLORSET_BEACH,
 		COLORSET_PARTTIME,
-
+		COLORSET_CARSHOP,
+		COLORSET_INTRO,
 		COLORSET_END
 	};
 
@@ -143,9 +144,26 @@ public:
 	// 잠깐의 레디얼 블러를 세팅한다.
 	void Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fSubtraction);
 	void Setting_RadialBlur(_float fRadial, _float fSubtraction);
-	// DOF 초점을 업데이트한다.
-	void Update_DofFocus(_fvector vWorldPos);
+
+	
+	//림라이트 세팅
 	void Update_RimLight(_float fRimRatio, _float fRimRadius = -1.f, _float3 vRimColor = {-1.f, -1.f, -1.f});
+
+	// fog 세팅
+	void Update_ViewFog(_float fIntensity, _float fStart, _float fEnd, _float3 vColor = { -1.f, -1.f, -1.f });
+	void Update_YFog(_float fIntensity, _float fBottom, _float fTop, _float3 vColor = {-1.f, -1.f, -1.f});
+	void Update_Ocean(_float fIntensity, _float fBottom = {1.f}, _float fTop = {-1.f},
+		_float3 vBottomColor = { -1.f, -1.f, -1.f }, _float3 vTopColor = { -1.f, -1.f, -1.f });
+	void Update_OceanWave(_float fOceanfrequency, _float fOceanAmplitude);
+
+	// DOF 세팅
+	void Update_DOFSet(_float fIntensity, _float3 vColor = { -1.f, -1.f, -1.f });
+
+	// DOF 초점 세팅
+	void Update_DofFocus(_fvector vWorldPos);
+
+	void Update_DirectionalLight(_float4 vDiffuse, _float4 vAmbient);
+
 	// GodRay 위치를 설정한다.
 	void Setting_GodRay(_fvector vWorldPos, 
 		_float fRayExposure = 0.15f, _float fRayDecay = 0.96815f, _float fRayIlluminationDecay = 0.8f, _float fRayDensity = 0.5f, _float fWeight = 0.5f);
@@ -326,12 +344,16 @@ private:
 	_float m_fFogViewEnd = { 0.f };
 	_float m_fFogViewIntensity = { 0.f };
 
+	//바다 관련 함수
 	_float3 m_vOceanTopColor = { 0.f, 0.f, 0.f };
 	_float3 m_vOceanBottomColor = { 0.f, 0.f, 0.f };
 	_float m_fOceanTopY = { 0.f };
 	_float m_fOceanBottomY = { 0.f };
 	_float m_fOceanIntensity = { 0.f };
 
+	_float m_fOceanTime = { 0.f };
+	_float m_fOceanFrequency = { 1.f };
+	_float m_fOceanAmplitude = { 2.4f };
 
 	void   ObjectBlack(_float fTimeDelta);
 	_float m_fObjectBlack = { 1.f };

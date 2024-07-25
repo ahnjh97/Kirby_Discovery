@@ -29,6 +29,8 @@
 #define QTE2 13
 #define QTE3 18
 
+#define KIRBY_DOFOFFSET _float3{0.f, .5f, 0.f}
+
 _float3 vertices[] = {
 	// Front face
    { -1.0f, -1.0f, -1.0f },
@@ -336,6 +338,12 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 	//dof 갱신(수동)
 	else
 	{
+		if (m_eSpecialSeq == SEQ_INTRO)
+		{ 
+			m_pGameInstance->Update_DofFocus(
+				m_pFirstTarget->Get_State(CTransform::STATE_POSITION) + KIRBY_DOFOFFSET);
+		}
+
 		if (m_eSpecialSeq == SEQ_BREAKRACINGMAP)
 		{
 
@@ -1281,13 +1289,7 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 		//_float4 vPos = GET_POS;
 		//SET_POS(_float4(vPos.x, vPos.y + 0.2f, vPos.z, 1.f));
 	}
-	//CGameObject* pKirby = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0);
-	//if (nullptr == pKirby)
-	//	return;
-	//CTransform* pKirbyTransform = static_cast<CTransform*>(pKirby->Get_Component(g_strTransformTag));
-	//if (nullptr == pKirbyTransform)
-	//	return;
-	//_vector pKirbyPos = pKirbyTransform->Get_State_Vector(CTransform::STATE_POSITION);
+;
 
 	m_vSlerpedDir = _float3::Lerp(m_vecFrontDirRadius[m_iMatrixIndex].first, m_vecRearDirRadius[m_iMatrixIndex].first, m_fTriggerRatio);
 	m_fLerpedRadius = LERP(m_vecFrontDirRadius[m_iMatrixIndex].second, m_vecRearDirRadius[m_iMatrixIndex].second, m_fTriggerRatio);
@@ -1306,6 +1308,13 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 	{
 		m_fDestUpOffset = m_CamTriggerUpOffsets[*m_pCurrentLevelID][m_iMatrixIndex];
 	}
+
+	//맨 처음 앵커 오프셋
+	if (*m_pCurrentLevelID == LEVEL_INTRO && m_iMatrixIndex == 10)
+	{
+		Set_TargetAnchor({ 0.f, 0.f, 0.f });
+	}
+
 	// = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f }
 	//m_fDestUpOffset = m_CamTriggerUpOffsets[m_iMatrixIndex];
 }
@@ -1457,6 +1466,25 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	}
 	break;
 
+	//본 컷신 시작
+	case SEQ_INTRO:
+	{
+		CAMACTION newAction = {};
+		
+		Fill_HardCutSet(newAction, 0.f);
+		Fill_ActionPos(newAction, POS_ABSOLUTE, { -130.f, 3.2f, -130.f });
+		Fill_ActionDir(newAction, DIR_ABSOLUTE, {0.f, .16f, 1.f});
+		newAction.fFOVY = 20.f;
+		m_CamSeq.emplace_back(newAction);
+
+
+		Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 6.f);
+		newAction.fFOVY = 30.f;
+		m_CamSeq.emplace_back(newAction);
+
+		Fill_Delay(newAction, 6.f, 5.f);
+	}
+	break;
 	case SEQ_BREAKCARSHOP:
 	{
 		CAMACTION newAction{};
