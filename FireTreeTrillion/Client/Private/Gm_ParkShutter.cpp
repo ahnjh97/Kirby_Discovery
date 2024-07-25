@@ -61,6 +61,9 @@ _int CGm_ParkShutter::Tick(_float fTimeDelta)
 	{
 		m_pModelCom->Set_Animation(STATE_TOOPEN, 60.f, FALSE, TRUE);
 		m_eCurState = STATE_TOOPEN;
+
+		m_pGameInstance->StopSound(CHANNEL_GIMMICK);
+		m_pGameInstance->PlayMySound(L"ParkShutter_ToOpen.wav", CHANNEL_GIMMICK, 0.5f);
 	}
 
 	return OBJ_NOEVENT;
