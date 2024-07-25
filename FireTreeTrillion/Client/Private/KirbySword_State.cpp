@@ -93,7 +93,7 @@ _bool CKirbySword_Idle_State::Key_X(CGameObject* pGameObject, _float fTimeDelta)
 		}
 		else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_SIDESLASH)
 		{
-			pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 80.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_MULITSWORDATTACK;
 			return true;
 		}
@@ -273,7 +273,7 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		}
 		else if (DESC(m_ePreAttackState) == CKirby::SWORDSTATE_SIDESLASH)
 		{
-			pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 80.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_MULITSWORDATTACK;
 
 		}
@@ -385,7 +385,7 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	if (pKirby->Get_State() == CKirby::SWORDSTATE_GUARD)
 	{
 		Guard_Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
-		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), 0.3f);
+		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), 0.2f);
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_DOWN) ||
 			m_pGameInstance->Get_DIKeyState(DIK_DOWN, KEY_DOWN) ||
@@ -571,7 +571,6 @@ void CKirbySword_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, 
 	case CKirby::SWORDSTATE_DECISIVESLASH:
 	{
 		SwordSlash_Final(pKirby->Get_TransformCom());
-		m_pGameInstance->PlaySound_Free(L"KirbySword_Three.wav", 0.5f);
 	}
 	break;
 	default:
@@ -653,7 +652,7 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			// 다음 공격으로 넘어간다는 시그널이 있을 경우
 			if (m_bPassNextAttackMotion == true)
 			{
-				pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+				pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 80.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_MULITSWORDATTACK;
 				return;
 			}
@@ -683,7 +682,7 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		// 엔드모션일 때, 뒤늦게 X키를 눌렀을 땐, 바로 다음 모션으로 보간되며 넘어간다.
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 		{
-			pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 60.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
+			pKirby->Change_State(CKirby::SWORDSTATE_MULITSWORDATTACK, 80.f, false, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_ePreAttackState) = CKirby::SWORDSTATE_MULITSWORDATTACK;
 			return;
 		}
@@ -701,7 +700,7 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_MULITSWORDATTACK)
 	{
-		m_fAnimTime += fTimeDelta;
+		m_fAnimTime += fTimeDelta * 1.33f;
 
 		if (JoyStick_On() == true)
 		{
@@ -709,7 +708,7 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			JoyStick_controller_Attack(Kirbydesc, pCamera);
 			CKirby::DIR eDir = Kirby_Standard_Angle(DESC(m_vMoveDir), DESC(m_vAttackDir));
 
-			DESC(m_fMoveSpeed) += fTimeDelta * 50.f;
+			DESC(m_fMoveSpeed) += fTimeDelta * 1.33f * 50.f;
 			if (DESC(m_fMoveSpeed) > 6.f - (m_fAnimTime * 8.f))
 				DESC(m_fMoveSpeed) = 6.f - (m_fAnimTime * 8.f);
 			if (DESC(m_fMoveSpeed) < 0.f)
@@ -717,17 +716,17 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 
 			if (eDir != CKirby::DIR_BACK)
 			{
-				_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+				_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * 1.33f * DESC(m_fMoveSpeed);
 				pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 			}
 		}
 		else
 		{
 			if (DESC(m_fMoveSpeed) > 0.f)
-				DESC(m_fMoveSpeed) -= 120.f * fTimeDelta;
+				DESC(m_fMoveSpeed) -= 120.f * fTimeDelta * 1.33f;
 			if (DESC(m_fMoveSpeed) < 0.f)
 				DESC(m_fMoveSpeed) = 0.f;
-			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * DESC(m_fMoveSpeed);
+			_vector vMoveDelta = DESC(m_vAttackDir) * fTimeDelta * 1.33f * DESC(m_fMoveSpeed);
 			pController->Move_Dir(pTransformCom, vMoveDelta, fTimeDelta);
 		}
 
@@ -780,6 +779,13 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	else if (pKirby->Get_State() == CKirby::SWORDSTATE_DECISIVESLASH)
 	{
 		m_fLockTime += fTimeDelta;
+
+		if (m_fLockTime > 0.15f && m_bSoundTrigger == true)
+		{
+			m_pGameInstance->PlaySound_Free(L"KirbySword_Three.wav", 0.5f);
+			m_bSoundTrigger = false;
+		}
+
 
 		if (m_fLockTime > 0.3f)
 			m_fAnimTime += fTimeDelta;
@@ -836,6 +842,9 @@ void CKirbySword_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 void CKirbySword_Attack_State::OnStateExit()
 {
 	m_bPassNextAttackMotion = false;
+	m_bSoundTrigger = true;
+	m_fAnimTime = 0.f;
+	m_fLockTime = 0.f;
 }
 
 CKirbySword_Attack_State* CKirbySword_Attack_State::Create()

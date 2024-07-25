@@ -906,7 +906,7 @@ void CKirbyDefault_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float f
 	{
 
 		Guard_Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
-		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), 0.3f);
+		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), 0.2f);
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_DOWN) ||
 			m_pGameInstance->Get_DIKeyState(DIK_DOWN, KEY_DOWN) ||
@@ -1182,7 +1182,7 @@ void CKirbyDefault_Slide_State::OnStateUpdate(CGameObject* pGameObject, _float f
 				return;
 
 			BodySlide(pKirby);
-			m_pGameInstance->PlaySound_Free(L"Kirby_Slide.wav", 0.5f);
+			m_pGameInstance->PlaySound_Free(L"Kirby_Slide.wav", 0.3f);
 
 			//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 			pKirby->Change_State(CKirby::STATE_SLIDE, 60.f, true, false, CKirby::BODY_DEFAULT);
@@ -1272,6 +1272,12 @@ CKirbyDefault_Happy_State::CKirbyDefault_Happy_State()
 void CKirbyDefault_Happy_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+	if (_iAnimIndex == CKirby::STATE_EMOTEWAVEHAND)
+	{
+		CUtils::Make_RandomInt(0, 1) == 0 ? m_pGameInstance->PlaySound_Free(L"Kirby_HappyState.wav", 0.4f) :
+			m_pGameInstance->PlaySound_Free(L"Kirby_HappyState2.wav", 0.4f);
+	}
 }
 
 void CKirbyDefault_Happy_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -1434,6 +1440,8 @@ void CKirbyDefault_Ladder_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_LADDERUP)
 	{
+		Make_LadderSound(DESC(m_fWalkSoundDelay), fTimeDelta);
+
 		if (GAMEINSTANCE Get_DIKeyState(DIK_UP, KEY_PRESS) == false)
 		{
 			pKirby->Change_State(CKirby::STATE_LADDERWAIT, 60.f, true, true, CKirby::BODY_DEFAULT);
@@ -1480,6 +1488,8 @@ void CKirbyDefault_Ladder_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_LADDERDOWN)
 	{
+		Make_LadderSound(DESC(m_fWalkSoundDelay), fTimeDelta);
+
 		if (GAMEINSTANCE Get_DIKeyState(DIK_DOWN, KEY_PRESS) == false)
 		{
 			pKirby->Change_State(CKirby::STATE_LADDERWAIT, 60.f, true, true, CKirby::BODY_DEFAULT);

@@ -267,7 +267,7 @@ void CPoppyBomb::Render_IMGUI()
 
 #endif
 
-_int CPoppyBomb::Ready_Dead(_float fDeadScale)
+_int CPoppyBomb::Ready_Dead(_float fDeadScale, _bool bDeadSound)
 {
 	if (m_ePhyXState == PO_KIRBYMOUTH || m_ePhyXState == PO_VACUUMING)
 		return OBJ_DEAD;

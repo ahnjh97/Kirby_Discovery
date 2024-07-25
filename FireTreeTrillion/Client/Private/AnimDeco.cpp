@@ -108,6 +108,15 @@ void CAnimDeco::HideModel()
 			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Bush Cut"), &MultiFXDesc)))
 				return;
 
+			switch (CUtils::Make_RandomInt(0, 2))
+			{
+			case 0: m_pGameInstance->PlaySound_Free(L"Collision_Bush1.wav", 0.3f);
+				break;
+			case 1: m_pGameInstance->PlaySound_Free(L"Collision_Bush2.wav", 0.3f);
+				break;
+			case 2: m_pGameInstance->PlaySound_Free(L"Collision_Bush3.wav", 0.3f);
+				break;
+			}
 		}
 
 		Set_Dead();
