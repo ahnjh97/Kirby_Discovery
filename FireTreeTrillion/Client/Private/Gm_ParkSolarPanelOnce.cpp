@@ -74,12 +74,20 @@ _int CGm_ParkSolarPanelOnce::Tick(_float fTimeDelta)
 		break;
 
 	case STATE_CHARGE: //충전 중
+		if (m_bPlaySoundFX)
+		{
+			//도레미파솔 사운드 세팅필요
+			//m_pGameInstance->PlayMySound(L"SolarPanel_OnWait.wav", CHANNEL_GIMMICK, 0.5f);
+			m_bPlaySoundFX = FALSE;
+		}
+
 		if (TRUE == m_pModelCom->IsFinished()) //충전 중 애님 종료 시 충전 완료 상태 변경
 		{
 			m_pModelCom->Set_Animation(STATE_ONWAITSTART, 60.f, FALSE, TRUE);
 			m_eCurState = STATE_ONWAITSTART;
 
 			m_bPlaySoundFX = TRUE;
+			m_pGameInstance->StopSound(CHANNEL_GIMMICK);
 		}
 		break;
 
@@ -258,6 +266,7 @@ void CGm_ParkSolarPanelOnce::Collision(CCollisionCenter::CONTENT_TYPE eContent, 
 		m_IsInteraction = TRUE;
 		m_pModelCom->Set_Animation(STATE_CHARGE, 60.f, FALSE, TRUE);
 		m_eCurState = STATE_CHARGE;
+		m_bPlaySoundFX = TRUE;
 	}
 
 #pragma region KEY_FRAME CUSTOM 1 SCOOP
