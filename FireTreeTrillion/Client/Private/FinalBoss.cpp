@@ -808,7 +808,7 @@ void CFinalBoss::Create_Gully()
 
 			CParticle::PARTICLE_DESC ParticleDesc{};
 			ParticleDesc.vInitPos = (vFXPosA + vFXPosB) * .5f;
-			Add_Effect("HS_perfect laser collide particle", FXDesc);
+			Add_Effect("HS_lion laser collide particle B", FXDesc);
 
 			m_pGameInstance->Get_CurCameraPtr()->Make_Shake(0.3f, 0.5f);
 		}

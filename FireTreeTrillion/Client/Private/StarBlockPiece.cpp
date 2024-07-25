@@ -43,7 +43,7 @@ HRESULT CStarBlockPiece::Initialize(void* pArg)
 _int CStarBlockPiece::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
-		return Ready_Dead(0.9f);
+		return Ready_Dead(0.9f, false);
 
 	__super::Tick(fTimeDelta);
 

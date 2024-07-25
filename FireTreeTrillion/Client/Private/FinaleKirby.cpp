@@ -77,6 +77,11 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
     m_fOffsetTurn = 2.f;
     m_bUpdate_FXSocketMatrix = false;
 
+    Add_AnimEvent();
+
+    m_pGameInstance->PlayBGM(L"Tsubazeriai.wav", .4f);
+    m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"´ýÇÁÆ®·° ºÎ¸ª.wav", .5f);
+
     return S_OK;
 }
 
@@ -409,7 +414,8 @@ HRESULT CFinaleKirby::Render_DeferredInfo()
 
 void CFinaleKirby::Add_AnimEvent()
 {
-    __super::Add_AnimEvent();
+    //m_pModelCom[BODY_DUMPCUT]->Add_Event("Collided", [this]() {
+    //    m_pGameInstance->PlaySound_Free(L"finale_collide2.wav", 0.5f);
 
     //m_pModelCom[INFO(m_eBodyState)]->Add_Event("Sound_Chop", [this]() {
     //    m_pGameInstance->PlaySound_Free(L"Bomber_Chop.wav", 0.3f);

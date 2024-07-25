@@ -109,6 +109,9 @@ private:
     _float m_fHitTimeDeltaMaxResetTime = { 0.f };
 
 
+    _bool  m_bDontSoundOverLap = { false };
+
+
 private:
     CONTENT_TYPE m_eColliderType[COLLISION_END][COLLISION_END];
     virtual void Free() override;

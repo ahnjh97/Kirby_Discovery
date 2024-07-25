@@ -57,6 +57,7 @@ _int CFinalStone::Tick(_float fTimeDelta)
 	if (vPos.y <= 0.f)
 	{
 		m_bDead = true;
+		m_pGameInstance->PlaySound_Free(L"Collision_KirbyMonster.wav", 0.5f);
 
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 		pCamera->Make_Shake(1.5f);
