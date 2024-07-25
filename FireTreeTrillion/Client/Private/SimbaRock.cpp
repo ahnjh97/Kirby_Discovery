@@ -100,6 +100,13 @@ void CSimbaRock::SetUpSimbaRock(_fvector vPos)
 	m_fTime = 0.f;
 }
 
+void CSimbaRock::TestRock(_fvector vPos)
+{
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+	m_bHide = false;
+	m_fTime = 0.f;
+}
+
 HRESULT CSimbaRock::Add_Components(const wstring& _wstrModelName)
 {
 	HRESULT hr{};

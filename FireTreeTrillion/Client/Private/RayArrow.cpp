@@ -67,6 +67,7 @@ HRESULT CRayArrow::Initialize(void* pArg)
 
 	m_fRotateSpeed = 10.f;
 	m_bNonDead = true;
+	m_fAttack = 10.f;
 
 	CEffect::FX_DESC FXDesc{};
 	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();

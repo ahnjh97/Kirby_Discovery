@@ -139,6 +139,7 @@ void CKirbyFinalCut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			DESC(m_fJumpVelocity) = 8.f;
 			m_bJump = true;
 			m_bJumpTrigger = false;
+			m_pGameInstance->PlaySound_Free(L"KirbyFinal_Cut1.wav", 0.5f);
 		}
 		else if (pController->Is_Terrain())
 		{
@@ -198,35 +199,46 @@ void CKirbyFinalCut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 
 
-		if (8.f < m_fTime && m_fTime <= 4.f)
+		if (3.f < m_fTime && m_fTime <= 3.15f)
 		{
+			if (m_bSound[0] == true)
+			{
+				m_pGameInstance->PlaySound_Free(L"KirbyFinal_Cut2.wav", 0.5f);
+				m_bSound[0] = false;
+			}
 			DESC(m_eEyeState) = CKirby::EYE_BLINK;
 			DESC(m_eMouthState) = CKirby::MOUTH_SURPRISE;
 		}
-		else if (4.15f < m_fTime && m_fTime <= 4.35f)
+		else if (3.15f < m_fTime && m_fTime <= 3.35f)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			DESC(m_eMouthState) = CKirby::MOUTH_SURPRISE;
 		}
-		else if (4.35f < m_fTime && m_fTime <= 4.45f)
+		else if (3.35f < m_fTime && m_fTime <= 3.45f)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_BLINK;
 			DESC(m_eMouthState) = CKirby::MOUTH_SURPRISE;
 		}
-		else if (4.45f < m_fTime && m_fTime <= 6.f)
+		else if (3.45f < m_fTime && m_fTime <= 5.f)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
 			DESC(m_eMouthState) = CKirby::MOUTH_SURPRISE;
 		}
-		else if (6.f < m_fTime && m_fTime <= 6.2f)
+		else if (5.f < m_fTime && m_fTime <= 5.2f)
 		{
 			DESC(m_eEyeState) = CKirby::EYE_BLINK;
 			DESC(m_eMouthState) = CKirby::MOUTH_IDLE;
 		}
-		else if (6.f < m_fTime)
+		else if (5.2f < m_fTime)
 		{
+			if (m_bSound[1] == true)
+			{
+				m_pGameInstance->PlaySound_Free(L"KirbyFinal_Cut3.wav", 0.5f);
+				m_bSound[1] = false;
+			}
+
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
-			DESC(m_eMouthState) = CKirby::MOUTH_SMILE;
+			DESC(m_eMouthState) = CKirby::MOUTH_HAPPY;
 		}
 
 	}

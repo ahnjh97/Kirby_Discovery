@@ -17,7 +17,7 @@ void CRoomGlass::Activate(CGameObject* pObj)
 {
 	m_bHide = false;
 	m_pModelCom->Set_Animation(0, 40.f, false, false);
-	m_pGameInstance->PlaySound_Free(L"RoomGlassBreak.wav", 0.5f);
+	m_pGameInstance->PlaySound_Free(L"RoomGlassBreak.wav", 0.55f);
 }
 
 HRESULT CRoomGlass::Initialize_Prototype()

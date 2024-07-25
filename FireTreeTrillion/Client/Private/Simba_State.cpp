@@ -28,7 +28,7 @@ void CSimba_Appear1::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	if (CSimba::Simba_DemoAppear1Cut10 == iState && 0.24f < fAnimRatio && false == m_bPlaySound) {
 		m_bPlaySound = true;
 		m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
-		m_pGameInstance->PlayMySound(L"SimbaLastDialog.wav", CHANNEL_BOSSVOICE, 0.3f);
+		m_pGameInstance->PlayMySound(L"SimbaLastDialog.wav", CHANNEL_BOSSVOICE, 0.6f);
 	}
 
 	if (true == pSimba->IsAnimFinished())
@@ -89,7 +89,7 @@ void CSimba_Appear2::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 		{
 			m_bPlaySound = true;
 			m_pGameInstance->StopSound(CHANNEL_BGM);
-			m_pGameInstance->PlayBGM(L"SimbaBattleStart.wav", 0.3f);
+			m_pGameInstance->PlayBGM(L"SimbaBattleStart.wav");
 		}
 	}
 
@@ -98,7 +98,7 @@ void CSimba_Appear2::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 		if (0.8f < fAnimRatio && false == m_bPlaySound) {
 			m_bPlaySound = true;
 			m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
-			m_pGameInstance->PlayMySound(L"SimbaName.wav", CHANNEL_BOSSVOICE, 0.33f);
+			m_pGameInstance->PlayMySound(L"SimbaName.wav", CHANNEL_BOSSVOICE, 0.6f);
 		}
 	}
 		
@@ -150,12 +150,12 @@ void CSimba_Walk::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	if (0.285f < fAnimRatio && 0 == s_iWalkSmokeCount)
 	{
 		pSimba->WalkSmoke();
-		m_pGameInstance->PlaySound_Free(L"SimbaWalk.wav", 0.23f);
+		m_pGameInstance->PlaySound_Free(L"SimbaWalk.wav", 0.35f);
 		s_iWalkSmokeCount++;
 	}
 	else if (0.76f < fAnimRatio && 1 == s_iWalkSmokeCount) {
 		pSimba->WalkSmoke();
-		m_pGameInstance->PlaySound_Free(L"SimbaWalk.wav", 0.23f);
+		m_pGameInstance->PlaySound_Free(L"SimbaWalk.wav", 0.35f);
 		s_iWalkSmokeCount++;
 	}
 
@@ -213,7 +213,7 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 		{
 			m_bNailEffect = true;
 			pSimba->QuickClawNailFlash(iState);
-			m_pGameInstance->PlaySound_Free(L"SimbaNail.wav", 0.4f);
+			m_pGameInstance->PlaySound_Free(L"SimbaNail.wav", 0.45f);
 		}
 	}
 
@@ -221,13 +221,13 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 	{
 		if (0.25f < fAnimRatio && false == m_bPlaySound) {
 			m_bPlaySound = true;
-			m_pGameInstance->PlaySound_Free(L"SimbaQuickClawVoice1.wav", 0.32f);
+			m_pGameInstance->PlaySound_Free(L"SimbaQuickClawVoice1.wav", 0.36f);
 		}
 		
 		if (0.4f < fAnimRatio && false == m_bSlashEffect) {
 			m_bSlashEffect = true;
 			pSimba->QuickClawSlash(iState);
-			m_pGameInstance->PlaySound_Free(L"SimbaQuickClaw.wav", 0.32f);
+			m_pGameInstance->PlaySound_Free(L"SimbaQuickClaw.wav", 0.36f);
 		}
 			
 		_float fStart = 0.42f;
@@ -261,13 +261,13 @@ void CSimba_QuickClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta
 		if (0.18f < fAnimRatio && false == m_bPlaySound)
 		{
 			m_bPlaySound = true;
-			m_pGameInstance->PlaySound_Free(L"SimbaQuickClawVoice2.wav", 0.35f);
+			m_pGameInstance->PlaySound_Free(L"SimbaQuickClawVoice2.wav", 0.4f);
 		}
 
 		if (0.3f < fAnimRatio && false == m_bSlashEffect) {
 			m_bSlashEffect = true;
 			pSimba->QuickClawSlash(iState);
-			m_pGameInstance->PlaySound_Free(L"SimbaQuickClaw.wav", 0.35f);
+			m_pGameInstance->PlaySound_Free(L"SimbaQuickClaw.wav", 0.36f);
 		}
 
 		if(0.3f > fAnimRatio)
@@ -1068,9 +1068,10 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			m_bSetDimensionClawMatrix = true;
 			pSimba->SetUpDimensionClawWorldMatrix();
-			m_pGameInstance->PlaySound_Free(L"SimbaQuickClaw.wav", 0.35f);
+			m_pGameInstance->PlaySound_Free(L"SimbaQuickClaw.wav", 0.45f);
 			m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
-			m_pGameInstance->PlayMySound(L"SimbaDimensionClawVoice.wav", CHANNEL_BOSSVOICE, 0.35f);
+			m_pGameInstance->PlayMySound(L"SimbaDimensionClawVoice.wav", CHANNEL_BOSSVOICE, 0.5f);
+			m_pGameInstance->PlaySound_Free(L"SimbaDimensionClaw.wav", 0.5f);
 		}
 
 		if (0.32f < fAnimRatio && 0 == iStarCount)
@@ -1085,9 +1086,10 @@ void CSimba_DimensionClaw::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			m_bSetDimensionClawMatrix = true;
 			pSimba->SetUpDimensionClawWorldMatrix();
-			m_pGameInstance->PlaySound_Free(L"SimbaQuickClaw.wav", 0.35f);
+			m_pGameInstance->PlaySound_Free(L"SimbaQuickClaw.wav", 0.45f);
 			m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
-			m_pGameInstance->PlayMySound(L"SimbaDimensionClawVoice.wav", CHANNEL_BOSSVOICE, 0.35f);
+			m_pGameInstance->PlayMySound(L"SimbaDimensionClawVoice.wav", CHANNEL_BOSSVOICE, 0.5f);
+			m_pGameInstance->PlaySound_Free(L"SimbaDimensionClaw.wav", 0.5f);
 		}
 
 		if (0.53f < fAnimRatio && 0 == iStarCount)

@@ -238,6 +238,9 @@ void CKickableRock::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObj
 			//m_pRigidBodyCom->Kick_RigidBody(XMVector3Normalize(force), 480.f);
 
 			// 힘이 한번만 작용되게 한다.
+
+
+
 			m_bLockCollision = true;
 		}
 		else if (m_ePhyXState == PO_VACUUMING)

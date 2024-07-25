@@ -63,6 +63,9 @@ CFinalBoss_Appear_State::CFinalBoss_Appear_State()
 void CFinalBoss_Appear_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+
+	m_bSound1 = false;
+	m_bSound2 = false;
 }
 
 void CFinalBoss_Appear_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -72,6 +75,25 @@ void CFinalBoss_Appear_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
 
 	m_pGameInstance->Update_DofFocus(pTransformCom->Get_State(CTransform::STATE_POSITION));
+
+	if (0.7f < pFinalBoss->Get_AnimRatio())
+	{
+		if (false == m_bSound2)
+		{
+			m_bSound2 = true;
+			// 사운드
+			m_pGameInstance->PlaySound_Free(L"BossChimera_LaserCharge.wav", 0.5f);
+		}
+	}
+	//else if (0.4f < pFinalBoss->Get_AnimRatio())
+	//{
+	//	if (false == m_bSound1)
+	//	{
+	//		m_bSound1 = true;
+	//		// 사운드
+	//		m_pGameInstance->PlaySound_Free(L"BossChimera_Appear.wav", 0.5f);
+	//	}
+	//}
 
 	if (pFinalBoss->IsAnimFinished())
 	{
@@ -1333,6 +1355,8 @@ void CFinalBoss_Thrust_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
 
+	pController->FreeFall(pTransformCom, fTimeDelta);
+
 	if (CFinalBoss::FINALBOSS_FLASHTHRUSTREADY == pFinalBoss->Get_State() || CFinalBoss::FINALBOSS_FLASHTHRUSTSWINGFINISHLEFT == pFinalBoss->Get_State())
 	{
 		pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f);
@@ -2159,6 +2183,8 @@ CFinalBoss_LastDamage_State::CFinalBoss_LastDamage_State()
 void CFinalBoss_LastDamage_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint iOffset)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
+
+	m_bSound = false;
 }
 
 void CFinalBoss_LastDamage_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -2166,6 +2192,19 @@ void CFinalBoss_LastDamage_State::OnStateUpdate(CGameObject* pGameObject, _float
 	CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(pGameObject);
 	CTransform* pTransformCom = pGameObject->Get_TransformCom();
 	CCharacterController* pController = static_cast<CCharacterController*>(pGameObject->Get_Component(TEXT("Com_Controller")));
+
+	if (CFinalBoss::FINALBOSS_DEMODISAPPEARCUT2 == pFinalBoss->Get_State())
+	{
+		if(0.76f < pFinalBoss->Get_AnimRatio())
+		{
+			if(false == m_bSound)
+			{
+				m_bSound = true;
+				m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"K15_BossChimeraPerfectAfter1.wav");
+				m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, 0.5f);
+			}
+		}
+	}
 
 	if (true == pFinalBoss->IsAnimFinished())
 	{

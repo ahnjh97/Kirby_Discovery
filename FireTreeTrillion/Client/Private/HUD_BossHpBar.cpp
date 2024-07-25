@@ -96,6 +96,9 @@ HRESULT CHUD_BossHpBar::Initialize(void* pArg)
 	m_vNameColor = { 1.f, 1.f, 1.f };
 
 	m_fAmplitude = 5.f;
+	
+	m_pGameInstance->StopSound(CHANNEL_SOUND12);
+	m_pGameInstance->PlayMySound(L"BossHpBar.wav", CHANNEL_SOUND12, 0.5f);
 
 	return S_OK;
 }
@@ -104,7 +107,6 @@ _int CHUD_BossHpBar::Tick(_float fTimeDelta)
 {
 	if (m_pMyMonster == nullptr || m_pMyMonster->Get_Dead() || m_bDead == true)
 		return OBJ_DEAD;
-
 
 	if (m_uInitializeBar == 0)
 	{
@@ -255,14 +257,15 @@ void CHUD_BossHpBar::InitializeBar(_float fTimeDelta)
 	m_fCurBossHpRatio = m_pMyMonster->Get_Hp() / m_pMyMonster->Get_MaxHp();
 
 	// 1초만에 피가 찬다.
-	m_fBossHpBar += fTimeDelta;
+	m_fBossHpBar += fTimeDelta * 0.5f; // 이제 2초임 수고요~
 
-	
+
 	if (m_fBossHpBar >= m_fCurBossHpRatio)
 	{
 		m_fBossSlowHpBar = m_fBossHpBar = m_fCurBossHpRatio;
 		m_uInitializeBar = 1;
 		m_fAlpha = 1.f;
+		m_pGameInstance->StopSound(CHANNEL_SOUND12);
 	}
 }
 

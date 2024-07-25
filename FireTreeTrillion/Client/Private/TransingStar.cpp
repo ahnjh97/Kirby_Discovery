@@ -370,7 +370,7 @@ void CTransingStar::RenderOpen()
 
 void CTransingStar::On_Event()
 {
-    if(m_eNextLevel != LEVEL_END)
+    if (m_eNextLevel != LEVEL_END)
     {
         // 스타트 로딩화면 렌더 켜기
         m_bLoadingStart = true;
@@ -379,7 +379,7 @@ void CTransingStar::On_Event()
         {
             m_pLoadingStart->Set_TexIndex(0);
 
-            CLoadingFont::LOADINGFONT_DESC LoadingFont_Desc{}; 
+            CLoadingFont::LOADINGFONT_DESC LoadingFont_Desc{};
             HRESULT hr;
             LoadingFont_Desc.strTag = TEXT("Prototype_Component_Texture_UI_Forest_Font");
             _float fPosX = -40.f;
@@ -402,7 +402,7 @@ void CTransingStar::On_Event()
                     fEndPos += 50.f;
                     fDisappearPos += 90.f;
                 }
-                else 
+                else
                 {
                     fEndPos += 60.f;
                     fDisappearPos += 100.f;
@@ -412,7 +412,7 @@ void CTransingStar::On_Event()
         else if (LEVEL_SIMBA == m_eNextLevel)
         {
             m_pLoadingStart->Set_TexIndex(2);
-
+            m_bFontRender = false;
             CLoadingFont::LOADINGFONT_DESC LoadingFont_Desc{};
             HRESULT hr;
             LoadingFont_Desc.strTag = TEXT("Prototype_Component_Texture_UI_Lab_Font");

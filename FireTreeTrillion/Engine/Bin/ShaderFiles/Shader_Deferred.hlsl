@@ -216,6 +216,9 @@ float3 FOGViewZ(float fViewZ, float4 vColor, float3 vFogColor, float fFogStart, 
 
 float3 Ocean(float fWorldY, float3 vColor, float3 vTopColor, float3 vBottomColor, float fOceanTopY, float fOceanBottomY, float fintensity)
 {
+    if (fintensity <= 0.01f)
+        return vColor;
+        
     if (fWorldY > fOceanTopY)
         return vColor;
     
