@@ -227,6 +227,8 @@ void CKirbySword_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	Turn_Z_Interpolate(Kirbydesc, pTransformCom, fTimeDelta);
 	pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
 
+	Make_BBongSound(DESC(m_fWalkSoundDelay), fTimeDelta);
+
 	if (Kirby_Ladder_Logic(pKirby, Kirbydesc, pTransformCom))
 	{
 		pController->Set_Position(pTransformCom, DESC(m_vLadderPoint));
@@ -344,7 +346,6 @@ void CKirbySword_Run_State::Free()
 
 #pragma endregion
 
-
 // SILDE 포함!
 #pragma region SWORD GUARD STATE
 
@@ -384,7 +385,7 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	if (pKirby->Get_State() == CKirby::SWORDSTATE_GUARD)
 	{
 		Guard_Deceleration(Kirbydesc, pTransformCom, pController, fTimeDelta);
-		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset));
+		pController->FreeFall(pTransformCom, fTimeDelta, DESC(m_fGravityOffset), 0.3f);
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_UP, KEY_DOWN) ||
 			m_pGameInstance->Get_DIKeyState(DIK_DOWN, KEY_DOWN) ||
@@ -445,6 +446,7 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BBong"), &FXDesc)))
 				return;
 
+			m_pGameInstance->PlaySound_Free(L"KirbySword_Dash.wav", 0.5f);
 
 			pKirby->Change_State(CKirby::SWORDSTATE_SWORDSLIDE, 60.f, true, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			DESC(m_fMoveSpeed) = 18.f;
@@ -489,6 +491,7 @@ void CKirbySword_Guard_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 		{
 			DESC(m_fJumpVelocity) = 22.f;
+			m_pGameInstance->PlaySound_Free(L"KirbySword_UpSlash.wav", 0.5f);
 			pKirby->Change_State(CKirby::SWORDSTATE_UPWARDSLASH, 60.f, false, false, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 			return;
 		}
@@ -533,7 +536,6 @@ void CKirbySword_Guard_State::Free()
 #pragma endregion
 
 
-
 #pragma region SWORD ATTACK STATE
 
 CKirbySword_Attack_State::CKirbySword_Attack_State()
@@ -557,16 +559,19 @@ void CKirbySword_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, 
 	case CKirby::SWORDSTATE_SIDESLASH:
 	{
 		SwordSlash_One(pKirby->Get_TransformCom());
+		m_pGameInstance->PlaySound_Free(L"KirbySword_One.wav", 0.5f);
 	}
 	break;
 	case CKirby::SWORDSTATE_MULITSWORDATTACK:
 	{
 		SwordSlash_Two(pKirby->Get_TransformCom());
+		m_pGameInstance->PlaySound_Free(L"KirbySword_Two.wav", 0.5f);
 	}
 	break;
 	case CKirby::SWORDSTATE_DECISIVESLASH:
 	{
 		SwordSlash_Final(pKirby->Get_TransformCom());
+		m_pGameInstance->PlaySound_Free(L"KirbySword_Three.wav", 0.5f);
 	}
 	break;
 	default:
@@ -847,7 +852,6 @@ void CKirbySword_Attack_State::Free()
 #pragma endregion
 
 
-
 #pragma region SWORD CHARGESPIN STATE
 
 CKirbySword_ChargeSpin_State::CKirbySword_ChargeSpin_State()
@@ -869,6 +873,8 @@ void CKirbySword_ChargeSpin_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 	case CKirby::SWORDSTATE_GIGANTSPINSLASH:
 	{
 		SwordSpinSlash_Two(pKirby->Get_TransformCom());
+		m_pGameInstance->PlaySound_Free(L"KirbySword_ChargeSpinOne.wav", 0.5f);
+		m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
 		pKirby->Delete_Effect("YW SwordParticle");
 	}
 	break;
@@ -881,6 +887,8 @@ void CKirbySword_ChargeSpin_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 	{
 		SwordSpinSlash_One(pKirby->Get_TransformCom());
 		pKirby->Delete_Effect("YW SwordParticle");
+		m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+		m_pGameInstance->PlaySound_Free(L"KirbySword_ChargeSpinTwo.wav", 0.5f);
 	}
 	break;
 	default:
@@ -904,6 +912,8 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		if (DESC(m_bSwordCharge1) == true)
 		{
 			SwordSpinCharge(pKirby->Get_TransformCom(), pKirby);
+			m_pGameInstance->PlaySound_Free(L"KirbySword_ChargeSoundOne.wav", 0.4f);
+			m_pGameInstance->PlayMySound(L"KirbySword_ChargeSound.wav", CHANNEL_PLAYERVOICE, 0.2f);
 			DESC(m_bSwordCharge1) = false;
 		}
 
@@ -954,6 +964,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 				DESC(m_ePreAttackState) = CKirby::SWORDSTATE_DECISIVESLASH;
 				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
 				pKirby->Delete_Effect("YW SwordParticle");
+				m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
 				return;
 			}
 			else
@@ -972,6 +983,7 @@ void CKirbySword_ChargeSpin_State::OnStateUpdate(CGameObject* pGameObject, _floa
 		if (DESC(m_bSwordCharge2) == true)
 		{
 			SwordSpinChargeBig(pKirby->Get_TransformCom());
+			m_pGameInstance->PlaySound_Free(L"KirbySword_ChargeSoundTwo.wav", 0.4f);
 			DESC(m_bSwordCharge2) = false;
 		}
 
@@ -1456,6 +1468,7 @@ void CKirbySword_JumpAttack_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 	case CKirby::SWORDSTATE_SWORDSPINSTART:
 	{
 		SwordSpin(pKirby->Get_TransformCom());
+		m_pGameInstance->PlaySound_Free(L"KirbySword_JumpSpin.wav", 0.5f);
 	}
 	break;
 	default:
@@ -1667,6 +1680,7 @@ void CKirbySword_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 		{
+			m_pGameInstance->PlaySound_Free(L"Kirby_BalloonCencal.wav", 0.5f);
 			Kirbydesc->m_fJumpVelocity = 0.f;
 			pController->Reset_FallVelocity();
 			pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
@@ -1677,6 +1691,12 @@ void CKirbySword_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	Kirbydesc->m_eEyeState = CKirby::EYE_IDLE;
 	DESC(m_fFlyTime) += fTimeDelta;
+	// 힘들경우 LIMITFALL 로 간다.
+	if (DESC(m_fFlyTime) > fFlyTime)
+	{
+		pKirby->Change_State(CKirby::STATE_FLIGHTLIMITFALL, 60.f, false, false, CKirby::BODY_BALLOON);
+		return;
+	}
 	Kirbydesc->m_fJumpVelocity -= GRAVITY * fTimeDelta;
 
 	if (Kirbydesc->m_fJumpVelocity < -2.f)
@@ -1686,6 +1706,7 @@ void CKirbySword_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	if (pController->Is_Terrain())
 	{
+		m_pGameInstance->PlaySound_Free(L"Kirby_BalloonCencal.wav", 0.5f);
 		pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
 		return;
 	}
@@ -1698,6 +1719,8 @@ void CKirbySword_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 	{
+		m_pGameInstance->PlaySound_Free(L"Kirby_BalloonFly.wav", 0.1f);
+
 		if (pController->Compute_Height() > 5.f && pController->Compute_Height() < 19.f)
 			DESC(m_fJumpVelocity) = 0.f;
 		else

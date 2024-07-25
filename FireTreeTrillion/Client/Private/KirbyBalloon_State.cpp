@@ -287,6 +287,12 @@ void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 	// 점프
 	else if (pKirby->Get_State() == CKirby::STATE_EATJUMP)
 	{
+		if (m_bJumpEffectTrigger == true)
+		{
+			Jump_FX(pTransformCom, true);
+			m_bJumpEffectTrigger = false;
+		}
+
 		// 0.3초 동안만 누적이 된다.
 		if (DESC(m_bRePressBlock) == false && m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS) && DESC(m_fJumpHoldTime) < 0.3f)
 		{
@@ -430,6 +436,7 @@ void CKirbyBalloon_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 
 void CKirbyBalloon_Jump_State::OnStateExit()
 {
+	m_bJumpEffectTrigger = true;
 }
 
 CKirbyBalloon_Jump_State* CKirbyBalloon_Jump_State::Create()
@@ -482,10 +489,14 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	Kirbydesc->m_eMouthState = CKirby::MOUTH_ANGER;
 	pKirby->DefaultIdle();
 
+	//m_pGameInstance->PlaySound_Free(L"Kirby_BalloonFly.wav", 0.5f);
+	//m_pGameInstance->PlaySound_Free(L"Kirby_BalloonCencal.wav", 0.5f);
+
 	if (pKirby->Get_State() != CKirby::STATE_FLIGHTLANDING)
 	{
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN))
 		{
+			m_pGameInstance->PlaySound_Free(L"Kirby_BalloonCencal.wav", 0.5f);
 			Kirbydesc->m_fJumpVelocity = 0.f;
 			pController->Reset_FallVelocity();
 			pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
@@ -496,6 +507,11 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 	if (pKirby->Get_State() == CKirby::STATE_FLIGHTSTART)
 	{
+		if (m_bSoundTrigger == true)
+		{
+			m_pGameInstance->PlaySound_Free(L"Kirby_BalloonFly.wav", 0.1f);
+			m_bSoundTrigger = false;
+		}
 		Kirbydesc->m_eEyeState = CKirby::EYE_IDLE;
 		DESC(m_fFlyTime) += fTimeDelta;
 		Kirbydesc->m_fJumpVelocity -= GRAVITY * fTimeDelta;
@@ -507,6 +523,7 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		// 추가로 누르면 더 올라감!
 		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 		{
+			m_pGameInstance->PlaySound_Free(L"Kirby_BalloonFly.wav", 0.1f);
 			if (pController->Compute_Height() > 5.f && pController->Compute_Height() < 19.f)
 				DESC(m_fJumpVelocity) = 0.f;
 			else
@@ -535,6 +552,7 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		if (pController->Is_Terrain())
 		{
 			pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
+			m_pGameInstance->PlaySound_Free(L"Kirby_BalloonCencal.wav", 0.5f);
 			return;
 		}
 		// 끝나면 FALL로 돌아간다.
@@ -546,6 +564,7 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 		{
+			m_pGameInstance->PlaySound_Free(L"Kirby_BalloonFly.wav", 0.1f);
 			if (pController->Compute_Height() > 5.f && pController->Compute_Height() < 19.f)
 				DESC(m_fJumpVelocity) = 0.f;
 			else
@@ -572,6 +591,7 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS))
 		{
+			m_pGameInstance->PlaySound_Free(L"Kirby_BalloonFly.wav", 0.1f);
 			// 날면서 뽀잉
 			if (pController->Compute_Height() > 5.f && pController->Compute_Height() < 19.f)
 				DESC(m_fJumpVelocity) = 0.f;
@@ -599,6 +619,7 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		pController->Jump(pTransformCom, Kirbydesc->m_fJumpVelocity, fTimeDelta);
 		if (pController->Is_Terrain())
 		{
+			m_pGameInstance->PlaySound_Free(L"Kirby_BalloonCencal.wav", 0.5f);
 			pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
 			return;
 		}
@@ -612,6 +633,7 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_DOWN))
 		{
+			m_pGameInstance->PlaySound_Free(L"Kirby_BalloonFly.wav", 0.1f);
 			pKirby->Set_Animation(CKirby::STATE_FLIGHTLIMIT, 60.f, false, false);
 			return;
 		}
@@ -629,12 +651,14 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		pController->Jump(pTransformCom, Kirbydesc->m_fJumpVelocity, fTimeDelta);
 		if (pController->Is_Terrain())
 		{
+			m_pGameInstance->PlaySound_Free(L"Kirby_BalloonCencal.wav", 0.5f);
 			pKirby->Change_State(CKirby::STATE_FLIGHTLANDING, 70.f, false, false, CKirby::BODY_VACUUM);
 			return;
 		}
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_C, KEY_PRESS))
 		{
+			m_pGameInstance->PlaySound_Free(L"Kirby_BalloonFly.wav", 0.1f);
 			// 힘들어 하기만 한다.
 			pKirby->Change_State(CKirby::STATE_FLIGHTLIMIT, 60.f, false, false, CKirby::BODY_BALLOON);
 			return;
@@ -679,6 +703,8 @@ void CKirbyBalloon_Fly_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 void CKirbyBalloon_Fly_State::OnStateExit()
 {
+	m_bSoundTrigger = true;
+
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	CKirby::KIRBY_INFODESC* Kirbydesc = pKirby->Get_KirbyInfo();
 
@@ -769,7 +795,7 @@ void CKirbyBalloon_Swallow_State::OnStateUpdate(CGameObject* pGameObject, _float
 				DESC(m_pObject) = nullptr;
 			}
 
-			pKirby->Change_State(CKirby::STATE_GETABILITY, 70.f, false, false, CKirby::BODY_DEFAULT);
+			pKirby->Change_State(CKirby::STATE_GETABILITY, 100.f, false, false, CKirby::BODY_DEFAULT);
 			return;
 		}
 	}

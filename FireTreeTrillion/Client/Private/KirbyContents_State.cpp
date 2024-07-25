@@ -31,6 +31,12 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	// 능력을 획득 하였을 때 나오는 애니메이션이다.
 	if (pKirby->Get_State() == CKirby::STATE_GETABILITY)
 	{
+		if (m_bDumpSound == true)
+		{
+			m_pGameInstance->PlaySound_Free(L"Kirby_Contents.wav", 0.5f);
+			m_bDumpSound = false;
+		}
+
 		DESC(m_eMouthState) = CKirby::MOUTH_HAPPY;
 		CTransform* pCameraTransform = pCamera->Get_TransformCom();
 		_float4 vCamRight = pCameraTransform->Get_State_Vector(CTransform::STATE_RIGHT);
@@ -70,6 +76,12 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	}
 	else if (pKirby->Get_State() == CKirby::STATE_ABILITYDUMP)
 	{
+		if (m_bDumpSound == true)
+		{
+			m_pGameInstance->PlaySound_Free(L"Kirby_AbilityDump.wav", 0.5f);
+			m_bDumpSound = false;
+		}
+
 		if (JoyStick_controller(Kirbydesc, pCamera) == true)
 			Moving_Logic(Kirbydesc, pTransformCom, pController, fTimeDelta);
 		else
@@ -101,8 +113,7 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 
 void CKirbyGet_State::OnStateExit()
 {
-
-
+	m_bDumpSound = true;
 }
 
 

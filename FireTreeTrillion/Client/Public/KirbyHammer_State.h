@@ -48,6 +48,8 @@ public:
 
 	_bool	m_bCountTrigger = { true };
 
+	_bool	m_bSoundTrigger = { true };
+
 	static	CKirbyHammer_Attack_State* Create();
 	virtual void						Free() override;
 
@@ -70,6 +72,8 @@ public:
 public:
 	_float	m_fMoveTime = { 0.f };
 	_float	m_fPreMoveTime = { 0.f };
+
+	_bool	m_bSoundTrigger = { true };
 
 	static	CKirbyHammer_Onigorosi_State* Create();
 	virtual void						Free() override;
