@@ -146,9 +146,10 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0));
 	CTransform* pKirbyTransformCom = pKirby->Get_TransformCom();
+	_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
 
 	// 플레이어를 향해 바라본다
-	pTransformCom->Look_At_Rotate(pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION), fTimeDelta * 4.f, false);
+	pTransformCom->Look_At_Rotate(vKirbyPos, fTimeDelta * 4.f, false);
 
 	if (true == pFinalBoss->Get_Auto())
 	{
@@ -183,17 +184,18 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if (0 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished()/*0.5f < pFinalBoss->Get_AnimRatio()*/)
+				if (0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
-					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+					vKirbyPos.m128_f32[1] = 0.f;
+					m_vLook = vKirbyPos - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
 					pFinalBoss->Set_Direction(m_vLook);
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 				}
 			}
 			else if (5 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
@@ -201,20 +203,20 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (8 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					// 좌우 활공 패턴
 					_vector vBossPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-					_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+					_vector vKirbyRotatePos = vKirbyPos;
 
-					pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, 45.f));
+					pFinalBoss->Set_Direction(RotateGlide(vKirbyRotatePos, vBossPos, 45.f));
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNRIGHTAIRSTART, 50.f, false, true);
 				}
 			}
 			else if (9 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					// 사운드
@@ -224,7 +226,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (10 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_RAYARROWREADYAIR, 50.f, false, true);
@@ -232,17 +234,18 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (11 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
-					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+					vKirbyPos.m128_f32[1] = 0.f;
+					m_vLook = vKirbyPos - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
 					pFinalBoss->Set_Direction(m_vLook);
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 				}
 			}
 			else if (14 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SLASHREADY, 50.f, false, true);
@@ -250,10 +253,11 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (18 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
-					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+					vKirbyPos.m128_f32[1] = 0.f;
+					m_vLook = vKirbyPos - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
 					pFinalBoss->Set_Direction(m_vLook);
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 				}
@@ -271,7 +275,8 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				if (pFinalBoss->IsAnimFinished())
 				{
 					++m_iCnt;
-					m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+					vKirbyPos.m128_f32[1] = 0.f;
+					m_vLook = vKirbyPos - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
 					pFinalBoss->Set_Direction(m_vLook);
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 				}
@@ -297,7 +302,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (3 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 40.f, false, true);
@@ -305,7 +310,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (4 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					pFinalBoss->Set_Direction(-pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) + XMVectorSet(0.f, 0.3f, 0.f, 0.f));
@@ -314,7 +319,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (6 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 50.f, false, true);
@@ -364,7 +369,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			}
 			else if (16 == m_iCnt)
 			{
-				if (pFinalBoss->IsAnimFinished())
+				if (/*pFinalBoss->IsAnimFinished()*/0.5f < pFinalBoss->Get_AnimRatio())
 				{
 					++m_iCnt;
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SWINGRIGHTSTART, 50.f, false, true);
@@ -440,7 +445,7 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			{
 				pFinalBoss->Set_Stab(false);
 				// Stab 패턴
-				m_vLook = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
+				m_vLook = vKirbyPos - pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) - pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 5.f;
 				pFinalBoss->Set_Direction(m_vLook);
 				pFinalBoss->Change_State(CFinalBoss::FINALBOSS_STABREADY, 50.f, false, true);
 			}
@@ -466,16 +471,16 @@ void CFinalBoss_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				pFinalBoss->Set_Side(false);
 				// 좌우 활공 패턴
 				_vector vBossPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
-				_vector vKirbyPos = pKirbyTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+				_vector vKirbyRotatePos = vKirbyPos;
 
 				if (rand() % 2 == 0)
 				{
-					pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, -45.f));
+					pFinalBoss->Set_Direction(RotateGlide(vKirbyRotatePos, vBossPos, -45.f));
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNLEFTAIRSTART, 50.f, false, true);
 				}
 				else
 				{
-					pFinalBoss->Set_Direction(RotateGlide(vKirbyPos, vBossPos, 45.f));
+					pFinalBoss->Set_Direction(RotateGlide(vKirbyRotatePos, vBossPos, 45.f));
 					pFinalBoss->Change_State(CFinalBoss::FINALBOSS_TURNRIGHTAIRSTART, 50.f, false, true);
 				}
 			}
