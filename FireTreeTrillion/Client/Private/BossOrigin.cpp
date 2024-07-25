@@ -128,7 +128,7 @@ _int CBossOrigin::Tick(_float fTimeDelta)
 		Ready_FadeOut();
 
 	if(m_bSoundDown)
-		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta);
+		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.9f);
 
 	return OBJ_NOEVENT;
 }
