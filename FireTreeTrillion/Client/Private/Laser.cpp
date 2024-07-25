@@ -84,7 +84,7 @@ _int CLaser::Tick(_float fTimeDelta)
 		if (CFinalBoss::FINALBOSS_DIMENSIONLASER == pFinalBoss->Get_State())
 		{
 			m_fColliderTime += m_fTimeDelta;
-			if(7.f > m_fColliderTime)
+			if (7.f > m_fColliderTime)
 			{
 				m_pTransformCom->Look_At_Interpolate(vKirbyPos, m_fTimeDelta * 0.2f);
 				Activate_FrustumCollider(0.f, 200.f, 5.f);
@@ -109,7 +109,7 @@ _int CLaser::Tick(_float fTimeDelta)
 					//레이저와의 충돌 자국
 					CEffect::FX_DESC FXDesc{};
 					FXDesc.vInitPos = vCollidingPoint;
-					FXDesc.vInitPos += (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK)*.8f;
+					FXDesc.vInitPos += (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK) * .8f;
 
 					FXDesc.vInitPos.y = 0.5f;
 					FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir((_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
