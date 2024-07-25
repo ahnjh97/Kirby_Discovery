@@ -86,7 +86,6 @@ HRESULT CRabbit::Initialize(void* pArg)
 		Set_Slope(false);
 	}
 
-	m_bIsCulling = true;
 	return S_OK;
 }
 
@@ -133,10 +132,7 @@ void CRabbit::Late_Tick(_float fTimeDelta)
 		}
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
-		m_bIsCulling = false;
 	}
-	else
-		m_bIsCulling = true;
 }
 
 HRESULT CRabbit::Render()
@@ -280,6 +276,25 @@ _vector CRabbit::JumpAttak(_float fTimeDelta)
 	m_vGoPos.z = m_vStartPos.z + m_fAxisZ * fTimeDelta;
 
 	return m_vGoPos;
+}
+
+// 커비와의 DISTANCE을 구해서 특정 dsitance 아래일 경우만 사운드 재생하도록 이 함수내에서 처리하기
+_bool CRabbit::IsNearKirby()
+{ 
+	_float fDistanceOffset = 20.f;
+
+	// Kirby 위치
+	CGameObject* pObj = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Kirby"));
+	CHECK_NULLPTR(pObj);
+	CTransform* pTransform = pObj->Get_TransformCom();
+	_float4 vPos = pTransform->Get_State_Float4(CTransform::STATE_POSITION);
+	
+	// Rabbit 위치
+	_float4 vRabbitPos = GET_POS;
+	
+	// 둘의 거리값이 fDistanceOffset이하일 경우 true를 반환
+	_float distance = Vector3::Distance(Vector3(vPos), Vector3(vRabbitPos));
+	return (distance <= fDistanceOffset) ? true : false;
 }
 
 HRESULT CRabbit::Add_Components(const wstring& _wstrModelName)
