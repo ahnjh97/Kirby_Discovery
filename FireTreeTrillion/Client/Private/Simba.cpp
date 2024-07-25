@@ -108,6 +108,7 @@ HRESULT CSimba::Initialize(void* pArg)
 	m_setResetRequiredAnims = { Simba_AttackJumpHit, Simba_BiteRush, Simba_DimensionClaw, Simba_DimensionClawContinue,
 		Simba_DimensionLaser, Simba_DoubleClaw, Simba_FinalCrusher, Simba_QuickClawL, Simba_QuickClawR, Simba_QuickClaw2L, Simba_QuickClaw2R };
 
+	Add_AnimEvent();
 #pragma endregion
 
 #pragma region ÀÌº¥Æ® ÇÔ¼öÆ÷ÀÎÅÍ ¹ÙÀÎµù
@@ -470,15 +471,39 @@ void CSimba::Add_AnimEvent()
 	// 1. ÇÑ ¾Ö´Ï¸ÞÀÌ¼Ç¿¡¼­ °°Àº ÀÌ¸§ÀÇ ÀÌº¥Æ® °¡´É
 	// 2. Àç»ý ±âÁØÀº ¾Ö´ÔÅø¿¡¼­ ÁöÁ¤ÇÑ ¾Ö´Ï¸ÞÀÌ¼ÇÀÎÁö + ½ÃÀÛ ÇÁ·¹ÀÓÀÌ ¾Ö´Ï¸ÞÀÌ¼Ç ÇÁ·¹ÀÓ¾È¿¡ µé¾î°¡´Â Áö
 	// 3. µÎ¹øÂ° ÀÎÀÚ·Î ³Ö¾îÁØ ¶÷´Ù°¡ ½ÃÀÛ ÇÁ·¹ÀÓ ÇÑ¹ø¸¸ ½ÇÇàµÈ´Ù.
-	m_pModelCom->Add_Event("FinalCrusherCharge", [this]() {
-		m_pGameInstance->PlaySound_Free(L"TakeItem01.wav", 0.5f);
-
+	m_pModelCom->Add_Event("SimbaJump", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaJump.wav", 0.35f);
 		});
 
-	m_pModelCom->Add_Event("FinalCrusherCharge", [this]() {
-		m_pGameInstance->PlaySound_Free(L"TakeItem01.wav", 0.5f);
+	m_pModelCom->Add_Event("SimbaLand", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaLand.wav", 0.35f);
 		});
 
+	m_pModelCom->Add_Event("FinalCrusherStart", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaFinalCrusherStartVoice.wav", 0.18f);
+		});
+
+	m_pModelCom->Add_Event("FinalCrusher", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaFinalCrusher.wav", 1.f);
+		m_pGameInstance->PlaySound_Free(L"SimbaFinalCrusherVoice.wav", 0.12f);
+		});
+
+	m_pModelCom->Add_Event("AttackJumpPre", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpPre.wav", 0.5f);
+		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpPreVoice.wav", 0.18f);
+		});
+
+	m_pModelCom->Add_Event("AttackJumpStart", [this]() {
+		
+		});
+
+	m_pModelCom->Add_Event("AttackJump", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpVoice.wav", 0.18f);
+		});
+
+	m_pModelCom->Add_Event("AttackJumpHit", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpHit.wav", 0.5f);
+		});
 }
 
 void CSimba::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
@@ -1354,20 +1379,27 @@ void CSimba::SpawnFire(_uint iAnimIdx)
 
 	m_iFireCount++;
 }
-
+// ¿Ï·á
 void CSimba::QuickClawNailFlash(_uint eSimbaAnim) // YW : Effect ¿µ¿ìÇü ¿©±âÀÓ °ËÁö¼ÕÅé ¹øÂ½
 {
+	_float3 vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+	_float3 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	CEffect::FX_DESC effectDesc{};
 	if (Simba_QuickClawStartL == eSimbaAnim) // ¿Þ¼Õ
 	{
-		_float3 vOffset = _float3(); // Right Up Look ¿ÀÇÁ¼Â °è¼ö
-		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_vecLeftNailBones[INDEX], vOffset);
-
+		_float3 vPos = m_pTransformCom->ComputeBoneWorldPos(m_vecLeftNailBones[INDEX]);
+		effectDesc.vInitPos = vPos + vLook * 0.35f - vRight * 0.95f;
+		effectDesc.vInitPos.y += 1.45f;
+		effectDesc.vInitScale = _float3(2.4f, 2.4f, 2.4f);
+		Add_Effect("YW Simba Nail", effectDesc);
 	}
 	else if (Simba_QuickClawStartR == eSimbaAnim) // ¿À¸¥¼Õ
 	{
-		_float3 vOffset = _float3(); // Right Up Look ¿ÀÇÁ¼Â °è¼ö
-		_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_vecRightNailBones[INDEX], vOffset);
-
+		_float3 vPos = m_pTransformCom->ComputeBoneWorldPos(m_vecRightNailBones[INDEX]);
+		effectDesc.vInitPos = vPos + vLook * 0.35f + vRight * 0.95f;
+		effectDesc.vInitPos.y += 1.45f;
+		effectDesc.vInitScale = _float3(2.4f, 2.4f, 2.4f);
+		Add_Effect("YW Simba Nail", effectDesc);
 	}
 }
 // ¿Ï·á
@@ -1672,6 +1704,9 @@ void CSimba::RoarElecParts() // ¾ÆÁ÷ È£Ãâ¾ÈµÊ // ¾Æ¸¶ ÇÑ¹ø È£Ãâ µÈ ÀÌÈÄ Àü±â °è¼
 
 void CSimba::BiteRushJumpSmoke(_uint iAnimIndex) // ¼Õ ¹ß¿¡¼­ ¿©·¯¹æÇâÀ¸·Î È¸»ö¹æ±¸ ³ª¿À°Ô ÇØÁÖ½ê¿ä
 {
+	CEffect::FX_DESC singleDesc{};
+	singleDesc.vInitScale = { 0.1f, 0.1f, 0.1f };
+
 	if (Simba_BiteRushJumpStartL == iAnimIndex || Simba_BiteRushJumpStartR == iAnimIndex)
 	{
 		_float3 vLeftHandPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
@@ -1682,6 +1717,15 @@ void CSimba::BiteRushJumpSmoke(_uint iAnimIndex) // ¼Õ ¹ß¿¡¼­ ¿©·¯¹æÇâÀ¸·Î È¸»ö¹
 		vLeftFootPos.y = 2.3f;
 		_float3 vRightFootPos = m_pTransformCom->ComputeBoneWorldPos(m_pRightFootBone);
 		vRightFootPos.y = 2.3f;
+
+		/*singleDesc.vInitPos = vLeftHandPos;
+		Add_Effect("YW Crash Boom Smoke", singleDesc);
+		singleDesc.vInitPos = vRightHandPos;
+		Add_Effect("YW Crash Boom Smoke", singleDesc);
+		singleDesc.vInitPos = vLeftFootPos;
+		Add_Effect("YW Crash Boom Smoke", singleDesc);
+		singleDesc.vInitPos = vRightFootPos;
+		Add_Effect("YW Crash Boom Smoke", singleDesc);*/
 	}
 	else if (Simba_BiteRushLandingL == iAnimIndex)
 	{
@@ -1691,16 +1735,27 @@ void CSimba::BiteRushJumpSmoke(_uint iAnimIndex) // ¼Õ ¹ß¿¡¼­ ¿©·¯¹æÇâÀ¸·Î È¸»ö¹
 			vLeftHandPos.y = 2.3f;
 			_float3 vRightFootPos = m_pTransformCom->ComputeBoneWorldPos(m_pRightFootBone);
 			vRightFootPos.y = 2.3f;
+
+			/*singleDesc.vInitPos = vLeftHandPos;
+			Add_Effect("YW Crash Boom Smoke", singleDesc);
+			singleDesc.vInitPos = vRightFootPos;
+			Add_Effect("YW Crash Boom Smoke", singleDesc);*/
 		}
 		else if (1 == m_iSmokeCount) // ¿Þ¹ß
 		{
 			_float3 vLeftFootPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftFootBone);
 			vLeftFootPos.y = 2.3f;
+
+			/*singleDesc.vInitPos = vLeftFootPos;
+			Add_Effect("YW Crash Boom Smoke", singleDesc);*/
 		}
 		else if (2 == m_iSmokeCount) // ¿À¸¥¼Õ
 		{
 			_float3 vRightHandPos = m_pTransformCom->ComputeBoneWorldPos(m_pRightHandBone);
 			vRightHandPos.y = 2.3f;
+
+			/*singleDesc.vInitPos = vRightHandPos;
+			Add_Effect("YW Crash Boom Smoke", singleDesc);*/
 		}
 	}
 	else if (Simba_BiteRushLandingR == iAnimIndex)
@@ -1711,16 +1766,24 @@ void CSimba::BiteRushJumpSmoke(_uint iAnimIndex) // ¼Õ ¹ß¿¡¼­ ¿©·¯¹æÇâÀ¸·Î È¸»ö¹
 			vRightHandPos.y = 2.3f;
 			_float3 vLeftFootPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftFootBone);
 			vLeftFootPos.y = 2.3f;
+			/*singleDesc.vInitPos = vRightHandPos;
+			Add_Effect("YW Crash Boom Smoke", singleDesc);
+			singleDesc.vInitPos = vLeftFootPos;
+			Add_Effect("YW Crash Boom Smoke", singleDesc);*/
 		}
 		else if (1 == m_iSmokeCount) // ¿À¸¥¹ß
 		{
 			_float3 vRightFootPos = m_pTransformCom->ComputeBoneWorldPos(m_pRightFootBone);
 			vRightFootPos.y = 2.3f;
+			/*singleDesc.vInitPos = vRightFootPos;
+			Add_Effect("YW Crash Boom Smoke", singleDesc);*/
 		}
 		else if (2 == m_iSmokeCount) // ¿Þ¼Õ
 		{
 			_float3 vLeftHandPos = m_pTransformCom->ComputeBoneWorldPos(m_pLeftHandBone);
 			vLeftHandPos.y = 2.3f;
+		/*	singleDesc.vInitPos = vLeftHandPos;
+			Add_Effect("YW Crash Boom Smoke", singleDesc);*/
 		}
 	}
 
@@ -2074,7 +2137,9 @@ void CSimba::OnAppearEnd(CGameObject* pObj)
 	TransformToDefault(0);
 	TriggerMonsterSpawning(11);
 	m_pGameInstance->StopSound(CHANNEL_BGM);
-	m_pGameInstance->PlayMySound(L"SimbaAfterDialog.wav", CHANNEL_BGM, 0.37f);
+	m_pGameInstance->PlayBGM(L"SimbaAfterDialog.wav", 0.33f);
+	//m_pGameInstance->SetVolume(CHANNEL_BGM, )
+	//m_pGameInstance->PlayMySound(L"SimbaAfterDialog.wav", CHANNEL_BGM, 0.33f);
 }
 
 void CSimba::OnWave1Dead(CGameObject* pObj)
@@ -2390,6 +2455,9 @@ void CSimba::CreateDimensionClawActor()
 
 void CSimba::OnSimbaAttackTrigger()
 {
+	if (LEVEL_TOOL_ANIM == *m_pCurrentLevelID)
+		return;
+
 	CKirby* pKirby = static_cast<CKirby*>(m_pKirby);
 
 	if (true == CCollisionCenter::Get_Instance()->Kirby_Dodge_SlowMotionSystem(pKirby))

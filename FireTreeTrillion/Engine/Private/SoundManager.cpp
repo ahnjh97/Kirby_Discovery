@@ -162,6 +162,8 @@ void CSound_Manager::PlayMySound(TCHAR* pSoundKey, CHANNELID eID, _float _vol)
 {
 	map<TCHAR*, FMOD_SOUND*>::iterator iter;
 
+	StopSound(eID);
+
 	iter = find_if(m_mapSound.begin(), m_mapSound.end(), [&](auto& iter)
 		{
 			return !lstrcmp(pSoundKey, iter.first);
@@ -234,7 +236,7 @@ FMOD_SOUND* CSound_Manager::FindSoundByKey(TCHAR* pSoundKey)
 	return iter->second;
 }
 
-void CSound_Manager::PlayBGM(TCHAR* pSoundKey)
+void CSound_Manager::PlayBGM(TCHAR* pSoundKey, _float _vol)
 {
 	map<TCHAR*, FMOD_SOUND*>::iterator iter;
 
@@ -248,13 +250,13 @@ void CSound_Manager::PlayBGM(TCHAR* pSoundKey)
 
 	FMOD_System_PlaySound(m_pSystem, iter->second, nullptr, FALSE, &m_pChannelArr[CHANNEL_BGM]);
 	FMOD_Channel_SetMode(m_pChannelArr[CHANNEL_BGM], FMOD_LOOP_NORMAL);
-    FMOD_Channel_SetVolume(m_pChannelArr[CHANNEL_BGM], 0.5f);
+    FMOD_Channel_SetVolume(m_pChannelArr[CHANNEL_BGM], _vol);
 
 	FMOD_System_Update(m_pSystem);
 }
 
 // BGM을 재생하는 채널이 CHANNEL_BGM이 아닐 경우, 해당 함수를 사용할 수 있습니다.
-void CSound_Manager::PlayBGM(CHANNELID eID, TCHAR* pSoundKey)
+void CSound_Manager::PlayBGM(CHANNELID eID, TCHAR* pSoundKey, _float _vol)
 {
 	if (eID != CHANNEL_BGM && eID != CHANNEL_BGM_SUB && eID != CHANNEL_BGM_STREAMING)
 	{
@@ -273,7 +275,7 @@ void CSound_Manager::PlayBGM(CHANNELID eID, TCHAR* pSoundKey)
 
 	FMOD_System_PlaySound(m_pSystem, iter->second, nullptr, FALSE, &m_pChannelArr[eID]);
 	FMOD_Channel_SetMode(m_pChannelArr[eID], FMOD_LOOP_NORMAL);
-	FMOD_Channel_SetVolume(m_pChannelArr[eID], 0.f);
+	FMOD_Channel_SetVolume(m_pChannelArr[eID], _vol);
 
 	FMOD_System_Update(m_pSystem);
 }

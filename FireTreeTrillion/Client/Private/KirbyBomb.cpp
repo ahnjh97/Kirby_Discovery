@@ -33,6 +33,8 @@ HRESULT CKirbyBomb::Initialize(void* pArg)
     m_pKirbyWorldMatrix = desc.pKirbyWorldMatrix;
     Safe_AddRef(m_pKirby);
 
+    m_pGameInstance->PlaySound_Free(L"KirbyBomb_Init.wav", 0.5f);
+
     if (m_pKirby == nullptr)
         return E_FAIL;
 
@@ -104,14 +106,23 @@ _int CKirbyBomb::Tick(_float fTimeDelta)
 
         m_fBombingTime += m_fTimeDelta * (1.f / 8.f);
 
-        if (m_fBombTime > 8.f)
+        if (m_fBombTime > 4.f)
+        {
             m_bDead = true;
+            m_pGameInstance->PlaySound_Free(L"KirbyBomb_Bomb.wav", 0.5f);
+        }
     }
 
     // 등장 애님 끝나면.
     if (m_pModelCom->IsFinished())
     {
         m_pModelCom->Set_Animation(1, 60.f, true, false);
+    }
+
+
+    if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).y < -50.f)
+    {
+        m_bDead = true;
     }
 
 
@@ -207,6 +218,7 @@ void CKirbyBomb::Throwing(CKirby::KIRBY_INFODESC* desc)
     // 이 폭탄은 평생에 한번 발동한다.
     if (m_bThrowTrigger == true)
     {
+
         Add_Rigid();
         m_pRigidBodyCom->Kick_RigidBody((_float3)desc->m_vBombThrowDir, desc->m_fBombPower);
         m_bThrowTrigger = false;

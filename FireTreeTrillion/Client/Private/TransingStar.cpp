@@ -491,7 +491,8 @@ void CTransingStar::On_Event()
                     fDisappearPos += 100.f;
                 }
             }
-
+            pCameraMain->Clear_Sequence();
+            pCameraMain->Lock_All(_float3(109.9f, 25.2f, 108.5f), _float3(1.f, .07f, -.12f));
             pCameraMain->Unlock();
             pCameraMain->Set_FOVY(38);
             pCameraMain->Set_InterpolateSpeed(3.f);

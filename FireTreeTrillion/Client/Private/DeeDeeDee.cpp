@@ -225,11 +225,14 @@ void CDeeDeeDee::Add_AnimEvent()
 
 void CDeeDeeDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
+	static _bool bClicked = false;
+
 	// PARK로 이동하기 위한 다이얼로그 출력
 	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN))
 	{
 		m_pUI_Interactable->Set_IsRender(false);
 		m_bIsInteractKirby = TRUE;
+		bClicked = true;
 
 		CUI_MessageWindow* pMWindow = dynamic_cast<CUI_MessageWindow*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_UI_Msg_DeeDeeDee")));
 		CHECK_NULLPTR(pMWindow);
@@ -241,17 +244,24 @@ void CDeeDeeDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject
 		CCamera_Main::CAMACTION newAction{};
 
 		pCameraMain->Fill_InterpolateCutSet(newAction, 0.f, EASE_INOUT, 1.f);
-		pCameraMain->Fill_ActionPos(newAction, CCamera_Main::POS_ABSOLUTE , {-4.95f, 38.9f, 29.9f});
-		pCameraMain->Fill_ActionDir(newAction, CCamera_Main::DIR_ABSOLUTE, { -0.32f, -0.17f, 0.93f });
+		/*pCameraMain->Fill_ActionPos(newAction, CCamera_Main::POS_ABSOLUTE , {-4.95f, 38.9f, 29.9f});
+		pCameraMain->Fill_ActionDir(newAction, CCamera_Main::DIR_ABSOLUTE, { -0.32f, -0.17f, 0.93f });*/
+		pCameraMain->Fill_ActionPos(newAction, CCamera_Main::POS_ABSOLUTE, { -13.f, 38.f, 28.5f });
+		pCameraMain->Fill_ActionDir(newAction, CCamera_Main::DIR_ABSOLUTE, { -0.27f, -0.15f, 0.95f });
 		pCameraMain->Make_One_Sequence(newAction);
 
 		pCameraMain->Fill_Delay(newAction, 1.f, 30.f);
 
 		//지영아 여기야
 		//맵 이동할 때 Camera Main의 Clear_Sequence 함수를 호출해 줘
+		//커마워 TransingStar로 커비가 이동하고 있어서 거기에 넣어봤어~~~
 	}
 
-	m_pUI_Interactable->Set_IsRender(true);
+	if (bClicked)
+		m_pUI_Interactable->Set_IsRender(false);
+	else
+		m_pUI_Interactable->Set_IsRender(true);
+	
 	m_bCheckCollision = true;
 }
 

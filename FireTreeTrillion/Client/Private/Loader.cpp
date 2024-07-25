@@ -2519,6 +2519,11 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("BreakableBlock", TYPE_ANIM, 0.5f, 0.f, 0);
 		m_vecModelInfo.emplace_back("Crumble", TYPE_ANIM);
 		m_vecModelInfo.emplace_back("Simba", TYPE_ANIM);
+		m_vecModelInfo.emplace_back("SimbaLaser", TYPE_NONANIM);
+		for (_uint i = 0; i <= 16; i++) {
+			string strTunnelRock = "TunnelRock" + to_string(i);
+			m_vecModelInfo.emplace_back(strTunnelRock, TYPE_NONANIM);
+		}
 	}
 }
 

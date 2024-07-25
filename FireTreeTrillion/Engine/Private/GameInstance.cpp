@@ -1058,13 +1058,13 @@ void CGameInstance::PlayMySound(TCHAR* pSoundKey, CHANNELID eID, _float _vol)
 {
 	m_pSound_Manager->PlayMySound(pSoundKey, eID, _vol);
 }
-void CGameInstance::PlayBGM(TCHAR* pSoundKey)
+void CGameInstance::PlayBGM(TCHAR* pSoundKey, _float _vol)
 {
-	m_pSound_Manager->PlayBGM(pSoundKey);
+	m_pSound_Manager->PlayBGM(pSoundKey, _vol);
 }
-void CGameInstance::PlayBGM(CHANNELID eID, TCHAR* pSoundKey)
+void CGameInstance::PlayBGM(CHANNELID eID, TCHAR* pSoundKey, _float _vol)
 {
-	m_pSound_Manager->PlayBGM(eID, pSoundKey);
+	m_pSound_Manager->PlayBGM(eID, pSoundKey, _vol);
 }
 void CGameInstance::PlaySmoothUp(CHANNELID eID, _float targetVolume, _float fAddValue)
 {

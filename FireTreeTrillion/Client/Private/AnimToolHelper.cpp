@@ -227,9 +227,9 @@ void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
 	//CHECK_NULLPTR(pCharacter);
 	//m_vecCharacter.push_back(pCharacter);
 
-	//pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Simba")));
-	//CHECK_NULLPTR(pCharacter);
-	//m_vecCharacter.push_back(pCharacter);
+	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Simba")));
+	CHECK_NULLPTR(pCharacter);
+	m_vecCharacter.push_back(pCharacter);
 }
 
 void CAnimToolHelper::Render_ObjectList()
@@ -429,9 +429,9 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 	ImGui::SameLine();
 	
 	// 애니메이션 스피드
-	m_fAnimationSpeed = 60.f;// (*ppAnimation)->Get_TickPerSecond();
+	m_fAnimationSpeed = 20.f;// (*ppAnimation)->Get_TickPerSecond();
 	if (previousAnimation != (*ppAnimation)->Get_AnimationName())
-		m_fAnimationSpeed = 60.f;//(*ppAnimation)->Get_TickPerSecond();
+		m_fAnimationSpeed = 20.f;//(*ppAnimation)->Get_TickPerSecond();
 	ImGui::Text("Animation Speed"); ImGui::SameLine();
 	ImGui::InputFloat("    ", &m_fAnimationSpeed); ImGui::SameLine();
 	(*ppAnimation)->Set_TickPerSecond(m_fAnimationSpeed);
