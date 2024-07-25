@@ -50,6 +50,7 @@ void CKirbyBoom_Fall_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
 		{
+			m_pGameInstance->PlaySound_Free(L"KirbyBomb_Throw.wav", 0.5f);
 			DESC(m_bBombOrbit) = false;
 			DESC(m_eEyeState) = CKirby::EYE_ANGER;
 			pKirby->Change_State(CKirby::BOOMSTATE_THROWAIR, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
@@ -145,8 +146,6 @@ void CKirbyBoom_Fall_State::Free()
 
 #pragma endregion
 
-
-
 #pragma region BOOM ATTACK STATE
 
 
@@ -157,6 +156,15 @@ CKirbyBoom_Attack_State::CKirbyBoom_Attack_State()
 void CKirbyBoom_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+	if (_iAnimIndex == CKirby::BOOMSTATE_BOOMSHOOT)
+	{
+		m_pGameInstance->PlaySound_Free(L"KirbyBomb_SlideBomb.wav", 0.5f);
+	}
+	else if (_iAnimIndex == CKirby::BOOMSTATE_THROW)
+	{
+		m_pGameInstance->PlaySound_Free(L"KirbyBomb_Throw.wav", 0.5f);
+	}
 }
 
 void CKirbyBoom_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -317,6 +325,7 @@ void CKirbyBoom_ChargeAttack_State::OnStateUpdate(CGameObject* pGameObject, _flo
 		// X ¸¦ ¶®À» °æ¿ì
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
 		{
+			m_pGameInstance->PlaySound_Free(L"KirbyBomb_Throw.wav", 0.5f);
 			DESC(m_bBombOrbit) = false;
 			pKirby->Change_State(CKirby::BOOMSTATE_THROW, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
 			return;
@@ -353,6 +362,7 @@ void CKirbyBoom_ChargeAttack_State::OnStateUpdate(CGameObject* pGameObject, _flo
 		// X ¸¦ ¶®À» °æ¿ì
 		if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_PRESS) == false)
 		{
+			m_pGameInstance->PlaySound_Free(L"KirbyBomb_Throw.wav", 0.5f);
 			DESC(m_bBombOrbit) = false;
 			pKirby->Change_State(CKirby::BOOMSTATE_THROW, 60.f, false, false, CKirby::BODY_BOOMDEFAULT, CKirby::OFFSET_BOOM);
 			return;

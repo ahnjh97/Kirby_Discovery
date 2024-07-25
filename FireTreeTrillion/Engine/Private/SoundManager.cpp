@@ -163,6 +163,8 @@ void CSound_Manager::PlayMySound(TCHAR* pSoundKey, CHANNELID eID, _float _vol)
 {
 	map<TCHAR*, FMOD_SOUND*>::iterator iter;
 
+	StopSound(eID);
+
 	iter = find_if(m_mapSound.begin(), m_mapSound.end(), [&](auto& iter)
 		{
 			return !lstrcmp(pSoundKey, iter.first);

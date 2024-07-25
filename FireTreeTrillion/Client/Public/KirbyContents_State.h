@@ -19,6 +19,7 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_bool	m_bDumpSound = { true };
 	static	CKirbyGet_State* Create();
 	virtual void						Free() override;
 };

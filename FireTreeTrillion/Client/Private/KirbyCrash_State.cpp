@@ -25,6 +25,11 @@ CKirbyCrash_Attack_State::CKirbyCrash_Attack_State()
 void CKirbyCrash_Attack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+	if (_iAnimIndex == CKirby::CRASHSTATE_ATTACKSTART)
+	{
+		m_pGameInstance->PlaySound_Free(L"KirbyCrash_Boom.wav", 0.7f);
+	}
 }
 
 void CKirbyCrash_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -278,6 +283,11 @@ CKirbyCrash_BigAttack_State::CKirbyCrash_BigAttack_State()
 void CKirbyCrash_BigAttack_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+
+	if (_iAnimIndex == CKirby::CRASHSTATE_BIGATTACKFIRE)
+	{
+		m_pGameInstance->PlaySound_Free(L"KirbyCrash_Boom.wav", 0.7f);
+	}
 
 }
 
@@ -535,6 +545,8 @@ void CKirbyCrash_Charge_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake(0.3f, 0.5f);
 			pKirby->Delete_Effect("YW Crash Charge MAX");
+			m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+			m_pGameInstance->PlaySound_Free(L"KirbyCrash_Break.wav", 0.6f);
 			m_bTrigger = false;
 		}
 
@@ -559,6 +571,7 @@ void CKirbyCrash_Charge_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			MFXDesc.vInitScale = { 2.f, 2.f, 2.f };
 
 			pKirby->Add_Effect("YW Crash Charge MAX", MFXDesc, true);
+			m_pGameInstance->PlayMySound(L"KirbyCrash_Charge.wav", CHANNEL_PLAYERVOICE, 0.5f);
 
 			//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Crash Charge"), &MFXDesc)))
 			//	return;
@@ -684,7 +697,6 @@ void CKirbyCrash_Charge_State::Free()
 
 #pragma endregion
 
-
 #pragma region Big Charge STATE
 
 CKirbyCrash_BigCharge_State::CKirbyCrash_BigCharge_State()
@@ -740,7 +752,8 @@ void CKirbyCrash_BigCharge_State::OnStateUpdate(CGameObject* pGameObject, _float
 			pCamera->Make_Shake(0.3f, 0.5f);
 
 			pKirby->Delete_Effect("YW Crash Charge MAX");
-
+			m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+			m_pGameInstance->PlaySound_Free(L"KirbyCrash_Break.wav", 0.6f);
 			m_bTrigger = false;
 		}
 

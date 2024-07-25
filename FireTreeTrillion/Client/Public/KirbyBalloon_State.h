@@ -68,6 +68,7 @@ public:
 	virtual void						Free() override;
 
 	_float	m_fChangeRunTime = { 0.f };
+	_bool	m_bJumpEffectTrigger = { true };
 
 };
 
@@ -88,6 +89,7 @@ public:
 	virtual void OnStateExit()														override;
 
 public:
+	_bool	m_bSoundTrigger = { true };
 	static	CKirbyBalloon_Fly_State* Create();
 	virtual void						Free() override;
 

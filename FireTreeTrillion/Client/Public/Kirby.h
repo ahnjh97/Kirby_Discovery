@@ -160,6 +160,11 @@ public:
 		class CLight* m_pKirbyAssistLight2 = { nullptr };
 
 
+
+		// 사운드 타임 관련 공유 변수
+		_float			m_fWalkSoundDelay = { 0.f };
+
+
 	}KIRBY_INFODESC;
 
 

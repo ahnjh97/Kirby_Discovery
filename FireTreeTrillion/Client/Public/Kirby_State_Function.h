@@ -1333,15 +1333,15 @@ static void Copy_Star(CTransform* pTransformCom)
 	FXDesc.vInitScale = { 2.5f, 2.5f, 2.5f };
 	FXDesc.vInitRot = CUtils::Make_Degree_FromDir(vCamDir);
 
-	FXDesc.fStartDelay = 0.7f;
+	FXDesc.fStartDelay = 0.5f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_bloom"), &FXDesc)))
 		return;
 
-	FXDesc.fStartDelay = 0.775f;
+	FXDesc.fStartDelay = 0.575f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
 		return;
 
-	FXDesc.fStartDelay = 0.85f;
+	FXDesc.fStartDelay = 0.65f;
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Copy Star Pink_nonBloom"), &FXDesc)))
 		return;
 
@@ -1375,13 +1375,20 @@ static void Bbong_FX(_float fTimeDelta, CTransform* pTransformCom)
 	}
 }
 
-static void Jump_FX(CTransform* pTransformCom)
+static void Jump_FX(CTransform* pTransformCom, _bool bBig = false)
 {
 	CMultiEffect::MULTI_FX_DESC FXDesc{};
 	_float4 vMyPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 	FXDesc.vInitPos = { vMyPos.x, vMyPos.y, vMyPos.z };
 	FXDesc.vInitScale = { 1.2f, 1.2f, 1.2f };
+
+
+	bBig == false ?
+		GAMEINSTANCE PlaySound_Free(L"Kirby_Jump.wav", 0.4f) :
+		GAMEINSTANCE PlaySound_Free(L"Kirby_BalloonJump.wav", 0.4f);
+
+
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Kirby Jump Effects"), &FXDesc)))
 		return;
 }
@@ -1577,6 +1584,23 @@ static void Fire_Maker(_float3 vLocalPos, CTransform* pTransformCom, _float Scal
 		return;
 }
 
+
+
+
+#pragma endregion 
+
+
+#pragma region Sound
+
+static void Make_BBongSound(_float& fBBongDelay, _float fTimeDelta)
+{
+	fBBongDelay += fTimeDelta;
+	if (fBBongDelay > 0.2f)
+	{
+		GAMEINSTANCE PlaySound_Free(L"Kirby_BBong.wav", 0.15f);
+		fBBongDelay = 0.f;
+	}
+}
 
 #pragma endregion 
 
