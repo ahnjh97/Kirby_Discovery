@@ -85,7 +85,8 @@ HRESULT CRabbit::Initialize(void* pArg)
 		m_bFind = true;
 		Set_Slope(false);
 	}
-		
+
+	m_bIsCulling = true;
 	return S_OK;
 }
 

@@ -279,7 +279,6 @@ void CAwoofy::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* p
 		{
 			Change_State(CAwoofy::AWOOFY_DAMAGE, 50.f, false, true);
 			m_eEyeState = AWOOFYEYE_HAPPY;
-			CGameInstance::Get_Instance()->PlaySound_Free(L"Collision_KirbyMonster.wav", 0.5f);
 		}
 	}
 	else if (eContent == CCollisionCenter::CONTENT_VACUUMOBJECT)

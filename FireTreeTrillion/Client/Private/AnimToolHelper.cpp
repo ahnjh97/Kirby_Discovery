@@ -12,6 +12,7 @@
 // °´Ã¼¸ðÀ½Áý
 #include "Awoofy.h"
 #include "Kirby.h"
+#include "FinaleKirby.h"
 
 
 static string	g_strProtoObjTag = "";
@@ -230,6 +231,10 @@ void CAnimToolHelper::Ready_AnimObjects(const wstring& strLayerTag)
 	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Simba")));
 	CHECK_NULLPTR(pCharacter);
 	m_vecCharacter.push_back(pCharacter);
+
+	pCharacter = static_cast<CCharacter*>(m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_FinaleKirby")));
+	CHECK_NULLPTR(pCharacter);
+	m_vecCharacter.push_back(pCharacter);
 }
 
 void CAnimToolHelper::Render_ObjectList()
@@ -313,6 +318,13 @@ void CAnimToolHelper::Render_AnimationList(const wstring& wstrObjectTag)
 							else
 								m_pCharacter->Set_AbilityType(ABILITY_DEFAULT);
 						}
+						else if (m_pCharacter->Get_PrototypeTag() == L"Prototype_GameObject_FinaleKirby")
+						{
+							CFinaleKirby::FINALEKIRBY_INFODESC* pKirbyDesc = dynamic_cast<CFinaleKirby*>(m_pCharacter)->Get_KirbyInfo();
+							pKirbyDesc->m_eBodyState = (CFinaleKirby::BODYSTATE)w;
+							static_cast<CFinaleKirby*>(m_pCharacter)->Set_KirbyInfo(*pKirbyDesc);
+						}
+
 
 						g_iActiveModelNum = w;
 						_float childwindowHeight = ImGui::GetWindowHeight();
