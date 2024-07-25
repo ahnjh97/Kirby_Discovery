@@ -211,7 +211,7 @@ HRESULT CCarShopWall::Add_Components()
 	HitBox.pCollisionType = OBJECT;
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
-	Set_BodyCollider(COLLIDER_SPHERE, 15.f, 0.f, 7.f);
+	Set_BodyCollider(COLLIDER_SPHERE, 15.f, 0.f, 7.7f);
 
 	return S_OK;
 }

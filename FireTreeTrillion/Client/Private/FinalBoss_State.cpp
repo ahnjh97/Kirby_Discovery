@@ -1373,7 +1373,6 @@ void CFinalBoss_Thrust_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		case CFinalBoss::FINALBOSS_FLASHTHRUSTREADY:
 		{
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_FLASHTHRUSTSTART, 50.f, false, true);
-			//효선아 여기야 thrust
 
 			CEffect::FX_DESC FXDesc{};
 			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();

@@ -2176,19 +2176,17 @@ HRESULT CKirby::Kirby_SystemInitialize()
 		else if (LEVEL_TOWN == eLEVEL && LEVEL_TOWN == *m_pCurrentLevelID)
 		{
 			_float3 vNewPos = tLevelData.vLastPos;
+			Set_ControllerPos(_float4(vNewPos.x, vNewPos.y, vNewPos.z, 1.f));
 		}
-		else if (*m_pCurrentLevelID == LEVEL_PARK)
-		{
-
-		}
-		else if (*m_pCurrentLevelID == LEVEL_SIMBA)
-		{
-
-		}
-		else if (*m_pCurrentLevelID == LEVEL_FINALBOSS)
-		{
-
-		}
+		//else if (*m_pCurrentLevelID == LEVEL_PARK)
+		//{
+		//}
+		//else if (*m_pCurrentLevelID == LEVEL_SIMBA)
+		//{
+		//}
+		//else if (*m_pCurrentLevelID == LEVEL_FINALBOSS)
+		//{
+		//}
 	}
 
 
