@@ -48,7 +48,6 @@ void CKirbyBulb_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
     {
         DESC(m_pLight)->Interpolate_Light(_float4(0.7f, 0.2f, 0.2f, 0.f), 6.f, 1.f);
         pKirby->Change_State(CKirby::BULBSTATE_WAIT, 60.f, true, true, CKirby::BODY_BULBDEFAULT, CKirby::OFFSET_BULB);
-        m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
         DESC(m_bLightOn) = false;
         return;
     }
@@ -144,7 +143,8 @@ void CKirbyBulb_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
     Kirby_EyeState_Assist(Kirbydesc);
 
     Bbong_FX(fTimeDelta, pTransformCom);
-    Make_BBongSound(DESC(m_fWalkSoundDelay), fTimeDelta);
+
+    DESC(m_bLightOn) == true ? Make_BBongSound(DESC(m_fWalkSoundDelay), fTimeDelta, 0.35f) : Make_BBongSound(DESC(m_fWalkSoundDelay), fTimeDelta, 0.18f);
 
     if (DESC(m_pLight) != nullptr)
         DESC(m_pLight)->Update_LightPos(pKirby->Get_BulbLightPos());
@@ -658,7 +658,7 @@ void CKirbyBulb_Light_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _f
     if (_iAnimIndex == CKirby::BULBSTATE_LIGHTON)
     {
         m_pGameInstance->PlaySound_Free(L"KirbyBulb_LightOn.wav", 0.5f);
-        m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyBulb_Lighting.wav", 0.05f);
+        m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"KirbyBulb_Lighting.wav", 0.1f);
     }
 }
 

@@ -2073,6 +2073,8 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 			m_vBulbColor += (vTargetColor - m_vBulbColor) / (fTimeDelta * 300.f);
 
 			m_pBulbFlare->Set_Position(m_pTransformCom->Get_State(CTransform::STATE_POSITION), false);
+
+			m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
 		}
 
 		m_pBulbFlare->Tick(fTimeDelta);

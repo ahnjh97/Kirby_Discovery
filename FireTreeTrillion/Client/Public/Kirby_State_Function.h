@@ -1594,10 +1594,10 @@ static void Fire_Maker(_float3 vLocalPos, CTransform* pTransformCom, _float Scal
 
 #pragma region Sound
 
-static void Make_BBongSound(_float& fBBongDelay, _float fTimeDelta)
+static void Make_BBongSound(_float& fBBongDelay, _float fTimeDelta, _float Delay = 0.2f)
 {
 	fBBongDelay += fTimeDelta;
-	if (fBBongDelay > 0.2f)
+	if (fBBongDelay > Delay)
 	{
 		GAMEINSTANCE PlaySound_Free(L"Kirby_BBong.wav", 0.15f);
 		fBBongDelay = 0.f;
