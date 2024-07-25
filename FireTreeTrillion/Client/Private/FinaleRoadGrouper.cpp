@@ -455,7 +455,7 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 			if (m_eCollideMove == MOVECMD_FLY)
 			{
 				//¼Ò¸® Àç»ı
-				m_pGameInstance->PlaySound_Free(L"Äí¸£±¤.wav", .5f);
+				m_pGameInstance->PlaySound_Free(L"Äí¸£±¤.wav", .7f);
 
 				CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 

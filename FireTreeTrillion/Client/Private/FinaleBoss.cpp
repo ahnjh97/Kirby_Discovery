@@ -155,39 +155,34 @@ void CFinaleBoss::Add_AnimEvent()
 	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
 
 	m_pModelCom->Add_Event("ReadyDebris", [this]() {
-		m_pGameInstance->PlaySound_Free(L"보스 고함 1.wav", 0.5f);
+		m_pGameInstance->PlaySound_Free(L"보스 고함 1.wav", .5f);
 
 		});
 
 
 	m_pModelCom->Add_Event("ThrowDebris", [this]() {
-		m_pGameInstance->PlaySound_Free(L"운석 던지기.wav", 0.3f);
-
-		/*if(CUtils::Make_RandomInt(1, 2) == 1)
-			m_pGameInstance->PlaySound_Free(L"옆으로 지나감.wav", 0.1f);
-		else
-			m_pGameInstance->PlaySound_Free(L"운석 던지기.wav", 0.3f);*/
+		m_pGameInstance->PlaySound_Free(L"운석 던지기.wav", .5f);
 
 		});
 
 	m_pModelCom->Add_Event("Charge", [this]()
 		{
-			m_pGameInstance->PlaySound_Free(L"운석 생성.wav", 0.2f);
+			m_pGameInstance->PlaySound_Free(L"운석 생성.wav", .5f);
 		});
 
 	m_pModelCom->Add_Event("QTE2", [this]()
 		{
-		m_pGameInstance->PlaySound_Free(L"마지막.wav", 0.2f);
+		m_pGameInstance->PlaySound_Free(L"마지막.wav", .5f);
 		});
 
 	m_pModelCom->Add_Event("QTE Collide", [this]()
 		{
-			m_pGameInstance->PlaySound_Free(L"qte 충돌 2.wav", 0.4f);
+			m_pGameInstance->PlaySound_Free(L"qte 충돌 2.wav", .5f);
 		});
 
 	m_pModelCom->Add_Event("Finale", [this]()
-		{
-			m_pGameInstance->PlaySound_Free(L"피날레.wav", 0.5f);
+		{ 
+			m_pGameInstance->PlaySound_Free(L"피날레.wav",.5f);
 		});
 
 	//m_pModelCom->Add_Event("Finale2", [this]()

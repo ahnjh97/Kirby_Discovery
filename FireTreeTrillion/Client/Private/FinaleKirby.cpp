@@ -77,7 +77,7 @@ HRESULT CFinaleKirby::Initialize(void* pArg)
 
     Add_AnimEvent();
 
-    m_pGameInstance->PlayBGM(L"Tsubazeriai.wav", .5f);
+    m_pGameInstance->PlayBGM(L"Tsubazeriai.wav", .4f);
     m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"´ýÇÁÆ®·° ºÎ¸ª.wav", .5f);
 
     return S_OK;
