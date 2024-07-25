@@ -45,6 +45,7 @@ void CEventCallBack::onTrigger(PxTriggerPair* pairs, PxU32 count)
                 {
                     CModel* pMapDeco = get<0>(iter->second);
                     pMapDeco->Set_Animation(get<1>(iter->second), get<2>(iter->second), false, true);
+                    pMapDeco->PlayModelSound();
                 }
             }
 
