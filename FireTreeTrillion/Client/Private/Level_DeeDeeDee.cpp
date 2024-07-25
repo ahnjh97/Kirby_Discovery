@@ -133,10 +133,6 @@ void CLevel_DeeDeeDee::Fog_Tick(_float fTimeDelta)
 
 void CLevel_DeeDeeDee::Sound_Tick(_float fTimeDelta)
 {
-	// initialize sound
-	//if(m_pGameInstance->Get_Volume(CHANNEL_BGM) > 0.f)
-	//	m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.5f);
-
 	//디디디 조우 시에 재생하는거롤 수정 필요
 	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(m_iLevel, TEXT("Layer_Player")));
 	_float4 vKirbyPos = pKirby->Get_TransformCom()->Get_State_Float4(CTransform::STATE_POSITION);
@@ -160,9 +156,6 @@ void CLevel_DeeDeeDee::Ready_FadeIn()
 	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
 	CHECK_NULLPTR(pUIObj);
 	CUI_Fading* pFadingUI = dynamic_cast<CUI_Fading*>(pUIObj);
-
-	// FadingUI가 이전에 FadeOut 안되어있다면 NO FadeIn
-	//if (pFadingUI->Get_State() != CUI_Fading::FADEOUT) return;
 
 	if (bOnceChanger == false)
 	{

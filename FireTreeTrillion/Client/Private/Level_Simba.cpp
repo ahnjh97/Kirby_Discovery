@@ -94,7 +94,7 @@ void CLevel_Simba::Tick(_float fTimeDelta)
 	__super::Tick(fTimeDelta);
 	m_fAccDelta += fTimeDelta;
 
-	static _bool bOpenLevel = false;
+	/*static _bool bOpenLevel = false;
 	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 		if (m_pGameInstance->Get_KeyState(DIK_LCONTROL, KEY_PRESS))
 			if (m_pGameInstance->Get_KeyState(DIK_SPACE, KEY_PRESS))
@@ -122,7 +122,10 @@ void CLevel_Simba::Tick(_float fTimeDelta)
 				bOnceChangeLevel = true;
 			}
 		}
-	}
+
+		if (bOnceFade)
+			m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.1f);
+	} */
 
 	if (m_pGameInstance->Get_KeyState(DIK_LSHIFT, KEY_PRESS))
 	{

@@ -194,7 +194,7 @@ HRESULT CLevel_Racing::Ready_UI()
 {
 	HRESULT hr = S_OK;
 
-#pragma region PARSING HUD_KIRBYHP, STARPOINT
+	#pragma region PARSING HUD_KIRBYHP, STARPOINT
 
 	vector<string> vecUITag = { "HUD_KirbyStatus", "HUD_StarPoint" };
 
