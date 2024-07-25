@@ -51,7 +51,7 @@ private:
 	void			Compute_MotionBlur();
 	_bool			RayCast_Terrain();
 	
-	virtual _int	Ready_Dead(_float fDeadScale = 1.8f) override;
+	virtual _int	Ready_Dead(_float fDeadScale = 1.8f, _bool bDeadSound = true) override;
 
 	_float2			m_vPreScreenPos = { 0.f, 0.f };
 	_float4			m_vMotionVelocity = { 0.f, 0.f, 0.f, 0.f };

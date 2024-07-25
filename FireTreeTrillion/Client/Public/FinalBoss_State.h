@@ -22,6 +22,10 @@ public:
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
 
+private:
+	_bool	m_bSound1 = { false };
+	_bool	m_bSound2 = { false };
+
 public:
 	static	CFinalBoss_Appear_State* Create();
 	virtual void Free() override;
@@ -159,6 +163,7 @@ private:
 	_float	m_fTimeDelta = { 0.f };
 	_float	m_fSpeed = { 0.f };
 	_bool	m_bChain = { false };
+	_bool	m_bSound = { false };
 
 public:
 	static	CFinalBoss_Slash_State* Create();
@@ -463,6 +468,9 @@ public:
 	// 상태 진입되어 있는 상태에서 매 tick마다 호출
 	virtual void OnStateUpdate(class CGameObject* pGameObject, _float fTimeDelta)	override;
 	virtual void OnStateExit()														override;
+
+private:
+	_bool	m_bSound = { false };
 
 public:
 	static	CFinalBoss_LastDamage_State* Create();

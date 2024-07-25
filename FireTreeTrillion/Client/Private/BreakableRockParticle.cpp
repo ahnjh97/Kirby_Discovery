@@ -42,7 +42,7 @@ HRESULT CBreakableRockParticle::Initialize(void* pArg)
 _int CBreakableRockParticle::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
-		return Ready_Dead(0.9f);
+		return Ready_Dead(0.9f, false);
 
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();

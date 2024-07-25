@@ -100,6 +100,7 @@ public:
 
 public:
 	_bool	m_bPassNextAttackMotion = { false };
+	_bool	m_bSoundTrigger = { true };
 	_float	m_fAttackSpeed = { 0.f };
 	_float	m_fAnimTime = { 0.f };
 	_float	m_fLockTime = { 0.f };

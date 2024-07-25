@@ -44,6 +44,7 @@ HRESULT CGully::Initialize(void* pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);
 	m_pTransformCom->Turn(CUtils::Make_Random_Vector(1.f), 1.f);
 
+	m_fAttack = 10.f;
 	m_bPoolingDead = true;
 	m_bDead = false;
 

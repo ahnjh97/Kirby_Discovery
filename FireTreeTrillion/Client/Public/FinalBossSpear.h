@@ -54,6 +54,7 @@ private:
 	_float			m_fHeight = { 0.f };
 
 	_uint			m_iCnt = { 0 };
+	_uint			m_iSoundChannel = { 107 };
 
 private:
 	HRESULT Add_Components();

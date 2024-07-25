@@ -34,6 +34,7 @@ HRESULT CRayArrow::Initialize(void* pArg)
 
 		pRayArrowDesc->fSpeedPerSec = 7.f;
 		pRayArrowDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		m_iSoundChannel = pRayArrowDesc->iSoundChannel;
 		m_vPosition = pRayArrowDesc->vPosition;
 		m_fAngle = pRayArrowDesc->fAngle;
 		m_fHeight = pRayArrowDesc->fHeight;
@@ -66,6 +67,7 @@ HRESULT CRayArrow::Initialize(void* pArg)
 
 	m_fRotateSpeed = 10.f;
 	m_bNonDead = true;
+	m_fAttack = 10.f;
 
 	CEffect::FX_DESC FXDesc{};
 	FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
@@ -123,6 +125,13 @@ _int CRayArrow::Tick(_float fTimeDelta)
 			}
 			else
 			{
+				if(false == m_bSound)
+				{
+					m_bSound = true;
+					// 사운드 처리
+					m_pGameInstance->PlayMySound(L"BossChimera_RayArrow.wav", (CHANNELID)m_iSoundChannel, 0.4f);
+				}
+
 				// 베지에 곡선 계산
 				_vector vNewPosition = {};
 				m_fElapsedTime += m_fTimeDelta * m_fSpeedWeight;
@@ -166,7 +175,10 @@ _int CRayArrow::Tick(_float fTimeDelta)
 					// 땅에 박히고 n초 후 dead처리
 					m_fDeadTime += m_fTimeDelta;
 					if (1.f < m_fDeadTime)
+					{
+						m_pGameInstance->StopSound((CHANNELID)m_iSoundChannel);
 						m_bDead = true;
+					}
 				}
 			}
 		}

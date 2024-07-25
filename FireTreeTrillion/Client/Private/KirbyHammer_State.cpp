@@ -565,8 +565,8 @@ void CKirbyHammer_Onigorosi_State::OnStateEnter(CModel* _pModel, _uint _iAnimInd
 		FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 
 		static_cast<CPhysXObject*>(pObject)->Add_Effect("YW KirbyHammerTrail2", FXDesc, true);
-		m_pGameInstance->PlaySound_Free(L"KirbyHammer_One.wav", 0.7f);
-
+		//m_pGameInstance->PlaySound_Free(L"KirbyHammer_One.wav", 0.7f);
+		m_pGameInstance->PlayMySound(L"KirbyHammer_One.wav", CHANNEL_SOUND2, 0.7f);
 
 		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW KirbyHammerTrail2"), &FXDesc)))
 		//	return;
@@ -894,7 +894,8 @@ void CKirbyHammer_Onigorosi_State::OnStateUpdate(CGameObject* pGameObject, _floa
 
 		if (0.4f < m_fMoveTime && m_bSoundTrigger == true)
 		{
-			m_pGameInstance->PlaySound_Free(L"KirbyHammer_One.wav", 0.8f);
+			//m_pGameInstance->PlaySound_Free(L"KirbyHammer_One.wav", 0.8f);
+			m_pGameInstance->PlayMySound(L"KirbyHammer_One.wav", CHANNEL_SOUND2, 0.8f);
 			m_bSoundTrigger = false;
 		}
 

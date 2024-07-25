@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "PhysXObject.h"
+#include "Character.h"
 
 BEGIN(Engine)
 class CModel;
@@ -10,7 +10,7 @@ END
 
 BEGIN(Client)
 
-class CBossClone final : public CPhysXObject
+class CBossClone final : public CCharacter
 {
 public:
 	struct BOSSCLONE_DESC : public CGameObject::GAMEOBJECT_DESC {

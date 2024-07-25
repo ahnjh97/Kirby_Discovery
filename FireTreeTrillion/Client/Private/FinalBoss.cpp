@@ -71,7 +71,7 @@ HRESULT CFinalBoss::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_fMaxHp = 500.f;
-	m_fHp = 500.f;
+	m_fHp = 250.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eBossState = STATE_FLYING;
@@ -149,27 +149,30 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, vRootBonePos);
 
 
-	//최초 보스전 시작 트리거
-	if (m_bStartOpeningTrigger)
+	if (*m_pCurrentLevelID != LEVEL_TOOL_ANIM)
 	{
-		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
-		CTransform* pKirbyTransform = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"))->Get_TransformCom();
-
-		_float fKirbyY = pKirbyTransform->Get_State(CTransform::STATE_POSITION).y;
-		_float fKirbyZ = pKirbyTransform->Get_State(CTransform::STATE_POSITION).z;
-		if ((fKirbyY < 1.f) && (fKirbyY > -4.f) &&
-			(fKirbyZ < -20.f) && (fKirbyZ > -25.f)) // QZR
+		//최초 보스전 시작 트리거
+		if (m_bStartOpeningTrigger)
 		{
-			//CEventCenter::Get_Instance()->Notify(KEVENT_FINALBOSS_APPEAR);
-			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
-			if (pCamera != nullptr)
-				pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_APPEAR);
-			m_bStartOpeningTrigger = false;
-			pKirby->Get_KirbyInfo()->m_bFinalBossCutStart = true;
+			CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
+			CTransform* pKirbyTransform = m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"))->Get_TransformCom();
 
-			m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
-			m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"K15_BossChimeraPerfect_Interactive.dspadpcm.wav");
-			m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, 0.5f);
+			_float fKirbyY = pKirbyTransform->Get_State(CTransform::STATE_POSITION).y;
+			_float fKirbyZ = pKirbyTransform->Get_State(CTransform::STATE_POSITION).z;
+			if ((fKirbyY < 1.f) && (fKirbyY > -4.f) &&
+				(fKirbyZ < -20.f) && (fKirbyZ > -25.f)) // QZR
+			{
+				//CEventCenter::Get_Instance()->Notify(KEVENT_FINALBOSS_APPEAR);
+				CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+				if (pCamera != nullptr)
+					pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_APPEAR);
+				m_bStartOpeningTrigger = false;
+				pKirby->Get_KirbyInfo()->m_bFinalBossCutStart = true;
+
+				m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
+				m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"K15_BossChimeraPerfect_Interactive.dspadpcm.wav");
+				m_pGameInstance->SetVolume(CHANNEL_BGM_STREAMING, 0.5f);
+			}
 		}
 	}
 
@@ -191,7 +194,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	}
 	else if (m_pGameInstance->Get_KeyState(DIK_L, KEY_DOWN))
 	{
-		Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
+		Change_State(FINALBOSS_JUMPREADY, 50.f, false, true);
 	}
 	//else if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
 	//	Change_State(FINALBOSS_DEMOAPPEARCUT5, 50.f, false, false);
@@ -199,9 +202,12 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	{
 		if(false == m_bLastDamage)
 		{
+			m_pGameInstance->StopSound(CHANNEL_BGM_STREAMING);
+
 			m_bLastDamage = true;
 			Change_State(FINALBOSS_LASTDAMAGESTART, 50.f, false, true);
 			m_pControllerCom->Set_Position(m_pTransformCom, XMVectorSet(0.f, 0.f, 0.f, 1.f));
+			m_pTransformCom->Look_At(XMVectorSet(0.f, 0.f, 1.f, 0.f));
 		}
 	}
 	else if (m_pGameInstance->Get_KeyState(DIK_I, KEY_DOWN))
@@ -405,6 +411,33 @@ void CFinalBoss::Add_AnimEvent()
 	m_pModelCom->Add_Event("Attack", [this]() {
 		// 커비의 히트박스를 실시간으로 변화시킨다.
 		HitBoxChanger(m_pFSM->Get_State());
+		});
+
+	// 사운드 처리
+	m_pModelCom->Add_Event("Sound", [this]() {
+		switch (m_pFSM->Get_State())
+		{
+		case FINALBOSS_RAYARROWSTART:
+			m_pGameInstance->PlaySound_Free(L"BossChimera_RayArrowStart.wav", 0.5f);
+			break;
+		case FINALBOSS_RAYARROWSTARTAIR:
+			m_pGameInstance->PlaySound_Free(L"BossChimera_RayArrowStart.wav", 0.5f);
+			break;
+		case FINALBOSS_SWINGRIGHT:
+			m_pGameInstance->PlaySound_Free(L"BossChimera_Swing.wav", 0.9f);
+			break;
+		case FINALBOSS_SWINGLEFT:
+			m_pGameInstance->PlaySound_Free(L"BossChimera_Swing.wav", 0.9f);
+			break;
+		case FINALBOSS_SWINGFINISHLEFT:
+			m_pGameInstance->PlaySound_Free(L"BossChimera_SwingFinish.wav", 0.5f);
+			break;
+		case FINALBOSS_DIMENSIONSPIKE:
+			m_pGameInstance->PlaySound_Free(L"BossChimera_Spike.wav", 0.5f);
+			break;
+		default:
+			break;
+		}
 		});
 }
 
@@ -671,9 +704,6 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
 		Add_Effect("HS_FB Slash R Multi", FXDesc, false);
-
-
-
 	}
 	break;
 	case FINALBOSS_SWINGLEFT:
@@ -688,7 +718,6 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 		FXDesc.vInitPos = { 0.f, 1.f, -1.f };
 		Add_Effect("HS_FB Slash L Multi", FXDesc, false);
-
 	}
 	break;
 	case FINALBOSS_SWINGFINISHLEFT:
@@ -725,6 +754,14 @@ void CFinalBoss::Create_Gully()
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 			if (pCamera != nullptr)
 				pCamera->Make_Shake(1.f, 1.f);
+
+			_uint iRand = rand() % 2;
+			if(0 == iRand)
+				m_pGameInstance->PlaySound_Free(L"GullyFire1.wav", 0.5f);
+			else if(1 == iRand)
+				m_pGameInstance->PlaySound_Free(L"GullyFire2.wav", 0.5f);
+			else
+				m_pGameInstance->PlaySound_Free(L"GullyFire3.wav", 0.5f);
 		}
 
 
@@ -771,7 +808,7 @@ void CFinalBoss::Create_Gully()
 
 			CParticle::PARTICLE_DESC ParticleDesc{};
 			ParticleDesc.vInitPos = (vFXPosA + vFXPosB) * .5f;
-			Add_Effect("HS_perfect laser collide particle", FXDesc);
+			Add_Effect("HS_lion laser collide particle B", FXDesc);
 
 			m_pGameInstance->Get_CurCameraPtr()->Make_Shake(0.3f, 0.5f);
 		}

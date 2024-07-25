@@ -610,7 +610,7 @@ void CBasicMap::ReadDecos_ForSmallLevels()
 
     string strLevel;
     if (LEVEL_TOWN == *m_pCurrentLevelID)
-        strLevel = "Town";
+        strLevel = "Town";                                                                                              
     else if (LEVEL_DEEDEEDEE == *m_pCurrentLevelID)
         strLevel = "DeeDeeDee";
     else if (LEVEL_PARTTIME == *m_pCurrentLevelID)

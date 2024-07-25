@@ -168,6 +168,8 @@ void CBox::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObj
 		if (pCamera != nullptr)
 			pCamera->Make_Shake(0.5f);
 
+		m_pGameInstance->PlaySound_Free(L"KirbyCar_BoxCollision.wav", 0.5f);
+
 		m_pGameInstance->DisableActor(m_pDynamicActor);
 		m_pModelCom->Set_Animation(0, 50.f, false, false);
 		m_bPlayAnim = true;
@@ -178,6 +180,8 @@ void CBox::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObj
 		if (pCamera != nullptr)
 			pCamera->Make_Shake(0.5f);
 
+		m_pGameInstance->PlaySound_Free(L"KirbyCar_BoxCollision.wav", 0.5f);
+
 		m_pGameInstance->DisableActor(m_pDynamicActor);
 		m_pModelCom->Set_Animation(0, 50.f, false, false);
 		m_bPlayAnim = true;
@@ -187,6 +191,8 @@ void CBox::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObj
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 		if (pCamera != nullptr)
 			pCamera->Make_Shake(0.5f);
+
+		m_pGameInstance->PlaySound_Free(L"KirbyCar_BoxCollision.wav", 0.5f);
 
 		m_pGameInstance->DisableActor(m_pDynamicActor);
 		m_pModelCom->Set_Animation(0, 50.f, false, false);
@@ -205,7 +211,8 @@ void CBox::Break_From_Car()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Car Collisions"), &Effectdesc)))
 		return;
 
-	m_pGameInstance->PlaySound_Free(L"KirbyCar_BoxCollision.wav", 0.5f);
+	//m_pGameInstance->PlaySound_Free(L"KirbyCar_BoxCollision.wav", 0.5f);
+	m_pGameInstance->PlayMySound(L"KirbyCar_BoxCollision.wav", CHANNEL_SOUND2, 0.5f);
 
 	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 	pCamera->Make_Shake(1.6f, 0.5f);

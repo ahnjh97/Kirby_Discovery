@@ -415,7 +415,6 @@ void CEffect::Billboard_Effect()
 
 	vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	m_pTransformCom->Turn(vLook, 1.f, vValue.z);
-
 }
 
 void CEffect::Free()
