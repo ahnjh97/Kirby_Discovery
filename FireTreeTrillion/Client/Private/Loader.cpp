@@ -1142,7 +1142,10 @@ HRESULT CLoader::Loading_For_Simba()
 		return E_FAIL;
 	if (FAILED(Add_Texture(eLevel, "Terrain_Fog", "Map/Fog/Sand_%d.png", 4)))
 		return E_FAIL;
-
+	if (FAILED(Add_Texture(eLevel, "SlimeBase", "BossOrigin/SlimeBase.dds")))
+		return E_FAIL;
+	if (FAILED(Add_Texture(eLevel, "SlimeNormal", "BossOrigin/SlimeNormal.dds")))
+		return E_FAIL;
 	hr = Add_Texture(eLevel, "FX_Mask_Bubble2", "Effects/Mask/noise_bubble_%d.png", 4);	CHECK_FAILED(hr);
 
 	//HUD_BOSSHPBAR
@@ -1160,7 +1163,7 @@ HRESULT CLoader::Loading_For_Simba()
 #pragma region SKYSPHERE::LEVEL_SIMBA
 	////FIELD
 	//hr = Add_Texture(eLevel, "SkySphere_Lab_CloudNoize", "SkySphere/SkySphere_Lab_CloudNoizeC_MRA.dds"); CHECK_FAILED(hr);
-	//hr = Add_Texture(eLevel, "SkySphere_Lab_Diffuse", "SkySphere/SkySphere_Lab_Diffuse_%d.dds", 3);	CHECK_FAILED(hr);
+	hr = Add_Texture(eLevel, "SkySphere_Lab_Diffuse", "SkySphere/SkySphere_Lab_Diffuse_%d.dds", 3);	CHECK_FAILED(hr);
 	//hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Normal", "SkySphere/SkySphere_LabBoss_2Pase_Normal.dds");	CHECK_FAILED(hr);
 	//hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Emissive", "SkySphere/SkySphere_LabBoss_2Pase_Emissive.dds");	CHECK_FAILED(hr);
 	//hr = Add_Texture(eLevel, "SkySphere_LabBoss_2Pase_Height", "SkySphere/SkySphere_LabBoss_2Pase_Height.dds");	CHECK_FAILED(hr);

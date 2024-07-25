@@ -796,7 +796,7 @@ void CUI_MessageWindow::StartSimbaDialog()
 	Show_DialogMessage();
 
 	m_pGameInstance->StopSound(CHANNEL_BGM);
-	m_pGameInstance->PlayBGM(L"SimbaPreBattle.wav", 0.35f);
+	m_pGameInstance->PlayBGM(L"SimbaPreBattle.wav");
 }
 
 void CUI_MessageWindow::PlaySimbaVoice()

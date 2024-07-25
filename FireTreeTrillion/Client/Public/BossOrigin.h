@@ -36,7 +36,9 @@ private:
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
+	CTexture* m_pTextureCom[2] = { nullptr, nullptr };
 
+	_uint m_iBodyMesh = {};
 	vector<_uint> m_vecMeshes;
 	vector<_uint> m_vecEyeMeshes;
 
@@ -47,6 +49,9 @@ private:
 	_bool m_bActivated = { false };
 	_bool m_bFadeOut = { false };
 	_float m_fTime = {};
+
+	_bool m_bRender_Bloom = { false };
+	_bool m_bBloom = { false };
 
 public:
 	static CBossOrigin* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
