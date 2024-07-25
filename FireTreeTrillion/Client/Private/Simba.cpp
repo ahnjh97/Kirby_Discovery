@@ -198,8 +198,8 @@ HRESULT CSimba::Initialize(void* pArg)
 	}
 #pragma endregion
 
-	tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(2);
-	m_pGameInstance->Add_Clone(LEVEL_SIMBA, TEXT("Layer_TestRock"), TEXT("Prototype_GameObject_SimbaRock"), &tDesc);
+	/*tDesc.wstrModelName = TEXT("TunnelRock") + to_wstring(2); // 디버깅용
+	m_pGameInstance->Add_Clone(LEVEL_SIMBA, TEXT("Layer_TestRock"), TEXT("Prototype_GameObject_SimbaRock"), &tDesc);*/
 
 	return S_OK;
 }
@@ -313,6 +313,14 @@ _int CSimba::Tick(_float fTimeDelta)
 		m_pGameInstance->StopSound(CHANNEL_SOUND12);
 		m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
 		m_bDeathAnimPlayed = true;
+		HideDimensionLaserActor();
+		HideDimensionClawActor();
+		m_bLaserActivated = false;
+		m_bRenderDimensionClaw = false;
+		m_bPlayPartialAnim = false;
+		m_bRenderRing = false;
+		m_bDimensionClawActivated = false;
+
 		TransformToDefault(0.f);
 		Change_State(Simba_DemoDeadCut1, 50.f, false, true);
 		Set_SimbaEye(CSimba::SIMBAEYE_NONE);
@@ -489,19 +497,21 @@ void CSimba::Add_AnimEvent()
 	
 #pragma region FINAL CRUSHER
 	m_pModelCom->Add_Event("FinalCrusherStart", [this]() {
-		m_pGameInstance->PlaySound_Free(L"SimbaFinalCrusherStartVoice.wav", 0.18f);
+		m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+		m_pGameInstance->PlayMySound(L"SimbaFinalCrusherStartVoice.wav", CHANNEL_BOSSVOICE, 0.45f);
 		});
 
 	m_pModelCom->Add_Event("FinalCrusher", [this]() {
 		m_pGameInstance->PlaySound_Free(L"SimbaFinalCrusher.wav", 1.f);
-		m_pGameInstance->PlaySound_Free(L"SimbaFinalCrusherVoice.wav", 0.12f);
+		m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+		m_pGameInstance->PlayMySound(L"SimbaFinalCrusherVoice.wav", CHANNEL_BOSSVOICE, 0.5f);
 		});
 #pragma endregion
 
 #pragma region ATTACK JUMP
 	m_pModelCom->Add_Event("AttackJumpPre", [this]() {
 		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpPre.wav", 0.5f);
-		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpPreVoice.wav", 0.18f);
+		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpPreVoice.wav", 0.4f);
 		});
 
 
@@ -510,7 +520,7 @@ void CSimba::Add_AnimEvent()
 		});
 
 	m_pModelCom->Add_Event("AttackJump", [this]() {
-		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpVoice.wav", 0.18f);
+		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpVoice.wav", 0.5f);
 		});
 
 	m_pModelCom->Add_Event("AttackJumpHit", [this]() {
@@ -520,24 +530,26 @@ void CSimba::Add_AnimEvent()
 
 #pragma region DOUBLE CLAW
 	m_pModelCom->Add_Event("DoubleClawCharge", [this]() {
-		m_pGameInstance->PlaySound_Free(L"SimbaDoubleClawCharge.wav", 0.3f);
+		m_pGameInstance->PlaySound_Free(L"SimbaDoubleClawCharge.wav", 0.45f);
 		});
 
 	m_pModelCom->Add_Event("DoubleClawDash", [this]() { // 음원 자체가 무한루프 처리되어있음
-		m_pGameInstance->PlayMySound(L"SimbaDoubleDash.wav",  CHANNEL_SOUND12, 0.27f);
+		m_pGameInstance->PlayMySound(L"SimbaDoubleDash.wav",  CHANNEL_SOUND12, 0.4f);
 
 		});
 	m_pModelCom->Add_Event("DoubleClaw", [this]() {
 		m_pGameInstance->StopSound(CHANNEL_SOUND12);
-		m_pGameInstance->PlaySound_Free(L"SimbaDoubleClaw.wav", 0.3f);
-		m_pGameInstance->PlaySound_Free(L"SimbaDoubleClawFire.wav", 0.4f);
-		m_pGameInstance->PlaySound_Free(L"SimbaDoubleClawVoice.wav", 0.33f);
+		m_pGameInstance->PlaySound_Free(L"SimbaDoubleClaw.wav", 0.4f);
+		m_pGameInstance->PlaySound_Free(L"SimbaDoubleClawFire.wav", 0.5f);
+
+		m_pGameInstance->PlaySound_Free(L"SimbaDoubleClawVoice.wav", 0.4f);
 		});
 #pragma endregion
 
 #pragma region ROAR
 	m_pModelCom->Add_Event("Roar", [this]() {
-		m_pGameInstance->PlaySound_Free(L"SimbaRoar.wav", 0.55f);
+
+		m_pGameInstance->PlaySound_Free(L"SimbaRoar.wav", 0.6f);
 		});
 #pragma endregion
 
@@ -576,24 +588,24 @@ void CSimba::Add_AnimEvent()
 		});
 
 	m_pModelCom->Add_Event("BiteRush0", [this]() {
-		m_pGameInstance->PlaySound_Free(L"SimbaBiteRush.wav", 0.35f);
+		m_pGameInstance->PlaySound_Free(L"SimbaBiteRush.wav", 0.4f);
 		});
 	m_pModelCom->Add_Event("BiteRush1", [this]() {
-		m_pGameInstance->PlaySound_Free(L"SimbaBiteRush.wav", 0.35f);
+		m_pGameInstance->PlaySound_Free(L"SimbaBiteRush.wav", 0.4f);
 		});
 #pragma endregion
 
 #pragma region DIMENSION LASER
 	m_pModelCom->Add_Event("DimensionLaser", [this]() {
 		m_pGameInstance->StopSound(CHANNEL_SOUND12);
-		m_pGameInstance->PlayMySound(L"SimbaDimensionLaser.wav", CHANNEL_SOUND12, 0.4f);
+		m_pGameInstance->PlayMySound(L"SimbaDimensionLaser.wav", CHANNEL_SOUND12, 0.6f);
 		});
 #pragma endregion
 
 #pragma region DEATH
 	m_pModelCom->Add_Event("DemoDead", [this]() {
 		m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
-		m_pGameInstance->PlayMySound(L"SimbaDeathDemo.wav", CHANNEL_BOSSVOICE, 0.35f);
+		m_pGameInstance->PlayMySound(L"SimbaDeathDemo.wav", CHANNEL_BOSSVOICE, 0.45f);
 		});
 #pragma endregion
 }
@@ -896,7 +908,7 @@ void CSimba::SetUpDimensionClawWorldMatrix()
 	if (true == m_bDimensionClawUpAttack)
 		vPos.y = 6.8f;
 	else
-		vPos.y = -0.2f;
+		vPos.y = -0.f;
 
 	memcpy(&matWorld.m[3], &vPos, sizeof(_float4));
 
@@ -934,9 +946,9 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 	//이펙트 다는 매트릭스 동기화
 	m_DimensionClawMat = matWorld;
 	
-	CGameObject* pRock = m_pGameInstance->Get_GameObject(LEVEL_SIMBA, TEXT("Layer_TestRock"));
+	/*CGameObject* pRock = m_pGameInstance->Get_GameObject(LEVEL_SIMBA, TEXT("Layer_TestRock")); // 디버깅용
 	if (nullptr != pRock)
-		dynamic_cast<CSimbaRock*>(pRock)->TestRock(vPos);
+		dynamic_cast<CSimbaRock*>(pRock)->TestRock(vPos);*/
 
 	//공격 밑 데칼 이펙트 출력
 	_float3 vClawMatPoint = m_DimensionClawMat.Translation();
@@ -2192,7 +2204,7 @@ void CSimba::PlayLipSinc()
 			wstring wstrSound = L"lion" + to_wstring(CUtils::Make_RandomInt(0, 16)) + L".wav";
 			wcscpy_s(tcharBuffer, wstrSound.size() + 1, wstrSound.c_str());
 			m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
-			m_pGameInstance->PlayMySound(tcharBuffer, CHANNEL_BOSSVOICE, 0.2f);
+			m_pGameInstance->PlayMySound(tcharBuffer, CHANNEL_BOSSVOICE, 0.42f);
 			Safe_Delete_Array(tcharBuffer);
 		}
 	}
@@ -2243,9 +2255,7 @@ void CSimba::OnAppearEnd(CGameObject* pObj)
 	TransformToDefault(0);
 	TriggerMonsterSpawning(11);
 	m_pGameInstance->StopSound(CHANNEL_BGM);
-	m_pGameInstance->PlayBGM(L"SimbaAfterDialog.wav", 0.33f);
-	//m_pGameInstance->SetVolume(CHANNEL_BGM, )
-	//m_pGameInstance->PlayMySound(L"SimbaAfterDialog.wav", CHANNEL_BGM, 0.33f);
+	m_pGameInstance->PlayBGM(L"SimbaAfterDialog.wav");
 }
 
 void CSimba::OnWave1Dead(CGameObject* pObj)

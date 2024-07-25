@@ -47,9 +47,14 @@ HRESULT CBossOrigin::Initialize(void* pArg)
 	m_bRimLight = true;
 	m_fRimWidth = .8f;
 	m_bStencil = true;
+
+	m_iBodyMesh = m_pModelCom->Find_MeshIndex(string("BodyM__BodyC"));
 	
 	for (_uint i = 0; i < m_pModelCom->Get_NumMeshes(); i++)
 	{
+		if (i == m_iBodyMesh)
+			continue;
+
 		string strMeshName = m_pModelCom->Get_MeshName(i);
 		if ("L_EyeBallM__EyeC" == strMeshName || "R_EyeBallM__EyeC" == strMeshName)
 			m_vecEyeMeshes.push_back(i);
@@ -92,11 +97,14 @@ _int CBossOrigin::Tick(_float fTimeDelta)
 		m_pGameInstance->PlaySound_Free(L"OriginEyeOpen.wav", 0.6f);
 	}
 
-	if (1.5f < m_fTime)
-	{
-		_float fRatio = RATIO(m_fTime, 1.5f, 2.9f);
-		m_fWhiteColorDiffuse = EASE_IN(fRatio);
-	}
+	//if (1.5f < m_fTime)
+	//{
+	//	_float fRatio = RATIO(m_fTime, 1.5f, 2.5f);
+	//	m_fWhiteColorDiffuse = EASE_IN(fRatio);
+	//}
+
+	if (3.1f < m_fTime) // 바로 Bloom 안하면 3.f로
+		m_bBloom = true;
 
 	if (m_pGameInstance->Get_KeyState(DIK_CAPSLOCK, KEY_PRESS) && m_pGameInstance->Get_KeyState(DIK_Q, KEY_DOWN))
 		Activate(nullptr);
@@ -124,7 +132,13 @@ _int CBossOrigin::Tick(_float fTimeDelta)
 void CBossOrigin::Late_Tick(_float fTimeDelta)
 {
 	m_pModelCom->Play_Animation(m_pGameInstance->Get_SecondTimer());
+
+	m_bRender_Bloom = false;
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
+	if (true == m_bBloom) {
+		Compute_BoneViewZ(m_pModelCom->Get_BonePtrByIndex(0), _float3(0, 0, 3));
+		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+	}
 }
 
 HRESULT CBossOrigin::Render()
@@ -133,51 +147,91 @@ HRESULT CBossOrigin::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	_float fZero{};
-	hr = m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fZero, sizeof(_float));
-	CHECK_FAILED(hr);
-	for (auto& i : m_vecMeshes)
+	if (false == m_bRender_Bloom)
 	{
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
+		_float fZero{};
+		hr = m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &fZero, sizeof(_float));
 		CHECK_FAILED(hr);
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
+		for (auto& i : m_vecMeshes)
+		{
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
+			CHECK_FAILED(hr);
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
+			CHECK_FAILED(hr);
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
+			CHECK_FAILED(hr);
+			hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
+			CHECK_FAILED(hr);
+
+			hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O);
+			CHECK_FAILED(hr);
+			hr = m_pModelCom->Render(i);
+			CHECK_FAILED(hr);
+		}
+
+		// Body
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_iBodyMesh, TextureType_DIFFUSE);
 		CHECK_FAILED(hr);
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", m_iBodyMesh, TextureType_NORMALS);
 		CHECK_FAILED(hr);
-		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
+		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", m_iBodyMesh, TextureType_METALNESS);
+		CHECK_FAILED(hr);
+		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", m_iBodyMesh);
+		CHECK_FAILED(hr);
+		hr = m_pTextureCom[0]->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture");
+		CHECK_FAILED(hr);
+		hr = m_pTextureCom[1]->Bind_ShaderResource(m_pShaderCom, "g_MaskTextureSub");
+		CHECK_FAILED(hr);
+		hr = m_pShaderCom->Begin(ANIMMODEL_ORIGINBOSSBODY);
+		CHECK_FAILED(hr);
+		hr = m_pModelCom->Render(m_iBodyMesh);
 		CHECK_FAILED(hr);
 
-		hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O);
-		CHECK_FAILED(hr);
-		hr = m_pModelCom->Render(i);
-		CHECK_FAILED(hr);
+		// Eye
+		if (false == m_bBloom) {
+			for (auto& i : m_vecEyeMeshes)
+			{
+				hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
+				CHECK_FAILED(hr);
+				hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
+				CHECK_FAILED(hr);
+				hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
+				CHECK_FAILED(hr);
+				hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
+				CHECK_FAILED(hr);
+
+				hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O);
+				CHECK_FAILED(hr);
+				hr = m_pModelCom->Render(i);
+				CHECK_FAILED(hr);
+			}
+		}		
 	}
-	
-	hr = m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
-	CHECK_FAILED(hr);
-
-	/*if (2.5f < m_fTime) {*/
-	/*	_bool bTrue = true;
-		hr = m_pShaderCom->Bind_RawValue("g_bRimLight", &bTrue, sizeof(_bool));
-		CHECK_FAILED(hr);*/
-	//}
-
-	for (auto& i : m_vecEyeMeshes)
+	else if (true == m_bRender_Bloom)
 	{
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
-		CHECK_FAILED(hr);
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
-		CHECK_FAILED(hr);
-		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
-		CHECK_FAILED(hr);
-		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
+		hr = m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float));
 		CHECK_FAILED(hr);
 
-		hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O);
-		CHECK_FAILED(hr);
-		hr = m_pModelCom->Render(i);
-		CHECK_FAILED(hr);
+		for (auto& i : m_vecEyeMeshes)
+		{
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
+			CHECK_FAILED(hr);
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
+			CHECK_FAILED(hr);
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
+			CHECK_FAILED(hr);
+			hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
+			CHECK_FAILED(hr);
+
+			hr = m_pShaderCom->Begin(ANIMMODEL_ORIGINBOSSEYE);
+			CHECK_FAILED(hr);
+			hr = m_pModelCom->Render(i);
+			CHECK_FAILED(hr);
+		}
 	}
+
+	if (false == m_bRender_Bloom)
+		m_bRender_Bloom = true;
 
 	return S_OK;
 }
@@ -190,10 +244,16 @@ HRESULT CBossOrigin::Add_Components(wstring& wstrModelName)
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
+	/* For.Com_Model */
 	wstring wstrModeltag = TEXT("Prototype_Component_Model_") + wstrModelName;
 	hr = __super::Add_Component(wstrModeltag, TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
+	/* For.Com_Texture */
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_SlimeBase"),TEXT("Com_Texture_Base"), (CComponent**)&m_pTextureCom[0]);
+	CHECK_FAILED(hr);
+	hr = __super::Add_Component(TEXT("Prototype_Component_Texture_SlimeNormal"), TEXT("Com_Texture_Normal"), (CComponent**)&m_pTextureCom[1]);
+	CHECK_FAILED(hr);
 	return S_OK;
 }
 
@@ -265,6 +325,8 @@ void CBossOrigin::Free()
 
 	__super::Free();
 
+	for(_uint i = 0; i < 2; i++)
+		Safe_Release(m_pTextureCom[i]);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }

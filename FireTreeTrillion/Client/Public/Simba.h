@@ -264,7 +264,7 @@ private:
 	_float3			m_vRingPos = { };
 	_float			m_fRingInnerRadius = {};
 	_float			m_fRingOuterRadius = {};
-	_bool			m_bRenderRing;
+	_bool			m_bRenderRing = { false };
 
 	_uint			m_iFireCount = {};
 	_bool			m_bEyeBloom = { false };
