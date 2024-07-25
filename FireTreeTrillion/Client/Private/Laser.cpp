@@ -109,7 +109,10 @@ _int CLaser::Tick(_float fTimeDelta)
 					//레이저와의 충돌 자국
 					CEffect::FX_DESC FXDesc{};
 					FXDesc.vInitPos = vCollidingPoint;
+					FXDesc.vInitPos += (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK)*.8f;
+
 					FXDesc.vInitPos.y = 0.5f;
+					FXDesc.vInitRot = { 0.f, CUtils::Make_Degree_FromDir((_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK)).y, 0.f };
 					FXDesc.vInitScale = { 3.f, 3.f, 3.f };
 					Add_Effect("HS_FB laser decal", FXDesc, false);
 

@@ -326,10 +326,7 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 	m_EffectSocket = _float4x4::Identity;
 	CUtils::Set_State_Matrix(m_EffectSocket, CUtils::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 
-
-
 	//dof 갱신(자동)
-
 	if (m_bAutoDOF)
 	{
 		m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
@@ -389,12 +386,10 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 			{
 				if (nullptr != pSimba)
 					m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 5.f, 0.f });
-
 			}
 			else
 			{
-	
-					m_pGameInstance->Update_DofFocus({ 2.6f, 7.3f, .42f });
+				m_pGameInstance->Update_DofFocus({ 2.6f, 7.3f, .42f });
 			}
 		}
 
@@ -411,11 +406,11 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 		//파이널 보스 등장
 		if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR)
 		{
-			if (m_fSeqCheckTime < 6.f)
+			if (m_fSeqCheckTime < 4.f)
 			{
 				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION));
 			}
-			else if (6.f <= m_fSeqCheckTime)
+			else if (4.f <= m_fSeqCheckTime)
 			{
 				CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster"));
 				if (nullptr != pBoss)
@@ -2072,7 +2067,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_fSeqEventTime = fLastSeqStartTime;
 
 		//보스 정면으로
-		vStartPos = { 0.f, 35.f, -3.f } + _float3{0.f, 0.f, 40.f};
+		vStartPos = { 0.f, 35.f, -3.f } + _float3{ 0.f, 0.f, 80.f };
 		Fill_HardCutSet(newAction, fLastSeqStartTime);
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos);
@@ -2082,7 +2077,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		//
 		Fill_InterpolateCutSet(newAction, fLastSeqStartTime, EASE_INOUT, 5.f);
-		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ 0.f, -5.f, 5.f });
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ 0.f, -3.f, 30.f });
 		m_CamSeq.push_back(newAction);
 
 		Fill_InterpolateCutSet(newAction, fLastSeqStartTime + 5.f, EASE_INOUT, 8.f);

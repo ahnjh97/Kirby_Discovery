@@ -46,6 +46,7 @@ HRESULT CParticle::Initialize(void* pArg)
 			FXDesc.vInitRot = (*(FX_DESC*)pArg).vInitRot;
 			FXDesc.vInitScale = (*(FX_DESC*)pArg).vInitScale;
 			FXDesc.pSocketMatrix = (*(FX_DESC*)pArg).pSocketMatrix;
+
 		}
 	}
 
@@ -99,6 +100,8 @@ HRESULT CParticle::Initialize(void* pArg)
 
 	if (m_InstanceDesc.vecMoveCommands.size() < INSTANCE_END)
 		m_InstanceDesc.vecMoveCommands.resize(INSTANCE_END);
+
+	m_fStartDelay = instanceDesc.fStartDelay;
 
 	return S_OK;
 }
@@ -236,6 +239,16 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 		break;
 	default:
 		break;
+	}
+
+	if (0.f < m_fStartDelay)
+	{
+		m_fStartDelay -= fMyTimeDelta;
+
+		if (m_fStartDelay <= 0.f)
+			m_fStartDelay = 0.f;
+
+		return;
 	}
 
 	//duration ´Ù ³¡³µ´Ù¸é
