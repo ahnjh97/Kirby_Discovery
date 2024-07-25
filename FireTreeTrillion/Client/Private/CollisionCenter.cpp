@@ -2539,8 +2539,12 @@ void CCollisionCenter::Compute_Heal(CPhysXObject* pPlayer, CPhysXObject* pItem)
 
 	CMultiEffect::MULTI_FX_DESC Effectdesc = {};
 	Effectdesc.vInitPos = { 0.f, 0.5f, 0.f };
-	Effectdesc.vInitScale = { 1.f, 1.f, 1.f };
-	Effectdesc.pSocketMatrix = pCPlayer->Get_TransformCom()->Get_WorldFloat4x4_Ptr();
+	if (pCPlayer->Get_KirbyInfo()->m_eBodyState == CKirby::BODY_BULBDEFAULT)
+	{
+		Effectdesc.vInitScale = { 2.f, 2.f, 2.f };
+	}
+
+	Effectdesc.pSocketMatrix = pCPlayer->Get_EffectSocket();
 	//if (FAILED(GAMEINSTANCE Add_Clone(*GAMEINSTANCE Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Food Eat Effects"), &Effectdesc)))
 	//	return;
 	pCPlayer->Add_Effect("YW Food Eat Effects", Effectdesc, false);
