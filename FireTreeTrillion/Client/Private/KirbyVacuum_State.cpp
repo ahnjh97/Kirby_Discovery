@@ -33,6 +33,9 @@ void CKirbyVacuum_Spit_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	{
 		if (m_fSpitTime > 0.05f && m_bSpitTrigger == true)
 		{
+			m_pGameInstance->PlaySound_Free(L"Kirby_SpitSmall.wav", 0.5f);
+
+			m_pGameInstance->PlaySound_Free(L"Kirby_SpitSmall.wav", 0.5f);
 			// 날려 보낸다. 날려보내는 순간 나의 관할이 아니기 때문에 그냥 보내버린다.
 			// 또한 보내기전에 마지막으로 Fly로 만들어준다. 또한 방향을 여기서 정해준다.
 			// 이곳에선 상대가 컨트롤러든 뭐시기든 아무런 상관이 없다. 내가 정해준 방향을 사용하여 객체의 움직임 구현대로 나가는것이기 때문이다. 
@@ -340,6 +343,7 @@ void CKirbyVacuum_Vacuum_State::OnStateUpdate(CGameObject* pGameObject, _float f
 		{
 			pKirby->Change_State(CKirby::STATE_IDLE, 60.f, true, true, CKirby::BODY_DEFAULT);
 			DESC(m_eEyeState) = CKirby::EYE_IDLE;
+			m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
 			return;
 		}
 

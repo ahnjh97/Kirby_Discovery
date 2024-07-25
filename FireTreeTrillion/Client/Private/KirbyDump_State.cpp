@@ -600,8 +600,6 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			return;
 		}
 	}
-
-
 }
 
 void CKirbyDump_Jump_State::OnStateExit()
@@ -670,6 +668,8 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			FXDesc.vInitPos = { 0.f, .6f, .4f };
 			FXDesc.pSocketMatrix = pTransformCom->Get_WorldFloat4x4_Ptr();
 
+
+			m_pGameInstance->PlayMySound(L"Kirby_Vacuuming.wav", CHANNEL_PLAYERVOICE, 0.5f);
 			pKirby->Add_Effect("Vacuum_v3", FXDesc, true);
 
 			//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Vacuum_v3"), &FXDesc)))
@@ -724,6 +724,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pCamera->Make_Shake(0.3f, 0.05f);
 			pKirby->Change_State(CFinaleKirby::DUMPSTATE_CUTDEMOKIRBY, 50.f, false, false, CFinaleKirby::BODY_DUMPVACUUM, CFinaleKirby::OFFSET_DUMPVACUUM);
 			pKirby->Delete_AllEffect();
+			m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
 			return;
 		}
 	}
