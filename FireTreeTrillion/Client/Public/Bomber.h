@@ -37,6 +37,7 @@ public:
 	virtual void	Render_IMGUI() override;
 #endif
 	virtual void	Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject) override;
+	virtual void	Add_AnimEvent() override;
 
 public:
 	void Change_State(BOMBER_ANIM eState, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation);

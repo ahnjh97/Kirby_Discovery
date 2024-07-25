@@ -239,11 +239,6 @@ void CAwoofy::Add_AnimEvent()
 		}
 		});
 
-	m_pModelCom->Add_Event("PlaySound", [this]() {
-		// 荤款靛 贸府
-		m_pGameInstance->PlaySound_Free(L"TakeItem01.wav", 0.5f);
-		});
-
 	m_pModelCom->Add_Event("ApplyDamage", [this]() {
 		//单固瘤 贸府
 		});

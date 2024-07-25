@@ -101,7 +101,6 @@ void CRabbit_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 		else if (15.f < fDistance)
 		{
 			pRabbit->Set_Find(false);
-
 			// 여러 상태의 IDLE로 전환
 			if (true == pRabbit->IsAnimFinished())
 			{
@@ -187,6 +186,7 @@ CRabbit_Find_State::CRabbit_Find_State()
 void CRabbit_Find_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fAnimSpeed, _bool _bLoop, _bool _bInterpolation, _uint _iOffSet)
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
+	m_pGameInstance->PlaySound_Free(L"Rabbit_FindKirby.wav", 0.25f);
 }
 
 void CRabbit_Find_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
@@ -277,14 +277,22 @@ void CRabbit_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDel
 		switch (pRabbit->Get_State())
 		{
 		case CRabbit::RABBIT_JUMPSTART:
+		{
+			if (pRabbit->Get_IsCulling() == false)
+				m_pGameInstance->PlaySound_Free(L"Rabbit_Jump.wav", 0.25f);
 			pRabbit->Change_State(CRabbit::RABBIT_JUMP, 85.f, false, true);
-			break;
+		}
+		break;
 		case CRabbit::RABBIT_JUMP:
 			pRabbit->Change_State(CRabbit::RABBIT_JUMPEND, 45.f, false, true);
 			break;
 		case CRabbit::RABBIT_JUMPEND:
+		{
+			if (pRabbit->Get_IsCulling() == false)
+				m_pGameInstance->PlaySound_Free(L"Rabbit_JumpEnd.wav", 0.25f);
 			pRabbit->Change_State(CRabbit::RABBIT_JUMPFALL, 45.f, false, true);
-			break;
+		}
+		break;
 		default:
 			pRabbit->Change_State(CRabbit::RABBIT_WAIT, 45.f, false, true);
 			break;

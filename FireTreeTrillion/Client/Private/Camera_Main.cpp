@@ -825,7 +825,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 					return;
 
 				m_pGameInstance->StopSound(CHANNEL_BGM_SUB);
-				m_pGameInstance->PlayMySound(L"K15_FoodShopLunchTime.marker.wav", CHANNEL_BGM_SUB, 0.5f);
+				m_pGameInstance->PlayMySound(L"K15_FoodShopLunchTime_long.wav", CHANNEL_BGM_SUB, 0.5f);
 			}
 		}
 		break;
