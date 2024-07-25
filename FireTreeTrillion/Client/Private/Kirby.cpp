@@ -73,14 +73,14 @@ HRESULT CKirby::Initialize(void* pArg)
 	if (FAILED(Kirby_SystemInitialize()))
 		return E_FAIL;
 
-	// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
-	m_eAbilityType = ABILITY_CRASH;
-	if (LEVEL_SIMBA == *m_pCurrentLevelID)
-			m_eAbilityType = ABILITY_HAMMER;
+	//// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
+	//m_eAbilityType = ABILITY_CRASH;
+	//if (LEVEL_SIMBA == *m_pCurrentLevelID)
+	//		m_eAbilityType = ABILITY_HAMMER;
 
-	m_fHp = 1000.f;
-	m_fMaxHp = 1000.f;
-	// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
+	//m_fHp = 1000.f;
+	//m_fMaxHp = 1000.f;
+	//// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
 
 
 	// 커비의 상태에 따라, 애니메이션이 시작된다.
@@ -452,6 +452,10 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if (m_bOverPower == true)
 				return;
 
+			if (INFO(m_pObject) != nullptr &&
+				(Get_State() == STATE_VACUUM || Get_State() == STATE_VACUUMHUSTLELV2) == true)
+				return;
+
 			m_pGameInstance->PlaySound_Free(L"Collision_Body.wav", 0.6f);
 			Reset_If_Damage();
 
@@ -575,6 +579,10 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		else
 		{
 			if (m_bOverPower == true)
+				return;
+
+			if (INFO(m_pObject) != nullptr &&
+				(Get_State() == STATE_VACUUM || Get_State() == STATE_VACUUMHUSTLELV2) == true)
 				return;
 
 			Reset_If_Damage();
@@ -2247,6 +2255,10 @@ void CKirby::Kirby_LookInitialize()
 		_float4 vLook = XMVector3Normalize(_float4(1.f, 0.f, 1.f, 0.f));
 		INFO(m_vTargetDir) = INFO(m_vMoveDir) = vLook;
 	}
+	else if (uLevel == LEVEL_SIMBA)
+	{
+		INFO(m_vTargetDir) = INFO(m_vMoveDir) = fCameraLook;
+	}
 	else
 	{
 		// 카메라를 정면으로 바라봄
@@ -2446,7 +2458,6 @@ void CKirby::AssistLight_Control()
 
 void CKirby::Reset_If_Damage()
 {
-
 	INFO(m_fVacuumTime) = 0.f;
 
 	INFO(m_ePreAttackState) = SWORDSTATE_DECISIVESLASH;
@@ -2473,6 +2484,10 @@ void CKirby::Reset_If_Damage()
 	INFO(m_fCrashChargeTime) = 0.f;
 
 	INFO(m_fTimeRatio) = 0.f;
+
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+	pCamera->Zoom(0.f);
+
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
