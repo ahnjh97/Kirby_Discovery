@@ -259,7 +259,7 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 										  0.1f, 0.1f, 0.0f, 0.f, 0.f, // 5 ~ 9
 										  0.1f, 0.f, 0.f, 0.1f, 0.f, // 10 ~ 14
 										  0.1f, 0.f, 0.f, 0.05f, 0.05f }; // 15 ~ 19  // 17 : 맨뒤 폭탄 받는 부분에서 직각으로 만드는 부분, 18 : 맨앞, 19 : 두번째 코너 돌릴때 distance 줄이는 곳
-	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .05f, 0.05f, 0.1f, 0.f, 0.f }; // 0 : 보스 만나기전, 1 : 계단으로 들어가는 입구, 2 : 복도 마지막 트리거
+	m_CamTriggerUpOffsets[LEVEL_FINALBOSS] = { .05f, 0.05f, 0.1f, 0.f, 0.f, 0.f }; // 0 : 보스 만나기전, 1 : 계단으로 들어가는 입구, 2 : 복도 마지막 트리거
 	m_CamTriggerUpOffsets[LEVEL_FINALE] = { .4f, 0.f, 0.f, .4f, .4f, .5f, 0.2f, 0.2f, 0.f };
 
 

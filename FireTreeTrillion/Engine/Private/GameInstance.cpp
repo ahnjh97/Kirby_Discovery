@@ -349,6 +349,14 @@ void CGameInstance::Update_DofFocus(_fvector vWorldPos)
 
 }
 
+void CGameInstance::Update_RimLight(_float fRimRatio, _float fRimRadius, _float3 vRimColor)
+{
+	if (nullptr == m_pRenderer)
+		return;
+
+	m_pRenderer->Update_RimLight(fRimRatio, fRimRadius, vRimColor);
+}
+
 void CGameInstance::Bind_RendererFunc(_int iTriggerType)
 {
 	if (nullptr == m_pRenderer)

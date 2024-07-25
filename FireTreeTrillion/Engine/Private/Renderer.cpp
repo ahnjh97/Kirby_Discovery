@@ -456,11 +456,13 @@ void CRenderer::Color_Initialize()
 		
 	Save_ColorSet("Town",
 		COLOR_DATA{
-		0.719726f, 1.f, 1.03994f, 1.43951f, 1.30029f, 1.24978f,
-		1.10968f, 0.730198f, 0.6f, 0.6f, 1.32995f, 1.08f, 1.1f,
-		0.0749753f, 0.0362015f, 0.188398f, 0.00991405f, 0.466084f,
-		0.676991f, 0.218674f, 0.00980014f, 0.499961f, 0.912908f,
-		0.99115f, 0.00976099f, 0.199837f, 0.350306f
+		0.790123f, 1.f, 1.00945f, 1.59058f, 1.29023f,
+		1.29037f, 1.00969f,
+		0.720199f, 0.6f, 0.6f, 1.32008f, 1.07341f, 1.0967f,
+		0.0849043f, 0.0345271f, 0.177737f, 0.0197524f,
+		0.466084f, 0.676991f, 0.218674f, 0.0197459f,
+		0.499961f, 0.912908f, 0.99115f, 0.0196069f,
+		0.189941f, 0.360106f
 		});
 
 	Save_ColorSet("Final",
@@ -488,10 +490,13 @@ void CRenderer::Color_Initialize()
 
 	Save_ColorSet("Park",
 		COLOR_DATA{
-		0.590069f, 1.f, 0.979981f, 1.20988f, 2.0299f, 1.20026f, 1.10964f,
-		0.720317f, 0.699998f, 0.7f, 0.949932f, 0.999996f, 1.f, 0.0945045f,
-		0.0329081f, 0.167429f, 0.00977626f, 0.466084f, 0.676991f, 0.218674f,
-		0.00982029f, 0.499961f, 0.912908f, 0.99115f, 0.00960964f, 0.180212f, 0.369867f
+		0.654073f, 1.f, 1.00722f, 1.10959f, 1.79011f,
+		1.21023f, 1.07992f,
+		0.720199f, 0.6f, 0.6f, 0.9598f, 1.00195f, 1.00258f,
+		0.0849043f, 0.0345271f, 0.177737f, 0.00997121f,
+		0.466084f, 0.676991f, 0.218674f, 0.00997041f,
+		0.499961f, 0.912908f, 0.99115f, 0.00982132f,
+		0.189941f, 0.360106f
 		});
 
 	Save_ColorSet("Lab",
@@ -526,6 +531,17 @@ void CRenderer::Color_Initialize()
 		0.917647f, 0.513726f, 0.145098f, 0.00968085f,
 		1.f, 0.847059f, 0.254902f, 0.00989194f,
 		0.13f, 0.55f
+		});
+
+	Save_ColorSet("ParkFront",
+		COLOR_DATA{
+		0.640434f, 1.f, 1.00945f, 1.50966f, 1.19037f,
+		1.24043f, 0.990033f,
+		0.720199f, 0.6f, 0.6f, 1.32008f, 1.07341f, 1.0967f,
+		0.0849043f, 0.0345271f, 0.177737f, 0.00997121f,
+		0.466084f, 0.676991f, 0.218674f, 0.00997041f,
+		0.499961f, 0.912908f, 0.99115f, 0.00982132f,
+		0.189941f, 0.360106f
 		});
 
 	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
@@ -1008,14 +1024,18 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 	break;
 	case 4:
 		m_DestColorData = Find_ColorSet("Town");
-		Update_RimLight(.7f, 1.f, { 1.f, .5f, .3f });
-
+		Update_RimLight(1.f, 1.5f, { 1.f, .5f, .3f });
+		Update_DirectionalLight({ .6f, .6f, .6f, 1.f }, { .6f, .6f, .6f, 1.f });
+		Update_Ocean(.9f, -45.3f, 4.8f);
+		Update_OceanWave(.5f, .2f);
 		break;
 	case 5:
 	{
 		m_DestColorData = Find_ColorSet("Finale");
 		Update_RimLight(1.f, 1.f, { 1.f, .45f, 0.f });
 		Update_DOFSet(.1f, { .07f, .05f, .09f });
+
+		Update_Ocean(0.f, -2000.f, 1000.f);
 	}
 	break;
 	case 6:
@@ -1027,8 +1047,9 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 	case 7:
 	{
 		m_DestColorData = Find_ColorSet("Final");
-		Update_RimLight(.8f, 2.f, { 1.f, .6f, .35f });
 
+		Update_RimLight(.8f, 2.f, { 1.f, .6f, .35f });
+		Update_Ocean(0.f, -1090.f, -990.f);
 		Update_DOFSet(0.f, { .26f, 0.f, -.11f });
 	}
 	break;
@@ -1048,6 +1069,10 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 
 		Update_RimLight(0.f);
 		Update_DOFSet(0.f);
+		Update_Ocean(0.f, -45.f, -10.f);
+		Update_DirectionalLight({ .08f, .04f, .1f, 1.f }, { 1.f, 1.f, 1.f, 1.f });
+
+
 	}
 	break;
 	case 10:
@@ -1083,7 +1108,7 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 		Update_RimLight(0.f);
 
 		Update_Ocean(.9f, -45.3f, 10.5f, { .03f, .55f, .61f }, { .7f, 1.f, 1.f });
-		Update_OceanWave(1.f, 2.4f);
+		Update_OceanWave(1.f, 1.4f);
 
 		break;
 	case 13:
@@ -1097,9 +1122,28 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 		Update_OceanWave(1.f, .1f);
 
 		break;
+	case 14:
+		m_DestColorData = Find_ColorSet("Town");
+
+		Update_RimLight(1.f, 1.5f, { 1.f, .5f, .3f });
+
+		Update_Ocean(0.f, -45.f, -10.f);
+
+		break;
+	case 15:
+		m_DestColorData = Find_ColorSet("ParkFront");
+
+		Update_RimLight(.6f, 1.5f, { 1.f, .5f, .3f });
+		Update_DOFSet(1.f, { -.05f, -.01f, -.02f });
+		Update_DirectionalLight({ .28f, .14f, .19f, 1.f }, { .13f, .04f, 0.f, 1.f });
+		Setting_GodRay({ 3450.f, 940.f, 580.f });
+		Update_Ocean(0.f, -45.f, -10.f);
+
+		break;
 	default:
 		m_DestColorData = Find_ColorSet("Tutorial");
 		Update_Option(OPTION_DOF, true);
+		Update_Ocean(0.f, -45.f, -10.f);
 
 		break;
 	}
