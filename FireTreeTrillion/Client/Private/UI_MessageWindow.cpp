@@ -134,7 +134,9 @@ _int CUI_MessageWindow::Tick(_float fTimeDelta)
 	if (m_pGameInstance->Get_DIKeyState(DIK_A, KEY_DOWN) && WINDOW_SHOW == m_eCurState)
 	{
 		m_pUIBtn->Set_BtnState(CUI_BtnIcon::BTN_STATE::BTN_SELECT); //버튼 상태 동기화
-		
+		m_pGameInstance->StopSound(CHANNEL_UI);
+		m_pGameInstance->PlayMySound(L"UI_BtnIcon_Select.wav", CHANNEL_UI, 0.5f);
+
 		m_bIsSkipScript = FALSE;
 
 		//07.22) 글자 단위 출력 상태에서 한번 더 키입력 했을 경우, 전체 문단을 출력
