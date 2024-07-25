@@ -142,6 +142,11 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 
 			return;
 		}
+		else if (m_fDuration.second == FX_MAXDURATION)
+		{
+			//m_fDuration.first = 0.f;
+			Reset_Duration();
+		}
 	}
 
 	//true 반환하면 lifetime 끝난 것.

@@ -980,7 +980,7 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 
 			//충돌 시 튀는 파티클
 			CParticle::PARTICLE_DESC ParticleDesc{};
-			ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+			ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
 			ParticleDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Get_State_Vector_Matrix(m_DimensionClawMat, CUtils::STATE_LOOK));
 
 			ParticleDesc.vInitPos = static_cast<_float3>(vCollidingPointA);
@@ -1007,7 +1007,7 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 			//충돌 시 튀는 파티클
 			CParticle::PARTICLE_DESC ParticleDesc{};
 			ParticleDesc.vInitPos = static_cast<_float3>(vClawMatPoint);
-			ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+			ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
 			ParticleDesc.vInitPos.y = 2.3f;
 
 			Add_Effect("HS_lion laser collide particle B", ParticleDesc);
@@ -1344,9 +1344,9 @@ void CSimba::SpawnDebris(_uint iAnimIdx)
 		CParticle::PARTICLE_DESC ParticleDesc{};
 		ParticleDesc.vInitPos = static_cast<_float3>(fResultPos);
 		ParticleDesc.vInitPos.y = 2.3f;
-		ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
+		ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
 
-		Add_Effect("HS_perfect laser collide particle", ParticleDesc);
+		Add_Effect("HS_lion laser collide particle B", ParticleDesc);
 
 		for (_uint i = m_iNextDebrisIndex; i < m_iNextDebrisIndex + iNumDebris; i++)
 		{
@@ -1378,7 +1378,7 @@ void CSimba::SetUpSecondTarget()
 {
 	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 	if (pCamera != nullptr)
-		pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_FINALBOSS, { 0.f, 2.f, 0.f }, 10.f);
+		pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_FINALBOSS, { 0.f, 4.5f, 0.f }, 10.f);
 }
 
 void CSimba::CheckFinalCrusherRingCollision(_float fTimeDelta)
@@ -2254,6 +2254,7 @@ void CSimba::OnAppearEnd(CGameObject* pObj)
 	Change_State(Simba_DemoAppear1Cut9, 50.f, false, true);
 	TransformToDefault(0);
 	TriggerMonsterSpawning(11);
+
 	m_pGameInstance->StopSound(CHANNEL_BGM);
 	m_pGameInstance->PlayBGM(L"SimbaAfterDialog.wav");
 }

@@ -25,6 +25,11 @@ void CFinalBoss::Appear_Event(CGameObject* pObj)
 {
 	Change_State(CFinalBoss::FINALBOSS_DEMOAPPEARCUT5, 50.f, false, false);
 
+	_float3 vPos = (_float3)GET_POS + _float3{ 0.f, 0.f, 30.f };
+
+	m_pControllerCom->Set_Position( m_pTransformCom, Pos(vPos) );
+
+
 	CParticle::PARTICLE_DESC FXDesc{};
 	FXDesc.pSocketMatrix = &m_EffectSocket;
 	FXDesc.vInitPos = { 0.f, 6.f, 0.f };
@@ -794,7 +799,7 @@ void CFinalBoss::Create_Gully()
 		//특정 순간에 rock slash 이펙트 생성하기
 		static _float fSlashFXTime{ 0.f };
 		fSlashFXTime += m_fTimeDelta;
-		if (.1f < fSlashFXTime)
+		if (.07f < fSlashFXTime)
 		{
 			fSlashFXTime = 0.f;
 
@@ -808,7 +813,7 @@ void CFinalBoss::Create_Gully()
 
 			CParticle::PARTICLE_DESC ParticleDesc{};
 			ParticleDesc.vInitPos = (vFXPosA + vFXPosB) * .5f;
-			Add_Effect("HS_lion laser collide particle B", FXDesc);
+			Add_Effect("HS_FB laser collide particle B", FXDesc);
 
 			m_pGameInstance->Get_CurCameraPtr()->Make_Shake(0.3f, 0.5f);
 		}
