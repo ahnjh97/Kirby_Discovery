@@ -148,7 +148,7 @@ _int CBaum::Tick(_float fTimeDelta)
 			return OBJ_NOEVENT;
 		}
 
-	}	
+	}
 	else if (m_bOnTerrain == true)
 	{
 		// 지형에 붙어 따라가는 기능
@@ -208,10 +208,10 @@ void CBaum::Late_Tick(_float fTimeDelta)
 	{
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
-	/*	if (m_eBaumType == BAUM_STARPIECE)
-		{
-			m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
-		}*/
+		/*	if (m_eBaumType == BAUM_STARPIECE)
+			{
+				m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
+			}*/
 	}
 }
 
@@ -421,6 +421,23 @@ void CBaum::Find_MyRoad()
 
 _int CBaum::Make_Partical()
 {
+	//사운드 재생
+	switch (CUtils::Make_RandomInt(1, 4))
+	{
+	case 1:
+		m_pGameInstance->PlaySound_Free(L"finale_collide1.wav", .5f);
+		break;
+	case 2:
+		m_pGameInstance->PlaySound_Free(L"finale_collide2.wav", .5f);
+		break;
+	case 3:
+		m_pGameInstance->PlaySound_Free(L"finale_collide3.wav", .5f);
+		break;
+	case 4:
+		m_pGameInstance->PlaySound_Free(L"finale_collide4.wav", .5f);
+		break;
+	}
+
 	for (_int i = 0; i < 15; ++i)
 	{
 		FinaleCollideCloud(m_pTransformCom);

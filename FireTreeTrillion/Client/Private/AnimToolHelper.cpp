@@ -429,9 +429,9 @@ void CAnimToolHelper::Render_FrameLine(CAnimation** ppAnimation, const string& s
 	ImGui::SameLine();
 	
 	// 애니메이션 스피드
-	m_fAnimationSpeed = 20.f;// (*ppAnimation)->Get_TickPerSecond();
+	m_fAnimationSpeed = (*ppAnimation)->Get_TickPerSecond();
 	if (previousAnimation != (*ppAnimation)->Get_AnimationName())
-		m_fAnimationSpeed = 20.f;//(*ppAnimation)->Get_TickPerSecond();
+		m_fAnimationSpeed = (*ppAnimation)->Get_TickPerSecond();
 	ImGui::Text("Animation Speed"); ImGui::SameLine();
 	ImGui::InputFloat("    ", &m_fAnimationSpeed); ImGui::SameLine();
 	(*ppAnimation)->Set_TickPerSecond(m_fAnimationSpeed);

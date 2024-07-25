@@ -74,7 +74,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
-	m_eAbilityType = ABILITY_BOMB;
+	m_eAbilityType = ABILITY_HAMMER;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 			m_eAbilityType = ABILITY_HAMMER;
 
@@ -106,9 +106,10 @@ _int CKirby::Tick(_float fTimeDelta)
 	// 커비의 기본적인 축 보정, 밸런스 보정을 담당한다.
 	Setting_KirbyBalance();
 
+	/*
 	// 테스트 전용
 	Key_Input(m_fTimeDelta);
-
+	*/
 	// 유틸업데이트가 들어가있다.
 	__super::Tick(m_fTimeDelta);
 	Kirby_SystemTick(m_fTimeDelta);

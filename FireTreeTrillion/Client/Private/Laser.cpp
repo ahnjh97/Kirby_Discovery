@@ -94,16 +94,16 @@ _int CLaser::Tick(_float fTimeDelta)
 				//레이저와의 충돌 자국
 				CEffect::FX_DESC FXDesc{};
 				FXDesc.vInitPos = vCollidingPoint;
-				FXDesc.vInitPos.y = 0.f;
+				FXDesc.vInitPos.y = 0.5f;
 				FXDesc.vInitScale = { 3.f, 3.f, 3.f };
 				Add_Effect("HS_FB laser decal", FXDesc, false);
 
 				//충돌 시 튀는 파티클
 				CParticle::PARTICLE_DESC ParticleDesc{};
 				ParticleDesc.vInitPos = vCollidingPoint;
-				FXDesc.vInitPos.y = 0.f;
+				FXDesc.vInitPos.y = 0.5f;
 				ParticleDesc.vInitScale = { 2.f, 2.f, 2.f };
-				Add_Effect("HS_perfect laser collide particle", ParticleDesc);
+				Add_Effect("HS_FB laser collider particle B", ParticleDesc);
 			}
 
 		}

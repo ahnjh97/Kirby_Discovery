@@ -135,7 +135,10 @@ void CFinaleBoss_CutScene_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	else if (12 == pCenter->Get_CutScene())
 		pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT12, 50.f, false, false);
 	else if (13 == pCenter->Get_CutScene())
+	{
 		pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT13, 50.f, true, false);
+		m_pGameInstance->PlaySound_Free(L"qte 충돌 2.wav", 0.5f);
+	}
 	else if (14 == pCenter->Get_CutScene())
 		pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT14, 50.f, false, false);
 	else if (15 == pCenter->Get_CutScene())
@@ -145,7 +148,10 @@ void CFinaleBoss_CutScene_State::OnStateUpdate(CGameObject* pGameObject, _float 
 	else if (17 == pCenter->Get_CutScene())
 		pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT17, 50.f, false, false);
 	else if (18 == pCenter->Get_CutScene())
+	{
+		m_pGameInstance->PlaySound_Free(L"qte 충돌 2.wav", 0.5f);
 		pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT18, 50.f, true, false);
+	}
 	else if (19 == pCenter->Get_CutScene())
 		pFinaleBoss->Change_State(CFinaleBoss::FINALEBOSS_CUT19, 50.f, false, false);
 	else if (20 == pCenter->Get_CutScene())

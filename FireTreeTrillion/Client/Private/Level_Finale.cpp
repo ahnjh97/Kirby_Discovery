@@ -29,6 +29,10 @@ HRESULT CLevel_Finale::Initialize()
 	m_pGameInstance->Set_RenderMode(CRenderer::MODE_GAMEPLAY);
 	m_pGameInstance->Setting_LensFlare(false);
 
+	m_pGameInstance->PlayBGM(L"Tsubazeriai.wav", .5f);
+	m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"´ýÇÁÆ®·° ºÎ¸ª.wav", .5f);
+
+	//m_pGameInstance->LoopSound(CHANNEL_GIMMICK_SUB)
 
 	HRESULT hr;
 	hr = __super::Initialize();

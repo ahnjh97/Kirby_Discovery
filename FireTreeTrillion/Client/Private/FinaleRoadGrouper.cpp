@@ -454,6 +454,9 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 			//날아와서 부딪히는 놈이면 shake 하기
 			if (m_eCollideMove == MOVECMD_FLY)
 			{
+				//소리 재생
+				m_pGameInstance->PlaySound_Free(L"쿠르광.wav", .5f);
+
 				CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 
 				if (nullptr != pCamera)
