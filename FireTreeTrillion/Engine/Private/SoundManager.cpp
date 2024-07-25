@@ -63,11 +63,12 @@ void CSound_Manager::AddLowPass()
 
 }
 
-//wstring CSound_Manager::Get_CurSound(CHANNELID eID)
-//{
-//	m_pChannelArr[eID]->
-//
-//}
+_float CSound_Manager::Get_Volume(CHANNELID eID)
+{
+	_float volume = 0.f;
+	FMOD_Channel_GetVolume(m_pChannelArr[eID], &volume);
+	return volume;
+}
 
 int CSound_Manager::SetVolume(CHANNELID eID, _float _vol)
 {

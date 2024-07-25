@@ -186,6 +186,7 @@ public: /* For.Extractor */
 #endif
 
 public: // Sound Manager
+	_float Get_Volume(CHANNELID eID);
 	_int  SetVolume(CHANNELID eID, _float _vol);
 	_int  VolumeUp(CHANNELID eID, _float _vol);
 	_int  VolumeDown(CHANNELID eID, _float _vol);

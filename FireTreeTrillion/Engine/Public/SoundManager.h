@@ -20,7 +20,7 @@ public:
 	HRESULT Initialize();
 	void  Tick(_float fTimeDelta);
 
-
+	_float Get_Volume(CHANNELID eID);
 	int  SetVolume(CHANNELID eID, _float _vol);
 
 	int  VolumeUp(CHANNELID eID, _float _vol);

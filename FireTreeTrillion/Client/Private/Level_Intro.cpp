@@ -216,7 +216,7 @@ void CLevel_Intro::Manage_BGM() // SOUND_WI
 		static _bool bOnce(false);
 		if (false == bOnce)
 		{
-			m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"Running Through the New World.mp3");
+			m_pGameInstance->PlayBGM(CHANNEL_BGM_STREAMING, L"Running Through the New World.wav");
 			bOnce = true;
 		}
 		else
