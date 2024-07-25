@@ -44,7 +44,7 @@ public:
 	virtual	void CPoppyBomb::Render_IMGUI()			override;
 #endif
 
-	virtual _int Ready_Dead(_float fDeadScale = 1.8f) override;
+	virtual _int Ready_Dead(_float fDeadScale = 1.8f, _bool bDeadSound = true) override;
 
 private:
 	//CModel*				m_pModelCom = { nullptr };

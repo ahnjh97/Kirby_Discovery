@@ -108,7 +108,7 @@ public:
 	virtual void Free() override;
 
 protected:
-	virtual _int Ready_Dead(_float fDeadScale = 1.8f);
+	virtual _int Ready_Dead(_float fDeadScale = 1.8f, _bool bDeadSound = true);
 
 	// 현재 이 객체의 타입
 	ABILITYTYPE m_eAbilityType = { ABILITY_END };

@@ -1314,7 +1314,7 @@ static void LadderStart_FX(CTransform* pTransformCom)
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_Ladder Star"), &FXDesc)))
 		return;
 
-	GAMEINSTANCE PlaySound_Free(L"Kirby_LadderSound.wav", 0.5f);
+	GAMEINSTANCE PlaySound_Free(L"Kirby_LadderSound.wav", 1.f);
 }
 
 static void FlyEnd_Smoke(CTransform* pTransformCom)
@@ -1389,8 +1389,8 @@ static void Jump_FX(CTransform* pTransformCom, _bool bBig = false)
 
 
 	bBig == false ?
-		GAMEINSTANCE PlaySound_Free(L"Kirby_Jump.wav", 0.4f) :
-		GAMEINSTANCE PlaySound_Free(L"Kirby_BalloonJump.wav", 0.4f);
+		GAMEINSTANCE PlaySound_Free(L"Kirby_Jump.wav", 0.3f) :
+		GAMEINSTANCE PlaySound_Free(L"Kirby_BalloonJump.wav", 0.3f);
 
 
 	if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Kirby Jump Effects"), &FXDesc)))

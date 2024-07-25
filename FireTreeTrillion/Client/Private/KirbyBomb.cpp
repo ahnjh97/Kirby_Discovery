@@ -349,7 +349,7 @@ _bool CKirbyBomb::RayCast_Terrain()
     return false;
 }
 
-_int CKirbyBomb::Ready_Dead(_float fDeadScale)
+_int CKirbyBomb::Ready_Dead(_float fDeadScale, _bool bDeadSound)
 {
     CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 

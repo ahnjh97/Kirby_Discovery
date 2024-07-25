@@ -74,7 +74,7 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ�
-	m_eAbilityType = ABILITY_BOMB;
+	m_eAbilityType = ABILITY_HAMMER;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 			m_eAbilityType = ABILITY_HAMMER;
 
@@ -447,6 +447,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if (m_bOverPower == true)
 				return;
 
+			m_pGameInstance->PlaySound_Free(L"Collision_Body.wav", 0.6f);
 			Reset_If_Damage();
 
 			if (pObject->Get_Attack() > 10.f && m_eAbilityType != ABILITY_DEFAULT)
@@ -572,6 +573,7 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 				return;
 
 			Reset_If_Damage();
+			m_pGameInstance->PlaySound_Free(L"Collision_Body.wav", 0.6f);
 
 
 			if (pObject->Get_Attack() > 10.f && m_eAbilityType != ABILITY_DEFAULT)
