@@ -269,7 +269,9 @@ _int CSimba::Tick(_float fTimeDelta)
 		else if (m_pGameInstance->Get_KeyState(DIK_0, KEY_DOWN))
 			Change_State(Simba_BiteRushJumpStartR, 50.f, false, true);
 		else if (m_pGameInstance->Get_KeyState(DIK_GRAVE, KEY_DOWN))
-			Change_State(Simba_Death, 50.f, false, true);
+			Change_State(Simba_DemoDeadCut1, 50.f, false, true);
+		else if (m_pGameInstance->Get_KeyState(DIK_NUMPAD1, KEY_DOWN))
+			m_fHp = 2.f;
 
 		if (true == m_bStateChanged) {
 			SetUpSecondTarget();
@@ -468,17 +470,17 @@ void CSimba::Add_AnimEvent()
 {
 	__super::Add_AnimEvent();
 
-	// 1. 한 애니메이션에서 같은 이름의 이벤트 가능
-	// 2. 재생 기준은 애님툴에서 지정한 애니메이션인지 + 시작 프레임이 애니메이션 프레임안에 들어가는 지
-	// 3. 두번째 인자로 넣어준 람다가 시작 프레임 한번만 실행된다.
+#pragma region JUMP
 	m_pModelCom->Add_Event("SimbaJump", [this]() {
-		m_pGameInstance->PlaySound_Free(L"SimbaJump.wav", 0.35f);
+		m_pGameInstance->PlaySound_Free(L"SimbaJump.wav", 0.4f);
 		});
 
 	m_pModelCom->Add_Event("SimbaLand", [this]() {
-		m_pGameInstance->PlaySound_Free(L"SimbaLand.wav", 0.35f);
+		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpPre.wav", 0.5f);
 		});
-
+#pragma endregion
+	
+#pragma region FINAL CRUSHER
 	m_pModelCom->Add_Event("FinalCrusherStart", [this]() {
 		m_pGameInstance->PlaySound_Free(L"SimbaFinalCrusherStartVoice.wav", 0.18f);
 		});
@@ -487,11 +489,14 @@ void CSimba::Add_AnimEvent()
 		m_pGameInstance->PlaySound_Free(L"SimbaFinalCrusher.wav", 1.f);
 		m_pGameInstance->PlaySound_Free(L"SimbaFinalCrusherVoice.wav", 0.12f);
 		});
+#pragma endregion
 
+#pragma region ATTACK JUMP
 	m_pModelCom->Add_Event("AttackJumpPre", [this]() {
 		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpPre.wav", 0.5f);
 		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpPreVoice.wav", 0.18f);
 		});
+
 
 	m_pModelCom->Add_Event("AttackJumpStart", [this]() {
 		
@@ -504,6 +509,86 @@ void CSimba::Add_AnimEvent()
 	m_pModelCom->Add_Event("AttackJumpHit", [this]() {
 		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpHit.wav", 0.5f);
 		});
+#pragma endregion
+
+#pragma region DOUBLE CLAW
+	m_pModelCom->Add_Event("DoubleClawCharge", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaDoubleClawCharge.wav", 0.3f);
+		});
+
+	m_pModelCom->Add_Event("DoubleClawDash", [this]() { // 음원 자체가 무한루프 처리되어있음
+		m_pGameInstance->PlayMySound(L"SimbaDoubleDash.wav",  CHANNEL_SOUND12, 0.27f);
+
+		});
+	m_pModelCom->Add_Event("DoubleClaw", [this]() {
+		m_pGameInstance->StopSound(CHANNEL_SOUND12);
+		m_pGameInstance->PlaySound_Free(L"SimbaDoubleClaw.wav", 0.3f);
+		m_pGameInstance->PlaySound_Free(L"SimbaDoubleClawFire.wav", 0.4f);
+		m_pGameInstance->PlaySound_Free(L"SimbaDoubleClawVoice.wav", 0.33f);
+		});
+#pragma endregion
+
+#pragma region ROAR
+	m_pModelCom->Add_Event("Roar", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaRoar.wav", 0.55f);
+		});
+#pragma endregion
+
+#pragma region BITE RUSH JUMP
+	m_pModelCom->Add_Event("BiteRushJumpStartL", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpPre.wav", 0.45f);
+		});
+	m_pModelCom->Add_Event("BiteRushJumpStartR", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpPre.wav", 0.45f);
+		});
+	m_pModelCom->Add_Event("BiteRushJumpL", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaJump.wav", 0.55f);
+		});
+	m_pModelCom->Add_Event("BiteRushJumpR", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaJump.wav", 0.55f);
+		});
+	m_pModelCom->Add_Event("BiteRushLandingL", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpPre.wav", 0.45f);
+		});
+	m_pModelCom->Add_Event("BiteRushLandingR", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpPre.wav", 0.45f);
+		});
+#pragma endregion
+
+#pragma region DIMENSION CLAW
+	m_pModelCom->Add_Event("DimensionClawStart", [this]() {
+		m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+		m_pGameInstance->PlayMySound(L"SimbaDimensionClawStartVoice.wav", CHANNEL_BOSSVOICE, 0.4f);
+		});
+#pragma endregion
+
+#pragma region BITE RUSH 
+	m_pModelCom->Add_Event("BiteRushStart", [this]() {
+		m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+		m_pGameInstance->PlayMySound(L"SimbaBiteRushStartVoice.wav", CHANNEL_BOSSVOICE, 0.35f);
+		});
+
+	m_pModelCom->Add_Event("BiteRush0", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaBiteRush.wav", 0.35f);
+		});
+	m_pModelCom->Add_Event("BiteRush1", [this]() {
+		m_pGameInstance->PlaySound_Free(L"SimbaBiteRush.wav", 0.35f);
+		});
+#pragma endregion
+
+#pragma region DIMENSION LASER
+	m_pModelCom->Add_Event("DimensionLaser", [this]() {
+		m_pGameInstance->StopSound(CHANNEL_SOUND12);
+		m_pGameInstance->PlayMySound(L"SimbaDimensionLaser.wav", CHANNEL_SOUND12, 0.4f);
+		});
+#pragma endregion
+
+#pragma region DEATH
+	m_pModelCom->Add_Event("DemoDead", [this]() {
+		m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+		m_pGameInstance->PlayMySound(L"SimbaDeathDemo.wav", CHANNEL_BOSSVOICE, 0.35f);
+		});
+#pragma endregion
 }
 
 void CSimba::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
@@ -551,7 +636,7 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 	AbilityItemDesc.fAngle = 0.f;
 	AbilityItemDesc.eAbilityType = ABILITY_DEFAULT;
 
-	_float fY = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y + 0.3f;
+	_float fY = 2.3f;
 	_vector vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 	_vector vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
 	_float4 vFloatLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
@@ -904,7 +989,7 @@ void CSimba::HideDimensionClawActor()
 	m_bDimensionClawActivated = false;
 	m_fDeactiveTime = 0.f;
 	if (nullptr != m_pDimensionClawActor)
-		m_pDimensionClawActor->setGlobalPose(PxTransform(0, 0, 0));
+		m_pDimensionClawActor->setGlobalPose(PxTransform(0, -30, 0));
 }
 
 void CSimba::HideDimensionLaserActor()
@@ -2402,10 +2487,10 @@ void CSimba::CreateDimensionClawActor()
 
 	PxTransform transform(PxVec3(0, 0, 0));
 	PxRigidDynamic* pRigidDynamic = pPhysics->createRigidDynamic(transform);
-	PxBoxGeometry boxGeometry(10.f, 1.f, 5.f);
+	PxBoxGeometry boxGeometry(16.f, 4.f, 1.f);
 
-	PxQuat rotation1(XMConvertToRadians(40), PxVec3(0, 0, 1)); // z축기준 35도 회전
-	PxQuat rotation2(-XMConvertToRadians(40), PxVec3(0, 0, 1)); // z축기준 35도 회전
+	PxQuat rotation1(XMConvertToRadians(42), PxVec3(0, 0, 1)); // z축기준 35도 회전
+	PxQuat rotation2(-XMConvertToRadians(42), PxVec3(0, 0, 1)); // z축기준 35도 회전
 	PxTransform transform1(PxVec3(0.f, 0.f, 0.f), rotation1);
 	PxTransform transform2(PxVec3(0.f, 0.f, 0.f), rotation2);
 

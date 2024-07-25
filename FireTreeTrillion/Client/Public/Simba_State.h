@@ -448,6 +448,7 @@ private:
 	CGameObject* m_pKirby = { nullptr };
 	CTransform* m_pKirbyTransform = { nullptr };
 	_bool m_bLaserActivated = { false };
+	_bool m_bStopSound = { false };
 
 public:
 	static	CSimba_DimensionLaser* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform)
