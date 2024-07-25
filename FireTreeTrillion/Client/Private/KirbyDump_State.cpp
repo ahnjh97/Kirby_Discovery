@@ -44,8 +44,6 @@ void MakeBoosterBBong(_float& fTime, CFinaleKirby* pKirby)
 		fMaxFloatForDump = CUtils::Make_RandomFloat(0.02f, 0.04f);
 	}
 }
-
-
 void Turn_Interpolate(CFinaleKirby::FINALEKIRBY_INFODESC* Kirbydesc, CTransform* pTransformCom, _float fTimeDelta, _float fInterpolateSpeed = 12.f)
 {
 	if (Kirbydesc->m_vMoveDir == Kirbydesc->m_vTargetDir)
@@ -332,15 +330,6 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		Turn_InterPolate_OtherVector(Kirbydesc->m_vTargetDir, Kirbydesc->m_vMoveDir, pTransformCom, fTimeDelta, 2.f);
 	}
 
-	if (m_pGameInstance->Get_DIKeyState(DIK_SPACE, KEY_DOWN))
-	{
-		m_bBreak = !m_bBreak;
-	}
-
-	if (m_bBreak == true)
-		return;
-
-
 	Kirbydesc->m_fMoveSpeed += fTimeDelta * 10.f;
 
 	if (DESC(m_bBooster) == true)
@@ -364,6 +353,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 	{
 		DESC(m_fJumpVelocity) = 20.f;
 		pKirby->Change_State(CFinaleKirby::DUMPSTATE_JUMP, 60.f, true, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
+		m_pGameInstance->PlaySound_Free(L"KirbyDump_Jump.wav", 0.5f);
 		return;
 	}
 
@@ -376,6 +366,7 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		FXDesc.vInitScale = { 15.f, 15.f, 30.f };
 		FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
 		pKirby->Add_Effect("YW Real Dash", FXDesc, true);
+		m_pGameInstance->PlayMySound(L"KirbyDump_Boost.wav", CHANNEL_PLAYERVOICE, 0.5f);
 
 		DESC(m_bBooster) = true;
 		CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
@@ -397,6 +388,9 @@ void CKirbyDump_Run_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 
 	if (DESC(m_fBoosterTime) <= 0.f)
 	{
+		if (DESC(m_bBooster) == true)
+			m_pGameInstance->PlayMySound(L"KirbyDump_Idle.wav", CHANNEL_PLAYERVOICE, 0.5f);
+
 		DESC(m_bBooster) = false;
 		pKirby->Delete_Effect("YW Real Dash");
 	}
@@ -494,6 +488,7 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		FXDesc.vInitScale = { 15.f, 15.f, 30.f };
 		FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
 		pKirby->Add_Effect("YW Real Dash", FXDesc, true);
+		m_pGameInstance->PlayMySound(L"KirbyDump_Boost.wav", CHANNEL_PLAYERVOICE, 0.5f);
 
 		//pKirby->Add_Effect(static_cast<CEffect*>(m_pGameInstance->Get_List(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Effect"))->back()));
 		DESC(m_bBooster) = true;
@@ -571,6 +566,8 @@ void CKirbyDump_Jump_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 		if (pController->Is_Terrain())
 		{
+			m_pGameInstance->PlaySound_Free(L"KirbyDump_Landing.wav", 0.6f);
+
 			pKirby->Change_State(CFinaleKirby::DUMPSTATE_LANDING, 60.f, false, false, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			if (m_fFallTime < 1.5f)
@@ -725,6 +722,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			pKirby->Change_State(CFinaleKirby::DUMPSTATE_CUTDEMOKIRBY, 50.f, false, false, CFinaleKirby::BODY_DUMPVACUUM, CFinaleKirby::OFFSET_DUMPVACUUM);
 			pKirby->Delete_AllEffect();
 			m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
+			m_pGameInstance->PlayMySound(L"Kirby_DumpVacuum.wav", CHANNEL_PLAYERVOICE, 0.5f);
 			return;
 		}
 	}
@@ -752,6 +750,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 			FXDesc.vInitPos = { 0.f, 0.f, 0.f };
 			FXDesc.vInitScale = { 1.8f, 1.8f, 1.8f };
 			pKirby->Add_Effect("YW Deform Effect2", FXDesc, false);
+			m_pGameInstance->PlaySound_Free(L"Kirby_DeformEvent.wav", 0.5f);
 			m_bEffectTrigger = false;
 		}
 
@@ -760,6 +759,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(GAMEINSTANCE Get_CurCameraPtr());
 			pCamera->Make_Shake();
+			m_pGameInstance->PlaySound_Free(L"KirbyDump_Landing.wav", 0.6f);
 
 			CFinalePartical_Maker* pMaker = static_cast<CFinalePartical_Maker*>(m_pGameInstance->Get_GameObject(LEVEL_FINALE, TEXT("Layer_FinalePartical_Maker")));
 			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
@@ -795,6 +795,7 @@ void CKirbyDump_Cut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			DESC(m_vHandleDir) = DESC(m_vMoveDir);
 			pKirby->Change_State(CFinaleKirby::DUMPSTATE_IDLING, 50.f, true, true, CFinaleKirby::BODY_DUMPDEFAULT, CFinaleKirby::OFFSET_DUMP);
+			m_pGameInstance->PlayMySound(L"KirbyDump_Idle.wav", CHANNEL_PLAYERVOICE, 0.5f);
 		}
 	}
 }
@@ -857,6 +858,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			FXDesc.vInitScale = { 15.f, 15.f, 30.f };
 			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
 			pKirby->Add_Effect("YW Real Dash", FXDesc, true);
+			m_pGameInstance->StopSound(CHANNEL_PLAYERVOICE);
 
 			m_bShakeTrigger1 = false;
 		}

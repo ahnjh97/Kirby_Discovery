@@ -1106,7 +1106,6 @@ _int CGameInstance::VolumeRestore(CHANNELID eID)
 {
 	return m_pSound_Manager->VolumeRestore(eID);
 }
-
 void CGameInstance::PlaySound_Free(TCHAR* pSoundKey, _float _vol)
 {
 	m_pSound_Manager->PlaySound_Free(pSoundKey, _vol);
