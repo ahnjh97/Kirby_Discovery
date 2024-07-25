@@ -215,6 +215,10 @@ PS_OUT PS_MAIN_SOLIDALPHABLEND(PS_IN_ALPHABLEND In)
     vector vMask = g_MaskTexture.Sample(ClampSampler, In.vTexcoord);
     Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
 
+    //알파 값 예외처리
+    if (Out.vColor.a <= 0.f)
+        discard;
+    
     Out.vColor.rgb = g_vRColor;
     Out.vColor.a *= g_fAlpha;
 
