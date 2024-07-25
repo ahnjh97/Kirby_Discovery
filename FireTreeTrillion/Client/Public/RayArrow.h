@@ -60,7 +60,6 @@ private:
 	_float			m_fHeight = { 0.f };
 	_float			m_fSpeedWeight = { 0.f };
 	_float			m_fRotateSpeed = { 0.f };
-	_float			m_bSound = { 0.f };
 
 	_vector			m_vPosition = {};
 	_vector			m_vKirbyPos = {};
@@ -74,6 +73,7 @@ private:
 	_bool			m_bActive = { false };
 	_bool			m_bFire = { false };
 	_bool			m_bFireActive = { false };
+	_bool			m_bSound = { false };
 
 	//이펙트 체크 위한 타임
 	_float			m_fFlyingTime = { 0.f };

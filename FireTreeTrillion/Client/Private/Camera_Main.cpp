@@ -424,12 +424,18 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 			}
 		}
 
-		if (m_eSpecialSeq == SEQ_FINALBOSS_2PHASE || m_eSpecialSeq == SEQ_FINALBOSS_DEAD
-			|| m_eSpecialSeq == SEQ_FINALBOSS_ENDING)
+		if (m_eSpecialSeq == SEQ_FINALBOSS_2PHASE)
 		{
 			CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster"));
 			if (nullptr != pBoss)
-				m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 4.5, 0.f });
+				m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 4.5f, 0.f });
+		}
+
+		if (m_eSpecialSeq == SEQ_FINALBOSS_DEAD || m_eSpecialSeq == SEQ_FINALBOSS_ENDING)
+		{
+			CGameObject* pBoss = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster"));
+			if (nullptr != pBoss)
+				m_pGameInstance->Update_DofFocus(pBoss->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 1.5f, 0.f });
 		}
 
 		if (m_eSpecialSeq == SEQ_FINALBOSS_DUMP)
@@ -2066,7 +2072,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_fSeqEventTime = fLastSeqStartTime;
 
 		//보스 정면으로
-		vStartPos = { 0.f, 35.f, -3.f } + _float3{0.f, 0.f, 30.f};
+		vStartPos = { 0.f, 35.f, -3.f } + _float3{0.f, 0.f, 40.f};
 		Fill_HardCutSet(newAction, fLastSeqStartTime);
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos);
@@ -2076,7 +2082,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 
 		//
 		Fill_InterpolateCutSet(newAction, fLastSeqStartTime, EASE_INOUT, 5.f);
-		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ 0.f, -5.f, -5.f });
+		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos + _float3{ 0.f, -5.f, 5.f });
 		m_CamSeq.push_back(newAction);
 
 		Fill_InterpolateCutSet(newAction, fLastSeqStartTime + 5.f, EASE_INOUT, 8.f);

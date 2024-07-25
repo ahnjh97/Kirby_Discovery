@@ -382,9 +382,9 @@ void CTransingStar::On_Event()
             CLoadingFont::LOADINGFONT_DESC LoadingFont_Desc{};
             HRESULT hr;
             LoadingFont_Desc.strTag = TEXT("Prototype_Component_Texture_UI_Forest_Font");
-            _float fPosX = -40.f;
-            _float fEndPos = -105.f;
-            _float fDisappearPos = -185.f;
+            _float fPosX = -60.f;
+            _float fEndPos = -125.f;
+            _float fDisappearPos = -205.f;
             for (_uint i = 0; i < 5; ++i)
             {
                 LoadingFont_Desc.fPosX = fPosX;
