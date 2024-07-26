@@ -547,6 +547,17 @@ void CRenderer::Color_Initialize()
 		0.189941f, 0.360106f
 		});
 
+	Save_ColorSet("BeforeFinal",
+		COLOR_DATA{
+		0.990317f, 1.f, 0.990142f, 0.810028f, 1.09972f,
+		1.19012f, 0.990103f,
+		0.659997f, 0.569915f, 0.6f, 1.00967f, 0.92066f, 1.04017f,
+		0.243137f, 0.00784314f, 0.00784314f, 0.0198248f,
+		0.917647f, 0.513726f, 0.145098f, 0.0196695f,
+		1.f, 0.847059f, 0.254902f, 0.019362f,
+		0.13f, 0.55f
+		});
+
 	//쉐이더 타입 트리거는 idx 1, 접촉하면 해당 함수를 호출!
 	function<void(_int)> TriggerFunc = bind(&CRenderer::Set_ColorSet_ByIndex, this, placeholders::_1);
 	m_pGameInstance->Emplace_TriggerFunc(1, TriggerFunc);
@@ -1145,7 +1156,18 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 		Setting_GodRay({ 3450.f, 940.f, 580.f });
 		Update_Ocean(0.f, -2000.f, -1000.f);
 
+		break;
+	case 16:
+		{
+		m_DestColorData = Find_ColorSet("BeforeFinal");
+		Update_DirectionalLight({ .6f, .18f, .13f, 1.f }, { .38f, .12f, .12f, 1.f });
 
+		Update_RimLight(.6f, 1.5f, { 1.f, .5f, .3f });
+		Update_DOFSet(0.f, { -.05f, -.01f, -.02f });
+		Setting_GodRay({ 3450.f, 940.f, 580.f });
+
+		Update_Ocean(0.f, -2000.f, -1000.f);
+	}
 		break;
 	default:
 		m_DestColorData = Find_ColorSet("Tutorial");
