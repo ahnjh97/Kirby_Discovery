@@ -203,7 +203,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	}
 	//else if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
 	//	Change_State(FINALBOSS_DEMOAPPEARCUT5, 50.f, false, false);
-	else if (m_pGameInstance->Get_KeyState(DIK_O, KEY_DOWN) || m_fHp <= 0.f)
+	else if (m_pGameInstance->Get_KeyState(DIK_O, KEY_DOWN) || m_fHp <= 0.1f)
 	{
 		if(false == m_bLastDamage)
 		{
@@ -707,6 +707,8 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
 
+		m_pGameInstance->Setting_RadialBlur(10.f, 10.f);
+
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
@@ -721,6 +723,8 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
 
+		m_pGameInstance->Setting_RadialBlur(10.f, 10.f);
+
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		FXDesc.vInitScale = { 2.f, 2.f, 2.f };
@@ -734,6 +738,8 @@ void CFinalBoss::HitBoxChanger(_uint eState)
 			pCamera->Make_Shake(0.3f, 0.5f);
 
 		Activate_FrustumCollider(0.5f, 10.f, 180.f);
+
+		m_pGameInstance->Setting_RadialBlur(15.f, 15.f);
 
 		CMultiEffect::MULTI_FX_DESC FXDesc{};
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
@@ -761,7 +767,10 @@ void CFinalBoss::Create_Gully()
 			m_bShake = true;
 			CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 			if (pCamera != nullptr)
+			{
+				m_pGameInstance->Setting_RadialBlur(10.f, 4.f);
 				pCamera->Make_Shake(1.f, 1.f);
+			}
 
 			_uint iRand = rand() % 2;
 			if(0 == iRand)

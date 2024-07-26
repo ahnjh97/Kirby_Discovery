@@ -353,31 +353,31 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 			//}
 		}
 
-#pragma region 사자
+		#pragma region 사자
 
-		//사자 컷
-		if (SEQ_SIMBA_START <= m_eSpecialSeq && m_eSpecialSeq <= SEQ_SIMBA_LOW)
-		{
-			//사자 로우 앵글포커스
-			if (m_eSpecialSeq == SEQ_SIMBA_LOW)
-			{
-				CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
-				if (nullptr != pSimba)
-					m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 8.f, 0.f });
-			}
-			//그 외 사자
-			else if (m_eSpecialSeq != SEQ_SIMBA_START)
-			{
-				CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
-				if (nullptr != pSimba)
-					m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 5.f, 0.f });
-			}
-			//커비
-			else
-			{
-				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION) + KIRBY_DOFOFFSET);
-			}
-		}
+				//사자 컷
+				if (SEQ_SIMBA_START <= m_eSpecialSeq && m_eSpecialSeq <= SEQ_SIMBA_LOW)
+				{
+					//사자 로우 앵글포커스
+					if (m_eSpecialSeq == SEQ_SIMBA_LOW)
+					{
+						CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
+						if (nullptr != pSimba)
+							m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 8.f, 0.f });
+					}
+					//그 외 사자
+					else if (m_eSpecialSeq != SEQ_SIMBA_START)
+					{
+						CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
+						if (nullptr != pSimba)
+							m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 5.f, 0.f });
+					}
+					//커비
+					else
+					{
+						m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION) + KIRBY_DOFOFFSET);
+					}
+				}
 
 		if (m_eSpecialSeq == SEQ_SIMBA_THRONEBREAK)
 		{
@@ -393,15 +393,15 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 			}
 		}
 
-		if (m_eSpecialSeq == SEQ_SIMBA_BOSSORIGIN)
-		{
-			CGameObject* pOrigin = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_BossOrigin"));
+				if (m_eSpecialSeq == SEQ_SIMBA_BOSSORIGIN)
+				{
+					CGameObject* pOrigin = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_BossOrigin"));
 
-			if (nullptr != pOrigin)
-				m_pGameInstance->Update_DofFocus(pOrigin->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 3.f, 0.f });
-		}
+					if (nullptr != pOrigin)
+						m_pGameInstance->Update_DofFocus(pOrigin->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 3.f, 0.f });
+				}
 
-#pragma endregion
+		#pragma endregion
 
 		//파이널 보스 등장
 		if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR)
@@ -475,6 +475,9 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 			}
 		}
 	}
+
+	if(m_bOnceFade)
+		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.1f);
 }
 
 void CCamera_Main::Check_FinaleScene(_float fTimeDelta)
@@ -705,18 +708,17 @@ void CCamera_Main::Fill_ActionDir(CAMACTION& Action, CAMDIR eCamDir, _float3 vDi
 // 임시입니다.
 void CCamera_Main::Change_LevelTrigger()
 {
-	static _bool bOnceFade = false;
 	static _bool bOnceChangeLevel = false;
 	_float4 vPos = GET_POS;
 	if (vPos.y >= 95.f)
 	{
 		CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
 		CUI_Fading* pFadingUI = static_cast<CUI_Fading*>(pUIObj);
-		if (bOnceFade == false)
+		if (m_bOnceFade == false)
 		{
 			pFadingUI->Set_InOutState(CUI_Fading::FADEOUT);
 			pFadingUI->Set_IsRender(true);
-			bOnceFade = true;
+			m_bOnceFade = true;
 		}
 		else if (pFadingUI->Get_FadeRatio() <= 0.f)
 		{

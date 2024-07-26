@@ -202,6 +202,7 @@
     <ClInclude Include="..\Public\BombOrbitGlow.h" />
     <ClInclude Include="..\Public\BossChimera.h" />
     <ClInclude Include="..\Public\BossClone.h" />
+    <ClInclude Include="..\Public\BossName.h" />
     <ClInclude Include="..\Public\BossOrigin.h" />
     <ClInclude Include="..\Public\BreakableBlock.h" />
     <ClInclude Include="..\Public\BreakableRock.h" />
@@ -470,6 +471,7 @@
     <ClCompile Include="..\Private\BombOrbitGlow.cpp" />
     <ClCompile Include="..\Private\BossChimera.cpp" />
     <ClCompile Include="..\Private\BossClone.cpp" />
+    <ClCompile Include="..\Private\BossName.cpp" />
     <ClCompile Include="..\Private\BossOrigin.cpp" />
     <ClCompile Include="..\Private\Box.cpp" />
     <ClCompile Include="..\Private\BreakableBlock.cpp" />
