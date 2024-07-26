@@ -52,7 +52,7 @@ HRESULT CSpikeSpear::Initialize(void* pArg)
 	m_fRingOuterRadius = 0;
 
 	m_fAttack = 10.f;
-
+	
 	return S_OK;                                                                                                                                                                                                                          
 }
 

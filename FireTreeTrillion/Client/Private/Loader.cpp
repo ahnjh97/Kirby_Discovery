@@ -222,6 +222,7 @@
 #include "LoadingStart.h"
 #include "HUD_KirbyNameTag.h"
 #include "LoadingFont.h"
+#include "BossName.h"
 
 // 아이템
 #include "Food.h"
@@ -417,6 +418,8 @@ HRESULT CLoader::Loading_ObjectAll()
 
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LoadingStart"), CLoadingStart);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("LoadingFont"), CLoadingFont);
+
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BossName"), CBossName);
 
 	//DIALOG
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("Dialog"), CDialog);
@@ -1744,9 +1747,10 @@ HRESULT CLoader::Add_StaticUITexture()
 	//UI_LoadingStart
 	hr = Add_Texture(LEVEL_STATIC, "UI_LoadingStart", "UI/LoadingStart/WorldIconLevel%d.png", 3);	CHECK_FAILED(hr);
 	hr = Add_Texture(LEVEL_STATIC, "UI_LoadingStartSide", "UI/LoadingStart/ComebackAreaCountBaseLv%d.png", 3);	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "UI_Forest_Font", "UI/LoadingStart/Loading_Forest_Font%d.dds", 5);	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "UI_Lab_Font", "UI/LoadingStart/Loading_Lab_Font%d.dds", 6);	CHECK_FAILED(hr);
-	hr = Add_Texture(LEVEL_STATIC, "UI_Park_Font", "UI/LoadingStart/Loading_Park_Font%d.dds", 7);	CHECK_FAILED(hr);
+
+	hr = Add_Texture(LEVEL_STATIC, "UI_Forest_Font", "UI/LoadingStart/Loading_Forest_Font%d.png", 5);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "UI_Lab_Font", "UI/LoadingStart/Loading_Lab_Font%d.png", 6);	CHECK_FAILED(hr);
+	hr = Add_Texture(LEVEL_STATIC, "UI_Park_Font", "UI/LoadingStart/Loading_Park_Font%d.png", 7);	CHECK_FAILED(hr);
 
 	return S_OK;
 }
@@ -2275,6 +2279,7 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 
 		// 액체괴물 :: Fecto_Forgo
 		//m_vecModelInfo.emplace_back("", TYPE_ANIM, 1.f, 180.f);
+		m_vecModelInfo.emplace_back("BossChimeraPerfect", TYPE_NONANIM, 1.f);
 
 		// For Monster
 		m_vecModelInfo.emplace_back("Awoofy", TYPE_ANIM, 1.2f, 180.f);

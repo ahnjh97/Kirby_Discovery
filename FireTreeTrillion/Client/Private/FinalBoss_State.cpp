@@ -9,6 +9,7 @@
 #include "Ability.h"
 #include "Camera_Main.h"
 #include "Gully.h"
+#include "BossName.h"
 //#include "SpikeSpear.h"
 
 
@@ -83,6 +84,12 @@ void CFinalBoss_Appear_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			m_bSound2 = true;
 			// »ç¿îµå
 			m_pGameInstance->PlaySound_Free(L"BossChimera_LaserCharge.wav", 0.5f);
+
+			HRESULT hr;
+			CBossName::BOSSNAME BossNameDesc = {};
+			BossNameDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 2.f;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Name"), TEXT("Prototype_GameObject_BossName"), &BossNameDesc);
+			CHECK_FAILED(hr);
 		}
 	}
 	//else if (0.4f < pFinalBoss->Get_AnimRatio())
@@ -94,7 +101,6 @@ void CFinalBoss_Appear_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	//		m_pGameInstance->PlaySound_Free(L"BossChimera_Appear.wav", 0.5f);
 	//	}
 	//}
-
 	if (pFinalBoss->IsAnimFinished())
 	{
 		HRESULT hr;
@@ -104,6 +110,28 @@ void CFinalBoss_Appear_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 		pKirby->Get_KirbyInfo()->m_bFinalBossCutStart = false;
 		pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAITAIR, 50.f, false, true);
+
+		CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+		AbilityItemDesc.bImmortal = true;
+		AbilityItemDesc.vPosition = XMVectorSet(16.f, 0.f, 16.f, 1.f);
+		AbilityItemDesc.eAbilityType = ABILITY_SWORD;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+
+		AbilityItemDesc.vPosition = XMVectorSet(16.f, 0.f, -16.f, 1.f);
+		AbilityItemDesc.eAbilityType = ABILITY_BOMB;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+
+		AbilityItemDesc.vPosition = XMVectorSet(-16.f, 0.f, -16.f, 1.f);
+		AbilityItemDesc.eAbilityType = ABILITY_HAMMER;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
+
+		AbilityItemDesc.vPosition = XMVectorSet(-16.f, 0.f, 16.f, 1.f);
+		AbilityItemDesc.eAbilityType = ABILITY_CRASH;
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+		CHECK_FAILED(hr);
 	}
 }
 
@@ -640,6 +668,8 @@ void CFinalBoss_Stab_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			if (pController->Is_Terrain())
 			{
+				m_pGameInstance->Setting_RadialBlur(pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 20.f, 10.f);
+
 				_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
 				_float4 vLook = pTransformCom->Get_State(CTransform::STATE_LOOK);
 
