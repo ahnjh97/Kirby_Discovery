@@ -75,7 +75,7 @@ HRESULT CSimba::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_fMaxHp = 320.f;
-	m_fHp = 320.f;
+	m_fHp = 160.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eEyeState = SIMBAEYE_BIG;
@@ -983,34 +983,36 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 			//레이저와의 충돌 자국
 			CEffect::FX_DESC FXDesc{};
 
-			FXDesc.fStartDelay = .15f;
+			FXDesc.fStartDelay = .3f;
 			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
 			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Get_State_Vector_Matrix(m_DimensionClawMat, CUtils::STATE_LOOK));
 
 			FXDesc.vInitPos = static_cast<_float3>(vCollidingPointA);
 			FXDesc.vInitPos.y = 2.3f;
-			FXDesc.vInitPos.z += 2.f;
+			FXDesc.vInitPos.z += 3.f;
 			Add_Effect("HS_lion cross decal", FXDesc);
 
 			FXDesc.vInitPos = static_cast<_float3>(vCollidingPointB);
 			FXDesc.vInitPos.y = 2.3f;
-			FXDesc.vInitPos.z += 2.f;
+			FXDesc.vInitPos.z += 3.f;
 			Add_Effect("HS_lion cross decal", FXDesc);
 
 
 			//충돌 시 튀는 파티클
 			CParticle::PARTICLE_DESC ParticleDesc{};
+			ParticleDesc.fStartDelay = .6f;
 			ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
 			ParticleDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Get_State_Vector_Matrix(m_DimensionClawMat, CUtils::STATE_LOOK));
 
 			ParticleDesc.vInitPos = static_cast<_float3>(vCollidingPointA);
 			ParticleDesc.vInitPos.y = 2.3f;
-			FXDesc.vInitPos.z += 2.f;
+			//ParticleDesc.vInitPos.z += 2.f;
 
 			Add_Effect("HS_lion laser collide particle B", ParticleDesc);
 
 			ParticleDesc.vInitPos = static_cast<_float3>(vCollidingPointB);
 			ParticleDesc.vInitPos.y = 2.3f;
+			//ParticleDesc.vInitPos.z += 2.f;
 
 			Add_Effect("HS_lion laser collide particle B", ParticleDesc);
 		}
@@ -1019,21 +1021,24 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 		{
 			//레이저와의 충돌 자국
 			CEffect::FX_DESC FXDesc{};
-			FXDesc.fStartDelay = .15f;
+			FXDesc.fStartDelay = .3f;
 
 			FXDesc.vInitPos = static_cast<_float3>(vClawMatPoint);
 			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
 			FXDesc.vInitPos.y = 2.3f;
-			FXDesc.vInitPos.z += 2.f;
+			FXDesc.vInitPos.z += 3.f;
 
 			Add_Effect("HS_lion cross decal", FXDesc);
 
 
 			//충돌 시 튀는 파티클
 			CParticle::PARTICLE_DESC ParticleDesc{};
+			ParticleDesc.fStartDelay = .6f;
+
 			ParticleDesc.vInitPos = static_cast<_float3>(vClawMatPoint);
 			ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
 			ParticleDesc.vInitPos.y = 2.3f;
+			//ParticleDesc.vInitPos.z += 2.f;
 
 			Add_Effect("HS_lion laser collide particle B", ParticleDesc);
 		}

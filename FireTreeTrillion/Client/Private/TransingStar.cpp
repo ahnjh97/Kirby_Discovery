@@ -119,6 +119,12 @@ HRESULT CTransingStar::Render()
 
     if (m_eActivateType == CLOSE)
     {
+        static _bool bOnce = false;
+        if (bOnce == false)
+        {
+            m_pGameInstance->PlaySound_Free(L"UI_TransingStar.wav", 0.4f);
+            bOnce = true;
+        }
         RenderClose();
     }
     else if (m_eActivateType == OPEN)
@@ -516,7 +522,7 @@ void CTransingStar::On_Event()
         {
             pKirby->Set_ControllerPos(_float4(-0.45f, -3.9f, -32.54f, 1.f));
             pCameraMain->Unlock();
-            //pCameraMain->Set_FOVY(38);
+            m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_FINAL);
             pCameraMain->Move_ForTrigger(m_fTimeDelta);
         }
         break;

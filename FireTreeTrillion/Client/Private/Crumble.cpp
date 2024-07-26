@@ -181,6 +181,8 @@ void CCrumble::Break_Crumble()
 	if (false == m_bOnce)
 	{
 		m_pModelCom->Set_Animation(PREDISAPPEAR, 30.f, true, false);
+		m_pGameInstance->PlayMySound(L"Gimmick_Crumble_Break.wav", CHANNEL_GIMMICK, 0.5f);
+
 		m_bOnce = true;
 	}
 }
