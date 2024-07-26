@@ -64,11 +64,15 @@ _int CDeeDeeDeeHammer::Tick(_float fTimeDelta)
 	if (m_bShowDialog)
 	{
 		m_fShowDialog += fTimeDelta;
-		if (m_fShowDialog > 3.f)
+		if (m_bFadeOutEnd)
+			Ready_FadeIn();
+
+		else if (m_fShowDialog > 7.f) 
 		{
-			(m_bFadeOutEnd == false) ? Ready_FadeOut() : Ready_FadeIn();
-			m_fShowDialog = 0.f;
+			if(m_bFadeOutEnd == false) 
+				Ready_FadeOut();
 		}
+
 		// Managing Sound
 		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.1f);
 	}
