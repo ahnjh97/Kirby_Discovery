@@ -65,7 +65,7 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 				if (nullptr != pCam)
 				{
 					if(*m_pGameInstance->Get_CurrentLevelID() == LEVEL_SIMBA || *m_pGameInstance->Get_CurrentLevelID() == LEVEL_FINALBOSS)
-						pCam->Set_FinalOffset( { 0.f,-2.f, 0.f } , .4f);
+						pCam->Set_FinalOffset( { 0.f,-1.4f, 0.f } , .4f);
 					pCam->Set_FOVY(20.f);
 				}
 

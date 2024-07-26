@@ -75,7 +75,7 @@ HRESULT CSimba::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_fMaxHp = 320.f;
-	m_fHp = 160.f;
+	m_fHp = 320.f;
 	m_fAttack = 10.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eEyeState = SIMBAEYE_BIG;
@@ -1408,7 +1408,7 @@ void CSimba::SetUpSecondTarget()
 {
 	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 	if (pCamera != nullptr)
-		pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_FINALBOSS, { 0.f, 4.5f, 0.f }, 10.f);
+		pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_FINALBOSS, { 0.f, 3.5f, 0.f }, 10.f);
 }
 
 void CSimba::CheckFinalCrusherRingCollision(_float fTimeDelta)

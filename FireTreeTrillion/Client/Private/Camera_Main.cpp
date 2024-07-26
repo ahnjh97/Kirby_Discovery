@@ -916,7 +916,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 				CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 				if (pFinalBoss != nullptr)
 				{
-					Set_Target(pFinalBoss->Get_TransformCom(), TARGET_SECOND, FOCUS_FINALBOSS, { 0.f, 3.f, 0.f }, 10.f);
+					Set_Target(pFinalBoss->Get_TransformCom(), TARGET_SECOND, FOCUS_FINALBOSS, { 0.f, 2.f, 0.f }, 10.f);
 				}
 			}
 			break;
