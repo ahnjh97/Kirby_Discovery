@@ -119,6 +119,12 @@ HRESULT CTransingStar::Render()
 
     if (m_eActivateType == CLOSE)
     {
+        static _bool bOnce = false;
+        if (bOnce == false)
+        {
+            m_pGameInstance->PlaySound_Free(L"UI_TransingStar.wav", 0.4f);
+            bOnce = true;
+        }
         RenderClose();
     }
     else if (m_eActivateType == OPEN)
