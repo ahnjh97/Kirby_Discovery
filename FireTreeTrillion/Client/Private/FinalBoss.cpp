@@ -38,7 +38,7 @@ void CFinalBoss::Appear_Event(CGameObject* pObj)
 
 	FXDesc = {};
 	FXDesc.vInitPos = { 0.f, 15.f, 0.f };
-	Add_Effect("BDBY", FXDesc);
+	Add_Effect("BDBY yellow", FXDesc);
 
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 	MultiFXDesc.pSocketMatrix = &m_EffectSocket;

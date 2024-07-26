@@ -233,6 +233,7 @@ void CKirbyFinalCut_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeD
 		{
 			if (m_bSound[1] == true)
 			{
+				//지영아 여기야
 				m_pGameInstance->PlaySound_Free(L"KirbyFinal_Cut3.wav", 0.5f);
 				m_bSound[1] = false;
 			}
