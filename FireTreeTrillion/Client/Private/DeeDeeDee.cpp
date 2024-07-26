@@ -45,8 +45,8 @@ HRESULT CDeeDeeDee::Initialize(void* pArg)
 	m_tInfo.m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 
 	m_fMaxHp = 200.f;
-	//m_fHp = 200.f;
-	m_fHp = 10.f; //디버그용 HP
+	m_fHp = 200.f;
+	//m_fHp = 10.f; //디버그용 HP
 	m_fAttack = 15.f;
 	m_eVacuumSize = SIZE_BIG;
 	m_eAbilityType = ABILITY_DEFAULT;

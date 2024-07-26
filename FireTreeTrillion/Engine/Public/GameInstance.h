@@ -151,6 +151,7 @@ public: /* For.Light_Manager */
 	class CLight* Get_DirectionLightAddress();
 	void Blink_Light(_float fTimeDelta, _uint iLightNum, _float fRandomSpeed = 1.f);
 	void Set_CurLightRange(_uint iLightNum, _float fRange);
+	list<class CLight*>* Get_LightListPtr();
 
 #pragma region FONT_MANAGER
 
@@ -249,6 +250,7 @@ public: /* For.PhysX */
 
 	void DisableActor(PxActor* pActor);
 	void ReleaseActor(PxActor* pActor);
+	PxRigidActor* RayCast(CTransform::ACTOR eActorType, _float4 vPos, _float3 vDir, _float fRayCastDistance = 25.f, _float3 vOffset = _float3());
 
 public: /* For. Picking */
 	void Transform_PickingToLocalSpace(const class CTransform* pTransform, _Out_ _float3* pRayDir, _Out_ _float3* pRayPos);

@@ -107,6 +107,8 @@ public:
 	void Set_DimensionGateActivation(_bool bActivation) { m_bDimensionClawActivated = bActivation; }
 	_uint Get_SmokeCount() { return m_iSmokeCount; }
 
+	void Set_MoveEye(_bool bMoveEye) { m_bMoveEye = bMoveEye; }
+
 public:
 	virtual HRESULT Initialize_Prototype()			override;
 	virtual HRESULT Initialize(void* pArg)			override;
@@ -187,6 +189,7 @@ private:
 	class CBone*	m_pLeftFootBone = { nullptr };
 	class CBone*	m_pRightFootBone = { nullptr };
 	class CBone*	m_pMouthBone = { nullptr };
+	class CBone*	m_pEyeBone = { nullptr };
 
 	_float4x4		m_matLeftHand = { _float4x4::Identity };
 	_float4x4		m_matRightHand = { _float4x4::Identity };
@@ -277,6 +280,8 @@ private:
 	_uint			m_iSmokeCount = {};
 	_float			m_fClawMoveTime = {};
 	_float4			m_vClawVelocity = {};
+	_float2			m_vUvOffset = {};
+	_bool			m_bMoveEye = {};
 
 private:
 	HRESULT		Add_Components();
@@ -317,6 +322,9 @@ private:
 	void		RemoveDeadDebrisFromList();
 
 	_float3		ComputeAngleForEffect(_float fReverseLook = 1.f);
+
+	_float		ComputeAngle();
+	void		DetermineSimbaEyeUV();
 
 #ifdef _DEBUG
 	void		RenderRing();

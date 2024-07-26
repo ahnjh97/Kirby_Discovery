@@ -27,6 +27,7 @@
 
 #include "WaddleDee.h"
 #include "ItemObject.h"
+#include "Light.h"
 
 #define MONSTER_TRIGGER(index) (index - 11)
 
@@ -1216,6 +1217,25 @@ HRESULT CLevel_Park::Ready_Objects()
 					break;
 				}
 			}
+		}
+
+		CModel* pModel = dynamic_cast<CModel*> (pField->Get_Component(TEXT("Com_Model_NonAnim")));
+		if (nullptr == pModel)
+			continue;
+
+		if (pModel->Get_ModelName() == "Gimmick_PkFunHouseDarkness01")
+		{
+			list<CLight*>* lightListPtr = m_pGameInstance->Get_LightListPtr();
+			if (nullptr == lightListPtr)
+				continue;
+
+			for (auto& light : *lightListPtr)
+			{
+				LIGHT_DESC lightDesc = *light->Get_LightDesc();
+				if (lightDesc.eType = LIGHT_DESC::TYPE_POINT)
+					pField->CheckMovingPointLights(light);
+			}
+			
 		}
 	}
 

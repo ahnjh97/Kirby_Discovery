@@ -890,6 +890,8 @@ CGameObject* CFinalBoss::Clone(void* pArg)
 
 void CFinalBoss::Free()
 {
+	CEventCenter::Get_Instance()->Unsubscribe(this);
+
 	__super::Free();
 
 	for (auto& Pair : m_PartObjects)

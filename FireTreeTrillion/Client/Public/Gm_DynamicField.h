@@ -35,6 +35,8 @@ public:
 	void Set_ReturnMove(_bool _bReturnMove) { m_bReturnMove = _bReturnMove; }
 	void EmplaceBackItem(CPhysXObject* pItem) { m_vecItems.emplace_back(pItem); Safe_AddRef(pItem); }
 
+	void CheckMovingPointLights(class CLight* pPointLight);
+
 private:
 	CGm_DynamicField(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CGm_DynamicField(const CGm_DynamicField& rhs);
@@ -60,6 +62,7 @@ private:
 	void				Apply_Quake(_float _fTimeDelta, _float _fQuakeDuration, _float _fShakeIntensity);
 	_int				Movement_Field(_float _fTimeDelta);
 	void				MoveItems(_float3 _vDir, _float _fTimeDelta);
+	void				MoveLights();
 	
 
 	unordered_set<_uint>	m_setUpdateMeshs;
@@ -102,6 +105,8 @@ private:
 	_bool					m_bPlaySoundFX = { FALSE };
 
 	_uint					m_iGimmickIndex = {};
+
+	vector<pair<class CLight*, _float3>>	m_vecPointLights;
 
 public:
 	static CGm_DynamicField* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
