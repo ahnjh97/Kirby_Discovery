@@ -121,7 +121,6 @@ _int CDeeDeeDee::Tick(_float fTimeDelta)
 		CTransform* pDeDeDeTrans = this->Get_TransformCom();
 
 		pDeDeDeTrans->Look_At_Interpolate(pKirbyTrans->Get_State_Vector(CTransform::STATE_POSITION), m_fTimeDelta);
-
 		pKirbyTrans->Look_At_Interpolate(pDeDeDeTrans->Get_State_Vector(CTransform::STATE_POSITION), m_fTimeDelta);
 		//pKirby->DialogOn(pKirbyTrans->Get_State_Float4(CTransform::STATE_LOOK));
 		//m_bIsInteractKirby = FALSE;
