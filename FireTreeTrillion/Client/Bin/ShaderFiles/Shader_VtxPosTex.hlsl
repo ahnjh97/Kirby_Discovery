@@ -259,7 +259,7 @@ PS_OUT PS_MAIN_BLEND_FX(PS_IN_ALPHABLEND In)
     if (smoothedAlpha < 0.1)
         discard;
     
-    
+    MaskTest(vMask);
 
     vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord + g_vUVOffset);
     if (vDiffuse.a < .01f || (vDiffuse.r < 0.1f && vDiffuse.g < 0.1f && vDiffuse.b < 0.1f))

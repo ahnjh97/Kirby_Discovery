@@ -29,6 +29,8 @@ public:
 	_float m_fBoomTime = { 0.f };
 	_int   m_iBoomCount = { 0 };
 
+	_float m_fDumpAbilityTime = { 0.f };
+
 	static	CKirbyCrash_Attack_State*		Create();
 	virtual void								Free() override;
 };
@@ -61,6 +63,8 @@ public:
 
 	_float m_fBoomTime = { 0.f };
 	_int   m_iBoomCount = { 0 };
+
+	_float m_fDumpAbilityTime = { 0.f };
 
 	static	CKirbyCrash_BigAttack_State* Create();
 	virtual void								Free() override;

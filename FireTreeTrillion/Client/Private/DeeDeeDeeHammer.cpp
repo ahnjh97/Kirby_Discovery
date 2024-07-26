@@ -69,6 +69,8 @@ _int CDeeDeeDeeHammer::Tick(_float fTimeDelta)
 			(m_bFadeOutEnd == false) ? Ready_FadeOut() : Ready_FadeIn();
 			m_fShowDialog = 0.f;
 		}
+		// Managing Sound
+		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.1f);
 	}
 
 	return OBJ_NOEVENT;

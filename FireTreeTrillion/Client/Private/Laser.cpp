@@ -100,7 +100,7 @@ _int CLaser::Tick(_float fTimeDelta)
 			fDecalTime = 0.f;
 
 			_float3 vCollidingPoint =
-				CUtils::Compute_CollidingPoint(GET_POS, (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK), { 0.f, 0.f, 0.f }, { 21.f, 1.f, 21.f });
+				CUtils::Compute_CollidingPoint(GET_POS, (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK), { 0.f, -.5f, 0.f }, { 21.f, 1.f, 21.f });
 
 			if (!ISDEFAULTFLOAT3(vCollidingPoint))
 			{

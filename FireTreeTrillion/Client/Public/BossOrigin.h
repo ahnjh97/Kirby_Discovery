@@ -52,6 +52,7 @@ private:
 
 	_bool m_bRender_Bloom = { false };
 	_bool m_bBloom = { false };
+	_bool m_bSoundDown = false;
 
 public:
 	static CBossOrigin* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

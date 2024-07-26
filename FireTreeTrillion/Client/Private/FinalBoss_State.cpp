@@ -2251,9 +2251,6 @@ void CFinalBoss_LastDamage_State::OnStateUpdate(CGameObject* pGameObject, _float
 			//피 다 깎여서 엎드림
 		case CFinalBoss::FINALBOSS_LASTDAMAGESTART:
 
-			if (pCamera != nullptr)
-				pCamera->Make_Sequence(CCamera_Main::SEQ_FINALBOSS_DEAD);
-
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_LASTDAMAGEWAIT, 50.f, false, false);
 			break;
 			//일어서서 빤쓰

@@ -90,8 +90,6 @@ HRESULT CAbility::Initialize(void* pArg)
 		FXDesc.vInitPos = { 0.f, .2f, 0.f };
 		FXDesc.pSocketMatrix = &m_EffectSocket;
 		FXDesc.vInitScale = { 1.7f, 1.7f, 1.7f };
-		//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemAbility1"), &FXDesc)))
-		//	return E_FAIL;
 
 		Add_Effect("ItemAbility1", FXDesc, true);
 	}
