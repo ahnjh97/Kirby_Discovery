@@ -1056,7 +1056,7 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 		Update_RimLight(.8f, 2.f, { 1.f, .6f, .35f });
 		Update_Ocean(0.f, -2000.f, -1000.f);
 
-		Update_DOFSet(0.f, { .26f, 0.f, -.11f });
+		Update_DOFSet(0.f, { .21f, .07f, .04f });
 	}
 	break;
 	case 8:

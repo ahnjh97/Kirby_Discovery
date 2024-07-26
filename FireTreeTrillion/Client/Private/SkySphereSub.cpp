@@ -64,11 +64,12 @@ void CSkySphereSub::Late_Tick(_float fTimeDelta)
 			iMod->Set_Hide(FALSE); //default FALSE
 	}
 	*/
-	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
+	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 }
 
 HRESULT CSkySphereSub::Render()
 {
+	//return S_OK;
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
