@@ -182,20 +182,35 @@
         <Data0 EventName="ApplyDamage" StartFrame="6" EndFrame="7"/>
         <Animation>HammerAttackHit</Animation>
         <AnimSpeed>60</AnimSpeed>
-        <Count>1</Count>
+        <Count>2</Count>
         <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
-        <Animation>Landing</Animation>
+		<Data1 EventName="HammerAttackHit" StartFrame="11" EndFrame="12"/>
+		<Animation>Jump</Animation>
+		<AnimSpeed>60</AnimSpeed>
+		<Count>1</Count>
+		<Data0 EventName="Jump" StartFrame="27" EndFrame="27"/>
+		<Animation>JumpEnd</Animation>
+		<AnimSpeed>60</AnimSpeed>
+		<Count>2</Count>
+		<Data0 EventName="JumpEnd" StartFrame="17" EndFrame="17"/>
+		<Data1 EventName="JumpEnd2" StartFrame="19" EndFrame="19"/>
+		<Animation>Landing</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
         <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
-        <Animation>Sliding</Animation>
+		<Animation>Command</Animation>
+		<AnimSpeed>20</AnimSpeed>
+		<Count>1</Count>
+		<Data0 EventName="Encount" StartFrame="26" EndFrame="27"/>
+		<Animation>Sliding</Animation>
         <AnimSpeed>60</AnimSpeed>
-        <Count>5</Count>
+        <Count>6</Count>
         <Data0 EventName="ApplyDamage" StartFrame="1" EndFrame="2"/>
         <Data1 EventName="ApplyDamage" StartFrame="19" EndFrame="20"/>
         <Data2 EventName="ApplyDamage" StartFrame="40" EndFrame="41"/>
         <Data3 EventName="ApplyDamage" StartFrame="60" EndFrame="61"/>
         <Data4 EventName="ApplyDamage" StartFrame="80" EndFrame="81"/>
+		<Data5 EventName="Sliding" StartFrame="1" EndFrame="2"/>
         <Animation>ShoutStart</Animation>
         <AnimSpeed>60</AnimSpeed>
         <Count>1</Count>
