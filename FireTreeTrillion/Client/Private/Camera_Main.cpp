@@ -916,7 +916,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 				CFinalBoss* pFinalBoss = dynamic_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_BossMonster")));
 				if (pFinalBoss != nullptr)
 				{
-					Set_Target(pFinalBoss->Get_TransformCom(), TARGET_SECOND, FOCUS_FINALBOSS, { 0.f, 3.f, 0.f }, 10.f);
+					Set_Target(pFinalBoss->Get_TransformCom(), TARGET_SECOND, FOCUS_FINALBOSS, { 0.f, 2.f, 0.f }, 10.f);
 				}
 			}
 			break;
@@ -3218,8 +3218,10 @@ _float3 CCamera_Main::Make_TargetPos()
 		//지형 위치를 구하여 같이 쓰기
 		_float4 vTerrainPos = static_cast<CCharacter*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
 
-		if (vTerrainPos.y != 0.f)
-			vTargetPos.y = vTerrainPos.y;
+		(*m_pCurrentLevelID == LEVEL_SIMBA)?
+				vTargetPos.y = 2.3f
+			:	vTargetPos.y = 0.f;
+
 	}
 	//피날레 카메라 포커스
 	else if (m_eCamFocus == FOCUS_FINALE)
