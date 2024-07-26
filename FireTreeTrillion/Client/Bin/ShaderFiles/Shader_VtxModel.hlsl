@@ -1037,7 +1037,36 @@ PS_OUT PS_SPIKESPEAR(PS_IN In)
     return Out;
 }
 
+PS_OUT_EFFECT PS_ALPHABLEND_NEARCLIP(PS_IN In)
+{
+    PS_OUT_EFFECT Out = (PS_OUT_EFFECT) 0;
 
+    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    AlphaTest(vDiffuse);
+
+    vector vViewPos = g_WorldMatrix._41_42_43_44;
+    vViewPos = mul(vViewPos, g_ViewMatrix);
+    
+    float fCameraDistance = 12.4f;
+    if (vViewPos.z < fCameraDistance)
+    {
+        float2 vPixelTexcoord = (float2) 0.f;
+        vPixelTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
+        vPixelTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
+        
+        vector vNearClipDesc = g_ObjNearClipTexture.Sample(LinearSampler, vPixelTexcoord * 100);
+        if (pow(saturate((vViewPos.z / fCameraDistance) - .1), 3) < vNearClipDesc.r)
+            discard;
+    }
+
+    Out.vColor.rgb = vDiffuse.rgb;
+    Out.vColor.a = vDiffuse.a;
+
+    if (.01 < Out.vColor.a)
+        Out.vNonBlur = vector(0.f, 1.f, 0.f, 0.f);
+    
+    return Out;
+}
 
 technique11 DefaultTechnique
 {
@@ -1409,4 +1438,16 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_SPIKESPEAR();
     }
 
+	// 알파블렌딩, 니어클립 (27)
+    pass AlphaBlend_NearClip
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
+        HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
+        DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
+        PixelShader = compile ps_5_0 PS_ALPHABLEND_NEARCLIP();
+    }
 }

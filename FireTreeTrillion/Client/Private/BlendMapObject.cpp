@@ -39,6 +39,12 @@ HRESULT CBlendMapObject::Initialize(void* pArg)
 
 	// Normal 유무 검사해서 PassIndex 지정하는 작업
 	//m_pModelCom->DeterminePassIndices(m_vecPassIndices);
+	m_setNearClipAlphaBlend = { "LbBossCapsuleGlass01L", "LbBossCapsuleGlass02L", "LbBossCapsuleGlass03L" };
+
+	m_iPassIndex = MAP_ALPHABLEND;
+
+	/*if (m_setNearClipAlphaBlend.end() != m_setNearClipAlphaBlend.find(m_pModelCom->Get_ModelName()))
+		m_iPassIndex = MAP_ALPHABLEND_NEARCLIP;*/
 
 	return S_OK;
 }
@@ -67,7 +73,7 @@ HRESULT CBlendMapObject::Render()
 			return E_FAIL;
 		/* 이 함수 내부에서 호출되는 Apply함수 호출 이전에 쉐이더 전역에 던져야할 모든 데이ㅏ터를 다 던져야한다. */
 
-		if (FAILED(m_pShaderCom->Begin(MAP_ALPHABLEND)))
+		if (FAILED(m_pShaderCom->Begin(m_iPassIndex)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;

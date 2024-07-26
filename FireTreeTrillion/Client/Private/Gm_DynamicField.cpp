@@ -7,6 +7,7 @@
 #include "Gm_ParkSolarPanelCharge.h"
 #include "SurprisedBoard.h"
 #include "Kirby.h"
+#include "Light.h"
 
 void CGm_DynamicField::Set_SolarPanelOnce(CGm_ParkSolarPanelOnce* _pSolarPanel)
 {
@@ -27,6 +28,23 @@ void CGm_DynamicField::RegisterToActorToKirby()
 		 return;
 
 	 pKirby->RegisterActorToPlayer_ForDynamicField(m_pDynamicActor, this);
+}
+
+void CGm_DynamicField::CheckMovingPointLights(CLight* pPointLight)
+{
+	LIGHT_DESC tDesc = *(pPointLight->Get_LightDesc());
+	if (tDesc.vSpecular.x == 0 && tDesc.vSpecular.y == 0 && tDesc.vSpecular.z == 0)
+		return;
+
+	if (tDesc.eType != LIGHT_DESC::TYPE_POINT)
+		return;
+
+	if (m_pDynamicActor == m_pGameInstance->RayCast(CTransform::DYNAMIC, tDesc.vPosition, _float3(0, -1, 0)))
+	{
+		_float3 vPos = GET_POS;
+		_float3 vOffset = _float3(tDesc.vPosition.x - vPos.x, tDesc.vPosition.y - vPos.y, tDesc.vPosition.z - vPos.z);
+		m_vecPointLights.push_back(pair<CLight*, _float3>(pPointLight, vOffset));
+	}
 }
 
 CGm_DynamicField::CGm_DynamicField(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -384,6 +402,7 @@ _int CGm_DynamicField::Movement_Field(_float _fTimeDelta)
 
 				m_pTransformCom->Go_Up(_fTimeDelta * fMoveSpeed);
 				MoveItems(_float3(0, 1, 0), _fTimeDelta * fMoveSpeed);
+				MoveLights();
 				fOffsetPosY = m_vInitPos.y + 20.f;
 				if (fOffsetPosY <= vCurPos.y) //36.963 > 56.963
 				{
@@ -674,6 +693,17 @@ void CGm_DynamicField::MoveItems(_float3 _vDir, _float _fTimeDelta)
 	}	
 }
 
+void CGm_DynamicField::MoveLights()
+{
+	_float4 vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+
+	for (auto& pair : m_vecPointLights)
+	{
+		_float4 vResultPos = vPos + pair.second;
+		pair.first->Update_LightPos(vResultPos);
+	}
+}
+
 CGm_DynamicField* CGm_DynamicField::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CGm_DynamicField* pInstance = new CGm_DynamicField(pDevice, pContext);
@@ -709,6 +739,9 @@ void CGm_DynamicField::Free()
 
 	for (auto& item : m_vecItems)
 		Safe_Release(item);
+
+	for (auto& pair : m_vecPointLights)
+		Safe_Release(pair.first);
 
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);

@@ -522,7 +522,7 @@ void CTransingStar::On_Event()
         {
             pKirby->Set_ControllerPos(_float4(-0.45f, -3.9f, -32.54f, 1.f));
             pCameraMain->Unlock();
-            //pCameraMain->Set_FOVY(38);
+            m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_FINAL);
             pCameraMain->Move_ForTrigger(m_fTimeDelta);
         }
         break;

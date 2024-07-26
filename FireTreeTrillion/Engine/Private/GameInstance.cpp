@@ -869,6 +869,14 @@ void CGameInstance::Set_CurLightRange(_uint iLightNum, _float fRange)
 	m_pLight_Manager->Set_CurLightRange(iLightNum, fRange);
 }
 
+list<class CLight*>* CGameInstance::Get_LightListPtr()
+{
+	if (nullptr == m_pLight_Manager)
+		return nullptr;
+
+	return m_pLight_Manager->Get_LightListPtr();
+}
+
 #pragma region FONT_MANAGER
 
 HRESULT CGameInstance::Add_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& strFontTag, const wstring& strFontFilePath)
@@ -1332,6 +1340,55 @@ void CGameInstance::ReleaseActor(PxActor* pActor)
 	pScene->removeActor(*pActor);
 	pActor->release();
 	pActor = nullptr;
+}
+
+PxRigidActor* CGameInstance::RayCast(CTransform::ACTOR eActorType, _float4 vPos, _float3 vDir, _float fRayCastDistance, _float3 vOffset)
+{
+	PxVec3 rayOrigin = PxVec3((_float)vPos.x + vOffset.x, (_float)vPos.y + vOffset.y, (_float)vPos.z + vOffset.z);
+	PxVec3 rayDirection = CUtils::To_PxVec3(vDir);
+	_float fMaxDistance = fRayCastDistance;
+
+	PxRaycastHit hit;
+	PxRaycastBuffer hitBuffer;
+	if (eActorType == CTransform::STATIC)
+	{
+		PxQueryFilterData filterData(PxQueryFlag::eSTATIC);
+		_bool isRayCast = Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eDEFAULT, filterData);
+		if (isRayCast)
+		{
+			hit = hitBuffer.block;
+
+			return hit.actor;
+		}
+		else
+			return nullptr;
+	}
+	else if (eActorType == CTransform::DYNAMIC)
+	{
+		PxQueryFilterData filterData(PxQueryFlag::eDYNAMIC);
+		_bool isRayCast = Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eDEFAULT, filterData);
+		if (isRayCast)
+		{
+			hit = hitBuffer.block;
+			return hit.actor;
+		}
+		else
+			return nullptr;
+	}
+	else if (eActorType == CTransform::BOTH)
+	{
+		PxQueryFilterData filterData;
+		_bool isRayCast = Get_Scene()->raycast(rayOrigin, rayDirection, fMaxDistance, hitBuffer, PxHitFlag::eDEFAULT, filterData);
+		if (isRayCast)
+		{
+			hit = hitBuffer.block;
+			return hit.actor;
+		}
+		else
+			return nullptr;
+	}
+	else
+		return nullptr;
 }
 
 void CGameInstance::Transform_PickingToLocalSpace(const CTransform* pTransform, _float3* pRayDir, _float3* pRayPos)

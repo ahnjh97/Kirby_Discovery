@@ -16,6 +16,7 @@ public:
 	{
 		MODEL tModel = {};
 		unordered_set<_uint> setBlendMeshIndices;
+		_uint iPassIndex = { MAP_ALPHABLEND };
 	};
 private:
 	CBlendMapObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -42,6 +43,9 @@ private:
 	unordered_set<_uint> m_setBlendMeshIndices;
 	vector<_uint> m_vecPassIndices;
 	
+	unordered_set<string> m_setNearClipAlphaBlend;
+	_uint m_iPassIndex = {};
+
 private:
 	HRESULT Add_Components(MODEL tModel);
 	HRESULT Bind_ShaderResources();

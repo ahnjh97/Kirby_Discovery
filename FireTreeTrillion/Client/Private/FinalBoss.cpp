@@ -38,7 +38,7 @@ void CFinalBoss::Appear_Event(CGameObject* pObj)
 
 	FXDesc = {};
 	FXDesc.vInitPos = { 0.f, 15.f, 0.f };
-	Add_Effect("BDBY", FXDesc);
+	Add_Effect("BDBY yellow", FXDesc);
 
 	CMultiEffect::MULTI_FX_DESC MultiFXDesc{};
 	MultiFXDesc.pSocketMatrix = &m_EffectSocket;
@@ -890,6 +890,8 @@ CGameObject* CFinalBoss::Clone(void* pArg)
 
 void CFinalBoss::Free()
 {
+	CEventCenter::Get_Instance()->Unsubscribe(this);
+
 	__super::Free();
 
 	for (auto& Pair : m_PartObjects)
