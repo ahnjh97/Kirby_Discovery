@@ -52,9 +52,11 @@ _int CBossName::Tick(_float fTimeDelta)
 		if (CFinalBoss::FINALBOSS_WAITAIR == pFinalBoss->Get_State())
 			m_bDead = true;
 	}
-	else
+	else if(LEVEL_SIMBA == *m_pGameInstance->Get_CurrentLevelID())
 	{
-
+		CSimba* pSimba = static_cast<CSimba*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Simba")));
+		if (CSimba::Simba_Walk == pSimba->Get_State())
+			m_bDead = true;
 	}
 
 	return OBJ_NOEVENT;
@@ -117,10 +119,17 @@ HRESULT CBossName::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_BossChiemraPerfect"),
-		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
-	CHECK_FAILED(hr);
-
+	if (LEVEL_FINALBOSS == *m_pGameInstance->Get_CurrentLevelID()) {
+		hr = __super::Add_Component(TEXT("Prototype_Component_Model_BossChiemraPerfect"),
+			TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+		CHECK_FAILED(hr);
+	}
+	else if (LEVEL_SIMBA == *m_pGameInstance->Get_CurrentLevelID()) {
+		hr = __super::Add_Component(TEXT("Prototype_Component_Model_BossLion"),
+			TEXT("Com_Model"), (CComponent**)&m_pModelCom);
+		CHECK_FAILED(hr);
+	}
+	
 	return S_OK;
 }
 

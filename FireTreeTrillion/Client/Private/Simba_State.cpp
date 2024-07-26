@@ -4,6 +4,7 @@
 #include "Kirby.h"
 #include "EventCenter.h"
 #include "Camera_Main.h"
+#include "BossName.h"
 
 static _float s_fOffsetY = {};
 static _uint s_iAttackCount = {};
@@ -60,6 +61,7 @@ void CSimba_Appear2::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _fA
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, iOffset);
 	m_fTime = 0.f; 
 	m_bPlaySound = false;
+	m_bCloneName = false;
 	_uint iCurAnim = _pModel->Get_CurAnimIndex();
 	if (CSimba::Simba_DemoAppear2Cut1 == iCurAnim)
 		s_fOffsetY = -0.3f;
@@ -113,6 +115,20 @@ void CSimba_Appear2::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			if (true == pSimba->Get_RenderMant())
 				pSimba->Set_RenderMant(false);
 			m_fTime += fTimeDelta;
+
+			if (0.0f < m_fTime && false == m_bCloneName)
+			{
+				m_bCloneName = true;
+				CBossName::BOSSNAME tDesc{};
+				tDesc.fScale = 0.46f;
+				CBone* pBone = dynamic_cast<CModel*>(pSimba->Get_Component(L"Com_Model"))->Get_BonePtrByIndex(0);
+
+				_float4 vOffset = -m_pTransform->Get_State(CTransform::STATE_LOOK) * 22.5f + _float4(0.65f, 5.75f, 0, 0);
+				tDesc.vPosition = m_pTransform->ComputeBoneWorldPos(pBone) + vOffset;
+
+				m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_BossName"), 
+					TEXT("Prototype_GameObject_BossName"), &tDesc);
+			}
 
 			if (m_fTime > 1.5f)
 			{

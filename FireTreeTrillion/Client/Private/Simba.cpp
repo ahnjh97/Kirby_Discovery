@@ -18,6 +18,7 @@
 #include "SimbaRock.h"
 #include "Debris.h"
 #include "Fire.h"
+#include "BossName.h"
 
 CSimba::CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
