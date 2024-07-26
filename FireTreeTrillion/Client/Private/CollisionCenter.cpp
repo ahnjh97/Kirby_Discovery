@@ -804,6 +804,7 @@ void CCollisionCenter::Simba_Battle()
 			pthis->Damage_And_Effect_For_Monster(pKirby, pSimba, 1.2f);
 			pSimba->Collision(CONTENT_DAMAGE, nullptr);
 			DstHit->Set_Alive(false);
+			GAMEINSTANCE PlaySound_Free(L"SimbaHit.wav", 0.25f);
 		});
 
 	// 플레이어 공격에 대한 처리
@@ -828,7 +829,7 @@ void CCollisionCenter::Simba_Battle()
 			DstHit->Set_Alive(false);
 			SrcHit->Set_Alive(false);
 			pObject->Set_PhyXState(PO_FLYDEADAWAY);
-
+			GAMEINSTANCE PlaySound_Free(L"SimbaHit.wav", 0.25f);
 		});
 
 	// 플레이어 공격에 대한 처리
@@ -853,6 +854,7 @@ void CCollisionCenter::Simba_Battle()
 			DstHit->Set_Alive(false);
 			SrcHit->Set_Alive(false);
 			Dst->Set_Dead();
+			GAMEINSTANCE PlaySound_Free(L"SimbaHit.wav", 0.25f);
 		});
 
 	// Simba 공격히트박스와 커비 충돌

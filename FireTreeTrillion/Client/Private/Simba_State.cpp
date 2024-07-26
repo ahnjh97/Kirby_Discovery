@@ -125,6 +125,7 @@ void CSimba_Appear2::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 				_vector vNewPos = vPos - vLook * 16.f;
 				m_pController->Set_Position(m_pTransform, vNewPos);
 				pSimba->CreateHpBar();
+				pSimba->Set_MoveEye(true);
 			}
 			break;
 		}
@@ -1013,7 +1014,7 @@ void CSimba_BiteRushJump::OnStateUpdate(CGameObject* pGameObject, _float fTimeDe
 			if (CSimba::Simba_Roar2 == iPreState)
 				pSimba->Change_State(CSimba::Simba_DimensionClawStart, 60.f, false, true);
 			else if(CSimba::Simba_DimensionClawEnd == iPreState)
-				pSimba->Change_State(CSimba::Simba_BiteRushStart, 50.f, false, true);
+				pSimba->Change_State(CSimba::Simba_BiteRushStart, 55.f, false, true);
 			else if (CSimba::Simba_DimensionLaserEnd == iPreState)
 				pSimba->Change_State(CSimba::Simba_DimensionClawStart, 60.f, false, true);
 			else 
@@ -1200,16 +1201,16 @@ void CSimba_BiteRush::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 	if (pSimba->IsAnimFinished())
 	{
 		if (CSimba::Simba_BiteRushStart == iState || CSimba::Simba_BiteRushStartStraight == iState)
-			pSimba->Change_State(CSimba::Simba_BiteRush, 50.f, true, false);
+			pSimba->Change_State(CSimba::Simba_BiteRush, 55.f, true, false);
 		else if (CSimba::Simba_BiteRushEnd == iState)
 			//pSimba->Change_State(CSimba::Simba_BiteRushStart, 50.f, false, false); // µð¹ö±ë¿ë
-			pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 50.f, false, false);
+			pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 60.f, false, false);
 
 		else if (CSimba::Simba_BiteRushTiredStart == iState)
-			pSimba->Change_State(CSimba::Simba_BiteRushTiredEnd, 50.f, false, false);	
+			pSimba->Change_State(CSimba::Simba_BiteRushTiredEnd, 60.f, false, false);
 		else if (CSimba::Simba_BiteRushTiredEnd == iState)
 			//pSimba->Change_State(CSimba::Simba_BiteRushStart, 50.f, false, false); // µð¹ö±ë¿ë
-			pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 50.f, false, false);
+			pSimba->Change_State(CSimba::Simba_DimensionLaserStart, 60.f, false, false);
 	}
 }
 

@@ -53,7 +53,7 @@ private:
 	_float				m_fAccTimePreDisappear = 0.f;
 	_float4				m_vOriginPosition = _float4();
 	_bool				m_bOnce = { false };
-
+	_float				m_fWhiteColorDiffuse = {};
 public:
 	static CCrumble*	 Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);

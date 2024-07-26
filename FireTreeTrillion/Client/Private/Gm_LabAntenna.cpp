@@ -86,8 +86,8 @@ void CGm_LabAntenna::Late_Tick(_float fTimeDelta)
 	if (TRUE == m_pModelCom->IsFinished())
 	{
 		m_eAnimState = STATE_BREAK;
+		Set_Dead();
 	}
-		//Set_Dead();
 }
 
 HRESULT CGm_LabAntenna::Render()
