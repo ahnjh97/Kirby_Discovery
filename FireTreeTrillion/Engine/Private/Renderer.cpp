@@ -575,7 +575,7 @@ void CRenderer::Fog_Intialize_ForIntroLevel(_int iPoint)
 
 		m_fFogViewStart = 1.f;
 		m_fFogViewEnd = 124.9f;
-		m_fFogViewIntensity = 1.f;
+		//m_fFogViewIntensity = 1.f;
 	}
 	else if (iPoint == 1) // 정글 포그
 	{
