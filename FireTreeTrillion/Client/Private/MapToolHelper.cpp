@@ -313,7 +313,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 									 "FhOrnamentRoofAL", "FhOrnamentRoofBL", "FhOrnamentRoofCL", "FhOrnamentRoofDL", "FhOrnamentRoofEL",
 									 "FnWallDecorationStickAL", "FnWallDecorationStickBL", "FnWallDecorationStickCL" };
 
-	m_setNearClipAlphaBlend = { "LbBossCapsuleGlass01L", "LbBossCapsuleGlass02L", "LbBossCapsuleGlass03L" };
+	//m_setNearClipAlphaBlend = { "LbBossCapsuleGlass01L", "LbBossCapsuleGlass02L", "LbBossCapsuleGlass03L" };
 
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());
@@ -2503,8 +2503,6 @@ _bool CMapToolHelper::Save_Decos(const string& _strLevel, vector<CGameObject*>& 
 		_uint iPassIndex = static_cast<_uint>(pMapToolObj->Get_PassIndex());
 		if (true == IsTree(strModelName))
 			iPassIndex = MODEL_NEARCLIP;
-		else if (m_setNearClipAlphaBlend.end() != m_setNearClipAlphaBlend.find(strModelName))
-			iPassIndex = MODEL_ALPHABLEND_NEARCLIP;
 		else
 		{
 			if (true == IsNonEmissive(strModelName))

@@ -129,7 +129,7 @@ HRESULT CThrone::Render()
 			hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
 			CHECK_FAILED(hr);
 
-			hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O);
+			hr = m_pShaderCom->Begin(ANIMMODEL_NEARCLIP);
 			CHECK_FAILED(hr);
 			hr = m_pModelCom->Render(i);
 			CHECK_FAILED(hr);
@@ -151,7 +151,7 @@ HRESULT CThrone::Render()
 			hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
 			CHECK_FAILED(hr);
 
-			hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O);
+			hr = m_pShaderCom->Begin(ANIMMODEL_NEARCLIP);
 			CHECK_FAILED(hr);
 			hr = m_pModelCom->Render(i);
 			CHECK_FAILED(hr);

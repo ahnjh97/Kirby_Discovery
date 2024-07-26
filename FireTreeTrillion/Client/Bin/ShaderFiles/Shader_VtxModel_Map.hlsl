@@ -391,7 +391,20 @@ PS_OUT_EFFECT PS_AlphaBlend_NearClip(PS_IN In)
     if (0.0f >= vMtrlDiffuse.a)
         discard;
 
+    vector vViewPos = g_WorldMatrix._41_42_43_44;
+    vViewPos = mul(vViewPos, g_ViewMatrix);
     
+    float fCameraDistance = 11.2f;
+    if (vViewPos.z < fCameraDistance)
+    {
+        float2 vPixelTexcoord = (float2) 0.f;
+        vPixelTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
+        vPixelTexcoord.y = (In.vProjPos.y / In.vProjPos.w) * -0.5f + 0.5f;
+        
+        vector vNearClipDesc = g_ObjNearClipTexture.Sample(LinearSampler, vPixelTexcoord * 100);
+        if (pow(saturate((vViewPos.z / fCameraDistance) - .1), 3) < vNearClipDesc.r)
+            discard;
+    }
     
     Out.vColor = vMtrlDiffuse;
     Out.vNonBlur = float4(0.f, 1.f, 0.f, 0.f);
@@ -548,6 +561,6 @@ technique11 DefaultTechnique
         GeometryShader = /*compile gs_5_0 GS_MAIN()*/NULL;
         HullShader = /*compile hs_5_0 HS_MAIN()*/NULL;
         DomainShader = /*compile ds_5_0 DS_MAIN()*/NULL;
-        PixelShader = compile ps_5_0 NONBLUR();
+        PixelShader = compile ps_5_0 PS_AlphaBlend_NearClip();
     }
 }

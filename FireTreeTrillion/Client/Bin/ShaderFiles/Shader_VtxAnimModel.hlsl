@@ -520,7 +520,7 @@ PS_OUT PS_MAIN_NEARCLIP(PS_IN In)
     vector vViewPos = g_WorldMatrix._41_42_43_44;
     vViewPos = mul(vViewPos, g_ViewMatrix);
     
-    if(vViewPos.z < 8.0)
+    if(vViewPos.z < 11.5f)
     {
         float2 vPixelTexcoord = (float2) 0.f;
         vPixelTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;

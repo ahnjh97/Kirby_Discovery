@@ -188,7 +188,7 @@ private:
 
 	unordered_set<string> m_setParkGimmicks;
 
-	unordered_set<string> m_setNearClipAlphaBlend;
+	//unordered_set<string> m_setNearClipAlphaBlend;
 
 	string m_strSelectedTxt;
 	string m_strCurModel;
