@@ -117,7 +117,8 @@ HRESULT CBossName::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_BossChiemraPerfect"),
+	//07.26) 네임태그 오탈자 수정
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_BossChimeraPerfect"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
