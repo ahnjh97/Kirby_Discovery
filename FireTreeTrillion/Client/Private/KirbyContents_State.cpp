@@ -14,7 +14,7 @@ void CKirbyGet_State::OnStateEnter(CModel* _pModel, _uint _iAnimIndex, _float _f
 {
 	__super::OnStateEnter(_pModel, _iAnimIndex, _fAnimSpeed, _bLoop, _bInterpolation, _iOffSet);
 
-	if(_iAnimIndex == CKirby::STATE_ABILITYDUMP)
+	if (_iAnimIndex == CKirby::STATE_ABILITYDUMP)
 		LadderStart_FX(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player"), 0)->Get_TransformCom());
 }
 
@@ -53,7 +53,15 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			m_pGameInstance->Set_BlackBackGround(false);
 			m_pGameInstance->Set_SecondTimerRatio(1.f);
 
-			static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr())->Set_FOVY(30.f);
+			CCamera_Main* pCam = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+
+			if (nullptr != pCam)
+			{
+				if (*m_pGameInstance->Get_CurrentLevelID() == LEVEL_SIMBA || *m_pGameInstance->Get_CurrentLevelID() == LEVEL_FINALBOSS)
+					pCam->Set_FinalOffset({ 0.f, 0.f, 0.f }, .4f);
+
+				pCam->Set_FOVY(30.f);
+			}
 
 			if (pKirby->Get_AbilityType() == ABILITY_SWORD)
 				pKirby->Change_State(CKirby::SWORDSTATE_WAIT, 60.f, true, true, CKirby::BODY_SWORDDEFAULT, CKirby::OFFSET_SWORD);
@@ -102,7 +110,7 @@ void CKirbyGet_State::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 			CHECK_FAILED(hr);
 
 			pKirby->Set_AbilityType(ABILITY_DEFAULT);
-			
+
 			if (JoyStick_controller(Kirbydesc, pCamera) == true)
 				pKirby->Change_State(CKirby::STATE_RUNSTART, 120.f, true, true, CKirby::BODY_DEFAULT);
 			else

@@ -3218,8 +3218,10 @@ _float3 CCamera_Main::Make_TargetPos()
 		//지형 위치를 구하여 같이 쓰기
 		_float4 vTerrainPos = static_cast<CCharacter*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
 
-		if (vTerrainPos.y != 0.f)
-			vTargetPos.y = vTerrainPos.y;
+		(*m_pCurrentLevelID == LEVEL_SIMBA)?
+				vTargetPos.y = 2.3f
+			:	vTargetPos.y = 0.f;
+
 	}
 	//피날레 카메라 포커스
 	else if (m_eCamFocus == FOCUS_FINALE)
