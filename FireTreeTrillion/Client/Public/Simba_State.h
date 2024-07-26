@@ -61,6 +61,7 @@ private:
 
 	_float m_fTime = {};
 	_bool m_bPlaySound = { false };
+	_bool m_bCloneName = { false };
 
 public:
 	static	CSimba_Appear2* Create(CCharacterController* pController, CTransform* pTransform, CGameObject* pKirby, CTransform* pKirbyTransform) 

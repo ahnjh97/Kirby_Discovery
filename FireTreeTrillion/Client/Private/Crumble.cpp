@@ -181,6 +181,8 @@ void CCrumble::Break_Crumble()
 	if (false == m_bOnce)
 	{
 		m_pModelCom->Set_Animation(PREDISAPPEAR, 30.f, true, false);
+		m_pGameInstance->PlayMySound(L"Gimmick_Crumble_Break.wav", CHANNEL_GIMMICK, 0.5f);
+
 		m_bOnce = true;
 	}
 }
@@ -222,8 +224,8 @@ HRESULT CCrumble::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bMotionBlur", &m_bMotionBlur, sizeof(_bool))))
 		return E_FAIL;
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
-	//	return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fWhiteColorDiffuse", &m_fWhiteColorDiffuse, sizeof(_float))))
+		return E_FAIL;
 
 	return S_OK;
 }

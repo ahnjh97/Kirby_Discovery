@@ -60,7 +60,15 @@ void CKirbyBalloon_Idle_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 
 				Copy_Star(pTransformCom);
 
-				static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr())->Set_FOVY(20.f);
+				CCamera_Main* pCam = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+
+				if (nullptr != pCam)
+				{
+					if(*m_pGameInstance->Get_CurrentLevelID() == LEVEL_SIMBA || *m_pGameInstance->Get_CurrentLevelID() == LEVEL_FINALBOSS)
+						pCam->Set_FinalOffset( { 0.f,-1.4f, 0.f } , .4f);
+					pCam->Set_FOVY(20.f);
+				}
+
 				pKirby->Change_State(CKirby::STATE_SWALLOWSTART, 60.f, false, false, CKirby::BODY_BALLOON);
 				return;
 			}

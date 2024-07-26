@@ -191,19 +191,19 @@ void CLevel_Intro::Manage_BGM() // SOUND_WI
 	{
 	case BEACH:
 	{
-		m_pGameInstance->PlayBGM(CHANNEL_BGM_SUB, L"EnvWaterWave.wav");
+		m_pGameInstance->PlayBGM(CHANNEL_BGM_SUB, L"EnvWaterWave.wav", 0.f);
 	}
 	break;
 	case JUNGLE:
 	{
 		if (m_ePreKirbyPosState == BEACH)
-			m_pGameInstance->PlayBGM(CHANNEL_BGM, L"EnvJungle.wav"); // SOUND_WI
+			m_pGameInstance->PlayBGM(CHANNEL_BGM, L"EnvJungle.wav", 0.f); // SOUND_WI
 	}
 	break;
 	case NOBGM:
 	{
 		if(m_ePreKirbyPosState == BUILDING)
-			m_pGameInstance->PlayBGM(CHANNEL_BGM, L"EnvJungle.wav"); // SOUND_WI
+			m_pGameInstance->PlayBGM(CHANNEL_BGM, L"EnvJungle.wav", 0.f); // SOUND_WI
 
 		m_pGameInstance->Pause(CHANNEL_BGM_STREAMING, true);
 	}// 이 구간을 위한 사운드는 따로 없습니다

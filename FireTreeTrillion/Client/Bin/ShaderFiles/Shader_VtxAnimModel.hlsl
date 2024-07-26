@@ -520,7 +520,7 @@ PS_OUT PS_MAIN_NEARCLIP(PS_IN In)
     vector vViewPos = g_WorldMatrix._41_42_43_44;
     vViewPos = mul(vViewPos, g_ViewMatrix);
     
-    if(vViewPos.z < 8.0)
+    if(vViewPos.z < 11.5f)
     {
         float2 vPixelTexcoord = (float2) 0.f;
         vPixelTexcoord.x = (In.vProjPos.x / In.vProjPos.w) * 0.5f + 0.5f;
@@ -872,13 +872,13 @@ PS_OUT PS_SimbaEyeDefault(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord + g_vUVOffset);
     if (0.3f >= vMtrlDiffuse.a)
         vMtrlDiffuse.rgb = float3(1, 1, 1);
 
     vector vWhite = vector(1.f, 1.f, 1.f, 1.f);
     
-    vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+    vector vNormalDesc = g_NormalTexture.Sample(ClampSampler, In.vTexcoord + g_vUVOffset);
 
     float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
 
@@ -890,7 +890,7 @@ PS_OUT PS_SimbaEyeDefault(PS_IN In)
     //Out.vDiffuse = vMtrlDiffuse + g_fWhiteColorDiffuse;
     Out.vNormal = vector(vWorldNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / g_fFar, 0.0f, 0.0f);
-    Out.vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord);
+    Out.vMRA = g_MRATexture.Sample(ClampSampler, In.vTexcoord + g_vUVOffset);
     if (Out.vMRA.z == 0)
         Out.vMRA.z = 0.001f;
     

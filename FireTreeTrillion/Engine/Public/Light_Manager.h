@@ -33,6 +33,8 @@ public:
 		return m_Lights.front();
 	}
 
+	list<class CLight*>* Get_LightListPtr() { return &m_Lights; }
+
 	// 빛을 초기화 한다.
 	void	Clear_Light();
 

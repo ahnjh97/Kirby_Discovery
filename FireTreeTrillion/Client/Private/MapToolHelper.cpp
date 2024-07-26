@@ -29,7 +29,8 @@ static _int s_iMapMeshIndex = -1;
 static _int s_iSelectedMeshIndex = -1; 
 
 static const _char* s_ShaderPasses[] = { "0. Normal O", "1. Normal X", "2. LightDepth", "3. AlphaBlend",
-	"4. Discard X" , "5. Masked, Normal O", "6. Emissive, Normal O", "7. Emissive, Normal X" };
+	"4. Discard X" , "5. Masked, Normal O", "6. Emissive, Normal O", "7. Emissive, Normal X", "8. SimbaRock"
+	,"9. NearClip", "10. AlphaBlend & NearClip" };
 static vector<vector<_int>> s_vecPassIndices;
 static vector<vector<_float>> s_vecSamplingFactors;
 static _int s_iMapIndex = 0;
@@ -51,7 +52,7 @@ static const _char* s_ModelPassIndices[] = { "0. NORMAL_0", "1. NORMAL_X", "2. L
 	,"13. BLEND_FX", "14. WHITE_FX_LINEAR", "15. WHITE_FX_CLAMP", "16. Emissive, Normal O", "17. Emissive, Normal X" };
 
 static const _char* s_PosTexPasses[] = { "0. DEFAULT", "1. ALPHABLEND", "2. BLENDFX", "3. BLOOM", "4. DEFAULTFX", "5. BLEND_NOZTEXT"
-	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX"};
+	,"6. WHITEFX", "7. UI_MASK", "8. UI_MASK2", "9. SOFTFX", "10. SOFTALPHAFX" };
 static _int s_iPassIndex = -1;
 static _char s_ObjectsFilter[MAX_PATH] = "";
 static _char s_MapDecoFilter[MAX_PATH] = "";
@@ -290,7 +291,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 	m_setTrees = { "GsTreeA", "GsTreeB", "GsTreeC", "DsPalmABottomL", "DsPalmAMiddleL", "DsPalmATopL", "DsPalmBL", "DsPalmCL"
 		, "GsFlowerBedTreeAL", "GsFlowerBedTreeBL", "GsIvyGroundMiddlePlus", "GsIvyB", "JgGrasslongB"
-		, "GsCarSteelPartsAL", "GsScrappedCar", "GsCarHoistCrane01L", "CvSteelPartsDL", "GsFlowerlongTreeAL", "GsFlowerlongTreeBL" };
+		, "GsCarSteelPartsAL", "GsScrappedCar", "GsCarHoistCrane01L", "CvSteelPartsDL", "GsFlowerlongTreeAL", "GsFlowerlongTreeBL"
+		, "VpControlBoxEL", "LbBossCapsule01L", "LbBossSmallRoom01L", "VpControlBoxChairL" };
 
 	//블렌드 적용이 필요한 데코오브젝트
 	m_setBlendDecos = { "LbOutBuildingWallL", "LbOutBuildingFenceL", "GsCarFloor", "LbBossCapsule02L"
@@ -310,6 +312,8 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 	m_setParkDecoTxts_NoEmissive = { "FhOrnamentGroundAL", "FhOrnamentGroundBL",
 									 "FhOrnamentRoofAL", "FhOrnamentRoofBL", "FhOrnamentRoofCL", "FhOrnamentRoofDL", "FhOrnamentRoofEL",
 									 "FnWallDecorationStickAL", "FnWallDecorationStickBL", "FnWallDecorationStickCL" };
+
+	//m_setNearClipAlphaBlend = { "LbBossCapsuleGlass01L", "LbBossCapsuleGlass02L", "LbBossCapsuleGlass03L" };
 
 	s_vecPassIndices.resize(m_vecMapModelNames.size());
 	s_vecSamplingFactors.resize(m_vecMapModelNames.size());

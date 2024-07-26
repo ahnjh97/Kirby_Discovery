@@ -68,7 +68,7 @@ HRESULT CLevel_FinalBoss::Initialize()
 	CHECK_FAILED(hr);
 	
 	// ¼ÎÀÌ´õ ¼¼ÆÃ
-	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_FINAL);
+	m_pGameInstance->Set_ColorSet(CRenderer::COLORSET_BEFOREFINAL);
 	m_pGameInstance->Bind_RendererFunc(TRIGGER_SHADER);
 
 	_bool bBloomSky{ true };

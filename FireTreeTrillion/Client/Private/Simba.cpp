@@ -18,6 +18,7 @@
 #include "SimbaRock.h"
 #include "Debris.h"
 #include "Fire.h"
+#include "BossName.h"
 
 CSimba::CSimba(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -178,6 +179,8 @@ HRESULT CSimba::Initialize(void* pArg)
 	Safe_AddRef(m_pRightFootBone);
 	m_pMouthBone = m_pModelCom->Get_BonePtr("T_MouthJ");
 	Safe_AddRef(m_pMouthBone);
+	m_pEyeBone = m_pModelCom->Get_BonePtr("C_BrowJ");
+	Safe_AddRef(m_pEyeBone);
 #pragma endregion
 
 	SetCamSequence(CCamera_Main::SEQ_SIMBA_START);
@@ -344,6 +347,9 @@ _int CSimba::Tick(_float fTimeDelta)
 	RemoveDeadRocksFromList();
 	RemoveDeadDebrisFromList();
 
+	if(true == m_bMoveEye)
+		DetermineSimbaEyeUV();
+
 	return OBJ_NOEVENT;
 }
 
@@ -434,6 +440,9 @@ HRESULT CSimba::Render()
 				return E_FAIL;
 		}
 
+		if(FAILED(m_pShaderCom->Bind_RawValue("g_vUVOffset", &m_vUvOffset, sizeof(m_vUvOffset))))
+			return E_FAIL;
+
 		// Render Eye Mesh
 		if (FAILED(m_pEyeTextureCom[EYETEX_DIFFUSE]->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_eEyeState)))
 			return E_FAIL;
@@ -498,7 +507,7 @@ void CSimba::Add_AnimEvent()
 #pragma region FINAL CRUSHER
 	m_pModelCom->Add_Event("FinalCrusherStart", [this]() {
 		m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
-		m_pGameInstance->PlayMySound(L"SimbaFinalCrusherStartVoice.wav", CHANNEL_BOSSVOICE, 0.45f);
+		m_pGameInstance->PlayMySound(L"SimbaFCSV.wav", CHANNEL_BOSSVOICE, 0.45f);
 		});
 
 	m_pModelCom->Add_Event("FinalCrusher", [this]() {
@@ -520,7 +529,7 @@ void CSimba::Add_AnimEvent()
 		});
 
 	m_pModelCom->Add_Event("AttackJump", [this]() {
-		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpVoice.wav", 0.5f);
+		m_pGameInstance->PlaySound_Free(L"SimbaAttackJumpVoice.wav", 0.6f);
 		});
 
 	m_pModelCom->Add_Event("AttackJumpHit", [this]() {
@@ -548,8 +557,8 @@ void CSimba::Add_AnimEvent()
 
 #pragma region ROAR
 	m_pModelCom->Add_Event("Roar", [this]() {
-
 		m_pGameInstance->PlaySound_Free(L"SimbaRoar.wav", 0.6f);
+		m_pGameInstance->Setting_RadialBlur(50.f, 20.f);
 		});
 #pragma endregion
 
@@ -588,10 +597,16 @@ void CSimba::Add_AnimEvent()
 		});
 
 	m_pModelCom->Add_Event("BiteRush0", [this]() {
-		m_pGameInstance->PlaySound_Free(L"SimbaBiteRush.wav", 0.4f);
+		m_pGameInstance->PlaySound_Free(L"SimbaBiteRush.wav", 0.63f);
+		//m_pGameInstance->PlaySound_Free(L"SimbaBiteRushVoice3.wav", 0.6f);
+		//m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+		//m_pGameInstance->PlayMySound(L"SimbaBiteRushVoice2.wav", CHANNEL_BOSSVOICE, 0.4f);
 		});
 	m_pModelCom->Add_Event("BiteRush1", [this]() {
-		m_pGameInstance->PlaySound_Free(L"SimbaBiteRush.wav", 0.4f);
+		m_pGameInstance->PlaySound_Free(L"SimbaBiteRush.wav", 0.63f);
+		//m_pGameInstance->PlaySound_Free(L"SimbaBiteRushVoice3.wav", 0.6f);
+		//m_pGameInstance->StopSound(CHANNEL_BOSSVOICE);
+		//m_pGameInstance->PlayMySound(L"SimbaBiteRushVoice2.wav", CHANNEL_BOSSVOICE, 0.4f);
 		});
 #pragma endregion
 
@@ -773,7 +788,7 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 		if (true == m_bDimensionClawUpAttack)
 		{
 			if (0 == m_iStarCount) {
-				AbilityItemDesc.vPosition = vPos + vFloatLook * 8.f + vFloatRight * 8.f;
+				AbilityItemDesc.vPosition = vPos + vFloatLook * 8.f + vFloatRight * 5.7f;
 				AbilityItemDesc.vPosition.y = fY;
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 				CHECK_FAILED(hr);
@@ -782,14 +797,14 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 					AbilityItemDesc.fRotateDir = 1.f;
 				else
 					AbilityItemDesc.fRotateDir = -1.f;
-				AbilityItemDesc.vPosition = vPos + vFloatLook * 8.f - vFloatRight * 8.f;
+				AbilityItemDesc.vPosition = vPos + vFloatLook * 8.f - vFloatRight * 5.7f;
 				AbilityItemDesc.vPosition.y = fY;
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 				CHECK_FAILED(hr);
 			}
 
 			else if (1 == m_iStarCount) {
-				AbilityItemDesc.vPosition = vPos + vFloatLook * 18.f + vFloatRight * 8.f;
+				AbilityItemDesc.vPosition = vPos + vFloatLook * 18.f + vFloatRight * 5.7f;
 				AbilityItemDesc.vPosition.y = fY;
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 				CHECK_FAILED(hr);
@@ -798,7 +813,7 @@ void CSimba::SpawnStar(_uint iAnimIdx) // 준수형 별 여기임
 					AbilityItemDesc.fRotateDir = 1.f;
 				else
 					AbilityItemDesc.fRotateDir = -1.f;
-				AbilityItemDesc.vPosition = vPos + vFloatLook * 18.f - vFloatRight * 8.f;
+				AbilityItemDesc.vPosition = vPos + vFloatLook * 18.f - vFloatRight * 5.7f;
 				AbilityItemDesc.vPosition.y = fY;
 				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
 				CHECK_FAILED(hr);
@@ -968,34 +983,36 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 			//레이저와의 충돌 자국
 			CEffect::FX_DESC FXDesc{};
 
-			FXDesc.fStartDelay = .15f;
+			FXDesc.fStartDelay = .3f;
 			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
 			FXDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Get_State_Vector_Matrix(m_DimensionClawMat, CUtils::STATE_LOOK));
 
 			FXDesc.vInitPos = static_cast<_float3>(vCollidingPointA);
 			FXDesc.vInitPos.y = 2.3f;
-			FXDesc.vInitPos.z += 2.f;
+			FXDesc.vInitPos.z += 3.f;
 			Add_Effect("HS_lion cross decal", FXDesc);
 
 			FXDesc.vInitPos = static_cast<_float3>(vCollidingPointB);
 			FXDesc.vInitPos.y = 2.3f;
-			FXDesc.vInitPos.z += 2.f;
+			FXDesc.vInitPos.z += 3.f;
 			Add_Effect("HS_lion cross decal", FXDesc);
 
 
 			//충돌 시 튀는 파티클
 			CParticle::PARTICLE_DESC ParticleDesc{};
+			ParticleDesc.fStartDelay = .6f;
 			ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
 			ParticleDesc.vInitRot = CUtils::Make_Degree_FromDir((_float3)CUtils::Get_State_Vector_Matrix(m_DimensionClawMat, CUtils::STATE_LOOK));
 
 			ParticleDesc.vInitPos = static_cast<_float3>(vCollidingPointA);
 			ParticleDesc.vInitPos.y = 2.3f;
-			FXDesc.vInitPos.z += 2.f;
+			//ParticleDesc.vInitPos.z += 2.f;
 
 			Add_Effect("HS_lion laser collide particle B", ParticleDesc);
 
 			ParticleDesc.vInitPos = static_cast<_float3>(vCollidingPointB);
 			ParticleDesc.vInitPos.y = 2.3f;
+			//ParticleDesc.vInitPos.z += 2.f;
 
 			Add_Effect("HS_lion laser collide particle B", ParticleDesc);
 		}
@@ -1004,21 +1021,24 @@ void CSimba::MoveDimensionClaw(_float fTimeDelta)
 		{
 			//레이저와의 충돌 자국
 			CEffect::FX_DESC FXDesc{};
-			FXDesc.fStartDelay = .15f;
+			FXDesc.fStartDelay = .3f;
 
 			FXDesc.vInitPos = static_cast<_float3>(vClawMatPoint);
 			FXDesc.vInitScale = { 3.f, 3.f, 3.f };
 			FXDesc.vInitPos.y = 2.3f;
-			FXDesc.vInitPos.z += 2.f;
+			FXDesc.vInitPos.z += 3.f;
 
 			Add_Effect("HS_lion cross decal", FXDesc);
 
 
 			//충돌 시 튀는 파티클
 			CParticle::PARTICLE_DESC ParticleDesc{};
+			ParticleDesc.fStartDelay = .6f;
+
 			ParticleDesc.vInitPos = static_cast<_float3>(vClawMatPoint);
 			ParticleDesc.vInitScale = { 1.f, 1.f, 1.f };
 			ParticleDesc.vInitPos.y = 2.3f;
+			//ParticleDesc.vInitPos.z += 2.f;
 
 			Add_Effect("HS_lion laser collide particle B", ParticleDesc);
 		}
@@ -1388,7 +1408,7 @@ void CSimba::SetUpSecondTarget()
 {
 	CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
 	if (pCamera != nullptr)
-		pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_FINALBOSS, { 0.f, 4.5f, 0.f }, 10.f);
+		pCamera->Set_Target(m_pTransformCom, CCamera::TARGET_SECOND, CCamera::FOCUS_FINALBOSS, { 0.f, 3.5f, 0.f }, 10.f);
 }
 
 void CSimba::CheckFinalCrusherRingCollision(_float fTimeDelta)
@@ -1764,7 +1784,7 @@ void CSimba::TeethBite(_bool bRight)
 		MultiFXDesc.vInitRot = vEulerAngle;
 	}
 
-	Add_Effect("HS_lion tooth", MultiFXDesc);
+	Add_Effect("SimbaTeeth", MultiFXDesc);
 }
 
 void CSimba::DimensionLaserVomit() // DimensionLaser 주위에 나오는 액체부스거리들
@@ -2374,7 +2394,8 @@ void CSimba::SpawnMonsters(_uint iTriggerIndex)
 	}
 
 	m_iMonsterCount++;
-
+	
+	m_pGameInstance->PlaySound_Free(L"JS_Smoke2.wav", 1.f);
 	if (11 == iTriggerIndex && 1 < m_iMonsterCount) {
 		m_bSummon1 = false;
 		m_fSpawnTime = 0.f;
@@ -2448,6 +2469,7 @@ void CSimba::SpawnEffects(_uint iTriggerIndex)
 	}
 
 	m_iEffectCount++;
+	m_pGameInstance->PlaySound_Free(L"JS_BBiJook.wav", 0.45f);
 }
 
 void CSimba::CheckSpawning()
@@ -2655,6 +2677,33 @@ _float3 CSimba::ComputeAngleForEffect(_float fReverseLook)
 	return _float3(0.f, fAngleDiff, 0.f);
 }
 
+_float CSimba::ComputeAngle()
+{
+	if (nullptr == m_pKirby)
+		return 0.f;
+	_float3 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	_float3 vDir = m_pKirby->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) - m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	vDir.Normalize();
+	_float fAngle = ::XMVectorGetX(::XMVector3AngleBetweenVectors(vLook, vDir));
+	_float fY = ::XMVectorGetY(::XMVector3Cross(vLook, vDir));
+	if (fY < 0)
+		fAngle = -fAngle;
+
+	return fAngle;
+}
+
+void CSimba::DetermineSimbaEyeUV()
+{
+	if (nullptr == m_pEyeBone)
+		return;
+
+	_float4 vPos = m_pTransformCom->ComputeBoneWorldPos(m_pEyeBone);
+
+	_float fY = m_pTransformCom->Get_State(CTransform::STATE_POSITION).y;
+	m_vUvOffset.y = (fY - vPos.y) * 0.016f;
+	m_vUvOffset.x = ComputeAngle() * 0.21f;
+}
+
 #ifdef _DEBUG
 
 void CSimba::RenderRing()
@@ -2755,6 +2804,7 @@ void CSimba::Free()
 	for (auto& bone : m_vecRightNailBones)
 		Safe_Release(bone);
 
+	Safe_Release(m_pEyeBone);
 	Safe_Release(m_pMouthBone);
 	Safe_Release(m_pLeftFootBone);
 	Safe_Release(m_pRightFootBone);
