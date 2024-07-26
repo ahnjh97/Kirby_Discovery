@@ -203,7 +203,7 @@ HRESULT CMapToolHelper::Initialize(void* pArg)
 
 		, "JgGuardrailAL", "JgGuardrailBL"
 
-		, "MlFlowerPot01L"
+		, "MlFlowerPot01L", "GsCarFloor"
 
 #pragma endregion
 

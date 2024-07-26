@@ -2,6 +2,7 @@
 #include "HUD_KirbyStatus.h"
 #include "Kirby.h"
 #include "FinaleKirby.h"
+#include "Utils.h"
 
 CHUD_KirbyStatus::CHUD_KirbyStatus(ID3D11Device* _pDevice, ID3D11DeviceContext* _pContext)
 	: CHUD{ _pDevice, _pContext }
@@ -348,6 +349,14 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta, _float _fKirbyHpMax,
 		m_fHpRatio = m_fCurHpRatio;
 		m_isDamage = true;
 
+		_uint iRand = CUtils::Make_RandomInt(1, 3);
+		switch(iRand)
+		{
+		case 1:	m_pGameInstance->PlayMySound(L"HUD_KirbyHp_Damage.wav", CHANNEL_PLAYERVOICE, 0.5f); break;
+		case 2:	m_pGameInstance->PlayMySound(L"HUD_KirbyHp_Damage1.wav", CHANNEL_PLAYERVOICE, 0.5f); break;
+		case 3:	m_pGameInstance->PlayMySound(L"HUD_KirbyHp_Damage2.wav", CHANNEL_PLAYERVOICE, 0.5f); break;
+		}
+
 		m_fIdleTime = 0.f;
 	}
 	// 피가 찼다는 뜻이다.
@@ -382,6 +391,7 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta, _float _fKirbyHpMax,
 		// 만약, 피가 닳고 0.8초가 넘어갔다면?
 		if (m_fDamageHoleTime > 0.8f)
 		{
+
 			if (m_bDeltaRatio == true)
 			{
 				// 차이값을 구했다.
@@ -415,9 +425,11 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta, _float _fKirbyHpMax,
 				// 차이값을 구했다.
 				m_fDeltaRatio = m_fSlowHpRatio - m_fHpRatio;
 				m_bDeltaRatio = false;
+
 			}
 			// 차이값을 한번 구했다면, 그만큼 피를 틱당 올려준다.
 			m_fHpRatio += m_fDeltaRatio * fTimeDelta * 2.f;
+			m_pGameInstance->PlayMySound(L"HUD_KirbyHP_Heal.wav", CHANNEL_UI, 0.5f); //힐 FX 사운드
 
 			if (m_fSlowHpRatio < m_fHpRatio)
 			{
@@ -426,6 +438,8 @@ void CHUD_KirbyStatus::Compute_Player_Hp(_float fTimeDelta, _float _fKirbyHpMax,
 				m_fHealHoleTime = 0.f;
 				m_fDeltaRatio = 0.f;
 				m_fHpRatio = m_fSlowHpRatio;
+
+				m_pGameInstance->StopSound(CHANNEL_UI);
 			}
 		}
 	}
