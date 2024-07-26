@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "BossName.h"
+#include "FinalBoss.h"
+#include "Simba.h"
 
 CBossName::CBossName(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -24,6 +26,7 @@ HRESULT CBossName::Initialize(void* pArg)
 	{
 		pBossNameDesc = (BOSSNAME*)pArg;
 		m_vPosition = pBossNameDesc->vPosition;
+		m_fScale = pBossNameDesc->fScale;
 	}
 
 	if (FAILED(__super::Initialize(pBossNameDesc)))
@@ -33,6 +36,7 @@ HRESULT CBossName::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vPosition);
+	m_pTransformCom->Set_Scaled(m_fScale, m_fScale, m_fScale);
 
 	return S_OK;
 }
@@ -41,6 +45,17 @@ _int CBossName::Tick(_float fTimeDelta)
 {
 	if (m_bDead == true)
 		return OBJ_DEAD;
+
+	if(LEVEL_FINALBOSS == *m_pGameInstance->Get_CurrentLevelID())
+	{
+		CFinalBoss* pFinalBoss = static_cast<CFinalBoss*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_BossMonster")));
+		if (CFinalBoss::FINALBOSS_WAITAIR == pFinalBoss->Get_State())
+			m_bDead = true;
+	}
+	else
+	{
+
+	}
 
 	return OBJ_NOEVENT;
 }
@@ -102,7 +117,7 @@ HRESULT CBossName::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_BossChimeraPerfect"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_BossLion"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 

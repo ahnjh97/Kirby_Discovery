@@ -87,7 +87,8 @@ void CFinalBoss_Appear_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 
 			HRESULT hr;
 			CBossName::BOSSNAME BossNameDesc = {};
-			BossNameDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 2.f;
+			BossNameDesc.fScale = 2.f;
+			BossNameDesc.vPosition = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION) + pTransformCom->Get_State_Vector(CTransform::STATE_LOOK) * 4.f - pTransformCom->Get_State_Vector(CTransform::STATE_UP) * 2.f;
 			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Name"), TEXT("Prototype_GameObject_BossName"), &BossNameDesc);
 			CHECK_FAILED(hr);
 		}

@@ -2223,6 +2223,8 @@ void CLoader::SetUp_ModelScaleRotation(LEVEL eLevel)
 		m_vecModelInfo.emplace_back("AwoofyWild", TYPE_ANIM, 1.35f, 180.f);
 		m_vecModelInfo.emplace_back("RabbitBig", TYPE_ANIM, 1.35f, 180.f);
 
+		m_vecModelInfo.emplace_back("BossLion", TYPE_NONANIM, 1.f);
+
 		// For Boss 
 		m_vecModelInfo.emplace_back("Simba", TYPE_ANIM, 1.f, 180.f);
 		m_vecModelInfo.emplace_back("SimbaLaser", TYPE_NONANIM);

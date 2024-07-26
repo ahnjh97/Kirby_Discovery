@@ -10,6 +10,7 @@ class CBossName final : public CGameObject
 {
 public:
 	struct BOSSNAME : public CGameObject::GAMEOBJECT_DESC {
+		_float	fScale = { 1.f };
 		_vector vPosition = {};
 	};
 
@@ -36,6 +37,8 @@ private:
 private:
 	CModel*		m_pModelCom = { nullptr };
 	CShader*	m_pShaderCom = { nullptr };
+
+	_float		m_fScale = { 0.f };
 
 	_vector		m_vPosition = {};
 
