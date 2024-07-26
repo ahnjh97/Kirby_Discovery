@@ -64,7 +64,7 @@ _int CDeeDeeDeeHammer::Tick(_float fTimeDelta)
 	if (m_bShowDialog)
 	{
 		m_fShowDialog += fTimeDelta;
-		if (m_fShowDialog > 1.5f)
+		if (m_fShowDialog > 3.f)
 		{
 			(m_bFadeOutEnd == false) ? Ready_FadeOut() : Ready_FadeIn();
 			m_fShowDialog = 0.f;
