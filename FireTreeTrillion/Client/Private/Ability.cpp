@@ -36,6 +36,7 @@ HRESULT CAbility::Initialize(void* pArg)
 
 		pAbilityItemDesc->fSpeedPerSec = 7.f;
 		pAbilityItemDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		m_bImmortal = pAbilityItemDesc->bImmortal;
 		m_fRotateDir = pAbilityItemDesc->fRotateDir;
 		m_fAngle = pAbilityItemDesc->fAngle;
 		m_vDir = pAbilityItemDesc->vDir;
@@ -227,8 +228,11 @@ _int CAbility::Tick(_float fTimeDelta)
 	else
 	{
 		// µ¥Ä«
-		if (25 == m_iDeathCount)
-			m_bDead = true;
+		if(true != m_bImmortal)
+		{
+			if (25 == m_iDeathCount)
+				m_bDead = true;
+		}
 
 		if (m_ePhyXState == PO_KIRBYMOUTH)
 			Delete_AllEffect();
@@ -308,8 +312,11 @@ void CAbility::Late_Tick(_float fTimeDelta)
 
 HRESULT CAbility::Render()
 {
-	if (true == m_bRender)
-		return S_OK;
+	if(true != m_bImmortal)
+	{
+		if (true == m_bRender)
+			return S_OK;
+	}
 
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;

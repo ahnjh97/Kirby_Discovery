@@ -736,6 +736,9 @@
     <Filter Include="02.GameObjects\Map\Bridge\BreakableRock">
       <UniqueIdentifier>{1804a8b8-0c68-4296-836c-c88b4878fba8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\BossName">
+      <UniqueIdentifier>{b2b5d041-41fa-49a4-a82e-1b4b5f391647}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -1468,6 +1471,9 @@
     <ClInclude Include="..\Public\LoadingFont.h">
       <Filter>02.GameObjects\UI\LoadingStart\LoadingFont</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BossName.h">
+      <Filter>02.GameObjects\UI\BossName</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -2180,6 +2186,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\LoadingFont.cpp">
       <Filter>02.GameObjects\UI\LoadingStart\LoadingFont</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BossName.cpp">
+      <Filter>02.GameObjects\UI\BossName</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
