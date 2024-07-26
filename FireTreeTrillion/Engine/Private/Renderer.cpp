@@ -1040,7 +1040,7 @@ void CRenderer::Set_ColorSet_ByIndex(_int iSetIdx) // QZR
 		m_DestColorData = Find_ColorSet("Town");
 		Update_RimLight(1.f, 1.5f, { 1.f, .5f, .3f });
 		Update_DirectionalLight({ .6f, .6f, .6f, 1.f }, { .6f, .6f, .6f, 1.f });
-		Update_Ocean(.9f, -45.3f, 4.8f);
+		Update_Ocean(.9f, -45.3f, 4.8f, { .03f, .55f, .61f }, { .7f, 1.f, 1.f });
 		Update_OceanWave(.5f, .2f);
 		break;
 	case 5:
