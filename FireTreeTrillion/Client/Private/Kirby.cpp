@@ -73,14 +73,14 @@ HRESULT CKirby::Initialize(void* pArg)
 	if (FAILED(Kirby_SystemInitialize()))
 		return E_FAIL;
 
-	//// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
-	//m_eAbilityType = ABILITY_CRASH;
+	// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★ 
+	//m_eAbilityType = ABILITY_HAMMER;
 	//if (LEVEL_SIMBA == *m_pCurrentLevelID)
 	//		m_eAbilityType = ABILITY_HAMMER;
 
-	//m_fHp = 1000.f;
-	//m_fMaxHp = 1000.f;
-	//// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
+	//m_fHp = 100.f;
+	//m_fMaxHp = 100.f;
+	// 디버깅 용 ★★★★★★★★★★★★★★★★★★★★★
 
 
 	// 커비의 상태에 따라, 애니메이션이 시작된다.
