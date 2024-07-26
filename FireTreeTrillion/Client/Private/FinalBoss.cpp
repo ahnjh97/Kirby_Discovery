@@ -203,7 +203,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	}
 	//else if (m_pGameInstance->Get_KeyState(DIK_P, KEY_DOWN))
 	//	Change_State(FINALBOSS_DEMOAPPEARCUT5, 50.f, false, false);
-	else if (m_pGameInstance->Get_KeyState(DIK_O, KEY_DOWN) || m_fHp <= 0.f)
+	else if (m_pGameInstance->Get_KeyState(DIK_O, KEY_DOWN) || m_fHp <= 0.1f)
 	{
 		if(false == m_bLastDamage)
 		{

@@ -117,7 +117,7 @@ HRESULT CBossName::Add_Components()
 		TEXT("Com_Shader"), (CComponent**)&m_pShaderCom);
 	CHECK_FAILED(hr);
 
-	hr = __super::Add_Component(TEXT("Prototype_Component_Model_BossLion"),
+	hr = __super::Add_Component(TEXT("Prototype_Component_Model_BossChiemraPerfect"),
 		TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 	CHECK_FAILED(hr);
 
