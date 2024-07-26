@@ -120,7 +120,7 @@ HRESULT CBossName::Add_Components()
 	CHECK_FAILED(hr);
 
 	if (LEVEL_FINALBOSS == *m_pGameInstance->Get_CurrentLevelID()) {
-		hr = __super::Add_Component(TEXT("Prototype_Component_Model_BossChiemraPerfect"),
+		hr = __super::Add_Component(TEXT("Prototype_Component_Model_BossChimeraPerfect"),
 			TEXT("Com_Model"), (CComponent**)&m_pModelCom);
 		CHECK_FAILED(hr);
 	}
