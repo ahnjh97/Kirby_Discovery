@@ -51,7 +51,7 @@ HRESULT CSpawnEffect::Initialize(void* pArg)
 	//FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 	//FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 
-	Add_Effect("ParkParticle3JS", FXDesc, true);
+	Add_Effect("ParkParticle5JS", FXDesc, true);
 	Add_Effect("ParkParticle4JS", FXDesc, true);
 
 	return S_OK;

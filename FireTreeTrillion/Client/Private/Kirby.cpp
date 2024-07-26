@@ -73,13 +73,13 @@ HRESULT CKirby::Initialize(void* pArg)
 	if (FAILED(Kirby_SystemInitialize()))
 		return E_FAIL;
 
-	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ�
-	m_eAbilityType = ABILITY_DEFAULT;
+	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ�     //.
+	m_eAbilityType = ABILITY_HAMMER;
 	if (LEVEL_SIMBA == *m_pCurrentLevelID)
 			m_eAbilityType = ABILITY_HAMMER;
 
-	m_fHp = 1000.f;
-	m_fMaxHp = 1000.f;
+	m_fHp = 100.f;
+	m_fMaxHp = 100.f;
 	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ�
 
 
@@ -125,7 +125,11 @@ _int CKirby::Tick(_float fTimeDelta)
 		//RayCast_SurpriseBoards();
 	}
 		
-	//m_bOverPower = true;
+	if (INFO(m_eBodyState) == BODY_BULBDEFAULT)
+	{
+		m_EffectSocket._42 += 1.5f;
+	}
+
 	return OBJ_NOEVENT;
 }
 

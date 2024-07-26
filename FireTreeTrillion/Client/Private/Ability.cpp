@@ -36,6 +36,7 @@ HRESULT CAbility::Initialize(void* pArg)
 
 		pAbilityItemDesc->fSpeedPerSec = 7.f;
 		pAbilityItemDesc->fRotationPerSec = XMConvertToRadians(90.0f);
+		m_bImmortal = pAbilityItemDesc->bImmortal;
 		m_fRotateDir = pAbilityItemDesc->fRotateDir;
 		m_fAngle = pAbilityItemDesc->fAngle;
 		m_vDir = pAbilityItemDesc->vDir;
@@ -89,8 +90,6 @@ HRESULT CAbility::Initialize(void* pArg)
 		FXDesc.vInitPos = { 0.f, .2f, 0.f };
 		FXDesc.pSocketMatrix = &m_EffectSocket;
 		FXDesc.vInitScale = { 1.7f, 1.7f, 1.7f };
-		//if (FAILED(m_pGameInstance->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_ItemAbility1"), &FXDesc)))
-		//	return E_FAIL;
 
 		Add_Effect("ItemAbility1", FXDesc, true);
 	}
@@ -229,8 +228,11 @@ _int CAbility::Tick(_float fTimeDelta)
 	else
 	{
 		// µ¥Ä«
-		if (25 == m_iDeathCount)
-			m_bDead = true;
+		if(true != m_bImmortal)
+		{
+			if (25 == m_iDeathCount)
+				m_bDead = true;
+		}
 
 		if (m_ePhyXState == PO_KIRBYMOUTH)
 			Delete_AllEffect();
@@ -310,8 +312,11 @@ void CAbility::Late_Tick(_float fTimeDelta)
 
 HRESULT CAbility::Render()
 {
-	if (true == m_bRender)
-		return S_OK;
+	if(true != m_bImmortal)
+	{
+		if (true == m_bRender)
+			return S_OK;
+	}
 
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;

@@ -213,6 +213,8 @@ void CKirbyCrash_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 			m_iBoomCount = 1;
 		}
 
+
+
 		_float fTime = m_pGameInstance->Get_OriginalTimer();
 		DESC(m_fTimeRatio) += fTime * 0.3f;
 		if (DESC(m_fTimeRatio) > 1.f)
@@ -222,8 +224,18 @@ void CKirbyCrash_Attack_State::OnStateUpdate(CGameObject* pGameObject, _float fT
 		m_pGameInstance->Set_SecondTimerRatio(DESC(m_fTimeRatio) * 0.2f);
 
 
+		//m_fDumpAbilityTime += fTime;
+		//if (m_fDumpAbilityTime > 0.4f && pKirby->Get_AbilityType() == ABILITY_CRASH)
+		//{
+		//	pKirby->Set_AbilityType(ABILITY_DEFAULT);
+		//}
+
+
+
 		if (pKirby->isAnimFinish())
 		{
+			pKirby->Set_AbilityType(ABILITY_DEFAULT);
+
 			_float4 vPos = pTransformCom->Get_State(CTransform::STATE_POSITION);
 			vPos.y += 5.f;
 			CParticle::PARTICLE_DESC FXPDesc{};
@@ -378,6 +390,13 @@ void CKirbyCrash_BigAttack_State::OnStateUpdate(CGameObject* pGameObject, _float
 			m_fBoomTime = 0.f;
 		}
 
+		m_fDumpAbilityTime += fTime;
+		if (m_fDumpAbilityTime > 2.1f && pKirby->Get_AbilityType() == ABILITY_CRASH)
+		{
+			pKirby->Set_AbilityType(ABILITY_DEFAULT);
+		}
+
+
 
 		DESC(m_fTimeRatio) += fTime * 0.3f;
 		if (DESC(m_fTimeRatio) > 1.f)
@@ -472,6 +491,8 @@ void CKirbyCrash_BigAttack_State::OnStateExit()
 	m_fRange = 0.f;
 	m_fBoomTime = 0.f;
 	m_iBoomCount = 0;
+
+	m_fDumpAbilityTime = 0.f;
 }
 
 CKirbyCrash_BigAttack_State* CKirbyCrash_BigAttack_State::Create()

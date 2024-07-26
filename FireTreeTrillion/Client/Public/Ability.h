@@ -13,13 +13,13 @@ class CAbility final : public CItemObject
 {
 public:
 	struct ABILITYITEM_DESC : public CGameObject::GAMEOBJECT_DESC {
+		_bool	bImmortal = { false };
 		_float	fRotateDir = { 0.f };
 		_float	fAngle = { 0.f };
 		_vector	vDir = {};
 		_float4 vPosition = {};
 		ABILITYTYPE eAbilityType = {};
 	};
-
 
 private:
 	CAbility(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -62,6 +62,7 @@ private:
 
 	_bool					m_bRender = { false };
 	_bool					m_bTurn = { false };
+	_bool					m_bImmortal = { false };
 
 	_uint					m_iDeathCount = { 0 };
 	_uint					m_iRenderCount = { 0 };

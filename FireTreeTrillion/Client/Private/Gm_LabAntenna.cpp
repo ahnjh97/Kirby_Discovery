@@ -52,7 +52,6 @@ _int CGm_LabAntenna::Tick(_float fTimeDelta)
 
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
-
 	if (m_bCollision == true)
 	{
 		m_fAlpha += m_fTimeDelta * 0.2f;
