@@ -74,11 +74,12 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ� 
-	//m_eAbilityType = ABILITY_HAMMER;
+	m_eAbilityType = ABILITY_HAMMER;
 	//if (LEVEL_SIMBA == *m_pCurrentLevelID)
 	//		m_eAbilityType = ABILITY_HAMMER;
 
-	//m_fHp = 100.f;
+	m_fHp = 100.f;
+	m_uCoin = 89;
 	//m_fMaxHp = 100.f;
 	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ�
 

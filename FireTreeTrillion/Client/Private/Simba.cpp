@@ -323,6 +323,11 @@ _int CSimba::Tick(_float fTimeDelta)
 		m_bPlayPartialAnim = false;
 		m_bRenderRing = false;
 		m_bDimensionClawActivated = false;
+		//Safe_Release(m_pSimbaLaser);
+
+		CGameObject* pLaserEffect = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_HS_lion laser"));
+		if (nullptr != pLaserEffect)
+			pLaserEffect->Set_Dead();
 
 		TransformToDefault(0.f);
 		Change_State(Simba_DemoDeadCut1, 50.f, false, true);
@@ -2426,7 +2431,15 @@ void CSimba::SpawnEffects(_uint iTriggerIndex)
 
 	if (11 == iTriggerIndex) {
 		if (0 == m_iEffectCount)
+		{
+			CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+			AbilityItemDesc.bImmortal = true;
+			AbilityItemDesc.vPosition = XMVectorSet(0.087f, 2.f, -72.f, 1.f);
+			AbilityItemDesc.eAbilityType = ABILITY_SWORD;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+
 			wstrMonsterName = TEXT("Awoofy");
+		}
 		else if (1 == m_iEffectCount)
 			wstrMonsterName = TEXT("AwoofyWild");
 	}

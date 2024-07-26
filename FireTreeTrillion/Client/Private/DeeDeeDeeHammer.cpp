@@ -67,9 +67,9 @@ _int CDeeDeeDeeHammer::Tick(_float fTimeDelta)
 		if (m_bFadeOutEnd)
 			Ready_FadeIn();
 
-		else if (m_fShowDialog > 7.f) 
+		else if (m_fShowDialog > 7.f)
 		{
-			if(m_bFadeOutEnd == false) 
+			if (m_bFadeOutEnd == false)
 				Ready_FadeOut();
 		}
 
@@ -236,8 +236,8 @@ void CDeeDeeDeeHammer::Ready_FadeOut()
 		m_pGameInstance->StopSound(CHANNEL_BGM);
 
 		//효선아 여기야 와들디 세팅
-		if (m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_BattleDee")) == nullptr)
-			return;
+		//if (m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_BattleDee")) == nullptr)
+		//	return;
 
 		CCamera_Main* pCameraMain = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 		CHECK_NULLPTR(pCameraMain);

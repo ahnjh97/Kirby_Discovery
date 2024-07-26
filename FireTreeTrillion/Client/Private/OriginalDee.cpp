@@ -14,7 +14,7 @@ pair<_float3, vector<TOWN_POINT_INFO>> COriginalDee::m_TownPoints =
 		{
 			TOWNPOINT_0,
 			{1.7f, 22.f, 9.3f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL},
+			{DEEANIM_WALK},
 			{TOWNPOINT_1, TOWNPOINT_7, TOWNPOINT_8}
 		},
 		TOWN_POINT_INFO
@@ -49,14 +49,14 @@ pair<_float3, vector<TOWN_POINT_INFO>> COriginalDee::m_TownPoints =
 		{
 			TOWNPOINT_5,
 			{-11.6f, 22.f, -9.3f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL},
+			{DEEANIM_WALK},
 			{TOWNPOINT_3, TOWNPOINT_6}
 		},
 		TOWN_POINT_INFO
 		{
 			TOWNPOINT_6,
 			{1.6f, 22.f, -12.7f},
-			{DEEANIM_WALK, DEEANIM_MOVEFALL},
+			{DEEANIM_WALK},
 			{TOWNPOINT_5, TOWNPOINT_9, TOWNPOINT_32}
 		},
 		TOWN_POINT_INFO

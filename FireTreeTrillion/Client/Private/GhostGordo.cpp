@@ -48,6 +48,8 @@ HRESULT CGhostGordo::Initialize(void* pArg)
 	m_eVacuumSize = SIZE_SMALL;
 	m_eAbilityType = ABILITY_DEFAULT;
 
+	Set_Slope(false);
+
 	return S_OK;
 }
 

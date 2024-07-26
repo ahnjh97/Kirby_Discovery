@@ -75,7 +75,10 @@ _int CBladeKnight::Tick(_float fTimeDelta)
 	}
 
 	if (m_ePhyXState == PO_VACUUMING || m_ePhyXState == PO_FLYDEADAWAY)
+	{
 		Change_State(BLADEKNIGHT_DAMAGE, 50.f, false, true);
+		Delete_AllEffect();
+	}
 
 
 	__super::Tick(m_fTimeDelta);
@@ -194,8 +197,9 @@ void CBladeKnight::Add_AnimEvent()
 		FXDesc.vInitRot = { 0.f, 45.f, 0.f };
 		FXDesc.vInitScale = { 5.f, 5.f, 5.f };
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BladeKnightTrail2"), &FXDesc)))
-			return;
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BladeKnightTrail2"), &FXDesc)))
+		//	return;
+		Add_Effect("BladeKnightTrail2", FXDesc, true);
 		});
 }
 
@@ -392,8 +396,10 @@ void CBladeKnight::EffectChanger(_uint eState)
 		//FXDesc.vInitRot = { 0.f, -90.f 0.f };
 		FXDesc.vInitScale = { 5.f, 5.f, 5.f };
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BladeKnightTrail"), &FXDesc)))
-			return;
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BladeKnightTrail"), &FXDesc)))
+		//	return;
+		Add_Effect("BladeKnightTrail", FXDesc, true);
+
 		break;
 	case BLADEKNIGHT_TORNADOATTACK:
 		// 荤款靛 贸府
@@ -402,8 +408,10 @@ void CBladeKnight::EffectChanger(_uint eState)
 		FXDesc.vInitPos = _float3{ 0.f, 0.95f, 0.f };
 		FXDesc.vInitScale = { 5.f, 5.f, 5.f };
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BladeKnightSpin"), &FXDesc)))
-			return;
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BladeKnightSpin"), &FXDesc)))
+		//	return;
+		Add_Effect("BladeKnightSpin", FXDesc, true);
+
 		break;
 	case BLADEKNIGHT_DOUBLEATTACK:
 		// 荤款靛 贸府
@@ -413,8 +421,10 @@ void CBladeKnight::EffectChanger(_uint eState)
 		FXDesc.vInitRot = { 0.f, 30.f, 0.f };
 		FXDesc.vInitScale = { 5.f, 5.f, 5.f };
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
-		if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BladeKnightTrail"), &FXDesc)))
-			return;
+		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BladeKnightTrail"), &FXDesc)))
+		//	return;
+		Add_Effect("BladeKnightTrai", FXDesc, true);
+
 		break;
 	default:
 		break;
