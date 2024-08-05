@@ -99,34 +99,34 @@ HRESULT CGm_LabAntenna::Render()
 	HRESULT hr;
 
 	//특정 애님 상태에 따라 렌더할 메쉬를 체크
-	//if (STATE_BREAK == m_eAnimState)
-	//{
-	///*	for (size_t i = 0; i < iNumMeshes; i++)
-	//	{
-	//		if (m_setDebrisMeshs.find(i) == m_setDebrisMeshs.end())
-	//			continue;
-	//		
-	//		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
-	//		CHECK_FAILED(hr);
+	if (STATE_BREAK == m_eAnimState)
+	{
+		for (size_t i = 0; i < iNumMeshes; i++)
+		{
+			if (m_setDebrisMeshs.find(i) == m_setDebrisMeshs.end())
+				continue;
+			
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
+			CHECK_FAILED(hr);
 
-	//		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
-	//		CHECK_FAILED(hr);
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_NormalTexture", i, TextureType_NORMALS);
+			CHECK_FAILED(hr);
 
-	//		hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
-	//		CHECK_FAILED(hr);
+			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_MRATexture", i, TextureType_METALNESS);
+			CHECK_FAILED(hr);
 
-	//		hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
-	//		CHECK_FAILED(hr);
+			hr = m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
+			CHECK_FAILED(hr);
 
-	//		hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O);
-	//		CHECK_FAILED(hr);
+			hr = m_pShaderCom->Begin(ANIMMODEL_NORMAL_O);
+			CHECK_FAILED(hr);
 
-	//		hr = m_pModelCom->Render(i);
-	//		CHECK_FAILED(hr);
-	//	}*/
-	//}
-	//else
-	//{
+			hr = m_pModelCom->Render(i);
+			CHECK_FAILED(hr);
+		}
+	}
+	else
+	{
 		for (size_t i = 0; i < iNumMeshes; i++)
 		{
 			hr = m_pModelCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", i, TextureType_DIFFUSE);
@@ -152,7 +152,7 @@ HRESULT CGm_LabAntenna::Render()
 			hr = m_pModelCom->Render(i);
 			CHECK_FAILED(hr);
 		}
-	//}
+	}
 
 	return S_OK;
 }
@@ -232,7 +232,7 @@ HRESULT CGm_LabAntenna::Add_Components()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &HitBox)))
 		return E_FAIL;
 
-	Set_BodyCollider(COLLIDER_SPHERE, 0.f, 0.f, 10.f);
+	Set_BodyCollider(COLLIDER_SPHERE, 0.f, 0.f, 15.f);
 
 #pragma endregion
 

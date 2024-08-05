@@ -406,6 +406,7 @@ void CBladeKnight::EffectChanger(_uint eState)
 		m_pGameInstance->PlaySound_Free(L"0x280c0-0x545f0.wav", 0.3f);
 
 		FXDesc.vInitPos = _float3{ 0.f, 0.95f, 0.f };
+		FXDesc.vInitRot = _float3{ 180.f, 0.f, 0.f };
 		FXDesc.vInitScale = { 5.f, 5.f, 5.f };
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BladeKnightSpin"), &FXDesc)))
@@ -423,7 +424,7 @@ void CBladeKnight::EffectChanger(_uint eState)
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BladeKnightTrail"), &FXDesc)))
 		//	return;
-		Add_Effect("BladeKnightTrai", FXDesc, true);
+		Add_Effect("BladeKnightTrail", FXDesc, true);
 
 		break;
 	default:

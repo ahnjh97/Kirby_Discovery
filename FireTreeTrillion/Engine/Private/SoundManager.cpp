@@ -251,7 +251,7 @@ void CSound_Manager::PlayBGM(TCHAR* pSoundKey, _float _vol)
 
 	FMOD_System_PlaySound(m_pSystem, iter->second, nullptr, FALSE, &m_pChannelArr[CHANNEL_BGM]);
 	FMOD_Channel_SetMode(m_pChannelArr[CHANNEL_BGM], FMOD_LOOP_NORMAL);
-    FMOD_Channel_SetVolume(m_pChannelArr[CHANNEL_BGM], _vol);
+    FMOD_Channel_SetVolume(m_pChannelArr[CHANNEL_BGM], 0.f);
 
 	FMOD_System_Update(m_pSystem);
 }
@@ -276,7 +276,7 @@ void CSound_Manager::PlayBGM(CHANNELID eID, TCHAR* pSoundKey, _float _vol)
 
 	FMOD_System_PlaySound(m_pSystem, iter->second, nullptr, FALSE, &m_pChannelArr[eID]);
 	FMOD_Channel_SetMode(m_pChannelArr[eID], FMOD_LOOP_NORMAL);
-	FMOD_Channel_SetVolume(m_pChannelArr[eID], _vol);
+	FMOD_Channel_SetVolume(m_pChannelArr[eID], 0.f);
 
 	FMOD_System_Update(m_pSystem);
 }
