@@ -920,7 +920,9 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 				}
 			}
 			break;
-
+			case SEQ_FINALBOSS_2PHASE:
+				Set_FOVY(40.f);
+				break;
 			case SEQ_FINALESTART:
 			{
 				m_fCurShakeTime = m_fInitialShakeTime = 0.f;
@@ -2090,9 +2092,8 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	case SEQ_FINALBOSS_2PHASE:
 	{
 		Set_AutoDOF(false);
-
 		CAMACTION newAction = {};
-
+		m_fSeqEventTime = 3.7f;
 		//뒤로 밀리는 보스
 
 		_float3 vStartPos = { -3.f, 3.18f, -1.14f };

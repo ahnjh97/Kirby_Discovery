@@ -74,11 +74,11 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ� 
-	m_eAbilityType = ABILITY_HAMMER;
+	m_eAbilityType = ABILITY_DEFAULT;
 	//if (LEVEL_SIMBA == *m_pCurrentLevelID)
 	//		m_eAbilityType = ABILITY_HAMMER;
 
-	m_fHp = 100.f;
+	m_fHp = 60.f;
 	m_uCoin = 89;
 	//m_fMaxHp = 100.f;
 	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ�
@@ -1964,12 +1964,17 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	if ((vPos.y < 1.f) && (vPos.y > -4.f) &&
 		(vPos.z < -20.f) && (vPos.z > -25.f))
 	{
-		m_bShadowFinal = true;
+		m_iShadowFinal = 1;
 	}
 
-	if (*m_pCurrentLevelID == LEVEL_FINALBOSS && m_bShadowFinal == true)
+	if (*m_pCurrentLevelID == LEVEL_FINALBOSS && m_iShadowFinal == 1)
 	{
 		m_pGameInstance->Update_LightShadow(_float4(0.f, 100.f, 42.f, 1.f), _float4(0.f, 0.f, 0.f, 1.f));
+	}
+	else if (m_iShadowFinal == 2)
+	{
+		m_pGameInstance->Update_LightShadow(_float4(0.68f, 65.11f, 75.62f, 1.f), _float4(0.f, 0.f, 0.f, 1.f));
+
 	}
 	else
 	{

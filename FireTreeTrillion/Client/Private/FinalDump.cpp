@@ -135,15 +135,11 @@ _int CFinalDump::Tick(_float fTimeDelta)
 
 void CFinalDump::Late_Tick(_float fTimeDelta)
 {
-	if (true == m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State_Vector(CTransform::STATE_POSITION), 5.0f))
-	{
 		m_pModelCom->Play_Animation(fTimeDelta);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_NONBLEND, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_BLOOM, this);
 		m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
-
 		m_iRenderCount = 1;
-	}
 }
 
 HRESULT CFinalDump::Render()

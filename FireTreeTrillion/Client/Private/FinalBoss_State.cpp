@@ -105,8 +105,8 @@ void CFinalBoss_Appear_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	if (pFinalBoss->IsAnimFinished())
 	{
 		HRESULT hr;
-		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_BossUI"), TEXT("Prototype_GameObject_HUD_BossHpBar"), pFinalBoss);
-		CHECK_FAILED(hr);
+		//hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_BossUI"), TEXT("Prototype_GameObject_HUD_BossHpBar"), pFinalBoss);
+		//CHECK_FAILED(hr);
 
 		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 		pKirby->Get_KirbyInfo()->m_bFinalBossCutStart = false;
@@ -1888,7 +1888,17 @@ void CFinalBoss_Meteor_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_SUMMONEND, 50.f, false, true);
 			break;
 		case CFinalBoss::FINALBOSS_SUMMONEND:
+		{
+			if (true == pFinalBoss->Get_Chain())
+			{
+				pFinalBoss->Set_Chain(false);
+				CCamera_Main* pCamera = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+				if (pCamera != nullptr)
+					pCamera->Set_FOVY(30.f);
+			}
+
 			pFinalBoss->Change_State(CFinalBoss::FINALBOSS_WAITAIR, 50.f, false, true);
+		}
 			break;
 		}
 	}
@@ -2118,6 +2128,15 @@ void CFinalBoss_Recovery_State::OnStateUpdate(CGameObject* pGameObject, _float f
 						m_fSecondSpeed -= fTimeDelta * 0.8f;
 					else
 					{
+						if(false == m_bEffect)
+						{
+							m_bEffect = true;
+							CEffect::FX_DESC FXDesc{};
+							FXDesc.vInitPos = pTransformCom->Get_State_Vector(CTransform::STATE_POSITION);
+							FXDesc.vInitScale = { 1.f, 1.f, 1.f };
+							pFinalBoss->Add_Effect("HS_FB recovery circle", FXDesc, true);
+						}
+
 						m_fSecondSpeed = 0.f;
 
 						m_fItemCycle += fTimeDelta;

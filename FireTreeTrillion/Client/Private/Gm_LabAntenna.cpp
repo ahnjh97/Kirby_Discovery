@@ -47,6 +47,7 @@ HRESULT CGm_LabAntenna::Initialize(void* pArg)
 
 _int CGm_LabAntenna::Tick(_float fTimeDelta)
 {
+	return OBJ_DEAD;
 	if (TRUE == m_bDead)
 		return OBJ_DEAD;
 

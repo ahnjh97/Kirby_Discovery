@@ -153,7 +153,7 @@ private:
 	_bool				m_bGully = { false };
 	_bool				m_bShake = { false };
 	_bool				m_bEffect = { false };
-	_bool				m_bAuto = { false };
+	_bool				m_bAuto = { true };
 	_bool				m_bLastDamage = { false };
 
 	// 임구이용
