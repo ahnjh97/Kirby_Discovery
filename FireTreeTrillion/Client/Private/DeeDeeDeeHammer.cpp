@@ -6,6 +6,7 @@
 #include "UI_MessageWindow.h"
 #include "Camera_Main.h"
 #include "Kirby.h"
+#include "BattleDee.h"
 #include "UI_Fading.h"
 
 CDeeDeeDeeHammer::CDeeDeeDeeHammer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -74,7 +75,7 @@ _int CDeeDeeDeeHammer::Tick(_float fTimeDelta)
 		}
 
 		// Managing Sound
-		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.1f);
+		//m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.1f);
 	}
 
 	return OBJ_NOEVENT;
@@ -192,7 +193,7 @@ void CDeeDeeDeeHammer::Ready_FadeIn()
 
 	CGameObject* pUIObj = m_pGameInstance->Get_GameObject_ByTag(LEVEL_STATIC, TEXT("Layer_ChangerUI"), TEXT("Prototype_GameObject_UI_Fading"));
 	CUI_Fading* pFadingUI = dynamic_cast<CUI_Fading*>(pUIObj);
-	
+
 	CKirby* pKirby = dynamic_cast<CKirby*>(m_pGameInstance->Get_GameObject(LEVEL_DEEDEEDEE, TEXT("Layer_Player")));
 	CHECK_NULLPTR(pKirby);
 
@@ -201,7 +202,7 @@ void CDeeDeeDeeHammer::Ready_FadeIn()
 		pFadingUI->Set_InOutState(CUI_Fading::FADEIN);
 		pFadingUI->Set_IsRender(true);
 		bOnceFade = true;
-		
+
 	}
 	else if (pFadingUI->Get_FadeRatio() >= 1.f)
 	{
@@ -232,12 +233,30 @@ void CDeeDeeDeeHammer::Ready_FadeOut()
 	{
 #pragma region 카메라 컷신 조정
 
-		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, VOLUME_BGM, 0.03f);
-		m_pGameInstance->StopSound(CHANNEL_BGM);
+		//m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, VOLUME_BGM, 0.03f);
+		//m_pGameInstance->StopSound(CHANNEL_BGM);
 
 		//효선아 여기야 와들디 세팅
-		//if (m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_BattleDee")) == nullptr)
-		//	return;
+		if (nullptr == m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_BattleDee")))
+			return;
+
+		for (auto& pDee : *m_pGameInstance->Get_List(*m_pCurrentLevelID, TEXT("Layer_BattleDee")))
+		{
+			dynamic_cast<CBattleDee*>(pDee)->Set_TrackKirby(m_bDeeOnce);
+			m_bDeeOnce = false;
+			
+			/*
+			if (bDeeOnce)
+			{
+				dynamic_cast<CBattleDee*>(pDee)->Set_TrackKirby(true);
+				bDeeOnce = false;
+			}
+			else
+			{
+				dynamic_cast<CBattleDee*>(pDee)->Set_TrackKirby(false);
+			}
+			*/
+		}
 
 		CCamera_Main* pCameraMain = dynamic_cast<CCamera_Main*>(m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Camera"), TEXT("Prototype_GameObject_Camera_Main")));
 		CHECK_NULLPTR(pCameraMain);

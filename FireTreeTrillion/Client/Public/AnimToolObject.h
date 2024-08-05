@@ -57,7 +57,7 @@ private:
 	class CCamera_Free*		m_pCamera = { nullptr };
 	CCharacterController*	m_pControllerCom = { nullptr };
 
-	wstring					m_wstrModelName = L"Prototype_Component_Model_KirbyDumpDefault";
+	wstring					m_wstrModelName = L"Prototype_Component_Model_KirbyDefault";
 	_int					m_iTestAnim = { 0 };
 
 public:
