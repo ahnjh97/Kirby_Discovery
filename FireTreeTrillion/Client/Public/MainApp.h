@@ -27,7 +27,8 @@ private:
 	HRESULT Ready_Prototype_Component_For_Static();
 
 #ifdef _DEBUG
-	_bool	Render_RTVFonts();
+	void	Render_RTVFonts();
+	void	Render_RTVFont(string strTag, _float2 vPos, _float4 vColor = {1.f, 1.f, 1.f, 1.f});
 #endif // _DEBUG
 
 private:

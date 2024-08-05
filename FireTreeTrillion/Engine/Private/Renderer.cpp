@@ -3,6 +3,9 @@
 #include "GameInstance.h"
 #include "Effect.h"
 #include "Light.h"
+
+#define RT_MINUSX(num) _float(vTargetSize.x * num + vCenterOffset.x)
+
 _uint		g_iSizeX = 8192;
 _uint		g_iSizeY = 4608;
 _uint		g_iOriginSizeX = 1600; //1280;
@@ -297,87 +300,104 @@ HRESULT CRenderer::Initialize()
 
 #ifdef _DEBUG
 
+
+	_float2 vTargetSize{ 160.f * .9f, 90.f * .9f};
+	_float2 vCenterOffset{ vTargetSize.x * .5f, vTargetSize.y * .5f };
+
+	_float vStartY = { ViewportDesc.Height - vTargetSize.y * 2.f + vCenterOffset.y };
+
+
+	//1째줄
+	
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Sky"), RT_MINUSX(0), vStartY, vTargetSize.x, vTargetSize.y)))
+		return E_FAIL;
+	m_DebugRTPos.emplace( "Sky", _float2{RT_MINUSX(0), vStartY} );
+
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_LightDepth"), RT_MINUSX(1), vStartY, vTargetSize.x, vTargetSize.y)))
+		return E_FAIL;
+	m_DebugRTPos.emplace("LightDepth", _float2{ RT_MINUSX(1), vStartY });
+
+
 	// GameObject
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Diffuse"), 50.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Diffuse"), RT_MINUSX(2), vStartY, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("Diffuse", _float2{ RT_MINUSX(2), vStartY });
 
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Normal"), 150.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Normal"), RT_MINUSX(3), vStartY, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("Normal", _float2{ RT_MINUSX(3), vStartY });
 
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Depth"), 250.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_MRA"), RT_MINUSX(4), vStartY, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("MRA", _float2{ RT_MINUSX(4), vStartY });
 
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Emissive"), 350.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Depth"), RT_MINUSX(5), vStartY, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("Depth", _float2{ RT_MINUSX(5), vStartY });
 
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Stencil"), 450.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RimLight"), RT_MINUSX(6), vStartY, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("RimLight", _float2{ RT_MINUSX(6), vStartY });
 
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RimLight"), 550.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Emissive"), RT_MINUSX(7), vStartY, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("Emissive", _float2{ RT_MINUSX(7), vStartY });
 
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_MotionBlur"), 1200.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Stencil"), RT_MINUSX(8), vStartY, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("Stencil", _float2{ RT_MINUSX(8), vStartY });
 
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_MRA"), 1300.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_MotionBlur"), RT_MINUSX(9), vStartY, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("MotionBlur", _float2{ RT_MINUSX(9), vStartY });
 
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_LensFlare"), 1400.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_LensFlare"), RT_MINUSX(10), vStartY, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
-
-	// LightAcc
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_ResultColor"), 700.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Specular"), 800.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_GodRay"), 900.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
-		return E_FAIL;
-	//if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_SSAO"), 1000.f, ViewportDesc.Height - 50.f, 100.f, 100.f)))
-	//	return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_SSAO"), 1000.f, ViewportDesc.Height - 300.f, 300.f, 300.f)))
-		return E_FAIL;
-
-	// ShadowObject
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_LightDepth"), 50.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
-		return E_FAIL;
+	m_DebugRTPos.emplace("LensFlare", _float2{ RT_MINUSX(10), vStartY });
 
 
-	// Effect
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_NonLight"), 900.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+	//2째줄
+
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_ResultColor"), RT_MINUSX(0), vStartY + vTargetSize.y, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("ResultColor", _float2{ RT_MINUSX(0), vStartY + vTargetSize.y });
 
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Blend"), 800.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Specular"), RT_MINUSX(1), vStartY + vTargetSize.y, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("Specular", _float2{ RT_MINUSX(1), vStartY + vTargetSize.y });
 
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Effect"), 400.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_SSAO"), RT_MINUSX(2), vStartY + vTargetSize.y, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("SSAO", _float2{ RT_MINUSX(2), vStartY + vTargetSize.y });
 
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Blur_X"), 200.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_NonLight"), RT_MINUSX(3), vStartY + vTargetSize.y, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("NonLight", _float2{ RT_MINUSX(3), vStartY + vTargetSize.y });
 
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Blur_Y"), 300.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Blend"), RT_MINUSX(4), vStartY + vTargetSize.y, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("Blend", _float2{ RT_MINUSX(4), vStartY + vTargetSize.y });
 
-
-	// Sky
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Sky"), 550.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_Blur_Y"), RT_MINUSX(5), vStartY + vTargetSize.y, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("Blur_Y", _float2{ RT_MINUSX(5), vStartY + vTargetSize.y });
 
-	// RadialBlur
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RadialBlur"), 700.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_GodRay"), RT_MINUSX(6), vStartY + vTargetSize.y, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("GodRay", _float2{ RT_MINUSX(6), vStartY + vTargetSize.y });
 
-	// DOFBlur
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DOFBlur"), 1000.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_RadialBlur"), RT_MINUSX(7), vStartY + vTargetSize.y, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("RadialBlur", _float2{ RT_MINUSX(7), vStartY + vTargetSize.y });
 
-	// MotionBlur
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DiffuseMotionBlur"), 1100.f, ViewportDesc.Height - 150.f, 100.f, 100.f)))
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DOFBlur"), RT_MINUSX(8), vStartY + vTargetSize.y, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;
+	m_DebugRTPos.emplace("DOFBlur", _float2{ RT_MINUSX(8), vStartY + vTargetSize.y });
 
-	/*if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_UI"), ViewportDesc.Width * 0.1f / 2.f, ViewportDesc.Height * 0.1f / 2.f,
-		ViewportDesc.Width * 0.1f, ViewportDesc.Height * 0.1f)))
-		return E_FAIL;*/
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_DiffuseMotionBlur"), RT_MINUSX(9), vStartY + vTargetSize.y, vTargetSize.x, vTargetSize.y)))
+		return E_FAIL;
+	m_DebugRTPos.emplace("DiffuseMotionBlur", _float2{ RT_MINUSX(9), vStartY + vTargetSize.y });
 
 #endif
 	return S_OK;

@@ -87,6 +87,7 @@ public:
 	HRESULT Add_DebugComponents(class CComponent* pRenderComponent);
 	_bool	Get_HitBoxRender();
 	_bool   Get_IsRenderRTV();
+	_float2	Get_DebugRTPos(string strTag);
 	void	Set_IsMaptool(_bool bMaptool);
 #endif
 
