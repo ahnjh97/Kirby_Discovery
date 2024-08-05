@@ -105,8 +105,8 @@ void CFinalBoss_Appear_State::OnStateUpdate(CGameObject* pGameObject, _float fTi
 	if (pFinalBoss->IsAnimFinished())
 	{
 		HRESULT hr;
-		//hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_BossUI"), TEXT("Prototype_GameObject_HUD_BossHpBar"), pFinalBoss);
-		//CHECK_FAILED(hr);
+		hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_BossUI"), TEXT("Prototype_GameObject_HUD_BossHpBar"), pFinalBoss);
+		CHECK_FAILED(hr);
 
 		CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pGameInstance->Get_CurrentLevelID(), TEXT("Layer_Player")));
 		pKirby->Get_KirbyInfo()->m_bFinalBossCutStart = false;
