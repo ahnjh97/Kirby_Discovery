@@ -484,6 +484,11 @@ HRESULT CSimba::Render()
 			return E_FAIL;
 	}
 
+#ifdef _DEBUG
+	if (true == m_bRenderRing)
+		RenderRing();
+#endif // _DEBUG
+	
 	return S_OK;
 }
 
