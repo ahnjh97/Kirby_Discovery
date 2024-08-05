@@ -423,7 +423,7 @@ void CBladeKnight::EffectChanger(_uint eState)
 		FXDesc.pSocketMatrix = m_pTransformCom->Get_WorldFloat4x4_Ptr();
 		//if (FAILED(CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BladeKnightTrail"), &FXDesc)))
 		//	return;
-		Add_Effect("BladeKnightTrai", FXDesc, true);
+		Add_Effect("BladeKnightTrail", FXDesc, true);
 
 		break;
 	default:
