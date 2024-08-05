@@ -74,12 +74,12 @@ HRESULT CKirby::Initialize(void* pArg)
 		return E_FAIL;
 
 	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ� 
-	m_eAbilityType = ABILITY_DEFAULT;
+	m_eAbilityType = ABILITY_CRASH;
 	//if (LEVEL_SIMBA == *m_pCurrentLevelID)
 	//		m_eAbilityType = ABILITY_HAMMER;
 
-	m_fHp = 60.f;
-	m_uCoin = 89;
+	m_fHp = 70.f;
+	m_uCoin = 13;
 	//m_fMaxHp = 100.f;
 	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ�
 
@@ -1592,11 +1592,11 @@ void CKirby::HitBoxChanger(_uint eState)
 		break;
 	// Į 1Ÿ
 	case SWORDSTATE_SIDESLASH:
-		Activate_FrustumCollider(0.5f, 4.f, 180.f);
+		Activate_FrustumCollider(0.5f, 4.f, 120.f);
 		break;
 	// Į 2Ÿ
 	case SWORDSTATE_MULITSWORDATTACK:
-		Activate_FrustumCollider(0.5f, 4.f, 180.f);
+		Activate_FrustumCollider(0.5f, 4.f, 120.f);
 		break;
 	// Į 3Ÿ
 	case SWORDSTATE_DECISIVESLASH:

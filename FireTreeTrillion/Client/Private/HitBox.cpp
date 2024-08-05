@@ -219,43 +219,55 @@ HRESULT CHitBox::Render()
 			}
 		}
 	}
+
+
 	else if (m_pOwnerCollisionDesc->eHitbox == COLLIDER_FRUSTUM)
 	{
 		_float3 vCenter = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		_float3 vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
-		vCenter = vCenter + (vLook * m_pOwnerCollisionDesc->fRadius * 0.5f);
-		ImVec2 center = TransformToScreen(XMLoadFloat3(&vCenter));
-		_float fRadius = m_pOwnerCollisionDesc->fRadius * 0.5f;
-		_int iSliceCnt = 8;
+		_float3 vUp = m_pTransformCom->Get_State(CTransform::STATE_UP);
 
-		vector<vector<ImVec2>> spherePoints;
-		// 구의 표면을 이루는 점 계산
-		for (int i = 0; i <= iSliceCnt; ++i)
+		_float fRadius = m_pOwnerCollisionDesc->fRadius;
+		_float fAngle = m_pOwnerCollisionDesc->fAngle;
+		_float fHalfAngle = fAngle * 0.5f;
+
+		_float3 vConeCenter = vCenter + (vLook * fRadius);
+		_float3 vConeCenterDir = vConeCenter - vCenter;
+
+
+		_float3 vConeborderPoint[8];
+		
+		// 4중 계란 후라이를 만들기 위한 포인트를 만들었다.
+		for (_int i = 1; i <= 8; ++i)
 		{
-			float phi = DirectX::XM_PI * i / iSliceCnt;
-			std::vector<ImVec2> stackPoints;
-
-			for (int j = 0; j <= iSliceCnt; ++j)
-			{
-				float theta = 2.0f * DirectX::XM_PI * j / iSliceCnt;
-
-				float x = fRadius * sinf(phi) * cosf(theta);
-				float y = fRadius * cosf(phi);
-				float z = fRadius * sinf(phi) * sinf(theta);
-
-				_float3 point = vCenter + _float3(x, y, z);
-				stackPoints.push_back(TransformToScreen(XMLoadFloat3(&point)));
-			}
-			spherePoints.push_back(stackPoints);
+			vConeborderPoint[i - 1] = CUtils::TurnDirectionVector(vConeCenterDir, vUp, fHalfAngle * 0.125f * i);
 		}
 
-		// 구 그리기
-		for (int i = 0; i < iSliceCnt; ++i)
+
+		// 위에서 만든 포인트를 이용해서 8방향으로 돌린다.
+		vector<ImVec2> vecBorderPoints[8];
+
+		for (_int i = 0; i < 8; ++i)
 		{
-			for (int j = 0; j < iSliceCnt; ++j)
+			for (_int j = 0; j < 8; ++j)
 			{
-				drawList->AddLine(spherePoints[i][j], spherePoints[i][j + 1], ImColor(color.x, color.y, color.z, color.w));
-				drawList->AddLine(spherePoints[i][j], spherePoints[i + 1][j], ImColor(color.x, color.y, color.z, color.w));
+				_float3 vConeBorderTurnPoint = CUtils::TurnDirectionVector(vConeborderPoint[i], vLook, 45.f * j);
+
+				// i 테두리의 포인트 좌표들을 j 8개 담는다. 이것은 월드상의 실제 위치를 투영공간 상으로 옮긴것이다.
+				vecBorderPoints[i].push_back(TransformToScreen(vCenter + vConeBorderTurnPoint));
+			}
+		}
+
+		// 그리기를 시작한다. 4중 밑면 호를 표현하기 위해 i 를 4회 반복한다.
+		for (_int i = 0; i < 8; ++i)
+		{
+			// 4중 호를 각각 잇는 작업을 시작한다. 
+			for (size_t j = 0; j < vecBorderPoints[i].size(); ++j)
+			{
+				drawList->AddLine(vecBorderPoints[i][j], j == vecBorderPoints[i].size() - 1 ? vecBorderPoints[i][0] : vecBorderPoints[i][j + 1], ImColor(color.x, color.y, color.z, color.w));
+
+				// 혹시 제일 끝에있는 호인가? 그렇다면 센터랑도 이으십시오.
+				if (i == 7) drawList->AddLine(vecBorderPoints[i][j], TransformToScreen(vCenter), ImColor(color.x, color.y, color.z, color.w));
 			}
 		}
 
@@ -336,7 +348,7 @@ void CHitBox::Restore_Logic(_float fTimeDelta)
 		{
 			m_fCollisionTime += fTimeDelta;
 
-			if (m_fCollisionTime > 0.05f)
+			if (m_fCollisionTime > 0.2f)
 			{
 				m_fCollisionTime = 0.f;
 				m_pOwnerCollisionDesc->bAlive = false;
