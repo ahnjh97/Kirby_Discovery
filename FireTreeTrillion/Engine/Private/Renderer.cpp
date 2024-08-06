@@ -854,7 +854,7 @@ HRESULT CRenderer::Render(_float fTimeDelta)
 		if (FAILED(Render_Debug()))
 			return E_FAIL;
 	}
-	Render_IMGUI();
+	//Render_IMGUI();
 #endif
 
 	return S_OK;

@@ -127,6 +127,9 @@ HRESULT CHitBox::Render()
 
 #ifdef _DEBUG
 
+	if (m_pOwner->Get_PrototypeTag() == TEXT("Prototype_GameObject_Kirby"))
+		return S_OK;
+
 	if (m_pGameInstance->Get_HitBoxRender() == false)
 		return S_OK;
 

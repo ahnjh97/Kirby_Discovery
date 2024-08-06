@@ -63,6 +63,8 @@ HRESULT CLight_Manager::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer, _b
 #ifdef _DEBUG
 void CLight_Manager::IMGUI_Tick()
 {
+	return;
+
 	if (m_Lights.empty()) return;
 
 	ImGui::Begin("LIGHT Editor");

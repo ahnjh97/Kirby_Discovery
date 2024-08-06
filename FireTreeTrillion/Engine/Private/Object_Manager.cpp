@@ -224,6 +224,8 @@ static _char filter[MAX_PATH] = "";
 /// <summary> 객체를 Clone할 당시에 자동으로 추가되어 관리되는 IMGUI 함수 </summary>
 void CObject_Manager::IMGUI_Tick()
 {
+	return;
+
 	// LEVEL_LOGO까지의 LEVEL에서는 IMGUI_Tick을 돌리지 않는다.
 	if (m_iCurrentLevel <= 2) return;
 
