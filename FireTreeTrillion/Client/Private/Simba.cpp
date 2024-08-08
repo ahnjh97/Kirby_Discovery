@@ -2025,9 +2025,9 @@ HRESULT CSimba::Add_Components()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
 		return E_FAIL;
 
-	Activate_FrustumCollider(0.f, 4.5f, 150.f, ATTACK);
-	Activate_FrustumCollider(0.f, 4.5f, 150.f, ATTACK2);
-	Activate_FrustumCollider(0.f, 8.f, 150.f, ATTACK3);
+	Activate_FrustumCollider(0.f, 7.5f, 150.f, ATTACK);
+	Activate_FrustumCollider(0.f, 7.5f, 150.f, ATTACK2);
+	Activate_FrustumCollider(0.f, 11.5f, 150.f, ATTACK3);
 
 	m_pSimbaLaser = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_SimbaLaser"));
 	m_pSimbaLaserTransform = m_pSimbaLaser->Get_TransformCom();
