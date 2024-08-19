@@ -949,6 +949,21 @@ void CModel::ShowAllAnims()
 	MB(wstrMsg.c_str(), TEXT("Animations"));
 }
 
+void CModel::ResetAnimDeco(_float _fRadius)
+{
+	if (false == m_bHide)
+		return;
+
+	m_bPreInFrustum = m_bInFrustum;
+	m_bInFrustum = m_pGameInstance->isInFrustum_WorldSpace(XMVectorSet(m_matWorld._41, m_matWorld._42, m_matWorld._43, 1), _fRadius);
+
+	if (false == m_bPreInFrustum && true == m_bInFrustum)
+	{
+		m_bHide = false;
+		ReturnToIdle();
+	}
+}
+
 HRESULT CModel::Ready_Meshes(_bool bOctree)
 {
 	m_InputFile.read(reinterpret_cast<char*>(&m_iNumMeshes), sizeof(m_iNumMeshes));

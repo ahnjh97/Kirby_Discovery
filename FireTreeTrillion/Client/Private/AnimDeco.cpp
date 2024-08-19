@@ -71,6 +71,14 @@ HRESULT CAnimDeco::Initialize(void* pArg)
 	return S_OK;
 }
 
+void CAnimDeco::Late_Tick(_float fTimeDelta)
+{
+	/*if (m_wstrNonAnimDecoName != L"")
+		return;
+
+	m_pAnimDecoModel->ResetAnimDeco(1.f);*/
+}
+
 void CAnimDeco::HideModel()
 {
 	if (nullptr != m_pAnimDecoModel) 

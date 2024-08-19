@@ -145,6 +145,8 @@ public:
 
 	void ShowAllAnims();
 
+	void ResetAnimDeco(_float _fRadius = 0.f);
+
 private:
 	_uint						m_iNumMeshes = { 0 };
 	vector<class CMesh*>		m_Meshes;
@@ -192,6 +194,8 @@ private:
 	_float						m_fIdleAnimTickPerSec = {};
 	_bool						m_bHide = { false };
 	_int						m_iActionAnimIndex = { -1 };
+	_bool						m_bInFrustum = { false };
+	_bool						m_bPreInFrustum = { false };
 
 	unordered_map<_uint, pair<vector<_uint>, unordered_set<_uint>>>	m_mapValidBones;
 
