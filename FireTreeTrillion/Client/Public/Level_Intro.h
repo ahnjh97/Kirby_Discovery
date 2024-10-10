@@ -45,6 +45,8 @@ private:
 	KIRBY_POS_STATE m_eKirbyPosState = STATE_END;
 	KIRBY_POS_STATE m_ePreKirbyPosState = STATE_END;
 
+	_float			m_fWaveDelay = { 0.f };
+
 public:
 	static CLevel_Intro* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;

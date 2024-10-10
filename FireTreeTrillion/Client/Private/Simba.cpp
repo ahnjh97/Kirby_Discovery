@@ -323,6 +323,11 @@ _int CSimba::Tick(_float fTimeDelta)
 		m_bPlayPartialAnim = false;
 		m_bRenderRing = false;
 		m_bDimensionClawActivated = false;
+		//Safe_Release(m_pSimbaLaser);
+
+		CGameObject* pLaserEffect = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_Effect"), TEXT("Prototype_GameObject_HS_lion laser"));
+		if (nullptr != pLaserEffect)
+			pLaserEffect->Set_Dead();
 
 		TransformToDefault(0.f);
 		Change_State(Simba_DemoDeadCut1, 50.f, false, true);
@@ -479,6 +484,11 @@ HRESULT CSimba::Render()
 			return E_FAIL;
 	}
 
+#ifdef _DEBUG
+	if (true == m_bRenderRing)
+		RenderRing();
+#endif // _DEBUG
+	
 	return S_OK;
 }
 
@@ -1414,7 +1424,10 @@ void CSimba::SetUpSecondTarget()
 void CSimba::CheckFinalCrusherRingCollision(_float fTimeDelta)
 {
 	m_fRingOuterRadius += fTimeDelta * 18.7f;
-	m_fRingInnerRadius = m_fRingOuterRadius * 0.92f;
+
+	_float fInnerRatio = 0.92f + m_fRingOuterRadius * 0.0015f; // 원이 커질수록 비율이 더 1에 가까워지도록
+
+	m_fRingInnerRadius = m_fRingOuterRadius * fInnerRatio;
 	if (m_fRingInnerRadius < 1.f)
 		m_fRingInnerRadius = 1.f;
 
@@ -2012,8 +2025,8 @@ HRESULT CSimba::Add_Components()
 	if (FAILED(m_pGameInstance->Add_Clone(*m_pCurrentLevelID, TEXT("Layer_HitBox"), TEXT("Prototype_GameObject_HitBox"), &tAttack)))
 		return E_FAIL;
 
-	Activate_FrustumCollider(0.f, 8.f, 150.f, ATTACK);
-	Activate_FrustumCollider(0.f, 8.f, 150.f, ATTACK2);
+	Activate_FrustumCollider(0.f, 7.5f, 150.f, ATTACK);
+	Activate_FrustumCollider(0.f, 7.5f, 150.f, ATTACK2);
 	Activate_FrustumCollider(0.f, 11.5f, 150.f, ATTACK3);
 
 	m_pSimbaLaser = m_pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_SimbaLaser"));
@@ -2426,7 +2439,15 @@ void CSimba::SpawnEffects(_uint iTriggerIndex)
 
 	if (11 == iTriggerIndex) {
 		if (0 == m_iEffectCount)
+		{
+			CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+			AbilityItemDesc.bImmortal = true;
+			AbilityItemDesc.vPosition = XMVectorSet(0.087f, 2.f, -72.f, 1.f);
+			AbilityItemDesc.eAbilityType = ABILITY_SWORD;
+			hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+
 			wstrMonsterName = TEXT("Awoofy");
+		}
 		else if (1 == m_iEffectCount)
 			wstrMonsterName = TEXT("AwoofyWild");
 	}

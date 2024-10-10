@@ -1054,7 +1054,12 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 			if (m_pGameInstance->Get_DIKeyState(DIK_X, KEY_DOWN) == true)
 			{
-				m_pGameInstance->PlaySound_Free(L"덤프트럭 부스터 2.wav", .7f);
+				static _bool bOnce{ true };
+				if (bOnce)
+				{
+					m_pGameInstance->PlaySound_Free(L"덤프트럭 부스터 2.wav", .7f);
+					bOnce = false;
+				}
 
 				m_fQTERatio += 1.f;
 
@@ -1255,7 +1260,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		{
 			// 들이 받을 때, 첫번째 QTE가 시작된다. 그와 동시에 이펙트의 시작.
 			CMultiEffect::MULTI_FX_DESC FXDesc{};
-			FXDesc.vInitPos = { 0.f, 0.f, + 5.f };
+			FXDesc.vInitPos = { 0.f, 0.f, +5.f };
 			FXDesc.vInitScale = { 1.f, 1.f, 1.f };
 			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
 			pKirby->Add_Effect("YW Finale Debris Cols", FXDesc, false);
@@ -1368,7 +1373,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 		if (pKirby->Get_AnimTrackPosition() >= 26.f && m_bEffectTrigger[0] == true)
 		{
 			CMultiEffect::MULTI_FX_DESC FXDesc{};
-			FXDesc.vInitPos = { 0.f, 0.f, + 10.f };
+			FXDesc.vInitPos = { 0.f, 0.f, +10.f };
 			FXDesc.vInitScale = { 1.5f, 1.5f, 1.5f };
 			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
 			pKirby->Add_Effect("YW Finale Debris Cols", FXDesc, false);
@@ -1464,7 +1469,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 
 			}
 
-			
+
 		}
 
 		if (fTrackPosition > 410.f)
@@ -1505,7 +1510,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 				////부스터 소리 준비 시작
 				//m_pGameInstance->LoopSound(CHANNEL_PLAYERVOICE, L"덤프트럭 주행.wav", .4f);
 			}
-			
+
 
 
 		}
@@ -1582,7 +1587,7 @@ void CKirbyDump_Cut2_State::OnStateUpdate(CGameObject* pGameObject, _float fTime
 			pCenter->Set_CutScene(18);
 
 			CMultiEffect::MULTI_FX_DESC FXDesc{};
-			FXDesc.vInitPos = { 0.f, 0.f, + 5.f };
+			FXDesc.vInitPos = { 0.f, 0.f, +5.f };
 			FXDesc.vInitScale = { 2.f, 2.f, 2.f };
 			FXDesc.pSocketMatrix = pKirby->Get_EffectSocket();
 			pKirby->Add_Effect("YW Finale Debris Cols", FXDesc, false);

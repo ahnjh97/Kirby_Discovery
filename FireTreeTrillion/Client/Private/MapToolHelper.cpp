@@ -1089,7 +1089,7 @@ void CMapToolHelper::Menu_LightInfo()
 			ImGui::Text("Specular");
 		ImGui::SameLine();
 		ImGui::SetCursorPosX(60);
-		string strLabel = "LightInfo" + to_string(i);
+		string strLabel = "##LightInfo" + to_string(i);
 		if (ImGui::InputFloat4(strLabel.c_str(), s_vecLightInfo[i].data(), "%.3f"))
 			pMapToolObject->Set_LightInfo(i, _float4(s_vecLightInfo[i][0], s_vecLightInfo[i][1], s_vecLightInfo[i][2], s_vecLightInfo[i][3]));
 	}

@@ -158,6 +158,9 @@ void CBasicMap::Late_Tick(_float fTimeDelta)
             m_pBlendMap->Late_Tick(fTimeDelta);
     }
 
+    for (auto& animDeco : m_vecAnimDecos)
+        animDeco->ResetAnimDeco(1.f);
+
     for (auto& blendDeco : m_vecBlendObjects)
         blendDeco->Late_Tick(fTimeDelta);
 

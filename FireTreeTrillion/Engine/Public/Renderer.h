@@ -63,9 +63,20 @@ public:
 	HRESULT Initialize();
 	void Color_Initialize();
 
+#ifdef _DEBUG
+	_float2 Get_DebugRTPos(string strTag)
+	{
+		auto iter = m_DebugRTPos.find(strTag);
+		if (iter == m_DebugRTPos.end())
+			return _float2();
+
+		return iter->second;
+	}
+#endif
+
 	// fog를 바깥에서 조절할 수 있는 함수들
 	void Fog_Zero();
-	
+
 	// LEVEL별 Fog 세팅을 돕습니다.
 	void Fog_Intialize_ForIntroLevel(_int iPoint);
 	void Fog_Intialize_ForRacing(_int iPoint);
@@ -74,28 +85,28 @@ public:
 	void Fog_Intialize_ForFinalBoss(_int iPoint);
 
 	void Increase_FogYValue(_float fTimeDelta)
-	{ 
+	{
 		m_fFogYIntensity += fTimeDelta;
 		if (m_fFogYIntensity >= 1.f)
 			m_fFogYIntensity = 1.f;
 	}
 
-	void Decrease_FogYValue(_float fTimeDelta) 
-	{ 
-		m_fFogYIntensity -= fTimeDelta; 
+	void Decrease_FogYValue(_float fTimeDelta)
+	{
+		m_fFogYIntensity -= fTimeDelta;
 		if (m_fFogYIntensity <= 0.f)
 			m_fFogYIntensity = 0.f;
 	}
 
-	void Increase_FogViewValue(_float fTimeDelta) 
-	{ 
-		m_fFogViewIntensity += fTimeDelta; 
+	void Increase_FogViewValue(_float fTimeDelta)
+	{
+		m_fFogViewIntensity += fTimeDelta;
 		if (m_fFogViewIntensity >= 1.f)
 			m_fFogViewIntensity = 1.f;
 	}
 
-	void Decrease_FogViewValue(_float fTimeDelta) 
-	{ 
+	void Decrease_FogViewValue(_float fTimeDelta)
+	{
 		m_fFogViewIntensity -= fTimeDelta;
 		if (m_fFogViewIntensity <= 0.f)
 			m_fFogViewIntensity = 0.f;
@@ -148,14 +159,14 @@ public:
 	void Setting_RadialBlur(_fvector vWorldPos, _float fRadial, _float fSubtraction);
 	void Setting_RadialBlur(_float fRadial, _float fSubtraction);
 
-	
+
 	//림라이트 세팅
-	void Update_RimLight(_float fRimRatio, _float fRimRadius = -1.f, _float3 vRimColor = {-1.f, -1.f, -1.f});
+	void Update_RimLight(_float fRimRatio, _float fRimRadius = -1.f, _float3 vRimColor = { -1.f, -1.f, -1.f });
 
 	// fog 세팅
 	void Update_ViewFog(_float fIntensity, _float fStart, _float fEnd, _float3 vColor = { -1.f, -1.f, -1.f });
-	void Update_YFog(_float fIntensity, _float fBottom, _float fTop, _float3 vColor = {-1.f, -1.f, -1.f});
-	void Update_Ocean(_float fIntensity, _float fBottom = {1.f}, _float fTop = {-1.f},
+	void Update_YFog(_float fIntensity, _float fBottom, _float fTop, _float3 vColor = { -1.f, -1.f, -1.f });
+	void Update_Ocean(_float fIntensity, _float fBottom = { 1.f }, _float fTop = { -1.f },
 		_float3 vBottomColor = { -1.f, -1.f, -1.f }, _float3 vTopColor = { -1.f, -1.f, -1.f });
 	void Update_OceanWave(_float fOceanfrequency, _float fOceanAmplitude);
 
@@ -168,7 +179,7 @@ public:
 	void Update_DirectionalLight(_float4 vDiffuse, _float4 vAmbient);
 
 	// GodRay 위치를 설정한다.
-	void Setting_GodRay(_fvector vWorldPos, 
+	void Setting_GodRay(_fvector vWorldPos,
 		_float fRayExposure = 0.15f, _float fRayDecay = 0.96815f, _float fRayIlluminationDecay = 0.8f, _float fRayDensity = 0.5f, _float fWeight = 0.5f);
 	// 랜즈 플레어를 끄고 킨다.
 	void Setting_LensFlare(_bool bOnOff) {
@@ -184,7 +195,7 @@ public:
 		m_vShadowFocusPos = vFocusPos;
 	}
 
-	void Set_BlackBackGround(_bool bSet) {	m_bBlackBackground = bSet; }
+	void Set_BlackBackGround(_bool bSet) { m_bBlackBackground = bSet; }
 
 	// 환경설정 업데이트
 	void Update_Option(OPTION Option, _bool bOn);
@@ -327,7 +338,7 @@ private:
 
 	pair<_float, _float> m_fRimLightRatio = { 1.f, 1.f };
 	pair<_float, _float> m_fRimLightRadius = { 1.f, 1.f };
-	pair<_float3, _float3> m_vRimColor = {_float3(1.f, 1.f, 1.f), _float3(1.f, 1.f, 1.f)};
+	pair<_float3, _float3> m_vRimColor = { _float3(1.f, 1.f, 1.f), _float3(1.f, 1.f, 1.f) };
 
 	_float m_fDOFIntensity = { 0.1f };
 	_float3 m_vDOFColor = { .03f, 0.f, .05f };
@@ -341,7 +352,7 @@ private:
 	_float m_fFogYBottom = { 0.f };
 	_float m_fFogYTopY = { 0.f };
 	_float m_fFogYIntensity = { 0.f };
-		   
+
 	_float3 m_vFogViewColor = { 1.f, 1.f, 1.f };
 	_float m_fFogViewStart = { 0.f };
 	_float m_fFogViewEnd = { 0.f };
@@ -376,9 +387,10 @@ private:
 	_bool  m_bMaptool = { false };
 	//_bool  m_bBloomSky = { false };
 
-
 #ifdef _DEBUG
 private:
+	map<string, _float2> m_DebugRTPos;
+
 	HRESULT Render_Debug();
 #endif
 

@@ -25,7 +25,7 @@ public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual _int Tick(_float fTimeDelta) override { return OBJ_NOEVENT; }
-	virtual void Late_Tick(_float fTimeDelta) override {};
+	virtual void Late_Tick(_float fTimeDelta) override;
 	virtual HRESULT Render() override { return S_OK; }
 
 public:
@@ -35,6 +35,9 @@ public:
 private:
 	CModel* m_pAnimDecoModel = { nullptr };
 	wstring m_wstrNonAnimDecoName;
+
+	_bool m_bInFrustum = { false };
+	_bool m_bPreInFrustum = { false };
 
 public:
 	static CAnimDeco* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

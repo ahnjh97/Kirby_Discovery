@@ -53,7 +53,7 @@ private:
 	_bool	m_bItemTrigger = { true };
 	_bool	m_bShowDialog = { FALSE };
 	_bool	m_bFadeOutEnd = false;
-
+	_bool	m_bDeeOnce = { true };
 private:
 	HRESULT Add_Components();
 	HRESULT Bind_ShaderResources();

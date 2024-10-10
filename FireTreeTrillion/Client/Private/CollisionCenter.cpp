@@ -825,6 +825,7 @@ void CCollisionCenter::Simba_Battle()
 				return;
 			_float fAttack = pObject->Get_Attack();
 			pSimba->Minus_Hp(fAttack);
+			pSimba->Collision(CONTENT_DAMAGE, nullptr);
 			pthis->Camera_Shaking(1.2f);
 			DstHit->Set_Alive(false);
 			SrcHit->Set_Alive(false);
@@ -850,6 +851,7 @@ void CCollisionCenter::Simba_Battle()
 			_float fAttack = pPlayerBullet->Get_Attack();
 			GAMEINSTANCE PlaySound_Free(L"KirbyBomb_Bomb.wav", 0.5f);
 			pSimba->Minus_Hp(fAttack);
+			pSimba->Collision(CONTENT_DAMAGE, nullptr);
 			pthis->Camera_Shaking(1.2f);
 			DstHit->Set_Alive(false);
 			SrcHit->Set_Alive(false);

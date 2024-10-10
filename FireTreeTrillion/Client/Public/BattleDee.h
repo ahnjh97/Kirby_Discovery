@@ -28,6 +28,8 @@ public:
 
 
 	void			Start_Battle(CGameObject* pNotifier) { m_bStartBattle = true; }
+	void			Set_TrackKirby(_bool bTrack){ m_bTrackKirby = bTrack; }
+
 
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;

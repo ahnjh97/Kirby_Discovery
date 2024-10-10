@@ -44,6 +44,7 @@ void CGm_DynamicField::CheckMovingPointLights(CLight* pPointLight)
 		_float3 vPos = GET_POS;
 		_float3 vOffset = _float3(tDesc.vPosition.x - vPos.x, tDesc.vPosition.y - vPos.y, tDesc.vPosition.z - vPos.z);
 		m_vecPointLights.push_back(pair<CLight*, _float3>(pPointLight, vOffset));
+		Safe_AddRef(pPointLight);
 	}
 }
 

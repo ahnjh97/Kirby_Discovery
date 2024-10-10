@@ -5,6 +5,7 @@
 #include "EventCenter.h"
 #include "Camera_Main.h"
 #include "BossName.h"
+#include "Ability.h"
 
 static _float s_fOffsetY = {};
 static _uint s_iAttackCount = {};
@@ -142,6 +143,29 @@ void CSimba_Appear2::OnStateUpdate(CGameObject* pGameObject, _float fTimeDelta)
 				m_pController->Set_Position(m_pTransform, vNewPos);
 				pSimba->CreateHpBar();
 				pSimba->Set_MoveEye(true);
+
+				HRESULT hr;
+				CAbility::ABILITYITEM_DESC AbilityItemDesc = {};
+				AbilityItemDesc.bImmortal = true;
+				AbilityItemDesc.vPosition = XMVectorSet(-16.f, 2.3f, -86.f, 1.f);
+				AbilityItemDesc.eAbilityType = ABILITY_SWORD;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+				CHECK_FAILED(hr);
+
+				AbilityItemDesc.vPosition = XMVectorSet(-16.f, 2.3f, -48.f, 1.f);
+				AbilityItemDesc.eAbilityType = ABILITY_BOMB;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+				CHECK_FAILED(hr);
+
+				AbilityItemDesc.vPosition = XMVectorSet(16.f, 2.3f, -48.f, 1.f);
+				AbilityItemDesc.eAbilityType = ABILITY_HAMMER;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+				CHECK_FAILED(hr);
+
+				AbilityItemDesc.vPosition = XMVectorSet(16.f, 2.3f, -86.5f, 1.f);
+				AbilityItemDesc.eAbilityType = ABILITY_CRASH;
+				hr = m_pGameInstance->Add_Clone(*m_pGameInstance->Get_CurrentLevelID(), g_strLayerItem, TEXT("Prototype_GameObject_Ability"), &AbilityItemDesc);
+				CHECK_FAILED(hr);
 			}
 			break;
 		}

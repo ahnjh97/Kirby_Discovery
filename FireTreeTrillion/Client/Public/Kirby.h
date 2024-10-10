@@ -253,6 +253,8 @@ public:
 	void DialogOn(_float4 vDir = _float4(0.f, 0.f, 0.f, 0.f ));
 	void DialogOff(_float4 vDir = _float4(0.f, 0.f, 0.f, 0.f));
 
+	_int				  m_iShadowFinal = { 0 };
+
 private:
 	// 커비의 움직임을 담은 구조체
 	KIRBY_INFODESC  m_tKirbyInfo;
@@ -341,8 +343,6 @@ private:
 	// For FinalCut
 	_bool				  m_bFinalCutTrigger = { true };
 	_bool				  m_bFinalCutStartTrigger = { true };
-
-	_bool				  m_bShadowFinal = { false };
 
 
 	unordered_map<PxRigidActor*, CGameObject*> m_mapToppleableBridges;

@@ -73,13 +73,14 @@ HRESULT CKirby::Initialize(void* pArg)
 	if (FAILED(Kirby_SystemInitialize()))
 		return E_FAIL;
 
-	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ�     //.
-	m_eAbilityType = ABILITY_HAMMER;
-	if (LEVEL_SIMBA == *m_pCurrentLevelID)
-			m_eAbilityType = ABILITY_HAMMER;
+	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ� 
+	m_eAbilityType = ABILITY_CRASH;
+	//if (LEVEL_SIMBA == *m_pCurrentLevelID)
+	//		m_eAbilityType = ABILITY_HAMMER;
 
-	m_fHp = 100.f;
-	m_fMaxHp = 100.f;
+	m_fHp = 70.f;
+	m_uCoin = 13;
+	//m_fMaxHp = 100.f;
 	// ����� �� �ڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡڡ�
 
 
@@ -452,6 +453,10 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 			if (m_bOverPower == true)
 				return;
 
+			if (INFO(m_pObject) != nullptr &&
+				(Get_State() == STATE_VACUUM || Get_State() == STATE_VACUUMHUSTLELV2) == true)
+				return;
+
 			m_pGameInstance->PlaySound_Free(L"Collision_Body.wav", 0.6f);
 			Reset_If_Damage();
 
@@ -575,6 +580,10 @@ void CKirby::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pO
 		else
 		{
 			if (m_bOverPower == true)
+				return;
+
+			if (INFO(m_pObject) != nullptr &&
+				(Get_State() == STATE_VACUUM || Get_State() == STATE_VACUUMHUSTLELV2) == true)
 				return;
 
 			Reset_If_Damage();
@@ -1583,11 +1592,11 @@ void CKirby::HitBoxChanger(_uint eState)
 		break;
 	// Į 1Ÿ
 	case SWORDSTATE_SIDESLASH:
-		Activate_FrustumCollider(0.5f, 4.f, 180.f);
+		Activate_FrustumCollider(0.5f, 4.f, 120.f);
 		break;
 	// Į 2Ÿ
 	case SWORDSTATE_MULITSWORDATTACK:
-		Activate_FrustumCollider(0.5f, 4.f, 180.f);
+		Activate_FrustumCollider(0.5f, 4.f, 120.f);
 		break;
 	// Į 3Ÿ
 	case SWORDSTATE_DECISIVESLASH:
@@ -1955,12 +1964,17 @@ void CKirby::Kirby_SystemTick(_float fTimeDelta)
 	if ((vPos.y < 1.f) && (vPos.y > -4.f) &&
 		(vPos.z < -20.f) && (vPos.z > -25.f))
 	{
-		m_bShadowFinal = true;
+		m_iShadowFinal = 1;
 	}
 
-	if (*m_pCurrentLevelID == LEVEL_FINALBOSS && m_bShadowFinal == true)
+	if (*m_pCurrentLevelID == LEVEL_FINALBOSS && m_iShadowFinal == 1)
 	{
 		m_pGameInstance->Update_LightShadow(_float4(0.f, 100.f, 42.f, 1.f), _float4(0.f, 0.f, 0.f, 1.f));
+	}
+	else if (m_iShadowFinal == 2)
+	{
+		m_pGameInstance->Update_LightShadow(_float4(0.68f, 65.11f, 75.62f, 1.f), _float4(0.f, 0.f, 0.f, 1.f));
+
 	}
 	else
 	{
@@ -2191,8 +2205,8 @@ HRESULT CKirby::Kirby_SystemInitialize()
 		}
 		else if (LEVEL_TOWN == eLEVEL && LEVEL_TOWN == *m_pCurrentLevelID)
 		{
-			_float3 vNewPos = tLevelData.vLastPos;
-			Set_ControllerPos(_float4(vNewPos.x, vNewPos.y, vNewPos.z, 1.f));
+			//_float3 vNewPos = tLevelData.vLastPos;
+			//Set_ControllerPos(_float4(vNewPos.x, vNewPos.y, vNewPos.z, 1.f));
 		}
 		//else if (*m_pCurrentLevelID == LEVEL_PARK)
 		//{
@@ -2246,6 +2260,10 @@ void CKirby::Kirby_LookInitialize()
 	{
 		_float4 vLook = XMVector3Normalize(_float4(1.f, 0.f, 1.f, 0.f));
 		INFO(m_vTargetDir) = INFO(m_vMoveDir) = vLook;
+	}
+	else if (uLevel == LEVEL_SIMBA)
+	{
+		INFO(m_vTargetDir) = INFO(m_vMoveDir) = fCameraLook;
 	}
 	else
 	{
@@ -2446,7 +2464,6 @@ void CKirby::AssistLight_Control()
 
 void CKirby::Reset_If_Damage()
 {
-
 	INFO(m_fVacuumTime) = 0.f;
 
 	INFO(m_ePreAttackState) = SWORDSTATE_DECISIVESLASH;
@@ -2473,6 +2490,10 @@ void CKirby::Reset_If_Damage()
 	INFO(m_fCrashChargeTime) = 0.f;
 
 	INFO(m_fTimeRatio) = 0.f;
+
+	CCamera_Main* pCamera = static_cast<CCamera_Main*>(m_pGameInstance->Get_CurCameraPtr());
+	pCamera->Zoom(0.f);
+
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

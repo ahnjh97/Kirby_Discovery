@@ -29,6 +29,8 @@ void CFinalBoss::Appear_Event(CGameObject* pObj)
 
 	m_pControllerCom->Set_Position( m_pTransformCom, Pos(vPos) );
 
+	CKirby* pKirby = static_cast<CKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player")));
+	pKirby->m_iShadowFinal = 2;
 
 	CParticle::PARTICLE_DESC FXDesc{};
 	FXDesc.pSocketMatrix = &m_EffectSocket;
@@ -225,6 +227,7 @@ _int CFinalBoss::Tick(_float fTimeDelta)
 	{
 		if (m_fHp < (m_fBeforeHp - m_fMaxHp * 0.1f))
 		{
+			Delete_Effect("HS_FB recovery circle");
 			Change_State(FINALBOSS_DAMAGE, 50.f, false, true);
 		}
 	}

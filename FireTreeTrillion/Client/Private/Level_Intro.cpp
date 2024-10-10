@@ -113,6 +113,19 @@ void CLevel_Intro::Tick(_float fTimeDelta)
 
 	Sound_Tick(fTimeDelta);
 	Fog_Tick(fTimeDelta);
+
+
+
+	m_fWaveDelay += fTimeDelta;
+
+	if (m_fWaveDelay > 4.f)
+	{
+		CMultiEffect::MULTI_FX_DESC desc = {};
+		desc.vInitPos = { -129.18f , 1.58f,-110.f };
+		desc.vInitRot = CUtils::Make_Degree_FromDir(_float3(0.f, 0.1f, 1.f));
+		CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_YW Intro Wave"), &desc);
+		m_fWaveDelay = 0.f;
+	}
 }
 
 void CLevel_Intro::Check_KirbyPosState()
@@ -439,6 +452,13 @@ HRESULT CLevel_Intro::Ready_Layer_BackGround(const wstring& strLayerTag)
 	// Car Test
 	if (FAILED(m_pGameInstance->Add_Clone(m_iLevel, TEXT("Layer_Portal"), TEXT("Prototype_GameObject_PortalSoftEffect"), &ObjDesc)))
 		return E_FAIL;
+
+	CParticle::PARTICLE_DESC PartDesc{};
+	PartDesc.vInitPos = { -113.f,  5.f, -8.f };
+	CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BDBY"), &PartDesc);
+
+	PartDesc.vInitPos = { -60.f,  5.f, -8.f };
+	CGameInstance::Get_Instance()->Add_Clone(*CGameInstance::Get_Instance()->Get_CurrentLevelID(), TEXT("Layer_Effect"), TEXT("Prototype_GameObject_BDBY"), &PartDesc);
 
 	return S_OK;
 }

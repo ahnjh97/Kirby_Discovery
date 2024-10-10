@@ -553,6 +553,10 @@ _bool CGameInstance::Get_IsRenderRTV()
 
 	return m_pRenderer->Get_IsRenderRTV();
 }
+_float2 CGameInstance::Get_DebugRTPos(string strTag)
+{
+	return m_pRenderer->Get_DebugRTPos(strTag);
+}
 void CGameInstance::Set_IsMaptool(_bool bMaptool)
 {
 	if (nullptr == m_pRenderer)
