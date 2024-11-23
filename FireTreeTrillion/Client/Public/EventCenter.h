@@ -25,12 +25,13 @@ public:
 	//원하는 이벤트가 발생했을 때 함수를 호출한다. 이벤트 이넘 + 내 주소 + 호출할 함수 바인딩 + 우선순위(기본 1)
 	HRESULT Subscribe(KIRBY_EVENT eEvent, CGameObject* pObj, function<void(CGameObject*)> func, _uint iPriority = 1);
 
-	//이벤트를 발생시킨다. 호출자의 주소를 넣어주세요(없으면 말고)
+	//이벤트를 발생시킨다. 필요하다면 호출자의 주소 전달
 	HRESULT Notify(KIRBY_EVENT eEvent, CGameObject* pObj = nullptr);
 
-	//특정 이벤트에 구독된 이력만 삭제한다.
+	//특정 이벤트에 구독된 객체 이력을 삭제.
 	HRESULT Unsubscribe(KIRBY_EVENT eEvent, CGameObject* pObj);
-	//모든 이벤트의 구독 이력을 삭제한다.
+
+	//모든 이벤트에 구독된 객체 이력을 삭제
 	HRESULT Unsubscribe(CGameObject* pObj);
 
 

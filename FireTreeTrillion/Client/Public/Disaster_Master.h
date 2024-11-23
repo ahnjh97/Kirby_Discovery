@@ -27,7 +27,7 @@ private:
 	void			Make_MissBaum();
 	void			Make_OnTerrainBaum(_float4 vTargetPos, _bool bBaum);
 	void			Make_AirParticle();
-	void			Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir, _float fDestZAngle = -1.f);
+	void			Make_FinaleRoad(ROADTYPE eType, MOVETYPE eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir, _float fDestZAngle = -1.f);
 
 	void			Make_CutAirParticle();
 	_bool			m_bCutInitializeParticle = { true };

@@ -150,6 +150,12 @@ enum DEE_CHARACTER
 	DEECHARACTER_END,
 };
 
+struct WAITING_INFO
+{
+	_float3 vPos;
+	_float	fAnimOffset;
+};
+
 enum TOWN_POINT
 {
 	TOWNPOINT_0,
@@ -214,23 +220,13 @@ enum TOWN_POINT
 	TOWNPOINT_END
 };
 
-struct WAITING_INFO
-{
-	_float3 vPos;
-	_float	fAnimOffset;
-};
 
 struct TOWN_POINT_INFO
 {
-	//자신의 인덱스(사실 그냥 바로 벡터 인덱스 써도 되는데 나중에 구별할 일 있을까봐 넣음)
 	TOWN_POINT			MyPoint;
-	//타운 랠리포인트 기준으로부터의 상대값
 	_float3				vPosOffset;
-	//거기서 디가 할 행동 패턴들
 	vector<DEE_ANIM>	StateOffset;
-	//인접하여 갈 수 있는 지점들
 	vector<TOWN_POINT>	NearPoint;
-	//사용 중인가? (그곳에 디가 있는가?)
 	_bool				bIsUsing = { false };
 };
 

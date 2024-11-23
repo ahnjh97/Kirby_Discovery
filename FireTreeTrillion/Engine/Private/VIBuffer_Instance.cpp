@@ -257,9 +257,7 @@ HRESULT CVIBuffer_Instance::Render()
 	if (nullptr == m_pContext)
 		return E_FAIL;
 
-	/* 인덱스버퍼의 값을 이용하여 정점 버퍼의 정점들을 그려낸다. */
 	m_pContext->DrawIndexedInstanced(m_iIndexCountPerInstance, m_iNumInstance, 0, 0, 0);
-
 	return S_OK;
 }
 

@@ -223,32 +223,27 @@ CEffect* CFXToolDirector::Find_Effect(string strName)
 }
 
 
-//이펙트 싹 저장
 HRESULT CFXToolDirector::Save_AllEffect()
 {
 	for (auto& FX : m_FXs)
 	{
 		wstring wstrName = CUtils::StrToWstr(FX->Get_Name());
-
 		Save_Effect(FX, wstrName);
 	}
 
 	for (auto& FX : m_Particles)
 	{
 		wstring wstrName = CUtils::StrToWstr(FX->Get_Name());
-
-		//파티클
 		Save_Particle(FX, wstrName);
 	}
 
 	for (auto& FX : m_MultiFXs)
 	{
 		wstring wstrName = CUtils::StrToWstr(FX->Get_Name());
-
 		Save_MultiEffect(FX, wstrName);
 	}
 
-	MSG_BOX(TEXT("저장 끝~"));
+	MSG_BOX(TEXT("저장 완료"));
 
 	return S_OK;
 }
@@ -260,12 +255,11 @@ HRESULT CFXToolDirector::Save_Effect(CEffect* pEffect, const wstring& strFileNam
 	ofstream OutputFile(wstrExactPath, ios::binary | ios::out);
 
 	if (!OutputFile.is_open())
-		ALARM_FAIL(TEXT("망했어"));
+		ALARM_FAIL(TEXT("단일 이펙트 저장 실패"));
 
 	SINGLE_FX_DATA FXData{};
 	pEffect->Fill_SaveData(&FXData);
-	if (FXData.strName == "FlowerLeaf A")
-		int a = 0;
+
 	OutputFile.write(reinterpret_cast<const char*>(&FXData.iNameStrLen), sizeof(_uint));
 	OutputFile.write(FXData.strName.c_str(), FXData.iNameStrLen);
 
@@ -329,7 +323,7 @@ HRESULT CFXToolDirector::Save_Particle(CEffect* pEffect, const wstring& strFileN
 	ofstream OutputFile(wstrExactPath, ios::binary | ios::out);
 
 	if (!OutputFile.is_open())
-		ALARM_FAIL(TEXT("망했어"));
+		ALARM_FAIL(TEXT("파티클 이펙트 저장 실패"));
 
 	PARTICLE_DATA FXData{};
 	pEffect->Fill_SaveData(&FXData);

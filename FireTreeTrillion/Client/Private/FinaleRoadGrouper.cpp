@@ -20,7 +20,7 @@ _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 {
 
 	//내가 움직이는 놈 아니면 나가기
-	if (m_eCollideMove == MOVECMD_END)
+	if (m_eCollideMoveType == MOVECMD_END)
 		return false;
 
 	_bool bIsMyCollision{ false };
@@ -39,7 +39,7 @@ _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 		return false;
 
 
-	switch (m_eCollideMove)
+	switch (m_eCollideMoveType)
 	{
 	case MOVECMD_ROTATE:
 		break;
@@ -47,8 +47,6 @@ _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 		m_bStartCollideEvent = true;
 		m_fCollideTime = 1.f;
 		m_fMaxDuration = m_fCollideTime;
-
-		//m_fDestZAngle = CUtils::Make_RandomFloat(-15.f, 15.f);
 
 		break;
 	default:
@@ -59,8 +57,6 @@ _bool CFinaleRoadGrouper::Make_CollideReaction(CFinaleRoad* pRoad)
 	{
 		road->Make_CollisionEvent();
 	}
-
-	//m_fDestZAngle = CUtils::Make_RandomInt(0, 1) ? 10.f : -10.f;
 
 	return true;
 }
@@ -86,7 +82,7 @@ HRESULT CFinaleRoadGrouper::Initialize(void* pArg)
 	CHECK_FAILED(hr);
 
 	//충돌 판정 시 어떻게 움직이는가?
-	m_eCollideMove = RoadGroupDesc.eMoveCommand;
+	m_eCollideMoveType = RoadGroupDesc.eMoveCommand;
 	if (false == ISDEFAULTFLOAT(RoadGroupDesc.fDestZAngle))
 	{
 		m_fDestZAngle = RoadGroupDesc.fDestZAngle;
@@ -452,7 +448,7 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 			m_fCollideTime = 0.f;
 
 			//날아와서 부딪히는 놈이면 shake 하기
-			if (m_eCollideMove == MOVECMD_FLY)
+			if (m_eCollideMoveType == MOVECMD_FLY)
 			{
 				//소리 재생
 				m_pGameInstance->PlaySound_Free(L"쿠르광.wav", .7f);
@@ -488,33 +484,29 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 
 		_float fTime = 0.f;
 
-		if (m_eCollideMove == MOVECMD_FLY)
+		if (m_eCollideMoveType == MOVECMD_FLY)
 			fTime = (m_fMaxDuration - m_fCollideTime) / m_fMaxDuration;
-		else if (m_eCollideMove == MOVECMD_COLLIDE)
+		else if (m_eCollideMoveType == MOVECMD_COLLIDE)
 			fTime = EASE_OUT((m_fMaxDuration - m_fCollideTime) / m_fMaxDuration);
 
 
-		//거리 스냅
-		if (.1f < fDist)
+		if (.05f < fDist)
 		{
 			_float3 vResultPos = _float3::Lerp(m_vStartPos, m_vDestPos, fTime);
 
-			if (_float3::Distance(vResultPos, m_vDestPos) < .1f)
+			if (_float3::Distance(vResultPos, m_vDestPos) < .05f)
 				vResultPos = m_vDestPos;
 
 			SET_POS(Pos(vResultPos));
 		}
 
-		//회전 보간
 		Quaternion vFirstQuat, vSecondQuat, vResultQuat;
-
 		vFirstQuat = CUtils::Make_Quat_FromDir(m_vStartDir);
 		vSecondQuat = CUtils::Make_Quat_FromDir(m_vDestDir);
 
 		vResultQuat = Quaternion::Slerp(vFirstQuat, vSecondQuat, clamp(fTime, 0.f, 1.f));
 		m_pTransformCom->Turn_Absolute(vResultQuat);
 
-		//z 앵글 보간
 		if (.05f < abs(m_fCurZAngle - m_fDestZAngle))
 		{
 			m_fCurZAngle = LERP(m_fStartZAngle, m_fDestZAngle, fTime);
@@ -526,7 +518,7 @@ _int CFinaleRoadGrouper::Tick(_float fTimeDelta)
 	else
 	{
 		//평소
-		if (m_eCollideMove == MOVECMD_FLY)
+		if (m_eCollideMoveType == MOVECMD_FLY)
 		{
 			//m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), fRealTimeDelta, 1.f);
 			/*m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_UP), fRealTimeDelta, 1.f);*/

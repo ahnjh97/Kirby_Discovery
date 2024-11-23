@@ -14,7 +14,7 @@ enum ROADTYPE
 	RTYPE_END
 };
 
-enum MOVECMD
+enum MOVETYPE
 {
 	MOVECMD_STOP,
 	MOVECMD_ROTATE,
@@ -30,7 +30,7 @@ public:
 	struct ROADGROUPER_DESC : public GAMEOBJECT_DESC
 	{
 		ROADTYPE	eRoadType = { RTYPE_END };
-		MOVECMD		eMoveCommand = { MOVECMD_STOP };
+		MOVETYPE		eMoveCommand = { MOVECMD_STOP };
 		_bool		bIsAnimModel = { false };
 
 		_float3		vDestPos = { -1.f, -1.f, -1.f };
@@ -63,7 +63,7 @@ public:
 
 private:
 	_bool		m_bStartCollideEvent = { false };
-	MOVECMD		m_eCollideMove = { MOVECMD_END };
+	MOVETYPE	m_eCollideMoveType = { MOVECMD_END };
 
 	_float		m_fCollideTime = { 1.f };
 	_float		m_fMaxDuration = { 1.f };

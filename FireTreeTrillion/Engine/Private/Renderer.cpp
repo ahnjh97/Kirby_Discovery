@@ -366,9 +366,15 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	m_DebugRTPos.emplace("Specular", _float2{ RT_MINUSX(1), vStartY + vTargetSize.y });
 
-	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_SSAO"), RT_MINUSX(2), vStartY + vTargetSize.y, vTargetSize.x, vTargetSize.y)))
+
+	_float2 vSize{ 600.f, 600.f / 16.f * 9.f };
+
+	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_SSAO"), 300.f, 300.f, vSize.x, vSize.y)))
 		return E_FAIL;
-	m_DebugRTPos.emplace("SSAO", _float2{ RT_MINUSX(2), vStartY + vTargetSize.y });
+
+	//m_DebugRTPos.emplace("SSAO", _float2{ RT_MINUSX(2), vStartY + vTargetSize.y });
+
+
 
 	if (FAILED(m_pGameInstance->Ready_RTVDebug(TEXT("Target_NonLight"), RT_MINUSX(3), vStartY + vTargetSize.y, vTargetSize.x, vTargetSize.y)))
 		return E_FAIL;

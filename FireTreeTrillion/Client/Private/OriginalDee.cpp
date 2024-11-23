@@ -5,7 +5,7 @@
 #include "Dee_Part.h"
 #include "Dee_State.h"
 
-pair<_float3, vector<TOWN_POINT_INFO>> COriginalDee::m_TownPoints =
+pair<_float3, vector<TOWN_POINT_INFO>> CTownDee::m_TownPoints =
 {
 	//이 부분을 이동 오프셋으로
 	_float3{0.f, 0.f, 0.f},
@@ -428,22 +428,22 @@ pair<_float3, vector<TOWN_POINT_INFO>> COriginalDee::m_TownPoints =
 };
 
 
-COriginalDee::COriginalDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CTownDee::CTownDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CWaddleDee{ pDevice, pContext }
 {
 }
 
-COriginalDee::COriginalDee(const COriginalDee& rhs)
+CTownDee::CTownDee(const CTownDee& rhs)
 	:CWaddleDee{ rhs }
 {
 }
 
-_float3 COriginalDee::Make_DestPos()
+_float3 CTownDee::Make_DestPos()
 {
 	return m_TownPoints.first + m_TownPoints.second[m_eDestPoint].vPosOffset;
 }
 
-pair<DEE_ANIM, _bool> COriginalDee::Make_WhatToDo()
+pair<DEE_ANIM, _bool> CTownDee::Make_WhatToDo()
 {
 	_int iStateSize = m_TownPoints.second[m_eDestPoint].StateOffset.size();
 	DEE_ANIM eDeeState = m_TownPoints.second[m_eDestPoint].StateOffset[CUtils::Make_RandomInt(0, iStateSize - 1)];
@@ -458,7 +458,6 @@ pair<DEE_ANIM, _bool> COriginalDee::Make_WhatToDo()
 
 	vector<TOWN_POINT> PointList = m_TownPoints.second[m_eDestPoint].NearPoint;
 
-	//갔던 곳 빼고 다시 만들기
 	while (true)
 	{
 		_int iDestIndex = CUtils::Make_RandomInt(0, PointList.size() - 1);
@@ -468,16 +467,12 @@ pair<DEE_ANIM, _bool> COriginalDee::Make_WhatToDo()
 		if (PointList.size() == 1)
 			break;
 
-
-		//누가 그 곳을 목적지로 한다면! 가지마.
 		if (m_TownPoints.second[eDestPoint].bIsUsing)
 		{
 			auto iter = PointList.begin() + iDestIndex;
 			PointList.erase(iter);
 			continue;
 		}
-
-		//내가 갔던 곳과 동일하다면! 가지마.
 		if (m_ePrePoint == eDestPoint)
 		{
 			auto iter = PointList.begin() + iDestIndex;
@@ -495,12 +490,12 @@ pair<DEE_ANIM, _bool> COriginalDee::Make_WhatToDo()
 	return { eDeeState, (eDeeState == DEEANIM_WALK) };
 }
 
-HRESULT COriginalDee::Initialize_Prototype()
+HRESULT CTownDee::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT COriginalDee::Initialize(void* pArg)
+HRESULT CTownDee::Initialize(void* pArg)
 {
 	DEE_DESC pDeeDesc{};
 
@@ -527,7 +522,7 @@ HRESULT COriginalDee::Initialize(void* pArg)
 	return S_OK;
 }
 
-_int COriginalDee::Tick(_float fTimeDelta)
+_int CTownDee::Tick(_float fTimeDelta)
 {
 	if (true == m_bDead)
 		return Ready_Dead();
@@ -545,7 +540,7 @@ _int COriginalDee::Tick(_float fTimeDelta)
 	return OBJ_NOEVENT;
 }
 
-void COriginalDee::Late_Tick(_float fTimeDelta)
+void CTownDee::Late_Tick(_float fTimeDelta)
 {
 	m_fTimeDelta = m_pGameInstance->Get_SecondTimer();
 
@@ -567,7 +562,7 @@ void COriginalDee::Late_Tick(_float fTimeDelta)
 	m_pGameInstance->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 }
 
-HRESULT COriginalDee::Render()
+HRESULT CTownDee::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
@@ -599,7 +594,7 @@ HRESULT COriginalDee::Render()
 	return S_OK;
 }
 
-HRESULT COriginalDee::Render_LightDepth()
+HRESULT CTownDee::Render_LightDepth()
 {
 	if (FAILED(m_pGameInstance->Render_LightDepth_For_GameObject(m_pShaderCom, m_pTransformCom, m_pModelCom)))
 		return E_FAIL;
@@ -607,12 +602,12 @@ HRESULT COriginalDee::Render_LightDepth()
 	return S_OK;
 }
 
-void COriginalDee::Add_AnimEvent()
+void CTownDee::Add_AnimEvent()
 {
 	__super::Add_AnimEvent();
 }
 
-void COriginalDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
+void CTownDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObject* pObject)
 {
 	m_bIsKirbyInZone = true;
 	m_fResetHiTime = 5.f;
@@ -620,7 +615,7 @@ void COriginalDee::Collision(CCollisionCenter::CONTENT_TYPE eContent, CPhysXObje
 
 #ifdef _DEBUG
 
-void COriginalDee::Render_IMGUI()
+void CTownDee::Render_IMGUI()
 {
 	__super::Render_IMGUI();
 
@@ -632,7 +627,7 @@ void COriginalDee::Render_IMGUI()
 
 #endif
 
-HRESULT COriginalDee::Add_Components()
+HRESULT CTownDee::Add_Components()
 {
 	HRESULT hr;
 
@@ -682,7 +677,7 @@ HRESULT COriginalDee::Add_Components()
 	return S_OK;
 }
 
-HRESULT COriginalDee::Add_PartObjects(DEE_CHARACTER eCharacter)
+HRESULT CTownDee::Add_PartObjects(DEE_CHARACTER eCharacter)
 {
 
 	CPartObject* pPartObj = { nullptr };
@@ -773,7 +768,7 @@ HRESULT COriginalDee::Add_PartObjects(DEE_CHARACTER eCharacter)
 	return S_OK;
 }
 
-HRESULT COriginalDee::Bind_ShaderResources()
+HRESULT CTownDee::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		ALARM_FAIL("쉐이더가 읍서");
@@ -804,7 +799,7 @@ HRESULT COriginalDee::Bind_ShaderResources()
 	return S_OK;
 }
 
-void COriginalDee::SetUp_FSM()
+void CTownDee::SetUp_FSM()
 {
 	m_pFSM = CFSM::Create();
 
@@ -838,7 +833,7 @@ void COriginalDee::SetUp_FSM()
 
 }
 
-void COriginalDee::Make_InitialState(DEE_CHARACTER eCharacter)
+void CTownDee::Make_InitialState(DEE_CHARACTER eCharacter)
 {
 	DEE_ANIM eAnim = DEEANIM_SITSLEEP;
 
@@ -911,7 +906,7 @@ void COriginalDee::Make_InitialState(DEE_CHARACTER eCharacter)
 
 }
 
-_bool COriginalDee::Custom_Face(_uint iMeshIndex)
+_bool CTownDee::Custom_Face(_uint iMeshIndex)
 {
 	if (iMeshIndex == 2)
 	{
@@ -944,7 +939,7 @@ _bool COriginalDee::Custom_Face(_uint iMeshIndex)
 
 #ifdef _DEBUG
 
-void COriginalDee::Draw_TownPoints()
+void CTownDee::Draw_TownPoints()
 {
 
 	ImDrawList* drawList = ImGui::GetForegroundDrawList();
@@ -973,9 +968,9 @@ void COriginalDee::Draw_TownPoints()
 
 #endif
 
-COriginalDee* COriginalDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CTownDee* CTownDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	COriginalDee* pInstance = new COriginalDee(pDevice, pContext);
+	CTownDee* pInstance = new CTownDee(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
@@ -987,9 +982,9 @@ COriginalDee* COriginalDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 	return pInstance;
 }
 
-CGameObject* COriginalDee::Clone(void* pArg)
+CGameObject* CTownDee::Clone(void* pArg)
 {
-	COriginalDee* pInstance = new COriginalDee(*this);
+	CTownDee* pInstance = new CTownDee(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
@@ -1000,7 +995,7 @@ CGameObject* COriginalDee::Clone(void* pArg)
 	return pInstance;
 }
 
-void COriginalDee::Free()
+void CTownDee::Free()
 {
 
 	__super::Free();

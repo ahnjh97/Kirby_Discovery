@@ -29,7 +29,7 @@ private:
 	HRESULT Ready_Objects();
 	HRESULT Ready_UI();
 
-	void Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir, _float fDestZAngle = -1.f);
+	void Make_FinaleRoad(ROADTYPE eType, MOVETYPE eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir, _float fDestZAngle = -1.f);
 
 	HRESULT Add_EnvMap();
 	enum TEXTURETYPE { TYPE_ENV, TYPE_LUT, TYPE_NORMAL, TYPE_END };

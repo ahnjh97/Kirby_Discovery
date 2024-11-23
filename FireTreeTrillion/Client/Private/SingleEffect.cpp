@@ -103,7 +103,6 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 	if (m_bDead)
 		return;
 
-	//현재 설정 값으로 적용할 타임델타 값을 바꾼다.
 	_float fMyTimeDelta = _fTimeDelta;
 	switch (m_eTimer)
 	{
@@ -128,13 +127,10 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 	}
 
 
-	//true 반환하면 duration 끝난 것.
 	if (Calculate_Duration(fMyTimeDelta))
 	{
-		//툴에서는 다시 시작하기
 		if (*m_pCurrentLevelID != LEVEL_TOOL_FX && m_fDuration.second != FX_MAXDURATION)
 		{
-			//단일 생성이면 바로 삭제, 멀티 이펙트중 하나라면 done 처리
 			if (m_bSingle)
 				m_bDead = true;
 			else
@@ -143,18 +139,11 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 			return;
 		}
 		else if (m_fDuration.second == FX_MAXDURATION)
-		{
-			//m_fDuration.first = 0.f;
 			Reset_Duration();
-		}
+		
 	}
 
-	//true 반환하면 lifetime 끝난 것.
-	if (Calculate_Lifetime(fMyTimeDelta))
-	{
-		//if (*m_pCurrentLevelID != LEVEL_TOOL_FX)
-			//m_bNoRender = true;
-	}
+	Calculate_Lifetime(fMyTimeDelta);
 
 	Compute_ViewZ();
 
@@ -163,8 +152,7 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 	Quaternion vCurQuat = Calculate_CurValue_Slerp(fMyTimeDelta, KF_ROT);
 	_float3 vRadianEuler = vCurQuat.ToEuler();
 	m_vCurRot = { ToDegree(vRadianEuler.x), ToDegree(vRadianEuler.y), ToDegree(vRadianEuler.z) };
-
-
+	
 	m_vCurScale = Calculate_CurValue_Lerp(fMyTimeDelta, KF_SCALE);
 
 	m_vCurRColor = Calculate_CurValue_Lerp(fMyTimeDelta, KF_RCOLOR);
@@ -178,7 +166,6 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 	m_vCurUVOffset = { vUVOffset.x, vUVOffset.y };
 
 
-	//뒤 세 변수는 이후 추가했으므로, vector 크기 기존과 달라 넘어가 버릴 수 있다.
 	if (KF_MASKUVOFFSET < m_Keyframes.size())
 	{
 		_float3 vMaskUVOffset = Calculate_CurValue_Lerp(fMyTimeDelta, KF_MASKUVOFFSET);
@@ -189,7 +176,6 @@ void CSingleEffect::Late_Tick(_float _fTimeDelta)
 		m_vCurMaskUVAngle = Calculate_CurValue_Lerp(fMyTimeDelta, KF_MASKUVANGLE).x;
 
 
-	//초기 회전 세팅
 	_float3 vInitRadianRot = { ToRadian(m_vInitRot.x), ToRadian(m_vInitRot.y) , ToRadian(m_vInitRot.z) };
 	_float4x4 RotMat = _float4x4::CreateFromYawPitchRoll(vInitRadianRot);
 	_float3 vDir = _float3::TransformNormal(m_vCurPos, RotMat);

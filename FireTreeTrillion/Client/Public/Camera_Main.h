@@ -73,39 +73,23 @@ public:
 	enum CAMPOS { POS_ABSOLUTE, POS_RELATIVE, POS_END };
 	enum CAMDIR	{ DIR_ABSOLUTE, DIR_RELATIVE, DIR_END };
 
-	//카메라 시퀀스 구조체
 	typedef struct
 	{
-
-		//시퀀스 시작부터 어느 시간에 재생할지?
 		_float	fTime = { 0.f };
 
-		//시퀀스를 어떻게 컷 할것인가? (하드 컷 / 보간)
 		CAMCUT	eCamCut = { CUT_HARD };
 
-		//하드 컷 모드라면, 필요없는 변수
-		//easing 플래그. 보간 그래프를 정의.
 		EASING eEase = { EASE_END };
-		//보간 속도.
 		_float fInterpolateSpeed = { -1.f };
 
-		//카메라 위치가 (커비)타겟 기준인가, 월드 기준인가?
 		CAMPOS eCamPos = { POS_END };
-
-		//카메라 방향이 (커비)타겟 기준인가, 월드 기준인가?
-		CAMDIR eCamDir = { DIR_END };
-
-		//볼 방향과 위치. -1 이라면, 기존 값을 유지.
 		_float3 vPos = { -1.f, -1.f, -1.f };
-		//Dir이 -1이라면 타겟을 보도록 한다.
+
+		CAMDIR eCamDir = { DIR_END };
 		_float3 vDir = { -1.f, -1.f, -1.f };
 
-		//fov y 값. degree로 기입. -1 이라면, 기존 값을 유지.
 		_float fFOVY = { -1.f };
-
-		//z 앵글. -1이라면 기존 값을 유지.
 		_float fZAngle = { -1.f };
-
 		_float fZoomOffset = { -1.f };
 
 	}CAMACTION;
@@ -169,20 +153,25 @@ public:
 	//카메라 쉐이크 주기
 	virtual void Make_Shake(_float fPower = 1.f, _float fTime = .5f, _float2 vDir = _float2(0.f, -1.f));
 
+
 	//카메라에게 특정 동작들을 시퀀스로 선예약한다.
 	void Make_Sequence(CAMSEQ eSeq);
-	//카메라에게 동작을 수행시킨다.
+	//카메라에게 동작 하나를 수행시킨다.
 	void Make_One_Sequence(CAMACTION newAction);
 	//시퀀스 내용을 비운다.
 	void Clear_Sequence();
-	//시퀀스 내용을 채운다.
+
+	//동작을 하드 컷 방식으로 준비한다.
 	void Fill_HardCutSet(CAMACTION& Action, _float fTime);
+	//동작을 보간 방식으로 준비한다.
 	void Fill_InterpolateCutSet(CAMACTION& Action, _float fTime, EASING eEase, _float fInterpolateSpeed);
-	//위치, 방향 
+	//위치, 방향을 채운다.
 	void Fill_ActionPos(CAMACTION& Action, CAMPOS eCamPos, _float3 vPos);
 	void Fill_ActionDir(CAMACTION& Action, CAMDIR eCamDir, _float3 vDir);
-	//딜레이용 시퀀스
+	//딜레이용 동작
 	void Fill_Delay(CAMACTION& Action, _float fStartTime, _float fDelayTime);
+
+
 
 	void Set_AutoDOF(_bool bAuto) { m_bAutoDOF = bAuto; }
 

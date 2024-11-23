@@ -14,14 +14,6 @@ public:
 	typedef struct : public FX_DESC
 	{
 		_uint iNumInstance = { 0 };
-		//_float fLifeTime = { 1.f };
-		//_float fLifetimeRandomOffset = { 0.f };
-
-		//_float fStartDelay = { 0.f };
-		//_float fStarDelayRandomOffset = { 0.f };
-
-
-		
 
 	}PARTICLE_DESC;
 
@@ -33,7 +25,7 @@ private:
 public:
 	virtual _bool	IsEnded() override;
 
-	void			Update_InstanceInfo(INSTANCE_DESC* _InstanceDesc = nullptr);
+	void			Update_InstanceInfo(INSTANCE_DESC* instanceDesc = nullptr);
 	virtual void	Fill_SaveData(_Out_ PARTICLE_DATA* pFXData) override;
 
 	virtual void	Reset_Duration() override
@@ -55,6 +47,7 @@ private:
 	CModel*						m_pModelCom = { nullptr };
 	CTexture*					m_pTextureCom[TEX_END] = { nullptr };
 	CShader*					m_pShaderCom = { nullptr };
+
 	PARTICLE_DESC				m_FXDesc = {};
 	INSTANCE_DESC				m_InstanceDesc = {};
 

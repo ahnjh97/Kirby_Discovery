@@ -899,7 +899,7 @@ HRESULT CLevel_Finale::Ready_UI()
 	return S_OK;
 }
 
-void CLevel_Finale::Make_FinaleRoad(ROADTYPE eType, MOVECMD eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir, _float fDestZAngle)
+void CLevel_Finale::Make_FinaleRoad(ROADTYPE eType, MOVETYPE eMoveType, _float3 vTargetPos, _float3 vLookDir, _float3 vDestPos, _float3 vDestDir, _float fDestZAngle)
 {
 
 	CFinaleRoadGrouper::ROADGROUPER_DESC roadGrouperDesc = {};

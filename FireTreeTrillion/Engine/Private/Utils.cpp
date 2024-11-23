@@ -440,7 +440,7 @@ _float3 CUtils::Compute_CollidingPoint(_float3 vLaserStart, _float3 vLaserDir, _
 
 }
 
-HRESULT CUtils::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
+HRESULT CUtils::Load_Effect(const path _FilePath, _Out_ SINGLE_FX_DATA* pData)
 {
 	ifstream InputFile(_FilePath, ios::binary | ios::in);
 
@@ -449,61 +449,61 @@ HRESULT CUtils::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
 
 
 	//이펙트 이름
-	InputFile.read(reinterpret_cast<char*>(&_pData->iNameStrLen), sizeof(_uint));
-	_pData->strName.resize(_pData->iNameStrLen);
-	InputFile.read(&_pData->strName[0], _pData->iNameStrLen);
+	InputFile.read(reinterpret_cast<char*>(&pData->iNameStrLen), sizeof(_uint));
+	pData->strName.resize(pData->iNameStrLen);
+	InputFile.read(&pData->strName[0], pData->iNameStrLen);
 
 
 	//버퍼 이름
-	InputFile.read(reinterpret_cast<char*>(&_pData->iBufferStrLen), sizeof(_uint));
-	_pData->strBufferName.resize(_pData->iBufferStrLen);
-	InputFile.read(&_pData->strBufferName[0], _pData->iBufferStrLen);
+	InputFile.read(reinterpret_cast<char*>(&pData->iBufferStrLen), sizeof(_uint));
+	pData->strBufferName.resize(pData->iBufferStrLen);
+	InputFile.read(&pData->strBufferName[0], pData->iBufferStrLen);
 
 
 	//텍스쳐 이름
-	InputFile.read(reinterpret_cast<char*>(&_pData->iTexStrLen), sizeof(_uint));
-	_pData->strTexName.resize(_pData->iTexStrLen);
-	InputFile.read(&_pData->strTexName[0], _pData->iTexStrLen);
+	InputFile.read(reinterpret_cast<char*>(&pData->iTexStrLen), sizeof(_uint));
+	pData->strTexName.resize(pData->iTexStrLen);
+	InputFile.read(&pData->strTexName[0], pData->iTexStrLen);
 
 
 	//마스크 텍스쳐 이름
-	InputFile.read(reinterpret_cast<char*>(&_pData->iMaskTexStrLen), sizeof(_uint));
-	_pData->strMaskTexName.resize(_pData->iMaskTexStrLen);
-	InputFile.read(&_pData->strMaskTexName[0], _pData->iMaskTexStrLen);
+	InputFile.read(reinterpret_cast<char*>(&pData->iMaskTexStrLen), sizeof(_uint));
+	pData->strMaskTexName.resize(pData->iMaskTexStrLen);
+	InputFile.read(&pData->strMaskTexName[0], pData->iMaskTexStrLen);
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->fDuration), sizeof(_float));
-	InputFile.read(reinterpret_cast<char*>(&_pData->fLifetime.first), sizeof(_float));
-	InputFile.read(reinterpret_cast<char*>(&_pData->fLifetime.second), sizeof(_float));
-
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->iPassIdx), sizeof(_int));
-	InputFile.read(reinterpret_cast<char*>(&_pData->iTexIdx), sizeof(_int));
-	InputFile.read(reinterpret_cast<char*>(&_pData->iMaskTexIdx), sizeof(_int));
+	InputFile.read(reinterpret_cast<char*>(&pData->fDuration), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&pData->fLifetime.first), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&pData->fLifetime.second), sizeof(_float));
 
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsLoop), sizeof(_bool));
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBillboard), sizeof(_bool));
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsOrthographic), sizeof(_bool));
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsColorRender), sizeof(_bool));
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBloom), sizeof(_bool));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->fRimLightThreshold), sizeof(_float));
-	InputFile.read(reinterpret_cast<char*>(&_pData->vContinuousRotation), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&pData->iPassIdx), sizeof(_int));
+	InputFile.read(reinterpret_cast<char*>(&pData->iTexIdx), sizeof(_int));
+	InputFile.read(reinterpret_cast<char*>(&pData->iMaskTexIdx), sizeof(_int));
 
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->iPropertyMapNum), sizeof(_uint));
+	InputFile.read(reinterpret_cast<char*>(&pData->bIsLoop), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&pData->bIsBillboard), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&pData->bIsOrthographic), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&pData->bIsColorRender), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&pData->bIsBloom), sizeof(_bool));
 
-	_pData->vecKeyframeInfo.resize(_pData->iPropertyMapNum);
-	_pData->vecKeyframes.resize(_pData->iPropertyMapNum);
+	InputFile.read(reinterpret_cast<char*>(&pData->fRimLightThreshold), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&pData->vContinuousRotation), sizeof(_float3));
 
-	for (_uint i = 0; i < _pData->iPropertyMapNum; ++i)
+
+	InputFile.read(reinterpret_cast<char*>(&pData->iPropertyMapNum), sizeof(_uint));
+
+	pData->vecKeyframeInfo.resize(pData->iPropertyMapNum);
+	pData->vecKeyframes.resize(pData->iPropertyMapNum);
+
+	for (_uint i = 0; i < pData->iPropertyMapNum; ++i)
 	{
-		InputFile.read(reinterpret_cast<char*>(&_pData->vecKeyframeInfo[i].first), sizeof(KF_PROPERTY));
-		InputFile.read(reinterpret_cast<char*>(&_pData->vecKeyframeInfo[i].second), sizeof(_uint));
+		InputFile.read(reinterpret_cast<char*>(&pData->vecKeyframeInfo[i].first), sizeof(KF_PROPERTY));
+		InputFile.read(reinterpret_cast<char*>(&pData->vecKeyframeInfo[i].second), sizeof(_uint));
 
-		_pData->vecKeyframes[i].resize(_pData->vecKeyframeInfo[i].second);
+		pData->vecKeyframes[i].resize(pData->vecKeyframeInfo[i].second);
 
-		for (auto& KF : _pData->vecKeyframes[i])
+		for (auto& KF : pData->vecKeyframes[i])
 		{
 			InputFile.read(reinterpret_cast<char*>(&KF.fTimeRatio), sizeof(_float));
 			InputFile.read(reinterpret_cast<char*>(&KF.vValue), sizeof(_float3));
@@ -511,13 +511,13 @@ HRESULT CUtils::Load_Effect(path _FilePath, SINGLE_FX_DATA* _pData)
 		}
 	}
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_uint));
-	InputFile.read(reinterpret_cast<char*>(&_pData->eTimer), sizeof(TIMER));
+	InputFile.read(reinterpret_cast<char*>(&pData->eRenderGroup), sizeof(_uint));
+	InputFile.read(reinterpret_cast<char*>(&pData->eTimer), sizeof(TIMER));
 
 	return S_OK;
 }
 
-HRESULT CUtils::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
+HRESULT CUtils::Load_Effect(const path _FilePath, _Out_ PARTICLE_DATA* pData)
 {
 	ifstream InputFile(_FilePath, ios::binary | ios::in);
 
@@ -526,109 +526,109 @@ HRESULT CUtils::Load_Effect(path _FilePath, PARTICLE_DATA* _pData)
 
 
 	//이펙트 이름
-	InputFile.read(reinterpret_cast<char*>(&_pData->iNameStrLen), sizeof(_uint));
-	_pData->strName.resize(_pData->iNameStrLen);
-	InputFile.read(&_pData->strName[0], _pData->iNameStrLen);
+	InputFile.read(reinterpret_cast<char*>(&pData->iNameStrLen), sizeof(_uint));
+	pData->strName.resize(pData->iNameStrLen);
+	InputFile.read(&pData->strName[0], pData->iNameStrLen);
 
 
 	//버퍼 이름
-	InputFile.read(reinterpret_cast<char*>(&_pData->iBufferStrLen), sizeof(_uint));
-	_pData->strBufferName.resize(_pData->iBufferStrLen);
-	InputFile.read(&_pData->strBufferName[0], _pData->iBufferStrLen);
+	InputFile.read(reinterpret_cast<char*>(&pData->iBufferStrLen), sizeof(_uint));
+	pData->strBufferName.resize(pData->iBufferStrLen);
+	InputFile.read(&pData->strBufferName[0], pData->iBufferStrLen);
 
 
 	//텍스쳐 이름
-	InputFile.read(reinterpret_cast<char*>(&_pData->iTexStrLen), sizeof(_uint));
-	_pData->strTexName.resize(_pData->iTexStrLen);
-	InputFile.read(&_pData->strTexName[0], _pData->iTexStrLen);
+	InputFile.read(reinterpret_cast<char*>(&pData->iTexStrLen), sizeof(_uint));
+	pData->strTexName.resize(pData->iTexStrLen);
+	InputFile.read(&pData->strTexName[0], pData->iTexStrLen);
 
 
 	//마스크 텍스쳐 이름
-	InputFile.read(reinterpret_cast<char*>(&_pData->iMaskTexStrLen), sizeof(_uint));
-	_pData->strMaskTexName.resize(_pData->iMaskTexStrLen);
-	InputFile.read(&_pData->strMaskTexName[0], _pData->iMaskTexStrLen);
+	InputFile.read(reinterpret_cast<char*>(&pData->iMaskTexStrLen), sizeof(_uint));
+	pData->strMaskTexName.resize(pData->iMaskTexStrLen);
+	InputFile.read(&pData->strMaskTexName[0], pData->iMaskTexStrLen);
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->iPassIdx), sizeof(_int));
-	InputFile.read(reinterpret_cast<char*>(&_pData->iTexIdx), sizeof(_int));
-	InputFile.read(reinterpret_cast<char*>(&_pData->iMaskTexIdx), sizeof(_int));
+	InputFile.read(reinterpret_cast<char*>(&pData->iPassIdx), sizeof(_int));
+	InputFile.read(reinterpret_cast<char*>(&pData->iTexIdx), sizeof(_int));
+	InputFile.read(reinterpret_cast<char*>(&pData->iMaskTexIdx), sizeof(_int));
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsLoop), sizeof(_bool));
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBillboard), sizeof(_bool));
-	InputFile.read(reinterpret_cast<char*>(&_pData->bIsBloom), sizeof(_bool));
-
-
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->iNumInstance), sizeof(_int));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->fDuration), sizeof(_float));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->fLifetime), sizeof(_float));
-	InputFile.read(reinterpret_cast<char*>(&_pData->fLifetimeRandomOffset), sizeof(_float));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->fStartDelay), sizeof(_float));
-	InputFile.read(reinterpret_cast<char*>(&_pData->fStarDelayRandomOffset), sizeof(_float));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->vCenter), sizeof(_float3));
-	InputFile.read(reinterpret_cast<char*>(&_pData->vRange), sizeof(_float3));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->fMinRange), sizeof(_float));
-	InputFile.read(reinterpret_cast<char*>(&_pData->fMaxRange), sizeof(_float));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->vRotation), sizeof(_float3));
-	InputFile.read(reinterpret_cast<char*>(&_pData->vRotationRandomOffset), sizeof(_float3));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->vScale), sizeof(_float3));
-	InputFile.read(reinterpret_cast<char*>(&_pData->vScaleRandomOffset), sizeof(_float3));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->vDir), sizeof(_float3));
-	InputFile.read(reinterpret_cast<char*>(&_pData->vDirRandomOffset), sizeof(_float3));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->fSpeed), sizeof(_float));
-	InputFile.read(reinterpret_cast<char*>(&_pData->fSpeedRandomOffset), sizeof(_float));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeed), sizeof(_float));
-	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSpeedRandomOffset), sizeof(_float));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSpeed), sizeof(_float));
-	InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSpeedRandomOffset), sizeof(_float));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->fAccSupplyAmount), sizeof(_float));
-	InputFile.read(reinterpret_cast<char*>(&_pData->fOrbitSupplyAmount), sizeof(_float));
-	InputFile.read(reinterpret_cast<char*>(&_pData->fTurnSupplyAmount), sizeof(_float));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->vColor), sizeof(_float3));
-	InputFile.read(reinterpret_cast<char*>(&_pData->vColorRandomOffset), sizeof(_float3));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->vTargetColor), sizeof(_float3));
-	InputFile.read(reinterpret_cast<char*>(&_pData->vTargetColorRandomOffset), sizeof(_float3));
-
-	InputFile.read(reinterpret_cast<char*>(&_pData->fAlpha), sizeof(_float));
-	InputFile.read(reinterpret_cast<char*>(&_pData->fAlphaRandomOffset), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&pData->bIsLoop), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&pData->bIsBillboard), sizeof(_bool));
+	InputFile.read(reinterpret_cast<char*>(&pData->bIsBloom), sizeof(_bool));
 
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->vPivot), sizeof(_float3));
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->vRotationAxis), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&pData->iNumInstance), sizeof(_int));
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->iMoveCommandsNum), sizeof(_int));
-	_pData->vecMoveCommands.clear();
-	_pData->vecMoveCommands.reserve(_pData->iMoveCommandsNum);
+	InputFile.read(reinterpret_cast<char*>(&pData->fDuration), sizeof(_float));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->fLifetime), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&pData->fLifetimeRandomOffset), sizeof(_float));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->fStartDelay), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&pData->fStarDelayRandomOffset), sizeof(_float));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->vCenter), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&pData->vRange), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->fMinRange), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&pData->fMaxRange), sizeof(_float));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->vRotation), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&pData->vRotationRandomOffset), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->vScale), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&pData->vScaleRandomOffset), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->vDir), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&pData->vDirRandomOffset), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->fSpeed), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&pData->fSpeedRandomOffset), sizeof(_float));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->fOrbitSpeed), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&pData->fOrbitSpeedRandomOffset), sizeof(_float));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->fTurnSpeed), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&pData->fTurnSpeedRandomOffset), sizeof(_float));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->fAccSupplyAmount), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&pData->fOrbitSupplyAmount), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&pData->fTurnSupplyAmount), sizeof(_float));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->vColor), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&pData->vColorRandomOffset), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->vTargetColor), sizeof(_float3));
+	InputFile.read(reinterpret_cast<char*>(&pData->vTargetColorRandomOffset), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->fAlpha), sizeof(_float));
+	InputFile.read(reinterpret_cast<char*>(&pData->fAlphaRandomOffset), sizeof(_float));
 
 
-	for (_int i = 0; i < _pData->iMoveCommandsNum; ++i)
+	InputFile.read(reinterpret_cast<char*>(&pData->vPivot), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->vRotationAxis), sizeof(_float3));
+
+	InputFile.read(reinterpret_cast<char*>(&pData->iMoveCommandsNum), sizeof(_int));
+	pData->vecMoveCommands.clear();
+	pData->vecMoveCommands.reserve(pData->iMoveCommandsNum);
+
+
+	for (_int i = 0; i < pData->iMoveCommandsNum; ++i)
 	{
 		_bool bTemp = { false };
 		InputFile.read(reinterpret_cast<char*>(&bTemp), sizeof(_bool));
-		_pData->vecMoveCommands.emplace_back(bTemp);
+		pData->vecMoveCommands.emplace_back(bTemp);
 	}
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->eRenderGroup), sizeof(_int));
-	InputFile.read(reinterpret_cast<char*>(&_pData->eTimer), sizeof(TIMER));
+	InputFile.read(reinterpret_cast<char*>(&pData->eRenderGroup), sizeof(_int));
+	InputFile.read(reinterpret_cast<char*>(&pData->eTimer), sizeof(TIMER));
 
 	return S_OK;
 }
 
-HRESULT CUtils::Load_Effect(path _FilePath, MULTI_FX_DATA* _pData)
+HRESULT CUtils::Load_Effect(const path _FilePath, _Out_ MULTI_FX_DATA* pData)
 {
 	ifstream InputFile(_FilePath, ios::binary | ios::in);
 
@@ -637,15 +637,15 @@ HRESULT CUtils::Load_Effect(path _FilePath, MULTI_FX_DATA* _pData)
 
 
 	//이펙트 이름
-	InputFile.read(reinterpret_cast<char*>(&_pData->iNameStrLen), sizeof(_uint));
-	_pData->strName.resize(_pData->iNameStrLen);
-	InputFile.read(&_pData->strName[0], _pData->iNameStrLen);
+	InputFile.read(reinterpret_cast<char*>(&pData->iNameStrLen), sizeof(_uint));
+	pData->strName.resize(pData->iNameStrLen);
+	InputFile.read(&pData->strName[0], pData->iNameStrLen);
 
 
-	InputFile.read(reinterpret_cast<char*>(&_pData->iFXsNum), sizeof(_uint));
-	_pData->FXs.resize(_pData->iFXsNum);
+	InputFile.read(reinterpret_cast<char*>(&pData->iFXsNum), sizeof(_uint));
+	pData->FXs.resize(pData->iFXsNum);
 
-	for (auto& FX : _pData->FXs)
+	for (auto& FX : pData->FXs)
 	{
 		InputFile.read(reinterpret_cast<char*>(&FX.first), sizeof(_uint));
 		FX.second.resize(FX.first);

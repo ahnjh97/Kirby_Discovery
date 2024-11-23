@@ -471,12 +471,7 @@ float3 AdjustShadow(float3 vColor, float3 vShadowColor, float fShadowIntensity, 
     
     float intensity = fShadowIntensity * smoothstep(g_fShadowThreshold - 0.1, g_fShadowThreshold, fLuminance);
     return lerp(vColor, vShadowColor, intensity);
-    
-    
-    //if (g_fShadowThreshold < fLuminance )
-    //    fShadowIntensity *= pow( 1 - ((fLuminance - g_fShadowThreshold) * 10) , 1);
 
-    //return lerp(vColor, vShadowColor, fShadowIntensity );
 }
 
 float3 AdjustMidtone(float3 vColor, float3 vMidtoneColor, float fMidtoneIntensity, float fLuminance)
@@ -486,14 +481,6 @@ float3 AdjustMidtone(float3 vColor, float3 vMidtoneColor, float fMidtoneIntensit
     float upperThreshold = g_fHighlightThreshold;
     float intensity = fMidtoneIntensity * smoothstep(lowerThreshold, upperThreshold, fLuminance);
     return lerp(vColor, vMidtoneColor, intensity);
-    
-    
-    //if ( fLuminance < g_fShadowThreshold)
-    //    fMidtoneIntensity *= pow((g_fShadowThreshold - fLuminance) * 10, 1);
-    //if (g_fHighlightThreshold < fLuminance)
-    //    fMidtoneIntensity *= pow(1 - (fLuminance - g_fHighlightThreshold) *10, 1);
-    
-    //return lerp(vColor, vMidtoneColor, fMidtoneIntensity);
 }
 
 float3 AdjustHighlight(float3 vColor, float3 vHighlightColor, float fHighlightIntensity, float fLuminance)
@@ -501,12 +488,7 @@ float3 AdjustHighlight(float3 vColor, float3 vHighlightColor, float fHighlightIn
     
     float intensity = fHighlightIntensity * smoothstep(g_fHighlightThreshold, g_fHighlightThreshold + 0.1, fLuminance);
     return lerp(vColor, vHighlightColor, intensity);
-    
-    
-    //if (fLuminance < g_fHighlightThreshold)
-    //    fHighlightIntensity *= pow(( g_fHighlightThreshold - fLuminance) * 10 , 1);
-    
-    //return lerp(vColor, vHighlightColor, fHighlightIntensity);
+
 }
 
 struct VS_IN
@@ -658,11 +640,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 
         float2 specularBRDF = g_LUTTexture.Sample(LinearSampler, float2(cosLo, fRoughness)).rg;
         
-        //float2 specularBRDF = float2(1.0, 0.0);
-        
-        //float3 specularIBL = (F0 * 1.0 + 0.0) * irradiance; // Adjusted for simplification
         float3 specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * irradiance;
-        //specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * irradiance;
         
         
         ambientLighting = diffuseIBL + specularIBL;
@@ -959,7 +937,6 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
         
         //float3 specularIBL = (F0 * 1.0 + 0.0) * irradiance; // Adjusted for simplification
         float3 specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * irradiance;
-        //specularIBL = (F0 * specularBRDF.x + specularBRDF.y) * irradiance;
         
         
         ambientLighting = diffuseIBL + specularIBL;

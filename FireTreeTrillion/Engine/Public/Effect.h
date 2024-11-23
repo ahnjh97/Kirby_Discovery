@@ -4,7 +4,6 @@
 
 BEGIN(Engine)
 
-#define FX_MAXDURATION 99.f
 
 class ENGINE_DLL CEffect : public CGameObject
 {
@@ -40,8 +39,15 @@ public:
 		_bool bIsBillboard = { false };
 		//직교하는가?
 		_bool bIsOrthographic = { false };
+
 		_bool bIsColorRender = { false };
 		_bool bIsBloom = { false };
+
+		//단일 이펙트인가?
+		_bool bIsSingleFX = { false };
+
+		_uint eRenderGroup = { 0 };
+		TIMER eTimer = { TIMER_END };
 
 		_float		fRimLightThreshold = { 0.f };
 		_float3		vContinuousRotation = { 0.f, 0.f, 0.f };
@@ -49,23 +55,20 @@ public:
 		map<KF_PROPERTY, vector<FX_KEYFRAME>> Keyframes;
 
 
-		//clone 시 전달되는 변수들. clone할 때만 전달할 것!!
+		//**prototype clone 시 전달되는 변수들. clone할 때만 전달할 것!!**//
 		
-		//위치를 계속 맞춰주는 소켓. 
+		//기준 위치를 맞춰주는 소켓 행렬 주소 
 		const _float4x4* pSocketMatrix = { nullptr };
 
-		//이펙트 재생을 시작하는 딜레이
+		//이펙트 재생 시작 딜레이
 		_float fStartDelay = { 0.f };
 
-		//이펙트의 기본 시작 크자이 offset
+		//이펙트의 기본 크자이 offset
 		_float3 vInitPos = { 0.f, 0.f, 0.f };
 		_float3 vInitRot = { 0.f, 0.f, 0.f };
 		_float3 vInitScale = { 1.f, 1.f, 1.f };
 
-		_uint eRenderGroup = { 0 };
-		TIMER eTimer = { TIMER_END };
 
-		_bool bIsSingleFX = { false };
 	}FX_DESC;
 
 protected:
@@ -88,8 +91,8 @@ public:
 
 	virtual void	Reset_Duration();
 	virtual void	Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData);
-	virtual void	Fill_SaveData(PARTICLE_DATA* pFXData) {}
-	virtual void	Fill_SaveData(MULTI_FX_DATA* pFXData) {}
+	virtual void	Fill_SaveData(_Out_ PARTICLE_DATA* pFXData);
+	virtual void	Fill_SaveData(_Out_ MULTI_FX_DATA* pFXData);
 
 	virtual void	Set_NoRender() { m_bRender = false; }
 
@@ -199,8 +202,8 @@ protected:
 
 	_bool			Calculate_Duration(_float _fTimeDelta);
 	_bool			Calculate_Lifetime(_float _fTimeDelta);
-	_float3			Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY eProperty, _bool bIsInEditor = false);
-	_float4			Calculate_CurValue_Slerp(_float fTimeDelta,  KF_PROPERTY eProperty, _bool bIsInEditor = false);
+	_float3			Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY eProperty);
+	_float4			Calculate_CurValue_Slerp(_float fTimeDelta,  KF_PROPERTY eProperty);
 	void			Billboard_Effect();
 
 public:

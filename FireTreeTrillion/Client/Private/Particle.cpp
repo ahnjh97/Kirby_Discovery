@@ -62,20 +62,16 @@ HRESULT CParticle::Initialize(void* pArg)
 
 	m_bIsBillboard = false;
 
-
-
 	hr = Add_Components(FXDesc);
 	CHECK_FAILED(hr);
 
 
 	INSTANCE_DESC instanceDesc{};
 
-	//fx 툴 레벨에서는 clone할 때 정보를 새로 기입하는 상황.
 	if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
 	{
 		m_FXDesc = FXDesc;
 
-		//기본 상태 세팅
 		instanceDesc.vecMoveCommands.resize(INSTANCE_END);
 		for (auto& moveCmd : instanceDesc.vecMoveCommands)
 			moveCmd = false;
@@ -84,10 +80,8 @@ HRESULT CParticle::Initialize(void* pArg)
 		instanceDesc.vRange = { 2.f, 2.f, 2.f };
 		instanceDesc.fSpeed = { 3.f };
 		instanceDesc.fSpeedRandomOffset = { 1.f };
-
 		instanceDesc.fStartDelay = { .1f };
 		instanceDesc.fStarDelayRandomOffset = { .2f };
-
 		instanceDesc.fLifetime = { 1.4f };
 		instanceDesc.fLifetimeRandomOffset = { .3f };
 		instanceDesc.bIsLoop = true;
@@ -106,18 +100,14 @@ HRESULT CParticle::Initialize(void* pArg)
 	return S_OK;
 }
 
-_bool CParticle::IsEnded()
-{
-	return m_bDone;
-}
+_bool CParticle::IsEnded(){	return m_bDone; }
 
 void CParticle::Update_InstanceInfo(INSTANCE_DESC* _instanceDesc)
 {
-	//이건 파티클에 저장하는 거. 값 있을 때만.
+
 	if (nullptr != _instanceDesc)
 		m_InstanceDesc = *_instanceDesc;
 
-	//loop가 두개여
 	m_InstanceDesc.fDuration = m_fDuration.second;
 	m_InstanceDesc.bIsLoop = m_bIsLoop;
 
@@ -227,7 +217,6 @@ _int CParticle::Tick(_float _fTimeDelta)
 void CParticle::Late_Tick(_float _fTimeDelta)
 {
 
-	//현재 설정 값으로 적용할 타임델타 값을 바꾼다.
 	_float fMyTimeDelta = _fTimeDelta;
 	switch (m_eTimer)
 	{
@@ -251,24 +240,12 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 		return;
 	}
 
-	//duration 다 끝났다면
 	if (Calculate_Duration(fMyTimeDelta))
 	{
-		//툴에서는 다시 시작하기
-		if (*m_pCurrentLevelID == LEVEL_TOOL_FX)
-		{
+		if (*m_pCurrentLevelID == LEVEL_TOOL_FX || m_fDuration.second == FX_MAXDURATION)
 			Reset_Duration();
-		}
-		////재생 시간 99라면 다시 시작하기
-		else if (m_fDuration.second == FX_MAXDURATION)
-		{
-			Reset_Duration();
-		}
 		else
-		{
-			//단일 생성이면 바로 삭제, 멀티 이펙트중 하나라면 done 처리
 			m_bSingle ? m_bDead = true : m_bDone = true;
-		}
 	}
 
 	m_pVIBufferCom->Compute_AllLifeTime(fMyTimeDelta);
@@ -285,20 +262,12 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 		return;
 	}
 
-
 	if (m_pSoketMatrix != nullptr)
 		m_pTransformCom->Set_WorldMatrix(*m_pSoketMatrix);
-
-	//m_pTransformCom->Set_Scaled(m_vInitScale);
 
 	Compute_ViewZ();
 
 	VTXMATRIX* pVertices = m_pVIBufferCom->Map();
-
-
-
-	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE])
-		m_pVIBufferCom->SimpleMove(fMyTimeDelta, pVertices);
 
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_SIMPLEMOVE])
 		m_pVIBufferCom->SimpleMove(fMyTimeDelta, pVertices);
@@ -360,12 +329,9 @@ void CParticle::Late_Tick(_float _fTimeDelta)
 	if (m_InstanceDesc.vecMoveCommands[INSTANCE_TURNMOVEDIR])
 		m_pVIBufferCom->Turn_MoveDirection(fMyTimeDelta, pVertices, m_pSoketMatrix);
 
-
 	m_pVIBufferCom->Save_PrePos(pVertices, m_pSoketMatrix);
 
-
 	m_pVIBufferCom->Unmap();
-
 
 
 	if ((CRenderer::RENDERGROUP)m_eRenderGroup != CRenderer::RENDER_END)

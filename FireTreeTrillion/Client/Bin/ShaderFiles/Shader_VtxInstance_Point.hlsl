@@ -130,20 +130,6 @@ VS_OUT VS_MAIN(VS_IN In)
     return Out;
 }
 
-//VS_OUT VS_MAIN_ALPHABLEND(VS_IN In)
-//{
-//    VS_OUT Out = (VS_OUT) 0;
-
-//    vector vPosition = mul(vector(In.vPosition, 1.f), In.TransformMatrix);
-
-//    Out.vPosition = mul(vPosition, g_WorldMatrix);
-//    Out.vProjPos = Out.vPosition;
-//    Out.vPSize = float2(In.TransformMatrix._11, In.TransformMatrix._22);
-//    Out.bAlive = In.bAlive;
-
-//    return Out;
-//}
-
 struct GS_IN
 {
     float4 vPosition : POSITION;
@@ -161,65 +147,37 @@ struct GS_OUT
     float2 vTexcoord : TEXCOORD0;
     bool bAlive : COLOR0;
     float4 vColor : COLOR1;
-
     float4 vProjPos : TEXCOORD1;
 };
 
-/* 정점을 생성한다. */
+
 [maxvertexcount(6)]
 void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
 {
     GS_OUT Out[4];
 
-    
 
     float3 vLook = normalize(-g_vCamLook).xyz;
     float3 vRight = normalize(cross(float3(0.f, 1.f, 0.f), vLook.xyz)) * In[0].vPSize.x * 0.5f;
     float3 vUp = normalize(cross(vLook, vRight)) * In[0].vPSize.y * 0.5f;
-    
-    
-    //float fZAngle = atan2(In[0].TransformMatrix._21, In[0].TransformMatrix._11);
-    
     matrix ZRotMatrix = CreateRotationMatrix(vLook, In[0].fAngleZ);
 
-    
     vRight = mul(float4(vRight, 0), ZRotMatrix).xyz;
     vUp = mul(float4(vUp, 0), ZRotMatrix).xyz;
-    
-    
-    //vRight.xy = RotateZ(vRight.xy, fZAngle);
-    //vUp.xy = RotateZ(vUp.xy, fZAngle);6
-
     
     matrix matVP = mul(g_ViewMatrix, g_ProjMatrix);
 
     Out[0].vPosition = vector(In[0].vPosition.xyz + vRight + vUp, 1.f);
     Out[0].vTexcoord = float2(0.0f, 0.0f);
-    //Out[0].vPosition = mul(Out[0].vPosition, matVP);
-    //Out[0].bAlive = In[0].bAlive;
-    //Out[0].vColor = In[0].vColor;
-    //Out[0].vProjPos = In[0].vProjPos;
 
     Out[1].vPosition = vector(In[0].vPosition.xyz - vRight + vUp, 1.f);
     Out[1].vTexcoord = float2(1.0f, 0.0f);
-    //Out[1].vPosition = mul(Out[1].vPosition, matVP);
-    //Out[1].bAlive = In[0].bAlive;
-    //Out[1].vColor = In[0].vColor;
-    //Out[1].vProjPos = In[0].vProjPos;
 
     Out[2].vPosition = vector(In[0].vPosition.xyz - vRight - vUp, 1.f);
     Out[2].vTexcoord = float2(1.0f, 1.0f);
-    //Out[2].vPosition = mul(Out[2].vPosition, matVP);
-    //Out[2].bAlive = In[0].bAlive;
-    //Out[2].vColor = In[0].vColor;
-    //Out[2].vProjPos = In[0].vProjPos;
 
     Out[3].vPosition = vector(In[0].vPosition.xyz + vRight - vUp, 1.f);
     Out[3].vTexcoord = float2(0.0f, 1.0f);
-    //Out[3].vPosition = mul(Out[3].vPosition, matVP);
-    //Out[3].bAlive = In[0].bAlive;
-    //Out[3].vColor = In[0].vColor;
-    //Out[3].vProjPos = In[0].vProjPos;
     
     for (int i = 0; i < 4; ++i)
     {

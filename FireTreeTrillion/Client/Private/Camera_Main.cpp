@@ -319,7 +319,6 @@ HRESULT CCamera_Main::Initialize(void* pArg)
 	return S_OK;
 }
 
-
 void CCamera_Main::System_Tick(_float fTimeDelta)
 {
 	//이펙트 소켓 업데이트
@@ -353,31 +352,31 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 			//}
 		}
 
-		#pragma region 사자
+#pragma region 사자
 
-				//사자 컷
-				if (SEQ_SIMBA_START <= m_eSpecialSeq && m_eSpecialSeq <= SEQ_SIMBA_LOW)
-				{
-					//사자 로우 앵글포커스
-					if (m_eSpecialSeq == SEQ_SIMBA_LOW)
-					{
-						CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
-						if (nullptr != pSimba)
-							m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 8.f, 0.f });
-					}
-					//그 외 사자
-					else if (m_eSpecialSeq != SEQ_SIMBA_START)
-					{
-						CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
-						if (nullptr != pSimba)
-							m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 5.f, 0.f });
-					}
-					//커비
-					else
-					{
-						m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION) + KIRBY_DOFOFFSET);
-					}
-				}
+		//사자 컷
+		if (SEQ_SIMBA_START <= m_eSpecialSeq && m_eSpecialSeq <= SEQ_SIMBA_LOW)
+		{
+			//사자 로우 앵글포커스
+			if (m_eSpecialSeq == SEQ_SIMBA_LOW)
+			{
+				CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
+				if (nullptr != pSimba)
+					m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 8.f, 0.f });
+			}
+			//그 외 사자
+			else if (m_eSpecialSeq != SEQ_SIMBA_START)
+			{
+				CGameObject* pSimba = m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Simba"));
+				if (nullptr != pSimba)
+					m_pGameInstance->Update_DofFocus(pSimba->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 5.f, 0.f });
+			}
+			//커비
+			else
+			{
+				m_pGameInstance->Update_DofFocus(m_pFirstTarget->Get_State(CTransform::STATE_POSITION) + KIRBY_DOFOFFSET);
+			}
+		}
 
 		if (m_eSpecialSeq == SEQ_SIMBA_THRONEBREAK)
 		{
@@ -393,15 +392,15 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 			}
 		}
 
-				if (m_eSpecialSeq == SEQ_SIMBA_BOSSORIGIN)
-				{
-					CGameObject* pOrigin = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_BossOrigin"));
+		if (m_eSpecialSeq == SEQ_SIMBA_BOSSORIGIN)
+		{
+			CGameObject* pOrigin = m_pGameInstance->Get_GameObject_ByTag(*m_pCurrentLevelID, TEXT("Layer_MapDeco"), TEXT("Prototype_GameObject_BossOrigin"));
 
-					if (nullptr != pOrigin)
-						m_pGameInstance->Update_DofFocus(pOrigin->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 3.f, 0.f });
-				}
+			if (nullptr != pOrigin)
+				m_pGameInstance->Update_DofFocus(pOrigin->Get_TransformCom()->Get_State(CTransform::STATE_POSITION) + _float3{ 0.f, 3.f, 0.f });
+		}
 
-		#pragma endregion
+#pragma endregion
 
 		//파이널 보스 등장
 		if (m_eSpecialSeq == SEQ_FINALBOSS_APPEAR)
@@ -476,8 +475,11 @@ void CCamera_Main::System_Tick(_float fTimeDelta)
 		}
 	}
 
-	if(m_bOnceFade)
+	if (m_bOnceFade)
 		m_pGameInstance->PlaySmoothDown(CHANNEL_BGM, 0.0f, fTimeDelta * 0.1f);
+
+	Check_FinaleScene(fTimeDelta);
+
 }
 
 void CCamera_Main::Check_FinaleScene(_float fTimeDelta)
@@ -734,34 +736,26 @@ void CCamera_Main::Change_LevelTrigger()
 _int CCamera_Main::Tick(_float fTimeDelta)
 {
 
-	//타임 델타를 보정한다.
 	_float fRealTimeDelta = fTimeDelta;
 	if (.1f < fRealTimeDelta)
 		fRealTimeDelta = 1.f / 60.f;
 
 	System_Tick(fTimeDelta);
 
-	Check_FinaleScene(fTimeDelta);
-
 	Control(fRealTimeDelta);
 
-	//후보정 카메라 설정 값을 초기화한다.
+
 	Reset_DeferredCamSet();
 
-
-	//카메라 lock 되어 있는 경우, 다르게 계산
 	if (m_eCamLockMode != LOCK_END)
 		Compute_Set_CamLock(fRealTimeDelta);
 	else
 	{
-		m_eSpecialSeq == SEQ_END ?
-			//실제 타겟을 기준으로 업데이트하는 경우
-			Track_Anchor(fRealTimeDelta) :
-			//특정 시퀀스가 세팅되어 있는 경우
-			Play_Sequence(fRealTimeDelta);
+		m_eSpecialSeq != SEQ_END ?
+			Play_Sequence(fRealTimeDelta) :
+			Track_Anchor(fRealTimeDelta);
 	}
 
-	//후보정
 	Set_DeferredCamSet(fRealTimeDelta);
 
 
@@ -780,39 +774,26 @@ void CCamera_Main::Late_Tick(_float fTimeDelta)
 //타겟 위치로부터 카메라 위치를 갱신, 보간한다.
 void CCamera_Main::Track_Anchor(_float fTimeDelta)
 {
-
 	if (nullptr == m_pFirstTarget)
 		return;
 
-	//**** 타겟 위치를 만듬 ****//
+
 	Update_Anchor(fTimeDelta);
 
-
-	//**** 카메라 방향 설정 ****//
-
-	// 두 타겟을 잡을 때의 설정
 	if (m_eCamFocus == FOCUS_BOTH)
 		Compute_Set_BothFocus(fTimeDelta);
 	else if (m_eCamFocus == FOCUS_BATTLE)
 		Compute_Set_BattleFocus(fTimeDelta);
 	else if (m_eCamFocus == FOCUS_FINALBOSS)
 		Compute_Set_FinalBossFocus(fTimeDelta);
-	//트리거 안에 들어가 있을 경우 트리거 사이에서의 카메라 설정
 	else if (m_bLerpByTriggerInfo)
 		Compute_Set_Trigger(m_iMatrixIndex);
 
 
-	/////Dest 값 설정 끝
-
-	//**** 카메라 세팅 값 보간 ****//
 	Interpolate_CamSet(fTimeDelta);
 
-
-	//**** 목표 위치 마지막 저장 ****//
 	Update_CurCamPos(fTimeDelta);
 
-
-	//**** 목표 위치로 이동 ****//
 	MoveTo_CurCamPos_Interpolate(fTimeDelta);
 
 }
@@ -820,21 +801,17 @@ void CCamera_Main::Track_Anchor(_float fTimeDelta)
 
 void CCamera_Main::Play_Sequence(_float fTimeDelta)
 {
-
 	if (m_eSpecialSeq == SEQ_END)
 		return;
 
-	//시퀀스에서 특수한 이벤트를 체크하기 위한 시간
 	if (0.f < m_fSeqEventTime)
 	{
 		m_fSeqEventTime -= fTimeDelta;
 
-		//이벤트 충간 체크
 		switch (m_eSpecialSeq)
 		{
 		case SEQ_LUNCHTIME:
 		{
-			//4초 남았을 시
 			if (m_SeqEventTriggers[0] == true && m_fSeqEventTime < 4.f)
 			{
 				m_SeqEventTriggers[0] = false;
@@ -874,14 +851,12 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 			break;
 		}
 
-		//시퀀스 시간 다 깠았다~~
 		if (m_fSeqEventTime < 0.f)
 		{
 			m_fSeqEventTime = 0.f;
 
 			switch (m_eSpecialSeq)
 			{
-				//case SEQ_BREAKCARSHOP:
 			case SEQ_BREAKRACINGMAP:
 			{
 				m_pGameInstance->StopSound(CHANNEL_BGM);
@@ -945,19 +920,12 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 		}
 	}
 
-	//시퀀스 경과 시간 체크
 	m_fSeqCheckTime += fTimeDelta;
 
-
-	//예약 동작이 모두 끝나면 다시 기본 상태로 만든다.
 	if (m_CamSeq.empty() && abs(m_fSeqInterpolateTime.first - m_fSeqInterpolateTime.second) < .01f)
 	{
-
 		Set_AutoDOF(true);
 
-		CAMSEQ eSeq = m_eSpecialSeq;
-		//clear_sequ
-		m_eSpecialSeq = SEQ_END;
 		m_eCurSeqEase = EASE_END;
 		m_fSeqInterpolateTime = { 0.f, 0.f };
 		m_fSeqTotalTime = m_fSeqCheckTime;
@@ -966,42 +934,34 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 		m_fDestFovy = m_fFovy;
 		m_fDestZAngle = m_fCurZAngle;
 		m_fDestZoomOffset = m_fCurZoomOffset;
-
 		m_fDestDistance = m_fCurDistance = _float3::Distance(F4toF3(m_pFirstTarget->Get_State(CTransform::STATE_POSITION)), GET_POS);
 
-		//끝나고 목표 위치로 딱 맞춰주기
-		if (eSeq == SEQ_SIMBA_BATTLESTART
-			/*|| eSeq == SEQ_FINALECUT5*/)
+		if (m_eSpecialSeq == SEQ_SIMBA_BATTLESTART)
 		{
-			//카메라 세팅 스냅
 			Snap_CamSet(fTimeDelta);
-			//카메라가 갈 포지션 업데이트
 			Update_CurCamPos(fTimeDelta);
-			//바로 이동
 			MoveTo_CurCamPos_Absolute(fTimeDelta);
 		}
 
+		m_eSpecialSeq = SEQ_END;
 		return;
 	}
 
-	//예약 리스트의 잔여 시간을 모두 깎는다.
+
 	if (!m_CamSeq.empty())
 	{
 		for (auto& seqKey : m_CamSeq)
-		{
 			seqKey.fTime -= fTimeDelta;
-		}
-
-		//시간이 다 된, 앞쪽에 있는 동작 정보를 읽는다.
+		
 		if (m_CamSeq.front().fTime <= 0.f)
 		{
 			CAMACTION curAction = m_CamSeq.front();
-
 			Update_Anchor(fTimeDelta);
 
 			if (curAction.eCamCut == CUT_HARD)
 			{
 				m_eCamCut = CUT_HARD;
+	
 				if (!ISDEFAULTFLOAT3(curAction.vPos))
 				{
 					if (curAction.eCamPos == POS_RELATIVE)
@@ -1024,14 +984,11 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 					else
 						SET_POS(Pos(curAction.vPos));
 				}
-
-				// 카메라 액션의 x, y, z가 모두 default일 경우, 타겟 위치를 곧바로 쳐다본다.
 				if (ISDEFAULTFLOAT3(curAction.vDir))
 				{
 					m_pTransformCom->Look_At(Pos(m_vAnchor));
 					m_vDestCamDir = m_vCurCamDir = (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK);
 				}
-				//default가 아닐 경우, 설정된 방향으로 쳐다본다.
 				else
 				{
 					m_pTransformCom->Look_At_Axis(curAction.vDir);
@@ -1049,14 +1006,12 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 				if (!ISDEFAULTFLOAT(curAction.fZoomOffset))
 					m_fDestZoomOffset = m_fCurZoomOffset = curAction.fZoomOffset;
 			}
-			else
+			else if(curAction.eCamCut == CUT_INTERPOLATE)
 			{
 				m_eCamCut = CUT_INTERPOLATE;
 				m_eCurSeqEase = curAction.eEase;
-				//보간 시간을 계산할 친구를 초기화해준다.
 				m_fSeqInterpolateTime = { 0.f, curAction.fInterpolateSpeed };
 
-				//position O
 				if (!ISDEFAULTFLOAT3(curAction.vPos))
 				{
 					if (curAction.eCamPos == POS_RELATIVE)
@@ -1083,11 +1038,9 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 					m_vStartCamPos = GET_POS;
 				}
 				else
-				{
 					m_vDestCamPos = m_vStartCamPos = GET_POS;
-				}
+				
 
-				// 카메라 목표 방향 값이 default일 경우와 아닐 경우를 구별한다.
 				m_bSeqDestDirIsAbsolute = ISDEFAULTFLOAT3(curAction.vDir) ? false : true;
 
 				m_vStartCamDir = (_float3)m_pTransformCom->Get_State(CTransform::STATE_LOOK);
@@ -1099,10 +1052,8 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 					m_fDestFovy = ToRadian(curAction.fFOVY);
 				}
 				else
-				{
 					m_fDestFovy = m_fStartFovy = m_fFovy;
-				}
-
+				
 				if (!ISDEFAULTFLOAT(curAction.fZAngle))
 				{
 					m_fStartZAngle = m_fCurZAngle;
@@ -1122,12 +1073,9 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 		}
 	}
 
-
 	if (m_eCamCut != CUT_INTERPOLATE)
 		return;
 
-
-	//보간 카메라
 	if (m_fSeqInterpolateTime.first < m_fSeqInterpolateTime.second)
 	{
 		m_fSeqInterpolateTime.first += fTimeDelta;
@@ -1158,7 +1106,7 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	case EASE_INOUT_FAST:
 		fInterpolateRatio = EASE_INOUT_FAST(fInterpolateRatio);
 		break;
-	default: //그냥 Linear도 여기 포함
+	default:
 		break;
 	}
 
@@ -1185,10 +1133,6 @@ void CCamera_Main::Play_Sequence(_float fTimeDelta)
 	m_fCurZoomOffset = fZoomOffset;
 
 	MoveTo_CurCamPos_Absolute(fTimeDelta);
-
-
-	//SET_POS(Pos(m_vCurCamPos));
-	//m_pTransformCom->Look_At_Axis(m_vCurCamDir);
 
 }
 
@@ -1317,16 +1261,8 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 		m_fTriggerRatio = -1.f;
 		return;
 	}
-
+	
 	m_fTriggerRatio = SATURATE(vRatio);
-
-	//QZR  >> Y값 살짝 올리는거
-	if (*m_pCurrentLevelID == LEVEL_PARK && 3 == m_iMatrixIndex)
-	{
-		//_float4 vPos = GET_POS;
-		//SET_POS(_float4(vPos.x, vPos.y + 0.2f, vPos.z, 1.f));
-	}
-	;
 
 	m_vSlerpedDir = _float3::Lerp(m_vecFrontDirRadius[m_iMatrixIndex].first, m_vecRearDirRadius[m_iMatrixIndex].first, m_fTriggerRatio);
 	m_fLerpedRadius = LERP(m_vecFrontDirRadius[m_iMatrixIndex].second, m_vecRearDirRadius[m_iMatrixIndex].second, m_fTriggerRatio);
@@ -1335,7 +1271,7 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 	m_fDestDistance = m_fLerpedRadius;
 
 
-	//카메라 보는 기준점 위로 올려주는 놈
+	//카메라의 기준점을 위로 한 번 더 올린다.
 	if (*m_pCurrentLevelID == LEVEL_INTRO
 		|| *m_pCurrentLevelID == LEVEL_PARTTIME
 		|| *m_pCurrentLevelID == LEVEL_PARK
@@ -1352,8 +1288,6 @@ void CCamera_Main::Compute_Set_Trigger(_int iTriggerIndex)
 		Set_TargetAnchor({ 0.f, 0.f, 0.f });
 	}
 
-	// = { 0.f, 0.f, 0.f, .15f, .15f, 0.f, 0.f, 0.f }
-	//m_fDestUpOffset = m_CamTriggerUpOffsets[m_iMatrixIndex];
 }
 
 void CCamera_Main::EmplaceBackCamMatrix(const _float4x4& matWorld)
@@ -1373,10 +1307,9 @@ _float CCamera_Main::Compute_TriggerPosRatio(_int iTriggerIndex)
 	if (m_vecTriggerInfo.empty())
 		return _float();
 
+	_float3 vWorldTargetPos = Make_TargetPos();
 
-	_float3 vLocalTargetPos = Make_TargetPos();
-
-	_float fZ = _float3::Transform(vLocalTargetPos, m_vecTriggerInfo[iTriggerIndex].first).z;
+	_float fZ = _float3::Transform(vWorldTargetPos, m_vecTriggerInfo[iTriggerIndex].first).z;
 
 	// rear : 0, middle : 0.5, front: 1
 	_float fRatio = 0.5f * fZ + 0.5f;
@@ -1394,25 +1327,19 @@ _vector CCamera_Main::SlerpDirVec(_fvector vStart, _fvector vEnd, _float fRatio)
 }
 
 
-//일련의 동작을 하나의 시퀀스로 선예약한다.
 void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 {
 	if (SEQ_END <= eSeq)
 		return;
 
-
-	//기존 시퀀스가 있었다면, 지우기
 	if (!m_CamSeq.empty())
-	{
-		//m_fSeqPlayedTime = m_fSeqCheckTime;
 		m_CamSeq.clear();
-	}
 
-	//해당 시퀀스를 명시적으로 변수로 저장!
+
 	m_eSpecialSeq = eSeq;
 	m_fSeqCheckTime = 0.f;
-	//오토 dof 끄기
 	Set_AutoDOF(false);
+
 
 	switch (eSeq)
 	{
@@ -1503,7 +1430,6 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 	}
 	break;
 
-	//본 컷신 시작
 	case SEQ_INTRO:
 	{
 		CAMACTION newAction = {};
@@ -2071,7 +1997,7 @@ void CCamera_Main::Make_Sequence(CAMSEQ eSeq)
 		m_fSeqEventTime = fLastSeqStartTime;
 
 		//보스 정면으로
-		vStartPos = { 0.f, 35.f, -3.f } + _float3{ 0.f, 0.f, 80.f };
+		vStartPos = _float3{ 0.f, 35.f, -3.f } + _float3{ 0.f, 0.f, 80.f };
 		Fill_HardCutSet(newAction, fLastSeqStartTime);
 
 		Fill_ActionPos(newAction, POS_ABSOLUTE, vStartPos);
@@ -3159,31 +3085,21 @@ void CCamera_Main::Move_ForTrigger(_float fTimeDelta, _float3 vPos, _float3 vDir
 
 void CCamera_Main::Update_Anchor(_float fTimeDelta)
 {
-
 	if (nullptr == m_pFirstTarget)
 	{
 		m_vAnchor = _float3(ZeroVecPos);
 		return;
 	}
 
-	//타겟 위치를 정한다.
 	_float4 vTargetPos = Make_TargetPos();
 
-
-	//실제 타겟 위치에서 조금 위로 기준점 정하기
 	_float fYOffset = m_fCurUpOffset + (m_fCurDistance / 40.f);
 	_float3 vAnchorOffset = _float3();
 
-	//설정한 anchor 기준점
-	//if (m_eCamFocus != FOCUS_FINALE)
-	{
-		_float4x4 RotMat = m_pFirstTarget->Get_WorldMatrix();
-		RotMat._41 = RotMat._42 = RotMat._43 = 0.f;
-		vAnchorOffset = CUtils::Make_Local_ToWorld(m_vAnchorOffset, RotMat);
-	}
+	_float4x4 RotMat = m_pFirstTarget->Get_WorldMatrix();
+	RotMat.Translation({ 0.f, 0.f, 0.f });
+	vAnchorOffset = CUtils::Make_Local_ToWorld(m_vAnchorOffset, RotMat);
 
-
-	//기준점 저장
 	m_vAnchor = F4toF3(vTargetPos) + vAnchorOffset + _float3(0.f, fYOffset, 0.f);
 }
 
@@ -3191,47 +3107,39 @@ _float3 CCamera_Main::Make_TargetPos()
 {
 	_float3 vTargetPos = _float3();
 
-	//첫번째 타겟 포커스
 	if (m_eCamFocus == FOCUS_FIRST)
 	{
 		vTargetPos = (_float3)m_pFirstTarget->Get_State(CTransform::STATE_POSITION);
-		//지형 위치를 구하여 같이 쓰기
 		_float4 vTerrainPos = static_cast<CCharacter*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
 
 		if (vTerrainPos.y != 0.f && m_eCamFocus != FOCUS_BOTH)
 			vTargetPos.y = (vTargetPos.y + vTerrainPos.y) * .5f;
 	}
-	//두번째 타겟 포커스
 	else if (m_eCamFocus == FOCUS_SECOND)
 		vTargetPos = (_float3)m_pSecondTarget->Get_State(CTransform::STATE_POSITION);
-	//두 타겟 사이의 중심 포커스
 	else if (m_eCamFocus == FOCUS_BOTH)
 	{
 		vTargetPos =
 			(_float3)m_pFirstTarget->Get_State(CTransform::STATE_POSITION)
 			+ (m_pSecondTarget->Get_State(CTransform::STATE_POSITION) - m_pFirstTarget->Get_State(CTransform::STATE_POSITION)) * m_fBothFocusRatio;
 	}
-	//마지막 보스용 포커스
 	else if (m_eCamFocus == FOCUS_FINALBOSS)
 	{
 		vTargetPos = (_float3)m_pFirstTarget->Get_State(CTransform::STATE_POSITION);
 
-		//지형 위치를 구하여 같이 쓰기
 		_float4 vTerrainPos = static_cast<CCharacter*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0))->Compute_TerrainPosition();
 
-		(*m_pCurrentLevelID == LEVEL_SIMBA)?
-				vTargetPos.y = 2.3f
-			:	vTargetPos.y = 0.f;
+		(*m_pCurrentLevelID == LEVEL_SIMBA) ?
+			vTargetPos.y = 2.3f
+			: vTargetPos.y = 0.f;
 
 	}
-	//피날레 카메라 포커스
 	else if (m_eCamFocus == FOCUS_FINALE)
 	{
 		CFinaleKirby* pKirby = dynamic_cast<CFinaleKirby*>(m_pGameInstance->Get_GameObject(*m_pCurrentLevelID, TEXT("Layer_Player"), 0));
 		if (nullptr != pKirby)
 			vTargetPos = (_float3)pKirby->m_vBonePos;
 	}
-	//피날레 배틀 포커스
 	else if (m_eCamFocus == FOCUS_BATTLE)
 	{
 		CFinaleKirby* pKirby = FINALEKIRBY;
@@ -3242,8 +3150,7 @@ _float3 CCamera_Main::Make_TargetPos()
 		CHECK_NULLPTR(pBoss);
 		_float3 vBossPos = (_float3)pBoss->Get_RootPos();
 
-		//vTargetPos = vKirbyPos * (1.f - m_fBothFocusRatio) + vBossPos * (m_fBothFocusRatio);
-		vTargetPos = vKirbyPos * .5f + vBossPos * .5f + _float3{ 0.f, -10.f, 0.f };
+		vTargetPos = (vKirbyPos * .5f) + (vBossPos * .5f) + _float3{ 0.f, -10.f, 0.f };
 	}
 
 	return vTargetPos;

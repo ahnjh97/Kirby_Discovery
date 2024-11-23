@@ -24,7 +24,7 @@ public:
 private:	
 	HRESULT Ready_Fonts();
 	HRESULT Ready_Object_For_Static();
-	HRESULT Ready_Prototype_Component_For_Static();
+	HRESULT Ready_Prototype_Effect();
 
 #ifdef _DEBUG
 	void	Render_RTVFonts();

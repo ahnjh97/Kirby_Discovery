@@ -94,7 +94,6 @@ void CEffect::Reset_Duration()
 void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData)
 {
 
-
 	pFXData->iNameStrLen = (_uint)m_strFXName.size();
 	pFXData->strName = m_strFXName;
 
@@ -127,8 +126,6 @@ void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData)
 
 	pFXData->fRimLightThreshold = m_fRimLightThreshold;
 	pFXData->vContinuousRotation = m_vContinuousRotation;
-	if (m_vContinuousRotation.y != 0.f)
-		int a = 0;
 
 	pFXData->iPropertyMapNum = m_Keyframes.size();
 
@@ -140,10 +137,15 @@ void CEffect::Fill_SaveData(_Out_ SINGLE_FX_DATA* pFXData)
 
 	pFXData->eRenderGroup = m_eRenderGroup;
 	pFXData->eTimer = m_eTimer;
-	if (m_eTimer == TIMER_SECOND)
-		int a = 0;
+
 }
 
+void CEffect::Fill_SaveData(_Out_ MULTI_FX_DATA* pFXData)
+{
+}
+void CEffect::Fill_SaveData(_Out_ PARTICLE_DATA* pFXData)
+{
+}
 void CEffect::Add_Keyframe(FX_KEYFRAME& newKeyframe, KF_PROPERTY eProperty)
 {
 	auto iter = lower_bound(m_Keyframes[eProperty].begin(), m_Keyframes[eProperty].end(), newKeyframe,
@@ -190,11 +192,6 @@ _bool CEffect::Calculate_Duration(_float _fTimeDelta)
 	{
 		m_fDuration.first = m_fDuration.second;
 
-		//if (m_fDuration.second == FX_MAXDURATION)
-		//{
-		//	m_fDuration.first = 0.f;
-		//	return false;
-		//}
 		return true;
 	}
 	return false;
@@ -205,12 +202,9 @@ _bool CEffect::Calculate_Lifetime(_float _fTimeDelta)
 	if (m_fDuration.first < m_fLifetime.first)
 		return false;
 
-	//if (m_fLifeRatio <= .01f)
-	//	int a = 0;
-
-	if (m_fLifetime.second< m_fDuration.first)
+	if (m_fLifetime.second < m_fDuration.first)
 	{
-		if (m_bIsLoop/* || m_fDuration.second == FX_MAXDURATION*/)
+		if (m_bIsLoop)
 		{
 			_float fLength = m_fLifetime.second - m_fLifetime.first;
 			m_fLifetime.first += fLength;
@@ -219,7 +213,6 @@ _bool CEffect::Calculate_Lifetime(_float _fTimeDelta)
 		else
 		{
 			m_fLifeRatio = 1.f;
-			//m_fLifetime.first = m_fLifetime.second;
 			return true;
 		}
 	}
@@ -229,19 +222,16 @@ _bool CEffect::Calculate_Lifetime(_float _fTimeDelta)
 	return false;
 }
 
-_float3 CEffect::Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY eProperty, _bool bIsInEditor)
+_float3 CEffect::Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY eProperty)
 {
 	vector<FX_KEYFRAME>& curKeyframes = m_Keyframes[eProperty];
 	_float3 vResultValue = curKeyframes[0].vValue;
 
-	//지금 키프레임이 마지막 키프레임?
 	if (curKeyframes.size() - 1 <= m_iCurKeyframeIdxs[eProperty])
 	{
 		if (m_bIsLoop)
-		{
 			m_iCurKeyframeIdxs[eProperty] = 0;
-		}
-		//루프하지 않는다면, 마지막 키프레임 값으로 제한한다.
+		
 		else
 		{
 			vResultValue = curKeyframes.back().vValue;
@@ -249,21 +239,16 @@ _float3 CEffect::Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY ePropert
 		}
 	}
 
-	//현재 lifetime이 현재 키프레임 시간보다 작거나, 다음 키프레임 시간보다 클 때 보정
 	if (curKeyframes[m_iCurKeyframeIdxs[eProperty] + 1].fTimeRatio <= m_fLifeRatio ||
 		m_fLifeRatio <= curKeyframes[m_iCurKeyframeIdxs[eProperty]].fTimeRatio)
 	{
-
 		_uint iTempIdx = 0;
-		while (iTempIdx < curKeyframes.size() - 1 &&
-			curKeyframes[iTempIdx + 1].fTimeRatio <= m_fLifeRatio)
+		while (iTempIdx < curKeyframes.size() - 1 && curKeyframes[iTempIdx + 1].fTimeRatio <= m_fLifeRatio)
 			++iTempIdx;
-
 
 		m_iCurKeyframeIdxs[eProperty] = iTempIdx;
 	}
 
-	//마지막 키프레임이면 하지마!!
 	if (curKeyframes.size() - 1 <= m_iCurKeyframeIdxs[eProperty])
 	{
 		vResultValue = curKeyframes[m_iCurKeyframeIdxs[eProperty]].vValue;
@@ -271,11 +256,9 @@ _float3 CEffect::Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY ePropert
 	}
 
 
-	//진~짜 보간합니다 레츠고
 	_float fCurKFRatio = curKeyframes[m_iCurKeyframeIdxs[eProperty]].fTimeRatio;
 	_float fNextKFRatio = curKeyframes[m_iCurKeyframeIdxs[eProperty] + 1].fTimeRatio;
-
-	_float fInterpolateRatio = (m_fLifeRatio - fCurKFRatio) / (fNextKFRatio - fCurKFRatio); //비율을 구한다.
+	_float fInterpolateRatio = (m_fLifeRatio - fCurKFRatio) / (fNextKFRatio - fCurKFRatio);
 
 	switch (curKeyframes[m_iCurKeyframeIdxs[eProperty]].eEasing)
 	{
@@ -297,7 +280,7 @@ _float3 CEffect::Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY ePropert
 	case EASE_INOUT_FAST:
 		fInterpolateRatio = EASE_INOUT_FAST(fInterpolateRatio);
 		break;
-	default: //그냥 Linear도 여기 포함
+	default:
 		break;
 	}
 
@@ -306,12 +289,12 @@ _float3 CEffect::Calculate_CurValue_Lerp(_float fTimeDelta, KF_PROPERTY ePropert
 	return vResultValue;
 }
 
-_float4 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProperty, _bool bIsInEditor)
+_float4 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProperty)
 {
 	vector<FX_KEYFRAME>& curKeyframes = m_Keyframes[eProperty];
 	_float4 vResultValue = curKeyframes[0].vValue;
 
-	//지금 키프레임이 마지막 키프레임?
+	//지금 키프레임이 마지막 키프레임인가?
 	if (curKeyframes.size() - 1 <= m_iCurKeyframeIdxs[eProperty])
 	{
 		if (m_bIsLoop)
@@ -321,8 +304,6 @@ _float4 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProper
 		//루프하지 않는다면, 마지막 키프레임 값으로 제한한다.
 		else
 		{
-			//vResultValue = curKeyframes.back().vValue;
-
 			vResultValue = Quaternion::CreateFromYawPitchRoll(curKeyframes.back().vValue);
 			return vResultValue;
 		}
@@ -341,12 +322,12 @@ _float4 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProper
 		m_iCurKeyframeIdxs[eProperty] = iTempIdx;
 	}
 
-	//마지막 키프레임이면 하지마!!
+	//마지막 키프레임이면 키프레임 값을 그대로 반환
 	if (curKeyframes.size() - 1 <= m_iCurKeyframeIdxs[eProperty])
 		return vResultValue;
 
 
-	//진~짜 보간합니다 레츠고
+	//실제 비율 계산
 	_float fCurKFRatio = curKeyframes[m_iCurKeyframeIdxs[eProperty]].fTimeRatio;
 	_float fNextKFRatio = curKeyframes[m_iCurKeyframeIdxs[eProperty] + 1].fTimeRatio;
 
@@ -372,14 +353,16 @@ _float4 CEffect::Calculate_CurValue_Slerp(_float fTimeDelta, KF_PROPERTY eProper
 	case EASE_INOUT_FAST:
 		fInterpolateRatio = EASE_INOUT_FAST(fInterpolateRatio);
 		break;
-	default: //그냥 Linear도 여기 포함
+	default: //단순 Linear 그래프
 		break;
 	}
+
 
 	_float3 vFirstRadian{ curKeyframes[m_iCurKeyframeIdxs[eProperty]].vValue };
 	vFirstRadian = { ToRadian(vFirstRadian.x), ToRadian(vFirstRadian.y) , ToRadian(vFirstRadian.z) };
 	_float3 vSecondRadian{ curKeyframes[m_iCurKeyframeIdxs[eProperty] + 1].vValue };
 	vSecondRadian = { ToRadian(vSecondRadian.x), ToRadian(vSecondRadian.y) , ToRadian(vSecondRadian.z) };
+
 
 	Quaternion vFirstQuat, vSecondQuat, vResultQuat;
 	vFirstQuat = Quaternion::CreateFromYawPitchRoll(vFirstRadian);

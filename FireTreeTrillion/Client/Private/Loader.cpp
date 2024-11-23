@@ -511,7 +511,7 @@ HRESULT CLoader::Loading_ObjectAll()
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("DeePart"), CDee_Part);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("FoodShopDee"), CFoodShopDee);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("HungryDee"), CHungryDee);
-	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OriginalDee"), COriginalDee);
+	ADD_GAMEOBJECT_PROTOTYPE(TEXT("OriginalDee"), CTownDee);
 	ADD_GAMEOBJECT_PROTOTYPE(TEXT("BattleDee"), CBattleDee);
 
 	//Boss

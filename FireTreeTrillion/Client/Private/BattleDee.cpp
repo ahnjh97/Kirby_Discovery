@@ -6,6 +6,8 @@
 #include "Dee_State.h"
 #include "EventCenter.h"
 
+
+const _float fLowYPoint{ -50.f };
 vector<_float3> CBattleDee::m_RespawnPoints =
 {
 	{-16.f, 24.f, 23.f},
@@ -36,11 +38,8 @@ pair<DEE_ANIM, _bool> CBattleDee::Make_WhatToDo()
 	else if (Get_State() == DEEANIM_ENEMYJUMPSTART)
 		return  { DEEANIM_FIND, false };
 
-	//목표 지점과의 거리가 가깝다면 디디디 주변
 	if (_float3::Distance(GET_POS, Make_DestPos()) < 6.f)
 		eDeeState = DEEANIM_TROUBLE;
-
-	//아니라면, 다시 달리기
 	else
 	{
 		_float fPercentage = CUtils::Make_RandomFloat(1.f, 100.f);
@@ -50,11 +49,8 @@ pair<DEE_ANIM, _bool> CBattleDee::Make_WhatToDo()
 			DEEANIM_ANGERRUN;
 
 		if (m_bStartBattle && eDeeState == DEEANIM_ANGERRUN)
-		{
 			m_bTrackKirby = (_bool)CUtils::Make_RandomInt(0, 1);
-		}
 	}
-
 
 	Set_DeeEyeState(DEEEYE_SADNESS);
 	return { eDeeState, true };
@@ -161,17 +157,14 @@ void CBattleDee::Late_Tick(_float fTimeDelta)
 		m_pModelCom->Play_Animation(m_fAccTime);
 
 
-	//움직임 체크 시간이 3초 이상 지났을 때, 움직임이 없거나 벼랑 끝으로 떨어짐
-	if (3.f < m_fNonMoveTime && (m_fMovedDistance < .5f || _float3(GET_POS).y < -50.f)
-		//절두체 밖으로 컬링되었다면,
-		&& !m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 2.0f))
+
+	if (3.f < m_fNonMoveTime &&
+		(m_fMovedDistance < .5f || _float3(GET_POS).y < fLowYPoint) &&
+		!m_pGameInstance->isInFrustum_WorldSpace(m_pTransformCom->Get_State(CTransform::STATE_POSITION), 2.0f))
 	{
-
-
 		vector<_float3> respawnPoints = m_RespawnPoints;
 		_uint iPointIdx = CUtils::Make_RandomInt(0, respawnPoints.size() - 1);
 
-		//리스폰 포인트 중 절두체 밖으로 나간 포인트를 찾는다.
 		while (!respawnPoints.empty())
 		{
 			if (!m_pGameInstance->isInFrustum_WorldSpace(respawnPoints[iPointIdx], 2.0f))
@@ -185,16 +178,14 @@ void CBattleDee::Late_Tick(_float fTimeDelta)
 			iPointIdx = CUtils::Make_RandomInt(0, respawnPoints.size() - 1);
 		}
 
-		//빌 때까지 돌았다면 아무런 리스폰 지점도 남지 않았다. return
 		if (respawnPoints.size() <= 0)
 			return;
 
-		_float3 vRespawnPos = Make_DestPos() + _float3{ 0.f, 10.f, 0.f };
+		_float3 vRespawnPos = respawnPoints[iPointIdx] + _float3{ 0.f, 10.f, 0.f };
 		m_pControllerCom->Set_Position(m_pTransformCom, Pos(vRespawnPos));
 		Change_State(DEEANIM_ANGERRUN, 60.f, true, true);
 
 		m_fNonMoveTime = m_fMovedDistance = 0.f;
-
 	}
 
 	m_vPrePos = GET_POS;

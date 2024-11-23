@@ -819,9 +819,7 @@ void CDee_NPC_State::Free()
 #pragma endregion
 
 #pragma region HUNGRY STATE
-//*********************************
-//			 HUNGRY STATE
-//*********************************
+
 CDee_Hungry_State::CDee_Hungry_State()
 {
 }

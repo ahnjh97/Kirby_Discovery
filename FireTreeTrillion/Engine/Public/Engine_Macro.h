@@ -8,6 +8,8 @@
 
 #define GRAVITY 9.81f
 
+#define FX_MAXDURATION 99.f
+
 //FOR COLLISION GROUP
 #define	PASSING_GROUP 50
 

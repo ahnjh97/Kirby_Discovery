@@ -40,7 +40,7 @@ HRESULT CMainApp::Initialize()
 		return E_FAIL;
 
 	//loader�� Loading_StaticComponentAll() �� �ű�
-	if (FAILED(Ready_Prototype_Component_For_Static()))
+	if (FAILED(Ready_Prototype_Effect()))
 		return E_FAIL;
 
 	if (FAILED(Open_Level(LEVEL_LOGO)))
@@ -236,16 +236,14 @@ HRESULT CMainApp::Open_Level(LEVEL eLevelID)
 	return	S_OK;
 }
 
-HRESULT CMainApp::Ready_Prototype_Component_For_Static()
+HRESULT CMainApp::Ready_Prototype_Effect()
 {
-
 	HRESULT hr;
-
 	
 	path FXPath("../Bin/Resources/Effects/Single/");
 	if (!exists(FXPath) || !is_directory(FXPath))
 	{
-		ALARM_FAIL("싱글이펙트 로드 망함");
+		ALARM_FAIL("단일 이펙트 로드 실패");
 		return E_FAIL;
 	}
 
@@ -293,14 +291,10 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 
 
 		wstring wstrProtoName = { TEXT("Prototype_GameObject_") + CUtils::StrToWstr(strname) };
-
 		hr = m_pGameInstance->Add_Prototype(wstrProtoName, CSingleEffect::Create(m_pDevice, m_pContext, FXDesc));
 		CHECK_FAILED(hr);
 
-
-		//Make_Effect(FXData);
 	}
-
 
 	
 	FXPath = "../Bin/Resources/Effects/Particle/";
@@ -309,7 +303,6 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		ALARM_FAIL(TEXT("fail"));
 		return E_FAIL;
 	}
-
 
 	for (auto& entry : directory_iterator(FXPath))
 	{
@@ -404,7 +397,6 @@ HRESULT CMainApp::Ready_Prototype_Component_For_Static()
 		return E_FAIL;
 	}
 
-	//멀티 이펙트
 	for (auto& entry : directory_iterator(FXPath))
 	{
 		auto& filePath = entry.path();

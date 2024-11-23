@@ -10,12 +10,12 @@ END
 
 BEGIN(Client)
 
-class COriginalDee final : public CWaddleDee
+class CTownDee final : public CWaddleDee
 {
 private:
-	COriginalDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	COriginalDee(const COriginalDee& rhs);
-	virtual ~COriginalDee() = default;
+	CTownDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CTownDee(const CTownDee& rhs);
+	virtual ~CTownDee() = default;
 
 public:
 	static pair<_float3, vector<TOWN_POINT_INFO>> m_TownPoints;
@@ -60,7 +60,7 @@ private:
 
 	void Draw_TownPoints();
 public:
-	static COriginalDee* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CTownDee* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 };

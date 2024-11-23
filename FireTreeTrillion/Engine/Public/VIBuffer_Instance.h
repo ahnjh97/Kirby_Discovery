@@ -109,7 +109,6 @@ protected:
 	_uint					m_iInstanceStride = { 0 };
 	_uint					m_iNumInstance = { 0 };
 	_uint					m_iIndexCountPerInstance = { 0 };
-	VTXMATRIX*				m_pInstanceVertices = { nullptr };
 	INSTANCE_DESC			m_InstanceDesc{};
 
 protected:
@@ -122,46 +121,30 @@ protected:
 
 	_float						m_fRemainedDuration = { 0.f };
 
-	//파싱 변수들
-	_float2*					m_pLifeTimes = { nullptr };
 
+	VTXMATRIX*					m_pInstanceVertices = { nullptr };
+
+	_float2*					m_pLifeTimes = { nullptr };
 	_float3*					m_pDirections = { nullptr };
 	_float*						m_pSpeeds = { nullptr };
-
 	_float3*					m_pColors = { nullptr };
 	_float3*					m_pTargetColors = { nullptr };
-
 	_float*						m_pAlphas = { nullptr };
-
-	// Orbit 도는 속도 (Degree값) 랜덤 필요함
 	_float*						m_pOrbitSpeed = { nullptr };
 	_float*						m_pTurnSpeed = { nullptr };
-
 	_float*						m_pStartDelays = { nullptr };
-
 	_float*						m_pAccSupplyAmount = { nullptr };
 	_float*						m_pOrbitSupplyAmount = { nullptr };
 	_float*						m_pTurnSupplyAmount = { nullptr };
 
-
-	//나머지 계산용 변수들
 	_float3*					m_pInitialScales = { nullptr };
 	_float*						m_pInitialSpeeds = { nullptr };
-
-	// 로컬을 위한 위치
 	_float3*					m_pPrePositions = { nullptr };
 	_float3*					m_pPreWorldPositions = { nullptr };
-
 	_float3*					m_pVelocities = { nullptr };
-
 	_float3*					m_pPreAxis = { nullptr };
-
 	_float*						m_fGravity = { nullptr };
 	
-
-	//void	Update_Buffer(_uint _iNumInstance);
-
-
 public:
 	virtual CComponent* Clone(void* pArg) = 0;
 	virtual void Free() override;

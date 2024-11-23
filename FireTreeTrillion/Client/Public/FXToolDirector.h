@@ -34,6 +34,7 @@ public:
 	CEffect* Find_Effect(string strEffectName);
 	
 	HRESULT Save_AllEffect();
+
 	HRESULT Save_Effect(CEffect* pEffect, const wstring& strFileName);
 	HRESULT Save_Particle(CEffect* pEffect, const wstring& strFileName);
 	HRESULT Save_MultiEffect(CEffect* pEffect, const wstring& strFileName);
