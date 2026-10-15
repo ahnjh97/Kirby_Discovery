@@ -219,6 +219,9 @@ void COcTree::Culling(CGameInstance* pGameInstance, CShader* pMapShader, CShader
 			iInFrustum++;
 	}
 
+	if (iInFrustum == 0)
+		return;
+
 	if (iInFrustum >= OC_END || nullptr == m_vecChildren[OC_XYZ]) {
 		RenderAll(pGameInstance, pMapShader, pNonAnimShader, pAnimShader);
 		iRenderAll++;
